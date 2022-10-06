@@ -5,25 +5,23 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
-    "start": "webpack-dev-server --port 8080",
-    "start:dev": "webpack-dev-server --watch --mode=development --inline --port 8080"
+    "start": "webpack-dev-server --port 8080"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@babylonjs/core": "preview",
-    "@babylonjs/inspector": "preview",
     "@babylonjs/gui": "preview",
+    "@babylonjs/inspector": "preview",
     "@babylonjs/loaders": "preview",
     "@types/node": "^17.0.12",
+    "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^11.0.0",
     "ts-loader": "^9.2.6",
     "typescript": "^4.5.4",
     "webpack": "^5.66.0",
     "webpack-cli": "^4.9.1",
-    "webpack-dev-server": "^4.7.4",
-    "html-loader": "^1.1.0",
-    "html-webpack-plugin": "^4.3.0",
-    "clean-webpack-plugin": "^3.0.0"
+    "webpack-dev-server": "^4.7.4"
   },
   "dependencies": {
     "babylonjs": "preview",
@@ -32,7 +30,6 @@
     "babylonjs-materials": "preview",
     "babylonjs-procedural-textures": "preview",
     "colyseus.js": "^0.15.0-preview.2",
-    "copy-webpack-plugin": "^10.2.4",
     "dotenv-webpack": "^7.0.3"
   }
 }

@@ -1,13 +1,13 @@
 const path = require("path");
 const fs = require('fs');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const appDirectory = fs.realpathSync(process.cwd());
+const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
     entry: path.resolve(appDirectory, "src/app.ts"),
     output: {
         //name for the js file that is created/compiled in memory
-        filename: 'js/hanabiBundle.js',
+        filename: 'js/bundle.js',
         clean: true, // Clean the output directory before emit.
     },
     resolve: {
@@ -19,7 +19,8 @@ module.exports = {
         static: {
             directory: path.join(__dirname, 'public'),
         },
-        compress: true,
+        watchFiles: ['src/**/*.ts', 'public/**/*'],
+        liveReload: true,
         port: 8080,
     },
     module: {
@@ -34,9 +35,10 @@ module.exports = {
         ]
     },
     plugins: [
-        new HtmlWebpackPlugin({
-            inject: true,
-            template: path.resolve(appDirectory, "public/index.html")
+        new CopyPlugin({
+            patterns: [
+                { from: "public", to: "./" },
+            ],
         }),
     ],
     mode: "development"
