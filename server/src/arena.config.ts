@@ -7,6 +7,9 @@ export default Arena({
     getId: () => "BabylonJS and Colyseus Demo Server",
 
     initializeGameServer: (gameServer) => {
+        /**
+         * Define your room handlers:
+         */
         gameServer.define('my_room', MyRoom);
     },
 
@@ -15,9 +18,17 @@ export default Arena({
             res.send("Server ready!");
         });
 
+        /**
+         * Bind @colyseus/monitor
+         * It is recommended to protect this route with a password.
+         * Read more: https://docs.colyseus.io/tools/monitor/
+         */
         app.use("/colyseus", monitor());
     },
 
     beforeListen: () => {
+        /**
+         * Before before gameServer.listen() is called.
+         */
     }
 });
