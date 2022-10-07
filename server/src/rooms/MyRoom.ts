@@ -46,11 +46,10 @@ export class MyRoom extends Room<MyRoomState> {
             username: btoa(Math.random().toString()).substring(10,15)
         });
 
-        // place Player at a random position in the floor
-        const FLOOR_SIZE = 500;
-        player.xPos = -(FLOOR_SIZE/2) + (Math.random() * FLOOR_SIZE);
-        player.yPos = -1;
-        player.zPos = -(FLOOR_SIZE/2) + (Math.random() * FLOOR_SIZE);
+        // place at initial position
+        player.xPos = 0;
+        player.yPos = 0;
+        player.zPos = 0;
 
         // place player in the map of players by its sessionId
         // (client.sessionId is unique per connection!)
@@ -103,6 +102,7 @@ export class MyRoom extends Room<MyRoomState> {
     registerForMessages() {
 
         this.onMessage("entityUpdate", (client, entityUpdateArray) => {
+            logger.silly(`Received entityUpdate from ${client.id}`);
             this.onEntityUpdate(client.id, entityUpdateArray);
         });
 
