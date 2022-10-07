@@ -1,4 +1,4 @@
-import { Scene, Mesh, Vector3, Color3, TransformNode, SceneLoader, ParticleSystem, Color4, Texture, PBRMetallicRoughnessMaterial, VertexBuffer, AnimationGroup, Sound, ExecuteCodeAction, ActionManager, Tags } from "@babylonjs/core";
+import { Scene, Mesh, Vector3, Color3, TransformNode, SceneLoader, MeshBuilder, ParticleSystem, Color4, Texture, PBRMetallicRoughnessMaterial, VertexBuffer, AnimationGroup, Sound, ExecuteCodeAction, ActionManager, Tags } from "@babylonjs/core";
 import { Lantern } from "./lantern";
 import { Player } from "./characterController";
 
@@ -99,6 +99,9 @@ export class Environment {
     //Load all necessary meshes for the environment
     public async _loadAsset() {
         //loads game environment
+
+        const plane = MeshBuilder.CreatePlane("plane", { "width": 100, "height": 100 }, this._scene); //scene is 
+
         const result = await SceneLoader.ImportMeshAsync(null, "./models/", "envSetting.glb", this._scene);
 
         let env = result.meshes[0];
@@ -124,6 +127,7 @@ export class Environment {
 
         return {
             env: env,
+            plane: plane,
             allMeshes: allMeshes,
             lantern: lantern as Mesh,
             animationGroups: animGroup

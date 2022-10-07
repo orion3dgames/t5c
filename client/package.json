@@ -10,11 +10,16 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@babylonjs/core": "preview",
-    "@babylonjs/gui": "preview",
-    "@babylonjs/inspector": "preview",
-    "@babylonjs/loaders": "preview",
+    "@babylonjs/core": "latest",
+    "@babylonjs/gui": "latest",
+    "@babylonjs/inspector": "latest",
+    "@babylonjs/loaders": "latest",
+    "@babylonjs/gui-editor": "latest",
+    "@babylonjs/materials": "latest",
+    "@babylonjs/serializers": "latest",
     "@types/node": "^17.0.12",
+    "@types/react": "16.7.3",
+    "@types/react-dom": "16.0.9",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^11.0.0",
     "ts-loader": "^9.2.6",
@@ -24,11 +29,11 @@
     "webpack-dev-server": "^4.7.4"
   },
   "dependencies": {
-    "babylonjs": "preview",
-    "babylonjs-gui": "preview",
-    "babylonjs-loaders": "preview",
-    "babylonjs-materials": "preview",
-    "babylonjs-procedural-textures": "preview",
+    "babylonjs": "latest",
+    "babylonjs-gui": "latest",
+    "babylonjs-loaders": "latest",
+    "babylonjs-materials": "latest",
+    "babylonjs-procedural-textures": "latest",
     "colyseus.js": "^0.15.0-preview.2",
     "dotenv-webpack": "^7.0.3"
   }
