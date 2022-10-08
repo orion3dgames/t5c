@@ -2,6 +2,7 @@ import Arena from "@colyseus/arena";
 import { monitor } from "@colyseus/monitor";
 
 import { MyRoom } from "./rooms/MyRoom";
+import { LobbyRoom } from "@colyseus/core";
 
 export default Arena({
     getId: () => "BabylonJS and Colyseus Demo Server",
@@ -10,7 +11,10 @@ export default Arena({
         /**
          * Define your room handlers:
          */
-        gameServer.define('my_room', MyRoom);
+        gameServer.define('lobby', LobbyRoom);
+
+        // Expose your game room with realtime listing enabled.
+        gameServer.define("my_room", MyRoom).enableRealtimeListing();
     },
 
     initializeExpress: (app) => {

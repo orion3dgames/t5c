@@ -1,4 +1,4 @@
-import { Room, Client } from "@colyseus/core";
+import { Room, Client, updateLobby } from "@colyseus/core";
 import { MyRoomState, Player } from "./schema/MyRoomState";
 
 import logger = require("../helpers/logger");
@@ -32,6 +32,18 @@ export class MyRoom extends Room<MyRoomState> {
         this.setSimulationInterval(dt => {
             this.state.serverTime += dt;
         });
+
+        //
+        // This is just a demonstration
+        // on how to call `updateLobby` from your Room
+        //
+        this.clock.setTimeout(() => {
+
+            this.setMetadata({
+            customData: "Hello world!"
+            }).then(() => updateLobby(this));
+    
+        }, 5000);
         
     }
 
@@ -43,7 +55,7 @@ export class MyRoom extends Room<MyRoomState> {
         const player = new Player().assign({
             id: client.id,
             timestamp: this.state.serverTime,
-            username: btoa(Math.random().toString()).substring(10,15)
+            username: Math.random().toString().substring(10,15)
         });
 
         // place at initial position
@@ -55,7 +67,7 @@ export class MyRoom extends Room<MyRoomState> {
         // (client.sessionId is unique per connection!)
         this.state.players.set(client.sessionId, player);
 
-        logger.silly(player.toJSON());
+        console.log(player.toJSON());
     }
 
     onLeave(client: Client, consented: boolean) {

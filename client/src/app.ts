@@ -6,11 +6,12 @@ import { Engine, Scene, Vector3, Mesh, Color3, Color4, ShadowGenerator, PointLig
 import { PlayerInput } from "./inputController";
 import { Player } from "./characterController";
 import { Hud } from "./ui";
-import { AdvancedDynamicTexture, Button, TextBlock, Rectangle, Control, Image } from "@babylonjs/gui";
+import { AdvancedDynamicTexture, Button, TextBlock, Rectangle, Control, Image, ScrollViewer } from "@babylonjs/gui";
 import { Environment } from "./environment";
 
 // colyseus
-import { Room } from "colyseus.js";
+import * as Colyseus from "colyseus.js"; // not necessary if included via <script> tag.
+import { Room, RoomAvailable } from "colyseus.js";
 
 //enum for states
 enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3, LOBBY = 4 }
@@ -28,6 +29,7 @@ class App {
     private _player: Player;
     private _ui: Hud;
     private _environment;
+    private _client;
 
     //Sounds
     // public sfx: Sound;
@@ -62,7 +64,9 @@ class App {
             antialiasing: true
         }) as Engine;
  
-        this._scene = new Scene(this._engine);
+        this._scene = new Scene(this._engine); 
+
+        this._client = new Colyseus.Client('ws://localhost:2567');
 
         //**for development: make inspector visible/invisible
         window.addEventListener("keydown", (ev) => {
@@ -312,6 +316,67 @@ class App {
         this._scene.dispose();
         this._scene = scene;
         this._state = State.LOBBY;
+
+        //////////////////////////////////////////////////////
+        // LOBBY
+
+        // add scrollable container
+        var sv = new ScrollViewer();
+        sv.width = 0.8;
+        sv.height = 0.6;
+        sv.background = "#CCCCCC";
+        sv.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        sv.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        imageRect.addControl(sv);
+
+        // join lobby
+        this._client.joinOrCreate("lobby").then((lobby) => {
+         
+            let allRooms: RoomAvailable[] = [];
+
+            lobby.onMessage("rooms", (rooms) => {
+                allRooms = rooms;
+                console.log('ALL ROOMS', allRooms);
+                var top = 0;
+                allRooms.forEach(room => {
+                    let btn = Button.CreateSimpleButton("back", "Room "+room.roomId);
+                    btn.fontFamily = "Viga";
+                    btn.width = .8
+                    btn.height = "30px";
+                    title.fontSize = "16px";
+                    btn.color = "white";
+                    btn.left = .1;
+                    btn.top = top+"px";
+                    btn.thickness = 1;
+                    sv.addControl(btn);
+                    top += 40;
+                
+                    //this handles interactions with the start button attached to the scene
+                    btn.onPointerDownObservable.add(() => { 
+                        this._goToGame(room.roomId);
+                    });
+
+                });
+            });
+    
+            lobby.onMessage("+", ([roomId, room]) => {
+                const roomIndex = allRooms.findIndex((room) => room.roomId === roomId);
+                if (roomIndex !== -1) {
+                    allRooms[roomIndex] = room;
+        
+                } else {
+                    allRooms.push(room);
+                }
+                console.log('ROOM ADDED', allRooms);
+            });
+    
+            lobby.onMessage("-", (roomId) => {
+                allRooms = allRooms.filter((room) => room.roomId !== roomId);
+                console.log('ROOM REMOVED', allRooms);
+            });
+
+        })
+        
     }
 
     private async _setUpGame() { //async
@@ -347,7 +412,7 @@ class App {
     }
 
     //goToGame
-    private async _goToGame(): Promise<void> {
+    private async _goToGame(roomId = ""): Promise<void> {
         
         //--START LOADING AND SETTING UP THE GAME DURING THIS SCENE--
         await this._setUpGame();
@@ -394,6 +459,21 @@ class App {
 
         //the game is ready, attach control back
         this._scene.attachControl();
+
+        if(roomId){
+            this._client.joinById(roomId).then(room => {
+                console.log(room.sessionId, "joined", room.name);
+            }).catch(e => {
+                console.log("JOIN ERROR", e);
+            });
+        }else{
+            this._client.create("my_room").then(room => {
+                console.log(room.sessionId, "created", room.name);
+            }).catch(e => {
+                console.log("create ERROR", e);
+            });
+        }
+        
 
         //--SOUNDS--
         //this.game.play(); // play the gamesong
