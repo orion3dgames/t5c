@@ -21,6 +21,8 @@ export class Environment {
             m.receiveShadows = true;
             m.checkCollisions = false;
 
+            console.log(m);
+
             console.log(m.name);
             if (m.name == "ground") { //dont check for collisions, dont allow for raycasting to detect it(cant land on it)
                 m.checkCollisions = false;
@@ -39,6 +41,8 @@ export class Environment {
 
         //loads game environment
         let plane = MeshBuilder.CreateGround("ground", { "width": 400, "height": 400 }, this._scene); 
+        plane.scaling = new Vector3(1,.02,1);
+
         allMeshes.push(plane);
 
         return {
