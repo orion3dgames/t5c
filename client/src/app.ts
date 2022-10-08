@@ -13,7 +13,7 @@ import { Environment } from "./environment";
 import { Room } from "colyseus.js";
 
 //enum for states
-enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3 }
+enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3, LOBBY = 4 }
 
 // App class is our entire game application
 class App {
@@ -81,17 +81,27 @@ class App {
     }
 
     private async _main(): Promise<void> {
-        await this._goToGame();
+
+        // debug 
+        // await this._goToGame();
+        await this._goToStart();
 
         // Register a render loop to repeatedly render the scene
         this._engine.runRenderLoop(() => {
             switch (this._state) {
+
                 case State.START:
                     this._scene.render();
                     break;
+
                 case State.CUTSCENE:
                     this._scene.render();
                     break;
+
+                case State.LOBBY:
+                    this._scene.render();
+                    break;
+
                 case State.GAME:
                     //if 240seconds/ 4mins have have passed, go to the lose state
                     if (this._ui.time >= 240 && !this._player.win) {
@@ -104,9 +114,11 @@ class App {
                     }
                     this._scene.render();
                     break;
+
                 case State.LOSE:
                     this._scene.render();
                     break;
+
                 default: break;
             }
         });
@@ -190,6 +202,75 @@ class App {
         title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         imageRect.addControl(title);
 
+        const startBtn = Button.CreateSimpleButton("play", "Play");
+        startBtn.fontFamily = "Viga";
+        startBtn.width = 0.2
+        startBtn.height = "40px";
+        startBtn.color = "white";
+        startBtn.top = "-60px";
+        startBtn.thickness = 0;
+        startBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        imageRect.addControl(startBtn);
+
+        //this handles interactions with the start button attached to the scene
+        startBtn.onPointerDownObservable.add(() => { 
+            //sounds
+            sfx.play();
+            
+            scene.detachControl(); //observables disabled
+
+            this._goToLobby();
+        });
+
+        //--SCENE FINISHED LOADING--
+        await scene.whenReadyAsync();
+        this._engine.hideLoadingUI(); //when the scene is ready, hide loading
+
+        //lastly set the current state to the start state and set the scene to the start scene
+        this._scene.dispose();
+        this._scene = scene;
+        this._state = State.START;
+    }
+
+    // goToLobby
+    private async _goToLobby() {
+
+        this._engine.displayLoadingUI(); //make sure to wait for start to load
+
+        //--SCENE SETUP--
+        //dont detect any inputs from this ui while the game is loading
+        this._scene.detachControl();
+        let scene = new Scene(this._engine);
+        scene.clearColor = new Color4(0, 0, 0, 1);
+        //creates and positions a free camera
+        let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), scene);
+        camera.setTarget(Vector3.Zero()); //targets the camera to scene origin
+
+        //--SOUNDS--
+        const sfx = new Sound("selection", "./sounds/vgmenuselect.wav", scene, function () {
+        });
+
+        //--GUI--
+        const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        guiMenu.idealHeight = 720;
+
+        //background image
+        const imageRect = new Rectangle("titleContainer");
+        imageRect.width = 1;
+        imageRect.thickness = 0;
+        guiMenu.addControl(imageRect);
+
+        const title = new TextBlock("title", "LOBBY");
+        title.resizeToFit = true;
+        title.fontFamily = "Viga";
+        title.fontSize = "40px";
+        title.color = "white";
+        title.resizeToFit = true;
+        title.top = "14px";
+        title.width = 0.8;
+        title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        imageRect.addControl(title);
+
         const startBtn = Button.CreateSimpleButton("start", "Create");
         startBtn.fontFamily = "Viga";
         startBtn.width = 0.2
@@ -200,112 +281,15 @@ class App {
         startBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         imageRect.addControl(startBtn);
 
-        const joinBtn = Button.CreateSimpleButton("join", "Join");
-        joinBtn.fontFamily = "Viga";
-        joinBtn.width = 0.2
-        joinBtn.height = "40px";
-        joinBtn.color = "white";
-        joinBtn.top = "-30px";
-        joinBtn.thickness = 0;
-        joinBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        imageRect.addControl(joinBtn);
-
-        //set up transition effect : modified version of https://www.babylonjs-playground.com/#2FGYE8#0
-        Effect.RegisterShader("fade",
-            "precision highp float;" +
-            "varying vec2 vUV;" +
-            "uniform sampler2D textureSampler; " +
-            "uniform float fadeLevel; " +
-            "void main(void){" +
-            "vec4 baseColor = texture2D(textureSampler, vUV) * fadeLevel;" +
-            "baseColor.a = 1.0;" +
-            "gl_FragColor = baseColor;" +
-            "}");
-
-        let fadeLevel = 1.0;
-        this._transition = false;
-        scene.registerBeforeRender(() => {
-            if (this._transition) {
-                this._goToGame();
-                //this._goToCutScene();
-                this._transition = false;
-            }
-        })
-
         //this handles interactions with the start button attached to the scene
         startBtn.onPointerDownObservable.add(() => { 
-
-            //fade screen
-            const postProcess = new PostProcess("Fade", "fade", ["fadeLevel"], null, 1.0, camera);
-            postProcess.onApply = (effect) => {
-                effect.setFloat("fadeLevel", fadeLevel);
-            };
-            this._transition = true;
             //sounds
             sfx.play();
-
+            
             scene.detachControl(); //observables disabled
+
+            this._goToGame();
         });
-
-        let isMobile = false;
-        //--MOBILE--
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-            isMobile = true;
-            //popup for mobile to rotate screen
-            const rect1 = new Rectangle();
-            rect1.height = 0.2;
-            rect1.width = 0.3;
-            rect1.verticalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-            rect1.horizontalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-            rect1.background = "white";
-            rect1.alpha = 0.8;
-            guiMenu.addControl(rect1);
-
-            const rect = new Rectangle();
-            rect.height = 0.2;
-            rect.width = 0.3;
-            rect.verticalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-            rect.horizontalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-            rect.color = "whites";
-            guiMenu.addControl(rect);
-
-            const stackPanel = new StackPanel();
-            stackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-            rect.addControl(stackPanel);
-
-            //image
-            const image = new Image("rotate", "./sprites/rotate.png")
-            image.width = 0.4;
-            image.height = 0.6;
-            image.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-            rect.addControl(image);
-
-            //alert message
-            const alert = new TextBlock("alert", "For the best experience, please rotate your device");
-            alert.fontSize = "16px";
-            alert.fontFamily = "Viga";
-            alert.color = "black";
-            alert.resizeToFit = true;
-            alert.textWrapping = true;
-            stackPanel.addControl(alert);
-
-            const closealert = Button.CreateSimpleButton("close", "X");
-            closealert.height = "24px";
-            closealert.width = "24px";
-            closealert.color = "black";
-            stackPanel.addControl(closealert);
-
-            //remove control of the play button until the user closes the notification(allowing for fullscreen mode)
-            startBtn.isHitTestVisible = false;
-
-            closealert.onPointerUpObservable.add(() => {
-                guiMenu.removeControl(rect);
-                guiMenu.removeControl(rect1);
-
-                startBtn.isHitTestVisible = true;
-                this._engine.enterFullscreen(true);
-            })
-        }
 
         //--SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
@@ -314,7 +298,7 @@ class App {
         //lastly set the current state to the start state and set the scene to the start scene
         this._scene.dispose();
         this._scene = scene;
-        this._state = State.START;
+        this._state = State.LOBBY;
     }
 
     private async _setUpGame() { //async
@@ -394,6 +378,7 @@ class App {
         this._state = State.GAME;
         this._scene = scene;
         this._engine.hideLoadingUI();
+
         //the game is ready, attach control back
         this._scene.attachControl();
 
