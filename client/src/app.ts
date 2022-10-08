@@ -81,7 +81,7 @@ class App {
     }
 
     private async _main(): Promise<void> {
-        await this._goToStart();
+        await this._goToGame();
 
         // Register a render loop to repeatedly render the scene
         this._engine.runRenderLoop(() => {
@@ -310,6 +310,7 @@ class App {
         //--SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
         this._engine.hideLoadingUI(); //when the scene is ready, hide loading
+
         //lastly set the current state to the start state and set the scene to the start scene
         this._scene.dispose();
         this._scene = scene;
@@ -327,6 +328,7 @@ class App {
         //--CREATE ENVIRONMENT--
         const environment = new Environment(scene);
         this._environment = environment;
+
         //Load environment and character assets
         await this._environment.load(); //environment
         await this._loadCharacterAssets(scene); //character
@@ -381,7 +383,8 @@ class App {
         await scene.whenReadyAsync();
 
         //Actions to complete once the game loop is setup
-        scene.getMeshByName("outer").position = scene.getTransformNodeByName("startPosition").getAbsolutePosition(); //move the player to the start position
+        //scene.getMeshByName("outer").position = scene.getTransformNodeByName("startPosition").getAbsolutePosition(); //move the player to the start position
+
         //set up the game timer and sparkler timer -- linked to the ui
         this._ui.startTimer();
         this._ui.startSparklerTimer(this._player.sparkler);
@@ -676,10 +679,8 @@ class App {
         //Create the player
         this._player = new Player(this.assets, scene, shadowGenerator, this._input);
 
-        const camera = this._player.activatePlayerCamera();
-
-        //set up lantern collision checks
-        this._environment.checkLanterns(this._player);
+        // Activate the camera
+        this._player.activatePlayerCamera();
 
         //--Transition post process--
         scene.registerBeforeRender(() => {
@@ -696,24 +697,9 @@ class App {
 
         //--GAME LOOP--
         scene.onBeforeRenderObservable.add(() => {
-            //reset the sparkler timer
-            if (this._player.sparkReset) {
-                this._ui.startSparklerTimer(this._player.sparkler);
-                this._player.sparkReset = false;
-
-                this._ui.updateLanternCount(this._player.lanternsLit);
-            }
-            //stop the sparkler timer after 20 seconds
-            else if (this._ui.stopSpark && this._player.sparkLit) {
-                this._ui.stopSparklerTimer(this._player.sparkler);
-                this._player.sparkLit = false;
-            }
 
             //if you've reached the destination and lit all the lanterns
-            if (this._player.win && this._player.lanternsLit == 22) {
-                this._ui.gamePaused = true; //stop the timer so that fireworks can play and player cant move around
-                //dont allow pause menu interaction
-                this._ui.pauseBtn.isHitTestVisible = false;
+            if (this._player.win) {
 
                 let i = 10; //10 seconds
                 window.setInterval(() => {
@@ -723,29 +709,15 @@ class App {
                     }
                 }, 1000);
 
-                this._environment._startFireworks = true;
                 this._player.win = false;
             }
 
             if (!this._ui.gamePaused) {
                 this._ui.updateHud();
             }
-            //if the player has attempted all tutorial moves, move on to the hint IF they haven't already lit the next lantern
-            if(this._player.tutorial_move && this._player.tutorial_jump && this._player.tutorial_dash && (this._ui.tutorial.isVisible || this._ui.hint.isVisible)){
-                this._ui.tutorial.isVisible = false;
-                if(!this._environment._lanternObjs[1].isLit){ // if the first lantern hasn't been lit, then give hint as to which direction to go
-                    this._ui.hint.isVisible = true;
-                } else {
-                    this._ui.hint.isVisible = false;
-                }
-            }
+
         })
-        //glow layer
-        const gl = new GlowLayer("glow", scene);
-        gl.intensity = 0.4;
-        this._environment._lanternObjs.forEach(lantern => {
-            gl.addIncludedOnlyMesh(lantern.mesh);
-        });
+
         //webpack served from public       
     }
 }

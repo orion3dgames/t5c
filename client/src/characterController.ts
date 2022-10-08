@@ -105,24 +105,6 @@ export class Player extends TransformNode {
         //--COLLISIONS--
         this.mesh.actionManager = new ActionManager(this.scene);
 
-        this.mesh.actionManager.registerAction(
-            new ExecuteCodeAction(
-                {
-                    trigger: ActionManager.OnIntersectionEnterTrigger,
-                    parameter: this.scene.getMeshByName("destination")
-                },
-                () => {
-                    if(this.lanternsLit == 22){
-                        this.win = true;
-                        //tilt camera to look at where the fireworks will be displayed
-                        this._yTilt.rotation = new Vector3(5.689773361501514, 0.23736477827122882, 0);
-                        this._yTilt.position = new Vector3(0, 6, 0);
-                        this.camera.position.y = 17;      
-                    }
-                }
-            )
-        );
-
         //if player falls through "world", reset the position to the last safe grounded position
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction({
@@ -440,31 +422,6 @@ export class Player extends TransformNode {
 
     //--CAMERA--
     private _updateCamera(): void {
-
-        //trigger areas for rotating camera view
-        if (this.mesh.intersectsMesh(this.scene.getMeshByName("cornerTrigger"))) {
-            if (this._input.horizontalAxis > 0) { //rotates to the right                
-                this._camRoot.rotation = Vector3.Lerp(this._camRoot.rotation, new Vector3(this._camRoot.rotation.x, Math.PI / 2, this._camRoot.rotation.z), 0.4);
-            } else if (this._input.horizontalAxis < 0) { //rotates to the left
-                this._camRoot.rotation = Vector3.Lerp(this._camRoot.rotation, new Vector3(this._camRoot.rotation.x, Math.PI, this._camRoot.rotation.z), 0.4);
-            }
-        }
-        //rotates the camera to point down at the player when they enter the area, and returns it back to normal when they exit
-        if (this.mesh.intersectsMesh(this.scene.getMeshByName("festivalTrigger"))) {
-            if (this._input.verticalAxis > 0) {
-                this._yTilt.rotation = Vector3.Lerp(this._yTilt.rotation, Player.DOWN_TILT, 0.4);
-            } else if (this._input.verticalAxis < 0) {
-                this._yTilt.rotation = Vector3.Lerp(this._yTilt.rotation, Player.ORIGINAL_TILT, 0.4);
-            }
-        }
-        //once you've reached the destination area, return back to the original orientation, if they leave rotate it to the previous orientation
-        if (this.mesh.intersectsMesh(this.scene.getMeshByName("destinationTrigger"))) {
-            if (this._input.verticalAxis > 0) {
-                this._yTilt.rotation = Vector3.Lerp(this._yTilt.rotation, Player.ORIGINAL_TILT, 0.4);
-            } else if (this._input.verticalAxis < 0) {
-                this._yTilt.rotation = Vector3.Lerp(this._yTilt.rotation, Player.DOWN_TILT, 0.4);
-            }
-        }
 
         //update camera postion up/down movement
         let centerPlayer = this.mesh.position.y + 2;
