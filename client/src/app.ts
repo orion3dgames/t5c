@@ -83,8 +83,8 @@ class App {
     private async _main(): Promise<void> {
 
         // debug 
-        await this._goToGame();
-        //await this._goToStart();
+        //await this._goToGame();
+        await this._goToStart();
 
         // Register a render loop to repeatedly render the scene
         this._engine.runRenderLoop(() => {
@@ -180,14 +180,12 @@ class App {
         const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
         guiMenu.idealHeight = 720;
 
-        //background image
         const imageRect = new Rectangle("titleContainer");
         imageRect.width = 1;
+        imageRect.height = 1;
+        imageRect.background = "#999999";
         imageRect.thickness = 0;
         guiMenu.addControl(imageRect);
-
-        const startbg = new Image("startbg", "sprites/start.jpeg");
-        imageRect.addControl(startbg);
 
         const title = new TextBlock("title", "Orbiter 3D");
         title.resizeToFit = true;
@@ -255,6 +253,8 @@ class App {
         //background image
         const imageRect = new Rectangle("titleContainer");
         imageRect.width = 1;
+        imageRect.height = 1;
+        imageRect.background = "#999999";
         imageRect.thickness = 0;
         guiMenu.addControl(imageRect);
 
@@ -274,20 +274,35 @@ class App {
         startBtn.width = 0.2
         startBtn.height = "40px";
         startBtn.color = "white";
-        startBtn.top = "-60px";
+        startBtn.top = "-90px";
         startBtn.thickness = 1;
         startBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         imageRect.addControl(startBtn);
+ 
+        const backButton = Button.CreateSimpleButton("back", "Back");
+        backButton.fontFamily = "Viga";
+        backButton.width = 0.2
+        backButton.height = "40px";
+        backButton.color = "white";
+        backButton.top = "-30px";
+        backButton.thickness = 1;
+        backButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        imageRect.addControl(backButton);
 
         //this handles interactions with the start button attached to the scene
         startBtn.onPointerDownObservable.add(() => { 
-            //sounds
             sfx.play();
-            
             scene.detachControl(); //observables disabled
-
             this._goToGame();
         });
+
+        //this handles interactions with the start button attached to the scene
+        backButton.onPointerDownObservable.add(() => { 
+            sfx.play();
+            scene.detachControl(); //observables disabled
+            this._goToStart();
+        });
+
 
         //--SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
