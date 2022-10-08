@@ -83,8 +83,8 @@ class App {
     private async _main(): Promise<void> {
 
         // debug 
-        // await this._goToGame();
-        await this._goToStart();
+         await this._goToGame();
+        //await this._goToStart();
 
         // Register a render loop to repeatedly render the scene
         this._engine.runRenderLoop(() => {
@@ -351,7 +351,7 @@ class App {
         envHdri.name = "env";
         envHdri.gammaSpace = false;
         scene.environmentTexture = envHdri;
-        scene.environmentIntensity = 0.04;
+        scene.environmentIntensity = 0.02;
 
         //--INPUT--
         this._input = new PlayerInput(scene, this._ui); //detect keyboard/mobile inputs
@@ -671,7 +671,6 @@ class App {
 
         //--Transition post process--
         scene.registerBeforeRender(() => {
-            /*
             if (this._ui.transition) {
                 this._ui.fadeLevel -= .05;
 
@@ -681,31 +680,14 @@ class App {
                     this._ui.transition = false;
                 }
             }
-            */
         })
 
         //--GAME LOOP--
         scene.onBeforeRenderObservable.add(() => {
-
-            /*
-            //if you've reached the destination and lit all the lanterns
-            if (this._player.win) {
-
-                let i = 10; //10 seconds
-                window.setInterval(() => {
-                    i--;
-                    if (i == 0) {
-                        this._showWin();
-                    }
-                }, 1000);
-
-                this._player.win = false;
+            
+            if(this._ui.transition){
+                this._goToStart();
             }
-
-            if (!this._ui.gamePaused) {
-                this._ui.updateHud();
-            }
-            */
 
         })
 

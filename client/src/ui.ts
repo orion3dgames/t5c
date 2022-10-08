@@ -50,14 +50,14 @@ export class Hud {
         quitButton.height = "40px";
         quitButton.color = "white";
         quitButton.top = "10px"; 
-        quitButton.left = "10px"; 
+        quitButton.left = "-10px"; 
         quitButton.thickness = 1;
         quitButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         quitButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         this._playerUI.addControl(quitButton);
 
         quitButton.onPointerDownObservable.add(() => { 
-            console.log('TEST');
+            this.transition = true;
         });
 
     }

@@ -23,9 +23,8 @@ export class Environment {
 
             console.log(m);
 
-            console.log(m.name);
             if (m.name == "ground") { //dont check for collisions, dont allow for raycasting to detect it(cant land on it)
-                m.checkCollisions = false;
+                m.checkCollisions = true;
                 m.isPickable = false;
             }
 
@@ -41,7 +40,8 @@ export class Environment {
 
         //loads game environment
         let plane = MeshBuilder.CreateGround("ground", { "width": 400, "height": 400 }, this._scene); 
-        plane.scaling = new Vector3(1,.02,1);
+        plane.scaling = new Vector3(.2,.2,.2);
+        plane.position._y = -5;
 
         allMeshes.push(plane);
 
