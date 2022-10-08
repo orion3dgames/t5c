@@ -1,6 +1,4 @@
-import { Scene, MeshBuilder, Mesh, Vector3, Color3, TransformNode, SceneLoader, ParticleSystem, Color4, Texture, PBRMetallicRoughnessMaterial, VertexBuffer, AnimationGroup, Sound, ExecuteCodeAction, ActionManager, Tags } from "@babylonjs/core";
-import { Lantern } from "./lantern";
-import { Player } from "./characterController";
+import { Scene, MeshBuilder, Vector3, StandardMaterial, MultiMaterial, Texture, HemisphericLight } from "@babylonjs/core";
 
 export class Environment {
     private _scene: Scene;
@@ -42,6 +40,18 @@ export class Environment {
         let plane = MeshBuilder.CreateGround("ground", { "width": 400, "height": 400 }, this._scene); 
         plane.scaling = new Vector3(.2,.2,.2);
         plane.position._y = -5;
+
+        // Set plane texture
+        let floorPlane = new StandardMaterial('floorTexturePlane', this._scene);
+        let floorTexture = new Texture('./ground.jpg', this._scene);
+        floorTexture.uScale = 5.0;
+        floorTexture.vScale = 5.0;
+        floorPlane.diffuseTexture = floorTexture;
+        floorPlane.backFaceCulling = false; // Always show the front and the back of an element
+
+        let materialPlane = new MultiMaterial('materialPlane', this._scene);
+        materialPlane.subMaterials.push(floorPlane);
+        plane.material = materialPlane;
 
         allMeshes.push(plane);
 

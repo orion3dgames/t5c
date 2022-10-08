@@ -25,6 +25,7 @@ export class Player extends TransformNode {
  
     private _moveDirection: Vector3 = new Vector3();
     private _inputAmt: number;
+    private _jumpCount: number;
 
     //gravity, ground detection, jumping
     private _gravity: Vector3 = new Vector3();
@@ -114,10 +115,12 @@ export class Player extends TransformNode {
     }
 
     private _updateGroundDetection(): void {
+
         if (!this._isGrounded()) {
             this._gravity = this._gravity.addInPlace(Vector3.Up().scale(this._deltaTime * Player.GRAVITY));
             this._grounded = false;
         }
+        
         //limit the speed of gravity to the negative of the jump power
         if (this._gravity.y < -Player.JUMP_FORCE) {
             this._gravity.y = -Player.JUMP_FORCE;
@@ -127,7 +130,15 @@ export class Player extends TransformNode {
         if (this._isGrounded()) {
             this._gravity.y = 0;
             this._grounded = true;
+            this._jumpCount = 1;
             this._lastGroundPos.copyFrom(this.mesh.position);
+        }
+
+        //Jump detection
+        if (this._input.jumpKeyDown) {
+            console.log('JUMP KEY DOWN');
+            this._gravity.y = Player.JUMP_FORCE;
+            this._jumpCount--;
         }
     }
 

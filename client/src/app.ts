@@ -2,11 +2,11 @@ import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
 
-import { Engine, Scene, Vector3, Mesh, Color3, Color4, ShadowGenerator, GlowLayer, PointLight, FreeCamera, CubeTexture, Sound, PostProcess, Effect, SceneLoader, Matrix, MeshBuilder, Quaternion, AssetsManager, EngineFactory } from "@babylonjs/core";
+import { Engine, Scene, Vector3, Mesh, Color3, Color4, ShadowGenerator, PointLight, FreeCamera, Sound, Matrix, MeshBuilder, Quaternion, EngineFactory } from "@babylonjs/core";
 import { PlayerInput } from "./inputController";
 import { Player } from "./characterController";
 import { Hud } from "./ui";
-import { AdvancedDynamicTexture, StackPanel, Button, TextBlock, Rectangle, Control, Image } from "@babylonjs/gui";
+import { AdvancedDynamicTexture, Button, TextBlock, Rectangle, Control, Image } from "@babylonjs/gui";
 import { Environment } from "./environment";
 
 // colyseus
@@ -83,7 +83,7 @@ class App {
     private async _main(): Promise<void> {
 
         // debug 
-         await this._goToGame();
+        await this._goToGame();
         //await this._goToStart();
 
         // Register a render loop to repeatedly render the scene
@@ -165,12 +165,14 @@ class App {
         camera.setTarget(Vector3.Zero()); //targets the camera to scene origin
 
         //--SOUNDS--
+        /*
         const start = new Sound("startSong", "./sounds/copycat(revised).mp3", scene, function () {
         }, {
             volume: 0.25,
             loop: true,
             autoplay: true
-        });
+        });*/
+
         const sfx = new Sound("selection", "./sounds/vgmenuselect.wav", scene, function () {
         });
 
@@ -204,7 +206,7 @@ class App {
         startBtn.height = "40px";
         startBtn.color = "white";
         startBtn.top = "-60px";
-        startBtn.thickness = 0;
+        startBtn.thickness = 1;
         startBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         imageRect.addControl(startBtn);
 
@@ -256,7 +258,7 @@ class App {
         imageRect.thickness = 0;
         guiMenu.addControl(imageRect);
 
-        const title = new TextBlock("title", "LOBBY");
+        const title = new TextBlock("title", "Lobby");
         title.resizeToFit = true;
         title.fontFamily = "Viga";
         title.fontSize = "40px";
@@ -273,7 +275,7 @@ class App {
         startBtn.height = "40px";
         startBtn.color = "white";
         startBtn.top = "-60px";
-        startBtn.thickness = 0;
+        startBtn.thickness = 1;
         startBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         imageRect.addControl(startBtn);
 
@@ -347,11 +349,12 @@ class App {
         scene.detachControl();
 
         //IBL (image based lighting) - to give scene an ambient light
+        /*
         const envHdri = CubeTexture.CreateFromPrefilteredData("textures/envtext.env", scene);
         envHdri.name = "env";
         envHdri.gammaSpace = false;
         scene.environmentTexture = envHdri;
-        scene.environmentIntensity = 0.02;
+        scene.environmentIntensity = 0.02;*/
 
         //--INPUT--
         this._input = new PlayerInput(scene, this._ui); //detect keyboard/mobile inputs
@@ -378,225 +381,7 @@ class App {
         this._scene.attachControl();
 
         //--SOUNDS--
-        this.game.play(); // play the gamesong
-    }
-
-    private _showWin(): void {
-
-        //stop game sound and play end song
-        this.game.dispose();
-        this.end.play();
-
-        const winUI = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-        winUI.idealHeight = 720;
-
-        const rect = new Rectangle();
-        rect.thickness = 0;
-        rect.background = "black";
-        rect.alpha = 0.4;
-        rect.width = 0.4;
-        winUI.addControl(rect);
-
-        const stackPanel = new StackPanel("credits");
-        stackPanel.width = 0.4;
-        stackPanel.fontFamily = "Viga";
-        stackPanel.fontSize = "16px";
-        stackPanel.color = "white";
-        winUI.addControl(stackPanel);
-
-        const wincreds = new TextBlock("special");
-        wincreds.resizeToFit = true;
-        wincreds.color = "white";
-        wincreds.text = "Special thanks to the Babylon Team!";
-        wincreds.textWrapping = true;
-        wincreds.height = "24px";
-        wincreds.width = "100%";
-        wincreds.fontFamily = "Viga";
-        stackPanel.addControl(wincreds);
-
-        //Credits for music & SFX
-        const music = new TextBlock("music", "Music");
-        music.fontSize = 22;
-        music.resizeToFit = true;
-        music.textWrapping = true;
-        
-        const source = new TextBlock("sources", "Sources: freesound.org, opengameart.org, and itch.io")
-        source.textWrapping = true;
-        source.resizeToFit = true;
-
-        const jumpCred = new TextBlock("jumpCred", "jump2 by LloydEvans09 - freesound.org");
-        jumpCred.textWrapping = true;
-        jumpCred.resizeToFit = true;
-
-        const walkCred = new TextBlock("walkCred", "Concrete 2 by MayaSama @mayasama.itch.io / ig: @mayaragandra");
-        walkCred.textWrapping = true;
-        walkCred.resizeToFit = true;
-
-        const gameCred = new TextBlock("gameSong", "Christmas synths by 3xBlast - opengameart.org"); 
-        gameCred.textWrapping = true;
-        gameCred.resizeToFit = true;
-
-        const pauseCred = new TextBlock("pauseSong", "Music by Matthew Pablo / www.matthewpablo.com - opengameart.org");
-        pauseCred.textWrapping = true;
-        pauseCred.resizeToFit = true;
-
-        const endCred = new TextBlock("startendSong", "copycat by syncopika - opengameart.org");
-        endCred.textWrapping = true;
-        endCred.resizeToFit = true;
-
-        const loseCred = new TextBlock("loseSong", "Eye of the Storm by Joth - opengameart.org");
-        loseCred.textWrapping = true;
-        loseCred.resizeToFit = true;
-
-        const fireworksSfx = new TextBlock("fireworks", "rubberduck - opengameart.org")
-        fireworksSfx.textWrapping = true;
-        fireworksSfx.resizeToFit = true;
-
-        const dashCred = new TextBlock("dashCred", "Woosh Noise 1 by potentjello - freesound.org");
-        dashCred.textWrapping = true;
-        dashCred.resizeToFit = true;
-
-        //quit, sparkwarning, reset
-        const sfxCred = new TextBlock("sfxCred", "200 Free SFX - https://kronbits.itch.io/freesfx");
-        sfxCred.textWrapping = true;
-        sfxCred.resizeToFit = true;
-
-        //lighting lantern, sparkreset
-        const sfxCred2 = new TextBlock("sfxCred2", "sound pack by wobbleboxx.com - opengameart.org");
-        sfxCred2.textWrapping = true;
-        sfxCred2.resizeToFit = true;
-
-        const selectionSfxCred = new TextBlock("select", "8bit menu select by Fupi - opengameart.org");
-        selectionSfxCred.textWrapping = true;
-        selectionSfxCred.resizeToFit = true;
-
-        stackPanel.addControl(music);
-        stackPanel.addControl(source);
-        stackPanel.addControl(jumpCred);
-        stackPanel.addControl(walkCred);
-        stackPanel.addControl(gameCred);
-        stackPanel.addControl(pauseCred);
-        stackPanel.addControl(endCred);
-        stackPanel.addControl(loseCred);
-        stackPanel.addControl(fireworksSfx);
-        stackPanel.addControl(dashCred);
-        stackPanel.addControl(sfxCred);
-        stackPanel.addControl(sfxCred2);
-        stackPanel.addControl(selectionSfxCred);
-
-        const mainMenu = Button.CreateSimpleButton("mainmenu", "RETURN");
-        mainMenu.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        mainMenu.fontFamily = "Viga";
-        mainMenu.width = 0.2
-        mainMenu.height = "40px";
-        mainMenu.color = "white";
-        winUI.addControl(mainMenu);
-
-        mainMenu.onPointerDownObservable.add(() => {
-            this._ui.transition = true;
-            this._ui.quitSfx.play();
-        })
-
-    }
-
-    private async _goToLose(): Promise<void> {
-        this._engine.displayLoadingUI();
-
-        //--SCENE SETUP--
-        this._scene.detachControl();
-        let scene = new Scene(this._engine);
-        scene.clearColor = new Color4(0, 0, 0, 1);
-        let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), scene);
-        camera.setTarget(Vector3.Zero());
-
-        //--SOUNDS--
-        const start = new Sound("loseSong", "./sounds/Eye of the Storm.mp3", scene, function () {
-        }, {
-            volume: 0.25,
-            loop: true,
-            autoplay: true
-        });
-        const sfx = new Sound("selection", "./sounds/vgmenuselect.wav", scene, function () {
-        });
-
-        //--GUI--
-        const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-        guiMenu.idealHeight = 720;
-
-        //background image
-        const image = new Image("lose", "sprites/lose.jpeg");
-        image.autoScale = true;
-        guiMenu.addControl(image);
-
-        const panel = new StackPanel();
-        guiMenu.addControl(panel);
-
-        const text = new TextBlock();
-        text.fontSize = 24;
-        text.color = "white";
-        text.height = "100px";
-        text.width = "100%";
-        panel.addControl(text);
-
-        text.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_CENTER;
-        text.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_CENTER;
-        text.text = "There's no fireworks this year";
-        const dots = new TextBlock();
-        dots.color = "white";
-        dots.fontSize = 24;
-        dots.height = "100px";
-        dots.width = "100%";
-        dots.text = "...."
-
-        const mainBtn = Button.CreateSimpleButton("mainmenu", "MAIN MENU");
-        mainBtn.width = 0.2;
-        mainBtn.height = "40px";
-        mainBtn.color = "white";
-        panel.addControl(mainBtn);
-
-        //set up transition effect : modified version of https://www.babylonjs-playground.com/#2FGYE8#0
-        Effect.RegisterShader("fade",
-            "precision highp float;" +
-            "varying vec2 vUV;" +
-            "uniform sampler2D textureSampler; " +
-            "uniform float fadeLevel; " +
-            "void main(void){" +
-            "vec4 baseColor = texture2D(textureSampler, vUV) * fadeLevel;" +
-            "baseColor.a = 1.0;" +
-            "gl_FragColor = baseColor;" +
-            "}");
-
-        let fadeLevel = 1.0;
-        this._transition = false;
-        scene.registerBeforeRender(() => {
-            if (this._transition) {
-                fadeLevel -= .05;
-                if(fadeLevel <= 0){
-                    
-                    this._goToStart();
-                    this._transition = false;
-                }
-            }
-        })
-
-        //this handles interactions with the start button attached to the scene
-        mainBtn.onPointerUpObservable.add(() => {
-            //todo: add fade transition & selection sfx
-            scene.detachControl();
-            guiMenu.dispose();
-            
-            this._transition = true;
-            sfx.play();
-            
-        });
-
-        //--SCENE FINISHED LOADING--
-        await scene.whenReadyAsync();
-        this._engine.hideLoadingUI(); //when the scene is ready, hide loading
-        //lastly set the current state to the lose state and set the scene to the lose scene
-        this._scene.dispose();
-        this._scene = scene;
-        this._state = State.LOSE;
+        //this.game.play(); // play the gamesong
     }
 
     //load the character model
@@ -655,10 +440,10 @@ class App {
         scene.ambientColor = new Color3(0.34509803921568627, 0.5568627450980392, 0.8352941176470589);
         scene.clearColor = new Color4(0.01568627450980392, 0.01568627450980392, 0.20392156862745098);
 
-        const light = new PointLight("sparklight", new Vector3(0, 0, 0), scene);
+        const light = new PointLight("sparklight", new Vector3(100, 200, 100), scene);
         light.diffuse = new Color3(0.08627450980392157, 0.10980392156862745, 0.15294117647058825);
-        light.intensity = 35;
-        light.radius = 1;
+        light.intensity = 15;
+        light.radius = .02;
 
         const shadowGenerator = new ShadowGenerator(1024, light);
         shadowGenerator.darkness = 0.4;
