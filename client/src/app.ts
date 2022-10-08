@@ -340,8 +340,8 @@ class App {
         let scene = this._gamescene;
 
         //--GUI--
-        //const ui = new Hud(scene);
-        //this._ui = ui;
+        const ui = new Hud(scene);
+        this._ui = ui;
 
         //dont detect any inputs from this ui while the game is loading
         scene.detachControl();
@@ -640,7 +640,7 @@ class App {
            //return the mesh and animations
            return {
                 mesh: outer as Mesh,
-                animationGroups: result.animationGroups
+                //animationGroups: result.animationGroups
             }
         }
 
