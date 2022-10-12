@@ -59,9 +59,9 @@ export class MyRoom extends Room<MyRoomState> {
         });
 
         // place at initial position
-        player.xPos = 0;
-        player.yPos = 0;
-        player.zPos = 0;
+        player.xPos = Math.floor(Math.random() * 11);
+        player.yPos = Math.floor(Math.random() * 11);
+        player.zPos = Math.floor(Math.random() * 11);
 
         // place player in the map of players by its sessionId
         // (client.sessionId is unique per connection!)

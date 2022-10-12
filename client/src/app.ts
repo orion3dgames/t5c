@@ -7,6 +7,7 @@ import { PlayerInput } from "./inputController";
 import { Player } from "./characterController";
 import { Hud } from "./ui";
 import { AdvancedDynamicTexture, Button, TextBlock, Rectangle, Control, Image, ScrollViewer } from "@babylonjs/gui";
+import { NormalMaterial, CustomMaterial, SimpleMaterial } from "@babylonjs/materials";
 import { Environment } from "./environment";
 
 // colyseus
@@ -26,7 +27,7 @@ class App {
     //Game State Related
     public assets;
     private _input: PlayerInput;
-    private _player: Player;
+    private _currentPlayer: Player;
     private _ui: Hud;
     private _environment;
     private _client;
@@ -45,9 +46,10 @@ class App {
     private _transition: boolean = false;
 
     // multi
+    private allRooms: RoomAvailable[] = [];
     private room: Room<any>;
+    private roomId = "";
     private playerEntities: { [playerId: string]: Player } = {};
-    private playerNextPosition: { [playerId: string]: BABYLON.Vector3 } = {};
 
     constructor() {
 
@@ -331,52 +333,66 @@ class App {
 
         // join lobby
         this._client.joinOrCreate("lobby").then((lobby) => {
-         
-            let allRooms: RoomAvailable[] = [];
-
+    
             lobby.onMessage("rooms", (rooms) => {
-                allRooms = rooms;
-                console.log('ALL ROOMS', allRooms);
-                var top = 0;
-                allRooms.forEach(room => {
-                    let btn = Button.CreateSimpleButton("back", "Room "+room.roomId);
-                    btn.fontFamily = "Viga";
-                    btn.width = .8
-                    btn.height = "30px";
-                    title.fontSize = "16px";
-                    btn.color = "white";
-                    btn.left = .1;
-                    btn.top = top+"px";
-                    btn.thickness = 1;
-                    sv.addControl(btn);
-                    top += 40;
-                
-                    //this handles interactions with the start button attached to the scene
-                    btn.onPointerDownObservable.add(() => { 
-                        this._goToGame(room.roomId);
-                    });
-
-                });
+                this.allRooms = rooms;
+                this._refreshLobbyUI(sv);
             });
     
             lobby.onMessage("+", ([roomId, room]) => {
-                const roomIndex = allRooms.findIndex((room) => room.roomId === roomId);
+                const roomIndex = this.allRooms.findIndex((room) => room.roomId === roomId);
                 if (roomIndex !== -1) {
-                    allRooms[roomIndex] = room;
-        
+                    this.allRooms[roomIndex] = room;
                 } else {
-                    allRooms.push(room);
+                    this.allRooms.push(room);
                 }
-                console.log('ROOM ADDED', allRooms);
+                this._refreshLobbyUI(sv);
             });
     
             lobby.onMessage("-", (roomId) => {
-                allRooms = allRooms.filter((room) => room.roomId !== roomId);
-                console.log('ROOM REMOVED', allRooms);
+                this.allRooms = this.allRooms.filter((room) => room.roomId !== roomId);
+                this._refreshLobbyUI(sv);
             });
 
         })
         
+    }
+
+    private _refreshLobbyUI(sv){
+        var top = 0;
+        this.allRooms.forEach(room => {
+
+            var roomTxt = new TextBlock();
+            roomTxt.text = "Room | Players "+room.clients+"/10";
+            roomTxt.textHorizontalAlignment = 0;
+            roomTxt.fontFamily = "Viga";
+            roomTxt.height = "30px";
+            roomTxt.fontSize = "16px";
+            roomTxt.color = "white";
+            roomTxt.left = .1;
+            roomTxt.top = top+"px";
+            roomTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            sv.addControl(roomTxt);
+
+            let joinBtn = Button.CreateSimpleButton("back", "JOIN");
+            joinBtn.fontFamily = "Viga";
+            joinBtn.width = .2
+            joinBtn.height = "30px";
+            joinBtn.fontSize = "16px";
+            joinBtn.color = "white";
+            joinBtn.top = top+"px";
+            joinBtn.thickness = 1;
+            joinBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+            sv.addControl(joinBtn);
+
+            top += 40;
+        
+            //this handles interactions with the start button attached to the scene
+            joinBtn.onPointerDownObservable.add(() => { 
+                this.roomId = room.roomId;
+                this._goToGame();
+            });
+        });
     }
 
     private async _setUpGame() { //async
@@ -412,7 +428,7 @@ class App {
     }
 
     //goToGame
-    private async _goToGame(roomId = ""): Promise<void> {
+    private async _goToGame(): Promise<void> {
         
         //--START LOADING AND SETTING UP THE GAME DURING THIS SCENE--
         await this._setUpGame();
@@ -444,12 +460,6 @@ class App {
 
         //--WHEN SCENE FINISHED LOADING--
         await scene.whenReadyAsync();
-
-        //Actions to complete once the game loop is setup
-        //scene.getMeshByName("outer").position = scene.getTransformNodeByName("startPosition").getAbsolutePosition(); //move the player to the start position
-
-        //set up the game timer and sparkler timer -- linked to the ui
-        //this._ui.startTimer();
         
         //get rid of start scene, switch to gamescene and change states
         this._scene.dispose();
@@ -459,22 +469,7 @@ class App {
 
         //the game is ready, attach control back
         this._scene.attachControl();
-
-        if(roomId){
-            this._client.joinById(roomId).then(room => {
-                console.log(room.sessionId, "joined", room.name);
-            }).catch(e => {
-                console.log("JOIN ERROR", e);
-            });
-        }else{
-            this._client.create("my_room").then(room => {
-                console.log(room.sessionId, "created", room.name);
-            }).catch(e => {
-                console.log("create ERROR", e);
-            });
-        }
         
-
         //--SOUNDS--
         //this.game.play(); // play the gamesong
     }
@@ -532,23 +527,38 @@ class App {
     //init game
     private async _initializeGameAsync(scene): Promise<void> {
 
-        scene.ambientColor = new Color3(0.34509803921568627, 0.5568627450980392, 0.8352941176470589);
-        scene.clearColor = new Color4(0.01568627450980392, 0.01568627450980392, 0.20392156862745098);
+        // join or create room
+        console.log('LOGGING IN TO ROOM', this.roomId);
 
-        const light = new PointLight("sparklight", new Vector3(100, 200, 100), scene);
-        light.diffuse = new Color3(0.08627450980392157, 0.10980392156862745, 0.15294117647058825);
-        light.intensity = 15;
-        light.radius = .02;
+        if(this.roomId){
+            this.room = await this._client.joinOrCreate("my_room", { roomId: this.roomId });
+        }else{
+            this.room = await this._client.joinOrCreate("my_room");
+        }
 
-        const shadowGenerator = new ShadowGenerator(1024, light);
-        shadowGenerator.darkness = 0.4;
+        // when someone joins the room event
+        this.room.state.players.onAdd((entity, sessionId) => {
 
-        //Create the player
-        this._player = new Player(this.assets, scene, shadowGenerator, this._input);
+            var isCurrentPlayer = sessionId === this.room.sessionId;
+          
+            let _player = new Player(entity, isCurrentPlayer, sessionId, scene, this._input);
 
-        // Activate the camera
-        this._player.activatePlayerCamera();
+            scene.playerEntities[sessionId] = _player;
 
+            if(isCurrentPlayer){
+                this._currentPlayer = _player;
+                this._currentPlayer.activatePlayerCamera();
+            }
+
+        });
+
+        // create the player
+        //this._player = new Player(this.assets, scene, shadowGenerator, this._input);
+
+        // activate the camera
+        //this._player.activatePlayerCamera();
+
+        
         //--Transition post process--
         scene.registerBeforeRender(() => {
             if (this._ui.transition) {
@@ -562,10 +572,11 @@ class App {
             }
         })
 
-        //--GAME LOOP--
+        // game loop
         scene.onBeforeRenderObservable.add(() => {
             
             if(this._ui.transition){
+                this.room.leave();
                 this._goToStart();
             }
 
