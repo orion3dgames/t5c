@@ -34,20 +34,22 @@ export class Player extends TransformNode {
     private _grounded: boolean;
 
     private playerNextPosition: { [playerId: string]: Vector3 } = {};
-    
+    private sessionId: string;
+
     constructor(entity, isCurrentPlayer, sessionId, scene: Scene, input?) {
         super("player", scene);
         this.scene = scene;
-        
+        this.sessionId = sessionId;
+
         // generate mesh
-        const sphere = MeshBuilder.CreateSphere(`player-${entity.sessionId}`, {
+        const sphere = MeshBuilder.CreateSphere(`player-${sessionId}`, {
             segments: 8,
-            diameter: 40
+            diameter: 4
         }, scene);
       
         // set material to differentiate CURRENT player and OTHER players
         let sphereMaterial = new CustomMaterial(`player-material-${sessionId}`);
-        sphereMaterial.emissiveColor = (isCurrentPlayer) ? Color3.FromHexString("#ff9900") : BABYLON.Color3.Gray();
+        sphereMaterial.emissiveColor = (isCurrentPlayer) ? Color3.FromHexString("#ff9900") : Color3.Gray();
         sphere.material = sphereMaterial;
 
         // set initial position from server
@@ -58,7 +60,7 @@ export class Player extends TransformNode {
 
         // update local target position
         entity.onChange(() => {
-            this.playerNextPosition[sessionId].set(entity.x, entity.y, entity.z);
+            this.playerNextPosition[sessionId].set(entity.xPos, entity.yPos, entity.zPos);
         });
 
         this.mesh = sphere;
@@ -102,7 +104,7 @@ export class Player extends TransformNode {
         yTilt.parent = this._camRoot;
 
         //our actual camera that's pointing at our root's position
-        this.camera = new UniversalCamera("cam", new Vector3(0, 0, -30), this.scene);
+        this.camera = new UniversalCamera("cam", new Vector3(0, 0, -300), this.scene);
         this.camera.lockedTarget = this._camRoot.position;
         this.camera.fov = 0.47350045992678597;
         this.camera.parent = yTilt;

@@ -19,8 +19,6 @@ export class Environment {
             m.receiveShadows = true;
             m.checkCollisions = false;
 
-            console.log(m);
-
             if (m.name == "ground") { //dont check for collisions, dont allow for raycasting to detect it(cant land on it)
                 m.checkCollisions = true;
                 m.isPickable = false;

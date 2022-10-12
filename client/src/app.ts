@@ -48,6 +48,7 @@ class App {
     // multi
     private allRooms: RoomAvailable[] = [];
     private room: Room<any>;
+    private lobbyRoom: Room<any>;
     private roomId = "";
     private playerEntities: { [playerId: string]: Player } = {};
 
@@ -299,6 +300,7 @@ class App {
         startBtn.onPointerDownObservable.add(() => { 
             sfx.play();
             scene.detachControl(); //observables disabled
+            this.lobbyRoom.removeAllListeners();
             this._goToGame();
         });
 
@@ -334,12 +336,16 @@ class App {
         // join lobby
         this._client.joinOrCreate("lobby").then((lobby) => {
     
-            lobby.onMessage("rooms", (rooms) => {
+            this.lobbyRoom = lobby;
+
+            this.lobbyRoom.onMessage("rooms", (rooms) => {
+                console.log('rooms');
                 this.allRooms = rooms;
                 this._refreshLobbyUI(sv);
             });
     
-            lobby.onMessage("+", ([roomId, room]) => {
+            this.lobbyRoom.onMessage("+", ([roomId, room]) => {
+                console.log('+ room');
                 const roomIndex = this.allRooms.findIndex((room) => room.roomId === roomId);
                 if (roomIndex !== -1) {
                     this.allRooms[roomIndex] = room;
@@ -349,7 +355,8 @@ class App {
                 this._refreshLobbyUI(sv);
             });
     
-            lobby.onMessage("-", (roomId) => {
+            this.lobbyRoom.onMessage("-", (roomId) => {
+                console.log('- room');
                 this.allRooms = this.allRooms.filter((room) => room.roomId !== roomId);
                 this._refreshLobbyUI(sv);
             });
@@ -359,6 +366,7 @@ class App {
     }
 
     private _refreshLobbyUI(sv){
+    
         var top = 0;
         this.allRooms.forEach(room => {
 
@@ -390,9 +398,12 @@ class App {
             //this handles interactions with the start button attached to the scene
             joinBtn.onPointerDownObservable.add(() => { 
                 this.roomId = room.roomId;
+                this.lobbyRoom.removeAllListeners();
                 this._goToGame();
+                
             });
         });
+        
     }
 
     private async _setUpGame() { //async
@@ -531,9 +542,9 @@ class App {
         console.log('LOGGING IN TO ROOM', this.roomId);
 
         if(this.roomId){
-            this.room = await this._client.joinOrCreate("my_room", { roomId: this.roomId });
+            this.room = await this._client.join("my_room", { roomId: this.roomId });
         }else{
-            this.room = await this._client.joinOrCreate("my_room");
+            this.room = await this._client.create("my_room");
         }
 
         // when someone joins the room event
@@ -545,20 +556,24 @@ class App {
 
             scene.playerEntities[sessionId] = _player;
 
+            console.log(scene.playerEntities);
+
             if(isCurrentPlayer){
                 this._currentPlayer = _player;
                 this._currentPlayer.activatePlayerCamera();
+                console.log('ADDING CURRENT PLAYER', entity, this._currentPlayer);
+            }else{
+                console.log('ADDING OTHER PLAYER', entity, _player);
             }
 
         });
 
-        // create the player
-        //this._player = new Player(this.assets, scene, shadowGenerator, this._input);
+        // when someone leave the room event
+        this.room.state.players.onRemove((player, sessionId) => {
+            console.log('Client left', player, sessionId);
+            delete scene.playerEntities[sessionId];
+        });
 
-        // activate the camera
-        //this._player.activatePlayerCamera();
-
-        
         //--Transition post process--
         scene.registerBeforeRender(() => {
             if (this._ui.transition) {
