@@ -33,47 +33,106 @@ export class Player extends TransformNode {
     private _lastGroundPos: Vector3 = Vector3.Zero(); // keep track of the last grounded position
     private _grounded: boolean;
 
-    private playerNextPosition: { [playerId: string]: Vector3 } = {};
+    public playerNextPosition: { [playerId: string]: Vector3 } = {};
+    private isCurrentPlayer: boolean;
     private sessionId: string;
+
+    private entity: {};
+    private xPos: 0;
+    private yPos: 0;
+    private zPos: 0;
 
     constructor(entity, isCurrentPlayer, sessionId, scene: Scene, input?) {
         super("player", scene);
-        this.scene = scene;
-        this.sessionId = sessionId;
 
+        this.scene = scene;
+        this.sessionId = sessionId; // network id from colyseus
+        this.entity = entity;
+        this.isCurrentPlayer = isCurrentPlayer;
+
+        this.xPos = 0
+        this.yPos = 0
+        this.zPos = 0
+
+        // spawn player
+        this.spawn(this.entity, input);
+
+    }
+
+    private spawn(entity, input): void {
+        
         // generate mesh
-        const sphere = MeshBuilder.CreateSphere(`player-${sessionId}`, {
+        const sphere = MeshBuilder.CreateSphere(`player-${this.sessionId}`, {
             segments: 8,
             diameter: 4
-        }, scene);
+        }, this.scene);
       
         // set material to differentiate CURRENT player and OTHER players
-        let sphereMaterial = new CustomMaterial(`player-material-${sessionId}`);
-        sphereMaterial.emissiveColor = (isCurrentPlayer) ? Color3.FromHexString("#ff9900") : Color3.Gray();
+        let sphereMaterial = new CustomMaterial(`player-material-${this.sessionId}`);
+        sphereMaterial.emissiveColor = (this.isCurrentPlayer) ? Color3.FromHexString("#ff9900") : Color3.Gray();
         sphere.material = sphereMaterial;
 
         // set initial position from server
         sphere.position.set(entity.xPos, entity.yPos, entity.zPos);
     
         // save entities
-        this.playerNextPosition[sessionId] = sphere.position.clone();
+        this.playerNextPosition[this.sessionId] = sphere.position.clone();
 
-        // update local target position
-        entity.onChange(() => {
-            this.playerNextPosition[sessionId].set(entity.xPos, entity.yPos, entity.zPos);
-        });
-
+        // set mesh
         this.mesh = sphere;
         this.mesh.parent = this;
-        this._input = input;
-
-        if(isCurrentPlayer){
+        
+        // if myself, add all player related stuff
+        if(this.isCurrentPlayer){
+            this._input = input;
             this._setupPlayerCamera();
         }
+
+        // init events
+        entity.onChange(() => {
+            this.playerNextPosition[this.sessionId].set(entity.xPos, entity.yPos, entity.zPos);
+        });
+        
+
     }
 
-    private _move(): void {
-        
+    private _initEvents() {
+
+    }
+
+    private processMove(command) {
+
+        /*
+        let velocityX = 0
+        let velocityZ = 0
+        let velocityY = 0
+
+        // create forces from input
+        velocityZ = command.backward - command.forward
+        velocityX = command.right - command.left
+        velocityY = command.jump ? 3 : -0.001 ; // jump or keep going down
+
+        // add values
+        this.moveDirection.x = velocityZ * Math.sin(command.rotation / 180 * Math.PI * 2) + velocityX * Math.cos((-command.rotation / 180 * Math.PI * 2));
+        this.moveDirection.z = velocityZ * Math.cos(command.rotation / 180 * Math.PI * 2) + velocityX * Math.sin((-command.rotation / 180 * Math.PI * 2));
+        this.moveDirection.y = velocityY
+
+        // DONT GO BELOW GROUND
+        if (velocityY < 1) {
+            //this.y = 0;
+            //this.moveDirection.y = 0
+        }
+
+        //console.log(command, velocityZ, velocityX, velocityY);
+        */
+    }
+
+    private move(delta) {
+        /*
+        this.x += this.moveDirection.x * this.speed * delta
+        this.z += this.moveDirection.z * this.speed * delta
+        this.y += this.moveDirection.y * this.speed * delta;
+        */
     }
 
     public activatePlayerCamera(): UniversalCamera {

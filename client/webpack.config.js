@@ -5,6 +5,7 @@ const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
     entry: path.resolve(appDirectory, "src/app.ts"),
+    devtool: "source-map",
     output: {
         //name for the js file that is created/compiled in memory
         filename: 'js/bundle.js',
@@ -28,10 +29,15 @@ module.exports = {
             // {test: /\.tsx?$/,
             // loader: "ts-loader"}
             {
-              test: /\.tsx?$/,
-              use: "ts-loader",
-              exclude: /node_modules/
-            },
+                test: /\.tsx?$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: "ts-loader",
+                    options: {
+                        //sourceMap: true,
+                    }
+                }
+            }
         ]
     },
     plugins: [

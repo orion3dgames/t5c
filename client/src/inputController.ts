@@ -100,6 +100,8 @@ export class PlayerInput {
         } else {
             this.jumpKeyDown = false;
         }
+
+        //console.log(this);
     }
 
     // Mobile controls

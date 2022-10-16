@@ -463,9 +463,6 @@ class App {
         scene.environmentTexture = envHdri;
         scene.environmentIntensity = 0.02;*/
 
-        //--INPUT--
-        this._input = new PlayerInput(scene, this._ui); //detect keyboard/mobile inputs
-
         //Initializes the game's loop
         await this._initializeGameAsync(scene); //handles scene related updates & setting up meshes in scene
 
@@ -547,35 +544,47 @@ class App {
             this.room = await this._client.create("my_room");
         }
 
+        scene.playerEntities = [];
+
         // when someone joins the room event
         this.room.state.players.onAdd((entity, sessionId) => {
 
             var isCurrentPlayer = sessionId === this.room.sessionId;
-          
+        
+            this._input = new PlayerInput(scene, this._ui); //detect keyboard/mobile inputs
+
             let _player = new Player(entity, isCurrentPlayer, sessionId, scene, this._input);
-
-            scene.playerEntities[sessionId] = _player;
-
-            console.log(scene.playerEntities);
 
             if(isCurrentPlayer){
                 this._currentPlayer = _player;
                 this._currentPlayer.activatePlayerCamera();
                 console.log('ADDING CURRENT PLAYER', entity, this._currentPlayer);
             }else{
-                console.log('ADDING OTHER PLAYER', entity, _player);
+                console.log('ADDING CURRENT PLAYER', entity, this._currentPlayer);
             }
+
+            scene.playerEntities[sessionId] = _player;
 
         });
 
         // when someone leave the room event
         this.room.state.players.onRemove((player, sessionId) => {
             console.log('Client left', player, sessionId);
+            scene.playerEntities[sessionId].mesh.dispose();
             delete scene.playerEntities[sessionId];
         });
 
         //--Transition post process--
         scene.registerBeforeRender(() => {
+
+            // 
+            for (let sessionId in this.playerEntities) {
+                const entity = this.playerEntities[sessionId];
+                const targetPosition = entity.playerNextPosition;
+                entity.position = Vector3.Lerp(entity.position, targetPosition, 0.05);
+              }
+
+
             if (this._ui.transition) {
                 this._ui.fadeLevel -= .05;
 
