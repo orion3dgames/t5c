@@ -50,7 +50,7 @@ class App {
     private room: Room<any>;
     private lobbyRoom: Room<any>;
     private roomId = "";
-    private playerEntities: { [playerId: string]: Player } = {};
+    private playerEntities: Player[] = [];
 
     constructor() {
 
@@ -420,7 +420,6 @@ class App {
 
         //Load environment and character assets
         await this._environment.load(); //environment
-        await this._loadCharacterAssets(scene); //character
     }
 
     //loading sounds for the game scene
@@ -455,14 +454,6 @@ class App {
         //dont detect any inputs from this ui while the game is loading
         scene.detachControl();
 
-        //IBL (image based lighting) - to give scene an ambient light
-        /*
-        const envHdri = CubeTexture.CreateFromPrefilteredData("textures/envtext.env", scene);
-        envHdri.name = "env";
-        envHdri.gammaSpace = false;
-        scene.environmentTexture = envHdri;
-        scene.environmentIntensity = 0.02;*/
-
         //Initializes the game's loop
         await this._initializeGameAsync(scene); //handles scene related updates & setting up meshes in scene
 
@@ -482,56 +473,6 @@ class App {
         //this.game.play(); // play the gamesong
     }
 
-    //load the character model
-    private async _loadCharacterAssets(scene): Promise<any> {
-
-        async function loadCharacter() {
-
-            //collision mesh
-            const outer = MeshBuilder.CreateBox("outer", { width: 2, depth: 1, height: 3 }, scene);
-            outer.isVisible = true;
-            outer.isPickable = false;
-            outer.checkCollisions = true;
-
-            //move origin of box collider to the bottom of the mesh (to match player mesh)
-            outer.bakeTransformIntoVertices(Matrix.Translation(0, 1.5, 0))
-
-            //for collisions
-            outer.ellipsoid = new Vector3(1, 1.5, 1);
-            outer.ellipsoidOffset = new Vector3(0, 1.5, 0);
-            outer.rotationQuaternion = new Quaternion(0, 1, 0, 0); // rotate the player mesh 180 since we want to see the back of the player
-            
-            /*
-            //--IMPORTING MESH--
-            return SceneLoader.ImportMeshAsync(null, "./models/", "player.glb", scene).then((result) =>{
-                const root = result.meshes[0];
-                //body is our actual player mesh
-                const body = root;
-                body.parent = outer;
-                body.isPickable = false;
-                body.getChildMeshes().forEach(m => {
-                    m.isPickable = false;
-                })
-                
-                //return the mesh and animations
-                return {
-                    mesh: outer as Mesh,
-                    animationGroups: result.animationGroups
-                }
-            });
-            */
-           //return the mesh and animations
-           return {
-                mesh: outer as Mesh,
-                //animationGroups: result.animationGroups
-            }
-        }
-
-        return loadCharacter().then(assets => {
-            this.assets = assets;
-        });
-    }
-
     //init game
     private async _initializeGameAsync(scene): Promise<void> {
 
@@ -543,8 +484,6 @@ class App {
         }else{
             this.room = await this._client.create("my_room");
         }
-
-        scene.playerEntities = [];
 
         // when someone joins the room event
         this.room.state.players.onAdd((entity, sessionId) => {
@@ -563,7 +502,7 @@ class App {
                 console.log('ADDING CURRENT PLAYER', entity, this._currentPlayer);
             }
 
-            scene.playerEntities[sessionId] = _player;
+            this.playerEntities[sessionId] = _player;
 
         });
 
@@ -577,17 +516,30 @@ class App {
         //--Transition post process--
         scene.registerBeforeRender(() => {
 
-            // 
+            // continuously lerp movement
             for (let sessionId in this.playerEntities) {
                 const entity = this.playerEntities[sessionId];
                 const targetPosition = entity.playerNextPosition;
-                entity.position = Vector3.Lerp(entity.position, targetPosition, 0.05);
-              }
+                entity.mesh.position = Vector3.Lerp(entity.mesh.position, targetPosition, 0.05);
+            }
 
+            // detect movement
+            if(this._input.horizontalAxis || this._input.verticalAxis ){
 
+                console.log('MOVE', this._currentPlayer.playerNextPosition);
+
+                this._currentPlayer.processMove();
+                
+                this.room.send("updatePosition", {
+                    x: this._currentPlayer.playerNextPosition.x,
+                    y: this._currentPlayer.playerNextPosition.y,
+                    z: this._currentPlayer.playerNextPosition.z,
+                });
+            }
+
+            // fade scene leave
             if (this._ui.transition) {
                 this._ui.fadeLevel -= .05;
-
                 //once the fade transition has complete, switch scenes
                 if(this._ui.fadeLevel <= 0) {
                     this._ui.quit = true;
@@ -598,7 +550,7 @@ class App {
 
         // game loop
         scene.onBeforeRenderObservable.add(() => {
-            
+                        
             if(this._ui.transition){
                 this.room.leave();
                 this._goToStart();

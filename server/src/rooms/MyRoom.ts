@@ -113,6 +113,15 @@ export class MyRoom extends Room<MyRoomState> {
 
     registerForMessages() {
 
+        this.onMessage("updatePosition", (client, data) => {
+            console.log("update received -> ");
+            console.debug(JSON.stringify(data));
+            const player = this.state.players.get(client.sessionId);
+            player.xPos = data["x"];
+            player.yPos = data['y'];
+            player.zPos = data["z"];
+        });
+
         this.onMessage("entityUpdate", (client, entityUpdateArray) => {
             logger.silly(`Received entityUpdate from ${client.id}`);
             this.onEntityUpdate(client.id, entityUpdateArray);

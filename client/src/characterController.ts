@@ -33,7 +33,7 @@ export class Player extends TransformNode {
     private _lastGroundPos: Vector3 = Vector3.Zero(); // keep track of the last grounded position
     private _grounded: boolean;
 
-    public playerNextPosition: { [playerId: string]: Vector3 } = {};
+    public playerNextPosition: Vector3;
     private isCurrentPlayer: boolean;
     private sessionId: string;
 
@@ -76,7 +76,7 @@ export class Player extends TransformNode {
         sphere.position.set(entity.xPos, entity.yPos, entity.zPos);
     
         // save entities
-        this.playerNextPosition[this.sessionId] = sphere.position.clone();
+        this.playerNextPosition = sphere.position.clone();
 
         // set mesh
         this.mesh = sphere;
@@ -90,17 +90,16 @@ export class Player extends TransformNode {
 
         // init events
         entity.onChange(() => {
-            this.playerNextPosition[this.sessionId].set(entity.xPos, entity.yPos, entity.zPos);
+            this.playerNextPosition.set(entity.xPos, entity.yPos, entity.zPos);
         });
-        
 
     }
 
     private _initEvents() {
-
+        
     }
 
-    private processMove(command) {
+    public processMove() {
 
         /*
         let velocityX = 0
@@ -125,6 +124,8 @@ export class Player extends TransformNode {
 
         //console.log(command, velocityZ, velocityX, velocityY);
         */
+
+        this.playerNextPosition.set(10, 0, 0);
     }
 
     private move(delta) {
