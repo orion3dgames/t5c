@@ -11,7 +11,7 @@
         "dom",
         "es6"
     ],
-    // "outDir": "./dist"
+    "outDir": "./dist",
     "rootDir": "src"
   },
   "exclude": [ //dont include the tutorial files in the build, they're just there for references in documentation
