@@ -1,4 +1,7 @@
 "use strict";
+
+import * as functions from "firebase-functions";
+
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * IMPORTANT:
@@ -14,3 +17,5 @@ const arena_config_1 = require("./arena.config");
 // Create and listen on 2567 (or PORT environment variable.)
 arena_1.listen(arena_config_1.default);
 //# sourceMappingURL=index.js.map
+
+exports.app = functions.https.onRequest(arena_1);
