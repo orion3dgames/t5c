@@ -9,6 +9,7 @@
   },
   "functions": [
     {
+      "runtime": "nodejs16",
       "source": "server",
       "codebase": "default",
       "ignore": [

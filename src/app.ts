@@ -69,7 +69,7 @@ class App {
  
         this._scene = new Scene(this._engine); 
 
-        this._client = new Colyseus.Client('ws://localhost:2567');
+        this._client = new Colyseus.Client('ws://orbiter-colyseus.web.app:2567');
 
         //**for development: make inspector visible/invisible
         window.addEventListener("keydown", (ev) => {
