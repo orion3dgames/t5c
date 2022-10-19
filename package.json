@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
-    "start": "webpack-dev-server --port 8080"
+    "serve": "webpack-dev-server --port 8080 & node ./server",
+    "start": "node ./server"
   },
   "author": "",
   "license": "ISC",

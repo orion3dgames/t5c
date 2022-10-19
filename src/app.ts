@@ -514,6 +514,8 @@ class App {
         });
 
         //--Transition post process--
+        
+        let timeThen = Date.now();   
         scene.registerBeforeRender(() => {
 
             // continuously lerp movement
@@ -523,19 +525,27 @@ class App {
                 entity.mesh.position = Vector3.Lerp(entity.mesh.position, targetPosition, 0.05);
             }
 
-            // detect movement
-            if(this._input.horizontalAxis || this._input.verticalAxis ){
+            // prepare game loop
+            let timeNow = Date.now();   
+            let timePassed = (timeNow - timeThen) / 1000;
+            let updateRate = .5;          
+            if( timePassed >= updateRate){
 
-                console.log('MOVE', this._currentPlayer.playerNextPosition);
+                console.log('GAME LOOP UPDATE '+updateRate+' SECONDS');
 
-                this._currentPlayer.processMove();
-                
-                this.room.send("updatePosition", {
-                    x: this._currentPlayer.playerNextPosition.x,
-                    y: this._currentPlayer.playerNextPosition.y,
-                    z: this._currentPlayer.playerNextPosition.z,
-                });
-            }
+                // detect movement
+                if(this._input.horizontalAxis || this._input.verticalAxis ){
+                    this._currentPlayer.processMove();
+                    this.room.send("updatePosition", {
+                        x: this._currentPlayer.playerNextPosition.x,
+                        y: this._currentPlayer.playerNextPosition.y,
+                        z: this._currentPlayer.playerNextPosition.z,
+                    });
+                }
+
+                timeThen = timeNow;
+            }              
+
 
             // fade scene leave
             if (this._ui.transition) {

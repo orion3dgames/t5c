@@ -37,10 +37,10 @@ export class Player extends TransformNode {
     private isCurrentPlayer: boolean;
     private sessionId: string;
 
-    private entity: {};
-    private xPos: 0;
-    private yPos: 0;
-    private zPos: 0;
+    public entity: any;
+    public xPos: number;
+    public yPos: number;
+    public zPos: number;
 
     constructor(entity, isCurrentPlayer, sessionId, scene: Scene, input?) {
         super("player", scene);
@@ -49,17 +49,14 @@ export class Player extends TransformNode {
         this.sessionId = sessionId; // network id from colyseus
         this.entity = entity;
         this.isCurrentPlayer = isCurrentPlayer;
-
-        this.xPos = 0
-        this.yPos = 0
-        this.zPos = 0
+        this._input = input;
 
         // spawn player
-        this.spawn(this.entity, input);
+        this.spawn(entity);
 
     }
 
-    private spawn(entity, input): void {
+    private spawn(entity): void {
         
         // generate mesh
         const sphere = MeshBuilder.CreateSphere(`player-${this.sessionId}`, {
@@ -73,7 +70,7 @@ export class Player extends TransformNode {
         sphere.material = sphereMaterial;
 
         // set initial position from server
-        sphere.position.set(entity.xPos, entity.yPos, entity.zPos);
+        sphere.position.set(this.entity.xPos, this.entity.yPos, this.entity.zPos);
     
         // save entities
         this.playerNextPosition = sphere.position.clone();
@@ -84,56 +81,50 @@ export class Player extends TransformNode {
         
         // if myself, add all player related stuff
         if(this.isCurrentPlayer){
-            this._input = input;
             this._setupPlayerCamera();
         }
 
-        // init events
-        entity.onChange(() => {
-            this.playerNextPosition.set(entity.xPos, entity.yPos, entity.zPos);
+        // entity network event
+        this.entity.onChange(() => {
+            console.log('entity.onChange', entity);
+            this.playerNextPosition.set(this.entity.xPos, this.entity.yPos, this.entity.zPos);
         });
 
     }
 
-    private _initEvents() {
-        
-    }
-
     public processMove() {
 
-        /*
+        // prepare velocity
         let velocityX = 0
         let velocityZ = 0
         let velocityY = 0
 
         // create forces from input
-        velocityZ = command.backward - command.forward
-        velocityX = command.right - command.left
-        velocityY = command.jump ? 3 : -0.001 ; // jump or keep going down
+        velocityX = this._input.horizontal;
+        velocityZ = this._input.vertical;
+        velocityY = 0; // jump or keep going down
 
         // add values
-        this.moveDirection.x = velocityZ * Math.sin(command.rotation / 180 * Math.PI * 2) + velocityX * Math.cos((-command.rotation / 180 * Math.PI * 2));
-        this.moveDirection.z = velocityZ * Math.cos(command.rotation / 180 * Math.PI * 2) + velocityX * Math.sin((-command.rotation / 180 * Math.PI * 2));
-        this.moveDirection.y = velocityY
+        this._moveDirection.x = velocityX;
+        this._moveDirection.y = velocityY;
+        this._moveDirection.z = velocityZ;
 
-        // DONT GO BELOW GROUND
-        if (velocityY < 1) {
-            //this.y = 0;
-            //this.moveDirection.y = 0
-        }
+        console.log('processMove', this._input.horizontal, this._input.vertical, this._moveDirection);
 
-        //console.log(command, velocityZ, velocityX, velocityY);
-        */
-
-        this.playerNextPosition.set(10, 0, 0);
+        // do move
+        this.move();
     }
 
-    private move(delta) {
-        /*
-        this.x += this.moveDirection.x * this.speed * delta
-        this.z += this.moveDirection.z * this.speed * delta
-        this.y += this.moveDirection.y * this.speed * delta;
-        */
+    private move() {
+
+        // update networked entity
+        this.entity.xPos += this._moveDirection.x * Player.PLAYER_SPEED;
+        this.entity.zPos += this._moveDirection.z * Player.PLAYER_SPEED;
+        this.entity.yPos = 1;
+
+        // update local player
+        this.playerNextPosition.set(this.entity.xPos, this.entity.yPos, this.entity.zPos);
+        
     }
 
     public activatePlayerCamera(): UniversalCamera {
