@@ -69,7 +69,7 @@ class App {
  
         this._scene = new Scene(this._engine); 
 
-        this._client = new Colyseus.Client('ws://orbiter-colyseus.web.app:2567');
+        this._client = new Colyseus.Client('ws://localhost:2567');
 
         //**for development: make inspector visible/invisible
         window.addEventListener("keydown", (ev) => {
@@ -91,7 +91,7 @@ class App {
 
         // debug 
         //await this._goToGame();
-        await this._goToStart();
+        await this._goToLobby();
 
         // Register a render loop to repeatedly render the scene
         this._engine.runRenderLoop(() => {
@@ -184,7 +184,7 @@ class App {
         });
 
         //--GUI--
-        const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI"); 
         guiMenu.idealHeight = 720;
 
         const imageRect = new Rectangle("titleContainer");
@@ -335,7 +335,7 @@ class App {
 
         // join lobby
         this._client.joinOrCreate("lobby").then((lobby) => {
-    
+
             this.lobbyRoom = lobby;
 
             this.lobbyRoom.onMessage("rooms", (rooms) => {

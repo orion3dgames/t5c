@@ -65,9 +65,9 @@ export class Player extends TransformNode {
         }, this.scene);
       
         // set material to differentiate CURRENT player and OTHER players
-        let sphereMaterial = new CustomMaterial(`player-material-${this.sessionId}`);
-        sphereMaterial.emissiveColor = (this.isCurrentPlayer) ? Color3.FromHexString("#ff9900") : Color3.Gray();
-        sphere.material = sphereMaterial;
+        //let sphereMaterial = new CustomMaterial(`player-material-${this.sessionId}`);
+        //sphereMaterial.emissiveColor = (this.isCurrentPlayer) ? Color3.FromHexString("#ff9900") : Color3.Gray();
+        //sphere.material = sphereMaterial;
 
         // set initial position from server
         sphere.position.set(this.entity.xPos, this.entity.yPos, this.entity.zPos);

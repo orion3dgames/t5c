@@ -12,11 +12,11 @@
   "license": "ISC",
   "devDependencies": {
     "@babylonjs/core": "latest",
-    "@babylonjs/gui": "latest",
     "@babylonjs/inspector": "latest",
-    "@babylonjs/loaders": "latest",
+    "@babylonjs/gui": "latest",
     "@babylonjs/gui-editor": "latest",
     "@babylonjs/materials": "latest",
+    "@babylonjs/loaders": "latest",
     "@babylonjs/serializers": "latest",
     "@types/node": "^17.0.12",
     "@types/react": "16.7.3",
@@ -34,7 +34,7 @@
     "babylonjs-gui": "latest",
     "babylonjs-loaders": "latest",
     "babylonjs-materials": "latest",
-    "babylonjs-procedural-textures": "latest",
+    "babylonjs-gltf2interface": "latest",
     "colyseus.js": "^0.15.0-preview.2",
     "dotenv-webpack": "^7.0.3"
   }

@@ -1,6 +1,5 @@
 import { Room, Client, updateLobby } from "@colyseus/core";
-import { MyRoomState, Player } from "./schema/MyRoomState";
-
+import { MyRoomState, Player, Cube } from "./schema/MyRoomState";
 import logger = require("../helpers/logger");
 
 export class MyRoom extends Room<MyRoomState> {
@@ -32,6 +31,9 @@ export class MyRoom extends Room<MyRoomState> {
         this.setSimulationInterval(dt => {
             this.state.serverTime += dt;
         });
+
+        // generate world
+        this.initializeWorld();
 
         //
         // This is just a demonstration
@@ -128,4 +130,44 @@ export class MyRoom extends Room<MyRoomState> {
         });
 
     }
+
+    spawnCube(cubeData: any){
+        const cube = new Cube(cubeData).assign(cubeData);
+        this.state.cubes.set('UNIQUE ID HERE', cube);
+        return cube;
+    }
+
+    initializeWorld() {
+
+        console.log('initializeWorldFromDB');
+
+        /////////////////////////////////////////////////////////
+        // GENERATE MAIN WORLD
+        var grid_x = 5;
+        var grid_z = 5;
+        for (var x = -grid_x; x <= grid_x; x++) {
+            for (var z = -grid_z; z <= grid_z; z++) {
+                let cubeData = {
+                    player_uid: 'SERVER',
+                    x: x,
+                    y: -1,
+                    z: z,
+                    color: '#EEEEEE',
+                    type: 'crate'
+                }
+                this.spawnCube(cubeData);
+
+                // ADD A BORDER TO THE MAIN WORLD
+                cubeData.y = 0;
+                if (z === -grid_x) { this.spawnCube(cubeData); }
+                if (x === -grid_z) { this.spawnCube(cubeData); }
+                if (x === grid_x) { this.spawnCube(cubeData); }
+                if (z === grid_z) { this.spawnCube(cubeData); }
+
+            }
+        }     
+        console.log("Generated Main World ( " + (grid_x * grid_z) + " cubes ) ");
+    }
+
+
 }

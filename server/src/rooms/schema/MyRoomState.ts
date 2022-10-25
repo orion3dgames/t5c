@@ -21,12 +21,23 @@ export class Player extends Schema {
   
 }
 
+//Chat related schemas
+export class Cube extends Schema {
+  @type("string") player_uid: string = "SERVER";
+  @type("string") color: string = "#EEEEEE";
+  @type("string") type: string = "crate";
+  @type("number") createdAt: number = Date.now();
+  @type("number") x: number = 0.0;
+  @type("number") y: number = 0.0;
+  @type("number") z: number = 0.0;
+}
+
 //
 export class MyRoomState extends Schema {
   @type({ map: Player }) players = new MapSchema<Player>();
+  @type({ map: Cube }) cubes = new MapSchema<Cube>();
   @type("number") serverTime: number = 0.0;
 }
-
 
 //Chat related schemas
 export class ChatMessage extends Schema {

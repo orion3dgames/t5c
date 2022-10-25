@@ -18,6 +18,7 @@ export default Arena({
     },
 
     initializeExpress: (app) => {
+        
         app.get("/", (req, res) => {
             res.send("Server ready!");
         });
