@@ -57,7 +57,7 @@ export class MyRoom extends Room<MyRoomState> {
         const player = new Player().assign({
             id: client.id,
             timestamp: this.state.serverTime,
-            username: Math.random().toString().substring(10,15)
+            username: this.generateRandomUUID()
         });
 
         // place at initial position
@@ -69,7 +69,10 @@ export class MyRoom extends Room<MyRoomState> {
         // (client.sessionId is unique per connection!)
         this.state.players.set(client.sessionId, player);
 
-        console.log(player.toJSON());
+    }
+
+    generateRandomUUID(){
+        return Math.random().toString().substring(10,20);
     }
 
     onLeave(client: Client, consented: boolean) {
@@ -133,13 +136,13 @@ export class MyRoom extends Room<MyRoomState> {
 
     spawnCube(cubeData: any){
         const cube = new Cube(cubeData).assign(cubeData);
-        this.state.cubes.set('UNIQUE ID HERE', cube);
+        this.state.cubes.set(cubeData.id, cube);
         return cube;
     }
 
     initializeWorld() {
 
-        console.log('initializeWorldFromDB');
+        logger.silly(`*** GENERATE WORLD ***`);
 
         /////////////////////////////////////////////////////////
         // GENERATE MAIN WORLD
@@ -148,6 +151,7 @@ export class MyRoom extends Room<MyRoomState> {
         for (var x = -grid_x; x <= grid_x; x++) {
             for (var z = -grid_z; z <= grid_z; z++) {
                 let cubeData = {
+                    id: this.generateRandomUUID(),
                     player_uid: 'SERVER',
                     x: x,
                     y: -1,
@@ -165,8 +169,9 @@ export class MyRoom extends Room<MyRoomState> {
                 if (z === grid_z) { this.spawnCube(cubeData); }
 
             }
-        }     
-        console.log("Generated Main World ( " + (grid_x * grid_z) + " cubes ) ");
+        }   
+
+        console.log("Generated Main World with " + (grid_x * grid_z) + " cubes ");
     }
 
 

@@ -23,6 +23,7 @@ export class Player extends Schema {
 
 //Chat related schemas
 export class Cube extends Schema {
+  @type("string") id: string = "ID";
   @type("string") player_uid: string = "SERVER";
   @type("string") color: string = "#EEEEEE";
   @type("string") type: string = "crate";

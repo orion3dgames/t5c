@@ -2,13 +2,13 @@ import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
 
-import { Engine, Scene, Vector3, Mesh, Color3, Color4, ShadowGenerator, PointLight, FreeCamera, Sound, Matrix, MeshBuilder, Quaternion, EngineFactory } from "@babylonjs/core";
-import { PlayerInput } from "./inputController";
-import { Player } from "./characterController";
-import { Hud } from "./ui";
-import { AdvancedDynamicTexture, Button, TextBlock, Rectangle, Control, Image, ScrollViewer } from "@babylonjs/gui";
-import { NormalMaterial, CustomMaterial, SimpleMaterial } from "@babylonjs/materials";
-import { Environment } from "./environment";
+import { Engine, Scene, Vector3, Mesh, Color3, Color4, HemisphericLight, FreeCamera, Sound, Matrix, MeshBuilder, Quaternion, EngineFactory } from "@babylonjs/core";
+import { PlayerInput } from "./Controllers/inputController";
+import { Player } from "./Entities/Player";
+import { Cube } from "./Entities/Cube";
+import { Hud } from "./Controllers/ui";
+import { AdvancedDynamicTexture, Button, TextBlock, Rectangle, Control, ScrollViewer } from "@babylonjs/gui";
+import { Environment } from "./Controllers/environment";
 
 // colyseus
 import * as Colyseus from "colyseus.js"; // not necessary if included via <script> tag.
@@ -451,6 +451,9 @@ class App {
         const ui = new Hud(scene);
         this._ui = ui;
 
+        // add light
+        var light = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
+
         //dont detect any inputs from this ui while the game is loading
         scene.detachControl();
 
@@ -511,6 +514,12 @@ class App {
             console.log('Client left', player, sessionId);
             scene.playerEntities[sessionId].mesh.dispose();
             delete scene.playerEntities[sessionId];
+        });
+
+        // when a cube is added
+        this.room.state.cubes.onAdd((entity, sessionId) => {
+            console.log('CUBE ADDED', entity, sessionId);
+            let cube = new Cube(entity, scene);
         });
 
         //--Transition post process--

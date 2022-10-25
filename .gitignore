@@ -12,6 +12,8 @@ pids
 logs
 results
 tmp
+.firebase
+.github
 
 # Build
 public/css/main.css
