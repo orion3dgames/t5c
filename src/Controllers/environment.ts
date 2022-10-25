@@ -52,6 +52,7 @@ export class Environment {
         plane.material = materialPlane;
 
         allMeshes.push(plane);
+        
 
         return {
             allMeshes: allMeshes,

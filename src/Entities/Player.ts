@@ -35,7 +35,7 @@ export class Player extends TransformNode {
 
     public playerNextPosition: Vector3;
     private isCurrentPlayer: boolean;
-    private sessionId: string;
+    public sessionId: string;
 
     public entity: any;
     public xPos: number;
@@ -61,7 +61,7 @@ export class Player extends TransformNode {
         // generate mesh
         const sphere = MeshBuilder.CreateSphere(`player-${this.sessionId}`, {
             segments: 8,
-            diameter: 4
+            diameter: 1
         }, this.scene);
       
         // set material to differentiate CURRENT player and OTHER players
@@ -118,9 +118,9 @@ export class Player extends TransformNode {
     private move() {
 
         // update networked entity
-        this.entity.xPos += this._moveDirection.x * Player.PLAYER_SPEED;
-        this.entity.zPos += this._moveDirection.z * Player.PLAYER_SPEED;
-        this.entity.yPos = 1;
+        this.entity.xPos -= this._moveDirection.x * Player.PLAYER_SPEED;
+        this.entity.zPos -= this._moveDirection.z * Player.PLAYER_SPEED;
+        this.entity.yPos = 0;
 
         // update local player
         this.playerNextPosition.set(this.entity.xPos, this.entity.yPos, this.entity.zPos);
@@ -155,7 +155,7 @@ export class Player extends TransformNode {
         yTilt.parent = this._camRoot;
 
         //our actual camera that's pointing at our root's position
-        this.camera = new UniversalCamera("cam", new Vector3(0, 0, -300), this.scene);
+        this.camera = new UniversalCamera("cam", new Vector3(0, 0, -50), this.scene);
         this.camera.lockedTarget = this._camRoot.position;
         this.camera.fov = 0.47350045992678597;
         this.camera.parent = yTilt;
