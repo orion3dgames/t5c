@@ -62,7 +62,7 @@ export class MyRoom extends Room<MyRoomState> {
 
         // place at initial position
         player.xPos = Math.floor(Math.random() * 11);
-        player.yPos = 1;
+        player.yPos = 0;
         player.zPos = Math.floor(Math.random() * 11);
 
         // place player in the map of players by its sessionId
@@ -84,52 +84,15 @@ export class MyRoom extends Room<MyRoomState> {
         console.log("room", this.roomId, "disposing...");
     }
 
-
-    /**
-     * Callback for the "entityUpdate" message from the client to update an entity
-     * @param {*} clientID The sessionId of the client we want to update
-     * @param {*} data The data containing the data we want to update the newtworkedUser with
-     */
-    onEntityUpdate(clientID: string, data: any) {
-
-        // Assumes that index 0 is going to be the sessionId of the user
-        if (this.state.players.has(`${data[0]}`) === false) {
-            logger.info(`Attempted to update client with id ${data[0]} but room state has no record of it`)
-            return;
-        }
-
-        let stateToUpdate = this.state.players.get(data[0]);
-
-        let startIndex = 1;
-
-        for (let i = startIndex; i < data.length; i += 2) {
-            const property = data[i];
-            let updateValue = data[i + 1];
-            if (updateValue === "inc") {
-                updateValue = data[i + 2];
-                i++; // inc i once more since we had a inc;
-            }
-
-            (stateToUpdate as any)[property] = updateValue;
-        }
-
-        stateToUpdate.timestamp = parseFloat(this.state.serverTime.toString());
-    }
-
     registerForMessages() {
 
+        // move event
         this.onMessage("updatePosition", (client, data) => {
-            console.log("update received -> ");
-            console.debug(JSON.stringify(data));
+            console.log("update received from client "+client.sessionId+" -> ", JSON.stringify(data));
             const player = this.state.players.get(client.sessionId);
-            player.xPos = data["x"];
-            player.yPos = data['y'];
-            player.zPos = data["z"];
-        });
-
-        this.onMessage("entityUpdate", (client, entityUpdateArray) => {
-            logger.silly(`Received entityUpdate from ${client.id}`);
-            this.onEntityUpdate(client.id, entityUpdateArray);
+            player.xPos = data["xPos"];
+            player.yPos = data['yPos'];
+            player.zPos = data["zPos"];
         });
 
     }
@@ -146,8 +109,8 @@ export class MyRoom extends Room<MyRoomState> {
 
         /////////////////////////////////////////////////////////
         // GENERATE MAIN WORLD
-        var grid_x = 5;
-        var grid_z = 5;
+        var grid_x = 10;
+        var grid_z = 10;
         for (var x = -grid_x; x <= grid_x; x++) {
             for (var z = -grid_z; z <= grid_z; z++) {
                 let cubeData = {

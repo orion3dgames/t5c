@@ -579,7 +579,7 @@ class App {
 
         // when a cube is added
         this.room.state.cubes.onAdd((entity, sessionId) => {
-            console.log('CUBE ADDED', entity, sessionId);
+            //console.log('CUBE ADDED', entity, sessionId);
             let cube = new Cube(entity, scene);
         });
 
@@ -598,7 +598,7 @@ class App {
             // prepare game loop
             let timeNow = Date.now();   
             let timePassed = (timeNow - timeThen) / 1000;
-            let updateRate = .5;          
+            let updateRate = .2;          
             if( timePassed >= updateRate){
 
                 console.log('GAME LOOP UPDATE '+updateRate+' SECONDS');
@@ -607,9 +607,9 @@ class App {
                 if(this._input.horizontalAxis || this._input.verticalAxis ){
                     this._currentPlayer.processMove();
                     this.room.send("updatePosition", {
-                        x: this._currentPlayer.playerNextPosition.x,
-                        y: this._currentPlayer.playerNextPosition.y,
-                        z: this._currentPlayer.playerNextPosition.z,
+                        xPos: this._currentPlayer.playerNextPosition.x,
+                        yPos: this._currentPlayer.playerNextPosition.y,
+                        zPos: this._currentPlayer.playerNextPosition.z,
                     });
                 }
 

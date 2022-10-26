@@ -4,7 +4,6 @@ export class Cube extends TransformNode {
     entity: any;
     constructor(entity, scene) {
         super("cube", scene);
-        console.log(entity);
         this.entity = entity;
         this.spawn(entity, scene);
     }
