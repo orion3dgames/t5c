@@ -10,12 +10,15 @@ import { Hud } from "./Controllers/ui";
 import { AdvancedDynamicTexture, Button, TextBlock, Rectangle, Control, ScrollViewer } from "@babylonjs/gui";
 import { Environment } from "./Controllers/environment";
 
+// IMPORT SCREEN
+import State from "./Screens/Screens";
+import { StartScene } from "./Screens/StartScene";
+import { LobbyScene } from "./Screens/LobbyScene";
+import { GameScene } from "./Screens/GameScene";
+
 // colyseus
 import * as Colyseus from "colyseus.js"; // not necessary if included via <script> tag.
 import { Room, RoomAvailable } from "colyseus.js";
-
-//enum for states
-enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3, LOBBY = 4 }
 
 // App class is our entire game application
 class App {
@@ -39,8 +42,7 @@ class App {
 
     //Scene - related
     private _state: number = 0;
-    private _gamescene: Scene;
-    private _cutScene: Scene;
+    private _currentScene: Scene;
 
     //post process
     private _transition: boolean = false;
@@ -63,14 +65,96 @@ class App {
 
     private async _init(): Promise<void> {
 
+        // create engine
         this._engine = await EngineFactory.CreateAsync(this._canvas, {
             antialiasing: true
         }) as Engine;
  
-        this._scene = new Scene(this._engine); 
-
+        // create colyseus client
         this._client = new Colyseus.Client('ws://localhost:2567');
 
+        //  start scene
+        this._state = State.GAME;
+
+        //MAIN render loop & state machine
+        await this._render();
+
+    }
+
+    private async _render(): Promise<void> {
+
+        console.log('RENDER START');
+
+        let scene;
+
+        // render loop
+        this._engine.runRenderLoop(() => {
+
+            switch (this._state) {
+
+                ///////////////////////////////////////
+                ///////////////////////////////////////
+                ///////////////////////////////////////
+                case State.START:
+                    this.clearScene();
+                    scene = new StartScene(this._engine);
+                    this._scene = scene._scene;
+                    this._state = State.NULL;
+                    break;
+    
+                ///////////////////////////////////////
+                ///////////////////////////////////////
+                ///////////////////////////////////////
+                case State.LOBBY:
+                    this.clearScene();
+                    scene = new LobbyScene(this._engine, this._client);
+                    this._scene = scene._scene;
+                    this._state = State.NULL;
+                    break;
+
+                ///////////////////////////////////////
+                ///////////////////////////////////////
+                ///////////////////////////////////////
+                case State.GAME:
+                    this.clearScene();
+                    scene = new GameScene(this._engine, this._client);
+                    this._scene = scene._scene;
+                    this._state = State.NULL;
+                    break;
+    
+    
+                default: break;
+            }
+
+            // monitor state
+            this._state = scene._newState;
+
+            // render when scene is ready
+            this._process();
+
+        });
+        
+    }
+
+    private async _process(): Promise<void> {
+        if(this._scene){
+            await this._scene.whenReadyAsync();
+            this._engine.hideLoadingUI(); //when the scene is ready, hide loading
+            this._scene.render();
+        }
+    }
+
+    private clearScene() {
+        if(this._scene){
+            this._scene.dispose();
+            this._scene.detachControl();
+            this._engine.displayLoadingUI();
+        }
+    }
+
+    private async _createScene(state: State): Promise<void> {
+
+        /*
         //**for development: make inspector visible/invisible
         window.addEventListener("keydown", (ev) => {
             //Shift+Ctrl+Alt+I
@@ -83,55 +167,41 @@ class App {
             }
         });
 
-        //MAIN render loop & state machine
-        await this._main();
-    }
-
-    private async _main(): Promise<void> {
-
-        // debug 
-        //await this._goToGame();
-        await this._goToLobby();
-
-        // Register a render loop to repeatedly render the scene
-        this._engine.runRenderLoop(() => {
-            switch (this._state) {
-
-                case State.START:
-                    this._scene.render();
-                    break;
-
-                case State.CUTSCENE:
-                    this._scene.render();
-                    break;
-
-                case State.LOBBY:
-                    this._scene.render();
-                    break;
-
-                case State.GAME:
-                    /*
-                    if (this._ui.quit) {
-                        this._goToStart();
-                        this._ui.quit = false;
-                    }*/
-                    this._scene.render();
-                    break;
-
-                case State.LOSE:
-                    this._scene.render();
-                    break;
-
-                default: break;
-            }
-        });
-
         //resize if the screen is resized/rotated
         window.addEventListener('resize', () => {
             this._engine.resize();
         });
+        */
+
     }
 
+    //set up the canvas
+    private _createCanvas(): HTMLCanvasElement {
+
+        document.documentElement.style["overflow"] = "hidden";
+        document.documentElement.style.overflow = "hidden";
+        document.documentElement.style.width = "100%";
+        document.documentElement.style.height = "100%";
+        document.documentElement.style.margin = "0";
+        document.documentElement.style.padding = "0";
+        
+        document.body.style.overflow = "hidden";
+        document.body.style.width = "100%";
+        document.body.style.height = "100%";
+        document.body.style.margin = "0";
+        document.body.style.padding = "0";
+
+        //create the canvas html element and attach it to the webpage
+        this._canvas = document.createElement("canvas");
+        this._canvas.style.width = "100%";
+        this._canvas.style.height = "100%";
+        this._canvas.id = "gameCanvas";
+        document.body.appendChild(this._canvas);
+
+        return this._canvas;
+    }
+
+    /*
     //set up the canvas
     private _createCanvas(): HTMLCanvasElement {
 
@@ -170,15 +240,6 @@ class App {
         //creates and positions a free camera
         let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), scene);
         camera.setTarget(Vector3.Zero()); //targets the camera to scene origin
-
-        //--SOUNDS--
-        /*
-        const start = new Sound("startSong", "./sounds/copycat(revised).mp3", scene, function () {
-        }, {
-            volume: 0.25,
-            loop: true,
-            autoplay: true
-        });*/
 
         const sfx = new Sound("selection", "./sounds/vgmenuselect.wav", scene, function () {
         });
@@ -579,5 +640,6 @@ class App {
 
         //webpack served from public       
     }
+    */
 }
 new App();
