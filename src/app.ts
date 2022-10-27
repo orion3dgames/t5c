@@ -137,11 +137,10 @@ class App {
     }
 
     private async _process(): Promise<void> {
-        if(this._scene){
-            await this._scene.whenReadyAsync();
-            this._engine.hideLoadingUI(); //when the scene is ready, hide loading
-            this._scene.render();
-        }
+        //await this._scene.whenReadyAsync();
+        this._engine.hideLoadingUI(); //when the scene is ready, hide loading
+        this._scene.render();
+        console.log('RENDER');
     }
 
     private clearScene() {

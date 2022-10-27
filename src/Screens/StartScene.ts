@@ -61,7 +61,6 @@ export class StartScene {
 
         // setup events
         this._button.onPointerDownObservable.add(() => { 
-            scene.detachControl(); //observables disabled
             this._newState = State.LOBBY;
         });
 

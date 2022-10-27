@@ -130,7 +130,6 @@ export class Player extends TransformNode {
     public activatePlayerCamera(): UniversalCamera {
         this.scene.registerBeforeRender(() => {
             this._updateCamera();
-    
         })
         return this.camera;
     }

@@ -28,10 +28,13 @@ export class GameScene {
         this.create(engine, client);
     }
 
-    public async create(engine, client) {
+    async create(engine, client): Promise<void> {
 
         // create scene
         let scene = new Scene(engine);
+
+        // set color
+        scene.clearColor = new Color4(0, 0, 0, 1);
 
         //creates and positions a free camera
         let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), scene);
@@ -53,37 +56,33 @@ export class GameScene {
         startBtn.width = 0.2
         startBtn.height = "40px";
         startBtn.color = "white";
-        startBtn.top = "-60px";
+        startBtn.top = "10px";
+        startBtn.left = '-10px';
         startBtn.thickness = 1;
         startBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         startBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         imageRect.addControl(startBtn);
-        this._button = startBtn;
 
         // setup events
-        this._button.onPointerDownObservable.add(() => { 
+        startBtn.onPointerDownObservable.add(() => { 
             this.room.leave();
             this._newState = State.START;
         });
 
-        // add light
-        var light = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
+        console.log('BEFORE NETWORK');
 
-        // 
         this._scene = scene;
 
-        if(this._roomId){
-            this.room = await client.join("my_room", { roomId: this._roomId });
-        }else{
-            this.room = await client.create("my_room");
-        }
+        await this._initNetwork(client);
+
+        console.log('AFTER NETWORK', this.room);
 
         // when someone joins the room event
         this.room.state.players.onAdd((entity, sessionId) => {
 
             var isCurrentPlayer = sessionId === this.room.sessionId;
-        
-            this._input = new PlayerInput(scene, this._ui); //detect keyboard/mobile inputs
+
+            this._input = new PlayerInput(scene); //detect keyboard inputs
 
             let _player = new Player(entity, isCurrentPlayer, sessionId, scene, this._input);
 
@@ -92,7 +91,7 @@ export class GameScene {
                 this._currentPlayer.activatePlayerCamera();
                 console.log('ADDING CURRENT PLAYER', entity, this._currentPlayer);
             }else{
-                console.log('ADDING CURRENT PLAYER', entity, this._currentPlayer);
+                console.log('NOT PLAYER');
             }
 
             this.playerEntities[sessionId] = _player;
@@ -108,7 +107,7 @@ export class GameScene {
 
         // when a cube is added
         this.room.state.cubes.onAdd((entity, sessionId) => {
-            console.log('CUBE ADDED', entity, sessionId);
+            //console.log('CUBE ADDED', entity, sessionId);
             let cube = new Cube(entity, scene);
         });
 
@@ -146,6 +145,16 @@ export class GameScene {
 
         })
 
+       
     }
 
+    private async _initNetwork(client): Promise<void> {
+        // networking
+        if(this._roomId){
+            this.room = await client.join("my_room", { roomId: this._roomId });
+        }else{
+            this.room = await client.create("my_room");
+        } 
+    }
+    
 }
