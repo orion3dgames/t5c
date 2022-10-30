@@ -1,5 +1,6 @@
 import { TransformNode, Scene, Mesh, UniversalCamera, Vector3, MeshBuilder, Color3 } from "@babylonjs/core";
 import { CustomMaterial } from "@babylonjs/materials";
+import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button,Ellipse, Line } from "@babylonjs/gui";
 
 export class Player extends TransformNode {
     public camera;
@@ -56,6 +57,47 @@ export class Player extends TransformNode {
 
     }
 
+    // todo: this should a global utils
+    addLabel(mesh, text) {
+
+        // GUI
+        var advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+    
+        var rect1 = new Rectangle();
+        rect1.width = 0.2;
+        rect1.height = "40px";
+        rect1.cornerRadius = 20;
+        rect1.color = "Orange";
+        rect1.thickness = 4;
+        rect1.background = "green";
+        advancedTexture.addControl(rect1);
+        rect1.linkWithMesh(mesh);   
+        rect1.linkOffsetY = -150;
+    
+        var label = new TextBlock();
+        label.text = text;
+        rect1.addControl(label);
+    
+        var target = new Ellipse();
+        target.width = "20px";
+        target.height = "20px";
+        target.color = "Orange";
+        target.thickness = 4;
+        target.background = "green";
+        advancedTexture.addControl(target);
+        target.linkWithMesh(mesh);   
+    
+        var line = new Line();
+        line.lineWidth = 4;
+        line.color = "Orange";
+        line.y2 = 20;
+        line.linkOffsetY = -10;
+        advancedTexture.addControl(line);
+        line.linkWithMesh(mesh); 
+        line.connectedControl = rect1;   
+
+    }
+
     private spawn(entity): void {
         
         // generate mesh
@@ -78,6 +120,9 @@ export class Player extends TransformNode {
         // set mesh
         this.mesh = sphere;
         this.mesh.parent = this;
+
+        // add player nameplate
+        this.addLabel(this.mesh, entity.username);
         
         // if myself, add all player related stuff
         if(this.isCurrentPlayer){
@@ -160,6 +205,7 @@ export class Player extends TransformNode {
         this.camera.parent = yTilt;
 
         this.scene.activeCamera = this.camera;
+        console.log('_setupPlayerCamera', this.scene);
         return this.camera;
     }
 

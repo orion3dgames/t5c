@@ -57,7 +57,8 @@ export class MyRoom extends Room<MyRoomState> {
         const player = new Player().assign({
             id: client.id,
             timestamp: this.state.serverTime,
-            username: this.generateRandomUUID()
+            //username: this.generateRandomUUID() 
+            username: client.sessionId
         });
 
         // place at initial position
@@ -90,9 +91,9 @@ export class MyRoom extends Room<MyRoomState> {
         this.onMessage("updatePosition", (client, data) => {
             console.log("update received from client "+client.sessionId+" -> ", JSON.stringify(data));
             const player = this.state.players.get(client.sessionId);
-            player.xPos = data["xPos"];
-            player.yPos = data['yPos'];
-            player.zPos = data["zPos"];
+            player.xPos = data["x"];
+            player.yPos = data['y'];
+            player.zPos = data["z"];
         });
 
     }

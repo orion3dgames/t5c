@@ -42,7 +42,7 @@ class App {
 
     //Scene - related
     private _state: number = 0;
-    private _currentScene: Scene;
+    private _currentScene;
 
     //post process
     private _transition: boolean = false;
@@ -74,7 +74,7 @@ class App {
         this._client = new Colyseus.Client('ws://localhost:2567');
 
         //  start scene
-        this._state = State.GAME;
+        this._state = State.LOBBY;
 
         //MAIN render loop & state machine
         await this._render();
@@ -97,8 +97,9 @@ class App {
                 ///////////////////////////////////////
                 case State.START:
                     this.clearScene();
-                    scene = new StartScene(this._engine);
-                    this._scene = scene._scene;
+                    this._currentScene = new StartScene();
+                    this._currentScene.createScene(this._engine);
+                    this._scene = this._currentScene._scene;
                     this._state = State.NULL;
                     break;
     
@@ -107,8 +108,9 @@ class App {
                 ///////////////////////////////////////
                 case State.LOBBY:
                     this.clearScene();
-                    scene = new LobbyScene(this._engine, this._client);
-                    this._scene = scene._scene;
+                    this._currentScene = new LobbyScene();
+                    this._currentScene.createScene(this._engine, this._client);
+                    this._scene = this._currentScene._scene;
                     this._state = State.NULL;
                     break;
 
@@ -117,8 +119,9 @@ class App {
                 ///////////////////////////////////////
                 case State.GAME:
                     this.clearScene();
-                    scene = new GameScene(this._engine, this._client);
-                    this._scene = scene._scene;
+                    this._currentScene = new GameScene();
+                    this._currentScene.createScene(this._engine, this._client, this.roomId);
+                    this._scene = this._currentScene._scene;
                     this._state = State.NULL;
                     break;
     
@@ -127,8 +130,14 @@ class App {
             }
 
             // monitor state
-            this._state = scene._newState;
-
+            if(this._currentScene && this._currentScene._newState){
+                this._state = this._currentScene._newState;
+            }
+            // monitor roomId
+            if(this._currentScene && this._currentScene.roomId){
+                this.roomId = this._currentScene.roomId;
+            }
+            
             // render when scene is ready
             this._process();
 
@@ -140,7 +149,7 @@ class App {
         //await this._scene.whenReadyAsync();
         this._engine.hideLoadingUI(); //when the scene is ready, hide loading
         this._scene.render();
-        console.log('RENDER');
+        //console.log('RENDER');
     }
 
     private clearScene() {

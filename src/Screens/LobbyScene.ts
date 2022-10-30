@@ -14,12 +14,13 @@ export class LobbyScene {
     // multi
     private allRooms: RoomAvailable[] = [];
     private lobbyRoom: Room<any>;
+    public roomId:string;
 
-    constructor(engine, client) {
-        this.create(engine, client);
+    constructor() {
+        this._newState = State.NULL;
     }
 
-    public async create(engine, client) {
+    public async createScene(engine, client) {
 
 
         let scene = new Scene(engine);
@@ -129,6 +130,8 @@ export class LobbyScene {
 
         this._scene = scene;
 
+        await this._scene.whenReadyAsync();
+
         console.log('LOBBY SCENE CREATED');
     }
 
@@ -164,9 +167,9 @@ export class LobbyScene {
         
             //this handles interactions with the start button attached to the scene
             joinBtn.onPointerDownObservable.add(() => { 
-                //this.roomId = room.roomId;
-                //this.lobbyRoom.removeAllListeners();
-                //this._goToGame();
+                this.roomId = room.roomId;
+                this.lobbyRoom.removeAllListeners();
+                this._newState = State.GAME;
             });
         });
         

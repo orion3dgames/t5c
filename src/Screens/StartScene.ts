@@ -5,16 +5,15 @@ import State from "./Screens";
 export class StartScene {
     
     public _scene: Scene;
-    private _engine: Engine;
     public _newState: State;
     private _gui: AdvancedDynamicTexture;
     public _button: Button;
 
-    constructor(engine) {
-        this.create(engine);
+    constructor() {
+        this._newState = State.NULL;
     }
 
-    public async create(engine) {
+    public async createScene(engine) {
 
         // create scene
         let scene = new Scene(engine);
@@ -61,10 +60,13 @@ export class StartScene {
 
         // setup events
         this._button.onPointerDownObservable.add(() => { 
+            console.log('CLICk');
             this._newState = State.LOBBY;
         });
 
         this._scene = scene;
+
+        await this._scene.whenReadyAsync();
 
         console.log('START SCENE CREATED');
     }
