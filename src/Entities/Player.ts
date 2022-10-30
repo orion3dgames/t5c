@@ -5,6 +5,7 @@ import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button,Ellipse, 
 export class Player extends TransformNode {
     public camera;
     public scene: Scene;
+    public ui;
     private _input;
 
     //Player
@@ -15,7 +16,7 @@ export class Player extends TransformNode {
     private _yTilt: TransformNode;
 
     //const values
-    private static readonly PLAYER_SPEED: number = 0.45;
+    private static readonly PLAYER_SPEED: number = 0.85;
     private static readonly JUMP_FORCE: number = 0.80;
     private static readonly GRAVITY: number = -2.8;
     private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.5934119456780721, 0, 0);
@@ -43,10 +44,11 @@ export class Player extends TransformNode {
     public yPos: number;
     public zPos: number;
 
-    constructor(entity, isCurrentPlayer, sessionId, scene: Scene, input?) {
+    constructor(entity, isCurrentPlayer, sessionId, scene: Scene, _ui,  input) {
         super("player", scene);
 
         this.scene = scene;
+        this.ui = _ui;
         this.sessionId = sessionId; // network id from colyseus
         this.entity = entity;
         this.isCurrentPlayer = isCurrentPlayer;
@@ -60,9 +62,6 @@ export class Player extends TransformNode {
     // todo: this should a global utils
     addLabel(mesh, text) {
 
-        // GUI
-        var advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-    
         var rect1 = new Rectangle();
         rect1.width = 0.2;
         rect1.height = "40px";
@@ -70,7 +69,7 @@ export class Player extends TransformNode {
         rect1.color = "Orange";
         rect1.thickness = 4;
         rect1.background = "green";
-        advancedTexture.addControl(rect1);
+        this.ui._playerUI.addControl(rect1);
         rect1.linkWithMesh(mesh);   
         rect1.linkOffsetY = -150;
     
@@ -84,7 +83,7 @@ export class Player extends TransformNode {
         target.color = "Orange";
         target.thickness = 4;
         target.background = "green";
-        advancedTexture.addControl(target);
+        this.ui._playerUI.addControl(target);
         target.linkWithMesh(mesh);   
     
         var line = new Line();
@@ -92,7 +91,7 @@ export class Player extends TransformNode {
         line.color = "Orange";
         line.y2 = 20;
         line.linkOffsetY = -10;
-        advancedTexture.addControl(line);
+        this.ui._playerUI.addControl(line);
         line.linkWithMesh(mesh); 
         line.connectedControl = rect1;   
 
@@ -127,6 +126,7 @@ export class Player extends TransformNode {
         // if myself, add all player related stuff
         if(this.isCurrentPlayer){
             this._setupPlayerCamera();
+            this.activatePlayerCamera();
         }
 
         // entity network event
@@ -154,7 +154,7 @@ export class Player extends TransformNode {
         this._moveDirection.y = velocityY;
         this._moveDirection.z = velocityZ;
 
-        console.log('processMove', this._input.horizontal, this._input.vertical, this._moveDirection);
+        console.log('processMove', this._input, this._input.horizontal, this._input.vertical, this._moveDirection);
 
         // do move
         this.move();

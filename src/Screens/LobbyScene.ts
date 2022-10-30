@@ -10,6 +10,8 @@ export class LobbyScene {
     public _scene: Scene;
     public _newState: State;
     public _button: Button;
+    public _ui;
+    public _uiRooms;
 
     // multi
     private allRooms: RoomAvailable[] = [];
@@ -50,7 +52,7 @@ export class LobbyScene {
         title.top = "14px";
         title.width = 0.8;
         title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        imageRect.addControl(title);
+        guiMenu.addControl(title);
 
         const startBtn = Button.CreateSimpleButton("start", "Create");
         startBtn.fontFamily = "Viga";
@@ -60,7 +62,7 @@ export class LobbyScene {
         startBtn.top = "-90px";
         startBtn.thickness = 1;
         startBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        imageRect.addControl(startBtn);
+        guiMenu.addControl(startBtn);
  
         const backButton = Button.CreateSimpleButton("back", "Back");
         backButton.fontFamily = "Viga";
@@ -70,7 +72,9 @@ export class LobbyScene {
         backButton.top = "-30px";
         backButton.thickness = 1;
         backButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        imageRect.addControl(backButton);
+        guiMenu.addControl(backButton);
+
+        this._ui = guiMenu;
 
         //this handles interactions with the start button attached to the scene
         startBtn.onPointerDownObservable.add(() => { 
@@ -89,15 +93,6 @@ export class LobbyScene {
         //////////////////////////////////////////////////////
         // LOBBY
 
-        // add scrollable container
-        var sv = new ScrollViewer();
-        sv.width = 0.8;
-        sv.height = 0.6;
-        sv.background = "#CCCCCC";
-        sv.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        sv.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-        imageRect.addControl(sv);
-
         // join lobby
         client.joinOrCreate("lobby").then((lobby) => {
 
@@ -106,7 +101,7 @@ export class LobbyScene {
             this.lobbyRoom.onMessage("rooms", (rooms) => {
                 console.log('rooms');
                 this.allRooms = rooms;
-                this._refreshLobbyUI(sv);
+                this._refreshLobbyUI();
             });
     
             this.lobbyRoom.onMessage("+", ([roomId, room]) => {
@@ -117,13 +112,13 @@ export class LobbyScene {
                 } else {
                     this.allRooms.push(room);
                 }
-                this._refreshLobbyUI(sv);
+                this._refreshLobbyUI();
             });
     
             this.lobbyRoom.onMessage("-", (roomId) => {
-                console.log('- room');
                 this.allRooms = this.allRooms.filter((room) => room.roomId !== roomId);
-                this._refreshLobbyUI(sv);
+                console.log('- room');
+                this._refreshLobbyUI();
             });
 
         })
@@ -135,8 +130,17 @@ export class LobbyScene {
         console.log('LOBBY SCENE CREATED');
     }
 
-    private _refreshLobbyUI(sv){
-    
+    private _refreshLobbyUI(){
+
+        // add scrollable container
+        var sv = new ScrollViewer();
+        sv.width = 0.8;
+        sv.height = 0.6;
+        sv.background = "#CCCCCC";
+        sv.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        sv.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        this._ui.addControl(sv);
+
         var top = 0;
         this.allRooms.forEach(room => {
 
@@ -152,7 +156,7 @@ export class LobbyScene {
             roomTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             sv.addControl(roomTxt);
 
-            let joinBtn = Button.CreateSimpleButton("back", "JOIN");
+            let joinBtn = Button.CreateSimpleButton("back_"+room.roomId, "JOIN");
             joinBtn.fontFamily = "Viga";
             joinBtn.width = .2
             joinBtn.height = "30px";

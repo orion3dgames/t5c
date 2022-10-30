@@ -1,6 +1,8 @@
 import { TextBlock, StackPanel, AdvancedDynamicTexture, Image, Button, Rectangle, Control, Grid } from "@babylonjs/gui";
 import { Scene, Sound, ParticleSystem, PostProcess, Effect, SceneSerializer } from "@babylonjs/core";
 
+import State from "../Screens/Screens";
+
 export class Hud {
     private _scene: Scene;
 
@@ -36,29 +38,13 @@ export class Hud {
     //Sounds
     public quitSfx: Sound;
 
-    constructor(scene: Scene) {
+    constructor(scene: Scene, state:State) {
 
         this._scene = scene;
  
-        const playerUI = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        const playerUI = AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
         this._playerUI = playerUI;
         this._playerUI.idealHeight = 720;
-
-        const quitButton = Button.CreateSimpleButton("start", "Quit");
-        quitButton.fontFamily = "Viga";
-        quitButton.width = 0.2
-        quitButton.height = "40px";
-        quitButton.color = "white";
-        quitButton.top = "20px"; 
-        quitButton.left = "-20px"; 
-        quitButton.thickness = 1;
-        quitButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        quitButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        this._playerUI.addControl(quitButton);
-
-        quitButton.onPointerDownObservable.add(() => { 
-            this.transition = true;
-        });
 
     }
 

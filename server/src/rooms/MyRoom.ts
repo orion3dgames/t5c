@@ -89,8 +89,8 @@ export class MyRoom extends Room<MyRoomState> {
 
         // move event
         this.onMessage("updatePosition", (client, data) => {
-            console.log("update received from client "+client.sessionId+" -> ", JSON.stringify(data));
             const player = this.state.players.get(client.sessionId);
+            console.log("update received from client "+client.sessionId+" -> ", JSON.stringify(player), JSON.stringify(data));
             player.xPos = data["x"];
             player.yPos = data['y'];
             player.zPos = data["z"];

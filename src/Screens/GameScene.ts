@@ -3,6 +3,7 @@ import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button } from "@
 import State from "./Screens";
 
 import { PlayerInput } from "../Controllers/inputController";
+import { Hud } from "../Controllers/ui";
 import { Player } from "../Entities/Player";
 import { Cube } from "../Entities/Cube";
 
@@ -68,61 +69,53 @@ export class GameScene {
 
     }
 
-    private async _setupGUI(){
-
-         // set up ui
-         const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI", true, this._scene); 
-         guiMenu.idealHeight = 720;
- 
-         const imageRect = new Rectangle("titleContainer");
-         imageRect.width = 1;
-         imageRect.height = 1;
-         imageRect.background = "#999999";
-         imageRect.thickness = 0;
-         guiMenu.addControl(imageRect);
- 
-         const startBtn = Button.CreateSimpleButton("play", "EXIT");
-         startBtn.fontFamily = "Viga";
-         startBtn.width = 0.2
-         startBtn.height = "40px";
-         startBtn.color = "white";
-         startBtn.top = "10px";
-         startBtn.left = '-10px';
-         startBtn.thickness = 1;
-         startBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-         startBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-         imageRect.addControl(startBtn);
- 
-         // setup events
-         startBtn.onPointerDownObservable.add(() => { 
-             this.room.leave();
-             this._newState = State.START;
-         });
-
-    }
-
     private async _initEvents(){
 
-        // draw gui
-        this._setupGUI();
+        // setup player input
+        // todo: probably should be in the player class
+        this._input = new PlayerInput(this._scene); //detect keyboard inputs
+
+        // setup hud
+        this._ui = new Hud(this._scene, this._newState); //detect keyboard inputs
+
+        // add a quit button
+        // todo: should be in the hud class, not sure how to propagate the state to the main game loop
+        // we need a global game variable that can be accessed from anywhere
+        const quitButton = Button.CreateSimpleButton("quit", "Quit");
+        quitButton.fontFamily = "Viga";
+        quitButton.width = 0.2
+        quitButton.height = "40px";
+        quitButton.color = "white";
+        quitButton.top = "20px"; 
+        quitButton.left = "-20px"; 
+        quitButton.thickness = 1;
+        quitButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        quitButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        this._ui._playerUI.addControl(quitButton);
+
+        quitButton.onPointerDownObservable.add(() => { 
+            this.room.leave();
+            this._newState = State.START;
+        });
 
         // when someone joins the room event
         this.room.state.players.onAdd((entity, sessionId) => {
 
             var isCurrentPlayer = sessionId === this.room.sessionId;
 
-            this._input = new PlayerInput(this._scene); //detect keyboard inputs
+            let _player = new Player(entity, isCurrentPlayer, sessionId, this._scene, this._ui, this._input);
 
-            let _player = new Player(entity, isCurrentPlayer, sessionId, this._scene, this._input);
-
+            // if current player, save entity ref
             if(isCurrentPlayer){
+
+                // set currentPlayer (probably not useful)
                 this._currentPlayer = _player;
-                this._currentPlayer.activatePlayerCamera();
+
+                //this._setupGUI();
                 console.log('ADDING CURRENT PLAYER', entity, this._currentPlayer);
-            }else{
-                console.log('NOT PLAYER');
             }
 
+            // save entity
             this.playerEntities[sessionId] = _player;
 
         });
@@ -131,6 +124,7 @@ export class GameScene {
         this.room.state.players.onRemove((player, sessionId) => {
             console.log('Client left', player, sessionId);
             this.playerEntities[sessionId].mesh.dispose();
+            this._roomId = "";
             delete this.playerEntities[sessionId];
         });
 
@@ -154,7 +148,7 @@ export class GameScene {
             // prepare game loop
             let timeNow = Date.now();   
             let timePassed = (timeNow - timeThen) / 1000;
-            let updateRate = .5;          
+            let updateRate = .1;          
             if( timePassed >= updateRate){
 
                 console.log('GAME LOOP UPDATE '+updateRate+' SECONDS');
@@ -162,7 +156,6 @@ export class GameScene {
                 // detect movement
                 if(this._input.horizontalAxis || this._input.verticalAxis ){
                     this._currentPlayer.processMove();
-                    console.log(this._currentPlayer.playerNextPosition);
                     this.room.send("updatePosition", {
                         x: this._currentPlayer.playerNextPosition.x,
                         y: this._currentPlayer.playerNextPosition.y,
