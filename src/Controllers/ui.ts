@@ -28,29 +28,18 @@ export class Hud {
 
         this.messages = [
             {
-                id: 1,
-                message: "HELLO WORLD 1"
+                'id': 1,
+                'message': "1 HELLO WORLD 1"
             },
             {
-                id: 2,
-                message: "HELLO WORLD 2"
+                'id': 2,
+                'message': "2 HELLO WORLD 2"
             },
         ];
  
         const playerUI = AdvancedDynamicTexture.CreateFullscreenUI("UI", true, this._scene);
         this._playerUI = playerUI;
         this._playerUI.idealHeight = 720;
-
-        // add chat box (contains all messages)
-        const chat_box = new ScrollViewer();
-        chat_box.width = .5;
-        chat_box.height = .2
-        chat_box.left = '20px';
-        chat_box.top = "-60px";
-        chat_box.color = "#FFFFFF";
-        chat_box.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        chat_box.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        this._playerUI.addControl(chat_box);
 
         // add chat input
         const chat_input = new InputText();
@@ -66,10 +55,44 @@ export class Hud {
         // chatbox on enter event
         chat_input.onKeyboardEventProcessedObservable.add((ev) => { 
             if(ev.key==="Enter" || ev.code==="Enter"){
-                console.log('SEND CHAT', chat_input.text);
+                this.messages.push({
+                    'id': this.messages.length + 1,
+                    'message': chat_input.text
+                })
+                this._refreshChatBox();
             }
         });
 
+        this._refreshChatBox();
+    }
+
+    private _refreshChatBox(){
+
+        // add scrollable container
+        var sv = new ScrollViewer();
+        sv.width = 0.5;
+        sv.height = 0.2;
+        sv.left = '20px';
+        sv.top = "-60px";
+        sv.background = "#CCCCCC";
+        sv.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        sv.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        this._playerUI.addControl(sv);
+
+        var top = 0;
+        this.messages.forEach(msg => {
+            var roomTxt = new TextBlock();
+            roomTxt.text = msg.message;
+            roomTxt.textHorizontalAlignment = 0;
+            roomTxt.height = "30px";
+            roomTxt.fontSize = "16px";
+            roomTxt.color = "white";
+            roomTxt.left = .1;
+            roomTxt.top = top+"px";
+            roomTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            sv.addControl(roomTxt);
+        });
+        
     }
 
 }
