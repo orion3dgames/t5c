@@ -76,7 +76,7 @@ export class GameScene {
         this._input = new PlayerInput(this._scene); //detect keyboard inputs
 
         // setup hud
-        this._ui = new Hud(this._scene, this._newState); //detect keyboard inputs
+        this._ui = new Hud(this._scene, this.room); //detect keyboard inputs
 
         // add a quit button
         // todo: should be in the hud class, not sure how to propagate the state to the main game loop

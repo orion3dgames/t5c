@@ -3,6 +3,8 @@ import { Scene, Sound, ParticleSystem, PostProcess, Effect, SceneSerializer } fr
 
 import State from "../Screens/Screens";
 
+import { Room } from "colyseus.js";
+
 export class Hud {
     private _scene: Scene;
 
@@ -22,20 +24,9 @@ export class Hud {
     //Chat
     public messages = [];
 
-    constructor(scene: Scene, state:State) {
+    constructor(scene: Scene, room:Room) {
 
         this._scene = scene;
-
-        this.messages = [
-            {
-                'id': 1,
-                'message': "1 HELLO WORLD 1"
-            },
-            {
-                'id': 2,
-                'message': "2 HELLO WORLD 2"
-            },
-        ];
  
         const playerUI = AdvancedDynamicTexture.CreateFullscreenUI("UI", true, this._scene);
         this._playerUI = playerUI;
@@ -55,12 +46,17 @@ export class Hud {
         // chatbox on enter event
         chat_input.onKeyboardEventProcessedObservable.add((ev) => { 
             if(ev.key==="Enter" || ev.code==="Enter"){
-                this.messages.push({
-                    'id': this.messages.length + 1,
-                    'message': chat_input.text
-                })
+                room.send("message", chat_input.text);
+                chat_input.text = "";
                 this._refreshChatBox();
             }
+        });
+
+        // receive message event
+        room.onMessage("message", (message) => {
+            console.log(message);
+           this.messages.push(message); 
+           this._refreshChatBox();
         });
 
         this._refreshChatBox();
@@ -80,9 +76,10 @@ export class Hud {
         this._playerUI.addControl(sv);
 
         var top = 0;
-        this.messages.forEach(msg => {
+        this.messages.slice().reverse().forEach(msg => {
+   
             var roomTxt = new TextBlock();
-            roomTxt.text = msg.message;
+            roomTxt.text = msg.senderID+': '+msg.message;
             roomTxt.textHorizontalAlignment = 0;
             roomTxt.height = "30px";
             roomTxt.fontSize = "16px";
@@ -90,7 +87,11 @@ export class Hud {
             roomTxt.left = .1;
             roomTxt.top = top+"px";
             roomTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            roomTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             sv.addControl(roomTxt);
+
+            top += 25;
+
         });
         
     }

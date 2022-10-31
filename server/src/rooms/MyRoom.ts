@@ -1,5 +1,5 @@
 import { Room, Client, updateLobby } from "@colyseus/core";
-import { MyRoomState, Player, Cube } from "./schema/MyRoomState";
+import { MyRoomState, Player, Cube, ChatMessage } from "./schema/MyRoomState";
 import logger = require("../helpers/logger");
 
 export class MyRoom extends Room<MyRoomState> {
@@ -25,7 +25,7 @@ export class MyRoom extends Room<MyRoomState> {
         this.registerForMessages();
 
         // Set the frequency of the patch rate
-        this.setPatchRate(50);
+        this.setPatchRate(16);
 
         // Set the Simulation Interval callback
         this.setSimulationInterval(dt => {
@@ -94,6 +94,16 @@ export class MyRoom extends Room<MyRoomState> {
             player.xPos = data["x"];
             player.yPos = data['y'];
             player.zPos = data["z"];
+        });
+
+        // message
+        this.onMessage("message", (client, message) => {
+            const player = this.state.players.get(client.sessionId);
+            console.log("received message from "+client.sessionId+" -> ", message);
+            let msg = new ChatMessage;
+            msg.senderID = client.sessionId;
+            msg.message = message;
+            this.broadcast("message", msg);
         });
 
     }
