@@ -1,4 +1,4 @@
-import { TextBlock, StackPanel, AdvancedDynamicTexture, Image, Button, Rectangle, Control, Grid } from "@babylonjs/gui";
+import { TextBlock, StackPanel, AdvancedDynamicTexture, Image, Button, Rectangle, Control, Grid, InputText } from "@babylonjs/gui";
 import { Scene, Sound, ParticleSystem, PostProcess, Effect, SceneSerializer } from "@babylonjs/core";
 
 import State from "../Screens/Screens";
@@ -9,31 +9,12 @@ export class Hud {
     //Game Timer
     public time: number; //keep track to signal end game REAL TIME
 
-    //Timer handlers
-    public stopSpark: boolean;
-
     //Pause toggle
     public gamePaused: boolean;
 
-    //Quit game
-    public quit: boolean;
-    public transition: boolean = false;
-
     //UI Elements
     public pauseBtn: Button;
-    public fadeLevel: number;
     private _playerUI;
-    public tutorial;
-    public hint;
-
-    //Mobile
-    public isMobile: boolean;
-    public jumpBtn: Button;
-    public dashBtn: Button;
-    public leftBtn: Button;
-    public rightBtn: Button;
-    public upBtn: Button;
-    public downBtn: Button;
 
     //Sounds
     public quitSfx: Sound;
@@ -42,9 +23,27 @@ export class Hud {
 
         this._scene = scene;
  
-        const playerUI = AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
+        const playerUI = AdvancedDynamicTexture.CreateFullscreenUI("UI", true, this._scene);
         this._playerUI = playerUI;
         this._playerUI.idealHeight = 720;
+
+        // add chat
+        const chatbox = new InputText();
+        chatbox.width = .5;
+        chatbox.height = '30px;'
+        chatbox.left = '20px';
+        chatbox.top = "-20px";
+        chatbox.color = "#FFFFFF";
+        chatbox.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        chatbox.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        this._playerUI.addControl(chatbox);
+
+        // chatbox on enter event
+        chatbox.onKeyboardEventProcessedObservable.add((ev) => { 
+            if(ev.key==="Enter" || ev.code==="Enter"){
+                console.log('SEND CHAT', chatbox.text);
+            }
+        });
 
     }
 
