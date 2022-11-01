@@ -1,6 +1,6 @@
 {
-  "name": "babylon-demo",
-  "version": "0.1.0",
+  "name": "my-app-client",
+  "version": "1.0.0",
   "description": "Babylon.js Colyseus demo",
   "main": "index.js",
   "scripts": {
@@ -35,7 +35,7 @@
     "babylonjs-loaders": "latest",
     "babylonjs-materials": "latest",
     "babylonjs-gltf2interface": "latest",
-    "colyseus.js": "^0.15.0-preview.2",
+    "colyseus.js": "^0.15.0-preview.0",
     "dotenv-webpack": "^7.0.3"
   }
 }

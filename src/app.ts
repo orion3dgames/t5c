@@ -71,10 +71,11 @@ class App {
         }) as Engine;
  
         // create colyseus client
-        this._client = new Colyseus.Client('ws://localhost:2567');
+        //this._client = new Colyseus.Client('ws://localhost:2567');
+        this._client = new Colyseus.Client('ws://y9gkk9.colyseus.de:2567');
 
         //  start scene
-        this._state = State.GAME;
+        this._state = State.START;
 
         //MAIN render loop & state machine
         await this._render();

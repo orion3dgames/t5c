@@ -1,8 +1,8 @@
 {
   "private": true,
-  "name": "my-app",
+  "name": "my-app-server",
   "version": "1.0.0",
-  "description": "npm init template for bootstrapping an empty Colyseus project",
+  "description": "Babylon.js Colyseus demo",
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
