@@ -45,16 +45,16 @@ export class Hud {
 
         // chatbox on enter event
         chat_input.onKeyboardEventProcessedObservable.add((ev) => { 
-            if(ev.key==="Enter" || ev.code==="Enter"){
+            if((ev.key==="Enter" || ev.code==="Enter") && chat_input.text != ""){
                 room.send("message", chat_input.text);
                 chat_input.text = "";
+                chat_input.focus();
                 this._refreshChatBox();
             }
         });
 
         // receive message event
         room.onMessage("message", (message) => {
-            console.log(message);
            this.messages.push(message); 
            this._refreshChatBox();
         });
