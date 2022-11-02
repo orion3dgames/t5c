@@ -177,10 +177,8 @@ export class LobbyScene {
         this.allRooms.forEach(room => {
 
             // add room txt
-            var roomTxt = new TextBlock();
-            roomTxt.text = "Room | Players "+room.clients+"/10";
+            var roomTxt = new TextBlock("txtjoin_"+room.roomId, "Room | Players "+room.clients+"/10");
             roomTxt.textHorizontalAlignment = 0;
-            roomTxt.fontFamily = "Viga";
             roomTxt.height = "30px";
             roomTxt.fontSize = "16px";
             roomTxt.color = "white";
@@ -190,8 +188,7 @@ export class LobbyScene {
             sv.addControl(roomTxt);
 
             // add room connect btn
-            let joinBtn = Button.CreateSimpleButton("back_"+room.roomId, "JOIN");
-            joinBtn.fontFamily = "Viga";
+            let joinBtn = Button.CreateSimpleButton("btnjoin_"+room.roomId, "JOIN");
             joinBtn.width = .2
             joinBtn.height = "30px";
             joinBtn.fontSize = "16px";
