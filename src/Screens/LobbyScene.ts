@@ -17,9 +17,11 @@ export class LobbyScene {
     private allRooms: RoomAvailable[] = [];
     private lobbyRoom: Room<any>;
     public roomId:string;
+    public error: string;
 
     constructor() {
         this._newState = State.NULL;
+        this.error = "";
     }
 
     public async createScene(engine, client) {
@@ -54,15 +56,6 @@ export class LobbyScene {
         title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         guiMenu.addControl(title);
 
-        const startBtn = Button.CreateSimpleButton("start", "Create");
-        startBtn.fontFamily = "Viga";
-        startBtn.width = 0.2
-        startBtn.height = "40px";
-        startBtn.color = "white";
-        startBtn.top = "-90px";
-        startBtn.thickness = 1;
-        startBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        guiMenu.addControl(startBtn);
  
         const backButton = Button.CreateSimpleButton("back", "Back");
         backButton.fontFamily = "Viga";
@@ -81,20 +74,14 @@ export class LobbyScene {
             window.nextScene = State.START;
         });
 
-        // create button
-        startBtn.onPointerDownObservable.add(() => { 
-            if(this.lobbyRoom){
-                this.lobbyRoom.removeAllListeners();
-            }
-            window.nextScene = State.GAME;
-        });
-
         //////////////////////////////////////////////////////
         // LOBBY
 
         // join lobby
         client.joinOrCreate("lobby").then((lobby) => {
 
+            //////////////////////////
+            // lobby events
             this.lobbyRoom = lobby;
 
             this.lobbyRoom.onMessage("rooms", (rooms) => {
@@ -120,13 +107,59 @@ export class LobbyScene {
                 this._refreshLobbyUI();
             });
 
-        })
+            //////////////////////////
+            // create button
+            const startBtn = Button.CreateSimpleButton("start", "Create");
+            startBtn.fontFamily = "Viga";
+            startBtn.width = 0.2
+            startBtn.height = "40px";
+            startBtn.color = "white";
+            startBtn.top = "-90px";
+            startBtn.thickness = 1;
+            startBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+            guiMenu.addControl(startBtn);
+            
+            startBtn.onPointerDownObservable.add(() => { 
+                this.lobbyRoom.removeAllListeners();
+                window.nextScene = State.GAME;
+            });
+
+        }).catch((error) => {
+            console.error(error);
+            this.error = "Could not connect to server!";
+        });
+
+
+        scene.registerBeforeRender(() => {
+            
+            // if cannot connect to lobby, show an error message
+            if(this.error !== ""){
+                
+                var sv = new ScrollViewer();
+                sv.width = 0.8;
+                sv.height = 0.6;
+                sv.background = "#CCCCCC";
+                sv.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+                sv.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+                this._ui.addControl(sv);
+
+                var roomTxt = new TextBlock();
+                roomTxt.text = this.error;
+                roomTxt.textHorizontalAlignment = 0;
+                roomTxt.height = "30px";
+                roomTxt.fontSize = "16px";
+                roomTxt.color = "red";
+                roomTxt.left = .1;
+                roomTxt.top = "0px";
+                roomTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+                sv.addControl(roomTxt);
+            }
+
+        });
 
         this._scene = scene;
 
         await this._scene.whenReadyAsync();
-
-        console.log('LOBBY SCENE CREATED');
     }
 
     private _refreshLobbyUI(){
@@ -143,6 +176,7 @@ export class LobbyScene {
         var top = 0;
         this.allRooms.forEach(room => {
 
+            // add room txt
             var roomTxt = new TextBlock();
             roomTxt.text = "Room | Players "+room.clients+"/10";
             roomTxt.textHorizontalAlignment = 0;
@@ -155,6 +189,7 @@ export class LobbyScene {
             roomTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             sv.addControl(roomTxt);
 
+            // add room connect btn
             let joinBtn = Button.CreateSimpleButton("back_"+room.roomId, "JOIN");
             joinBtn.fontFamily = "Viga";
             joinBtn.width = .2
@@ -166,9 +201,10 @@ export class LobbyScene {
             joinBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
             sv.addControl(joinBtn);
 
+            // increment top 
             top += 40;
         
-            //this handles interactions with the start button attached to the scene
+            // add on click observable
             joinBtn.onPointerDownObservable.add(() => { 
                 this.lobbyRoom.removeAllListeners();
                 window.currentRoomID = room.roomId;

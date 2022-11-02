@@ -55,16 +55,23 @@ export class GameScene {
 
         await this._scene.whenReadyAsync();
 
-        // networking
-        if(this._roomId){
-            this.room = await client.join("my_room", { roomId: this._roomId });
-        }else{
-            this.room = await client.create("my_room");
-            this._roomId = this.room.roomId;
-            window.currentRoomID = this._roomId;
-        } 
+        try {
 
-        await this._initEvents();
+            if(this._roomId){
+                this.room = await client.join("my_room", { roomId: this._roomId });
+            }else{
+                this.room = await client.create("my_room");
+                this._roomId = this.room.roomId;
+                window.currentRoomID = this._roomId;
+            } 
+
+            if(this.room){
+                await this._initEvents();
+            }
+
+        } catch (e) {
+            console.error("join error", e);
+        }
 
     }
 
