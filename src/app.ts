@@ -2,13 +2,10 @@ import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
 
-import { Engine, Scene, Vector3, Mesh, Color3, Color4, HemisphericLight, FreeCamera, Sound, Matrix, MeshBuilder, Quaternion, EngineFactory } from "@babylonjs/core";
+import { Engine, Scene, Sound, EngineFactory } from "@babylonjs/core";
 import { PlayerInput } from "./Controllers/inputController";
 import { Player } from "./Entities/Player";
-import { Cube } from "./Entities/Cube";
 import { Hud } from "./Controllers/ui";
-import { AdvancedDynamicTexture, Button, TextBlock, Rectangle, Control, ScrollViewer } from "@babylonjs/gui";
-import { Environment } from "./Controllers/environment";
 
 // IMPORT SCREEN
 import State from "./Screens/Screens";
@@ -71,8 +68,8 @@ class App {
         }) as Engine;
  
         // create colyseus client
-        //this._client = new Colyseus.Client('ws://localhost:2567');
-        this._client = new Colyseus.Client('ws://y9gkk9.colyseus.de:2567');
+        this._client = new Colyseus.Client('ws://localhost:2567');
+        //this._client = new Colyseus.Client('ws://y9gkk9.colyseus.de:2567');
 
         //  start scene
         this._state = State.START;
@@ -85,8 +82,6 @@ class App {
     private async _render(): Promise<void> {
 
         console.log('RENDER START');
-
-        let scene;
 
         // render loop
         this._engine.runRenderLoop(() => {
@@ -131,9 +126,11 @@ class App {
             }
 
             // monitor state
-            if(this._currentScene && this._currentScene._newState){
-                this._state = this._currentScene._newState;
+            if(window.nextScene != State.NULL){
+                this._state = window.nextScene;
+                window.nextScene = State.NULL;
             }
+
             // monitor roomId
             if(this._currentScene && this._currentScene.roomId){
                 this.roomId = this._currentScene.roomId;
@@ -173,16 +170,14 @@ class App {
 
             // render scene
             this._scene.render();
-
-            //console.log('RENDER');
         }  
     }
 
     private clearScene() {
         if(this._scene){
+            this._engine.displayLoadingUI();
             this._scene.dispose();
             this._scene.detachControl();
-            this._engine.displayLoadingUI();
         }
     }
 

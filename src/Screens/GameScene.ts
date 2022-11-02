@@ -29,15 +29,13 @@ export class GameScene {
 
     }
 
-    async createScene(engine, client, roomId): Promise<void> {
+    async createScene(engine, client): Promise<void> {
 
-        this._roomId = roomId;
+        // get current roomID from globals
+        this._roomId = window.currentRoomID;
 
         // create scene
         let scene = new Scene(engine);
-
-        // set color
-        //scene.clearColor = new Color4(0, 0, 0, 1);
 
         // set up some lights
         var light = new HemisphericLight(
@@ -45,9 +43,8 @@ export class GameScene {
             new Vector3(0, 1, 0),
             scene
           );
-
-        console.log('BEFORE NETWORK');
-
+        
+        // set scene
         this._scene = scene;
 
         await this._initNetwork(client);
@@ -63,6 +60,8 @@ export class GameScene {
             this.room = await client.join("my_room", { roomId: this._roomId });
         }else{
             this.room = await client.create("my_room");
+            this._roomId = this.room.roomId;
+            window.currentRoomID = this._roomId;
         } 
 
         await this._initEvents();
@@ -95,7 +94,7 @@ export class GameScene {
 
         quitButton.onPointerDownObservable.add(() => { 
             this.room.leave();
-            this._newState = State.START;
+            window.nextScene = State.START;
         });
 
         // when someone joins the room event

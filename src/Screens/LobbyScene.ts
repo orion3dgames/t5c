@@ -79,12 +79,12 @@ export class LobbyScene {
         //this handles interactions with the start button attached to the scene
         startBtn.onPointerDownObservable.add(() => { 
             this.lobbyRoom.removeAllListeners();
-            this._newState = State.GAME;
+            window.nextScene = State.GAME;
         });
 
         //this handles interactions with the start button attached to the scene
         backButton.onPointerDownObservable.add(() => { 
-            this._newState = State.START;
+            window.nextScene = State.START;
         });
 
         //--SCENE FINISHED LOADING--
@@ -171,9 +171,10 @@ export class LobbyScene {
         
             //this handles interactions with the start button attached to the scene
             joinBtn.onPointerDownObservable.add(() => { 
-                this.roomId = room.roomId;
                 this.lobbyRoom.removeAllListeners();
-                this._newState = State.GAME;
+                window.currentRoomID = room.roomId;
+                window.nextScene = State.GAME;
+
             });
         });
         
