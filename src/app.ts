@@ -72,7 +72,8 @@ class App {
         //this._client = new Colyseus.Client('ws://y9gkk9.colyseus.de:2567');
 
         //  start scene
-        this._state = State.START;
+        //this._state = State.START;
+        window.nextScene = State.START;
 
         //MAIN render loop & state machine
         await this._render();
@@ -85,6 +86,17 @@ class App {
 
         // render loop
         this._engine.runRenderLoop(() => {
+
+            // monitor state
+            if(window.nextScene != State.NULL){
+                this._state = window.nextScene;
+                window.nextScene = State.NULL;
+            }
+
+            // monitor roomId
+            if(this._currentScene && this._currentScene.roomId){
+                this.roomId = this._currentScene.roomId;
+            }
 
             switch (this._state) {
 
@@ -123,17 +135,6 @@ class App {
     
     
                 default: break;
-            }
-
-            // monitor state
-            if(window.nextScene != State.NULL){
-                this._state = window.nextScene;
-                window.nextScene = State.NULL;
-            }
-
-            // monitor roomId
-            if(this._currentScene && this._currentScene.roomId){
-                this.roomId = this._currentScene.roomId;
             }
             
             // render when scene is ready
@@ -175,9 +176,12 @@ class App {
 
     private clearScene() {
         if(this._scene){
+            console.log('CLEAR SCENE');
             this._engine.displayLoadingUI();
-            this._scene.dispose();
             this._scene.detachControl();
+            this._scene.dispose();
+            this._currentScene = null;
+            this._scene = null;
         }
     }
 

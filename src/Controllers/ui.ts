@@ -38,7 +38,7 @@ export class Hud {
         quitButton.onPointerDownObservable.add(() => { 
             room.leave();
             window.currentRoomID = "";
-            window.nextScene = State.START;
+            window.nextScene = State.LOBBY;
         });
 
         ////////////////////////////

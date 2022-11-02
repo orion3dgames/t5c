@@ -71,6 +71,7 @@ export class LobbyScene {
 
         // back button
         backButton.onPointerDownObservable.add(() => { 
+            this._leaveLobby();
             window.nextScene = State.START;
         });
 
@@ -85,13 +86,13 @@ export class LobbyScene {
             this.lobbyRoom = lobby;
 
             this.lobbyRoom.onMessage("rooms", (rooms) => {
-                console.log('rooms');
+                console.log('rooms', this.lobbyRoom);
                 this.allRooms = rooms;
                 this._refreshLobbyUI();
             });
     
             this.lobbyRoom.onMessage("+", ([roomId, room]) => {
-                console.log('+ room');
+                console.log('+ room', this.lobbyRoom);
                 const roomIndex = this.allRooms.findIndex((room) => room.roomId === roomId);
                 if (roomIndex !== -1) {
                     this.allRooms[roomIndex] = room;
@@ -120,7 +121,7 @@ export class LobbyScene {
             guiMenu.addControl(startBtn);
             
             startBtn.onPointerDownObservable.add(() => { 
-                this.lobbyRoom.removeAllListeners();
+                this._leaveLobby();
                 window.nextScene = State.GAME;
             });
 
@@ -160,6 +161,13 @@ export class LobbyScene {
         this._scene = scene;
 
         await this._scene.whenReadyAsync();
+    }
+
+    private _leaveLobby(){
+        if(this.lobbyRoom){
+            this.lobbyRoom.removeAllListeners();
+            this.lobbyRoom.leave();
+        }
     }
 
     private _refreshLobbyUI(){
@@ -203,7 +211,7 @@ export class LobbyScene {
         
             // add on click observable
             joinBtn.onPointerDownObservable.add(() => { 
-                this.lobbyRoom.removeAllListeners();
+                this._leaveLobby();
                 window.currentRoomID = room.roomId;
                 window.nextScene = State.GAME;
 
