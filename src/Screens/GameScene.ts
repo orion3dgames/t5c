@@ -77,26 +77,6 @@ export class GameScene {
         // setup hud
         this._ui = new Hud(this._scene, this.room); 
 
-        // add a quit button
-        // todo: should be in the hud class, not sure how to propagate the state to the main game loop
-        // we need a global game variable that can be accessed from anywhere
-        const quitButton = Button.CreateSimpleButton("quit", "Quit");
-        quitButton.fontFamily = "Viga";
-        quitButton.width = 0.2
-        quitButton.height = "40px";
-        quitButton.color = "white";
-        quitButton.top = "20px"; 
-        quitButton.left = "-20px"; 
-        quitButton.thickness = 1;
-        quitButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        quitButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        this._ui._playerUI.addControl(quitButton);
-
-        quitButton.onPointerDownObservable.add(() => { 
-            this.room.leave();
-            window.nextScene = State.START;
-        });
-
         // when someone joins the room event
         this.room.state.players.onAdd((entity, sessionId) => {
 
@@ -121,19 +101,16 @@ export class GameScene {
 
         // when someone leave the room event
         this.room.state.players.onRemove((player, sessionId) => {
-            console.log('Client left', player, sessionId);
             this.playerEntities[sessionId].mesh.dispose();
-            this._roomId = "";
             delete this.playerEntities[sessionId];
         });
 
         // when a cube is added
         this.room.state.cubes.onAdd((entity, sessionId) => {
-            //console.log('CUBE ADDED', entity, sessionId);
-            let cube = new Cube(entity, this._scene);
+            new Cube(entity, this._scene);
         });
 
-        //--Transition post process--
+        // main loop
         let timeThen = Date.now();   
         this._scene.registerBeforeRender(() => {
 
@@ -144,13 +121,11 @@ export class GameScene {
                 entity.mesh.position = Vector3.Lerp(entity.mesh.position, targetPosition, 0.05);
             }
 
-            // prepare game loop
+            // main game loop
             let timeNow = Date.now();   
             let timePassed = (timeNow - timeThen) / 1000;
-            let updateRate = .1;          
+            let updateRate = .4;          
             if( timePassed >= updateRate){
-
-                console.log('GAME LOOP UPDATE '+updateRate+' SECONDS');
 
                 // detect movement
                 if(this._input.horizontalAxis || this._input.verticalAxis ){

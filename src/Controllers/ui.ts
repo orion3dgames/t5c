@@ -1,25 +1,14 @@
-import { TextBlock, StackPanel, AdvancedDynamicTexture, Image, Button, Rectangle, Control, Grid, InputText, ScrollViewer} from "@babylonjs/gui";
-import { Scene, Sound, ParticleSystem, PostProcess, Effect, SceneSerializer } from "@babylonjs/core";
+import { TextBlock, AdvancedDynamicTexture, Button, Control, InputText, ScrollViewer} from "@babylonjs/gui";
+import { Scene} from "@babylonjs/core";
 
 import State from "../Screens/Screens";
-
 import { Room } from "colyseus.js";
 
 export class Hud {
     private _scene: Scene;
 
-    //Game Timer
-    public time: number; //keep track to signal end game REAL TIME
-
-    //Pause toggle
-    public gamePaused: boolean;
-
     //UI Elements
-    public pauseBtn: Button;
     private _playerUI;
-
-    //Sounds
-    public quitSfx: Sound;
 
     //Chat
     public messages = [];
@@ -32,6 +21,27 @@ export class Hud {
         this._playerUI = playerUI;
         this._playerUI.idealHeight = 720;
 
+        ////////////////////////////
+        // add a quit button
+        const quitButton = Button.CreateSimpleButton("quit", "Quit");
+        quitButton.fontFamily = "Viga";
+        quitButton.width = 0.2
+        quitButton.height = "40px";
+        quitButton.color = "white";
+        quitButton.top = "20px"; 
+        quitButton.left = "-20px"; 
+        quitButton.thickness = 1;
+        quitButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        quitButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        this._playerUI.addControl(quitButton);
+
+        quitButton.onPointerDownObservable.add(() => { 
+            room.leave();
+            window.currentRoomID = "";
+            window.nextScene = State.START;
+        });
+
+        ////////////////////////////
         // add chat input
         const chat_input = new InputText();
         chat_input.width = .5;
@@ -59,6 +69,7 @@ export class Hud {
            this._refreshChatBox();
         });
 
+        // intial refresh chatbox
         this._refreshChatBox();
     }
 

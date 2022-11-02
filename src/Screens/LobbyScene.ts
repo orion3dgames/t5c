@@ -76,19 +76,18 @@ export class LobbyScene {
 
         this._ui = guiMenu;
 
-        //this handles interactions with the start button attached to the scene
-        startBtn.onPointerDownObservable.add(() => { 
-            this.lobbyRoom.removeAllListeners();
-            window.nextScene = State.GAME;
-        });
-
-        //this handles interactions with the start button attached to the scene
+        // back button
         backButton.onPointerDownObservable.add(() => { 
             window.nextScene = State.START;
         });
 
-        //--SCENE FINISHED LOADING--
-        //await scene.whenReadyAsync();
+        // create button
+        startBtn.onPointerDownObservable.add(() => { 
+            if(this.lobbyRoom){
+                this.lobbyRoom.removeAllListeners();
+            }
+            window.nextScene = State.GAME;
+        });
 
         //////////////////////////////////////////////////////
         // LOBBY
