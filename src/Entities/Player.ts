@@ -1,4 +1,4 @@
-import { TransformNode, Scene, Mesh, UniversalCamera, Vector3, MeshBuilder, Color3 } from "@babylonjs/core";
+import { TransformNode, Scene, Mesh, UniversalCamera, Vector3, MeshBuilder, Color3, SceneLoader, AbstractMesh } from "@babylonjs/core";
 import { CustomMaterial } from "@babylonjs/materials";
 import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button,Ellipse, Line } from "@babylonjs/gui";
 
@@ -9,7 +9,7 @@ export class Player extends TransformNode {
     private _input;
 
     //Player
-    public mesh: Mesh; //outer collisionbox of player
+    public mesh: AbstractMesh; //outer collisionbox of player
     
     //Camera
     private _camRoot: TransformNode;
@@ -97,8 +97,15 @@ export class Player extends TransformNode {
 
     }
 
-    private spawn(entity): void {
-        
+    private async spawn(entity) {
+
+        const result = await SceneLoader.ImportMeshAsync(null, "./models/", "player.glb", this._scene);
+
+        const playerMesh = result.meshes[0];
+
+        /*
+        console.log(playerMesh);
+
         // generate mesh
         const sphere = MeshBuilder.CreateSphere(`player-${this.sessionId}`, {
             segments: 8,
@@ -109,19 +116,27 @@ export class Player extends TransformNode {
         //let sphereMaterial = new CustomMaterial(`player-material-${this.sessionId}`);
         //sphereMaterial.emissiveColor = (this.isCurrentPlayer) ? Color3.FromHexString("#ff9900") : Color3.Gray();
         //sphere.material = sphereMaterial;
+        */
+
+        // set initial scale 
+        playerMesh.scaling.set(0.04,0.04,0.04);
 
         // set initial position from server
-        sphere.position.set(this.entity.xPos, this.entity.yPos, this.entity.zPos);
+        playerMesh.position.set(this.entity.xPos, this.entity.yPos, this.entity.zPos);
     
         // save entities
-        this.playerNextPosition = sphere.position.clone();
+        this.playerNextPosition = playerMesh.position.clone();
 
         // set mesh
-        this.mesh = sphere;
+        this.mesh = playerMesh;
         this.mesh.parent = this;
 
         // add player nameplate
         this.addLabel(this.mesh, entity.username);
+
+        // start idle animation
+        const playerAnim = this._scene.getAnimationGroupByName("Hobbit_Idle");
+        playerAnim.start(true, 1.0, playerAnim.from, playerAnim.to, false);
         
         // if myself, add all player related stuff
         if(this.isCurrentPlayer){
