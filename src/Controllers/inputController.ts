@@ -17,6 +17,9 @@ export class PlayerInput {
     public jumpKeyDown: boolean = false;
     public dashing: boolean = false;
 
+    // moving
+    public moving: boolean;
+
     constructor(scene: Scene) {
 
         this._scene = scene;
@@ -36,6 +39,11 @@ export class PlayerInput {
         scene.onBeforeRenderObservable.add(() => {
             this._updateFromKeyboard();
         });
+
+    }
+
+    // Mouse UPDATE
+    private _updateFromMouse(): void {
 
     }
 
