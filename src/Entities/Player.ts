@@ -1,4 +1,4 @@
-import { TransformNode, Scene, Mesh, UniversalCamera, Vector3, MeshBuilder, Color3, SceneLoader, AbstractMesh } from "@babylonjs/core";
+import { TransformNode, Scene, Mesh, UniversalCamera, Vector3, AnimationGroup, MeshBuilder, Color3, SceneLoader, AbstractMesh } from "@babylonjs/core";
 import { CustomMaterial } from "@babylonjs/materials";
 import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button,Ellipse, Line } from "@babylonjs/gui";
 
@@ -29,6 +29,16 @@ export class Player extends TransformNode {
     private _moveDirection: Vector3 = new Vector3();
     private _inputAmt: number;
     private _jumpCount: number;
+
+    // animation trackers
+    private _currentAnim: AnimationGroup = null;
+    private _prevAnim: AnimationGroup;
+    private _isFalling: boolean = false;
+    private _jumped: boolean = false;
+
+    //animations
+    private _walk: AnimationGroup;
+    private _idle: AnimationGroup;
 
     //gravity, ground detection, jumping
     private _gravity: Vector3 = new Vector3();
@@ -135,9 +145,12 @@ export class Player extends TransformNode {
         this.addLabel(this.mesh, entity.username);
 
         // start idle animation
-        const playerAnim = this._scene.getAnimationGroupByName("Hobbit_Idle");
-        playerAnim.start(true, 1.0, playerAnim.from, playerAnim.to, false);
+        //this._currentAnim = this._scene.getAnimationGroupByName("Hobbit_Idle");
+        //this._currentAnim.play(this._currentAnim.loopAnimation);
         
+        this._idle = this._scene.getAnimationGroupByName("Hobbit_Idle");
+        this._walk = this._scene.getAnimationGroupByName("Hobbit_Walk");
+
         // if myself, add all player related stuff
         if(this.isCurrentPlayer){
             this._setupPlayerCamera();
@@ -150,6 +163,45 @@ export class Player extends TransformNode {
             this.playerNextPosition.set(this.entity.xPos, this.entity.yPos, this.entity.zPos);
         });
 
+        // 
+        this._setUpAnimations();
+
+    }
+
+    private _setUpAnimations(): void {
+
+        this.scene.stopAllAnimations();
+
+        this._idle.loopAnimation = true;
+        this._walk.loopAnimation = true;
+
+        //initialize current and previous
+        this._currentAnim = this._idle;
+        this._prevAnim = this._walk;
+    }
+
+    private _animatePlayer(): void {
+
+        if ((this._input.inputMap["ArrowUp"] || this._input.mobileUp
+            || this._input.inputMap["ArrowDown"] || this._input.mobileDown
+            || this._input.inputMap["ArrowLeft"] || this._input.mobileLeft
+            || this._input.inputMap["ArrowRight"] || this._input.mobileRight)) {
+
+            this._currentAnim = this._walk;
+
+        } else {
+            this._currentAnim = this._idle;
+
+        }
+         
+        console.log(this._currentAnim);
+
+        //Animations
+        if(this._currentAnim != null && this._prevAnim !== this._currentAnim){
+            this._prevAnim.stop();
+            this._currentAnim.play(this._currentAnim.loopAnimation);
+            this._prevAnim = this._currentAnim;
+        }
     }
 
     public processMove() {
@@ -169,7 +221,7 @@ export class Player extends TransformNode {
         this._moveDirection.y = velocityY;
         this._moveDirection.z = velocityZ;
 
-        console.log('processMove', this._input, this._input.horizontal, this._input.vertical, this._moveDirection);
+        //console.log('processMove', this._input, this._input.horizontal, this._input.vertical, this._moveDirection);
 
         // do move
         this.move();
@@ -189,6 +241,7 @@ export class Player extends TransformNode {
 
     public activatePlayerCamera(): UniversalCamera {
         this.scene.registerBeforeRender(() => {
+            this._animatePlayer();
             this._updateCamera();
         })
         return this.camera;
