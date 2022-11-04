@@ -34,16 +34,34 @@ export class PlayerInput {
         this._scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyUpTrigger, (evt) => {
             this.inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
         }));
+        this._scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnLeftPickTrigger, (evt) => {
+            this.inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "leftmousedown";
+        }));
 
         //add to the scene an observable that calls updateFromKeyboard before rendering
         scene.onBeforeRenderObservable.add(() => {
             this._updateFromKeyboard();
+            console.log();
         });
+
+        scene.onPointerDown = function (e){
+            if(e.button == 0){
+                this.moving=true
+            }
+        }
+	
+        scene.onPointerUp = function (e){		
+            if(e.button == 0){
+                this.moving=false
+            }
+        }
 
     }
 
     // Mouse UPDATE
     private _updateFromMouse(): void {
+
+
 
     }
 
