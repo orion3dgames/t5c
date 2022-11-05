@@ -94,6 +94,7 @@ export class MyRoom extends Room<MyRoomState> {
             player.xPos = data["x"];
             player.yPos = data['y'];
             player.zPos = data["z"];
+            player.yRot = data["rotation"];
         });
 
         // message

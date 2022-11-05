@@ -125,7 +125,9 @@ export class GameScene {
             for (let sessionId in this.playerEntities) {
                 const entity = this.playerEntities[sessionId];
                 const targetPosition = entity.playerNextPosition;
+                const targetRotation = entity.playerNextRotation;
                 entity.mesh.position = Vector3.Lerp(entity.mesh.position, targetPosition, 0.05);
+                entity.mesh.rotation = new Vector3(0,targetRotation, 0);
             }
 
             // main game loop
@@ -141,6 +143,7 @@ export class GameScene {
                         x: this._currentPlayer.playerNextPosition.x,
                         y: this._currentPlayer.playerNextPosition.y,
                         z: this._currentPlayer.playerNextPosition.z,
+                        rotation: this._currentPlayer.playerNextRotation,
                     });
                 }
 

@@ -27,6 +27,7 @@ export class Player extends TransformNode {
     private _v: number;
  
     private _moveDirection: Vector3 = new Vector3();
+    private _rotationY: number;
     private _inputAmt: number;
     private _jumpCount: number;
 
@@ -46,6 +47,7 @@ export class Player extends TransformNode {
     private _grounded: boolean;
 
     public playerNextPosition: Vector3;
+    public playerNextRotation: number;
     private isCurrentPlayer: boolean;
     public sessionId: string;
 
@@ -136,6 +138,7 @@ export class Player extends TransformNode {
     
         // save entities
         this.playerNextPosition = playerMesh.position.clone();
+        this.playerNextRotation = playerMesh.rotation.y;
 
         // set mesh
         this.mesh = playerMesh;
@@ -161,6 +164,7 @@ export class Player extends TransformNode {
         this.entity.onChange(() => {
             console.log('entity.onChange', entity);
             this.playerNextPosition.set(this.entity.xPos, this.entity.yPos, this.entity.zPos);
+            this.playerNextRotation = this.entity.rotation;
         });
 
         // 
@@ -186,15 +190,10 @@ export class Player extends TransformNode {
             || this._input.inputMap["ArrowDown"] || this._input.mobileDown
             || this._input.inputMap["ArrowLeft"] || this._input.mobileLeft
             || this._input.inputMap["ArrowRight"] || this._input.mobileRight)) {
-
             this._currentAnim = this._walk;
-
         } else {
             this._currentAnim = this._idle;
-
         }
-         
-        console.log(this._currentAnim);
 
         //Animations
         if(this._currentAnim != null && this._prevAnim !== this._currentAnim){
@@ -211,6 +210,20 @@ export class Player extends TransformNode {
         let velocityZ = 0
         let velocityY = 0
 
+        let rotationY = this._rotationY;
+        if(this._input.horizontal < 0){
+            rotationY = 90;
+        }
+        if(this._input.horizontal > 0){
+            rotationY = -90;
+        }
+        if(this._input.vertical < 0){
+            rotationY = 0;
+        }
+        if(this._input.vertical > 0){
+            rotationY = 160;
+        }
+
         // create forces from input
         velocityX = this._input.horizontal;
         velocityZ = this._input.vertical;
@@ -221,7 +234,9 @@ export class Player extends TransformNode {
         this._moveDirection.y = velocityY;
         this._moveDirection.z = velocityZ;
 
-        //console.log('processMove', this._input, this._input.horizontal, this._input.vertical, this._moveDirection);
+        this._rotationY = rotationY;
+
+        console.log('processMove', this._moveDirection, this._rotationY);
 
         // do move
         this.move();
@@ -233,6 +248,9 @@ export class Player extends TransformNode {
         this.entity.xPos -= this._moveDirection.x * Player.PLAYER_SPEED;
         this.entity.zPos -= this._moveDirection.z * Player.PLAYER_SPEED;
         this.entity.yPos = 0;
+
+        // update local rotation
+        this.playerNextRotation = this._rotationY;
 
         // update local player
         this.playerNextPosition.set(this.entity.xPos, this.entity.yPos, this.entity.zPos);
