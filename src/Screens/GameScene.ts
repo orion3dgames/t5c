@@ -36,6 +36,7 @@ export class GameScene {
 
         // create scene
         let scene = new Scene(engine);
+        scene.shadowsEnabled = true;
 
         // set up some lights
         var light = new HemisphericLight(
@@ -133,7 +134,7 @@ export class GameScene {
             // main game loop
             let timeNow = Date.now();   
             let timePassed = (timeNow - timeThen) / 1000;
-            let updateRate = .4;          
+            let updateRate = .1;          
             if( timePassed >= updateRate){
 
                 // detect movement

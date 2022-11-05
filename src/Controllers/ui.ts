@@ -15,6 +15,11 @@ export class Hud {
 
     constructor(scene: Scene, room:Room) {
 
+        this.messages = [
+            {"senderID": "System", "message": "Hello World."},
+            {"senderID": "System", "message": "Server has a 200ms simulated latency."},
+        ];
+
         this._scene = scene;
  
         const playerUI = AdvancedDynamicTexture.CreateFullscreenUI("UI", true, this._scene);
