@@ -94,7 +94,7 @@ export class MyRoom extends Room<MyRoomState> {
             player.xPos = data["x"];
             player.yPos = data['y'];
             player.zPos = data["z"];
-            player.yRot = data["rotation"];
+            player.yRot = data["r"];
         });
 
         // message
@@ -121,8 +121,8 @@ export class MyRoom extends Room<MyRoomState> {
 
         /////////////////////////////////////////////////////////
         // GENERATE MAIN WORLD
-        var grid_x = 10;
-        var grid_z = 10;
+        var grid_x = 20;
+        var grid_z = 20;
         for (var x = -grid_x; x <= grid_x; x++) {
             for (var z = -grid_z; z <= grid_z; z++) {
                 let cubeData = {

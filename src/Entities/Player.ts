@@ -16,7 +16,7 @@ export class Player extends TransformNode {
     private _yTilt: TransformNode;
 
     //const values
-    private static readonly PLAYER_SPEED: number = 0.85;
+    private static readonly PLAYER_SPEED: number = 1.85;
     private static readonly JUMP_FORCE: number = 0.80;
     private static readonly GRAVITY: number = -2.8;
     private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.5934119456780721, 0, 0);
@@ -111,7 +111,7 @@ export class Player extends TransformNode {
 
     private async spawn(entity) {
 
-        const result = await SceneLoader.ImportMeshAsync(null, "./models/", "player.glb", this._scene);
+        const result = await SceneLoader.ImportMeshAsync(null, "./models/", "player_fixed.glb", this._scene);
 
         const playerMesh = result.meshes[0];
 
@@ -164,7 +164,7 @@ export class Player extends TransformNode {
         this.entity.onChange(() => {
             console.log('entity.onChange', entity);
             this.playerNextPosition.set(this.entity.xPos, this.entity.yPos, this.entity.zPos);
-            this.playerNextRotation = this.entity.rotation;
+            this.playerNextRotation = this.entity.yRot;
         });
 
         // 
@@ -210,19 +210,8 @@ export class Player extends TransformNode {
         let velocityZ = 0
         let velocityY = 0
 
-        let rotationY = this._rotationY;
-        if(this._input.horizontal < 0){
-            rotationY = 90;
-        }
-        if(this._input.horizontal > 0){
-            rotationY = -90;
-        }
-        if(this._input.vertical < 0){
-            rotationY = 0;
-        }
-        if(this._input.vertical > 0){
-            rotationY = 160;
-        }
+        // this should work // model needs to be rotated I think // ask dayd :)
+        let rotationY = (Math.atan2(this._input.horizontal, this._input.vertical) * (180 / Math.PI));
 
         // create forces from input
         velocityX = this._input.horizontal;
