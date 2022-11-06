@@ -34,13 +34,11 @@ export class PlayerInput {
         this._scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyUpTrigger, (evt) => {
             this.inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
         }));
-        this._scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnLeftPickTrigger, (evt) => {
-            this.inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "leftmousedown";
-        }));
 
         //add to the scene an observable that calls updateFromKeyboard before rendering
         scene.onBeforeRenderObservable.add(() => {
             this._updateFromKeyboard();
+            this._updateFromMouse();
             console.log();
         });
 
@@ -53,7 +51,43 @@ export class PlayerInput {
         scene.onPointerUp = function (e){		
             if(e.button == 0){
                 this.moving=false
+                this.vertical = 0;
+                this.verticalAxis = 0;
+                this.horizontal = 0;
+                this.horizontalAxis = 0;
             }
+        }
+
+        scene.onPointerMove = function (evt){	
+            if(this.moving){	
+                
+                this.vertical = Scalar.Lerp(this.vertical, evt.movementY, 0.2);
+                this.horizontal = Scalar.Lerp(this.horizontal, evt.movementX, 0.2);
+
+                let x = evt.x / evt.target.width;
+                let y = evt.y / evt.target.height;
+
+                // right
+                if(x > 0.5){
+                    this.horizontal = 1;
+                    this.horizontalAxis = 1;
+                // left
+                }else{
+                    this.horizontal = -1;
+                    this.horizontalAxis = -1;
+                }
+
+                if(y > 0.5){
+                    this.verticalAxis = 1;
+                    this.vertical = 1;
+                }else{
+                    this.vertical = -1;
+                    this.verticalAxis = -1;
+                }
+
+                console.log(this.horizontalAxis, this.verticalAxis, this.vertical, this.horizontal);
+            }
+            //this.inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
         }
 
     }
@@ -61,7 +95,7 @@ export class PlayerInput {
     // Mouse UPDATE
     private _updateFromMouse(): void {
 
-
+        
 
     }
 
