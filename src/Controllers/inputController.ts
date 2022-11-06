@@ -24,6 +24,8 @@ export class PlayerInput {
 
         this._scene = scene;
 
+
+        console.log('TEST');
         //scene action manager to detect inputs
         this._scene.actionManager = new ActionManager(this._scene);
 
@@ -38,7 +40,6 @@ export class PlayerInput {
         //add to the scene an observable that calls updateFromKeyboard before rendering
         scene.onBeforeRenderObservable.add(() => {
             this._updateFromKeyboard();
-            this._updateFromMouse();
             console.log();
         });
 
@@ -51,51 +52,28 @@ export class PlayerInput {
         scene.onPointerUp = function (e){		
             if(e.button == 0){
                 this.moving=false
-                this.vertical = 0;
-                this.verticalAxis = 0;
-                this.horizontal = 0;
-                this.horizontalAxis = 0;
+                this.inputMap["ArrowRight"] = false;
+                this.inputMap["ArrowLeft"] = false;
             }
         }
 
         scene.onPointerMove = function (evt){	
-            if(this.moving){	
-                
-                this.vertical = Scalar.Lerp(this.vertical, evt.movementY, 0.2);
-                this.horizontal = Scalar.Lerp(this.horizontal, evt.movementX, 0.2);
-
+            if(this.moving){
+                this.inputMap = {};	
                 let x = evt.x / evt.target.width;
                 let y = evt.y / evt.target.height;
-
-                // right
                 if(x > 0.5){
-                    this.horizontal = 1;
-                    this.horizontalAxis = 1;
-                // left
+                    this.inputMap["ArrowRight"] = true;
                 }else{
-                    this.horizontal = -1;
-                    this.horizontalAxis = -1;
+                    this.inputMap["ArrowLeft"] = true;
                 }
-
                 if(y > 0.5){
-                    this.verticalAxis = 1;
                     this.vertical = 1;
                 }else{
                     this.vertical = -1;
-                    this.verticalAxis = -1;
                 }
-
-                console.log(this.horizontalAxis, this.verticalAxis, this.vertical, this.horizontal);
             }
-            //this.inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
         }
-
-    }
-
-    // Mouse UPDATE
-    private _updateFromMouse(): void {
-
-        
 
     }
 
@@ -145,6 +123,8 @@ export class PlayerInput {
         } else {
             this.jumpKeyDown = false;
         }
+
+        //console.log(this.horizontalAxis, this.verticalAxis, this.vertical, this.horizontal);
 
         //console.log(this);
     }
