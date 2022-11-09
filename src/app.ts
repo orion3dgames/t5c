@@ -1,11 +1,7 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
-import "@babylonjs/loaders/glTF";
 
-import { Engine, Scene, Sound, EngineFactory } from "@babylonjs/core";
-import { PlayerInput } from "./Controllers/inputController";
-import { Player } from "./Entities/Player";
-import { Hud } from "./Controllers/ui";
+import { Engine, Scene, EngineFactory } from "@babylonjs/core";
 
 // IMPORT SCREEN
 import State from "./Screens/Screens";
@@ -14,42 +10,22 @@ import { LobbyScene } from "./Screens/LobbyScene";
 import { GameScene } from "./Screens/GameScene";
 
 // colyseus
-import * as Colyseus from "colyseus.js"; // not necessary if included via <script> tag.
-import { Room, RoomAvailable } from "colyseus.js";
+import * as Colyseus from "colyseus.js";
 
 // App class is our entire game application
 class App {
+
     // General Entire Application
     private _scene: Scene;
     private _canvas: HTMLCanvasElement;
     private _engine: Engine;
 
     //Game State Related
-    public assets;
-    private _input: PlayerInput;
-    private _currentPlayer: Player;
-    private _ui: Hud;
-    private _environment;
     private _client;
-
-    //Sounds
-    // public sfx: Sound;
-    public game: Sound;
-    public end: Sound;
 
     //Scene - related
     private _state: number = 0;
     private _currentScene;
-
-    //post process
-    private _transition: boolean = false;
-
-    // multi
-    private allRooms: RoomAvailable[] = [];
-    private room: Room<any>;
-    private lobbyRoom: Room<any>;
-    private roomId = "";
-    private playerEntities: Player[] = [];
 
     constructor() {
 
@@ -93,11 +69,6 @@ class App {
                 window.nextScene = State.NULL;
             }
 
-            // monitor roomId
-            if(this._currentScene && this._currentScene.roomId){
-                this.roomId = this._currentScene.roomId;
-            }
-
             switch (this._state) {
 
                 ///////////////////////////////////////
@@ -128,7 +99,7 @@ class App {
                 case State.GAME:
                     this.clearScene();
                     this._currentScene = new GameScene();
-                    this._currentScene.createScene(this._engine, this._client, this.roomId);
+                    this._currentScene.createScene(this._engine, this._client);
                     this._scene = this._currentScene._scene;
                     this._state = State.NULL;
                     break;

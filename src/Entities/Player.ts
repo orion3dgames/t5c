@@ -1,6 +1,5 @@
-import { TransformNode, Scene, Mesh, UniversalCamera, Vector3, AnimationGroup, MeshBuilder, Color3, SceneLoader, AbstractMesh } from "@babylonjs/core";
-import { CustomMaterial } from "@babylonjs/materials";
-import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button,Ellipse, Line } from "@babylonjs/gui";
+import { TransformNode, Scene, UniversalCamera, Vector3, AnimationGroup, SceneLoader, AbstractMesh } from "@babylonjs/core";
+import { Rectangle, TextBlock} from "@babylonjs/gui";
 
 export class Player extends TransformNode {
     public camera;
@@ -72,15 +71,15 @@ export class Player extends TransformNode {
     }
 
     // todo: this should a global utils
-    addLabel(mesh, text) {
+    private addLabel(mesh, text) {
 
         var rect1 = new Rectangle();
         rect1.width = 0.2;
         rect1.height = "40px";
         rect1.cornerRadius = 20;
-        rect1.color = "Orange";
+        rect1.color = "white";
         rect1.thickness = 4;
-        rect1.background = "green";
+        rect1.background = "black";
         this.ui._playerUI.addControl(rect1);
         rect1.linkWithMesh(mesh);   
         rect1.linkOffsetY = -150;
@@ -89,24 +88,6 @@ export class Player extends TransformNode {
         label.text = text;
         rect1.addControl(label);
     
-        var target = new Ellipse();
-        target.width = "20px";
-        target.height = "20px";
-        target.color = "Orange";
-        target.thickness = 4;
-        target.background = "green";
-        this.ui._playerUI.addControl(target);
-        target.linkWithMesh(mesh);   
-    
-        var line = new Line();
-        line.lineWidth = 4;
-        line.color = "Orange";
-        line.y2 = 20;
-        line.linkOffsetY = -10;
-        this.ui._playerUI.addControl(line);
-        line.linkWithMesh(mesh); 
-        line.connectedControl = rect1;   
-
     }
 
     private async spawn(entity) {
@@ -114,21 +95,6 @@ export class Player extends TransformNode {
         const result = await SceneLoader.ImportMeshAsync(null, "./models/", "player_fixed.glb", this._scene);
 
         const playerMesh = result.meshes[0];
-
-        /*
-        console.log(playerMesh);
-
-        // generate mesh
-        const sphere = MeshBuilder.CreateSphere(`player-${this.sessionId}`, {
-            segments: 8,
-            diameter: 1
-        }, this.scene);
-      
-        // set material to differentiate CURRENT player and OTHER players
-        //let sphereMaterial = new CustomMaterial(`player-material-${this.sessionId}`);
-        //sphereMaterial.emissiveColor = (this.isCurrentPlayer) ? Color3.FromHexString("#ff9900") : Color3.Gray();
-        //sphere.material = sphereMaterial;
-        */
 
         // set initial scale 
         playerMesh.scaling.set(0.04,0.04,0.04);
@@ -147,12 +113,12 @@ export class Player extends TransformNode {
         // add player nameplate
         this.addLabel(this.mesh, entity.username);
 
-        // start idle animation
-        //this._currentAnim = this._scene.getAnimationGroupByName("Hobbit_Idle");
-        //this._currentAnim.play(this._currentAnim.loopAnimation);
-        
+        // find animations
         this._idle = this._scene.getAnimationGroupByName("Hobbit_Idle");
         this._walk = this._scene.getAnimationGroupByName("Hobbit_Walk");
+
+        // prepare animations
+        this._setUpAnimations();
 
         // if myself, add all player related stuff
         if(this.isCurrentPlayer){
@@ -161,15 +127,14 @@ export class Player extends TransformNode {
         }
 
         // entity network event
+        // Colyseus automatically updates entity variables, so let's listen to any changes
         this.entity.onChange(() => {
-            console.log('entity.onChange', entity);
+            //console.log('entity.onChange', entity);
             this.playerNextPosition.set(this.entity.xPos, this.entity.yPos, this.entity.zPos);
             this.playerNextRotation = this.entity.yRot;
         });
 
-        // 
-        this._setUpAnimations();
-
+        
     }
 
     private _setUpAnimations(): void {
@@ -195,7 +160,6 @@ export class Player extends TransformNode {
             this._currentAnim = this._idle;
         }
 
-        //Animations
         if(this._currentAnim != null && this._prevAnim !== this._currentAnim){
             this._prevAnim.stop();
             this._currentAnim.play(this._currentAnim.loopAnimation);
@@ -225,7 +189,7 @@ export class Player extends TransformNode {
 
         this._rotationY = rotationY;
 
-        console.log('processMove', this._moveDirection, this._rotationY);
+        //console.log('processMove', this._moveDirection, this._rotationY);
 
         // do move
         this.move();
@@ -280,7 +244,6 @@ export class Player extends TransformNode {
         this.camera.parent = yTilt;
 
         this.scene.activeCamera = this.camera;
-        console.log('_setupPlayerCamera', this.scene);
         return this.camera;
     }
 
