@@ -7,7 +7,7 @@
       "**/node_modules/**"
     ],
     "predeploy": [
-      "npm run build"
+      "yarn run build"
     ]
   },
   "functions": [
@@ -22,7 +22,7 @@
         "firebase-debug.*.log"
       ],
       "predeploy": [
-        "npm --prefix \"$RESOURCE_DIR\" run build"
+        "yarn --prefix \"$RESOURCE_DIR\" run build"
       ]
     }
   ]
