@@ -74,7 +74,7 @@ export class Player extends TransformNode {
     private addLabel(mesh, text) {
 
         var rect1 = new Rectangle();
-        rect1.width = 0.2;
+        rect1.width = "100px";
         rect1.height = "40px";
         rect1.cornerRadius = 20;
         rect1.color = "white";
