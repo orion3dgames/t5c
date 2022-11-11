@@ -1,5 +1,5 @@
 import { TransformNode, Scene, UniversalCamera, Vector3, AnimationGroup, SceneLoader, AbstractMesh } from "@babylonjs/core";
-import { Rectangle, TextBlock} from "@babylonjs/gui";
+import { Rectangle, TextBlock } from "@babylonjs/gui";
 
 export class Player extends TransformNode {
     public camera;
@@ -9,7 +9,7 @@ export class Player extends TransformNode {
 
     //Player
     public mesh: AbstractMesh; //outer collisionbox of player
-    
+
     //Camera
     private _camRoot: TransformNode;
     private _yTilt: TransformNode;
@@ -24,7 +24,7 @@ export class Player extends TransformNode {
     private _deltaTime: number = 0;
     private _h: number;
     private _v: number;
- 
+
     private _moveDirection: Vector3 = new Vector3();
     private _rotationY: number;
     private _inputAmt: number;
@@ -55,7 +55,7 @@ export class Player extends TransformNode {
     public yPos: number;
     public zPos: number;
 
-    constructor(entity, isCurrentPlayer, sessionId, scene: Scene, _ui,  input) {
+    constructor(entity, isCurrentPlayer, sessionId, scene: Scene, _ui, input) {
         super("player", scene);
 
         this.scene = scene;
@@ -81,13 +81,13 @@ export class Player extends TransformNode {
         rect1.thickness = 4;
         rect1.background = "black";
         this.ui._playerUI.addControl(rect1);
-        rect1.linkWithMesh(mesh);   
+        rect1.linkWithMesh(mesh);
         rect1.linkOffsetY = -150;
-    
+
         var label = new TextBlock();
         label.text = text;
         rect1.addControl(label);
-    
+
     }
 
     private async spawn(entity) {
@@ -97,11 +97,11 @@ export class Player extends TransformNode {
         const playerMesh = result.meshes[0];
 
         // set initial scale 
-        playerMesh.scaling.set(0.04,0.04,0.04);
+        playerMesh.scaling.set(0.04, 0.04, 0.04);
 
         // set initial position from server
         playerMesh.position.set(this.entity.xPos, this.entity.yPos, this.entity.zPos);
-    
+
         // save entities
         this.playerNextPosition = playerMesh.position.clone();
         this.playerNextRotation = playerMesh.rotation.y;
@@ -124,7 +124,7 @@ export class Player extends TransformNode {
         this._setUpAnimations();
 
         // if myself, add all player related stuff
-        if(this.isCurrentPlayer){
+        if (this.isCurrentPlayer) {
             this._setupPlayerCamera();
             this.activatePlayerCamera();
         }
@@ -137,7 +137,7 @@ export class Player extends TransformNode {
             this.playerNextRotation = this.entity.yRot;
         });
 
-        
+
     }
 
     private _setUpAnimations(): void {
@@ -160,7 +160,7 @@ export class Player extends TransformNode {
             this._currentAnim = this._idle;
         }
 
-        if(this._currentAnim != null && this._prevAnim !== this._currentAnim){
+        if (this._currentAnim != null && this._prevAnim !== this._currentAnim) {
             this._prevAnim.stop();
             this._currentAnim.play(this._currentAnim.loopAnimation);
             this._prevAnim = this._currentAnim;
@@ -174,9 +174,8 @@ export class Player extends TransformNode {
         let velocityZ = 0
         let velocityY = 0
 
-        // this should work // model needs to be rotated I think // ask dayd :)
-        let rotationY = (Math.atan2(this._input.horizontal, this._input.vertical) * (180 / Math.PI));
-
+        // this should work // model needs to be rotated I think // ask dayd :), EDIT : yes, you were not far ;)
+        let rotationY = Math.atan2(this._input.horizontal, this._input.vertical);
         // create forces from input
         velocityX = this._input.horizontal;
         velocityZ = this._input.vertical;
@@ -207,7 +206,7 @@ export class Player extends TransformNode {
 
         // update local player
         this.playerNextPosition.set(this.entity.xPos, this.entity.yPos, this.entity.zPos);
-        
+
     }
 
     public activatePlayerCamera(): UniversalCamera {
