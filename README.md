@@ -17,7 +17,7 @@
 - Clone or download this repository.
 - Run `cd server`
 - Run `npm install`
-- Run `npm dev`
+- Run `npm run dev`
 
 The client should be accessible at [`http://localhost:8080`](http://localhost:8080).
 The WebSocket server should be available locally at `ws://localhost:2567`, and [http://localhost:2567](http://localhost:2567) should be accessible.
