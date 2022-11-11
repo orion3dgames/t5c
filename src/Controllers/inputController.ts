@@ -28,15 +28,15 @@ export class PlayerInput {
         // detect mouse movement
         this._scene.onPointerObservable.add((pointerInfo) => {
 
-            if(pointerInfo.type === PointerEventTypes.POINTERDOWN){
-                if(pointerInfo.event.button == 0){
-                    this.moving=true
+            if (pointerInfo.type === PointerEventTypes.POINTERDOWN) {
+                if (pointerInfo.event.button == 0) {
+                    this.moving = true
                 }
             }
 
-            if(pointerInfo.type === PointerEventTypes.POINTERUP){
-                if(pointerInfo.event.button == 0){
-                    this.moving=false;
+            if (pointerInfo.type === PointerEventTypes.POINTERUP) {
+                if (pointerInfo.event.button == 0) {
+                    this.moving = false;
                     this.inputMap["Right"] = false;
                     this.inputMap["Left"] = false;
                     this.inputMap["Up"] = false;
@@ -47,34 +47,36 @@ export class PlayerInput {
                     this.horizontalAxis = 0;
                 }
             }
-            
-            if(pointerInfo.type === PointerEventTypes.POINTERMOVE){
-                if(this.moving){
-                    this.inputMap = {};
-                    let x = pointerInfo.event.x / pointerInfo.event.target.width;
-                    let y = pointerInfo.event.y / pointerInfo.event.target.height;
-                    if(x > 0.5){
-                        this.inputMap["Right"] = true;
-                    }
-                    if(x < 0.5){
-                        this.inputMap["Left"] = true;
-                    }
-                    if(y < 0.5){
-                        this.inputMap["Up"] = true;
-                    }
-                    if(y > 0.5){
-                        this.inputMap["Down"] = true;
-                    }
 
-                    //console.log(this.inputMap, this.verticalAxis, this.vertical, this.horizontal, this.horizontalAxis);
-
-                    this._updateFromMouse();
-                    
+            // if(pointerInfo.type === PointerEventTypes.POINTERMOVE){
+            if (this.moving) {
+                this.inputMap = {};
+                // FIXME, do it better, in star and not 9 cube, i understand myself...
+                const left = pointerInfo.event.target.width / 3;
+                const right = 2 * pointerInfo.event.target.width / 3;
+                const up = pointerInfo.event.target.height / 3;
+                const down = 2 * pointerInfo.event.target.height / 3;
+                if (pointerInfo.event.x > right) {
+                    this.inputMap["Right"] = true;
                 }
-            }
-          });
+                if (pointerInfo.event.x < left) {
+                    this.inputMap["Left"] = true;
+                }
+                if (pointerInfo.event.y < up) {
+                    this.inputMap["Up"] = true;
+                }
+                if (pointerInfo.event.y > down) {
+                    this.inputMap["Down"] = true;
+                }
 
-        
+                //console.log(this.inputMap, this.verticalAxis, this.vertical, this.horizontal, this.horizontalAxis);
+
+                this._updateFromMouse();
+            }
+            // }
+        });
+
+
     }
 
     //handles what is done when mouse is pressed or moved
