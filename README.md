@@ -9,7 +9,7 @@
 - Download and install [Node.js LTS](https://nodejs.org/en/download/)
 - Clone or download this repository.
 - Run `npm install`
-- Run `npm start`
+- Run `npm run serve`
 
 ## How to run server
 
