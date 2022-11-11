@@ -48,49 +48,49 @@ export class PlayerInput {
                 }
             }
 
-            // if(pointerInfo.type === PointerEventTypes.POINTERMOVE){
-            if (this.moving) {
-                this.inputMap = {};
-                const x = (pointerInfo.event.x / pointerInfo.event.target.width) * 2 - 1;
-                const y = (pointerInfo.event.y / pointerInfo.event.target.height) * 2 - 1;
-                const a = (Math.atan2(x, y) / (2 * Math.PI) * 360);
-                if (a < -157.5) {
-                    this.inputMap["Up"] = true;
-                }
-                else if (a < -112.5) {
-                    this.inputMap["Up"] = true;
-                    this.inputMap["Left"] = true;
-                }
-                else if (a < -67.5) {
-                    this.inputMap["Left"] = true;
-                }
-                else if (a < -22.5) {
-                    this.inputMap["Left"] = true;
-                    this.inputMap["Down"] = true;
-                }
-                else if (a < 22.5) {
-                    this.inputMap["Down"] = true;
-                }
-                else if (a < 67.5) {
-                    this.inputMap["Down"] = true;
-                    this.inputMap["Right"] = true;
-                }
-                else if (a < 112.5) {
-                    this.inputMap["Right"] = true;
-                }
-                else if (a < 157.5) {
-                    this.inputMap["Right"] = true;
-                    this.inputMap["Up"] = true;
-                }
-                else {
-                    this.inputMap["Up"] = true;
-                }
+            if (pointerInfo.type === PointerEventTypes.POINTERMOVE) {
+                if (this.moving) {
+                    this.inputMap = {};
+                    const x = (pointerInfo.event.x / pointerInfo.event.target.width) * 2 - 1;
+                    const y = (pointerInfo.event.y / pointerInfo.event.target.height) * 2 - 1;
+                    const a = (Math.atan2(x, y) / (2 * Math.PI) * 360);
+                    if (a < -157.5) {
+                        this.inputMap["Up"] = true;
+                    }
+                    else if (a < -112.5) {
+                        this.inputMap["Up"] = true;
+                        this.inputMap["Left"] = true;
+                    }
+                    else if (a < -67.5) {
+                        this.inputMap["Left"] = true;
+                    }
+                    else if (a < -22.5) {
+                        this.inputMap["Left"] = true;
+                        this.inputMap["Down"] = true;
+                    }
+                    else if (a < 22.5) {
+                        this.inputMap["Down"] = true;
+                    }
+                    else if (a < 67.5) {
+                        this.inputMap["Down"] = true;
+                        this.inputMap["Right"] = true;
+                    }
+                    else if (a < 112.5) {
+                        this.inputMap["Right"] = true;
+                    }
+                    else if (a < 157.5) {
+                        this.inputMap["Right"] = true;
+                        this.inputMap["Up"] = true;
+                    }
+                    else {
+                        this.inputMap["Up"] = true;
+                    }
 
-                //console.log(this.inputMap, this.verticalAxis, this.vertical, this.horizontal, this.horizontalAxis);
+                    //console.log(this.inputMap, this.verticalAxis, this.vertical, this.horizontal, this.horizontalAxis);
 
-                this._updateFromMouse();
+                    this._updateFromMouse();
+                }
             }
-            // }
         });
 
 
