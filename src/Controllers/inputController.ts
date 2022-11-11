@@ -82,34 +82,58 @@ export class PlayerInput {
     //handles what is done when mouse is pressed or moved
     private _updateFromMouse(): void {
 
-        //forward - backwards movement
-        if ((this.inputMap["Up"])) {
-            this.verticalAxis = 1;
-            this.vertical = Scalar.Lerp(this.vertical, 1, 0.2);
+        //lerp will create a scalar linearly interpolated amt between start and end scalar
+        //taking current horizontal and how long you hold, will go up to -1(all the way left)
 
+        const d = 1 / Math.sqrt(2);
+        //forward - backwards movement
+        if (this.inputMap["Up"] && this.inputMap["Left"]) {
+            this.vertical = Scalar.Lerp(this.vertical, d, 0.2);
+            this.verticalAxis = 1;
+            this.horizontal = Scalar.Lerp(this.horizontal, -d, 0.2);
+            this.horizontalAxis = -1;
+        }
+        else if (this.inputMap["Up"] && this.inputMap["Right"]) {
+            this.vertical = Scalar.Lerp(this.vertical, d, 0.2);
+            this.verticalAxis = 1;
+            this.horizontal = Scalar.Lerp(this.horizontal, d, 0.2);
+            this.horizontalAxis = 1;
+        }
+        else if (this.inputMap["Down"] && this.inputMap["Left"]) {
+            this.vertical = Scalar.Lerp(this.vertical, -d, 0.2);
+            this.verticalAxis = -1;
+            this.horizontal = Scalar.Lerp(this.horizontal, -d, 0.2);
+            this.horizontalAxis = -1;
+        }
+        else if (this.inputMap["Down"] && this.inputMap["Right"]) {
+            this.vertical = Scalar.Lerp(this.vertical, -d, 0.2);
+            this.verticalAxis = -1;
+            this.horizontal = Scalar.Lerp(this.horizontal, d, 0.2);
+            this.horizontalAxis = 1;
+        }
+        else if (this.inputMap["Up"]) {
+            this.vertical = Scalar.Lerp(this.vertical, 1, 0.2);
+            this.verticalAxis = 1;
+            this.horizontal = 0;
+            this.horizontalAxis = 0;
         } else if ((this.inputMap["Down"])) {
             this.vertical = Scalar.Lerp(this.vertical, -1, 0.2);
             this.verticalAxis = -1;
-        } else {
+            this.horizontal = 0;
+            this.horizontalAxis = 0;
+        }
+        else if ((this.inputMap["Left"])) {
+            this.horizontal = Scalar.Lerp(this.horizontal, -1, 0.2);
+            this.horizontalAxis = -1;
+            this.vertical = 0;
+            this.verticalAxis = 0;
+        } else if ((this.inputMap["Right"])) {
+            this.horizontal = Scalar.Lerp(this.horizontal, 1, 0.2);
+            this.horizontalAxis = 1;
             this.vertical = 0;
             this.verticalAxis = 0;
         }
 
-        //left - right movement
-        if ((this.inputMap["Left"])) {
-            //lerp will create a scalar linearly interpolated amt between start and end scalar
-            //taking current horizontal and how long you hold, will go up to -1(all the way left)
-            this.horizontal = Scalar.Lerp(this.horizontal, -1, 0.2);
-            this.horizontalAxis = -1;
-
-        } else if ((this.inputMap["Right"])) {
-            this.horizontal = Scalar.Lerp(this.horizontal, 1, 0.2);
-            this.horizontalAxis = 1;
-        }
-        else {
-            this.horizontal = 0;
-            this.horizontalAxis = 0;
-        }
 
     }
 
