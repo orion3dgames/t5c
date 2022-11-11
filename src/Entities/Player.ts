@@ -106,6 +106,9 @@ export class Player extends TransformNode {
         this.playerNextPosition = playerMesh.position.clone();
         this.playerNextRotation = playerMesh.rotation.y;
 
+        // hide mesh (DEBUG)
+        //playerMesh.setEnabled(false);
+
         // set mesh
         this.mesh = playerMesh;
         this.mesh.parent = this;
@@ -151,10 +154,7 @@ export class Player extends TransformNode {
 
     private _animatePlayer(): void {
 
-        if ((this._input.inputMap["ArrowUp"] || this._input.mobileUp
-            || this._input.inputMap["ArrowDown"] || this._input.mobileDown
-            || this._input.inputMap["ArrowLeft"] || this._input.mobileLeft
-            || this._input.inputMap["ArrowRight"] || this._input.mobileRight)) {
+        if ((this._input.moving)) {
             this._currentAnim = this._walk;
         } else {
             this._currentAnim = this._idle;

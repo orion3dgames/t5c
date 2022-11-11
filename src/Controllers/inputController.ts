@@ -1,14 +1,15 @@
-import { Scene, ActionManager, ExecuteCodeAction, Observer, Scalar } from '@babylonjs/core';
+import { Scene, ActionManager, ExecuteCodeAction, Observer, Scalar, PointerEventTypes } from '@babylonjs/core';
 import { Hud } from './ui';
 
 export class PlayerInput {
 
-    public inputMap: any;
+    public inputMap: {};
     private _scene: Scene;
 
     //simple movement
     public horizontal: number = 0;
     public vertical: number = 0;
+
     //tracks whether or not there is movement in that axis
     public horizontalAxis: number = 0;
     public verticalAxis: number = 0;
@@ -24,69 +25,67 @@ export class PlayerInput {
 
         this._scene = scene;
 
+        // detect mouse movement
+        this._scene.onPointerObservable.add((pointerInfo) => {
 
-        console.log('TEST');
-        //scene action manager to detect inputs
-        this._scene.actionManager = new ActionManager(this._scene);
-
-        this.inputMap = {};
-        this._scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyDownTrigger, (evt) => {
-            this.inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
-        }));
-        this._scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyUpTrigger, (evt) => {
-            this.inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
-        }));
-
-        //add to the scene an observable that calls updateFromKeyboard before rendering
-        scene.onBeforeRenderObservable.add(() => {
-            this._updateFromKeyboard();
-            console.log();
-        });
-
-        scene.onPointerDown = function (e){
-            if(e.button == 0){
-                this.moving=true
-            }
-        }
-	
-        scene.onPointerUp = function (e){		
-            if(e.button == 0){
-                this.moving=false
-                this.inputMap["ArrowRight"] = false;
-                this.inputMap["ArrowLeft"] = false;
-            }
-        }
-
-        scene.onPointerMove = function (evt){	
-            if(this.moving){
-                this.inputMap = {};	
-                let x = evt.x / evt.target.width;
-                let y = evt.y / evt.target.height;
-                if(x > 0.5){
-                    this.inputMap["ArrowRight"] = true;
-                }else{
-                    this.inputMap["ArrowLeft"] = true;
-                }
-                if(y > 0.5){
-                    this.vertical = 1;
-                }else{
-                    this.vertical = -1;
+            if(pointerInfo.type === PointerEventTypes.POINTERDOWN){
+                if(pointerInfo.event.button == 0){
+                    this.moving=true
                 }
             }
-        }
 
+            if(pointerInfo.type === PointerEventTypes.POINTERUP){
+                if(pointerInfo.event.button == 0){
+                    this.moving=false;
+                    this.inputMap["Right"] = false;
+                    this.inputMap["Left"] = false;
+                    this.inputMap["Up"] = false;
+                    this.inputMap["Down"] = false;
+                    this.verticalAxis = 0;
+                    this.vertical = 0;
+                    this.horizontal = 0;
+                    this.horizontalAxis = 0;
+                }
+            }
+            
+            if(pointerInfo.type === PointerEventTypes.POINTERMOVE){
+                if(this.moving){
+                    this.inputMap = {};
+                    let x = pointerInfo.event.x / pointerInfo.event.target.width;
+                    let y = pointerInfo.event.y / pointerInfo.event.target.height;
+                    if(x > 0.5){
+                        this.inputMap["Right"] = true;
+                    }
+                    if(x < 0.5){
+                        this.inputMap["Left"] = true;
+                    }
+                    if(y < 0.5){
+                        this.inputMap["Up"] = true;
+                    }
+                    if(y > 0.5){
+                        this.inputMap["Down"] = true;
+                    }
+
+                    //console.log(this.inputMap, this.verticalAxis, this.vertical, this.horizontal, this.horizontalAxis);
+
+                    this._updateFromMouse();
+                    
+                }
+            }
+          });
+
+        
     }
 
-    // Keyboard controls & Mobile controls
-    //handles what is done when keys are pressed or if on mobile, when buttons are pressed
-    private _updateFromKeyboard(): void {
+    //handles what is done when mouse is pressed or moved
+    private _updateFromMouse(): void {
 
         //forward - backwards movement
-        if ((this.inputMap["ArrowUp"])) {
+        if ((this.inputMap["Up"])) {
             this.verticalAxis = 1;
             this.vertical = Scalar.Lerp(this.vertical, 1, 0.2);
 
-        } else if ((this.inputMap["ArrowDown"])) {
+        } else if ((this.inputMap["Down"])) {
             this.vertical = Scalar.Lerp(this.vertical, -1, 0.2);
             this.verticalAxis = -1;
         } else {
@@ -95,13 +94,13 @@ export class PlayerInput {
         }
 
         //left - right movement
-        if ((this.inputMap["ArrowLeft"])) {
+        if ((this.inputMap["Left"])) {
             //lerp will create a scalar linearly interpolated amt between start and end scalar
             //taking current horizontal and how long you hold, will go up to -1(all the way left)
             this.horizontal = Scalar.Lerp(this.horizontal, -1, 0.2);
             this.horizontalAxis = -1;
 
-        } else if ((this.inputMap["ArrowRight"])) {
+        } else if ((this.inputMap["Right"])) {
             this.horizontal = Scalar.Lerp(this.horizontal, 1, 0.2);
             this.horizontalAxis = 1;
         }
@@ -110,23 +109,6 @@ export class PlayerInput {
             this.horizontalAxis = 0;
         }
 
-        //dash
-        if ((this.inputMap["Shift"])) {
-            this.dashing = true;
-        } else {
-            this.dashing = false;
-        }
-
-        //Jump Checks (SPACE)
-        if ((this.inputMap[" "])) {
-            this.jumpKeyDown = true;
-        } else {
-            this.jumpKeyDown = false;
-        }
-
-        //console.log(this.horizontalAxis, this.verticalAxis, this.vertical, this.horizontal);
-
-        //console.log(this);
     }
 
 }
