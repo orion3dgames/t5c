@@ -37,7 +37,6 @@ export class StartScene {
 
         const title = new TextBlock("title", "START");
         title.resizeToFit = true;
-        title.fontFamily = "Viga";
         title.fontSize = "40px";
         title.color = "white";
         title.resizeToFit = true;
@@ -47,7 +46,6 @@ export class StartScene {
         imageRect.addControl(title);
 
         const startBtn = Button.CreateSimpleButton("play", "Play");
-        startBtn.fontFamily = "Viga";
         startBtn.width = 0.2
         startBtn.height = "40px";
         startBtn.color = "white";

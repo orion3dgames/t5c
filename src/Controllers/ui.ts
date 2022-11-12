@@ -28,8 +28,7 @@ export class Hud {
 
         ////////////////////////////
         // add a quit button
-        const quitButton = Button.CreateSimpleButton("quit", "Quit");
-        quitButton.fontFamily = "Viga";
+        const quitButton = Button.CreateSimpleButton("quit", "Quit");;
         quitButton.width = 0.2
         quitButton.height = "40px";
         quitButton.color = "white";

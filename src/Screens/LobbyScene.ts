@@ -47,7 +47,6 @@ export class LobbyScene {
 
         const title = new TextBlock("title", "Lobby");
         title.resizeToFit = true;
-        title.fontFamily = "Viga";
         title.fontSize = "40px";
         title.color = "white";
         title.resizeToFit = true;
@@ -58,7 +57,6 @@ export class LobbyScene {
 
  
         const backButton = Button.CreateSimpleButton("back", "Back");
-        backButton.fontFamily = "Viga";
         backButton.width = 0.2
         backButton.height = "40px";
         backButton.color = "white";
@@ -111,7 +109,6 @@ export class LobbyScene {
             //////////////////////////
             // create button
             const startBtn = Button.CreateSimpleButton("start", "Create");
-            startBtn.fontFamily = "Viga";
             startBtn.width = 0.2
             startBtn.height = "40px";
             startBtn.color = "white";
