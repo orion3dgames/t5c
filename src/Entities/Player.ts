@@ -16,9 +16,7 @@ export class Player extends TransformNode {
     private _yTilt: TransformNode;
 
     //const values
-    private static readonly PLAYER_SPEED: number = 1.85;
-    private static readonly JUMP_FORCE: number = 0.80;
-    private static readonly GRAVITY: number = -2.8;
+    private static readonly PLAYER_SPEED: number = 0.12;
     private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.5934119456780721, 0, 0);
 
     //player movement vars
@@ -26,38 +24,28 @@ export class Player extends TransformNode {
     private _h: number;
     private _v: number;
 
-    private _moveDirection: Vector3 = new Vector3();
-    private _rotationY: number;
-    private _inputAmt: number;
-    private _jumpCount: number;
-
     // animation trackers
     private _currentAnim: AnimationGroup = null;
     private _prevAnim: AnimationGroup;
-    private _isFalling: boolean = false;
-    private _jumped: boolean = false;
 
     //animations
     private _walk: AnimationGroup;
     private _idle: AnimationGroup;
 
-    //gravity, ground detection, jumping
-    private _gravity: Vector3 = new Vector3();
-    private _lastGroundPos: Vector3 = Vector3.Zero(); // keep track of the last grounded position
-    private _grounded: boolean;
-
     public playerPosition: Vector3;
     public playerDirection: Vector3;
     public playerNextPosition: Vector3;
     public playerNextRotation: Vector3;
+    public playerMove: any;
 
     private isCurrentPlayer: boolean;
     public sessionId: string;
 
     public entity: any;
-    public xPos: number;
-    public yPos: number;
-    public zPos: number;
+    public x: number;
+    public y: number;
+    public z: number;
+    public rot: number;
 
     constructor(entity, isCurrentPlayer, sessionId, scene: Scene, _ui, input, _shadow) {
         super("player", scene);
@@ -72,7 +60,6 @@ export class Player extends TransformNode {
 
         // spawn player
         this.spawn(entity);
-
     }
 
     // todo: this should a global utils
@@ -111,12 +98,8 @@ export class Player extends TransformNode {
         playerMesh.scaling.set(0.04, 0.04, 0.04);
 
         // save entities
-        this.playerNextPosition = playerMesh.position.clone();
-        this.playerNextRotation = new Vector3(0,0,0);
-
-        // 
-        this.playerPosition = this.entity.playerPosition;
-        this.playerDirection = this.entity.playerDirection;
+        this.playerNextPosition = new Vector3(this.entity.x, this.entity.y, this.entity.z);
+        this.playerNextRotation = new Vector3(0,this.entity.rot,0);
 
         // hide mesh (DEBUG)
         //playerMesh.setEnabled(false);
@@ -141,12 +124,65 @@ export class Player extends TransformNode {
             this.activatePlayerCamera();
         }
 
+        ///////////////////////////////////////////////////////////
         // entity network event
         // Colyseus automatically updates entity variables, so let's listen to any changes
         this.entity.onChange(() => {
-            //this.playerNextPosition = this.entity.playerPosition;
-            //this.playerNextRotation = this.entity.yRotation;
+            if(!this.isCurrentPlayer) {
+                console.log('onChange', this.entity)
+                this.playerNextPosition = new Vector3(this.entity.x, this.entity.y, this.entity.z);
+                this.playerNextRotation = new Vector3(0,this.entity.rot,0);
+            }
         });
+    }
+    
+    public processMove() {
+
+        // prepare velocity
+        let velocityX = 0
+        let velocityZ = 0
+        let velocityY = 0
+
+        // this should work // model needs to be rotated I think // ask dayd :), EDIT : yes, you were not far ;)
+        let rotationY = Math.atan2(this._input.horizontal, this._input.vertical);
+
+        // create forces from input
+        velocityX = this._input.horizontal;
+        velocityZ = this._input.vertical;
+        velocityY = 0; // jump or keep going down
+
+        // add values
+        this.playerMove = {};
+        this.playerMove.x = velocityX;
+        this.playerMove.y = velocityY;
+        this.playerMove.z = velocityZ;
+        this.playerMove.rot = rotationY;
+
+        console.log('processMove', this.playerMove);
+
+        // do move
+        this.move();
+    }
+
+    private move() {
+
+        
+        /*
+        this.entity.xPos -= this._moveDirection.x * Player.PLAYER_SPEED;
+        this.entity.zPos -= this._moveDirection.z * Player.PLAYER_SPEED;
+        this.entity.yPos = 0;
+        */
+
+        // update local entity
+        this.playerNextPosition.x -= this.playerMove.x * Player.PLAYER_SPEED;
+        this.playerNextPosition.z -= this.playerMove.z * Player.PLAYER_SPEED;
+        this.playerNextRotation.y = this.playerMove.rot;
+
+        // update networked entity
+        this.entity.x = this.playerNextPosition.x;
+        this.entity.z = this.playerNextPosition.z;
+        this.entity.rot = this.playerNextRotation.y;
+
     }
 
     private _setUpAnimations(): void {
@@ -176,51 +212,6 @@ export class Player extends TransformNode {
         }
     }
 
-    public processMove() {
-
-        // prepare velocity
-        let velocityX = 0
-        let velocityZ = 0
-        let velocityY = 0
-
-        // this should work // model needs to be rotated I think // ask dayd :), EDIT : yes, you were not far ;)
-        let rotationY = Math.atan2(this._input.horizontal, this._input.vertical);
-
-        // create forces from input
-        velocityX = this._input.horizontal;
-        velocityZ = this._input.vertical;
-        velocityY = 0; // jump or keep going down
-
-        // add values
-        this.playerNextPosition.x = velocityX;
-        this.playerNextPosition.y = velocityY;
-        this.playerNextPosition.z = velocityZ;
-        this.playerNextRotation = new Vector3(0, rotationY, 0);
-
-        console.log('processMove', this.playerNextPosition, this.playerNextRotation);
-
-        // do move
-        this.move();
-    }
-
-    private move() {
-
-        // update networked entity
-        /*
-        this.entity.xPos -= this._moveDirection.x * Player.PLAYER_SPEED;
-        this.entity.zPos -= this._moveDirection.z * Player.PLAYER_SPEED;
-        this.entity.yPos = 0;
-        */
-
-        // update local entity
-        this.playerPosition.x -= this.playerNextPosition.x * Player.PLAYER_SPEED;
-        this.playerPosition.y = 0;
-        this.playerPosition.z -= this.playerNextPosition.z * Player.PLAYER_SPEED;
-
-        // update local rotation
-        this.playerDirection.y = this.playerNextRotation.y;
-
-    }
 
     public activatePlayerCamera(): UniversalCamera {
         this.scene.registerBeforeRender(() => {

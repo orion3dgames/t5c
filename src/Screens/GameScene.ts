@@ -140,28 +140,31 @@ export class GameScene {
             // continuously lerp movement
             for (let sessionId in this.playerEntities) {
                 const entity = this.playerEntities[sessionId];
-                entity.mesh.position = Vector3.Lerp(entity.mesh.position, entity.playerPosition, 0.2);
-                entity.mesh.rotation = Vector3.Lerp(entity.mesh.rotation, entity.playerDirection, 0.8);
+                entity.mesh.position = Vector3.Lerp(entity.mesh.position, entity.playerNextPosition, 0.2);
+                entity.mesh.rotation = Vector3.Lerp(entity.mesh.rotation, entity.playerNextRotation, 0.8);
+            }
+
+            // detect movement
+            if (this._input.moving) {
+                this._currentPlayer.processMove();
             }
 
             // main game loop
             let timeNow = Date.now();
             let timePassed = (timeNow - timeThen) / 1000;
-            let updateRate = .2;
+            let updateRate = 0.1;
             if (timePassed >= updateRate) {
 
                 // detect movement
                 if (this._input.moving) {
-                    this._currentPlayer.processMove();
-                    /*
+    
                     this.room.send("playerPosition", {
                         x: this._currentPlayer.playerNextPosition.x,
                         y: this._currentPlayer.playerNextPosition.y,
-                        z: this._currentPlayer.playerNextPosition.z
+                        z: this._currentPlayer.playerNextPosition.z,
+                        rot: this._currentPlayer.playerNextRotation.y
                     });
-                    this.room.send("playerDirection", {
-                        rotationY: this._currentPlayer.playerNextRotation,
-                    });*/
+
                 }
 
                 timeThen = timeNow;

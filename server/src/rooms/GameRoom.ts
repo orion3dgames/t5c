@@ -1,5 +1,5 @@
 import { Room, Client, updateLobby } from "@colyseus/core";
-import { PlayerDirectionSchema, PlayerKeySchema, PlayerPositionSchema } from './schema/PlayerSchema';
+import { PlayerSchema } from './schema/PlayerSchema';
 import { CubeSchema } from './schema/CubeSchema';
 import { ChatSchema } from './schema/ChatSchema';
 import logger = require("../helpers/logger");
@@ -46,18 +46,11 @@ export class GameRoom extends Room<StateHandlerSchema> {
         this.state.addPlayer(client.sessionId);
         
         //Update player
-        this.onMessage("playerPosition", (client, data: PlayerPositionSchema) => {
+        this.onMessage("playerPosition", (client, data: any) => {
             console.log("playerPosition", data);
-            this.state.setPosition(client.sessionId, data);
+            this.state.setPosition(client.sessionId, data, data.rot);
         });
 
-        this.onMessage("playerDirection", (client, data: PlayerDirectionSchema) => {
-            this.state.setDirection(client.sessionId, data);
-        });
-
-        this.onMessage("playerKey", (client, data: PlayerKeySchema) => {
-            this.state.setKeys(client.sessionId, data);
-        });
 
         this.onMessage("playerMessage", (client, message) => {
             this.broadcast("playerMessage", this.generateMessage(client.sessionId, message));

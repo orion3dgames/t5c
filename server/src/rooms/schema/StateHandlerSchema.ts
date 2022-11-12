@@ -1,7 +1,7 @@
 import {Schema, type, MapSchema} from '@colyseus/schema';
 import { Vector3 } from 'babylonjs';
 
-import {PlayerDirectionSchema, PlayerKeySchema, PlayerPositionSchema, PlayerSchema} from './PlayerSchema';
+import {PlayerSchema} from './PlayerSchema';
 
 export class StateHandlerSchema extends Schema {
 
@@ -10,22 +10,15 @@ export class StateHandlerSchema extends Schema {
     @type("number") serverTime: number = 0.0;
 
     addPlayer(sessionId: string) {
-
         let min = -10;
         let max = 10;
-        let defaultPosition = new PlayerPositionSchema({
+        this.players.set(sessionId, new PlayerSchema().assign({
+            sessionId: sessionId,
+            username: sessionId,
             x: Math.floor(Math.random() * (max - min + 1)) + min,
             y: 0,
             z: Math.floor(Math.random() * (max - min + 1)) + min,
-        });
-
-        console.log(defaultPosition);
-
-        this.players.set(sessionId, new PlayerSchema().assign({
-            sessionId: sessionId, 
-            playerPosition: defaultPosition,
-            playerDirection: new PlayerDirectionSchema({x:0,y:0,z:0}),
-            username: sessionId
+            rot: 0,
         }));
     }
 
@@ -37,24 +30,12 @@ export class StateHandlerSchema extends Schema {
         this.players.delete(sessionId);
     }
 
-    setDirection(sessionId: string, direction: PlayerDirectionSchema) {
-        this.getPlayer(sessionId).playerDirection.y = direction.y;
-    }
-
-    setKeys(sessionId: string, keys: PlayerKeySchema) {
+    setPosition(sessionId: string, position: Vector3, rotation: number) {
         const player = this.getPlayer(sessionId);
-        player.playerKey.up = keys.up;
-        player.playerKey.right = keys.right;
-        player.playerKey.down = keys.down;
-        player.playerKey.left = keys.left;
-        player.playerKey.jump = keys.jump;
-    }
-
-    setPosition(sessionId: string, position: PlayerPositionSchema) {
-        const player = this.getPlayer(sessionId);
-        player.playerPosition.x = position.x;
-        player.playerPosition.y = position.y;
-        player.playerPosition.z = position.z;
+        player.x = position.x;
+        player.y = position.y;
+        player.z = position.z;
+        player.rot = rotation;
     }
 
     generateRandomUUID(){
