@@ -1,7 +1,9 @@
 import { Schema, type } from "@colyseus/schema";
 
 export class PlayerDirectionSchema extends Schema {
-  @type('number') public rotationY: number;
+  @type('number') public x: number;
+  @type('number') public y: number;
+  @type('number') public z: number;
 }
 
 export class PlayerKeySchema extends Schema {

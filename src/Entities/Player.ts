@@ -6,6 +6,7 @@ export class Player extends TransformNode {
     public scene: Scene;
     public ui;
     private _input;
+    private _shadow;
 
     //Player
     public mesh: AbstractMesh; //outer collisionbox of player
@@ -45,8 +46,11 @@ export class Player extends TransformNode {
     private _lastGroundPos: Vector3 = Vector3.Zero(); // keep track of the last grounded position
     private _grounded: boolean;
 
+    public playerPosition: Vector3;
+    public playerDirection: Vector3;
     public playerNextPosition: Vector3;
-    public playerNextRotation: number;
+    public playerNextRotation: Vector3;
+
     private isCurrentPlayer: boolean;
     public sessionId: string;
 
@@ -55,11 +59,12 @@ export class Player extends TransformNode {
     public yPos: number;
     public zPos: number;
 
-    constructor(entity, isCurrentPlayer, sessionId, scene: Scene, _ui, input) {
+    constructor(entity, isCurrentPlayer, sessionId, scene: Scene, _ui, input, _shadow) {
         super("player", scene);
 
         this.scene = scene;
         this.ui = _ui;
+        this._shadow = _shadow;
         this.sessionId = sessionId; // network id from colyseus
         this.entity = entity;
         this.isCurrentPlayer = isCurrentPlayer;
@@ -94,19 +99,24 @@ export class Player extends TransformNode {
         
         console.log(entity);
 
+        // load mesh
         const result = await SceneLoader.ImportMeshAsync(null, "./models/", "player_fixed.glb", this._scene);
-
         const playerMesh = result.meshes[0];
+
+        // add shadows
+        this._shadow.addShadowCaster(playerMesh, true);
+        playerMesh.receiveShadows = true;
 
         // set initial scale 
         playerMesh.scaling.set(0.04, 0.04, 0.04);
 
-        // set initial position from server
-        playerMesh.position.set(this.entity.xPos, this.entity.yPos, this.entity.zPos);
-
         // save entities
         this.playerNextPosition = playerMesh.position.clone();
-        this.playerNextRotation = playerMesh.rotation.y;
+        this.playerNextRotation = new Vector3(0,0,0);
+
+        // 
+        this.playerPosition = this.entity.playerPosition;
+        this.playerDirection = this.entity.playerDirection;
 
         // hide mesh (DEBUG)
         //playerMesh.setEnabled(false);
@@ -134,8 +144,7 @@ export class Player extends TransformNode {
         // entity network event
         // Colyseus automatically updates entity variables, so let's listen to any changes
         this.entity.onChange(() => {
-            console.log('entity.onChange', entity);
-            //this.playerNextPosition.set(this.entity.position);
+            //this.playerNextPosition = this.entity.playerPosition;
             //this.playerNextRotation = this.entity.yRotation;
         });
     }
@@ -176,19 +185,19 @@ export class Player extends TransformNode {
 
         // this should work // model needs to be rotated I think // ask dayd :), EDIT : yes, you were not far ;)
         let rotationY = Math.atan2(this._input.horizontal, this._input.vertical);
+
         // create forces from input
         velocityX = this._input.horizontal;
         velocityZ = this._input.vertical;
         velocityY = 0; // jump or keep going down
 
         // add values
-        this._moveDirection.x = velocityX;
-        this._moveDirection.y = velocityY;
-        this._moveDirection.z = velocityZ;
+        this.playerNextPosition.x = velocityX;
+        this.playerNextPosition.y = velocityY;
+        this.playerNextPosition.z = velocityZ;
+        this.playerNextRotation = new Vector3(0, rotationY, 0);
 
-        this._rotationY = rotationY;
-
-        //console.log('processMove', this._moveDirection, this._rotationY);
+        console.log('processMove', this.playerNextPosition, this.playerNextRotation);
 
         // do move
         this.move();
@@ -197,15 +206,19 @@ export class Player extends TransformNode {
     private move() {
 
         // update networked entity
+        /*
         this.entity.xPos -= this._moveDirection.x * Player.PLAYER_SPEED;
         this.entity.zPos -= this._moveDirection.z * Player.PLAYER_SPEED;
         this.entity.yPos = 0;
+        */
+
+        // update local entity
+        this.playerPosition.x -= this.playerNextPosition.x * Player.PLAYER_SPEED;
+        this.playerPosition.y = 0;
+        this.playerPosition.z -= this.playerNextPosition.z * Player.PLAYER_SPEED;
 
         // update local rotation
-        this.playerNextRotation = this._rotationY;
-
-        // update local player
-        this.playerNextPosition.set(this.entity.xPos, this.entity.yPos, this.entity.zPos);
+        this.playerDirection.y = this.playerNextRotation.y;
 
     }
 

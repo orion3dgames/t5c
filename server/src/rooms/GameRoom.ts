@@ -47,6 +47,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
         
         //Update player
         this.onMessage("playerPosition", (client, data: PlayerPositionSchema) => {
+            console.log("playerPosition", data);
             this.state.setPosition(client.sessionId, data);
         });
 
@@ -85,10 +86,6 @@ export class GameRoom extends Room<StateHandlerSchema> {
         msg.senderID = sessionId;
         msg.message = message;
         return msg;
-    }
-
-    generateRandomUUID(){
-        return Math.random().toString().substring(10,20);
     }
 
     /*

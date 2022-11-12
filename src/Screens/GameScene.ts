@@ -1,4 +1,4 @@
-import { Scene, Engine, Color4, Vector3, FreeCamera, HemisphericLight } from "@babylonjs/core";
+import { Scene, Engine, Color4, Vector3, FreeCamera, HemisphericLight, MeshBuilder, SpotLight, ShadowGenerator } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button } from "@babylonjs/gui";
 import State from "./Screens";
 
@@ -8,6 +8,7 @@ import { Player } from "../Entities/Player";
 import { Cube } from "../Entities/Cube";
 
 import { Room } from "colyseus.js";
+import { Console } from "console";
 
 export class GameScene {
     
@@ -19,6 +20,7 @@ export class GameScene {
 
     private _input;
     private _ui;
+    private _shadow: ShadowGenerator;
     
     public _roomId: string;
     private room: Room<any>;
@@ -39,12 +41,24 @@ export class GameScene {
         scene.shadowsEnabled = true;
 
         // set up some lights
-        var light = new HemisphericLight(
-            "light1",
-            new Vector3(0, 1, 0),
-            scene
-          );
-        
+        const light = new SpotLight("spotLight", new Vector3(-40, 40, -40), new Vector3(1, -1, 1), Math.PI / 5, 30, scene);
+        light.position = new Vector3(-40, 40, -40);
+        light.shadowMaxZ = 100;
+        light.shadowMinZ = 10;
+
+        const plane = MeshBuilder.CreatePlane("plane", { size: 30 }, scene);
+        plane.position.y = 0;
+        plane.rotation.x = Math.PI / 2;
+        plane.receiveShadows = true;
+
+        // shadow generator
+        this._shadow = new ShadowGenerator(1024, light);
+        this._shadow.bias = 0.001;
+        this._shadow.normalBias = 0.02;
+        this._shadow.useContactHardeningShadow = true;
+        this._shadow.contactHardeningLightSizeUVRatio = 0.05;
+        this._shadow.setDarkness(0.5);
+
         // set scene
         this._scene = scene;
 
@@ -81,7 +95,7 @@ export class GameScene {
         // setup player input
         // todo: probably should be in the player class
         this._input = new PlayerInput(this._scene);
-        
+
         // setup hud
         this._ui = new Hud(this._scene, this.room); 
 
@@ -90,7 +104,7 @@ export class GameScene {
 
             var isCurrentPlayer = sessionId === this.room.sessionId;
 
-            let _player = new Player(entity, isCurrentPlayer, sessionId, this._scene, this._ui, this._input);
+            let _player = new Player(entity, isCurrentPlayer, sessionId, this._scene, this._ui, this._input, this._shadow);
 
             // if current player, save entity ref
             if(isCurrentPlayer){
@@ -124,24 +138,22 @@ export class GameScene {
         this._scene.registerBeforeRender(() => {
 
             // continuously lerp movement
-            for (let sessionId in this.playerEntities) {
+            for (let sessionId in this.playerEntities) {               
                 const entity = this.playerEntities[sessionId];
-                const targetPosition = entity.playerNextPosition;
-                const targetRotation = entity.playerNextRotation;
-                entity.mesh.position = Vector3.Lerp(entity.mesh.position, targetPosition, 0.05);
-                //entity.mesh.rotation = new Vector3(0,targetRotation, 0);
-                entity.mesh.rotation = Vector3.Lerp(entity.mesh.rotation, new Vector3(0, targetRotation, 0), 0.7);
+                entity.mesh.position = Vector3.Lerp(entity.mesh.position, entity.playerPosition, 0.2);
+                entity.mesh.rotation = Vector3.Lerp(entity.mesh.rotation, entity.playerDirection, 0.8);;
             }
-
+            
             // main game loop
             let timeNow = Date.now();   
             let timePassed = (timeNow - timeThen) / 1000;
-            let updateRate = .1;          
+            let updateRate = .2;          
             if( timePassed >= updateRate){
 
                 // detect movement
                 if(this._input.horizontalAxis || this._input.verticalAxis ){
                     this._currentPlayer.processMove();
+                    /*
                     this.room.send("playerPosition", {
                         x: this._currentPlayer.playerNextPosition.x,
                         y: this._currentPlayer.playerNextPosition.y,
@@ -149,7 +161,7 @@ export class GameScene {
                     });
                     this.room.send("playerDirection", {
                         rotationY: this._currentPlayer.playerNextRotation,
-                    });
+                    });*/
                 }
 
                 timeThen = timeNow;

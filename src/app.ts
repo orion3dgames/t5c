@@ -50,7 +50,7 @@ class App {
 
         //  start scene
         //this._state = State.START;
-        window.nextScene = State.START;
+        window.nextScene = State.GAME;
 
         //MAIN render loop & state machine
         await this._render();

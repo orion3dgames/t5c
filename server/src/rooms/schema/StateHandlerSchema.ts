@@ -1,7 +1,7 @@
 import {Schema, type, MapSchema} from '@colyseus/schema';
+import { Vector3 } from 'babylonjs';
 
 import {PlayerDirectionSchema, PlayerKeySchema, PlayerPositionSchema, PlayerSchema} from './PlayerSchema';
-import {ChatSchema} from './ChatSchema';
 
 export class StateHandlerSchema extends Schema {
 
@@ -10,7 +10,23 @@ export class StateHandlerSchema extends Schema {
     @type("number") serverTime: number = 0.0;
 
     addPlayer(sessionId: string) {
-        this.players.set(sessionId, new PlayerSchema().assign({sessionId: sessionId}));
+
+        let min = -10;
+        let max = 10;
+        let defaultPosition = new PlayerPositionSchema({
+            x: Math.floor(Math.random() * (max - min + 1)) + min,
+            y: 0,
+            z: Math.floor(Math.random() * (max - min + 1)) + min,
+        });
+
+        console.log(defaultPosition);
+
+        this.players.set(sessionId, new PlayerSchema().assign({
+            sessionId: sessionId, 
+            playerPosition: defaultPosition,
+            playerDirection: new PlayerDirectionSchema({x:0,y:0,z:0}),
+            username: sessionId
+        }));
     }
 
     getPlayer(sessionId: string): PlayerSchema {
@@ -22,7 +38,7 @@ export class StateHandlerSchema extends Schema {
     }
 
     setDirection(sessionId: string, direction: PlayerDirectionSchema) {
-        this.getPlayer(sessionId).playerDirection.rotationY = direction.rotationY;
+        this.getPlayer(sessionId).playerDirection.y = direction.y;
     }
 
     setKeys(sessionId: string, keys: PlayerKeySchema) {
@@ -39,6 +55,10 @@ export class StateHandlerSchema extends Schema {
         player.playerPosition.x = position.x;
         player.playerPosition.y = position.y;
         player.playerPosition.z = position.z;
+    }
+
+    generateRandomUUID(){
+        return Math.random().toString().substring(10,20);
     }
 
 }
