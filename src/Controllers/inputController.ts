@@ -10,10 +10,6 @@ export class PlayerInput {
     public horizontal: number = 0;
     public vertical: number = 0;
 
-    //tracks whether or not there is movement in that axis
-    public horizontalAxis: number = 0;
-    public verticalAxis: number = 0;
-
     //jumping and dashing
     public jumpKeyDown: boolean = false;
     public dashing: boolean = false;
@@ -59,16 +55,10 @@ export class PlayerInput {
     //handles what is done when mouse is pressed or moved
     private _updateFromMouse(): void {
 
-        //lerp will create a scalar linearly interpolated amt between start and end scalar
-        //taking current horizontal and how long you hold, will go up to -1(all the way left)
-
         //forward - backwards movement
         if (this.inputMap["rotY"]) {
             this.vertical = -Math.cos(this.inputMap["rotY"]);
-            this.verticalAxis = 1;
-            // this.horizontal = Scalar.Lerp(this.horizontal, -d, 0.2);
             this.horizontal = Math.sin(this.inputMap["rotY"]);
-            this.horizontalAxis = -1;
         }
     }
 }

@@ -11,7 +11,7 @@ import { Room } from "colyseus.js";
 import { Console } from "console";
 
 export class GameScene {
-    
+
     public _scene: Scene;
     private _engine: Engine;
     public _newState: State;
@@ -21,7 +21,7 @@ export class GameScene {
     private _input;
     private _ui;
     private _shadow: ShadowGenerator;
-    
+
     public _roomId: string;
     private room: Room<any>;
     private playerEntities: Player[] = [];
@@ -63,7 +63,7 @@ export class GameScene {
         this._scene = scene;
 
         await this._initNetwork(client);
-       
+
     }
 
     private async _initNetwork(client): Promise<void> {
@@ -72,15 +72,15 @@ export class GameScene {
 
         try {
 
-            if(this._roomId){
+            if (this._roomId) {
                 this.room = await client.join("game_room", { roomId: this._roomId });
-            }else{
+            } else {
                 this.room = await client.create("game_room");
                 this._roomId = this.room.roomId;
                 window.currentRoomID = this._roomId;
-            } 
+            }
 
-            if(this.room){
+            if (this.room) {
                 await this._initEvents();
             }
 
@@ -90,14 +90,14 @@ export class GameScene {
 
     }
 
-    private async _initEvents(){
+    private async _initEvents() {
 
         // setup player input
         // todo: probably should be in the player class
         this._input = new PlayerInput(this._scene);
 
         // setup hud
-        this._ui = new Hud(this._scene, this.room); 
+        this._ui = new Hud(this._scene, this.room);
 
         // when someone joins the room event
         this.room.state.players.onAdd((entity, sessionId) => {
@@ -107,7 +107,7 @@ export class GameScene {
             let _player = new Player(entity, isCurrentPlayer, sessionId, this._scene, this._ui, this._input, this._shadow);
 
             // if current player, save entity ref
-            if(isCurrentPlayer){
+            if (isCurrentPlayer) {
 
                 // set currentPlayer (probably not useful)
                 this._currentPlayer = _player;
@@ -134,24 +134,24 @@ export class GameScene {
         });*/
 
         // main loop
-        let timeThen = Date.now();   
+        let timeThen = Date.now();
         this._scene.registerBeforeRender(() => {
 
             // continuously lerp movement
-            for (let sessionId in this.playerEntities) {               
+            for (let sessionId in this.playerEntities) {
                 const entity = this.playerEntities[sessionId];
                 entity.mesh.position = Vector3.Lerp(entity.mesh.position, entity.playerPosition, 0.2);
                 entity.mesh.rotation = Vector3.Lerp(entity.mesh.rotation, entity.playerDirection, 0.8);
             }
-            
+
             // main game loop
-            let timeNow = Date.now();   
+            let timeNow = Date.now();
             let timePassed = (timeNow - timeThen) / 1000;
-            let updateRate = .2;          
-            if( timePassed >= updateRate){
+            let updateRate = .2;
+            if (timePassed >= updateRate) {
 
                 // detect movement
-                if(this._input.horizontalAxis || this._input.verticalAxis ){
+                if (this._input.moving) {
                     this._currentPlayer.processMove();
                     /*
                     this.room.send("playerPosition", {
@@ -165,10 +165,10 @@ export class GameScene {
                 }
 
                 timeThen = timeNow;
-            }              
+            }
 
         })
 
     }
-    
+
 }
