@@ -1,6 +1,4 @@
 import {Schema, type, MapSchema} from '@colyseus/schema';
-import { Vector3 } from 'babylonjs';
-
 import {PlayerSchema} from './PlayerSchema';
 
 export class StateHandlerSchema extends Schema {
@@ -30,11 +28,11 @@ export class StateHandlerSchema extends Schema {
         this.players.delete(sessionId);
     }
 
-    setPosition(sessionId: string, position: Vector3, rotation: number) {
+    setPosition(sessionId: string, x: number, y: number, z: number, rotation: number) {
         const player = this.getPlayer(sessionId);
-        player.x = position.x;
-        player.y = position.y;
-        player.z = position.z;
+        player.x = x;
+        player.y = y;
+        player.z = z;
         player.rot = rotation;
     }
 
