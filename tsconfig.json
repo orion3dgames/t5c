@@ -3,18 +3,25 @@
   "compilerOptions": {
     "target": "ES6",
     "module": "CommonJS",
-    "sourceMap": true,
-    "outDir": "./dist",
+    //"sourceMap": true,
+    "outDir": "./dist/server",
     "strict": false,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
     "types": [
       "babylonjs",
       "babylonjs-gui",
       "babylonjs-materials",
-      "node"
-    ]
+      "node",
+    ],
+    "paths": {
+			"@shared/*": ["../shared/*"],
+		}
   },
   "include": [
-    "src/**/*"
+    "src/server/*",
+    "src/**/*.d.ts",
+    "src/shared/**/*.ts",
   ],
   "exclude": [
     "node_modules",

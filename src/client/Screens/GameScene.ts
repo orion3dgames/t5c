@@ -4,11 +4,9 @@ import State from "./Screens";
 
 import { PlayerInput } from "../Controllers/inputController";
 import { Hud } from "../Controllers/ui";
-import { Player } from "../Entities/Player";
-import { Cube } from "../Entities/Cube";
+import { Player } from "../../shared/Entities/Player";
 
 import { Room } from "colyseus.js";
-import { Console } from "console";
 
 export class GameScene {
 
