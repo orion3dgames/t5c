@@ -44,8 +44,9 @@ class App {
         }) as Engine;
  
         // create colyseus client
-        //this._client = new Colyseus.Client('ws://localhost:3000');
-        this._client = new Colyseus.Client('wss://t5c.onrender.com');
+        // this should use environement values
+        //this._client = new Colyseus.Client('ws://localhost:3000'); // local
+        this._client = new Colyseus.Client('wss://t5c.onrender.com'); // online using render.com
 
         //  start scene
         //this._state = State.START;
