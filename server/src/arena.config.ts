@@ -1,3 +1,4 @@
+/*
 import Arena from "@colyseus/arena";
 import { monitor } from "@colyseus/monitor";
 import { WebSocketTransport } from '@colyseus/ws-transport';
@@ -10,14 +11,11 @@ export default Arena({
 
     initializeTransport: function () {
 		return new WebSocketTransport({
-			/* ...options */
+		
 		});
 	},
 
     initializeGameServer: (gameServer) => {
-        /**
-         * Define your room handlers:
-         */
         gameServer.define('lobby', LobbyRoom);
 
         // Expose your game room with realtime listing enabled.
@@ -35,17 +33,11 @@ export default Arena({
             res.send("Server ready!");
         });
 
-        /**
-         * Bind @colyseus/monitor
-         * It is recommended to protect this route with a password.
-         * Read more: https://docs.colyseus.io/tools/monitor/
-         */
         app.use("/colyseus", monitor());
     },
 
     beforeListen: () => {
-        /**
-         * Before before gameServer.listen() is called.
-         */
+
     }
 });
+*/
