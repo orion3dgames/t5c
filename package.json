@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "client-dev": "webpack-dev-server --port 8080",
+    "client-start": "webpack-server --port 8080",
     "client-build": "webpack",
     "server-dev": "ts-node-dev --respawn --transpile-only src/server/index.ts",
+    "server-start": "ts-node --transpile-only src/server/index.ts",
     "server-build": "tsc"
   },
   "author": "",
