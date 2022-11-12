@@ -2,7 +2,7 @@ import Arena from "@colyseus/arena";
 import { monitor } from "@colyseus/monitor";
 import { WebSocketTransport } from '@colyseus/ws-transport';
 
-import { MyRoom } from "./rooms/MyRoom";
+import { MyRoom } from "./rooms/GameRoom";
 import { LobbyRoom } from "@colyseus/core";
 
 export default Arena({

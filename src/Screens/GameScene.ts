@@ -59,9 +59,9 @@ export class GameScene {
         try {
 
             if(this._roomId){
-                this.room = await client.join("my_room", { roomId: this._roomId });
+                this.room = await client.join("game_room", { roomId: this._roomId });
             }else{
-                this.room = await client.create("my_room");
+                this.room = await client.create("game_room");
                 this._roomId = this.room.roomId;
                 window.currentRoomID = this._roomId;
             } 
@@ -114,9 +114,10 @@ export class GameScene {
         });
 
         // when a cube is added
+        /*
         this.room.state.cubes.onAdd((entity, sessionId) => {
             new Cube(entity, this._scene);
-        });
+        });*/
 
         // main loop
         let timeThen = Date.now();   
@@ -141,11 +142,13 @@ export class GameScene {
                 // detect movement
                 if(this._input.horizontalAxis || this._input.verticalAxis ){
                     this._currentPlayer.processMove();
-                    this.room.send("updatePosition", {
+                    this.room.send("playerPosition", {
                         x: this._currentPlayer.playerNextPosition.x,
                         y: this._currentPlayer.playerNextPosition.y,
-                        z: this._currentPlayer.playerNextPosition.z,
-                        r: this._currentPlayer.playerNextRotation,
+                        z: this._currentPlayer.playerNextPosition.z
+                    });
+                    this.room.send("playerDirection", {
+                        rotationY: this._currentPlayer.playerNextRotation,
                     });
                 }
 

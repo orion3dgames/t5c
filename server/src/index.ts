@@ -1,10 +1,12 @@
 // Colyseus + Express
-import { Server } from "colyseus";
+
 import { createServer } from "http";
 import express from "express";
 import cors from "cors";
 
-import { MyRoom } from "./rooms/MyRoom";
+import { Server } from "colyseus";
+import { WebSocketTransport } from '@colyseus/ws-transport';
+import { GameRoom } from "./rooms/GameRoom";
 import { LobbyRoom } from "@colyseus/core";
 
 const port = Number(process.env.port) || 3000;
@@ -14,20 +16,23 @@ app.use(cors());
 app.use(express.json());
 
 const gameServer = new Server({
-  server: createServer(app),
+  transport: new WebSocketTransport({ 
+    server: createServer(app)
+  }),
 });
 
+
+// LOBBY ROOM
+gameServer.define('lobby', LobbyRoom);
+
+// GAME ROOM
+gameServer.define("game_room", GameRoom).enableRealtimeListing();
+
+// Make sure to never call the `simulateLatency()` method in production.
+if (process.env.NODE_ENV !== "production") {
+    gameServer.simulateLatency(200);
+}
+
+// LISTEN
 gameServer.listen(port);
-
-/**
- * Define your room handlers:
- */
- gameServer.define('lobby', LobbyRoom);
-
- // Expose your game room with realtime listing enabled.
- gameServer.define("my_room", MyRoom).enableRealtimeListing();
-
- // Make sure to never call the `simulateLatency()` method in production.
- if (process.env.NODE_ENV !== "production") {
-     gameServer.simulateLatency(200);
- }
+console.log("listening on http://localhost:" + port);

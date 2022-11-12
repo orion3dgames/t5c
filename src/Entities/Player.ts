@@ -91,6 +91,8 @@ export class Player extends TransformNode {
     }
 
     private async spawn(entity) {
+        
+        console.log(entity);
 
         const result = await SceneLoader.ImportMeshAsync(null, "./models/", "player_fixed.glb", this._scene);
 
@@ -132,12 +134,10 @@ export class Player extends TransformNode {
         // entity network event
         // Colyseus automatically updates entity variables, so let's listen to any changes
         this.entity.onChange(() => {
-            //console.log('entity.onChange', entity);
-            this.playerNextPosition.set(this.entity.xPos, this.entity.yPos, this.entity.zPos);
-            this.playerNextRotation = this.entity.yRot;
+            console.log('entity.onChange', entity);
+            //this.playerNextPosition.set(this.entity.position);
+            //this.playerNextRotation = this.entity.yRotation;
         });
-
-
     }
 
     private _setUpAnimations(): void {
