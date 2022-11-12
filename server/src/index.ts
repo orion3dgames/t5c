@@ -1,15 +1,31 @@
+// Colyseus + Express
+import { Server } from "colyseus";
+import { createServer } from "http";
+import express from "express";
+
+import { MyRoom } from "./rooms/MyRoom";
+import { LobbyRoom } from "@colyseus/core";
+
+const port = Number(process.env.port) || 3000;
+
+const app = express();
+app.use(express.json());
+
+const gameServer = new Server({
+  server: createServer(app),
+});
+
+gameServer.listen(port);
+
 /**
- * IMPORTANT:
- * ---------
- * Do not manually edit this file if you'd like to use Colyseus Arena
- *
- * If you're self-hosting (without Arena), you can manually instantiate a
- * Colyseus Server as documented here: 👉 https://docs.colyseus.io/server/api/#constructor-options
+ * Define your room handlers:
  */
-import { listen } from "@colyseus/arena";
+ gameServer.define('lobby', LobbyRoom);
 
-// Import arena config
-import arenaConfig from "./arena.config";
+ // Expose your game room with realtime listing enabled.
+ gameServer.define("my_room", MyRoom).enableRealtimeListing();
 
-// Create and listen on 2567 (or PORT environment variable.)
-listen(arenaConfig);
+ // Make sure to never call the `simulateLatency()` method in production.
+ if (process.env.NODE_ENV !== "production") {
+     gameServer.simulateLatency(200);
+ }

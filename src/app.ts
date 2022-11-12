@@ -44,8 +44,8 @@ class App {
         }) as Engine;
  
         // create colyseus client
-        this._client = new Colyseus.Client('ws://localhost:2567');
-        //this._client = new Colyseus.Client('ws://y9gkk9.colyseus.de:2567');
+        //this._client = new Colyseus.Client('ws://localhost:3000');
+        this._client = new Colyseus.Client('ws://t5c.onrender.com');
 
         //  start scene
         //this._state = State.START;
