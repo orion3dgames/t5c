@@ -10,6 +10,7 @@ export class Player extends TransformNode {
 
     //Player
     public mesh: AbstractMesh; //outer collisionbox of player
+    public characterLabel: Rectangle;
 
     //Camera
     private _camRoot: TransformNode;
@@ -25,6 +26,7 @@ export class Player extends TransformNode {
     private _v: number;
 
     // animation trackers
+    private playerAnimations: AnimationGroup[];
     private _currentAnim: AnimationGroup = null;
     private _prevAnim: AnimationGroup;
 
@@ -37,6 +39,7 @@ export class Player extends TransformNode {
     public playerNextPosition: Vector3;
     public playerNextRotation: Vector3;
     public playerMove: any;
+    public playerInputs: [];
 
     private isCurrentPlayer: boolean;
     public sessionId: string;
@@ -80,6 +83,8 @@ export class Player extends TransformNode {
         label.text = text;
         rect1.addControl(label);
 
+        this.characterLabel = rect1;
+
     }
 
     private async spawn(entity) {
@@ -89,6 +94,7 @@ export class Player extends TransformNode {
         // load mesh
         const result = await SceneLoader.ImportMeshAsync(null, "./models/", "player_fixed.glb", this._scene);
         const playerMesh = result.meshes[0];
+        this.playerAnimations = result.animationGroups;
 
         // add shadows
         this._shadow.addShadowCaster(playerMesh, true);
@@ -112,8 +118,10 @@ export class Player extends TransformNode {
         this.addLabel(this.mesh, entity.username);
 
         // find animations
-        this._idle = this._scene.getAnimationGroupByName("Hobbit_Idle");
-        this._walk = this._scene.getAnimationGroupByName("Hobbit_Walk");
+        this._idle = this.playerAnimations.find(o => o.name === 'Hobbit_Idle');
+        this._walk = this.playerAnimations.find(o => o.name === 'Hobbit_Walk');
+        //this._idle = this._scene.getAnimationGroupByName("Hobbit_Idle");
+        //this._walk = this._scene.getAnimationGroupByName("Hobbit_Walk");
 
         // prepare animations
         this._setUpAnimations();
@@ -121,23 +129,31 @@ export class Player extends TransformNode {
         // if myself, add all player related stuff
         if (this.isCurrentPlayer) {
             this._setupPlayerCamera();
-            this.activatePlayerCamera();
         }
+
+        //
+        this.scene.registerBeforeRender(() => {
+            this._animatePlayer();
+            if (this.isCurrentPlayer) {
+                this._updateCamera();
+            }
+        });
 
         ///////////////////////////////////////////////////////////
         // entity network event
         // Colyseus automatically updates entity variables, so let's listen to any changes
         this.entity.onChange(() => {
-            if(!this.isCurrentPlayer) {
+            //if(!this.isCurrentPlayer) {
                 console.log('onChange', this.entity)
                 this.playerNextPosition = new Vector3(this.entity.x, this.entity.y, this.entity.z);
                 this.playerNextRotation = new Vector3(0,this.entity.rot,0);
-            }
+            //}
         });
     }
     
     public processMove() {
 
+        /*
         // prepare velocity
         let velocityX = 0
         let velocityZ = 0
@@ -162,26 +178,23 @@ export class Player extends TransformNode {
 
         // do move
         this.move();
+        */
     }
 
     private move() {
 
-        
         /*
-        this.entity.xPos -= this._moveDirection.x * Player.PLAYER_SPEED;
-        this.entity.zPos -= this._moveDirection.z * Player.PLAYER_SPEED;
-        this.entity.yPos = 0;
-        */
-
         // update local entity
-        this.playerNextPosition.x -= this.playerMove.x * Player.PLAYER_SPEED;
-        this.playerNextPosition.z -= this.playerMove.z * Player.PLAYER_SPEED;
+        this.playerNextPosition.x -= this.playerMove.x;
+        this.playerNextPosition.z -= this.playerMove.z;
         this.playerNextRotation.y = this.playerMove.rot;
 
+        /*
         // update networked entity
         this.entity.x = this.playerNextPosition.x;
         this.entity.z = this.playerNextPosition.z;
         this.entity.rot = this.playerNextRotation.y;
+        */
 
     }
 
@@ -197,9 +210,19 @@ export class Player extends TransformNode {
         this._prevAnim = this._walk;
     }
 
+    private roundToTwo(num:number) {
+        return Math.round(num * 100) / 100;
+    }
+
     private _animatePlayer(): void {
 
-        if ((this._input.moving)) {
+        if(
+            ( 
+                this.roundToTwo(this.mesh.position.x) != this.roundToTwo(this.playerNextPosition.x) || 
+                this.roundToTwo(this.mesh.position.y) != this.roundToTwo(this.playerNextPosition.y)
+            )
+        ){
+            //console.log(this.mesh.position, this.playerNextPosition, '_animatePlayer', 'WALK');
             this._currentAnim = this._walk;
         } else {
             this._currentAnim = this._idle;
@@ -210,15 +233,6 @@ export class Player extends TransformNode {
             this._currentAnim.play(this._currentAnim.loopAnimation);
             this._prevAnim = this._currentAnim;
         }
-    }
-
-
-    public activatePlayerCamera(): UniversalCamera {
-        this.scene.registerBeforeRender(() => {
-            this._animatePlayer();
-            this._updateCamera();
-        })
-        return this.camera;
     }
 
     private _updateCamera(): void {

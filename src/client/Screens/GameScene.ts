@@ -1,5 +1,5 @@
-import { Scene, Engine, Color4, Vector3, FreeCamera, HemisphericLight, MeshBuilder, SpotLight, ShadowGenerator } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button } from "@babylonjs/gui";
+import { Scene, Engine, Vector3, MeshBuilder, SpotLight, ShadowGenerator, AssetsManager, AssetContainer, MeshAssetTask, ContainerAssetTask } from "@babylonjs/core";
+import { AdvancedDynamicTexture, Button } from "@babylonjs/gui";
 import State from "./Screens";
 
 import { PlayerInput } from "../Controllers/inputController";
@@ -11,11 +11,13 @@ import { Room } from "colyseus.js";
 export class GameScene {
 
     public _scene: Scene;
+    public _client;
     private _engine: Engine;
     public _newState: State;
     private _gui: AdvancedDynamicTexture;
     public _button: Button;
-
+    public _assetsManager: AssetsManager;
+    public _assets = [];
     private _input;
     private _ui;
     private _shadow: ShadowGenerator;
@@ -25,6 +27,8 @@ export class GameScene {
     private playerEntities: Player[] = [];
     private _currentPlayer;
 
+    public _loadedAssets;
+
     constructor() {
 
     }
@@ -33,6 +37,7 @@ export class GameScene {
 
         // get current roomID from globals
         this._roomId = window.currentRoomID;
+        this._client = client;
 
         // create scene
         let scene = new Scene(engine);
@@ -60,11 +65,38 @@ export class GameScene {
         // set scene
         this._scene = scene;
 
-        await this._initNetwork(client);
+        await this._loadAssets();
 
     }
 
+    private async _loadAssets(): Promise<void> {
+
+        /*
+        this._loadedAssets = [];
+
+        var container = new AssetContainer(this._scene);
+
+        this._assetsManager = new AssetsManager(this._scene);
+        this._assetsManager.addContainerTask("player_mesh", "", "./models/", "player_fixed.glb");
+        this._assetsManager.load();
+
+        this._assetsManager.onFinish = function(meshes) {
+           console.log('MESH LOADED', meshes);
+           meshes.forEach((task: MeshAssetTask) => {
+                console.log(task);
+                this._loadedAssets.push({
+                    "meshes": task.loadedMeshes[0]
+                })
+           });
+          
+        };*/
+
+        await this._initNetwork(this._client);
+    }
+
     private async _initNetwork(client): Promise<void> {
+
+        console.log(this._assetsManager);
 
         await this._scene.whenReadyAsync();
 
@@ -121,15 +153,10 @@ export class GameScene {
 
         // when someone leave the room event
         this.room.state.players.onRemove((player, sessionId) => {
+            this.playerEntities[sessionId].characterLabel.dispose();
             this.playerEntities[sessionId].mesh.dispose();
             delete this.playerEntities[sessionId];
         });
-
-        // when a cube is added
-        /*
-        this.room.state.cubes.onAdd((entity, sessionId) => {
-            new Cube(entity, this._scene);
-        });*/
 
         // main loop
         let timeThen = Date.now();
@@ -138,7 +165,7 @@ export class GameScene {
             // continuously lerp movement
             for (let sessionId in this.playerEntities) {
                 const entity = this.playerEntities[sessionId];
-                entity.mesh.position = Vector3.Lerp(entity.mesh.position, entity.playerNextPosition, 0.2);
+                entity.mesh.position = Vector3.Lerp(entity.mesh.position, entity.playerNextPosition, 0.3);
                 entity.mesh.rotation = Vector3.Lerp(entity.mesh.rotation, entity.playerNextRotation, 0.8);
             }
 
@@ -156,12 +183,23 @@ export class GameScene {
                 // detect movement
                 if (this._input.moving) {
     
+                    /*
                     this.room.send("playerPosition", {
                         x: this._currentPlayer.playerNextPosition.x,
                         y: this._currentPlayer.playerNextPosition.y,
                         z: this._currentPlayer.playerNextPosition.z,
                         rot: this._currentPlayer.playerNextRotation.y
                     });
+                    */
+                    let seq = 1;
+                    let input = {
+                        seq: seq,
+                        h: this._input.horizontal, 
+                        v: this._input.vertical
+                    }
+                    //this._currentPlayer.playerInputs[seq] = input;
+
+                    this.room.send("playerInput", input);
 
                 }
 

@@ -49,6 +49,10 @@ export class GameRoom extends Room<StateHandlerSchema> {
             this.state.setPosition(client.sessionId, data.x, data.y, data.z, data.rot);
         });
 
+        this.onMessage("playerInput", (client, data: any) => {
+            console.log("playerInput", data);
+            this.state.calculatePosition(client.sessionId, data.h, data.v, data.seq);
+        });
 
         this.onMessage("playerMessage", (client, message) => {
             this.broadcast("playerMessage", this.generateMessage(client.sessionId, message));
