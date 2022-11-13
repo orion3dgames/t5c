@@ -1,4 +1,4 @@
-import { TransformNode, Scene, UniversalCamera, Vector3, AnimationGroup, SceneLoader, AbstractMesh } from "@babylonjs/core";
+import { TransformNode, Scene, UniversalCamera, ArcRotateCamera, Vector3, AnimationGroup, SceneLoader, AbstractMesh } from "@babylonjs/core";
 import { Rectangle, TextBlock } from "@babylonjs/gui";
 
 export class Player extends TransformNode {
@@ -261,6 +261,7 @@ export class Player extends TransformNode {
         this.camera.parent = yTilt;
 
         this.scene.activeCamera = this.camera;
+
         return this.camera;
     }
 

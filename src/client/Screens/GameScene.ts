@@ -1,6 +1,7 @@
 import { 
     Scene, Engine, Vector3, MeshBuilder, Color3, SpotLight,
      ShadowGenerator, CubeTexture, Texture, StandardMaterial, 
+     Mesh,Matrix,Quaternion,SceneLoader,
      DirectionalLight, PointLight,HemisphericLight,
      AssetsManager, AssetContainer, MeshAssetTask, ContainerAssetTask 
 } from "@babylonjs/core";
@@ -9,6 +10,7 @@ import {  } from "@babylonjs/materials";
 import State from "./Screens";
 
 import { PlayerInput } from "../Controllers/inputController";
+import { Environment } from "../Controllers/environment";
 import { Hud } from "../Controllers/ui";
 import { Player } from "../../shared/Entities/Player";
 
@@ -27,6 +29,7 @@ export class GameScene {
     private _input;
     private _ui;
     private _shadow: ShadowGenerator;
+    private _environment: Environment;
 
     public _roomId: string;
     private room: Room<any>;
@@ -49,39 +52,21 @@ export class GameScene {
         let scene = new Scene(engine);
         scene.shadowsEnabled = true;
 
-        // set up some lights
+        // ambient light
         var ambientLight = new HemisphericLight(
             "light1",
             new Vector3(0, 1, 0),
             scene
         );
-        ambientLight.intensity = 1.5;
+        ambientLight.intensity = 2;
         ambientLight.groundColor = new Color3(0.13, 0.13, 0.13);
         ambientLight.specular = Color3.Black();
 
-        // set up some lights
-        var light = new DirectionalLight("DirectionalLight", new Vector3(0, 0, 1), scene);
+        // shadow light
+        var light = new DirectionalLight("DirectionalLight", new Vector3(0, -1, 0), scene);
         light.intensity = 1;
-        //light.position = new Vector3(0, 10, 10);
-        /*
-        const light = new SpotLight("spotLight", new Vector3(-40, 40, -40), new Vector3(1, -1, 1), Math.PI / 0.5, 30, scene);
-        light.position = new Vector3(-40, 40, -40);
-        
-        light.shadowMaxZ = 30;
-        light.shadowMinZ = 20;
-        */
 
-        const plane = MeshBuilder.CreatePlane("plane", { size: 100 }, scene);
-        plane.position.y = 0;
-        plane.rotation.x = Math.PI / 2;
-        plane.receiveShadows = true;
-        var myMaterial = new StandardMaterial("myMaterial", scene);
-        var myTexture = new Texture("ground.jpg", scene);
-        myTexture.uScale = 5.0;
-        myTexture.vScale = 5.0;
-        myMaterial.diffuseTexture = myTexture;
-        plane.material = myMaterial;
-
+        // add sky box
         var skybox = MeshBuilder.CreateBox("skyBox", { size: 1000.0 }, scene);
         var skyboxMaterial = new StandardMaterial("skyBox", scene);
         skyboxMaterial.backFaceCulling = false;
@@ -111,6 +96,12 @@ export class GameScene {
 
     private async _loadAssets(): Promise<void> {
 
+        //--CREATE ENVIRONMENT--
+        const environment = new Environment(this._scene);
+        this._environment = environment;
+        //Load environment and character assets
+        await this._environment.load(); //environment
+
         /*
         this._loadedAssets = [];
 
@@ -132,6 +123,48 @@ export class GameScene {
         };*/
 
         await this._initNetwork(this._client);
+    }
+
+    //load the character model
+    private async _loadCharacterAssets(scene): Promise<any> {
+
+        async function loadCharacter() {
+            //collision mesh
+            const outer = MeshBuilder.CreateBox("outer", { width: 2, depth: 1, height: 3 }, scene);
+            outer.isVisible = false;
+            outer.isPickable = false;
+            outer.checkCollisions = true;
+
+            //move origin of box collider to the bottom of the mesh (to match player mesh)
+            outer.bakeTransformIntoVertices(Matrix.Translation(0, 1.5, 0))
+            //for collisions
+            outer.ellipsoid = new Vector3(1, 1.5, 1);
+            outer.ellipsoidOffset = new Vector3(0, 1.5, 0);
+
+            outer.rotationQuaternion = new Quaternion(0, 1, 0, 0); // rotate the player mesh 180 since we want to see the back of the player
+            
+            //--IMPORTING MESH--
+            return SceneLoader.ImportMeshAsync(null, "./models/", "player_fixed.glb", scene).then((result) =>{
+                const root = result.meshes[0];
+                //body is our actual player mesh
+                const body = root;
+                body.parent = outer;
+                body.isPickable = false;
+                body.getChildMeshes().forEach(m => {
+                    m.isPickable = false;
+                })
+                
+                //return the mesh and animations
+                return {
+                    mesh: outer as Mesh,
+                    animationGroups: result.animationGroups
+                }
+            });
+        }
+
+        return loadCharacter().then(assets => {
+            this._loadedAssets = assets;
+        });
     }
 
     private async _initNetwork(client): Promise<void> {

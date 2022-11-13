@@ -48,7 +48,7 @@ export class Hud {
         chat_input.height = '30px;'
         chat_input.left = '20px';
         chat_input.top = "-20px";
-        chat_input.color = "#FFFFFF";
+        chat_input.color = "#FFF";
         chat_input.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         chat_input.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         this._playerUI.addControl(chat_input);
@@ -90,12 +90,16 @@ export class Hud {
         var top = 0;
         this.messages.slice().reverse().forEach(msg => {
    
+            let date = new Date(msg.createdAt);
+            let dateFormat = date.toLocaleString('en-US');
+
             var roomTxt = new TextBlock();
-            roomTxt.text = msg.senderID+': '+msg.message;
+            roomTxt.paddingLeft = "5px";
+            roomTxt.text = dateFormat+" | "+msg.senderID+': '+msg.message;
             roomTxt.textHorizontalAlignment = 0;
             roomTxt.height = "30px";
-            roomTxt.fontSize = "16px";
-            roomTxt.color = "white";
+            roomTxt.fontSize = "12px";
+            roomTxt.color = "#000";
             roomTxt.left = .1;
             roomTxt.top = top+"px";
             roomTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
