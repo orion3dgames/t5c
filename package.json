@@ -27,7 +27,6 @@
     "@types/react": "16.7.3",
     "@types/react-dom": "16.0.9",
     "clean-webpack-plugin": "^3.0.0",
-    "colyseus.js": "^0.15.0-preview.0",
     "copy-webpack-plugin": "^11.0.0",
     "ts-loader": "^9.2.6",
     "typescript": "^4.5.4",
@@ -38,13 +37,18 @@
     "ts-node-dev": "^2.0.0"
   },
   "dependencies": {
+    "colyseus.js": "^0.15.0-preview.0",
     "babylonjs": "latest",
     "babylonjs-gui": "latest",
     "babylonjs-materials": "latest",
+    "babylonjs-gltf2interface": "latest",
     "dotenv-webpack": "^7.0.3",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "winston": "^3.8.2"
+  },
+  "peerDependencies": {
+    
   },
   "browserslist": {
     "production": [

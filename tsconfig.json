@@ -3,7 +3,7 @@
   "compilerOptions": {
     "target": "ES6",
     "module": "CommonJS",
-    //"sourceMap": true,
+    "sourceMap": true,
     "outDir": "./dist/server",
     "strict": false,
     "experimentalDecorators": true,
@@ -14,13 +14,15 @@
       "babylonjs-materials",
       "node",
     ],
+    "typeRoots": [
+      "node_modules/@types"
+    ],
     "paths": {
 			"@shared/*": ["../shared/*"],
 		}
   },
   "include": [
     "src/server/*",
-    "src/**/*.d.ts",
     "src/shared/**/*.ts",
   ],
   "exclude": [
