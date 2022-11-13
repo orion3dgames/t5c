@@ -28,7 +28,8 @@ export class Hud {
         quitButton.height = "40px";
         quitButton.color = "white";
         quitButton.top = "20px"; 
-        quitButton.left = "-20px"; 
+        quitButton.left = "-20px";
+        quitButton.background = "#222"; 
         quitButton.thickness = 1;
         quitButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         quitButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;

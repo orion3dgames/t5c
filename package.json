@@ -14,13 +14,15 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@babylonjs/core": "latest",
-    "@babylonjs/gui": "latest",
-    "@babylonjs/gui-editor": "latest",
-    "@babylonjs/inspector": "latest",
-    "@babylonjs/loaders": "latest",
-    "@babylonjs/materials": "latest",
-    "@babylonjs/serializers": "latest",
+
+    "@babylonjs/core": "5.32.1",
+    "@babylonjs/gui": "5.32.1",
+    "@babylonjs/gui-editor": "5.32.1",
+    "@babylonjs/inspector": "5.32.1",
+    "@babylonjs/loaders": "5.32.1",
+    "@babylonjs/materials": "5.32.1",
+    "@babylonjs/serializers": "5.32.1",
+
     "@colyseus/loadtest": "0.15.0-preview.0",
     "@colyseus/ws-transport": "0.15.0-preview.0",
     "@types/node": "^17.0.12",
@@ -38,10 +40,12 @@
   },
   "dependencies": {
     "colyseus.js": "^0.15.0-preview.0",
-    "babylonjs": "latest",
-    "babylonjs-gui": "latest",
-    "babylonjs-materials": "latest",
-    "babylonjs-gltf2interface": "latest",
+    
+    "babylonjs": "5.32.1",
+    "babylonjs-gui": "5.32.1",
+    "babylonjs-materials": "5.32.1",
+    "babylonjs-gltf2interface": "5.32.1",
+
     "dotenv-webpack": "^7.0.3",
     "cors": "^2.8.5",
     "express": "^4.18.2",

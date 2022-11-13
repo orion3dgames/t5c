@@ -1,5 +1,11 @@
-import { Scene, Engine, Vector3, MeshBuilder, SpotLight, ShadowGenerator, AssetsManager, AssetContainer, MeshAssetTask, ContainerAssetTask } from "@babylonjs/core";
+import { 
+    Scene, Engine, Vector3, MeshBuilder, Color3, SpotLight,
+     ShadowGenerator, CubeTexture, Texture, StandardMaterial, 
+     DirectionalLight, PointLight,HemisphericLight,
+     AssetsManager, AssetContainer, MeshAssetTask, ContainerAssetTask 
+} from "@babylonjs/core";
 import { AdvancedDynamicTexture, Button } from "@babylonjs/gui";
+import {  } from "@babylonjs/materials";
 import State from "./Screens";
 
 import { PlayerInput } from "../Controllers/inputController";
@@ -44,15 +50,46 @@ export class GameScene {
         scene.shadowsEnabled = true;
 
         // set up some lights
-        const light = new SpotLight("spotLight", new Vector3(-40, 40, -40), new Vector3(1, -1, 1), Math.PI / 5, 30, scene);
-        light.position = new Vector3(-40, 40, -40);
-        light.shadowMaxZ = 100;
-        light.shadowMinZ = 10;
+        var ambientLight = new HemisphericLight(
+            "light1",
+            new Vector3(0, 1, 0),
+            scene
+        );
+        ambientLight.intensity = 1.5;
+        ambientLight.groundColor = new Color3(0.13, 0.13, 0.13);
+        ambientLight.specular = Color3.Black();
 
-        const plane = MeshBuilder.CreatePlane("plane", { size: 30 }, scene);
+        // set up some lights
+        var light = new DirectionalLight("DirectionalLight", new Vector3(0, 0, 1), scene);
+        light.intensity = 1;
+        //light.position = new Vector3(0, 10, 10);
+        /*
+        const light = new SpotLight("spotLight", new Vector3(-40, 40, -40), new Vector3(1, -1, 1), Math.PI / 0.5, 30, scene);
+        light.position = new Vector3(-40, 40, -40);
+        
+        light.shadowMaxZ = 30;
+        light.shadowMinZ = 20;
+        */
+
+        const plane = MeshBuilder.CreatePlane("plane", { size: 100 }, scene);
         plane.position.y = 0;
         plane.rotation.x = Math.PI / 2;
         plane.receiveShadows = true;
+        var myMaterial = new StandardMaterial("myMaterial", scene);
+        var myTexture = new Texture("ground.jpg", scene);
+        myTexture.uScale = 5.0;
+        myTexture.vScale = 5.0;
+        myMaterial.diffuseTexture = myTexture;
+        plane.material = myMaterial;
+
+        var skybox = MeshBuilder.CreateBox("skyBox", { size: 1000.0 }, scene);
+        var skyboxMaterial = new StandardMaterial("skyBox", scene);
+        skyboxMaterial.backFaceCulling = false;
+        skyboxMaterial.reflectionTexture = new CubeTexture("textures/skybox", scene);
+        skyboxMaterial.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
+        skyboxMaterial.diffuseColor = new Color3(0, 0, 0);
+        skyboxMaterial.specularColor = new Color3(0, 0, 0);
+        skybox.material = skyboxMaterial;
 
         // shadow generator
         this._shadow = new ShadowGenerator(1024, light);
@@ -61,6 +98,9 @@ export class GameScene {
         this._shadow.useContactHardeningShadow = true;
         this._shadow.contactHardeningLightSizeUVRatio = 0.05;
         this._shadow.setDarkness(0.5);
+
+        //
+        //scene.environmentTexture = CubeTexture.CreateFromPrefilteredData('textures/skybox.dds', scene)
 
         // set scene
         this._scene = scene;
