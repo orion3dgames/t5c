@@ -12,32 +12,37 @@ export class Environment {
 
     //What we do once the environment assets have been imported
     //handles setting the necessary flags for collision and trigger meshes,
-    //sets up the lantern objects
-    //creates the firework particle systems for end-game
      public async load() {
        
         const assets = await this._loadAsset();
 
         //Loop through all environment meshes that were imported
         assets.allMeshes.forEach(m => {
+
+            // default values
             m.receiveShadows = true;
             m.checkCollisions = true;
+            m.isPickable = false;
+            m.doNotSyncBoundingInfo = true;
 
-            if (m.name == "ground") { //dont check for collisions, dont allow for raycasting to detect it(cant land on it)
+            //dont check for collisions, dont allow for raycasting to detect it(cant land on it)
+            if (m.name == "ground") { 
                 m.checkCollisions = false;
                 m.isPickable = false;
             }
 
             //areas that will use box collisions
-            if (m.name.includes("stairs") || m.name == "cityentranceground" || m.name == "fishingground.001" || m.name.includes("lilyflwr")) {
+            if (m.name.includes("XXXX")) {
                 m.checkCollisions = false;
                 m.isPickable = false;
             }
+
             //collision meshes
             if (m.name.includes("collision")) {
                 m.isVisible = false;
                 m.isPickable = true;
             }
+
             //trigger meshes
             if (m.name.includes("Trigger")) {
                 m.isVisible = false;

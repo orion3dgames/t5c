@@ -99,18 +99,14 @@ export class GameScene {
         //--CREATE ENVIRONMENT--
         const environment = new Environment(this._scene);
         this._environment = environment;
-        //Load environment and character assets
         await this._environment.load(); //environment
 
         /*
         this._loadedAssets = [];
-
         var container = new AssetContainer(this._scene);
-
         this._assetsManager = new AssetsManager(this._scene);
         this._assetsManager.addContainerTask("player_mesh", "", "./models/", "player_fixed.glb");
         this._assetsManager.load();
-
         this._assetsManager.onFinish = function(meshes) {
            console.log('MESH LOADED', meshes);
            meshes.forEach((task: MeshAssetTask) => {
@@ -168,8 +164,6 @@ export class GameScene {
     }
 
     private async _initNetwork(client): Promise<void> {
-
-        console.log(this._assetsManager);
 
         await this._scene.whenReadyAsync();
 

@@ -45,7 +45,7 @@ class App {
  
         // create colyseus client
         // this should use environement values
-        if (process.env.NODE_ENV !== "production") {
+        if ( window.location.host === "localhost:8080") {
             this._client = new Colyseus.Client('ws://localhost:3000'); // local
         }else{
             this._client = new Colyseus.Client('wss://t5c.onrender.com'); // online using render.com
@@ -61,8 +61,6 @@ class App {
     }
 
     private async _render(): Promise<void> {
-
-        console.log('RENDER START');
 
         // render loop
         this._engine.runRenderLoop(() => {

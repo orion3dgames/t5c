@@ -35,12 +35,12 @@ export class StartScene {
         imageRect.thickness = 0;
         guiMenu.addControl(imageRect);
 
-        const title = new TextBlock("title", "START");
+        const title = new TextBlock("title", "T5C");
         title.resizeToFit = true;
         title.fontSize = "40px";
         title.color = "white";
         title.resizeToFit = true;
-        title.top = "14px";
+        title.top = "30px";
         title.width = 0.8;
         title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         imageRect.addControl(title);
