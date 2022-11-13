@@ -4,7 +4,8 @@ export class PlayerSchema extends Schema {
   @type("string") id: string = "ID";
   @type('string') public sessionId: string;
   @type("number") timestamp: number = 0.0;
-  @type("string") username: string = "";
+  @type("string") public username: string = "";
+  @type("number") public sequence: number = 0;
   @type('number') public x: number;
   @type('number') public y: number;
   @type('number') public z: number;

@@ -56,6 +56,7 @@ export class StateHandlerSchema extends Schema {
         player.y = velocityY;
         player.z -= velocityZ;
         player.rot = rotationY;
+        player.sequence = seq;
 
     }
 

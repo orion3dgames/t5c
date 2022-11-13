@@ -1,5 +1,7 @@
 import { TransformNode, Scene, UniversalCamera, ArcRotateCamera, Vector3, AnimationGroup, SceneLoader, AbstractMesh } from "@babylonjs/core";
 import { Rectangle, TextBlock } from "@babylonjs/gui";
+import { PlayerSchema } from "../../server/rooms/schema/PlayerSchema";
+import { PlayerInputs } from "../../client/Types/index"
 
 export class Player extends TransformNode {
     public camera;
@@ -39,12 +41,13 @@ export class Player extends TransformNode {
     public playerNextPosition: Vector3;
     public playerNextRotation: Vector3;
     public playerMove: any;
-    public playerInputs: [];
+    public playerInputs: PlayerInputs[];
+    public playerLatestSequence: number;
 
     private isCurrentPlayer: boolean;
     public sessionId: string;
 
-    public entity: any;
+    public entity: PlayerSchema;
     public x: number;
     public y: number;
     public z: number;
@@ -60,6 +63,7 @@ export class Player extends TransformNode {
         this.entity = entity;
         this.isCurrentPlayer = isCurrentPlayer;
         this._input = input;
+        this.playerInputs = [];
 
         // spawn player
         this.spawn(entity);
@@ -143,15 +147,56 @@ export class Player extends TransformNode {
         // entity network event
         // Colyseus automatically updates entity variables, so let's listen to any changes
         this.entity.onChange(() => {
-            //if(!this.isCurrentPlayer) {
-                console.log('onChange', this.entity)
-                this.playerNextPosition = new Vector3(this.entity.x, this.entity.y, this.entity.z);
-                this.playerNextRotation = new Vector3(0,this.entity.rot,0);
-            //}
+
+            console.log('#'+this.entity.sequence+' MOVING FROM SERVER', this.entity);
+
+            // update player movement from server
+            this.playerNextPosition = new Vector3(this.entity.x, this.entity.y, this.entity.z);
+            this.playerNextRotation = new Vector3(0,this.entity.rot,0);
+
+            // remove matching player input sequence from server
+            let index = this.playerInputs.findIndex(object => {
+                return object.seq === this.entity.sequence
+            });
+            this.playerInputs.splice(index, 1);
+            this.playerLatestSequence = this.entity.sequence;
+
+            // log
+            //console.log('onChange', this.entity, this.playerInputs);
+ 
         });
     }
     
     public processMove() {
+
+        if(!this.playerInputs.length) return false
+
+        let nextSequence = this.playerLatestSequence+1;
+        let nextInputIndex = this.playerInputs.findIndex(object => {
+            return object.seq === nextSequence
+        });
+
+        if(nextInputIndex != -1){
+            let nextInput = this.playerInputs[nextInputIndex];
+
+            console.log('#'+nextSequence+' MOVING LOCALLY', nextInputIndex);
+
+            let rotationY = Math.atan2(nextInput.h, nextInput.v);
+
+            // update local entity
+            this.playerNextPosition.x -= nextInput.h;
+            this.playerNextPosition.z -= nextInput.v;
+            this.playerNextRotation.y = rotationY;
+            
+        }
+
+        /*
+        // remove matching player input sequence from server
+        let index = this.playerInputs.findIndex(object => {
+            return object.seq === this.entity.sequence
+        });
+        this.playerInputs.splice(index, 1);
+        this.playerLatestSequence = this.entity.sequence;
 
         /*
         // prepare velocity

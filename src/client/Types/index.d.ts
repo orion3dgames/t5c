@@ -1,6 +1,14 @@
 import State from "../Screens/Screens";
 
-export {};
+type PlayerInputs = {
+  seq: number,
+  h: number,
+  v: number,
+};
+
+export {
+  PlayerInputs
+};
 
 declare global {
   interface Window {
