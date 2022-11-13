@@ -45,12 +45,12 @@ class App {
  
         // create colyseus client
         // this should use environement values
-        this._client = new Colyseus.Client('ws://localhost:3000'); // local
-        //this._client = new Colyseus.Client('wss://t5c.onrender.com'); // online using render.com
+        //this._client = new Colyseus.Client('ws://localhost:3000'); // local
+        this._client = new Colyseus.Client('wss://t5c.onrender.com'); // online using render.com
 
         //  start scene
         //this._state = State.START;
-        window.nextScene = State.GAME;
+        window.nextScene = State.START;
 
         //MAIN render loop & state machine
         await this._render();
