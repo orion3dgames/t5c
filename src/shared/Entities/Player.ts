@@ -167,8 +167,16 @@ export class Player extends TransformNode {
         });
     }
     
-    public processMove() {
+    public processMove(nextInput) {
 
+        let rotationY = Math.atan2(nextInput.h, nextInput.v);
+
+        // update local entity
+        this.playerNextPosition.x -= nextInput.h;
+        this.playerNextPosition.z -= nextInput.v;
+        this.playerNextRotation.y = rotationY;
+
+        /*
         if(!this.playerInputs.length) return false
 
         let nextSequence = this.playerLatestSequence+1;
@@ -179,7 +187,7 @@ export class Player extends TransformNode {
         if(nextInputIndex != -1){
             let nextInput = this.playerInputs[nextInputIndex];
 
-            console.log('#'+nextSequence+' MOVING LOCALLY', nextInputIndex);
+            console.log('#'+nextSequence+' MOVING LOCALLY', nextInput);
 
             let rotationY = Math.atan2(nextInput.h, nextInput.v);
 

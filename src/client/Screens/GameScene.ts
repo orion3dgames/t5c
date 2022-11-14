@@ -229,8 +229,14 @@ export class GameScene {
         // main loop
         let timeThen = Date.now();
         let sequence = 0;
+        let latestInput: PlayerInputs;
         this._scene.registerBeforeRender(() => {
 
+            // main game loop
+            let timeNow = Date.now();
+            let timePassed = (timeNow - timeThen) / 1000;
+            let updateRate = 0.1; // game is networked update every 100ms
+            
             // continuously lerp movement
             for (let sessionId in this.playerEntities) {
                 const entity = this.playerEntities[sessionId];
@@ -240,40 +246,37 @@ export class GameScene {
 
             // detect movement realtime
             if (this._input.moving && (this._input.horizontal && this._input.vertical)) {
+
+                // inc seq
+                sequence++;
                 
+                // prepare input to be sent
+                latestInput = {
+                    seq: sequence,
+                    h: this._input.horizontal, 
+                    v: this._input.vertical
+                }
+
+                // process move locally
+                this._currentPlayer.processMove(latestInput);
+
+                // record input to local list
+                // i need to use these to move my player locally
+                // an make sure to delete any request that has been sent back from server
+                this._currentPlayer.playerInputs.push(latestInput);
+
+                
+
             }
 
-            // main game loop
-            let timeNow = Date.now();
-            let timePassed = (timeNow - timeThen) / 1000;
-            let updateRate = 0.1; // game is networked update every 100ms
-            
             // every 100ms loop
             if (timePassed >= updateRate) {
                 
                 // detect movement
                 if (this._input.moving && (this._input.horizontal && this._input.vertical)) {
 
-                    // inc seq
-                    sequence++;
-   
-                    // prepare input to be sent
-                    let input : PlayerInputs = {
-                        seq: sequence,
-                        h: this._input.horizontal, 
-                        v: this._input.vertical
-                    }
-
-                    // record input to local list
-                    // i need to use these to move my player locally
-                    // an make sure to delete any request that has been sent back from server
-                    this._currentPlayer.playerInputs.push(input);
-
-                    // process move locally
-                    this._currentPlayer.processMove();
-
                     // sent to server
-                    this.room.send("playerInput", input);
+                    this.room.send("playerInput", latestInput);
 
                 }
 
