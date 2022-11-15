@@ -1,12 +1,12 @@
-import { 
+import {
     Scene, Engine, Vector3, MeshBuilder, Color3, SpotLight,
-     ShadowGenerator, CubeTexture, Texture, StandardMaterial, 
-     Mesh,Matrix,Quaternion,SceneLoader,
-     DirectionalLight, PointLight,HemisphericLight,
-     AssetsManager, AssetContainer, MeshAssetTask, ContainerAssetTask 
+    ShadowGenerator, CubeTexture, Texture, StandardMaterial,
+    Mesh, Matrix, Quaternion, SceneLoader,
+    DirectionalLight, PointLight, HemisphericLight,
+    AssetsManager, AssetContainer, MeshAssetTask, ContainerAssetTask
 } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Button } from "@babylonjs/gui";
-import {  } from "@babylonjs/materials";
+import { } from "@babylonjs/materials";
 import State from "./Screens";
 
 import { PlayerInput } from "../Controllers/inputController";
@@ -139,9 +139,9 @@ export class GameScene {
             outer.ellipsoidOffset = new Vector3(0, 1.5, 0);
 
             outer.rotationQuaternion = new Quaternion(0, 1, 0, 0); // rotate the player mesh 180 since we want to see the back of the player
-            
+
             //--IMPORTING MESH--
-            return SceneLoader.ImportMeshAsync(null, "./models/", "player_fixed.glb", scene).then((result) =>{
+            return SceneLoader.ImportMeshAsync(null, "./models/", "player_fixed.glb", scene).then((result) => {
                 const root = result.meshes[0];
                 //body is our actual player mesh
                 const body = root;
@@ -150,7 +150,7 @@ export class GameScene {
                 body.getChildMeshes().forEach(m => {
                     m.isPickable = false;
                 })
-                
+
                 //return the mesh and animations
                 return {
                     mesh: outer as Mesh,
@@ -236,7 +236,7 @@ export class GameScene {
             let timeNow = Date.now();
             let timePassed = (timeNow - timeThen) / 1000;
             let updateRate = 0.1; // game is networked update every 100ms
-            
+
             // continuously lerp movement
             for (let sessionId in this.playerEntities) {
                 const entity = this.playerEntities[sessionId];
@@ -244,34 +244,29 @@ export class GameScene {
                 entity.mesh.rotation = Vector3.Lerp(entity.mesh.rotation, entity.playerNextRotation, 0.8);
             }
 
-            // detect movement realtime
-            if (this._input.left_click && (this._input.horizontal && this._input.vertical)) {
-
-                // inc seq
-                sequence++;
-                                    
-                // prepare input to be sent
-                latestInput = {
-                    seq: sequence,
-                    h: this._input.horizontal, 
-                    v: this._input.vertical
-                }
-
-                // record input to local list
-                // i need to use these to move my player locally
-                // an make sure to delete any request that has been sent back from server
-                this._currentPlayer.playerInputs.push(latestInput);
-
-                // process move locally
-                //this._currentPlayer.processMove();
-
-            }
-
             // every 100ms loop
             if (timePassed >= updateRate) {
-                
+
                 // detect movement
                 if (this._input.left_click && (this._input.horizontal && this._input.vertical)) {
+
+                    // inc seq
+                    sequence++;
+
+                    // prepare input to be sent
+                    latestInput = {
+                        seq: sequence,
+                        h: this._input.horizontal,
+                        v: this._input.vertical
+                    }
+
+                    // record input to local list
+                    // i need to use these to move my player locally
+                    // an make sure to delete any request that has been sent back from server
+                    this._currentPlayer.playerInputs.push(latestInput);
+
+                    // process move locally
+                    //this._currentPlayer.processMove();
 
                     this.room.send("playerInput", latestInput);
 

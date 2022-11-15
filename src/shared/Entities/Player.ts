@@ -93,7 +93,7 @@ export class Player extends TransformNode {
     }
 
     private async spawn(entity) {
-        
+
         console.log(entity);
 
         // load mesh
@@ -110,7 +110,7 @@ export class Player extends TransformNode {
 
         // save entities
         this.playerNextPosition = new Vector3(this.entity.x, this.entity.y, this.entity.z);
-        this.playerNextRotation = new Vector3(0,this.entity.rot,0);
+        this.playerNextRotation = new Vector3(0, this.entity.rot, 0);
 
         // hide mesh (DEBUG)
         //playerMesh.setEnabled(false);
@@ -149,11 +149,11 @@ export class Player extends TransformNode {
         // Colyseus automatically updates entity variables, so let's listen to any changes
         this.entity.onChange(() => {
 
-            console.log('#'+this.entity.sequence+' MOVING FROM SERVER', this.entity);
+            console.log('#' + this.entity.sequence + ' MOVING FROM SERVER', this.entity.x, this.entity.z, this.entity.rot);
 
             // update player movement from server
             this.playerNextPosition = new Vector3(this.entity.x, this.entity.y, this.entity.z);
-            this.playerNextRotation = new Vector3(0,this.entity.rot,0);
+            this.playerNextRotation = new Vector3(0, this.entity.rot, 0);
 
             // remove all player input lower and equal than returned server sequence from server
             let index = this.playerInputs.findIndex(object => {
@@ -166,26 +166,30 @@ export class Player extends TransformNode {
 
             // log
             //console.log('onChange', this.entity, this.playerInputs);
- 
+
+            this.processMove();
         });
     }
-    
+
     public processMove() {
 
-        if(!this.playerInputs.length) return false
+        let nb = 3; // how many move can we make beetwin two position received? 
+        if (!this.playerInputs.length) return false
 
         this.decalage++;
         let nextInput = this.playerInputs[this.decalage];
 
-        if(nextInput){
+        if (nextInput) {
             let rotationY = Math.atan2(nextInput.h, nextInput.v);
 
-            // update local entity
-            this.playerNextPosition.x -= nextInput.h;
-            this.playerNextPosition.z -= nextInput.v;
-            this.playerNextRotation.y = rotationY;
+            for (let index = 0; index < nb; index++) {
+                // update local entity
+                this.playerNextPosition.x -= nextInput.h / (nb + 1);
+                this.playerNextPosition.z -= nextInput.v / (nb + 1);
+                this.playerNextRotation.y = this.playerNextRotation.y + (rotationY - this.playerNextRotation.y) / (nb);
 
-            console.log('#'+nextInput.seq+' MOVING LOCALLY', nextInput);
+                console.log('#' + nextInput.seq + ' MOVING LOCALLY', this.playerNextPosition.x, this.playerNextPosition.z, this.playerNextRotation.y);
+            }
         }
 
         // save position against current sequence
@@ -278,18 +282,18 @@ export class Player extends TransformNode {
         this._prevAnim = this._walk;
     }
 
-    private roundToTwo(num:number) {
+    private roundToTwo(num: number) {
         return Math.round(num * 100) / 100;
     }
 
     private _animatePlayer(): void {
 
-        if(
-            ( 
-                this.roundToTwo(this.mesh.position.x) != this.roundToTwo(this.playerNextPosition.x) || 
+        if (
+            (
+                this.roundToTwo(this.mesh.position.x) != this.roundToTwo(this.playerNextPosition.x) ||
                 this.roundToTwo(this.mesh.position.y) != this.roundToTwo(this.playerNextPosition.y)
             )
-        ){
+        ) {
             //console.log(this.mesh.position, this.playerNextPosition, '_animatePlayer', 'WALK');
             this._currentAnim = this._walk;
         } else {
