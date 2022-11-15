@@ -43,6 +43,7 @@ export class Player extends TransformNode {
     public playerMove: any;
     public playerInputs: PlayerInputs[];
     public playerLatestSequence: number;
+    public decalage: number;
 
     private isCurrentPlayer: boolean;
     public sessionId: string;
@@ -154,12 +155,14 @@ export class Player extends TransformNode {
             this.playerNextPosition = new Vector3(this.entity.x, this.entity.y, this.entity.z);
             this.playerNextRotation = new Vector3(0,this.entity.rot,0);
 
-            // remove matching player input sequence from server
+            // remove all player input lower and equal than returned server sequence from server
             let index = this.playerInputs.findIndex(object => {
                 return object.seq === this.entity.sequence
             });
-            this.playerInputs.splice(index, 1);
+            this.playerInputs.splice(0, index);
             this.playerLatestSequence = this.entity.sequence;
+
+            this.decalage = 0;
 
             // log
             //console.log('onChange', this.entity, this.playerInputs);
@@ -167,14 +170,26 @@ export class Player extends TransformNode {
         });
     }
     
-    public processMove(nextInput) {
+    public processMove() {
 
-        let rotationY = Math.atan2(nextInput.h, nextInput.v);
+        if(!this.playerInputs.length) return false
 
-        // update local entity
-        this.playerNextPosition.x -= nextInput.h;
-        this.playerNextPosition.z -= nextInput.v;
-        this.playerNextRotation.y = rotationY;
+        this.decalage++;
+        let nextInput = this.playerInputs[this.decalage];
+
+        if(nextInput){
+            let rotationY = Math.atan2(nextInput.h, nextInput.v);
+
+            // update local entity
+            this.playerNextPosition.x -= nextInput.h;
+            this.playerNextPosition.z -= nextInput.v;
+            this.playerNextRotation.y = rotationY;
+
+            console.log('#'+nextInput.seq+' MOVING LOCALLY', nextInput);
+        }
+
+        // save position against current sequence
+
 
         /*
         if(!this.playerInputs.length) return false

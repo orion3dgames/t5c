@@ -247,6 +247,23 @@ export class GameScene {
             // detect movement realtime
             if (this._input.left_click && (this._input.horizontal && this._input.vertical)) {
 
+                // inc seq
+                sequence++;
+                                    
+                // prepare input to be sent
+                latestInput = {
+                    seq: sequence,
+                    h: this._input.horizontal, 
+                    v: this._input.vertical
+                }
+
+                // record input to local list
+                // i need to use these to move my player locally
+                // an make sure to delete any request that has been sent back from server
+                this._currentPlayer.playerInputs.push(latestInput);
+
+                // process move locally
+                //this._currentPlayer.processMove();
 
             }
 
@@ -256,30 +273,13 @@ export class GameScene {
                 // detect movement
                 if (this._input.left_click && (this._input.horizontal && this._input.vertical)) {
 
-                    // inc seq
-                    sequence++;
-                    
-                    // prepare input to be sent
-                    latestInput = {
-                        seq: sequence,
-                        h: this._input.horizontal, 
-                        v: this._input.vertical
-                    }
-
                     this.room.send("playerInput", latestInput);
-
-                    // process move locally
-                    //this._currentPlayer.processMove(latestInput);
-
-                    // record input to local list
-                    // i need to use these to move my player locally
-                    // an make sure to delete any request that has been sent back from server
-                    this._currentPlayer.playerInputs.push(latestInput);
 
                 }
 
                 timeThen = timeNow;
             }
+
 
         })
 
