@@ -290,7 +290,12 @@ export class Player extends TransformNode {
 
     private _updateCamera(): void {
         let centerPlayer = this.mesh.position.y + 2;
+        //this._camRoot.rotation.y += 0.01;
         this._camRoot.position = Vector3.Lerp(this._camRoot.position, new Vector3(this.mesh.position.x, centerPlayer, this.mesh.position.z), 0.4);
+
+        if (this._input.right_click) {
+            this._camRoot.rotation.y += 0.01;
+        }
     }
 
     private _setupPlayerCamera() {

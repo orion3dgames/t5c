@@ -15,7 +15,8 @@ export class PlayerInput {
     public dashing: boolean = false;
 
     // moving
-    public moving: boolean;
+    public left_click: boolean;
+    public right_click: boolean;
 
     constructor(scene: Scene) {
 
@@ -25,22 +26,30 @@ export class PlayerInput {
         this._scene.onPointerObservable.add((pointerInfo) => {
 
             if (pointerInfo.type === PointerEventTypes.POINTERDOWN) {
+                console.log(pointerInfo.event);
                 if (pointerInfo.event.button == 0) {
-                    this.moving = true
+                    this.left_click = true
+                }
+                if (pointerInfo.event.button == 2) {
+                    this.right_click = true
                 }
             }
 
             if (pointerInfo.type === PointerEventTypes.POINTERUP) {
                 if (pointerInfo.event.button == 0) {
-                    this.moving = false;
+                    this.left_click = false;
                     this.inputMap = { rotY: null }
                     this.vertical = 0;
                     this.horizontal = 0;
                 }
+                if (pointerInfo.event.button == 2) {
+                    this.right_click = false
+                }
             }
 
             if (pointerInfo.type === PointerEventTypes.POINTERMOVE) {
-                if (this.moving) {
+                
+                if (this.left_click) {
                     const x = (pointerInfo.event.x / pointerInfo.event.target.width) * 2 - 1;
                     const y = (pointerInfo.event.y / pointerInfo.event.target.height) * 2 - 1;
                     this.inputMap = { rotY: Math.atan2(x, y) }
