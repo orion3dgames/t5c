@@ -30,7 +30,7 @@ gameServer.define("game_room", GameRoom).enableRealtimeListing();
 
 // Make sure to never call the `simulateLatency()` method in production.
 if (process.env.NODE_ENV !== "production") {
-  gameServer.simulateLatency(250);
+  gameServer.simulateLatency(100);
 }
 
 // LISTEN

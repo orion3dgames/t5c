@@ -247,7 +247,7 @@ export class GameScene {
             }
 
             // every 100ms loop
-            if (timePassed >= updateRate) {
+            if (timePassed >= updateRate) { 
 
                 // detect movement
                 if (this._input.left_click && (this._input.horizontal && this._input.vertical)) {
@@ -262,17 +262,15 @@ export class GameScene {
                         v: this._input.vertical
                     }
 
-                    // record input to local list
-                    // so we can remove all player inputs lower and equal than next returned server sequence from server
-                    this._currentPlayer.playerInputs.push(latestInput);
-
-                    // process move locally
-                    // this is where we need to reconcile position
-                    // this._currentPlayer.processLocalMove();
-
                     // sent current input to server for processing
                     this.room.send("playerInput", latestInput);
 
+                    // do client side prediction
+                    this._currentPlayer.move(latestInput);
+
+                    // Save this input for later reconciliation.
+                    this._currentPlayer.playerInputs.push(latestInput);
+                   
                 }
 
                 timeThen = timeNow;

@@ -155,42 +155,47 @@ export class Player extends TransformNode {
             this.playerNextPosition = new Vector3(this.entity.x, this.entity.y, this.entity.z);
             this.playerNextRotation = new Vector3(0, this.entity.rot, 0);
 
-            // remove all player input lower and equal than returned server sequence from server
-            let index = this.playerInputs.findIndex(object => {
-                return object.seq === this.entity.sequence
-            });
-            this.playerInputs.splice(0, index);
+            // store latest sequence processed by server
             this.playerLatestSequence = this.entity.sequence;
 
-            this.decalage = 0;
-
+            // process move locally
+            // this is where we need to reconcile position
             this.processLocalMove();
+
         });
     }
 
-    public processLocalMove() {
+    // apply movement
+    public move(input) {
+        let rotationY = Math.atan2(input.h, input.v);
+        this.playerNextPosition.x -= input.h;
+        this.playerNextPosition.z -= input.v;
+        this.playerNextRotation.y = this.playerNextRotation.y + (rotationY - this.playerNextRotation.y);
+    }
 
-        let nb = 3; // how many move can we make between two position received? 
+
+    // Server Reconciliation. Re-apply all the inputs not yet processed by the server
+    public processLocalMove() {
 
         if (!this.playerInputs.length) return false
 
-        this.decalage++;
-        let nextInput = this.playerInputs[this.decalage];
+        var j = 0;
+        while (j < this.playerInputs.length) {
 
-        if (nextInput) {
-            let rotationY = Math.atan2(nextInput.h, nextInput.v);
+            var nextInput = this.playerInputs[j];
 
-            for (let index = 0; index < nb; index++) {
-
-                // update local entity
-                this.playerNextPosition.x -= nextInput.h / (nb + 1);
-                this.playerNextPosition.z -= nextInput.v / (nb + 1);
-                this.playerNextRotation.y = this.playerNextRotation.y + (rotationY - this.playerNextRotation.y) / (nb);
-
+            if (nextInput.seq <= this.playerLatestSequence) {
+                // Already processed. Its effect is already taken into account into the world update
+                // we just got, so we can drop it.
+                this.playerInputs.splice(j, 1);
+            } else {
+                // Not processed by the server yet. Re-apply it.
+                this.move(nextInput);
                 console.log('#' + nextInput.seq + ' MOVING LOCALLY', this.playerNextPosition.x, this.playerNextPosition.z, this.playerNextRotation.y);
+                j++;
             }
+  
         }
-
 
     }
 
