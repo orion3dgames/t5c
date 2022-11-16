@@ -48,7 +48,7 @@ export class PlayerInput {
             }
 
             if (pointerInfo.type === PointerEventTypes.POINTERMOVE) {
-                
+
                 if (this.left_click) {
                     const x = (pointerInfo.event.clientX / pointerInfo.event.target.width) * 2 - 1;
                     const y = (pointerInfo.event.clientY / pointerInfo.event.target.height) * 2 - 1;
@@ -65,7 +65,7 @@ export class PlayerInput {
     private _updateFromMouse(): void {
 
         //forward - backwards movement
-        if (this.inputMap["rotY"]) {
+        if (this.inputMap["rotY"] !== null) {
             this.vertical = -Math.cos(this.inputMap["rotY"]);
             this.horizontal = Math.sin(this.inputMap["rotY"]);
         }
