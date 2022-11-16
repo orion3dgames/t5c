@@ -146,7 +146,7 @@ export class Player extends TransformNode {
 
         ///////////////////////////////////////////////////////////
         // entity network event
-        // Colyseus automatically updates entity variables, so let's listen to any changes
+        // colyseus automatically sends entity updates, so let's listen to those changes
         this.entity.onChange(() => {
 
             console.log('#' + this.entity.sequence + ' MOVING FROM SERVER', this.entity.x, this.entity.z, this.entity.rot);
@@ -219,7 +219,6 @@ export class Player extends TransformNode {
                 this.roundToTwo(this.mesh.position.y) !== this.roundToTwo(this.playerNextPosition.y)
             )
         ) {
-            //console.log(this.mesh.position, this.playerNextPosition, '_animatePlayer', 'WALK');
             this._currentAnim = this._walk;
         } else {
             this._currentAnim = this._idle;

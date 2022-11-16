@@ -28,9 +28,6 @@ export class GameRoom extends Room<StateHandlerSchema> {
         // set max clients
         this.maxClients = Config.maxClients;
 
-        // generate world
-        //this.initializeWorld();
-
         // initial chat message
         this.broadcast("playerMessage", this.generateMessage("Server", "Hello World"));
         
