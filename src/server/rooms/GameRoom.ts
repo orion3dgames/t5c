@@ -3,6 +3,7 @@ import { ChatSchema } from './schema/ChatSchema';
 import logger = require("../helpers/logger");
 
 import {StateHandlerSchema} from './schema/StateHandlerSchema';
+import Config from '../../shared/Config';
 
 export class GameRoom extends Room<StateHandlerSchema> {
 
@@ -16,47 +17,45 @@ export class GameRoom extends Room<StateHandlerSchema> {
         this.setState(new StateHandlerSchema());
 
         // Set the frequency of the patch rate
-        this.setPatchRate(16);
+        // let's make it the same as our game loop
+        this.setPatchRate(Config.updateRate);
 
-        // Set the Simulation Interval callback
+        // Set the simulation interval callback
         this.setSimulationInterval(dt => {
             this.state.serverTime += dt;
         });
 
+        // set max clients
+        this.maxClients = Config.maxClients;
+
         // generate world
         //this.initializeWorld();
 
+        // initial chat message
         this.broadcast("playerMessage", this.generateMessage("Server", "Hello World"));
         
     }
 
     onJoin(client: Client, options: any) {
 
-        // 
+        // let everyone knows someone has joined the game
         this.broadcast("playerMessage", this.generateMessage("Server", "Player "+client.sessionId+" has joined the game.") );
-        
-        this.onMessage("key", (message) => {
-            this.broadcast("key", message);
-            console.log(message);
-        });
 
+        // add player to server
         console.log(`player ${client.sessionId} joined room ${this.roomId}.`);
         this.state.addPlayer(client.sessionId);
         
-        //Update player
-        this.onMessage("playerPosition", (client, data: any) => {
-            console.log("playerPosition", data);
-            this.state.setPosition(client.sessionId, data.x, data.y, data.z, data.rot);
-        });
-
+        // on player input event
         this.onMessage("playerInput", (client, data: any) => {
             console.log("playerInput", data);
             this.state.calculatePosition(client.sessionId, data.h, data.v, data.seq);
         });
 
+        // on player chat message
         this.onMessage("playerMessage", (client, message) => {
             this.broadcast("playerMessage", this.generateMessage(client.sessionId, message));
         });
+
     }
 
     // When a client leaves the room
@@ -74,9 +73,10 @@ export class GameRoom extends Room<StateHandlerSchema> {
 
 
     /////////////////////////////////////////////////
+    /////////////////////////////////////////////////
 
+    // prepare chat message to be sent
     generateMessage(sessionId: string, message = "") {
-        this.state.players.get(sessionId);
         let msg = new ChatSchema;
         msg.senderID = sessionId;
         msg.message = message;

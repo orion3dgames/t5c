@@ -13,6 +13,7 @@ import { PlayerInput } from "../Controllers/inputController";
 import { Environment } from "../Controllers/environment";
 import { Hud } from "../Controllers/ui";
 import { Player } from "../../shared/Entities/Player";
+import Config from '../../shared/Config';
 import { PlayerInputs } from "../Types/index"
 
 import { Room } from "colyseus.js";
@@ -226,18 +227,19 @@ export class GameScene {
             delete this.playerEntities[sessionId];
         });
 
-        // main loop
+        ///////////////
+        // main game loop
         let timeThen = Date.now();
         let sequence = 0;
         let latestInput: PlayerInputs;
         this._scene.registerBeforeRender(() => {
 
-            // main game loop
+            
             let timeNow = Date.now();
             let timePassed = (timeNow - timeThen) / 1000;
-            let updateRate = 0.1; // game is networked update every 100ms
+            let updateRate = Config.updateRate / 1000; // game is networked update every 100ms
 
-            // continuously lerp movement
+            // continuously lerp movement at 60fps
             for (let sessionId in this.playerEntities) {
                 const entity = this.playerEntities[sessionId];
                 entity.mesh.position = Vector3.Lerp(entity.mesh.position, entity.playerNextPosition, 0.2);
@@ -250,7 +252,7 @@ export class GameScene {
                 // detect movement
                 if (this._input.left_click && (this._input.horizontal && this._input.vertical)) {
 
-                    // inc seq
+                    // increment seq
                     sequence++;
 
                     // prepare input to be sent
@@ -261,13 +263,14 @@ export class GameScene {
                     }
 
                     // record input to local list
-                    // i need to use these to move my player locally
-                    // an make sure to delete any request that has been sent back from server
+                    // so we can remove all player inputs lower and equal than next returned server sequence from server
                     this._currentPlayer.playerInputs.push(latestInput);
 
                     // process move locally
-                    //this._currentPlayer.processMove();
+                    // this is where we need to reconcile position
+                    // this._currentPlayer.processMove();
 
+                    // sent current input to server for processing
                     this.room.send("playerInput", latestInput);
 
                 }
