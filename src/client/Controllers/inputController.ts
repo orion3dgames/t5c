@@ -50,8 +50,8 @@ export class PlayerInput {
             if (pointerInfo.type === PointerEventTypes.POINTERMOVE) {
                 
                 if (this.left_click) {
-                    const x = (pointerInfo.event.x / pointerInfo.event.target.width) * 2 - 1;
-                    const y = (pointerInfo.event.y / pointerInfo.event.target.height) * 2 - 1;
+                    const x = (pointerInfo.event.clientX / pointerInfo.event.target.width) * 2 - 1;
+                    const y = (pointerInfo.event.clientY / pointerInfo.event.target.height) * 2 - 1;
                     this.inputMap = { rotY: Math.atan2(x, y) }
                     this._updateFromMouse();
                 }

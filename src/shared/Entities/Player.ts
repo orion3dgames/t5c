@@ -20,7 +20,7 @@ export class Player extends TransformNode {
 
     //const values
     private static readonly PLAYER_SPEED: number = 0.12;
-    private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.5934119456780721, 0, 0);
+    private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.50, 0, 0);
 
     //player movement vars
     private _deltaTime: number = 0;
@@ -158,8 +158,7 @@ export class Player extends TransformNode {
             // store latest sequence processed by server
             this.playerLatestSequence = this.entity.sequence;
 
-            // process move locally
-            // this is where we need to reconcile position
+            // do server reconciliation
             this.processLocalMove();
 
         });
@@ -174,9 +173,10 @@ export class Player extends TransformNode {
     }
 
 
-    // Server Reconciliation. Re-apply all the inputs not yet processed by the server
+    // server Reconciliation. Re-apply all the inputs not yet processed by the server
     public processLocalMove() {
 
+        // if nothing to apply, do nothin
         if (!this.playerInputs.length) return false
 
         var j = 0;
@@ -194,7 +194,7 @@ export class Player extends TransformNode {
                 console.log('#' + nextInput.seq + ' MOVING LOCALLY', this.playerNextPosition.x, this.playerNextPosition.z, this.playerNextRotation.y);
                 j++;
             }
-  
+
         }
 
     }
@@ -244,30 +244,37 @@ export class Player extends TransformNode {
 
         // rotate camera around the Y position if right click is true
         if (this._input.right_click) {
+
             // ddaydd to implement
+            //let rotationY = this.camera.rotation.y -= this._input.h;
+            //this.camera.rotation = new Vector3(0, rotationY, 0);
         }
     }
 
     private _setupPlayerCamera() {
-        //root camera parent that handles positioning of the camera to follow the player
+
+        // root camera parent that handles positioning of the camera to follow the player
         this._camRoot = new TransformNode("root");
         this._camRoot.position = new Vector3(0, 0, 0); //initialized at (0,0,0)
-        //to face the player from behind (180 degrees)
+
+        // to face the player from behind (180 degrees)
         this._camRoot.rotation = new Vector3(0, Math.PI, 0);
 
-        //rotations along the x-axis (up/down tilting)
+        // rotations along the x-axis (up/down tilting)
         let yTilt = new TransformNode("ytilt");
-        //adjustments to camera view to point down at our player
+
+        // adjustments to camera view to point down at our player
         yTilt.rotation = Player.ORIGINAL_TILT;
         this._yTilt = yTilt;
         yTilt.parent = this._camRoot;
 
-        //our actual camera that's pointing at our root's position
+        // our actual camera that's pointing at our root's position
         this.camera = new UniversalCamera("cam", new Vector3(0, 0, -50), this.scene);
         this.camera.lockedTarget = this._camRoot.position;
         this.camera.fov = 0.47350045992678597;
         this.camera.parent = yTilt;
 
+        // set as active camera
         this.scene.activeCamera = this.camera;
 
         return this.camera;

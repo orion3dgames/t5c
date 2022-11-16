@@ -19,9 +19,9 @@ module.exports = {
     devServer: {
         host: '0.0.0.0',
         static: {
-            directory: path.join(__dirname, 'src/client/Public'),
+            directory: path.join(__dirname, 'src/public'),
         },
-        watchFiles: ['src/**/*.ts', 'src/client/Public/**/*'],
+        watchFiles: ['src/**/*.ts', 'src/public/**/*'],
         liveReload: true,
         port: 8080,
     },
@@ -44,7 +44,7 @@ module.exports = {
     plugins: [
         new CopyPlugin({
             patterns: [
-                { from: "src/client/Public/", to: "./" },
+                { from: "src/public/", to: "./" },
             ],
         }),
     ],
