@@ -268,7 +268,7 @@ export class GameScene {
 
                     // process move locally
                     // this is where we need to reconcile position
-                    // this._currentPlayer.processMove();
+                    // this._currentPlayer.processLocalMove();
 
                     // sent current input to server for processing
                     this.room.send("playerInput", latestInput);

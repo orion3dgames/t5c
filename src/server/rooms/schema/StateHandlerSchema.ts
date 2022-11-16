@@ -37,25 +37,11 @@ export class StateHandlerSchema extends Schema {
     }
 
     calculatePosition(sessionId: string, h: number, v: number, seq: number) {
-
-        // prepare velocity
-        let velocityX = 0
-        let velocityZ = 0
-        let velocityY = 0
-
-        // this should work // model needs to be rotated I think // ask dayd :), EDIT : yes, you were not far ;)
-        let rotationY = Math.atan2(h, v);
-
-        // create forces from input
-        velocityX = h;
-        velocityZ = v;
-        velocityY = 0; // jump or keep going down
-
         const player = this.getPlayer(sessionId);
-        player.x -= velocityX;
-        player.y = velocityY;
-        player.z -= velocityZ;
-        player.rot = rotationY;
+        player.x -= h;
+        player.y = 0;
+        player.z -= v;
+        player.rot = Math.atan2(h, v);
         player.sequence = seq;
 
     }

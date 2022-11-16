@@ -164,16 +164,14 @@ export class Player extends TransformNode {
 
             this.decalage = 0;
 
-            // log
-            //console.log('onChange', this.entity, this.playerInputs);
-
-            this.processMove();
+            this.processLocalMove();
         });
     }
 
-    public processMove() {
+    public processLocalMove() {
 
-        let nb = 3; // how many move can we make beetwin two position received? 
+        let nb = 3; // how many move can we make between two position received? 
+
         if (!this.playerInputs.length) return false
 
         this.decalage++;
@@ -183,6 +181,7 @@ export class Player extends TransformNode {
             let rotationY = Math.atan2(nextInput.h, nextInput.v);
 
             for (let index = 0; index < nb; index++) {
+
                 // update local entity
                 this.playerNextPosition.x -= nextInput.h / (nb + 1);
                 this.playerNextPosition.z -= nextInput.v / (nb + 1);
@@ -192,81 +191,6 @@ export class Player extends TransformNode {
             }
         }
 
-        // save position against current sequence
-
-
-        /*
-        if(!this.playerInputs.length) return false
-
-        let nextSequence = this.playerLatestSequence+1;
-        let nextInputIndex = this.playerInputs.findIndex(object => {
-            return object.seq === nextSequence
-        });
-
-        if(nextInputIndex != -1){
-            let nextInput = this.playerInputs[nextInputIndex];
-
-            console.log('#'+nextSequence+' MOVING LOCALLY', nextInput);
-
-            let rotationY = Math.atan2(nextInput.h, nextInput.v);
-
-            // update local entity
-            this.playerNextPosition.x -= nextInput.h;
-            this.playerNextPosition.z -= nextInput.v;
-            this.playerNextRotation.y = rotationY;
-            
-        }
-
-        /*
-        // remove matching player input sequence from server
-        let index = this.playerInputs.findIndex(object => {
-            return object.seq === this.entity.sequence
-        });
-        this.playerInputs.splice(index, 1);
-        this.playerLatestSequence = this.entity.sequence;
-
-        /*
-        // prepare velocity
-        let velocityX = 0
-        let velocityZ = 0
-        let velocityY = 0
-
-        // this should work // model needs to be rotated I think // ask dayd :), EDIT : yes, you were not far ;)
-        let rotationY = Math.atan2(this._input.horizontal, this._input.vertical);
-
-        // create forces from input
-        velocityX = this._input.horizontal;
-        velocityZ = this._input.vertical;
-        velocityY = 0; // jump or keep going down
-
-        // add values
-        this.playerMove = {};
-        this.playerMove.x = velocityX;
-        this.playerMove.y = velocityY;
-        this.playerMove.z = velocityZ;
-        this.playerMove.rot = rotationY;
-
-        console.log('processMove', this.playerMove);
-
-        // do move
-        this.move();
-        */
-    }
-
-    private move() {
-
-        /*
-        // update local entity
-        this.playerNextPosition.x -= this.playerMove.x;
-        this.playerNextPosition.z -= this.playerMove.z;
-        this.playerNextRotation.y = this.playerMove.rot;
-
-        /*
-        // update networked entity
-        this.entity.x = this.playerNextPosition.x;
-        this.entity.z = this.playerNextPosition.z;
-        this.entity.rot = this.playerNextRotation.y;
-        */
 
     }
 
@@ -288,10 +212,11 @@ export class Player extends TransformNode {
 
     private _animatePlayer(): void {
 
+        // if position has changed
         if (
             (
-                this.roundToTwo(this.mesh.position.x) != this.roundToTwo(this.playerNextPosition.x) ||
-                this.roundToTwo(this.mesh.position.y) != this.roundToTwo(this.playerNextPosition.y)
+                this.roundToTwo(this.mesh.position.x) !== this.roundToTwo(this.playerNextPosition.x) ||
+                this.roundToTwo(this.mesh.position.y) !== this.roundToTwo(this.playerNextPosition.y)
             )
         ) {
             //console.log(this.mesh.position, this.playerNextPosition, '_animatePlayer', 'WALK');
@@ -308,12 +233,14 @@ export class Player extends TransformNode {
     }
 
     private _updateCamera(): void {
+
+        // camera must follow player 
         let centerPlayer = this.mesh.position.y + 2;
-        //this._camRoot.rotation.y += 0.01;
         this._camRoot.position = Vector3.Lerp(this._camRoot.position, new Vector3(this.mesh.position.x, centerPlayer, this.mesh.position.z), 0.4);
 
+        // rotate camera around the Y position if right click is true
         if (this._input.right_click) {
-            this._camRoot.rotation.y += 0.01;
+            // ddaydd to implement
         }
     }
 
