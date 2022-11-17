@@ -8,8 +8,8 @@ let Config = {
     updateRate: 75, // Set frequency the patched state should be sent to all clients, in milliseconds
 
     // basic locations
-    initialLocation: "town",
-    secondaryLocation: "island",
+    initialLocation: "island",
+    secondaryLocation: "town",
     locations: {
         "town": {
             title: "Town",
