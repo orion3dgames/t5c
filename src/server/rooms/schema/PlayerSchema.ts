@@ -10,6 +10,7 @@ export class PlayerSchema extends Schema {
   @type('number') public y: number;
   @type('number') public z: number;
   @type('number') public rot: number;
+  @type("string") public location: string = "";
   @type("number") createdAt: number = Date.now();
 }
 

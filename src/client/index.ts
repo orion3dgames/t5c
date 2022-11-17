@@ -9,6 +9,8 @@ import { StartScene } from "./Screens/StartScene";
 import { LobbyScene } from "./Screens/LobbyScene";
 import { GameScene } from "./Screens/GameScene";
 
+import Config from "../shared/Config";
+
 // colyseus
 import * as Colyseus from "colyseus.js";
 
@@ -46,9 +48,9 @@ class App {
         // create colyseus client
         // this should use environement values
         if ( window.location.host === "localhost:8080") {
-            this._client = new Colyseus.Client('ws://localhost:3000'); // local
+            this._client = new Colyseus.Client(Config.serverUrlLocal); // local
         }else{
-            this._client = new Colyseus.Client('wss://t5c.onrender.com'); // online using render.com
+            this._client = new Colyseus.Client(Config.serverUrlProduction); // online
         }
 
         //  start scene

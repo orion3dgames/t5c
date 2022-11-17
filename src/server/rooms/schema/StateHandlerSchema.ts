@@ -1,6 +1,8 @@
 import {Schema, type, MapSchema} from '@colyseus/schema';
 import {PlayerSchema} from './PlayerSchema';
 
+import Config from '../../../shared/Config';
+
 export class StateHandlerSchema extends Schema {
 
     @type({map: PlayerSchema})
@@ -8,15 +10,15 @@ export class StateHandlerSchema extends Schema {
     @type("number") serverTime: number = 0.0;
 
     addPlayer(sessionId: string) {
-        let min = -10;
-        let max = 10;
+        let defaultSpawnPoint = Config.locations[Config.initialLocation].spawnPoint;
         this.players.set(sessionId, new PlayerSchema().assign({
             sessionId: sessionId,
             username: sessionId,
-            x: Math.floor(Math.random() * (max - min + 1)) + min,
+            x: defaultSpawnPoint.x,
             y: 0,
-            z: Math.floor(Math.random() * (max - min + 1)) + min,
+            z: defaultSpawnPoint.z,
             rot: 0,
+            location: Config.initialLocation,
         }));
     }
 

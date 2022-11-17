@@ -49,6 +49,7 @@ export class GameScene {
         // get current roomID from globals
         this._roomId = window.currentRoomID;
         this._client = client;
+        this._engine = engine;
 
         // create scene
         let scene = new Scene(engine);
@@ -89,16 +90,49 @@ export class GameScene {
         //
         //scene.environmentTexture = CubeTexture.CreateFromPrefilteredData('textures/skybox.dds', scene)
 
+        // load player info from database
+        // in this case we will fake it
+        window.currentLocation = Config.locations[Config.initialLocation];
+
         // set scene
         this._scene = scene;
 
-        await this._loadAssets();
+        await this._initNetwork(client);
 
     }
 
+    private async _initNetwork(client): Promise<void> {
+
+        await this._scene.whenReadyAsync();
+
+        try {
+
+            if (this._roomId) {
+                this.room = await client.join("game_room", { roomId: this._roomId });
+            } else {
+                this.room = await client.create("game_room");
+                this._roomId = this.room.roomId;
+                window.currentRoomID = this._roomId;
+                window.currentSessionID = this.room.sessionId;
+            }
+
+            if (this.room) {
+                await this._loadAssets();
+            }
+
+        } catch (e) {
+            console.error("join error", e);
+        }
+
+        
+
+    }
+
+    
     private async _loadAssets(): Promise<void> {
 
-        //--CREATE ENVIRONMENT--
+        // load environment
+        // should load window.currentLocation GLB file only
         const environment = new Environment(this._scene);
         this._environment = environment;
         await this._environment.load(); //environment
@@ -120,7 +154,7 @@ export class GameScene {
           
         };*/
 
-        await this._initNetwork(this._client);
+        await this._initEvents();
     }
 
     //load the character model
@@ -165,30 +199,6 @@ export class GameScene {
         });
     }
 
-    private async _initNetwork(client): Promise<void> {
-
-        await this._scene.whenReadyAsync();
-
-        try {
-
-            if (this._roomId) {
-                this.room = await client.join("game_room", { roomId: this._roomId });
-            } else {
-                this.room = await client.create("game_room");
-                this._roomId = this.room.roomId;
-                window.currentRoomID = this._roomId;
-            }
-
-            if (this.room) {
-                await this._initEvents();
-            }
-
-        } catch (e) {
-            console.error("join error", e);
-        }
-
-    }
-
     private async _initEvents() {
 
         // setup player input
@@ -196,7 +206,7 @@ export class GameScene {
         this._input = new PlayerInput(this._scene);
 
         // setup hud
-        this._ui = new Hud(this._scene, this.room);
+        this._ui = new Hud(this._scene, this._engine, this.room, this.playerEntities);
 
         // when someone joins the room event
         this.room.state.players.onAdd((entity, sessionId) => {

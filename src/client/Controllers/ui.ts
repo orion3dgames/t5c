@@ -1,8 +1,12 @@
-import { TextBlock, AdvancedDynamicTexture, Button, Control, InputText, ScrollViewer } from "@babylonjs/gui";
-import { Scene, MeshBuilder } from "@babylonjs/core";
+import { TextBlock, AdvancedDynamicTexture, Button, Control, InputText, ScrollViewer, } from "@babylonjs/gui";
+import { Scene, Engine } from "@babylonjs/core";
+
+import { Room } from "colyseus.js";
 
 import State from "../Screens/Screens";
-import { Room } from "colyseus.js";
+import { Player } from "../../shared/Entities/Player";
+import { countPlayers, roundToTwo } from "../../shared/Utils";
+import { PlayerMessage } from "../Types";
 
 export class Hud {
     private _scene: Scene;
@@ -11,12 +15,13 @@ export class Hud {
     private _playerUI;
 
     //Chat
-    public messages = [];
+    public messages: PlayerMessage[] = [];
 
-    constructor(scene: Scene, room:Room) {
+    constructor(scene: Scene, engine:Engine, room:Room, players:Player[]) {
 
         this._scene = scene;
  
+        // create main io box
         const playerUI = AdvancedDynamicTexture.CreateFullscreenUI("UI", true, this._scene);
         this._playerUI = playerUI;
         this._playerUI.idealHeight = 720;
@@ -37,9 +42,27 @@ export class Hud {
 
         quitButton.onPointerDownObservable.add(() => { 
             room.leave();
-            window.currentRoomID = "";
+            window.currentRoomID = ""; 
             window.nextScene = State.LOBBY;
         });
+
+        ////////////////////////////
+        // add location debug info
+        console.log(room.state.players);
+        
+        const locationBtn = new TextBlock("location", "");
+        locationBtn.width = 0.5
+        locationBtn.height = 0.2;
+        locationBtn.color = "#FFF";
+        locationBtn.top = "20px"; 
+        locationBtn.left = "20px";
+        locationBtn.fontSize = "24px;";
+        locationBtn.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        locationBtn.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        locationBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        locationBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        this._playerUI.addControl(locationBtn);
+
 
         ////////////////////////////
         // add chat input
@@ -64,16 +87,31 @@ export class Hud {
         });
 
         // receive message event
-        room.onMessage("playerMessage", (message) => {
-            console.log("playerMessage",message);
+        room.onMessage("playerMessage", (message:PlayerMessage) => {
            this.messages.push(message); 
            this._refreshChatBox();
+        });
+
+        // some ui must be constantly refreshed as things change
+        this._scene.registerBeforeRender(() => {
+            this._refreshUI(locationBtn, engine, room, players);
         });
 
         // intial refresh chatbox
         this._refreshChatBox();
     }
 
+    // ui refresh
+    private _refreshUI(locationBtn, engine, room, players){
+        let locationText = "Zone: "+window.currentLocation.title+"\n";
+        locationText += "RoomID: "+room.roomId+" \n";
+        locationText += "PlayerID: "+room.sessionId+" \n";
+        locationText += "Total Players: "+countPlayers(players)+" \n";
+        locationText += "FPS: "+roundToTwo(engine.getFps())+" \n";
+        locationBtn.text = locationText;
+    }
+
+    // chat refresh
     private _refreshChatBox(){
 
         // add scrollable container
@@ -88,7 +126,7 @@ export class Hud {
         this._playerUI.addControl(sv);
 
         var top = 0;
-        this.messages.slice().reverse().forEach(msg => {
+        this.messages.slice().reverse().forEach((msg:PlayerMessage) => {
    
             let date = new Date(msg.createdAt);
             let dateFormat = date.toLocaleString('en-US');

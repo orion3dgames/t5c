@@ -1,7 +1,10 @@
 import { TransformNode, Scene, UniversalCamera, ArcRotateCamera, Vector3, AnimationGroup, SceneLoader, AbstractMesh } from "@babylonjs/core";
 import { Rectangle, TextBlock } from "@babylonjs/gui";
 import { PlayerSchema } from "../../server/rooms/schema/PlayerSchema";
+
 import { PlayerInputs } from "../../client/Types/index"
+import { roundToTwo } from "../Utils"
+import Config from "../Config";
 
 export class Player extends TransformNode {
     public camera;
@@ -149,7 +152,7 @@ export class Player extends TransformNode {
         // colyseus automatically sends entity updates, so let's listen to those changes
         this.entity.onChange(() => {
 
-            console.log('#' + this.entity.sequence + ' MOVING FROM SERVER', this.entity.x, this.entity.z, this.entity.rot);
+            //console.log('#' + this.entity.sequence + ' MOVING FROM SERVER', this.entity.x, this.entity.z, this.entity.rot);
 
             // update player movement from server
             this.playerNextPosition = new Vector3(this.entity.x, this.entity.y, this.entity.z);
@@ -160,6 +163,9 @@ export class Player extends TransformNode {
 
             // do server reconciliation
             this.processLocalMove();
+
+            // set location
+            window.currentLocation = Config.locations[this.entity.location];
 
         });
     }
@@ -191,7 +197,7 @@ export class Player extends TransformNode {
             } else {
                 // Not processed by the server yet. Re-apply it.
                 this.move(nextInput);
-                console.log('#' + nextInput.seq + ' MOVING LOCALLY', this.playerNextPosition.x, this.playerNextPosition.z, this.playerNextRotation.y);
+                //console.log('#' + nextInput.seq + ' MOVING LOCALLY', this.playerNextPosition.x, this.playerNextPosition.z, this.playerNextRotation.y);
                 j++;
             }
 
@@ -220,8 +226,8 @@ export class Player extends TransformNode {
         // if position has changed
         if (
             (
-                this.roundToTwo(this.mesh.position.x) !== this.roundToTwo(this.playerNextPosition.x) ||
-                this.roundToTwo(this.mesh.position.y) !== this.roundToTwo(this.playerNextPosition.y)
+                roundToTwo(this.mesh.position.x) !== roundToTwo(this.playerNextPosition.x) ||
+                roundToTwo(this.mesh.position.y) !== roundToTwo(this.playerNextPosition.y)
             )
         ) {
             this._currentAnim = this._walk;
