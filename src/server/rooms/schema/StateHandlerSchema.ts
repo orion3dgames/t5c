@@ -18,7 +18,7 @@ export class StateHandlerSchema extends Schema {
             y: 0,
             z: defaultSpawnPoint.z,
             rot: 0,
-            location: Config.initialLocation,
+            location: defaultSpawnPoint.key,
         }));
     }
 
@@ -45,7 +45,12 @@ export class StateHandlerSchema extends Schema {
         player.z -= v;
         player.rot = Math.atan2(h, v);
         player.sequence = seq;
+    }
 
+    setLocation(sessionId, location){
+        const player = this.getPlayer(sessionId);
+        player.location = location;
+        console.log("LOCATION SET", location);
     }
 
     generateRandomUUID(){

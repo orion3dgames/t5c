@@ -87,12 +87,11 @@ export class GameScene {
         this._shadow.contactHardeningLightSizeUVRatio = 0.05;
         this._shadow.setDarkness(0.5);
 
-        //
-        //scene.environmentTexture = CubeTexture.CreateFromPrefilteredData('textures/skybox.dds', scene)
-
-        // load player info from database
-        // in this case we will fake it
-        window.currentLocation = Config.locations[Config.initialLocation];
+        // SET DEFAULT ZONE
+        if(!window.currentLocation){
+            console.log('NO ZONE SET, SET DEFAULT', Config.locations[Config.initialLocation]);
+            window.currentLocation = Config.locations[Config.initialLocation];
+        }
 
         // set scene
         this._scene = scene;
@@ -103,14 +102,17 @@ export class GameScene {
 
     private async _initNetwork(client): Promise<void> {
 
-        await this._scene.whenReadyAsync();
-
         try {
 
             if (this._roomId) {
-                this.room = await client.join("game_room", { roomId: this._roomId });
+                this.room = await client.join("game_room", { 
+                    roomId: this._roomId,
+                    location: window.currentLocation.key
+                 });
             } else {
-                this.room = await client.create("game_room");
+                this.room = await client.create("game_room", {
+                    location: window.currentLocation.key
+                });
                 this._roomId = this.room.roomId;
                 window.currentRoomID = this._roomId;
                 window.currentSessionID = this.room.sessionId;
@@ -124,12 +126,12 @@ export class GameScene {
             console.error("join error", e);
         }
 
-        
-
     }
 
     
     private async _loadAssets(): Promise<void> {
+
+        console.log(this._scene.metadata);
 
         // load environment
         // should load window.currentLocation GLB file only
@@ -201,6 +203,8 @@ export class GameScene {
 
     private async _initEvents() {
 
+        await this._scene.whenReadyAsync();
+
         // setup player input
         // todo: probably should be in the player class
         this._input = new PlayerInput(this._scene);
@@ -213,7 +217,7 @@ export class GameScene {
 
             var isCurrentPlayer = sessionId === this.room.sessionId;
 
-            let _player = new Player(entity, isCurrentPlayer, sessionId, this._scene, this._ui, this._input, this._shadow);
+            let _player = new Player(entity, this.room, this._scene, this._ui, this._input, this._shadow);
 
             // if current player, save entity ref
             if (isCurrentPlayer) {

@@ -44,7 +44,7 @@ export class Environment {
             }
 
             //trigger meshes
-            if (m.name.includes("Trigger")) {
+            if (m.name.includes("trigger")) {
                 m.isVisible = false;
                 m.isPickable = false;
                 m.checkCollisions = false;
@@ -56,8 +56,11 @@ export class Environment {
 
     //Load all necessary meshes for the environment
     public async _loadAsset() {
+
+        console.log("LOADING ZONE: ", window.currentLocation);
+
         //loads game environment
-        const result = await SceneLoader.ImportMeshAsync(null, "./models/", "town.glb", this._scene);
+        const result = await SceneLoader.ImportMeshAsync(null, "./models/", window.currentLocation.mesh, this._scene);
 
         let env = result.meshes[0];
         let allMeshes = env.getChildMeshes();

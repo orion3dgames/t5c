@@ -1,14 +1,16 @@
-import { TransformNode, Scene, UniversalCamera, ArcRotateCamera, Vector3, AnimationGroup, SceneLoader, AbstractMesh } from "@babylonjs/core";
+import { TransformNode, Scene, UniversalCamera, Vector3, AnimationGroup, SceneLoader, AbstractMesh, ActionManager, ExecuteCodeAction} from "@babylonjs/core";
 import { Rectangle, TextBlock } from "@babylonjs/gui";
 import { PlayerSchema } from "../../server/rooms/schema/PlayerSchema";
 
 import { PlayerInputs } from "../../client/Types/index"
 import { roundToTwo } from "../Utils"
 import Config from "../Config";
+import State from "../../client/Screens/Screens";
 
 export class Player extends TransformNode {
     public camera;
     public scene: Scene;
+    public _room;
     public ui;
     private _input;
     private _shadow;
@@ -57,15 +59,16 @@ export class Player extends TransformNode {
     public z: number;
     public rot: number;
 
-    constructor(entity, isCurrentPlayer, sessionId, scene: Scene, _ui, input, _shadow) {
+    constructor(entity, room, scene: Scene, _ui, input, _shadow) {
         super("player", scene);
 
         this.scene = scene;
+        this._room = room;
         this.ui = _ui;
         this._shadow = _shadow;
-        this.sessionId = sessionId; // network id from colyseus
+        this.sessionId = entity.sessionId; // network id from colyseus
         this.entity = entity;
-        this.isCurrentPlayer = isCurrentPlayer;
+        this.isCurrentPlayer = this._room.sessionId === entity.sessionId;
         this._input = input;
         this.playerInputs = [];
 
@@ -97,7 +100,7 @@ export class Player extends TransformNode {
 
     private async spawn(entity) {
 
-        console.log(entity);
+        //console.log(entity);
 
         // load mesh
         const result = await SceneLoader.ImportMeshAsync(null, "./models/", "player_fixed.glb", this._scene);
@@ -144,7 +147,7 @@ export class Player extends TransformNode {
             this._animatePlayer();
             if (this.isCurrentPlayer) {
                 this._updateCamera();
-            }
+            }    
         });
 
         ///////////////////////////////////////////////////////////
@@ -168,6 +171,25 @@ export class Player extends TransformNode {
             window.currentLocation = Config.locations[this.entity.location];
 
         });
+
+        //--COLLISIONS--
+        this.mesh.actionManager = new ActionManager(this.scene);
+
+        this.mesh.actionManager.registerAction(
+            new ExecuteCodeAction(
+                {
+                    trigger: ActionManager.OnIntersectionEnterTrigger,
+                    parameter: this.scene.getMeshByName("teleport trigger")
+                },
+                () => {
+                    console.log("CHANGING ZONE", Config.locations[Config.secondaryLocation]);
+                    this._room.leave();
+                    window.currentLocation = Config.locations[Config.secondaryLocation];
+                    window.currentRoomID = "";
+                    window.nextScene = State.GAME;  
+                }
+            )
+        );
     }
 
     // apply movement

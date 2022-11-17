@@ -9,6 +9,8 @@ type PlayerInputs = {
 
 type PlayerLocation = {
   title: string,
+  mesh: string,
+  key: string,
   spawnPoint: Vector3,
 };
 

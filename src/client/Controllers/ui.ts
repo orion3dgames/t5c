@@ -48,8 +48,6 @@ export class Hud {
 
         ////////////////////////////
         // add location debug info
-        console.log(room.state.players);
-        
         const locationBtn = new TextBlock("location", "");
         locationBtn.width = 0.5
         locationBtn.height = 0.2;
@@ -103,7 +101,10 @@ export class Hud {
 
     // ui refresh
     private _refreshUI(locationBtn, engine, room, players){
-        let locationText = "Zone: "+window.currentLocation.title+"\n";
+        let locationText = "";
+        if(window.currentLocation){
+            locationText = "Zone: "+(window.currentLocation.title ?? 'undefined')+"\n";
+        }
         locationText += "RoomID: "+room.roomId+" \n";
         locationText += "PlayerID: "+room.sessionId+" \n";
         locationText += "Total Players: "+countPlayers(players)+" \n";

@@ -26,7 +26,6 @@ export class PlayerInput {
         this._scene.onPointerObservable.add((pointerInfo) => {
 
             if (pointerInfo.type === PointerEventTypes.POINTERDOWN) {
-                console.log(pointerInfo.event);
                 if (pointerInfo.event.button == 0) {
                     this.left_click = true
                 }

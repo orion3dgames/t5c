@@ -39,8 +39,11 @@ export class GameRoom extends Room<StateHandlerSchema> {
         this.broadcast("playerMessage", this.generateMessage("Server", "Player "+client.sessionId+" has joined the game.") );
 
         // add player to server
-        console.log(`player ${client.sessionId} joined room ${this.roomId}.`);
+        console.log(`player ${client.sessionId} joined room ${this.roomId}.`, options);
         this.state.addPlayer(client.sessionId);
+
+        // set location
+        this.state.setLocation(client.sessionId, options.location);
         
         // on player input event
         this.onMessage("playerInput", (client, data: any) => {
