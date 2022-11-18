@@ -96,11 +96,11 @@ export class GameScene {
         // set scene
         this._scene = scene;
 
-        await this._initNetwork(client);
+        await this._initNetwork();
 
     }
 
-    private async _initNetwork(client): Promise<void> {
+    private async _initNetwork(): Promise<void> {
 
         try {
 
@@ -109,14 +109,14 @@ export class GameScene {
             ////////////////////////////////////
 
             let currentLocationKey = window.currentLocation.key;
-            let room = await client.findCurrentRoom(currentLocationKey);
+            let room = await this._client.findCurrentRoom(currentLocationKey);
 
             if(room){
                 // if room already created, let's join
-                this.room = await client.joinRoom(room.roomId);
+                this.room = await this._client.joinRoom(room.roomId);
             }else{
                 // else lets create the room
-                this.room = await client.createRoom(currentLocationKey);
+                this.room = await this._client.createRoom(currentLocationKey);
             }
 
             if (this.room) {
