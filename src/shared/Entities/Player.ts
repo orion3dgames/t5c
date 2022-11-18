@@ -48,7 +48,7 @@ export class Player extends TransformNode {
     public playerMove: any;
     public playerInputs: PlayerInputs[];
     public playerLatestSequence: number;
-    public decalage: number;
+    public playerNextLocation: string;
 
     private isCurrentPlayer: boolean;
     public sessionId: string;
@@ -155,7 +155,7 @@ export class Player extends TransformNode {
         // colyseus automatically sends entity updates, so let's listen to those changes
         this.entity.onChange(() => {
 
-            //console.log('#' + this.entity.sequence + ' MOVING FROM SERVER', this.entity.x, this.entity.z, this.entity.rot);
+            console.log('#UPDATE SERVER', this.entity);
 
             // update player movement from server
             this.playerNextPosition = new Vector3(this.entity.x, this.entity.y, this.entity.z);
@@ -168,28 +168,37 @@ export class Player extends TransformNode {
             this.processLocalMove();
 
             // set location
-            window.currentLocation = Config.locations[this.entity.location];
+            if(window.currentLocation.key != entity.location){
+                this.teleport(entity.location);
+            }
 
         });
 
         //--COLLISIONS--
-        this.mesh.actionManager = new ActionManager(this.scene);
+        if(this.mesh && this.scene.getMeshByName("teleport trigger")){
+            this.mesh.actionManager = new ActionManager(this.scene);
+            this.mesh.actionManager.registerAction(
+                new ExecuteCodeAction(
+                    {
+                        trigger: ActionManager.OnIntersectionEnterTrigger,
+                        parameter: this.scene.getMeshByName("teleport trigger")
+                    },
+                    () => {
+                        console.log('SEND playerTeleport TO SERVER', Config.locations['island'].key);
+                        this._room.send('playerTeleport', Config.locations['island'].key);
+                    }
+                )
+            );
+        }
+    }
 
-        this.mesh.actionManager.registerAction(
-            new ExecuteCodeAction(
-                {
-                    trigger: ActionManager.OnIntersectionEnterTrigger,
-                    parameter: this.scene.getMeshByName("teleport trigger")
-                },
-                () => {
-                    console.log("CHANGING ZONE", Config.locations[Config.secondaryLocation]);
-                    this._room.leave();
-                    window.currentLocation = Config.locations[Config.secondaryLocation];
-                    window.currentRoomID = "";
-                    window.nextScene = State.GAME;  
-                }
-            )
-        );
+    // 
+    public teleport(location){
+        console.log("CHANGING ZONE", Config.locations[location]);
+        this._room.leave();
+        window.currentLocation = Config.locations[location];
+        window.currentRoomID = "";
+        window.nextScene = State.GAME;  
     }
 
     // apply movement

@@ -13,6 +13,8 @@ export class GameRoom extends Room<StateHandlerSchema> {
 
         console.log("GameRoom created!", options);
 
+        this.roomId = options.location;
+
         // Set initial state
         this.setState(new StateHandlerSchema());
 
@@ -47,13 +49,18 @@ export class GameRoom extends Room<StateHandlerSchema> {
         
         // on player input event
         this.onMessage("playerInput", (client, data: any) => {
-            console.log("playerInput", data);
             this.state.calculatePosition(client.sessionId, data.h, data.v, data.seq);
         });
 
         // on player chat message
         this.onMessage("playerMessage", (client, message) => {
             this.broadcast("playerMessage", this.generateMessage(client.sessionId, message));
+        });
+
+        // on player teleport
+        this.onMessage("playerTeleport", (client, location) => {
+            console.log('playerTeleport', location);
+            this.state.setLocation(client.sessionId, location);
         });
 
     }
