@@ -104,6 +104,37 @@ export class GameScene {
 
         try {
 
+            ////////////////////////////////////
+            ////////// ZONING SYSTEM ///////////
+            ////////////////////////////////////
+
+            let currentLocationKey = window.currentLocation.key;
+            let room = await client.findCurrentRoom(currentLocationKey);
+
+            if(room){
+                // if room already created, let's join
+                this.room = await client.joinRoom(room.roomId);
+            }else{
+                // else lets create the room
+                this.room = await client.createRoom(currentLocationKey);
+            }
+
+            if (this.room) {
+
+                // set global vars
+                this._roomId = this.room.roomId;
+                window.currentRoomID = this._roomId;
+                window.currentSessionID = this.room.sessionId;
+
+                await this._loadAssets();
+
+            }else{
+
+                console.error('FAILED TO CONNECT/CREATE ROOM');
+
+            }
+            
+            /*
             if (this._roomId) {
                 this.room = await client.join("game_room", { 
                     roomId: this._roomId,
@@ -120,7 +151,7 @@ export class GameScene {
 
             if (this.room) {
                 await this._loadAssets();
-            }
+            }*/
 
         } catch (e) {
             console.error("join error", e);
@@ -217,6 +248,7 @@ export class GameScene {
 
             var isCurrentPlayer = sessionId === this.room.sessionId;
 
+            // create player entity
             let _player = new Player(entity, this.room, this._scene, this._ui, this._input, this._shadow);
 
             // if current player, save entity ref

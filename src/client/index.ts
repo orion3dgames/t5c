@@ -13,6 +13,7 @@ import Config from "../shared/Config";
 
 // colyseus
 import * as Colyseus from "colyseus.js";
+import { GameNetwork } from "./Controllers/network";
 
 // App class is our entire game application
 class App {
@@ -47,11 +48,7 @@ class App {
  
         // create colyseus client
         // this should use environement values
-        if ( window.location.host === "localhost:8080") {
-            this._client = new Colyseus.Client(Config.serverUrlLocal); // local
-        }else{
-            this._client = new Colyseus.Client(Config.serverUrlProduction); // online
-        }
+        this._client = new GameNetwork(this._scene);
 
         //  start scene
         //this._state = State.START;

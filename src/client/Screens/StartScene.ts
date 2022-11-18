@@ -57,7 +57,7 @@ export class StartScene {
 
         // setup events
         this._button.onPointerDownObservable.add(() => { 
-            window.nextScene = State.LOBBY;
+            window.nextScene = State.GAME;
         });
 
         this._scene = scene;
