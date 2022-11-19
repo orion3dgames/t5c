@@ -8,31 +8,32 @@ import Config from '../../shared/Config';
 export class GameRoom extends Room<StateHandlerSchema> {
 
     public maxClients = 64;
+    public autoDispose = false;
 
     onCreate(options: any) {
 
-        console.log("GameRoom created!", options);
-
-        this.roomId = options.location;
+        console.log("GameRoom created!", this.roomId, options);
+ 
+        this.setMetadata(options);
 
         // Set initial state
         this.setState(new StateHandlerSchema());
-
+ 
         // Set the frequency of the patch rate
         // let's make it the same as our game loop
         this.setPatchRate(Config.updateRate);
 
         // Set the simulation interval callback
         this.setSimulationInterval(dt => {
-            this.state.serverTime += dt;
-        });
+            this.state.serverTime += dt; 
+        });  
 
         // set max clients
         this.maxClients = Config.maxClients;
 
         // initial chat message
         this.broadcast("playerMessage", this.generateMessage("Server", "Hello World"));
-        
+ 
     }
 
     onJoin(client: Client, options: any) {
@@ -41,11 +42,12 @@ export class GameRoom extends Room<StateHandlerSchema> {
         this.broadcast("playerMessage", this.generateMessage("Server", "Player "+client.sessionId+" has joined the game.") );
 
         // add player to server
-        console.log(`player ${client.sessionId} joined room ${this.roomId}.`, options);
+        console.log(`player ${client.sessionId} joined room ${this.roomId}.`, this.metadata, options);
         this.state.addPlayer(client.sessionId);
 
-        // set location
-        this.state.setLocation(client.sessionId, options.location);
+        // set zone location and spawn point
+        this.state.setSpawnPoint(client.sessionId, this.metadata.location); 
+        this.state.setLocation(client.sessionId, this.metadata.location); 
         
         // on player input event
         this.onMessage("playerInput", (client, data: any) => {

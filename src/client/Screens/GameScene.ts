@@ -14,9 +14,9 @@ import { Environment } from "../Controllers/environment";
 import { Hud } from "../Controllers/ui";
 import { Player } from "../../shared/Entities/Player";
 import Config from '../../shared/Config';
-import { PlayerInputs } from "../Types/index"
 
 import { Room } from "colyseus.js";
+import { PlayerInputs } from "../../shared/types";
 
 export class GameScene {
 
@@ -111,12 +111,11 @@ export class GameScene {
             let currentLocationKey = window.currentLocation.key;
             let room = await this._client.findCurrentRoom(currentLocationKey);
 
+            console.log('FOUND ROOM TO JOIN', room)
+
             if(room){
                 // if room already created, let's join
                 this.room = await this._client.joinRoom(room.roomId);
-            }else{
-                // else lets create the room
-                this.room = await this._client.createRoom(currentLocationKey);
             }
 
             if (this.room) {
@@ -288,8 +287,10 @@ export class GameScene {
             // continuously lerp movement at 60fps
             for (let sessionId in this.playerEntities) {
                 const entity = this.playerEntities[sessionId];
-                entity.mesh.position = Vector3.Lerp(entity.mesh.position, entity.playerNextPosition, 0.2);
-                entity.mesh.rotation = Vector3.Lerp(entity.mesh.rotation, entity.playerNextRotation, 0.8);
+                if(entity.mesh){
+                    entity.mesh.position = Vector3.Lerp(entity.mesh.position, entity.playerNextPosition, 0.2);
+                    entity.mesh.rotation = Vector3.Lerp(entity.mesh.rotation, entity.playerNextRotation, 0.8);
+                }
             }
 
             // every 100ms loop

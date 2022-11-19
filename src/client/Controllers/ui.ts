@@ -6,7 +6,7 @@ import { Room } from "colyseus.js";
 import State from "../Screens/Screens";
 import { Player } from "../../shared/Entities/Player";
 import { countPlayers, roundToTwo } from "../../shared/Utils";
-import { PlayerMessage } from "../Types";
+import { PlayerMessage } from "../../shared/types";
 
 export class Hud {
     private _scene: Scene;

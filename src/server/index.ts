@@ -4,10 +4,11 @@ import { createServer } from "http";
 import express from "express";
 import cors from "cors";
 
-import { Server } from "@colyseus/core";
+import { Server, matchMaker } from "@colyseus/core";
 import { WebSocketTransport } from '@colyseus/ws-transport';
 import { GameRoom } from "./rooms/GameRoom";
 import { LobbyRoom } from "@colyseus/core";
+
 
 const port = Number(process.env.port) || 3000;
 
@@ -34,5 +35,15 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 // LISTEN
-gameServer.listen(port);
-console.log("listening on http://localhost:" + port);
+gameServer.listen(port).then(()=>{
+  
+  // server is now running
+  console.log("listening on http://localhost:" + port);
+
+  // create town
+  matchMaker.createRoom("game_room", { location: "town" });
+
+  //create island
+  matchMaker.createRoom("game_room", { location: "island" });
+
+});

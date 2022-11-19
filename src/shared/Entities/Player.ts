@@ -2,10 +2,10 @@ import { TransformNode, Scene, UniversalCamera, Vector3, AnimationGroup, SceneLo
 import { Rectangle, TextBlock } from "@babylonjs/gui";
 import { PlayerSchema } from "../../server/rooms/schema/PlayerSchema";
 
-import { PlayerInputs } from "../../client/Types/index"
 import { roundToTwo } from "../Utils"
 import Config from "../Config";
 import State from "../../client/Screens/Screens";
+import { PlayerInputs } from "../types";
 
 export class Player extends TransformNode {
     public camera;
@@ -126,7 +126,7 @@ export class Player extends TransformNode {
         this.mesh.parent = this;
 
         // add player nameplate
-        this.addLabel(this.mesh, entity.username);
+        this.addLabel(this.mesh, entity.username+"\n"+entity.location);
 
         // find animations
         this._idle = this.playerAnimations.find(o => o.name === 'Hobbit_Idle');
@@ -168,24 +168,32 @@ export class Player extends TransformNode {
             this.processLocalMove();
 
             // set location
-            if(window.currentLocation.key != entity.location){
-                this.teleport(entity.location);
+            if(this.isCurrentPlayer && window.currentLocation.key != entity.location){
+                //console.log("CHANGING ZONE", entity);
+                //this.teleport(entity.location);
             }
 
         });
 
         //--COLLISIONS--
-        if(this.mesh && this.scene.getMeshByName("teleport trigger")){
+
+        if(this.mesh){
+            let targetMesh = this.scene.getMeshByName("teleport");
             this.mesh.actionManager = new ActionManager(this.scene);
             this.mesh.actionManager.registerAction(
                 new ExecuteCodeAction(
                     {
                         trigger: ActionManager.OnIntersectionEnterTrigger,
-                        parameter: this.scene.getMeshByName("teleport trigger")
+                        parameter: targetMesh
                     },
                     () => {
-                        console.log('SEND playerTeleport TO SERVER', Config.locations['island'].key);
-                        this._room.send('playerTeleport', Config.locations['island'].key);
+                        console.log('COLLISION WITH PORTAL, TELPORTING TO ZONE', targetMesh.metadata.location);
+                        this.teleport(targetMesh.metadata.location);
+                        /*
+                        this._room.send('playerTeleport', {
+                            location: targetMesh.metadata.location,
+                            playerId: this.entity.sessionId
+                        });*/
                     }
                 )
             );
@@ -194,11 +202,10 @@ export class Player extends TransformNode {
 
     // 
     public teleport(location){
-        console.log("CHANGING ZONE", Config.locations[location]);
         this._room.leave();
         window.currentLocation = Config.locations[location];
         window.currentRoomID = "";
-        window.nextScene = State.GAME;  
+        window.nextScene = State.GAME;
     }
 
     // apply movement

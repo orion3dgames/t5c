@@ -25,15 +25,7 @@ export class GameNetwork {
     }
 
     public async joinRoom(roomId):Promise<any> {
-        return await this._client.join("game_room", { 
-            roomId: roomId
-        });
-    }
-
-    public async createRoom(currentRoomKey):Promise<any>{
-        return await this._client.create("game_room", { 
-            location: currentRoomKey
-        });
+        return await this._client.joinById(roomId);
     }
 
     public async findCurrentRoom(currentRoomKey):Promise<any> {
@@ -41,7 +33,7 @@ export class GameNetwork {
             let rooms = await this._client.getAvailableRooms("game_room");
             if(rooms.length > 0){
                 rooms.forEach((room) => {
-                    if(room.roomId === currentRoomKey){ 
+                    if(room.metadata.location === currentRoomKey){ 
                         resolve(room);
                     }
                 });

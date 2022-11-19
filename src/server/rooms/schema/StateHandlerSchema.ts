@@ -10,15 +10,13 @@ export class StateHandlerSchema extends Schema {
     @type("number") serverTime: number = 0.0;
 
     addPlayer(sessionId: string) {
-        let defaultSpawnPoint = Config.locations[Config.initialLocation].spawnPoint;
         this.players.set(sessionId, new PlayerSchema().assign({
             sessionId: sessionId,
             username: sessionId,
-            x: defaultSpawnPoint.x,
+            x: 0,
             y: 0,
-            z: defaultSpawnPoint.z,
+            z: 0,
             rot: 0,
-            location: defaultSpawnPoint.key,
         }));
     }
 
@@ -28,6 +26,15 @@ export class StateHandlerSchema extends Schema {
 
     removePlayer(sessionId: string) {
         this.players.delete(sessionId);
+    }
+
+    setSpawnPoint(sessionId: string, location:string) {
+        let defaultSpawnPoint = Config.locations[location].spawnPoint;
+        const player = this.getPlayer(sessionId);
+        player.x = defaultSpawnPoint.x;
+        player.y = 0;
+        player.z = defaultSpawnPoint.z;
+        console.log('SET SPAWN POINT', defaultSpawnPoint);
     }
 
     setPosition(sessionId: string, x: number, y: number, z: number, rotation: number) {
