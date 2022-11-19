@@ -30,26 +30,23 @@ export class GameNetwork {
         });
     }
 
-    public async createRoom(currentRoomKey):Promise<any> {
+    public async createRoom(currentRoomKey):Promise<any>{
         return await this._client.create("game_room", { 
             location: currentRoomKey
         });
     }
 
     public async findCurrentRoom(currentRoomKey):Promise<any> {
-        let rooms = await this._client.getAvailableRooms("game_room");
-        if(rooms.length > 0){
-            let exists = false;
-            rooms.forEach((room) => {
-                if(room.location === currentRoomKey){
-                    return room;
-                }
-            });
-            if(!exists){
-                return false
+        return new Promise(async (resolve: any, reject: any) => {
+            let rooms = await this._client.getAvailableRooms("game_room");
+            if(rooms.length > 0){
+                rooms.forEach((room) => {
+                    if(room.roomId === currentRoomKey){ 
+                        resolve(room);
+                    }
+                });
             }
-        }
-        return false;
-
+            resolve(false);
+        });
     }
 }

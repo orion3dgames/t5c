@@ -50,7 +50,6 @@ export class StateHandlerSchema extends Schema {
     setLocation(sessionId, location){
         const player = this.getPlayer(sessionId);
         player.location = location;
-        console.log("LOCATION SET", location);
     }
 
     generateRandomUUID(){
