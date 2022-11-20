@@ -15,9 +15,6 @@
   },
   "author": "",
   "license": "ISC",
-  "engines": {
-    "node": "16.14.0"
-  },
   "devDependencies": {
     "@babylonjs/core": "5.32.1",
     "@babylonjs/gui": "5.32.1",
