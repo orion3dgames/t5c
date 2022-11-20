@@ -1,7 +1,7 @@
 import { Engine, Scene, Color4, Vector3, FreeCamera } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText } from "@babylonjs/gui";
 import { firebaseController } from "../Controllers/Firebase/firebase";
-
+import Config from "../../shared/Config";
 import State from "./Screens";
 
 export class LoginScene {
@@ -95,7 +95,7 @@ export class LoginScene {
 
         // back button
         backButton.onPointerDownObservable.add(() => { 
-            global.T5C.nextScene = State.START;
+            Config.goToScene(State.START);
         });
 
         this._ui = guiMenu;
@@ -107,11 +107,8 @@ export class LoginScene {
     }
 
     async connect(username){
-        //this._engine.displayLoadingUI();
         await firebaseController.loginAnonymously(username).then((auth)=>{
-            console.log('LOGIN TO GAME AS ', auth);
-            global.T5C.currentUser = auth;
-            global.T5C.nextScene = State.GAME;
+            Config.goToScene(State.GAME, auth);
         });
     }
 

@@ -7,6 +7,7 @@ import State from "../Screens/Screens";
 import { Player } from "../../shared/Entities/Player";
 import { countPlayers, roundToTwo } from "../../shared/Utils";
 import { PlayerMessage } from "../../shared/types";
+import Config from "../../shared/Config";
 
 export class Hud {
     private _scene: Scene;
@@ -42,8 +43,7 @@ export class Hud {
 
         quitButton.onPointerDownObservable.add(() => { 
             room.leave();
-            global.T5C.currentRoomID = ""; 
-            global.T5C.nextScene = State.START;
+            Config.goToScene(State.START);
         });
 
         ////////////////////////////
@@ -102,9 +102,7 @@ export class Hud {
     // ui refresh
     private _refreshUI(locationBtn, engine, room, players){
         let locationText = "";
-        if(global.T5C.currentLocation){
-            locationText = "Zone: "+(global.T5C.currentLocation.title ?? 'undefined')+"\n";
-        }
+        locationText = "Zone: "+(global.T5C.currentLocation.title ?? 'undefined')+"\n";
         locationText += "RoomID: "+room.roomId+" \n";
         locationText += "PlayerID: "+room.sessionId+" \n";
         locationText += "Total Players: "+countPlayers(players)+" \n";

@@ -1,3 +1,4 @@
+import State from "../client/Screens/Screens"
 
 let Config = {
 
@@ -26,13 +27,37 @@ let Config = {
             key: 'island',
             mesh: "island.glb",
             spawnPoint: {
-                x: 20.29,
+                x: -31.29,
                 y: 0,
-                z: 27.82
+                z: -15.82
             },
         },
-    }
+    },
 
+    setDefault(){
+        global.T5C = {
+            nextScene: State.LOGIN,
+            currentRoomID: "",
+            currentSessionID: "",
+            currentLocation: Config.locations[Config.initialLocation],
+            currentUser: false
+        }
+    },
+
+    checkForSceneChange(){
+        let currentScene = global.T5C.nextScene;
+        if(global.T5C.nextScene != State.NULL){
+            global.T5C.nextScene = State.NULL;
+            return currentScene;  
+        }
+    },
+
+    goToScene(newState: State, user:any = {}){
+        global.T5C.nextScene = newState;
+        if(user){
+            global.T5C.currentUser = user;
+        }
+    }
 
 }
 

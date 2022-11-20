@@ -48,8 +48,6 @@ export class GameScene {
 
     async createScene(engine, client): Promise<void> {
 
-        // get current roomID from globals
-        this._roomId = global.T5C.currentRoomID;
         this._client = client;
         this._engine = engine;
 
@@ -59,10 +57,6 @@ export class GameScene {
 
         // black background
         scene.clearColor = new Color4(0, 0, 0, 1);
-        /*
-        scene.fogMode = Scene.FOGMODE_LINEAR;
-        scene.fogColor = new Color3(1, 1, 1);
-        scene.fogDensity = 0.001;*/
 
         // ambient light
         var ambientLight = new HemisphericLight(
@@ -79,18 +73,6 @@ export class GameScene {
         light.position = new Vector3(1,1,1);
         light.intensity = 1; 
 
-        // add sky box
-        /*
-        var skybox = MeshBuilder.CreateBox("skyBox", { size: 1000.0 }, scene);
-        var skyboxMaterial = new StandardMaterial("skyBox", scene);
-        skyboxMaterial.backFaceCulling = false;
-        skyboxMaterial.reflectionTexture = new CubeTexture("textures/skybox", scene);
-        skyboxMaterial.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
-        skyboxMaterial.diffuseColor = new Color3(0, 0, 0);
-        skyboxMaterial.specularColor = new Color3(0, 0, 0);
-        skybox.material = skyboxMaterial;
-        */
-
         // shadow generator
         this._shadow = new ShadowGenerator(512, light);
         this._shadow.bias = 0.001;
@@ -98,12 +80,6 @@ export class GameScene {
         this._shadow.useContactHardeningShadow = true;
         this._shadow.contactHardeningLightSizeUVRatio = 0.05;
         this._shadow.setDarkness(0.5);
-
-        // SET DEFAULT ZONE
-        if(!global.T5C.currentLocation){
-            console.log('NO ZONE SET, SET DEFAULT', Config.locations[Config.initialLocation]);
-            global.T5C.currentLocation = Config.locations[Config.initialLocation];
-        }
 
         // set scene
         this._scene = scene;

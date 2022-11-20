@@ -40,13 +40,7 @@ class App {
         this._init();
 
         // setup default values
-        global.T5C = {
-            nextScene: State.START,
-            currentRoomID: "",
-            currentSessionID: "",
-            currentLocation: Config.locations[Config.initialLocation],
-            currentUser: false
-        }
+        Config.setDefault();
     }
 
     private async _init(): Promise<void> {
@@ -60,10 +54,6 @@ class App {
         // this should use environement values
         this._client = new GameNetwork(this._scene);
 
-        //  start scene
-        //this._state = State.START;
-        global.T5C.nextScene = State.LOGIN; 
-
         //MAIN render loop & state machine
         await this._render();
 
@@ -75,10 +65,7 @@ class App {
         this._engine.runRenderLoop(() => {
 
             // monitor state
-            if(global.T5C.nextScene != State.NULL){
-                this._state = global.T5C.nextScene;
-                global.T5C.nextScene = State.NULL;
-            }
+            this._state = Config.checkForSceneChange();
 
             switch (this._state) {
 

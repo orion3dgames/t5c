@@ -20,9 +20,9 @@ module.exports = {
     devServer: {
         host: '0.0.0.0',
         static: {
-            directory: path.join(__dirname, 'src/public'),
+            directory: path.join(__dirname, 'public'),
         },
-        watchFiles: ['src/**/*.ts', 'src/public/**/*'],
+        watchFiles: ['src/**/*.ts', 'public/**/*'],
         liveReload: true,
         port: 8080,
     },
@@ -45,7 +45,7 @@ module.exports = {
     plugins: [
         new CopyPlugin({
             patterns: [
-                { from: "src/public/", to: "./" },
+                { from: "public/", to: "./" },
             ],
         }),
         //new BundleAnalyzerPlugin()
