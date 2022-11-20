@@ -61,7 +61,8 @@ export class GameRoom extends Room<StateHandlerSchema> {
         // set zone location and spawn point
         this.state.setSpawnPoint(client.sessionId, this.metadata.location); 
         this.state.setLocation(client.sessionId, this.metadata.location); 
-        
+        this.state.setUsername(client.sessionId, options.username); 
+
         // on player input event
         this.onMessage("playerInput", (client, data: any) => {
             this.state.calculatePosition(client.sessionId, data.h, data.v, data.seq);

@@ -48,7 +48,7 @@ module.exports = {
                 { from: "src/public/", to: "./" },
             ],
         }),
-        new BundleAnalyzerPlugin()
+        //new BundleAnalyzerPlugin()
     ],
     mode: "development"
 };

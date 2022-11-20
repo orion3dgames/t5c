@@ -14,6 +14,7 @@ import Config from "../shared/Config";
 // colyseus
 import * as Colyseus from "colyseus.js";
 import { GameNetwork } from "./Controllers/network";
+import { LoginScene } from "./Screens/LoginScene";
 
 // App class is our entire game application
 class App {
@@ -37,6 +38,15 @@ class App {
 
         // initialize babylon scene and engine
         this._init();
+
+        // setup default values
+        global.T5C = {
+            nextScene: State.START,
+            currentRoomID: "",
+            currentSessionID: "",
+            currentLocation: Config.locations[Config.initialLocation],
+            currentUser: false
+        }
     }
 
     private async _init(): Promise<void> {
@@ -52,7 +62,7 @@ class App {
 
         //  start scene
         //this._state = State.START;
-        window.nextScene = State.GAME;
+        global.T5C.nextScene = State.LOGIN; 
 
         //MAIN render loop & state machine
         await this._render();
@@ -65,9 +75,9 @@ class App {
         this._engine.runRenderLoop(() => {
 
             // monitor state
-            if(window.nextScene != State.NULL){
-                this._state = window.nextScene;
-                window.nextScene = State.NULL;
+            if(global.T5C.nextScene != State.NULL){
+                this._state = global.T5C.nextScene;
+                global.T5C.nextScene = State.NULL;
             }
 
             switch (this._state) {
@@ -86,9 +96,9 @@ class App {
                 ///////////////////////////////////////
                 ///////////////////////////////////////
                 ///////////////////////////////////////
-                case State.LOBBY:
+                case State.LOGIN:
                     this.clearScene();
-                    this._currentScene = new LobbyScene();
+                    this._currentScene = new LoginScene();
                     this._currentScene.createScene(this._engine, this._client);
                     this._scene = this._currentScene._scene;
                     this._state = State.NULL;
@@ -105,9 +115,8 @@ class App {
                     this._state = State.NULL;
                     break;
     
-    
                 default: break;
-            }
+            } 
             
             // render when scene is ready
             this._process();

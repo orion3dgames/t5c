@@ -70,7 +70,7 @@ export class LobbyScene {
         // back button
         backButton.onPointerDownObservable.add(() => { 
             this._leaveLobby();
-            window.nextScene = State.START;
+            global.T5C.nextScene = State.START;
         });
 
         //////////////////////////////////////////////////////
@@ -119,7 +119,7 @@ export class LobbyScene {
             
             startBtn.onPointerDownObservable.add(() => { 
                 this._leaveLobby();
-                window.nextScene = State.GAME;
+                global.T5C.nextScene = State.GAME;
             });
 
         }).catch((error) => {
@@ -209,8 +209,8 @@ export class LobbyScene {
             // add on click observable
             joinBtn.onPointerDownObservable.add(() => { 
                 this._leaveLobby();
-                window.currentRoomID = room.roomId;
-                window.nextScene = State.GAME;
+                global.T5C.currentRoomID = room.roomId;
+                global.T5C.nextScene = State.GAME;
 
             });
         });

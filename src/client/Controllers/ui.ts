@@ -42,8 +42,8 @@ export class Hud {
 
         quitButton.onPointerDownObservable.add(() => { 
             room.leave();
-            window.currentRoomID = ""; 
-            window.nextScene = State.START;
+            global.T5C.currentRoomID = ""; 
+            global.T5C.nextScene = State.START;
         });
 
         ////////////////////////////
@@ -102,8 +102,8 @@ export class Hud {
     // ui refresh
     private _refreshUI(locationBtn, engine, room, players){
         let locationText = "";
-        if(window.currentLocation){
-            locationText = "Zone: "+(window.currentLocation.title ?? 'undefined')+"\n";
+        if(global.T5C.currentLocation){
+            locationText = "Zone: "+(global.T5C.currentLocation.title ?? 'undefined')+"\n";
         }
         locationText += "RoomID: "+room.roomId+" \n";
         locationText += "PlayerID: "+room.sessionId+" \n";

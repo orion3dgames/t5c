@@ -49,7 +49,7 @@ export class GameScene {
     async createScene(engine, client): Promise<void> {
 
         // get current roomID from globals
-        this._roomId = window.currentRoomID;
+        this._roomId = global.T5C.currentRoomID;
         this._client = client;
         this._engine = engine;
 
@@ -100,9 +100,9 @@ export class GameScene {
         this._shadow.setDarkness(0.5);
 
         // SET DEFAULT ZONE
-        if(!window.currentLocation){
+        if(!global.T5C.currentLocation){
             console.log('NO ZONE SET, SET DEFAULT', Config.locations[Config.initialLocation]);
-            window.currentLocation = Config.locations[Config.initialLocation];
+            global.T5C.currentLocation = Config.locations[Config.initialLocation];
         }
 
         // set scene
@@ -120,15 +120,13 @@ export class GameScene {
             ////////// ZONING SYSTEM ///////////
             ////////////////////////////////////
 
-            let username = generateRandomPlayerName();
-            let currentLocationKey = window.currentLocation.key;
+            let user = global.T5C.currentUser;
+            let currentLocationKey = global.T5C.currentLocation.key;
             let room = await this._client.findCurrentRoom(currentLocationKey);
-
-            console.log('FOUND ROOM TO JOIN', room)
 
             if(room){
                 // if room already created, let's join
-                this.room = await this._client.joinRoom(room.roomId, username);
+                this.room = await this._client.joinRoom(room.roomId, user);
                 this.chatRoom = await this._client.joinChatRoom();
             }
 
@@ -136,8 +134,8 @@ export class GameScene {
 
                 // set global vars
                 this._roomId = this.room.roomId;
-                window.currentRoomID = this._roomId;
-                window.currentSessionID = this.room.sessionId;
+                global.T5C.currentRoomID = this._roomId;
+                global.T5C.currentSessionID = this.room.sessionId;
 
                 await this._loadAssets();
 
@@ -146,25 +144,6 @@ export class GameScene {
                 console.error('FAILED TO CONNECT/CREATE ROOM');
 
             }
-            
-            /*
-            if (this._roomId) {
-                this.room = await client.join("game_room", { 
-                    roomId: this._roomId,
-                    location: window.currentLocation.key
-                 });
-            } else {
-                this.room = await client.create("game_room", {
-                    location: window.currentLocation.key
-                });
-                this._roomId = this.room.roomId;
-                window.currentRoomID = this._roomId;
-                window.currentSessionID = this.room.sessionId;
-            }
-
-            if (this.room) {
-                await this._loadAssets();
-            }*/
 
         } catch (e) {
             console.error("join error", e);
@@ -178,7 +157,7 @@ export class GameScene {
         console.log(this._scene.metadata);
 
         // load environment
-        // should load window.currentLocation GLB file only
+        // should load global.T5C.currentLocation GLB file only
         const environment = new Environment(this._scene);
         this._environment = environment;
         await this._environment.load(); //environment

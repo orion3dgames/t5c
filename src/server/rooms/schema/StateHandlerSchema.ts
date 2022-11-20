@@ -59,6 +59,11 @@ export class StateHandlerSchema extends Schema {
         player.location = location;
     }
 
+    setUsername(sessionId, username){
+        const player = this.getPlayer(sessionId);
+        player.username = username;
+    }
+   
     generateRandomUUID(){
         return Math.random().toString().substring(10,20);
     }

@@ -57,14 +57,12 @@ export class StartScene {
 
         // setup events
         this._button.onPointerDownObservable.add(() => { 
-            window.nextScene = State.GAME;
+            global.T5C.nextScene = State.LOGIN;
         });
 
         this._scene = scene;
 
         await this._scene.whenReadyAsync();
-
-        console.log('START SCENE CREATED');
     }
 
 }

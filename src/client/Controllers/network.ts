@@ -17,15 +17,18 @@ export class GameNetwork {
 
         // create colyseus client
         // this should use environement values
-        if ( window.location.host === "localhost:8080") {
+        if (window.location.host === "localhost:8080") {
             this._client = new Client(Config.serverUrlLocal); // local
         }else{
             this._client = new Client(Config.serverUrlProduction); // online
         }   
     }
 
-    public async joinRoom(roomId):Promise<any> {
-        return await this._client.joinById(roomId);
+    public async joinRoom(roomId, currentUser):Promise<any> {
+        return await this._client.joinById(roomId, { 
+            token: currentUser.user.accessToken,
+            username: currentUser.user.displayName
+        });
     }
     
 

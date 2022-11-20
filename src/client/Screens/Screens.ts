@@ -1,8 +1,9 @@
 enum State { 
     NULL = 0, 
     START = 1, 
-    LOBBY = 2,
-    GAME = 3,
+    LOGIN = 2,
+    REGISTER = 3,
+    GAME = 4,
     ERROR = 9
 }
 

@@ -28,14 +28,22 @@ type PlayerMessage = {
 };
 
 declare global {
-
     interface Window {
         nextScene: State;
         currentRoomID: string;
         currentSessionID: string; 
         currentLocation: PlayerLocation;
+        currentUser: any
     }
+}
 
-    var T5C: string
-    
+
+declare global {
+    interface T5C {
+        nextScene: State;
+        currentRoomID: string;
+        currentSessionID: string; 
+        currentLocation: PlayerLocation;
+        currentUser: any
+    }
 }

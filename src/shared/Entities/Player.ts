@@ -129,7 +129,7 @@ export class Player extends TransformNode {
         }
 
         // add player nameplate
-        this.addLabel(this.mesh, entity.username+"\n"+entity.location);
+        this.addLabel(this.mesh, entity.username);
 
         // find animations
         this._idle = this.playerAnimations.find(o => o.name === 'Hobbit_Idle');
@@ -171,7 +171,7 @@ export class Player extends TransformNode {
             this.processLocalMove();
 
             // set location
-            if(this.isCurrentPlayer && window.currentLocation.key != entity.location){
+            if(this.isCurrentPlayer && global.T5C.currentLocation.key != entity.location){
                 //console.log("CHANGING ZONE", entity);
                 //this.teleport(entity.location);
             }
@@ -212,9 +212,9 @@ export class Player extends TransformNode {
     // 
     public teleport(location){
         this._room.leave();
-        window.currentLocation = Config.locations[location];
-        window.currentRoomID = "";
-        window.nextScene = State.GAME;
+        global.T5C.currentLocation = Config.locations[location];
+        global.T5C.currentRoomID = "";
+        global.T5C.nextScene = State.GAME;
     }
 
     // apply movement
