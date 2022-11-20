@@ -102,10 +102,12 @@ export class LoginScene {
 
         this._scene = scene;
 
+        await this._scene.whenReadyAsync();
+
     }
 
     async connect(username){
-        this._engine.displayLoadingUI();
+        //this._engine.displayLoadingUI();
         await firebaseController.loginAnonymously(username).then((auth)=>{
             console.log('LOGIN TO GAME AS ', auth);
             global.T5C.currentUser = auth;
