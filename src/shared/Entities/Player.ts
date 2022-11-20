@@ -124,6 +124,9 @@ export class Player extends TransformNode {
         // set mesh
         this.mesh = playerMesh;
         this.mesh.parent = this;
+        this.mesh.metadata = {
+            sessionId: entity.sessionId
+        }
 
         // add player nameplate
         this.addLabel(this.mesh, entity.username+"\n"+entity.location);
@@ -177,7 +180,7 @@ export class Player extends TransformNode {
 
         //--COLLISIONS--
 
-        if(this.mesh){
+        if(this.mesh && this.isCurrentPlayer){
             let targetMesh = this.scene.getMeshByName("teleport");
             this.mesh.actionManager = new ActionManager(this.scene);
             this.mesh.actionManager.registerAction(
@@ -186,9 +189,15 @@ export class Player extends TransformNode {
                         trigger: ActionManager.OnIntersectionEnterTrigger,
                         parameter: targetMesh
                     },
-                    () => {
-                        console.log('COLLISION WITH PORTAL, TELPORTING TO ZONE', targetMesh.metadata.location);
-                        this.teleport(targetMesh.metadata.location);
+                    (collision) => {
+                        
+                        if(this.mesh.metadata.sessionId === this.entity.sessionId){
+                            console.log('COLLISION WITH PORTAL, TELPORTING TO ZONE',collision, this.mesh.metadata, targetMesh.metadata.location);
+                            this.teleport(targetMesh.metadata.location);
+                        }
+                        /*
+                        }
+                        //this.teleport(targetMesh.metadata.location);
                         /*
                         this._room.send('playerTeleport', {
                             location: targetMesh.metadata.location,
