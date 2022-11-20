@@ -20,13 +20,12 @@ export class Environment {
         assets.allMeshes.forEach(m => {
 
             // default values
-            m.receiveShadows = true;
             m.checkCollisions = true;
             m.isPickable = false;
-            m.doNotSyncBoundingInfo = true;
 
             //dont check for collisions, dont allow for raycasting to detect it(cant land on it)
             if (m.name == "ground") { 
+                m.receiveShadows = true;
                 m.checkCollisions = false;
                 m.isPickable = false;
             }

@@ -1,7 +1,7 @@
 import {
-    Scene, Engine, Vector3, MeshBuilder, Color3, SpotLight,
+    Scene, Engine, Vector3, MeshBuilder, Color3, Color4, SpotLight,
     ShadowGenerator, CubeTexture, Texture, StandardMaterial,
-    Mesh, Matrix, Quaternion, SceneLoader,
+    Mesh, Matrix, Quaternion, SceneLoader, 
     DirectionalLight, PointLight, HemisphericLight,
     AssetsManager, AssetContainer, MeshAssetTask, ContainerAssetTask
 } from "@babylonjs/core";
@@ -57,21 +57,30 @@ export class GameScene {
         let scene = new Scene(engine);
         scene.shadowsEnabled = true;
 
+        // black background
+        scene.clearColor = new Color4(0, 0, 0, 1);
+        /*
+        scene.fogMode = Scene.FOGMODE_LINEAR;
+        scene.fogColor = new Color3(1, 1, 1);
+        scene.fogDensity = 0.001;*/
+
         // ambient light
         var ambientLight = new HemisphericLight(
             "light1",
             new Vector3(0, 1, 0),
             scene
         );
-        ambientLight.intensity = 2;
+        ambientLight.intensity = 1.5;
         ambientLight.groundColor = new Color3(0.13, 0.13, 0.13);
         ambientLight.specular = Color3.Black();
 
         // shadow light
-        var light = new DirectionalLight("DirectionalLight", new Vector3(0, -1, 0), scene);
-        light.intensity = 1;
+        var light = new DirectionalLight("DirectionalLight", new Vector3(-1, -1, -1), scene);
+        light.position = new Vector3(1,1,1);
+        light.intensity = 1; 
 
         // add sky box
+        /*
         var skybox = MeshBuilder.CreateBox("skyBox", { size: 1000.0 }, scene);
         var skyboxMaterial = new StandardMaterial("skyBox", scene);
         skyboxMaterial.backFaceCulling = false;
@@ -80,9 +89,10 @@ export class GameScene {
         skyboxMaterial.diffuseColor = new Color3(0, 0, 0);
         skyboxMaterial.specularColor = new Color3(0, 0, 0);
         skybox.material = skyboxMaterial;
+        */
 
         // shadow generator
-        this._shadow = new ShadowGenerator(1024, light);
+        this._shadow = new ShadowGenerator(512, light);
         this._shadow.bias = 0.001;
         this._shadow.normalBias = 0.02;
         this._shadow.useContactHardeningShadow = true;
