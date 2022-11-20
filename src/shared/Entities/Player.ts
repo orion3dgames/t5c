@@ -313,7 +313,7 @@ export class Player extends TransformNode {
         let yTilt = new TransformNode("ytilt");
 
         // adjustments to camera view to point down at our player
-        yTilt.rotation = Config.PLAYER_CAMERA_TILT;
+        yTilt.rotation = new Vector3(0.50, 0, 0);
         this._yTilt = yTilt;
         yTilt.parent = this._camRoot;
 

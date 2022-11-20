@@ -1,6 +1,4 @@
-import { Vector3 } from "@babylonjs/core";
 import State from "../client/Screens/Screens"
-
 
 let Config = {
 
@@ -38,7 +36,6 @@ let Config = {
 
     // player defaults
     PLAYER_SPEED: 0.75,
-    PLAYER_CAMERA_TILT: new Vector3(0.50, 0, 0),
 
     // functions
     setDefault(){
