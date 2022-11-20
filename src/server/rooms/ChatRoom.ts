@@ -32,10 +32,11 @@ export class ChatRoom extends Room {
     onDispose() {}
 
     // prepare chat message to be sent
-    generateMessage(sessionId: string, message = "") {
+    generateMessage(sessionId: string, incomingMsg:any) {
         let msg = new ChatSchema;
         msg.senderID = sessionId;
-        msg.message = message;
+        msg.username = incomingMsg.username;
+        msg.message = incomingMsg.message;
         return msg;
     }
 }

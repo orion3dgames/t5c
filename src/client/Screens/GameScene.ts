@@ -92,22 +92,18 @@ export class GameScene {
 
         try {
 
-            ////////////////////////////////////
-            ////////// ZONING SYSTEM ///////////
-            ////////////////////////////////////
-
             let user = global.T5C.currentUser;
             let currentLocationKey = global.T5C.currentLocation.key;
             let room = await this._client.findCurrentRoom(currentLocationKey);
 
             if(room){
-                // if room already created, let's join
+
+                // join game room
                 this.room = await this._client.joinRoom(room.roomId, user);
+
+                // join global chat room
                 this.chatRoom = await this._client.joinChatRoom();
-            }
-
-            if (this.room) {
-
+       
                 // set global vars
                 this._roomId = this.room.roomId;
                 global.T5C.currentRoomID = this._roomId;

@@ -22,21 +22,11 @@ type PlayerLocation = {
 
 type PlayerMessage = {
     senderID: string,
+    username: string;
     message: string,
     timestamp: number,
     createdAt: string
 };
-
-declare global {
-    interface Window {
-        nextScene: State;
-        currentRoomID: string;
-        currentSessionID: string; 
-        currentLocation: PlayerLocation;
-        currentUser: any
-    }
-}
-
 
 declare global {
     interface T5C {
