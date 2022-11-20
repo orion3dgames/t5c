@@ -37,6 +37,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
     onAuth (client: Client, options: any, request: http.IncomingMessage) { 
 
         console.log(client.sessionId, options, request.headers);
+        return true;
         /**
          * Alternatively, you can use `async` / `await`,
          * which will return a `Promise` under the hood.
