@@ -47,9 +47,9 @@ export class StateHandlerSchema extends Schema {
 
     calculatePosition(sessionId: string, h: number, v: number, seq: number) {
         const player = this.getPlayer(sessionId);
-        player.x -= h;
+        player.x -= h * Config.PLAYER_SPEED;
         player.y = 0;
-        player.z -= v;
+        player.z -= v * Config.PLAYER_SPEED;
         player.rot = Math.atan2(h, v);
         player.sequence = seq;
     }

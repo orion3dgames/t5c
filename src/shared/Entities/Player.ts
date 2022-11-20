@@ -23,10 +23,6 @@ export class Player extends TransformNode {
     private _camRoot: TransformNode;
     private _yTilt: TransformNode;
 
-    //const values
-    private static readonly PLAYER_SPEED: number = 0.12;
-    private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.50, 0, 0);
-
     //player movement vars
     private _deltaTime: number = 0;
     private _h: number;
@@ -220,8 +216,8 @@ export class Player extends TransformNode {
     // apply movement
     public move(input) {
         let rotationY = Math.atan2(input.h, input.v);
-        this.playerNextPosition.x -= input.h;
-        this.playerNextPosition.z -= input.v;
+        this.playerNextPosition.x -= input.h * Config.PLAYER_SPEED;
+        this.playerNextPosition.z -= input.v * Config.PLAYER_SPEED;
         this.playerNextRotation.y = this.playerNextRotation.y + (rotationY - this.playerNextRotation.y);
     }
 
@@ -317,7 +313,7 @@ export class Player extends TransformNode {
         let yTilt = new TransformNode("ytilt");
 
         // adjustments to camera view to point down at our player
-        yTilt.rotation = Player.ORIGINAL_TILT;
+        yTilt.rotation = Config.PLAYER_CAMERA_TILT;
         this._yTilt = yTilt;
         yTilt.parent = this._camRoot;
 
