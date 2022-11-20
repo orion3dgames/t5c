@@ -7,6 +7,7 @@ import cors from "cors";
 import { Server, matchMaker } from "@colyseus/core";
 import { WebSocketTransport } from '@colyseus/ws-transport';
 import { GameRoom } from "./rooms/GameRoom";
+import { ChatRoom } from "./rooms/ChatRoom";
 import { LobbyRoom } from "@colyseus/core";
 
 
@@ -27,7 +28,8 @@ const gameServer = new Server({
 gameServer.define('lobby', LobbyRoom);
 
 // GAME ROOM
-gameServer.define("game_room", GameRoom).enableRealtimeListing();
+gameServer.define("game_room", GameRoom);
+gameServer.define("chat_room", ChatRoom);
 
 // Make sure to never call the `simulateLatency()` method in production.
 if (process.env.NODE_ENV !== "production") {
@@ -39,7 +41,7 @@ gameServer.listen(port).then(()=>{
   
   // server is now running
   console.log("listening on http://localhost:" + port);
-
+  
   // create town
   matchMaker.createRoom("game_room", { location: "town" });
 

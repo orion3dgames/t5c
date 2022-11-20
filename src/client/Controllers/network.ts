@@ -27,6 +27,11 @@ export class GameNetwork {
     public async joinRoom(roomId):Promise<any> {
         return await this._client.joinById(roomId);
     }
+    
+
+    public async joinChatRoom():Promise<any> {
+        return await this._client.joinOrCreate("chat_room");
+    }
 
     public async findCurrentRoom(currentRoomKey):Promise<any> {
         return new Promise(async (resolve: any, reject: any) => {

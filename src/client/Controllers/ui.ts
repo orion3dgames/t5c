@@ -17,7 +17,7 @@ export class Hud {
     //Chat
     public messages: PlayerMessage[] = [];
 
-    constructor(scene: Scene, engine:Engine, room:Room, players:Player[]) {
+    constructor(scene: Scene, engine:Engine, room:Room, chatRoom:Room, players:Player[]) {
 
         this._scene = scene;
  
@@ -77,7 +77,7 @@ export class Hud {
         // chatbox on enter event
         chat_input.onKeyboardEventProcessedObservable.add((ev) => { 
             if((ev.key==="Enter" || ev.code==="Enter") && chat_input.text != ""){
-                room.send("playerMessage", chat_input.text);
+                chatRoom.send("message", chat_input.text);
                 chat_input.text = "";
                 chat_input.focus();
                 this._refreshChatBox();
@@ -85,7 +85,7 @@ export class Hud {
         });
 
         // receive message event
-        room.onMessage("playerMessage", (message:PlayerMessage) => {
+        chatRoom.onMessage("messages", (message:PlayerMessage) => {
            this.messages.push(message); 
            this._refreshChatBox();
         });

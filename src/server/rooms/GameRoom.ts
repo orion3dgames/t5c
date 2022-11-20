@@ -1,5 +1,5 @@
+import http from "http";
 import { Room, Client } from "@colyseus/core";
-import { ChatSchema } from './schema/ChatSchema';
 import logger = require("../helpers/logger");
 
 import {StateHandlerSchema} from './schema/StateHandlerSchema';
@@ -29,17 +29,29 @@ export class GameRoom extends Room<StateHandlerSchema> {
         });  
 
         // set max clients
-        this.maxClients = Config.maxClients;
-
-        // initial chat message
-        this.broadcast("playerMessage", this.generateMessage("Server", "Hello World"));
+        this.maxClients = Config.maxClients; 
  
     }
 
-    onJoin(client: Client, options: any) {
+    // Authorize client based on provided options before WebSocket handshake is complete
+    onAuth (client: Client, options: any, request: http.IncomingMessage) { 
 
-        // let everyone knows someone has joined the game
-        this.broadcast("playerMessage", this.generateMessage("Server", "Player "+client.sessionId+" has joined the game.") );
+        console.log(client.sessionId, options, request.headers);
+        /**
+         * Alternatively, you can use `async` / `await`,
+         * which will return a `Promise` under the hood.
+         */
+        /*
+        const userData = await validateToken(options.accessToken);
+        if (userData) {
+            return userData;
+
+        } else {
+            throw new ServerError(400, "bad access token");
+        }*/
+    }
+
+    onJoin(client: Client, options: any) {
 
         // add player to server
         console.log(`player ${client.sessionId} joined room ${this.roomId}.`, this.metadata, options);
@@ -52,11 +64,6 @@ export class GameRoom extends Room<StateHandlerSchema> {
         // on player input event
         this.onMessage("playerInput", (client, data: any) => {
             this.state.calculatePosition(client.sessionId, data.h, data.v, data.seq);
-        });
-
-        // on player chat message
-        this.onMessage("playerMessage", (client, message) => {
-            this.broadcast("playerMessage", this.generateMessage(client.sessionId, message));
         });
 
         // on player teleport
@@ -84,13 +91,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
     /////////////////////////////////////////////////
     /////////////////////////////////////////////////
 
-    // prepare chat message to be sent
-    generateMessage(sessionId: string, message = "") {
-        let msg = new ChatSchema;
-        msg.senderID = sessionId;
-        msg.message = message;
-        return msg;
-    }
+    
 
     /*
     spawnCube(cubeData: any){

@@ -17,6 +17,7 @@ import Config from '../../shared/Config';
 
 import { Room } from "colyseus.js";
 import { PlayerInputs } from "../../shared/types";
+import { generateRandomPlayerName } from "../../shared/Utils";
 
 export class GameScene {
 
@@ -35,6 +36,7 @@ export class GameScene {
 
     public _roomId: string;
     private room: Room<any>;
+    private chatRoom: Room<any>;
     private playerEntities: Player[] = [];
     private _currentPlayer;
 
@@ -108,6 +110,7 @@ export class GameScene {
             ////////// ZONING SYSTEM ///////////
             ////////////////////////////////////
 
+            let username = generateRandomPlayerName();
             let currentLocationKey = window.currentLocation.key;
             let room = await this._client.findCurrentRoom(currentLocationKey);
 
@@ -115,7 +118,8 @@ export class GameScene {
 
             if(room){
                 // if room already created, let's join
-                this.room = await this._client.joinRoom(room.roomId);
+                this.room = await this._client.joinRoom(room.roomId, username);
+                this.chatRoom = await this._client.joinChatRoom();
             }
 
             if (this.room) {
@@ -240,7 +244,7 @@ export class GameScene {
         this._input = new PlayerInput(this._scene);
 
         // setup hud
-        this._ui = new Hud(this._scene, this._engine, this.room, this.playerEntities);
+        this._ui = new Hud(this._scene, this._engine, this.room, this.chatRoom, this.playerEntities);
 
         // when someone joins the room event
         this.room.state.players.onAdd((entity, sessionId) => {
