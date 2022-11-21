@@ -108,7 +108,7 @@ export class Player extends TransformNode {
         playerMesh.receiveShadows = true;
 
         // set initial scale 
-        playerMesh.scaling.set(0.04, 0.04, 0.04);
+        playerMesh.scaling.set(0.02, 0.02, 0.02);
 
         // save entities
         this.playerNextPosition = new Vector3(this.entity.x, this.entity.y, this.entity.z);
@@ -130,8 +130,6 @@ export class Player extends TransformNode {
         // find animations
         this._idle = this.playerAnimations.find(o => o.name === 'Hobbit_Idle');
         this._walk = this.playerAnimations.find(o => o.name === 'Hobbit_Walk');
-        //this._idle = this._scene.getAnimationGroupByName("Hobbit_Idle");
-        //this._walk = this._scene.getAnimationGroupByName("Hobbit_Walk");
 
         // prepare animations
         this._setUpAnimations();
@@ -174,53 +172,49 @@ export class Player extends TransformNode {
 
         });
 
-        //--COLLISIONS--
-
+        // collision with  other meshes
         if(this.mesh && this.isCurrentPlayer){
-            let targetMesh = this.scene.getMeshByName("teleport");
+
+            // start action manager
             this.mesh.actionManager = new ActionManager(this.scene);
+
+            // teleport collision
+            let targetMesh = this.scene.getMeshByName("teleport");
             this.mesh.actionManager.registerAction(
-                new ExecuteCodeAction(
-                    {
+                new ExecuteCodeAction({
                         trigger: ActionManager.OnIntersectionEnterTrigger,
                         parameter: targetMesh
-                    },
-                    (collision) => {
-                        
+                    },() => {
                         if(this.mesh.metadata.sessionId === this.entity.sessionId){
-                            console.log('COLLISION WITH PORTAL, TELPORTING TO ZONE',collision, this.mesh.metadata, targetMesh.metadata.location);
                             this.teleport(targetMesh.metadata.location);
                         }
-                        /*
-                        }
-                        //this.teleport(targetMesh.metadata.location);
-                        /*
-                        this._room.send('playerTeleport', {
-                            location: targetMesh.metadata.location,
-                            playerId: this.entity.sessionId
-                        });*/
                     }
                 )
             );
+
+            // houses collision
+            /*
+            let targetMeshs = this.scene.getMeshesByTags("collisions");
+            this.mesh.actionManager.registerAction(
+                new ExecuteCodeAction({
+                        trigger: ActionManager.OnIntersectionEnterTrigger,
+                        parameter: targetMeshs
+                    },() => {
+                        console.log('COLLIDING');
+                    }
+                )
+            );*/
+
         }
     }
 
-    // 
+    // teleport player
     public teleport(location){
         this._room.leave();
         global.T5C.currentLocation = Config.locations[location];
         global.T5C.currentRoomID = "";
         global.T5C.nextScene = State.GAME;
     }
-
-    // apply movement
-    public move(input) {
-        let rotationY = Math.atan2(input.h, input.v);
-        this.playerNextPosition.x -= input.h * Config.PLAYER_SPEED;
-        this.playerNextPosition.z -= input.v * Config.PLAYER_SPEED;
-        this.playerNextRotation.y = this.playerNextRotation.y + (rotationY - this.playerNextRotation.y);
-    }
-
 
     // server Reconciliation. Re-apply all the inputs not yet processed by the server
     public processLocalMove() {
@@ -246,6 +240,14 @@ export class Player extends TransformNode {
 
         }
 
+    }
+
+    // apply movement
+    public move(input) {
+        let rotationY = Math.atan2(input.h, input.v);
+        this.playerNextPosition.x -= input.h * Config.PLAYER_SPEED;
+        this.playerNextPosition.z -= input.v * Config.PLAYER_SPEED;
+        this.playerNextRotation.y = this.playerNextRotation.y + (rotationY - this.playerNextRotation.y);
     }
 
     private _setUpAnimations(): void {
@@ -318,9 +320,9 @@ export class Player extends TransformNode {
         yTilt.parent = this._camRoot;
 
         // our actual camera that's pointing at our root's position
-        this.camera = new UniversalCamera("cam", new Vector3(0, 0, -50), this.scene);
+        this.camera = new UniversalCamera("cam", new Vector3(0, 0, -40), this.scene);
         this.camera.lockedTarget = this._camRoot.position;
-        this.camera.fov = 0.47350045992678597;
+        this.camera.fov = 0.35;
         this.camera.parent = yTilt;
 
         // set as active camera

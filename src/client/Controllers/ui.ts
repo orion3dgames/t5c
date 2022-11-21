@@ -77,7 +77,6 @@ export class Hud {
         // chatbox on enter event
         chat_input.onKeyboardEventProcessedObservable.add((ev) => { 
             if((ev.key==="Enter" || ev.code==="Enter") && chat_input.text != ""){
-                console.log(global.T5C.currentUser);
                 chatRoom.send("message", {
                     username: global.T5C.currentUser.user.displayName,
                     message: chat_input.text
@@ -90,7 +89,6 @@ export class Hud {
 
         // receive message event
         chatRoom.onMessage("messages", (message:PlayerMessage) => {
-            console.log(message);
            this.messages.push(message); 
            this._refreshChatBox();
         });
@@ -131,13 +129,10 @@ export class Hud {
 
         var top = 0;
         this.messages.slice().reverse().forEach((msg:PlayerMessage) => {
-   
-            let date = new Date(msg.createdAt);
-            let dateFormat = date.toLocaleString('en-US');
 
             var roomTxt = new TextBlock();
             roomTxt.paddingLeft = "5px";
-            roomTxt.text = msg.username+': '+msg.message;
+            roomTxt.text = "[GLOBAL] "+msg.username+': '+msg.message;
             roomTxt.textHorizontalAlignment = 0;
             roomTxt.height = "20px";
             roomTxt.fontSize = "12px";

@@ -1,4 +1,4 @@
-import { Scene, SceneLoader} from "@babylonjs/core";
+import { Scene, SceneLoader, Tags} from "@babylonjs/core";
 
 export class Environment {
 
@@ -30,16 +30,9 @@ export class Environment {
                 m.isPickable = false;
             }
 
-            //areas that will use box collisions
-            if (m.name.includes("XXXX")) {
-                m.checkCollisions = false;
-                m.isPickable = false;
-            }
-
             //collision meshes
             if (m.name.includes("collision")) {
-                m.isVisible = false;
-                m.isPickable = true;
+                Tags.AddTagsTo(m, 'collisions');
             }
 
             //trigger meshes
