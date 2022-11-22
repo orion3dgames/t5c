@@ -1,6 +1,9 @@
 {
   "name": "my-app-client",
   "version": "1.0.0",
+  "repository": {
+    "url": "git+https://github.com/oriongunning/t5c.git"
+  },
   "description": "Babylon.js Colyseus demo",
   "main": "index.js",
   "scripts": {
