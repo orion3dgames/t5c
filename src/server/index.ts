@@ -3,6 +3,7 @@
 import { createServer } from "http";
 import express from "express";
 import cors from "cors";
+import path from "path";
 
 import { Server, matchMaker } from "@colyseus/core";
 import { WebSocketTransport } from '@colyseus/ws-transport';
@@ -48,4 +49,20 @@ gameServer.listen(port).then(()=>{
   //create island
   matchMaker.createRoom("game_room", { location: "island" });
 
+});
+
+
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+require('dotenv').config();
+
+let indexPath = "dist/client/";
+let clientFile = "index.html";
+const clientApp = express();
+app.use(express.static(indexPath));
+let indexFile = path.resolve(indexPath + clientFile);
+clientApp.get('/', function (req, res) {
+  console.log('TEST');
+  res.sendFile(indexFile);
 });
