@@ -1,4 +1,4 @@
-import { TransformNode, Scene, UniversalCamera, Vector3, AnimationGroup, SceneLoader, AbstractMesh, ActionManager, ExecuteCodeAction} from "@babylonjs/core";
+import { TransformNode, Scene, UniversalCamera, MeshBuilder,AxesViewer, Space,Vector3,Axis, AnimationGroup, SceneLoader, AbstractMesh, ActionManager, ExecuteCodeAction} from "@babylonjs/core";
 import { Rectangle, TextBlock } from "@babylonjs/gui";
 import { PlayerSchema } from "../../server/rooms/schema/PlayerSchema";
 
@@ -72,7 +72,6 @@ export class Player extends TransformNode {
         this.spawn(entity);
     }
 
-    // todo: this should a global utils
     private addLabel(mesh, text) {
 
         var rect1 = new Rectangle();
@@ -96,34 +95,41 @@ export class Player extends TransformNode {
 
     private async spawn(entity) {
 
-        //console.log(entity);
+        // create collision cube
+        const box = MeshBuilder.CreateBox("collision", {width: 2, height: 4}, this.scene);
+        box.visibility = 0.5;
 
-        // load mesh
-        const result = await SceneLoader.ImportMeshAsync(null, "./models/", "player_fixed.glb", this._scene);
-        const playerMesh = result.meshes[0];
-        this.playerAnimations = result.animationGroups;
-
-        // set initial scale 
-        playerMesh.scaling.set(0.02, 0.02, 0.02);
-
-        // save entities
-        this.playerNextPosition = new Vector3(this.entity.x, this.entity.y, this.entity.z);
-        this.playerNextRotation = new Vector3(0, this.entity.rot, 0);
-
-        // hide mesh (DEBUG)
-        //playerMesh.setEnabled(false);
+        // show debug axis
+        const axes = new AxesViewer(this._scene, 2);
+        axes.xAxis.parent = box;
+        axes.yAxis.parent = box;
+        axes.zAxis.parent = box;
 
         // set mesh
-        this.mesh = playerMesh;
+        this.mesh = box;
         this.mesh.parent = this;
         this.mesh.metadata = {
             sessionId: entity.sessionId
         }
 
-        // add shadows
-        this._shadow.addShadowCaster(this.mesh, true);
-        //this._shadow.getShadowMap().renderList.push(playerMesh);
-        //playerMesh.receiveShadows = true;
+        // load player mesh
+        const result = await SceneLoader.ImportMeshAsync(null, "./models/", "player_fixed.glb", this._scene);
+        const playerMesh = result.meshes[0];
+        this.playerAnimations = result.animationGroups;
+
+        // set initial player scale & rotation
+        playerMesh.name = "player_mesh";
+        playerMesh.parent = box;
+        playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
+        playerMesh.rotation.set(0, 0, 0);
+        playerMesh.scaling.set(0.02, 0.02, 0.02);
+
+        // add mesh to shadow generator
+        this._shadow.addShadowCaster(playerMesh, true);
+
+        // save initial entity details
+        this.playerNextPosition = new Vector3(this.entity.x, this.entity.y, this.entity.z);
+        this.playerNextRotation = new Vector3(0, this.entity.rot, 0);
 
         // add player nameplate
         this.addLabel(this.mesh, entity.username);
@@ -140,7 +146,7 @@ export class Player extends TransformNode {
             this._setupPlayerCamera();
         }
 
-        //
+        // render loop
         this.scene.registerBeforeRender(() => {
             this._animatePlayer();
             if (this.isCurrentPlayer) {
@@ -261,10 +267,6 @@ export class Player extends TransformNode {
         //initialize current and previous
         this._currentAnim = this._idle;
         this._prevAnim = this._walk;
-    }
-
-    private roundToTwo(num: number) {
-        return Math.round(num * 100) / 100;
     }
 
     private _animatePlayer(): void {
