@@ -3,6 +3,7 @@ import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputTex
 import { firebaseController } from "../Controllers/Firebase/firebase";
 import Config from "../../shared/Config";
 import State from "./Screens";
+import { generateRandomPlayerName } from "../../shared/Utils";
 
 export class LoginScene {
     
@@ -69,11 +70,15 @@ export class LoginScene {
 
         ////////////////////////////
         // add username input 
+
+        let randomName = generateRandomPlayerName();
+
         const chat_input = new InputText();
         chat_input.width = .5;
         chat_input.height = '30px;'
         chat_input.left = .25;
         chat_input.color = "#FFF";
+        chat_input.text = randomName;
         chat_input.placeholderText = "Enter player name...";
         chat_input.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         chat_input.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
