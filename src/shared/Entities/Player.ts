@@ -72,27 +72,6 @@ export class Player extends TransformNode {
         this.spawn(entity);
     }
 
-    private addLabel(mesh, text) {
-
-        var rect1 = new Rectangle();
-        rect1.width = "100px";
-        rect1.height = "40px";
-        rect1.cornerRadius = 20;
-        rect1.color = "white";
-        rect1.thickness = 4;
-        rect1.background = "black";
-        this.ui._playerUI.addControl(rect1);
-        rect1.linkWithMesh(mesh);
-        rect1.linkOffsetY = -150;
-
-        var label = new TextBlock();
-        label.text = text;
-        rect1.addControl(label);
-
-        this.characterLabel = rect1;
-
-    }
-
     private async spawn(entity) {
 
         // create collision cube
@@ -213,6 +192,27 @@ export class Player extends TransformNode {
             );*/
 
         }
+    }
+
+    private addLabel(mesh, text) {
+
+        var rect1 = new Rectangle();
+        rect1.width = "100px";
+        rect1.height = "40px";
+        rect1.cornerRadius = 20;
+        rect1.color = "white";
+        rect1.thickness = 4;
+        rect1.background = "black";
+        this.ui._playerUI.addControl(rect1);
+        rect1.linkWithMesh(mesh);
+        rect1.linkOffsetY = -150;
+
+        var label = new TextBlock();
+        label.text = text;
+        rect1.addControl(label);
+
+        this.characterLabel = rect1;
+
     }
 
     // teleport player
