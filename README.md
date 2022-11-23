@@ -1,5 +1,5 @@
 # T5C
-Building a basic multiplayer top down rpg using babylong.js and colyseus
+Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 
 ## Current progress:
 - fully authorative movement with client side prediction and server reconciliation (server is king)
