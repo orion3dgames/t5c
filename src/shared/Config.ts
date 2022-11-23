@@ -36,7 +36,7 @@ let Config = {
     },
 
     // player defaults
-    PLAYER_SPEED: 0.75,
+    PLAYER_SPEED: 0.50,
 
     // functions
     setDefault(){

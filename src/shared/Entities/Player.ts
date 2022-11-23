@@ -103,10 +103,6 @@ export class Player extends TransformNode {
         const playerMesh = result.meshes[0];
         this.playerAnimations = result.animationGroups;
 
-        // add shadows
-        this._shadow.addShadowCaster(playerMesh, true);
-        playerMesh.receiveShadows = true;
-
         // set initial scale 
         playerMesh.scaling.set(0.02, 0.02, 0.02);
 
@@ -123,6 +119,11 @@ export class Player extends TransformNode {
         this.mesh.metadata = {
             sessionId: entity.sessionId
         }
+
+        // add shadows
+        this._shadow.addShadowCaster(this.mesh, true);
+        //this._shadow.getShadowMap().renderList.push(playerMesh);
+        //playerMesh.receiveShadows = true;
 
         // add player nameplate
         this.addLabel(this.mesh, entity.username);

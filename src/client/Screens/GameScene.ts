@@ -1,7 +1,7 @@
 import {
     Scene, Engine, Vector3, MeshBuilder, Color3, Color4, SpotLight,
     ShadowGenerator, CubeTexture, Texture, StandardMaterial,
-    Mesh, Matrix, Quaternion, SceneLoader, 
+    Mesh, Matrix, Quaternion, SceneLoader, CascadedShadowGenerator,
     DirectionalLight, PointLight, HemisphericLight,
     AssetsManager, AssetContainer, MeshAssetTask, ContainerAssetTask
 } from "@babylonjs/core";
@@ -64,22 +64,19 @@ export class GameScene {
             new Vector3(0, 1, 0),
             scene
         );
-        ambientLight.intensity = 1.5;
+        ambientLight.intensity = 1;
         ambientLight.groundColor = new Color3(0.13, 0.13, 0.13);
         ambientLight.specular = Color3.Black();
 
         // shadow light
-        var light = new DirectionalLight("DirectionalLight", new Vector3(-1, -1, -1), scene);
-        light.position = new Vector3(1,1,1);
-        light.intensity = 1; 
+        var light = new DirectionalLight("DirectionalLight", new Vector3(0, -1, 0), scene);
+        //light.position = new Vector3(1,1,1);
+        light.intensity = 4; 
 
         // shadow generator
-        this._shadow = new ShadowGenerator(512, light);
-        this._shadow.bias = 0.001;
-        this._shadow.normalBias = 0.02;
-        this._shadow.useContactHardeningShadow = true;
-        this._shadow.contactHardeningLightSizeUVRatio = 0.05;
-        this._shadow.setDarkness(0.5);
+        this._shadow = new CascadedShadowGenerator(1024, light);
+        this._shadow.filteringQuality = ShadowGenerator.QUALITY_MEDIUM;
+        this._shadow.bias = 0.018;
 
         // set scene
         this._scene = scene;
