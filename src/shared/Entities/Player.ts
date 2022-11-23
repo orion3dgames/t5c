@@ -92,7 +92,7 @@ export class Player extends TransformNode {
         }
 
         // load player mesh
-        const result = await SceneLoader.ImportMeshAsync(null, "./models/", "player_fixed.glb", this._scene);
+        const result = await SceneLoader.ImportMeshAsync(null, "./models/", "player_hobbit.glb", this._scene);
         const playerMesh = result.meshes[0];
         this.playerAnimations = result.animationGroups;
 

@@ -1,11 +1,6 @@
 import { TransformNode, Scene, UniversalCamera, MeshBuilder,AxesViewer, Space,Vector3,Axis, AnimationGroup, SceneLoader, AbstractMesh, ActionManager, ExecuteCodeAction} from "@babylonjs/core";
 import { Rectangle, TextBlock } from "@babylonjs/gui";
-import { PlayerSchema } from "../../server/rooms/schema/PlayerSchema";
-
-import { roundToTwo } from "../Utils"
-import Config from "../Config";
-import State from "../../client/Screens/Screens";
-import { PlayerInputs } from "../types";
+import { roundToTwo } from "../../Utils";
 
 export class Player extends TransformNode {
     public camera;
@@ -37,23 +32,9 @@ export class Player extends TransformNode {
     private _walk: AnimationGroup;
     private _idle: AnimationGroup;
 
-    public playerPosition: Vector3;
-    public playerDirection: Vector3;
-    public playerNextPosition: Vector3;
-    public playerNextRotation: Vector3;
-    public playerMove: any;
-    public playerInputs: PlayerInputs[];
-    public playerLatestSequence: number;
-    public playerNextLocation: string;
-
     private isCurrentPlayer: boolean;
     public sessionId: string;
-
-    public entity: PlayerSchema;
-    public x: number;
-    public y: number;
-    public z: number;
-    public rot: number;
+    public playerNextPosition: Vector3;
 
     constructor(result, scene) {
         super("playerAnimator", scene);
@@ -75,7 +56,7 @@ export class Player extends TransformNode {
 
     }
 
-    private _setUpAnimations(): void {
+    private _setUpAnimations(): void { 
 
         this.scene.stopAllAnimations();
 
