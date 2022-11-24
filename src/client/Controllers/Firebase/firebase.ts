@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app"
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, updateProfile} from "firebase/auth"
+import { getAuth, signInAnonymously, updateProfile} from "firebase/auth"
 import { getDatabase } from "firebase/database"
 
 const firebaseConfig = require("./config.json");

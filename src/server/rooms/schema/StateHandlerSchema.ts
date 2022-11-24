@@ -52,6 +52,7 @@ export class StateHandlerSchema extends Schema {
         player.z -= v * Config.PLAYER_SPEED;
         player.rot = Math.atan2(h, v);
         player.sequence = seq;
+        console.log('position validated '+player.username+' ( x: '+player.x+', y: '+player.y+', z: '+player.z+', rot: '+player.rot);
     }
 
     setLocation(sessionId, location){

@@ -30,6 +30,8 @@ export class GameRoom extends Room<StateHandlerSchema> {
 
         // set max clients
         this.maxClients = Config.maxClients; 
+
+        // initialize database
  
     }
 
