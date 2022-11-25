@@ -4,12 +4,14 @@ import logger = require("../helpers/logger");
 
 import {StateHandlerSchema} from './schema/StateHandlerSchema';
 import Config from '../../shared/Config';
+import firebaseInstance from "../helpers/databaseInstance";
 
 export class GameRoom extends Room<StateHandlerSchema> {
 
     public maxClients = 64;
     public autoDispose = false;
-
+    private database: any;
+ 
     onCreate(options: any) {
 
         console.log("GameRoom created!", this.roomId, options);
@@ -32,7 +34,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
         this.maxClients = Config.maxClients; 
 
         // initialize database
- 
+        this.database = new firebaseInstance();
     }
 
     // Authorize client based on provided options before WebSocket handshake is complete
@@ -60,10 +62,18 @@ export class GameRoom extends Room<StateHandlerSchema> {
         console.log(`player ${client.sessionId} joined room ${this.roomId}.`, this.metadata, options);
         this.state.addPlayer(client.sessionId);
 
+        // find player in database
+        let player = this.database.getPlayer(options.username)
+        console.log("PLAYER FOUND", player);
+        
+
         // set zone location and spawn point
         this.state.setSpawnPoint(client.sessionId, this.metadata.location); 
         this.state.setLocation(client.sessionId, this.metadata.location); 
         this.state.setUsername(client.sessionId, options.username); 
+
+        // save players
+        //this.database.savePlayer(this.state.getPlayer(client.sessionId))
 
         // on player input event
         this.onMessage("playerInput", (client, data: any) => {
