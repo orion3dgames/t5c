@@ -55,7 +55,10 @@
     "firebase": "^9.14.0",
     "firebase-admin": "^11.3.0",
     "sqlite3": "^5.1.2",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "navmesh": "^2.3.1",
+    "wavefront-obj-parser": "^2.0.1",
+    "fs-extra": "^10.1.0"
   },
   "peerDependencies": {},
   "browserslist": {

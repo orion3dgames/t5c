@@ -46,7 +46,7 @@ gameServer.listen(port).then(()=>{
   matchMaker.createRoom("game_room", { location: "town" });
 
   // create island room
-  matchMaker.createRoom("game_room", { location: "island" });
+  //matchMaker.createRoom("game_room", { location: "island" });
 
 });
 

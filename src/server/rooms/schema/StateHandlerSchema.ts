@@ -5,9 +5,9 @@ import Config from '../../../shared/Config';
 
 export class StateHandlerSchema extends Schema {
 
-    @type({map: PlayerSchema})
-    players = new MapSchema<PlayerSchema>();
+    @type({map: PlayerSchema}) players = new MapSchema<PlayerSchema>();
     @type("number") serverTime: number = 0.0;
+    public navMesh: any;
 
     addPlayer(sessionId: string) {
         this.players.set(sessionId, new PlayerSchema().assign({
@@ -47,12 +47,42 @@ export class StateHandlerSchema extends Schema {
 
     calculatePosition(sessionId: string, h: number, v: number, seq: number) {
         const player = this.getPlayer(sessionId);
-        player.x -= h * Config.PLAYER_SPEED;
-        player.y = 0;
-        player.z -= v * Config.PLAYER_SPEED;
-        player.rot = Math.atan2(h, v);
-        player.sequence = seq;
-        console.log('position validated '+player.username+' ( x: '+player.x+', y: '+player.y+', z: '+player.z+', rot: '+player.rot);
+
+        // save current position
+        let oldX = player.x;
+        let oldZ = player.z;
+        let oldRot = player.rot;
+
+        // calculate new position
+        let newX = player.x - (h * Config.PLAYER_SPEED);
+        let newZ = player.z - (v * Config.PLAYER_SPEED);
+        let newRot = Math.atan2(h, v);
+
+        // check it fits in navmesh
+        const foundPath: any = this.navMesh.findPath({ x: player.x, y: player.z }, { x: newX, y: newZ });
+
+        if (foundPath && foundPath.length > 0){
+
+            // next position validated, update player
+            player.x = newX;
+            player.y = 0;
+            player.z = newZ;
+            player.rot = newRot;
+            player.sequence = seq;
+
+            console.log('position validated '+player.username+' ( x: '+player.x+', y: '+player.y+', z: '+player.z+', rot: '+player.rot);
+
+        }else{
+
+            // collision detected, return player old position
+            player.x = oldX;
+            player.y = 0;
+            player.z = oldZ;
+            player.rot = oldRot;
+            player.sequence = seq;
+
+            console.log('position not validate, return to previous position '+player.username+' ( x: '+player.x+', y: '+player.y+', z: '+player.z+', rot: '+player.rot);
+        }
     }
 
     setLocation(sessionId, location){

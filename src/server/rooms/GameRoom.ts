@@ -5,6 +5,7 @@ import logger = require("../helpers/logger");
 import {StateHandlerSchema} from './schema/StateHandlerSchema';
 import Config from '../../shared/Config';
 import firebaseInstance from "../helpers/databaseInstance";
+import utility from "../../shared/utiliy";
 
 export class GameRoom extends Room<StateHandlerSchema> {
 
@@ -12,7 +13,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
     public autoDispose = false;
     private database: any;
  
-    onCreate(options: any) {
+    async onCreate(options: any) {
 
         console.log("GameRoom created!", this.roomId, options);
  
@@ -32,6 +33,10 @@ export class GameRoom extends Room<StateHandlerSchema> {
 
         // set max clients
         this.maxClients = Config.maxClients; 
+
+        // load navmesh
+        const navMesh = await utility.loadNavMesh(options.location)
+        this.state.navMesh = navMesh;
 
         // initialize database
         this.database = new firebaseInstance();
