@@ -8,6 +8,7 @@ Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 - zoning system (ability to teleport to different locations)
 - global chat (works accross zones)
 - networked collisions **(work in progress)**
+- integrating mysql lite ***(work in progress)** 
 
 ## Roadmap
 You can follow the progress here: [FORUM POST](https://forum.babylonjs.com/t/multiplayer-top-down-rpg-babylon-js-colyseus/35733/12)
