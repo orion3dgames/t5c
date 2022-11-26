@@ -16,7 +16,6 @@ tmp
 .github
 
 # Build
-public/css/main.css
 dist/
 
 # Coverage reports
@@ -47,3 +46,5 @@ yarn.lock
 # 
 firebase-admin-servicekey.json
 database.db
+
+!.obj
