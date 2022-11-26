@@ -45,7 +45,8 @@ let Config = {
             currentRoomID: "",
             currentSessionID: "",
             currentLocation: Config.locations[Config.initialLocation],
-            currentUser: false
+            currentUser: false,
+            currentMs: 0
         }
     },
 

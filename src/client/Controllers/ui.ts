@@ -50,7 +50,7 @@ export class Hud {
         // add location debug info
         const locationBtn = new TextBlock("location", "");
         locationBtn.width = 0.5
-        locationBtn.height = 0.2;
+        locationBtn.height = 0.3;
         locationBtn.color = "#FFF";
         locationBtn.top = "20px"; 
         locationBtn.left = "20px";
@@ -110,6 +110,7 @@ export class Hud {
         locationText += "PlayerID: "+room.sessionId+" \n";
         locationText += "Total Players: "+countPlayers(players)+" \n";
         locationText += "FPS: "+roundToTwo(engine.getFps())+" \n";
+        locationText += "Ping: 0.0ms \n";
         locationBtn.text = locationText;
     }
 

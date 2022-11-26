@@ -63,7 +63,7 @@ class App {
 
         // render loop
         this._engine.runRenderLoop(() => {
-
+            
             // monitor state
             this._state = Config.checkForSceneChange();
 

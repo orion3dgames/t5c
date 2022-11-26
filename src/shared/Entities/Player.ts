@@ -45,7 +45,6 @@ export class Player extends TransformNode {
     public playerInputs: PlayerInputs[];
     public playerLatestSequence: number;
     public playerNextLocation: string;
-
     private isCurrentPlayer: boolean;
     public sessionId: string;
 
@@ -150,12 +149,6 @@ export class Player extends TransformNode {
             // do server reconciliation
             this.processLocalMove();
 
-            // set location
-            if(this.isCurrentPlayer && global.T5C.currentLocation.key != entity.location){
-                //console.log("CHANGING ZONE", entity);
-                //this.teleport(entity.location);
-            }
-
         });
 
         // collision with  other meshes
@@ -177,19 +170,6 @@ export class Player extends TransformNode {
                     }
                 )
             );
-
-            // houses collision
-            /*
-            let targetMeshs = this.scene.getMeshesByTags("collisions");
-            this.mesh.actionManager.registerAction(
-                new ExecuteCodeAction({
-                        trigger: ActionManager.OnIntersectionEnterTrigger,
-                        parameter: targetMeshs
-                    },() => {
-                        console.log('COLLIDING');
-                    }
-                )
-            );*/
 
         }
     }
