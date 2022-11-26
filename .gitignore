@@ -47,4 +47,4 @@ yarn.lock
 firebase-admin-servicekey.json
 database.db
 
-!.obj
+!public/**/*.obj
