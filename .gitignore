@@ -48,3 +48,4 @@ firebase-admin-servicekey.json
 database.db
 
 !public/**/*.obj
+database.db-journal

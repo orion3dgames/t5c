@@ -1,10 +1,10 @@
 import http from "http";
-import { Room, Client } from "@colyseus/core";
+import { Room, Client, ServerError } from "@colyseus/core";
 import logger = require("../helpers/logger");
 
 import {StateHandlerSchema} from './schema/StateHandlerSchema';
 import Config from '../../shared/Config';
-import firebaseInstance from "../helpers/databaseInstance";
+import databaseInstance from "../../shared/databaseInstance";
 import utility from "../../shared/utiliy";
 
 export class GameRoom extends Room<StateHandlerSchema> {
@@ -39,56 +39,75 @@ export class GameRoom extends Room<StateHandlerSchema> {
         this.state.navMesh = navMesh;
 
         // initialize database
-        this.database = new firebaseInstance();
+        this.database = new databaseInstance();
     }
 
     // Authorize client based on provided options before WebSocket handshake is complete
-    onAuth (client: Client, options: any, request: http.IncomingMessage) { 
+    async onAuth (client: Client, data: any, request: http.IncomingMessage) { 
 
-        console.log(client.sessionId, options, request.headers);
-        return true;
-        /**
-         * Alternatively, you can use `async` / `await`,
-         * which will return a `Promise` under the hood.
-         */
-        /*
-        const userData = await validateToken(options.accessToken);
+        // find user in database
+        const userData = await this.database.getPlayer(data.username)
         if (userData) {
             return userData;
-
         } else {
-            throw new ServerError(400, "bad access token");
-        }*/
+            let defaultSpawnPoint = Config.locations[Config.initialLocation].spawnPoint;
+            return this.database.savePlayer({
+                username: data.username,
+                location: data.location,
+                x: defaultSpawnPoint.x,
+                y: defaultSpawnPoint.y,
+                z: defaultSpawnPoint.z,
+                rot: 0,
+            })
+        }
+
     }
 
-    onJoin(client: Client, options: any) {
+    async onJoin(client: Client, options: any) {
 
         // add player to server
-        console.log(`player ${client.sessionId} joined room ${this.roomId}.`, this.metadata, options);
-        this.state.addPlayer(client.sessionId);
+        console.log(`player ${client.sessionId} joined room ${this.roomId}.`, this.metadata, options,  client.auth);
 
-        // find player in database
-        let player = this.database.getPlayer(options.username)
-        console.log("PLAYER FOUND", player);
+        // find player in database and set databse data to player
+        let player = await this.database.getPlayer(options.username)
+        this.state.addPlayer(client.sessionId, player);
         
-
         // set zone location and spawn point
-        this.state.setSpawnPoint(client.sessionId, this.metadata.location); 
-        this.state.setLocation(client.sessionId, this.metadata.location); 
-        this.state.setUsername(client.sessionId, options.username); 
-
-        // save players
+        //this.state.setSpawnPoint(client.sessionId, this.metadata.location); 
+        //this.state.setLocation(client.sessionId, this.metadata.location); 
+        //this.state.setUsername(client.sessionId, options.username); 
         //this.database.savePlayer(this.state.getPlayer(client.sessionId))
 
         // on player input event
         this.onMessage("playerInput", (client, data: any) => {
+            
+            // calculate new position
             this.state.calculatePosition(client.sessionId, data.h, data.v, data.seq);
+
+            // save to db
+            const player = this.state.getPlayer(client.sessionId);
+            this.database.updatePlayer(client.auth.id, {
+                location: player.location,
+                x: player.x,
+                y: player.y,
+                z: player.z,
+                rot: player.rot
+            });
+
         });
 
         // on player teleport
         this.onMessage("playerTeleport", (client, location) => {
             console.log('playerTeleport', location);
             this.state.setLocation(client.sessionId, location);
+            this.database.updatePlayer(client.auth.id, {
+                location: location,
+                x: Config.locations[location].x,
+                y: Config.locations[location].y,
+                z: Config.locations[location].z,
+                rot: 0
+            });
+            //
         });
 
     }

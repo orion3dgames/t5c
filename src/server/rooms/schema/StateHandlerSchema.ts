@@ -9,14 +9,15 @@ export class StateHandlerSchema extends Schema {
     @type("number") serverTime: number = 0.0;
     public navMesh: any;
 
-    addPlayer(sessionId: string) {
+    addPlayer(sessionId: string, data:PlayerSchema) {
         this.players.set(sessionId, new PlayerSchema().assign({
             sessionId: sessionId,
-            username: sessionId,
-            x: 0,
-            y: 0,
-            z: 0,
-            rot: 0,
+            username: data.username,
+            location: data.location,
+            x: data.x,
+            y: data.y,
+            z: data.z,
+            rot: data.rot,
         }));
     }
 
@@ -28,21 +29,9 @@ export class StateHandlerSchema extends Schema {
         this.players.delete(sessionId);
     }
 
-    setSpawnPoint(sessionId: string, location:string) {
-        let defaultSpawnPoint = Config.locations[location].spawnPoint;
+    setLocation(sessionId, location){
         const player = this.getPlayer(sessionId);
-        player.x = defaultSpawnPoint.x;
-        player.y = 0;
-        player.z = defaultSpawnPoint.z;
-        console.log('SET SPAWN POINT', defaultSpawnPoint);
-    }
-
-    setPosition(sessionId: string, x: number, y: number, z: number, rotation: number) {
-        const player = this.getPlayer(sessionId);
-        player.x = x;
-        player.y = y;
-        player.z = z;
-        player.rot = rotation;
+        player.location = location;
     }
 
     calculatePosition(sessionId: string, h: number, v: number, seq: number) {
@@ -83,16 +72,6 @@ export class StateHandlerSchema extends Schema {
 
             console.log('position not validate, return to previous position '+player.username+' ( x: '+player.x+', y: '+player.y+', z: '+player.z+', rot: '+player.rot);
         }
-    }
-
-    setLocation(sessionId, location){
-        const player = this.getPlayer(sessionId);
-        player.location = location;
-    }
-
-    setUsername(sessionId, username){
-        const player = this.getPlayer(sessionId);
-        player.username = username;
     }
    
     generateRandomUUID(){

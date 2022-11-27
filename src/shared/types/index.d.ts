@@ -28,6 +28,11 @@ type PlayerMessage = {
     createdAt: string
 };
 
+type PlayerLogin = {
+    username: string,
+    password: string
+}
+
 declare global {
     interface T5C {
         nextScene: State;

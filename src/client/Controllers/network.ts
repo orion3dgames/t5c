@@ -2,8 +2,6 @@ import { Scene } from '@babylonjs/core';
 
 // colyseus
 import { Client, Room } from "colyseus.js";
-import { resolve } from 'path';
-
 import Config from '../../shared/Config';
 
 export class GameNetwork {
@@ -24,10 +22,10 @@ export class GameNetwork {
         }   
     }
 
-    public async joinRoom(roomId, currentUser):Promise<any> {
+    public async joinRoom(roomId, loginData):Promise<any> {
         return await this._client.joinById(roomId, { 
-            token: currentUser.user.accessToken,
-            username: currentUser.user.displayName
+            username: loginData.username,
+            password: "test"
         });
     }
     

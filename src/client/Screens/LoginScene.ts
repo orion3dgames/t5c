@@ -78,7 +78,8 @@ export class LoginScene {
         chat_input.height = '30px;'
         chat_input.left = .25;
         chat_input.color = "#FFF";
-        chat_input.text = randomName;
+        //chat_input.text = randomName;
+        chat_input.text = "Past Power";
         chat_input.placeholderText = "Enter player name...";
         chat_input.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         chat_input.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
@@ -112,9 +113,15 @@ export class LoginScene {
     }
 
     async connect(username){
+
+        // validate user and sent auth token to colyseus
+        Config.goToScene(State.GAME, {
+            username: username
+        });
+        /*
         await firebaseController.loginAnonymously(username).then((auth)=>{
             Config.goToScene(State.GAME, auth);
-        });
+        });*/
     }
 
 }

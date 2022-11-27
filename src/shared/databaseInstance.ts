@@ -29,7 +29,8 @@ class databaseInstance {
       "x" NUMERIC DEFAULT 0.0,
       "y"	NUMERIC DEFAULT 0.0,
       "z"	NUMERIC DEFAULT 0.0,
-      "rot" NUMERIC DEFAULT 0.0
+      "rot" NUMERIC DEFAULT 0.0,
+      "token" TEXT
     );` 
 
     this.db.serialize(() => {
@@ -39,7 +40,6 @@ class databaseInstance {
   }
 
   get(sql, params = []) {
-    console.log(sql, params);
     return new Promise((resolve, reject) => {
       this.db.get(sql, params, (err, result) => {
         if (err) {
@@ -84,9 +84,9 @@ class databaseInstance {
     })
   }
 
-  getPlayer(username) {
+  async getPlayer(username) {
     const sql = `SELECT * FROM players WHERE username=?;` 
-    return this.db.get(sql, [username]);
+    return await this.get(sql, [username]);
   }
 
   async savePlayer(data) {
@@ -104,6 +104,19 @@ class databaseInstance {
       console.log(sql);
     return this.db.run(sql);
   }
+
+  async updatePlayer(player_id:number, data) {
+    const sql = `UPDATE players SET location=?, x=?, y=?, z=?, rot=? WHERE id=? ;` 
+    return this.db.run(sql, [
+      data.location ?? 'town',
+      data.x,
+      data.y,
+      data.z,
+      data.rot,
+      player_id
+    ]);
+  }
 }
+
 
 export default databaseInstance
