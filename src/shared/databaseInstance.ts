@@ -108,7 +108,7 @@ class databaseInstance {
   async updatePlayer(player_id:number, data) {
     const sql = `UPDATE players SET location=?, x=?, y=?, z=?, rot=? WHERE id=? ;` 
     return this.db.run(sql, [
-      data.location ?? 'town',
+      data.location,
       data.x,
       data.y,
       data.z,

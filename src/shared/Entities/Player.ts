@@ -167,13 +167,18 @@ export class Player extends TransformNode {
                         parameter: targetMesh
                     },() => {
                         if(this.mesh.metadata.sessionId === this.entity.sessionId){
-                            this.teleport(targetMesh.metadata.location);
+                            this._room.send("playerTeleport", targetMesh.metadata.location);
                         }
                     }
                 )
             );
 
         }
+
+        this._room.onMessage('playerTeleportConfirm', (location) => {
+            console.log("playerTeleportConfirm", location);
+            this.teleport(location);
+        });
     }
 
     private addLabel(mesh, text) {

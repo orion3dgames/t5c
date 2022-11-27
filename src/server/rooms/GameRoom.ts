@@ -1,5 +1,5 @@
 import http from "http";
-import { Room, Client, ServerError } from "@colyseus/core";
+import { Room, Client, ServerError, Delayed } from "@colyseus/core";
 import logger = require("../helpers/logger");
 
 import {StateHandlerSchema} from './schema/StateHandlerSchema';
@@ -12,7 +12,8 @@ export class GameRoom extends Room<StateHandlerSchema> {
     public maxClients = 64;
     public autoDispose = false;
     private database: any;
- 
+    public delayedInterval!: Delayed;
+
     async onCreate(options: any) {
 
         console.log("GameRoom created!", this.roomId, options);
@@ -40,6 +41,26 @@ export class GameRoom extends Room<StateHandlerSchema> {
 
         // initialize database
         this.database = new databaseInstance();
+
+        // Set an interval and store a reference to it
+        // so that we may clear it later
+        this.delayedInterval = this.clock.setInterval(() => {
+
+            if(this.state.players.size > 0){
+                this.state.players.forEach(player => {
+                    let playerClient = this.clients.hashedArray[player.sessionId];
+                    this.database.updatePlayer(playerClient.auth.id, {
+                        location: player.location,
+                        x: player.x,
+                        y: player.y,
+                        z: player.z,
+                        rot: player.rot,
+                    });
+                    
+                });
+            }
+
+        }, 1000);
     }
 
     // Authorize client based on provided options before WebSocket handshake is complete
@@ -60,7 +81,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
                 rot: 0,
             })
         }
-
+ 
     }
 
     async onJoin(client: Client, options: any) {
@@ -68,46 +89,29 @@ export class GameRoom extends Room<StateHandlerSchema> {
         // add player to server
         console.log(`player ${client.sessionId} joined room ${this.roomId}.`, this.metadata, options,  client.auth);
 
-        // find player in database and set databse data to player
+        // find player in database and set database data to player
         let player = await this.database.getPlayer(options.username)
         this.state.addPlayer(client.sessionId, player);
         
-        // set zone location and spawn point
-        //this.state.setSpawnPoint(client.sessionId, this.metadata.location); 
-        //this.state.setLocation(client.sessionId, this.metadata.location); 
-        //this.state.setUsername(client.sessionId, options.username); 
-        //this.database.savePlayer(this.state.getPlayer(client.sessionId))
-
         // on player input event
         this.onMessage("playerInput", (client, data: any) => {
-            
             // calculate new position
             this.state.calculatePosition(client.sessionId, data.h, data.v, data.seq);
-
-            // save to db
-            const player = this.state.getPlayer(client.sessionId);
-            this.database.updatePlayer(client.auth.id, {
-                location: player.location,
-                x: player.x,
-                y: player.y,
-                z: player.z,
-                rot: player.rot
-            });
-
         });
 
         // on player teleport
         this.onMessage("playerTeleport", (client, location) => {
-            console.log('playerTeleport', location);
-            this.state.setLocation(client.sessionId, location);
+            console.log("playerTeleport", client.sessionId, location);
+            let newLocation = Config.locations[location];
             this.database.updatePlayer(client.auth.id, {
                 location: location,
-                x: Config.locations[location].x,
-                y: Config.locations[location].y,
-                z: Config.locations[location].z,
+                x: newLocation.x,
+                y: newLocation.y,
+                z: newLocation.z,
                 rot: 0
             });
-            //
+            this.state.setLocation(client.sessionId, location);
+            client.send('playerTeleportConfirm', location)
         });
 
     }
