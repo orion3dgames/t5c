@@ -9,6 +9,7 @@ export class ChatRoom extends Room {
 
     // When room is initialized
     onCreate(options: any){
+
         console.log("ChatRoom created!", options);
 
         //For chat
@@ -20,6 +21,9 @@ export class ChatRoom extends Room {
     
     // When client successfully join the room
     onJoin (client: Client, options: any, auth: any){
+
+        // sent initial help message
+        client.send('messages', this.generateMessage(client.sessionId, "Welcome to T5C, you can move around by left clicking and dragging the mouse around."));
 
     }
 

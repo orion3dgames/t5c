@@ -1,4 +1,4 @@
-import { TextBlock, AdvancedDynamicTexture, Button, Control, InputText, ScrollViewer, } from "@babylonjs/gui";
+import { TextBlock, AdvancedDynamicTexture, Button, Control, InputText, ScrollViewer, Rectangle, TextWrapping, StackPanel } from "@babylonjs/gui";
 import { Scene, Engine } from "@babylonjs/core";
 
 import { Room } from "colyseus.js";
@@ -8,12 +8,14 @@ import { Player } from "../../shared/Entities/Player";
 import { countPlayers, roundToTwo } from "../../shared/Utils";
 import { PlayerMessage } from "../../shared/types";
 import Config from "../../shared/Config";
+import { createLogger } from "winston";
 
 export class Hud {
     private _scene: Scene;
 
     //UI Elements
     private _playerUI;
+    private _chatUI;
 
     //Chat
     public messages: PlayerMessage[] = [];
@@ -98,6 +100,36 @@ export class Hud {
             this._refreshUI(locationBtn, engine, room, players);
         });
 
+        // add default chat message
+        this.messages.push({
+            senderID: "SYSTEM",
+            message: "Welcome to T5C, you can move around by left clicking and dragging the mouse around.",
+            username: "SYSTEM",
+            timestamp: 0,
+            createdAt: ""
+        }); 
+
+        // add scrollable container
+        var sv = new ScrollViewer("chat-scroll-viewer");
+        sv.width = 0.5;
+        sv.height = 0.2;
+        sv.left = '20px';
+        sv.top = "-60px";
+        sv.background = "#CCCCCC";
+        sv.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        sv.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+
+        // add stack panel
+        const sp = new StackPanel("chat-stack-panel");
+        sp.width = "100%";
+        sp.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        sp.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        sp.paddingTop = "5px;"
+        sv.addControl(sp);
+
+        this._chatUI = sp;
+        this._playerUI.addControl(sv);
+
         // intial refresh chatbox
         this._refreshChatBox();
     }
@@ -117,34 +149,37 @@ export class Hud {
     // chat refresh
     private _refreshChatBox(){
 
-        // add scrollable container
-        var sv = new ScrollViewer();
-        sv.width = 0.5;
-        sv.height = 0.2;
-        sv.left = '20px';
-        sv.top = "-60px";
-        sv.background = "#CCCCCC";
-        sv.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        sv.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        this._playerUI.addControl(sv);
+        // remove all chat and refresh
+        let elements = this._chatUI.getDescendants();
+        elements.forEach(element => {
+            element.dispose();
+        });
 
-        var top = 0;
         this.messages.slice().reverse().forEach((msg:PlayerMessage) => {
 
+            // container
+            var headlineRect = new Rectangle("chatmessage_"+msg.timestamp);
+            headlineRect.width = "100%";
+            headlineRect.thickness = 0;
+            headlineRect.paddingBottom = "10px";
+            headlineRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            headlineRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            headlineRect.adaptHeightToChildren = true;
+            this._chatUI.addControl(headlineRect);
+
+            // message
             var roomTxt = new TextBlock();
             roomTxt.paddingLeft = "5px";
-            roomTxt.text = "[GLOBAL] "+msg.username+': '+msg.message;
+            roomTxt.text = "[GLOBAL] "+msg.username+': ' +msg.message;
             roomTxt.textHorizontalAlignment = 0;
-            roomTxt.height = "20px";
             roomTxt.fontSize = "12px";
             roomTxt.color = "#000";
-            roomTxt.left = .1;
-            roomTxt.top = top+"px";
+            roomTxt.left = "0px";
+            roomTxt.textWrapping = TextWrapping.WordWrap;
+            roomTxt.resizeToFit = true;
             roomTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             roomTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-            sv.addControl(roomTxt);
-
-            top += 25;
+            headlineRect.addControl(roomTxt);
 
         });
         

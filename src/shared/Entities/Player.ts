@@ -75,13 +75,15 @@ export class Player extends TransformNode {
 
         // create collision cube
         const box = MeshBuilder.CreateBox("collision", {width: 2, height: 4}, this.scene);
-        box.visibility = 0.5;
+        box.visibility = 0;
 
         // show debug axis
+        /*
         const axes = new AxesViewer(this._scene, 2);
         axes.xAxis.parent = box;
         axes.yAxis.parent = box;
         axes.zAxis.parent = box;
+        */
 
         // set mesh
         this.mesh = box;
