@@ -14,6 +14,13 @@ export class StartScene {
 
     public async createScene(engine) {
 
+        global.T5C.currentUser = {
+            id: 1,
+            username: 'test',
+            password: 'test',
+            token: 'G5IgCLfAcBFgifKFLVycT'
+        }
+
         // create scene
         let scene = new Scene(engine);
 
@@ -35,9 +42,9 @@ export class StartScene {
         imageRect.thickness = 0;
         guiMenu.addControl(imageRect);
 
-        const title = new TextBlock("title", "T5C");
+        const title = new TextBlock("title", "Welcome \n "+global.T5C.currentUser.username);
         title.resizeToFit = true;
-        title.fontSize = "40px";
+        title.fontSize = "30px";
         title.color = "white";
         title.resizeToFit = true;
         title.top = "30px";

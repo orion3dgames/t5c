@@ -4,8 +4,10 @@ let Config = {
 
     // basic server settings
     serverUrlLocal: "ws://localhost:3000",
-    //serverUrlProduction: "ws://localhost:3000",
+    loginUrlLocal: "http://localhost:3001",
     serverUrlProduction: "wss://t5c.onrender.com",
+    loginUrlProduction: "https://t5c.onrender.com:3001",
+    
     maxClients: 64, // set maximum clients per room
     updateRate: 100, // Set frequency the patched state should be sent to all clients, in milliseconds
     logLevel: "info", 
@@ -42,7 +44,7 @@ let Config = {
     // functions
     setDefault(){
         global.T5C = {
-            nextScene: State.LOGIN,
+            nextScene: State.START,
             currentRoomID: "",
             currentSessionID: "",
             currentLocation: Config.locations[Config.initialLocation],
@@ -59,11 +61,8 @@ let Config = {
         }
     },
 
-    goToScene(newState: State, user:any = {}){
+    goToScene(newState: State){
         global.T5C.nextScene = newState;
-        if(user){
-            global.T5C.currentUser = user;
-        }
     }
 
 }

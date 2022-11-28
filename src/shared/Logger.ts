@@ -31,15 +31,15 @@ export class Logger {
     this.service = service;
   }
 
-  public info(message, data = []){
+  public info(message, data:any = []){
     this.logger.info(message, data);
   }
 
-  public warning(message, data = []){
+  public warning(message, data:any = []){
     this.logger.warning(message, data);
   }
 
-  public error(message, data = []){
+  public error(message, data:any = []){
     this.logger.error(message, data);
   }
 

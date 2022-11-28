@@ -1,10 +1,10 @@
 import http from "http";
-import { Room, Client, ServerError, Delayed } from "@colyseus/core";
-import logger = require("../../shared/logger");
-
+import { Room, Client, Delayed } from "@colyseus/core";
 import {StateHandlerSchema} from './schema/StateHandlerSchema';
-import Config from '../../shared/Config';
+
 import databaseInstance from "../../shared/Database";
+
+import Config from '../../shared/Config';
 import utility from "../../shared/utiliy";
 import Logger from "../../shared/Logger";
 

@@ -1,9 +1,9 @@
 import { Engine, Scene, Color4, Vector3, FreeCamera } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText } from "@babylonjs/gui";
+import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText, InputPassword } from "@babylonjs/gui";
 import Config from "../../shared/Config";
 import State from "./Screens";
 import { generateRandomPlayerName } from "../../shared/Utils";
-
+import { request } from "../../shared/Requests"
 export class LoginScene {
     
     private _engine: Engine;
@@ -38,7 +38,7 @@ export class LoginScene {
         imageRect.thickness = 0;
         guiMenu.addControl(imageRect);
 
-        const title = new TextBlock("title", "LOGIN");
+        const title = new TextBlock("title", "T5C");
         title.resizeToFit = true;
         title.fontSize = "40px";
         title.color = "white";
@@ -48,6 +48,7 @@ export class LoginScene {
         title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         guiMenu.addControl(title);
 
+        /*
         const backButton = Button.CreateSimpleButton("back", "Back");
         backButton.width = 0.2
         backButton.height = "40px";
@@ -55,7 +56,7 @@ export class LoginScene {
         backButton.top = "-60px";
         backButton.thickness = 1;
         backButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        guiMenu.addControl(backButton);
+        guiMenu.addControl(backButton);*/
 
         const joinBtn = Button.CreateSimpleButton("back", "Connect To Game");
         joinBtn.width = 0.5
@@ -72,35 +73,39 @@ export class LoginScene {
 
         let randomName = generateRandomPlayerName();
 
-        const chat_input = new InputText();
-        chat_input.width = .5;
-        chat_input.height = '30px;'
-        chat_input.left = .25;
-        chat_input.color = "#FFF";
-        //chat_input.text = randomName;
-        chat_input.text = "Past Power";
-        chat_input.placeholderText = "Enter player name...";
-        chat_input.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        chat_input.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-        guiMenu.addControl(chat_input); 
+        const usernameInput = new InputText("usernameInput");
+        usernameInput.top = "-35px;";
+        usernameInput.width = .5;
+        usernameInput.height = '30px;'
+        usernameInput.left = .25;
+        usernameInput.color = "#FFF";
+        usernameInput.placeholderText = "Enter username";
+        usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        usernameInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        guiMenu.addControl(usernameInput); 
 
-        // chatbox on enter event
-        chat_input.onKeyboardEventProcessedObservable.add((ev) => { 
-            if((ev.key==="Enter" || ev.code==="Enter") && chat_input.text != ""){
-                this.connect(chat_input.text);
-                chat_input.text = "";
+        usernameInput.onKeyboardEventProcessedObservable.add(ev => {
+            if (ev.key === "Tab") {
+                guiMenu.focusedControl = passwordInput;
+                ev.preventDefault();
             }
-        });
+        })
+
+        const passwordInput = new InputPassword("passwordInput");
+        passwordInput.width = .5;
+        passwordInput.height = '30px;'
+        passwordInput.left = .25;
+        passwordInput.color = "#FFF";
+        passwordInput.placeholderText = "Enter password";
+        passwordInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        passwordInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        guiMenu.addControl(passwordInput);  
 
         // connetc button
         joinBtn.onPointerDownObservable.add(() => { 
-            this.connect(chat_input.text);
-            chat_input.text = "";
-        });
-
-        // back button
-        backButton.onPointerDownObservable.add(() => { 
-            Config.goToScene(State.START);
+            this.connect(usernameInput.text, passwordInput.text);
+            usernameInput.text = "";
+            passwordInput.text = "";
         });
 
         this._ui = guiMenu;
@@ -111,16 +116,17 @@ export class LoginScene {
 
     }
 
-    async connect(username){
+    async connect(username:string, password:string){
 
-        // validate user and sent auth token to colyseus
-        Config.goToScene(State.GAME, {
-            username: username
+        let req = await request('post', Config.loginUrlLocal+'/login', {
+            username: username,
+            password: password
         });
-        /*
-        await firebaseController.loginAnonymously(username).then((auth)=>{
-            Config.goToScene(State.GAME, auth);
-        });*/
+
+        global.T5C.currentUser = JSON.parse(req.data).user;
+
+        Config.goToScene(State.START);
+
     }
 
 }

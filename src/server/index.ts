@@ -57,10 +57,15 @@ gameServer.listen(port).then(()=>{
 //// SERVING CLIENT DIST FOLDER TO EXPRESS ///////
 //////////////////////////////////////////////////
 
+// initialize database
+import databaseInstance from "../shared/Database";
+let database = new databaseInstance();
+
 require('dotenv').config();
 let indexPath = "dist/client/";
 let clientFile = "index.html";
 const clientApp = express();
+clientApp.use(cors());
 app.use(express.static(indexPath));
 let indexFile = path.resolve(indexPath + clientFile);
 
@@ -68,6 +73,34 @@ clientApp.get('/', function (req, res) {
   res.sendFile(indexFile);
 });
 
-clientApp.get('/login', function (req, res) {
-  console.log(req)
+clientApp.post('/login', function (req, res) {
+  let username = req.query.username;
+  let password = req.query.password;
+  if(username && password){
+    database.getUser(username, password).then((user:any)=>{
+      if(!user) {
+        return res.status(400).send({
+          message: "Login Failed"
+        });
+      }
+      return database.refreshToken(user.id);
+    }).then((user)=>{
+      return res.send({
+        message: "Login Successful",
+        user: user
+      });
+    })
+  }else{
+    return res.status(400).send({
+      message: "Wrong Parameters"
+    });
+  }
 });
+
+clientApp.get('/register', function (req, res) {
+  
+});
+
+clientApp.listen(3001, () =>
+  console.log(`Example app listening on port 3001!`),
+);

@@ -55,6 +55,7 @@
     "firebase": "^9.14.0",
     "firebase-admin": "^11.3.0",
     "fs-extra": "^10.1.0",
+    "nanoid": "^3.0.0",
     "navmesh": "^2.3.1",
     "sqlite3": "^5.1.2",
     "uuid": "^9.0.0",

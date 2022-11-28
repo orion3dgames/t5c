@@ -1,8 +1,9 @@
 const sqlite3 = require('sqlite3');
 const dbFilePath = './database.db';
 import Logger from "./Logger";
+import { nanoid } from 'nanoid';
 
-class databaseInstance {
+class Database {
 
   private db: typeof sqlite3;
 
@@ -21,19 +22,26 @@ class databaseInstance {
 
   create() {
 
-    const playersSql = `CREATE TABLE IF NOT EXISTS "players" (
+    const usersSql = `CREATE TABLE IF NOT EXISTS "users" (
       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-      "username" TEXT,
+      "username" TEXT NOT NULL UNIQUE,
       "password" TEXT,
-      "location" TEXT,
-      "x" NUMERIC DEFAULT 0.0,
-      "y"	NUMERIC DEFAULT 0.0,
-      "z"	NUMERIC DEFAULT 0.0,
-      "rot" NUMERIC DEFAULT 0.0,
       "token" TEXT
     );` 
 
+    const playersSql = `CREATE TABLE IF NOT EXISTS "characters" (
+      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+      "user_id" INTEGER,
+      "location" TEXT,
+      "x" REAL DEFAULT 0.0,
+      "y"	REAL DEFAULT 0.0,
+      "z"	REAL DEFAULT 0.0,
+      "rot" REAL DEFAULT 0.0,
+      "token" TEXT
+    );`
+
     this.db.serialize(() => {
+      this.db.run(usersSql);
       this.db.run(playersSql);
     });
 
@@ -49,7 +57,7 @@ class databaseInstance {
           console.log(err)
           reject(err)
         } else {
-          console.log('sql: ' + sql)
+          //console.log('sql: ' + sql)
           resolve(result)
         }
       })
@@ -86,39 +94,75 @@ class databaseInstance {
     })
   }
 
-  async getPlayer(username) {
-    const sql = `SELECT * FROM players WHERE username=?;` 
+  ///////////////////////////////////////
+  ///////////////////////////////////////
+  ///////////////////////////////////////
+
+  async getUser(username, password) {
+    const sql = `SELECT * FROM users WHERE username=? AND password=?;` 
+    return await this.get(sql, [username, password]);
+  }
+
+  async getUserById(user_id) {
+    const sql = `SELECT * FROM users WHERE id=?;` 
+    return await this.get(sql, [user_id]);
+  }
+
+  async hasUser(username) {
+    const sql = `SELECT * FROM users WHERE username=?;` 
     return await this.get(sql, [username]);
   }
 
-  async savePlayer(data) {
-    const sql = `INSERT INTO players (
-      "username","password","location","x","y","z","rot") VALUES 
-      (
+  async refreshToken(user_id) {
+    let token = nanoid();
+    const sql = `UPDATE users SET token=? WHERE id=?;` 
+    await this.run(sql, [token, user_id]);
+    console.log("TOKEN REFRESHED", token);
+    let user = await this.getUserById(user_id);
+    console.log("USER FOUND", user);
+    return user;
+  }
+
+  async saveUser(data) {
+    const sql = `INSERT INTO users ("username","password") VALUES (
         "${data.username}", 
-        "test",
+        "${data.password}", 
+      );` 
+    return this.db.run(sql);
+  }
+
+  ///////////////////////////////////////
+  ///////////////////////////////////////
+  ///////////////////////////////////////
+
+  async getPlayer(character_id) {
+    const sql = `SELECT * FROM characters WHERE id=?;` 
+    return await this.get(sql, [character_id]);
+  }
+
+  async savePlayer(data) {
+    const sql = `INSERT INTO characters ("location","x","y","z","rot") VALUES (
         "${data.location}",
         "${data.x}",
         "${data.y}",
         "${data.z}",
         "${data.rot}"
-      );` 
-      console.log(sql);
+      );`
     return this.db.run(sql);
   }
 
-  async updatePlayer(player_id:number, data) {
-    const sql = `UPDATE players SET location=?, x=?, y=?, z=?, rot=? WHERE id=? ;` 
+  async updatePlayer(character_id:number, data) {
+    const sql = `UPDATE characters SET location=?, x=?, y=?, z=?, rot=? WHERE id=? ;` 
     return this.db.run(sql, [
       data.location,
       data.x,
       data.y,
       data.z,
       data.rot,
-      player_id
+      character_id
     ]);
   }
 }
 
 
-export default databaseInstance
+export default Database
