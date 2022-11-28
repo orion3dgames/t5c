@@ -1,6 +1,5 @@
 import { Engine, Scene, Color4, Vector3, FreeCamera } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText } from "@babylonjs/gui";
-import { firebaseController } from "../Controllers/Firebase/firebase";
 import Config from "../../shared/Config";
 import State from "./Screens";
 import { generateRandomPlayerName } from "../../shared/Utils";

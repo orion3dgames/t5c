@@ -60,10 +60,10 @@ export class GameRoom extends Room<StateHandlerSchema> {
                     
                 });
 
-                Logger.info("Saving data for "+this.state.players.size+" players");
+                Logger.info("Saving data for "+this.state.players.size+" players / every 5 seconds.");
             }
 
-        }, 1000);
+        }, 5000);
     }
 
     // Authorize client based on provided options before WebSocket handshake is complete
@@ -90,7 +90,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
     async onJoin(client: Client, options: any) {
 
         // add player to server
-        console.log(`player ${client.sessionId} joined room ${this.roomId}.`, this.metadata, options,  client.auth);
+        Logger.info(`player ${client.sessionId} joined room ${this.roomId}.`, options);
 
         // find player in database and set database data to player
         let player = await this.database.getPlayer(options.username)

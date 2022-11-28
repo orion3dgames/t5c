@@ -1,6 +1,6 @@
 import {Schema, type, MapSchema} from '@colyseus/schema';
 import {PlayerSchema} from './PlayerSchema';
-
+import Logger from "../../../shared/Logger";
 import Config from '../../../shared/Config';
 
 export class StateHandlerSchema extends Schema {
@@ -59,7 +59,8 @@ export class StateHandlerSchema extends Schema {
             player.rot = newRot;
             player.sequence = seq;
 
-            console.log('position validated '+player.username+' ( x: '+player.x+', y: '+player.y+', z: '+player.z+', rot: '+player.rot);
+             // add player to server
+            Logger.info('Valid position for '+player.username+': ( x: '+player.x+', y: '+player.y+', z: '+player.z+', rot: '+player.rot);
 
         }else{
 
@@ -70,7 +71,7 @@ export class StateHandlerSchema extends Schema {
             player.rot = oldRot;
             player.sequence = seq;
 
-            console.log('position not validate, return to previous position '+player.username+' ( x: '+player.x+', y: '+player.y+', z: '+player.z+', rot: '+player.rot);
+            Logger.warning('Invalid position for '+player.username+': ( x: '+player.x+', y: '+player.y+', z: '+player.z+', rot: '+player.rot);
         }
     }
    

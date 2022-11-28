@@ -63,7 +63,11 @@ let clientFile = "index.html";
 const clientApp = express();
 app.use(express.static(indexPath));
 let indexFile = path.resolve(indexPath + clientFile);
+
 clientApp.get('/', function (req, res) {
-  console.log('TEST');
   res.sendFile(indexFile);
+});
+
+clientApp.get('/login', function (req, res) {
+  console.log(req)
 });
