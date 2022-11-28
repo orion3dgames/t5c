@@ -18,6 +18,11 @@ You can follow the progress here: [FORUM POST](https://forum.babylonjs.com/t/mul
 - Clone or download this repository.
 - Run `yarn install`
 
+## Technology
+- Babylon.js (3d rendering engine)
+- Colyseus (networking)
+- SQLite (database)
+
 ## How to run client
 - Run `yarn client-dev`
 
