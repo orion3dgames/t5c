@@ -10,6 +10,8 @@ import { WebSocketTransport } from '@colyseus/ws-transport';
 import { GameRoom } from "./rooms/GameRoom";
 import { ChatRoom } from "./rooms/ChatRoom";
 
+import Logger from "../shared/Logger";
+
 //////////////////////////////////////////////////
 ///////////// COLYSEUS GAME SERVER ///////////////
 //////////////////////////////////////////////////
@@ -40,7 +42,7 @@ if (process.env.NODE_ENV !== "production") {
 gameServer.listen(port).then(()=>{
   
   // server is now running
-  console.log("listening on http://localhost:" + port);
+  Logger.info("listening on http://localhost:"+ port)
   
   // create town room
   matchMaker.createRoom("game_room", { location: "town" });

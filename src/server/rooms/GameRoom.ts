@@ -1,11 +1,12 @@
 import http from "http";
 import { Room, Client, ServerError, Delayed } from "@colyseus/core";
-import logger = require("../helpers/logger");
+import logger = require("../../shared/logger");
 
 import {StateHandlerSchema} from './schema/StateHandlerSchema';
 import Config from '../../shared/Config';
-import databaseInstance from "../../shared/databaseInstance";
+import databaseInstance from "../../shared/Database";
 import utility from "../../shared/utiliy";
+import Logger from "../../shared/Logger";
 
 export class GameRoom extends Room<StateHandlerSchema> {
 
@@ -16,7 +17,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
 
     async onCreate(options: any) {
 
-        console.log("GameRoom created!", this.roomId, options);
+        Logger.info("GameRoom created: "+this.roomId, options)
  
         this.setMetadata(options);
 
@@ -58,6 +59,8 @@ export class GameRoom extends Room<StateHandlerSchema> {
                     });
                     
                 });
+
+                Logger.info("Saving data for "+this.state.players.size+" players");
             }
 
         }, 1000);

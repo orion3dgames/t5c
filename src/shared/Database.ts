@@ -1,5 +1,6 @@
 const sqlite3 = require('sqlite3');
 const dbFilePath = './database.db';
+import Logger from "./Logger";
 
 class databaseInstance {
 
@@ -8,15 +9,14 @@ class databaseInstance {
   constructor() {
     this.db = new sqlite3.Database(dbFilePath, (err) => {
       if (err) {
-        console.log('Could not connect to database', err)
+        Logger.error("Could not connect to database: "+dbFilePath, err);
       } else {
-        console.log('Connected to database')
+        Logger.info("Connected to database: "+dbFilePath);
+
+        // initialize all tables
+        this.create();
       }
     });
-
-    // initialize all tables
-    this.create();
-
   }
 
   create() {
@@ -36,6 +36,8 @@ class databaseInstance {
     this.db.serialize(() => {
       this.db.run(playersSql);
     });
+
+    Logger.info("Creating default database structure.");
 
   }
 
