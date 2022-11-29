@@ -177,7 +177,7 @@ class Database {
         "0"
       );`
     let c = await <any> this.run(sql);
-    return await this.getPlayer(c.id);
+    return await this.getCharacter(c.id);
   }
 
   async updateCharacter(character_id:number, data: { location: any; x: any; y: any; z: any; rot: any; }) {
