@@ -1,7 +1,7 @@
 // Colyseus + Express
 
 import { createServer } from "http";
-import express from "express";
+import express, { Request } from "express";
 import cors from "cors";
 import path from "path";
 
@@ -59,6 +59,9 @@ gameServer.listen(port).then(()=>{
 
 // initialize database
 import databaseInstance from "../shared/Database";
+import { PlayerUser } from "../shared/types";
+
+// start db
 let database = new databaseInstance();
 
 // default to built client index.html
@@ -104,9 +107,9 @@ clientApp.post('/login', function (req, res) {
 });
 
 clientApp.post('/check', function (req, res) {
-  let token = req.query.token;
-  if(token){
-    database.checkToken(token).then((user:any)=>{
+  const token:string = req.query.token as string ?? '';
+  if(token !== ""){
+    database.checkToken(token).then((user)=>{
       if(!user) {
         return res.status(400).send({
           message: "Check Failed"

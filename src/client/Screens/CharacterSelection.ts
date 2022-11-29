@@ -1,9 +1,10 @@
 import { Scene, Engine, Color4, Vector3, FreeCamera } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button } from "@babylonjs/gui";
+import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText } from "@babylonjs/gui";
 import { debug } from "console";
 import Config from "../../shared/Config";
 import { request } from "../../shared/Requests";
 import State from "./Screens";
+import { PlayerCharacter, PlayerUser } from "../../shared/types";
 
 export class CharacterSelectionScene {
     
@@ -55,34 +56,90 @@ export class CharacterSelectionScene {
         title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         imageRect.addControl(title);
 
-        const startBtn = Button.CreateSimpleButton("play", "Play");
-        startBtn.width = 0.2
-        startBtn.height = "40px";
-        startBtn.color = "white";
-        startBtn.top = "-60px";
-        startBtn.thickness = 1;
-        startBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        imageRect.addControl(startBtn);
-        this._button = startBtn;
-
-        // setup events
-        this._button.onPointerDownObservable.add(() => { 
-            global.T5C.nextScene = State.LOGIN;
-        });
-
         this._scene = scene;
+        this._gui = guiMenu;
 
         await this._scene.whenReadyAsync();
 
-        // 
-        let user = await this.checkLogin();
-        console.log(user);
+        // check if user token is valid
+        let user:PlayerUser = await this.checkLogin();
         if(!user){
+            // if token not valid, send back to login screen
             Config.goToScene(State.LOGIN);
         }
 
+        // SHOW AVAILABLE CHARACTERS GUI
+        await this.displayCharactersGUI(user.characters as PlayerCharacter[]);
+        
+        // SHOW NEW PLAYER GUI
+        await this.displayCreateNewCharacterGUI();
     }
 
+    async displayCreateNewCharacterGUI(){
+
+        const usernameInput = new InputText("newCharacterInput");
+        usernameInput.top = "-90px;";
+        usernameInput.width = .5;
+        usernameInput.height = '30px;'
+        usernameInput.left = .25;
+        usernameInput.color = "#FFF";
+        usernameInput.placeholderText = "Enter username";
+        usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        usernameInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        this._gui.addControl(usernameInput); 
+
+        const createBtn = Button.CreateSimpleButton("newCharacterBtn", "Create New Character");
+        createBtn.top = "-60px";
+        createBtn.width = .5;
+        createBtn.height = "30px";
+        createBtn.color = "white";
+        createBtn.thickness = 1;
+        createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        this._gui.addControl(createBtn);
+
+        createBtn.onPointerDownObservable.add(() => { 
+            
+            // create new character via database 
+
+            // login as this character
+
+        });
+
+    }
+
+    async displayCharactersGUI(characters:PlayerCharacter[]){
+
+        let top = 100;
+        characters.forEach(char => {
+
+            const createBtn = Button.CreateSimpleButton("characterBtn-"+char.id, "Play as: "+char.name);
+            createBtn.top = top+"px";
+            createBtn.width = .5;
+            createBtn.height = "30px";
+            createBtn.color = "white";
+            createBtn.thickness = 1;
+            createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+            createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            this._gui.addControl(createBtn);
+
+            createBtn.onPointerDownObservable.add(() => { 
+                this.loginAs(char);
+            });
+
+            top += 35;
+        });
+
+    }
+
+    // login as this character
+    loginAs(character:PlayerCharacter){
+        global.T5C.currentCharacter = character;
+        global.T5C.currentLocationKey = character.location;
+        Config.goToScene(State.GAME);
+    }
+
+    // check login details
     async checkLogin(){
 
         // check user exists else send back to login

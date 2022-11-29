@@ -96,7 +96,7 @@ export class GameScene {
             if(room){
 
                 // join game room
-                this.room = await this._client.joinRoom(room.roomId, user);
+                this.room = await this._client.joinRoom(room.roomId, user.token);
 
                 // join global chat room
                 this.chatRoom = await this._client.joinChatRoom();

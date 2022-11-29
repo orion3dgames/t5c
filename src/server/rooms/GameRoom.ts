@@ -69,6 +69,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
     // Authorize client based on provided options before WebSocket handshake is complete
     async onAuth (client: Client, data: any, request: http.IncomingMessage) { 
 
+        /*
         // find user in database
         const userData = await this.database.getPlayer(data.username)
         if (userData) {
@@ -83,8 +84,8 @@ export class GameRoom extends Room<StateHandlerSchema> {
                 z: defaultSpawnPoint.z,
                 rot: 0,
             })
-        }
- 
+        }*/
+        return true;
     }
 
     async onJoin(client: Client, options: any) {

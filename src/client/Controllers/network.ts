@@ -22,10 +22,9 @@ export class GameNetwork {
         }   
     }
 
-    public async joinRoom(roomId, loginData):Promise<any> {
+    public async joinRoom(roomId, token):Promise<any> {
         return await this._client.joinById(roomId, { 
-            username: loginData.username,
-            password: "test"
+            token: token
         });
     }
     

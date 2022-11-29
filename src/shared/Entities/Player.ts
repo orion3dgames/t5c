@@ -206,6 +206,8 @@ export class Player extends TransformNode {
     public teleport(location){
         this._room.leave();
         global.T5C.currentLocation = Config.locations[location];
+        global.T5C.currentLocationKey = location;
+        global.T5C.currentCharacter.location = location;
         global.T5C.currentRoomID = "";
         global.T5C.nextScene = State.GAME;
     }

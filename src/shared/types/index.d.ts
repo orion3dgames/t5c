@@ -55,7 +55,8 @@ declare global {
         currentRoomID: string;
         currentSessionID: string; 
         currentLocation: PlayerLocation;
-        currentUser: any;
+        currentUser: PlayerUser;
+        currentCharacter: PlayerCharacter;
         currentMs: number;
     }
 }
