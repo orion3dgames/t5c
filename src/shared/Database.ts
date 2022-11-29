@@ -175,7 +175,8 @@ class Database {
         "${defaultLocation.spawnPoint.z}",
         "0"
       );`
-    return this.db.run(sql);
+    let c = await <any> this.run(sql);
+    return await this.getPlayer(c.id);
   }
 
   async updateCharacter(character_id:number, data: { location: any; x: any; y: any; z: any; rot: any; }) {
