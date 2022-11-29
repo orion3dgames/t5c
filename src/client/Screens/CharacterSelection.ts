@@ -101,8 +101,16 @@ export class CharacterSelectionScene {
         createBtn.onPointerDownObservable.add(() => { 
             
             // create new character via database 
+            this.createCharacter(usernameInput.text).then((char)=>{
 
-            // login as this character
+                console.log('CREATED', char);
+
+                // login as this character
+                this.loginAs(char);
+
+                // reset text
+                usernameInput.text = "";
+            });
 
         });
 
@@ -136,6 +144,7 @@ export class CharacterSelectionScene {
     loginAs(character:PlayerCharacter){
         global.T5C.currentCharacter = character;
         global.T5C.currentLocationKey = character.location;
+        global.T5C.currentLocation = Config.locations[character.location];
         Config.goToScene(State.GAME);
     }
 
@@ -143,11 +152,24 @@ export class CharacterSelectionScene {
     async checkLogin(){
 
         // check user exists else send back to login
-        let req = await request('post', Config.loginUrlLocal+'/check', {
+        let req = await request('post', Config.apiUrlLocal+'/check', {
             token: global.T5C.currentUser.token,
         });
 
         return JSON.parse(req.data).user;
     }
+
+    // create character
+    async createCharacter(name){
+
+        // check user exists else send back to login
+        let req = await request('post', Config.apiUrlLocal+'/create_character', {
+            token: global.T5C.currentUser.token,
+            name: name
+        });
+
+        return JSON.parse(req.data).character;
+    }
+
 
 }

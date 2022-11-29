@@ -4,6 +4,7 @@ import Logger from "./Logger";
 import { nanoid } from 'nanoid';
 import { PlayerCharacter, PlayerUser } from "./types";
 import { ParsedQs } from "qs";
+import Config from "./Config";
 
 class Database {
 
@@ -162,18 +163,22 @@ class Database {
     return await this.get(sql, [character_id]);
   }
 
-  async savePlayer(data: { location: any; x: any; y: any; z: any; rot: any; }) {
-    const sql = `INSERT INTO characters ("location","x","y","z","rot") VALUES (
-        "${data.location}",
-        "${data.x}",
-        "${data.y}",
-        "${data.z}",
-        "${data.rot}"
+  async createCharacter(token, name) {
+    let user = await this.getUserByToken(token);
+    let defaultLocation = Config.locations[Config.initialLocation];
+    const sql = `INSERT INTO characters ("user_id", "name","location","x","y","z","rot") VALUES (
+        "${user.id}",
+        "${name}",
+        "${defaultLocation.key}",
+        "${defaultLocation.spawnPoint.x}",
+        "${defaultLocation.spawnPoint.y}",
+        "${defaultLocation.spawnPoint.z}",
+        "0"
       );`
     return this.db.run(sql);
   }
 
-  async updatePlayer(character_id:number, data: { location: any; x: any; y: any; z: any; rot: any; }) {
+  async updateCharacter(character_id:number, data: { location: any; x: any; y: any; z: any; rot: any; }) {
     const sql = `UPDATE characters SET location=?, x=?, y=?, z=?, rot=? WHERE id=? ;` 
     return this.db.run(sql, [
       data.location,

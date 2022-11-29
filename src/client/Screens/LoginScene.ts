@@ -118,7 +118,7 @@ export class LoginScene {
 
     async connect(username:string, password:string){
 
-        let req = await request('post', Config.loginUrlLocal+'/login', {
+        let req = await request('post', Config.apiUrlLocal+'/login', {
             username: username,
             password: password
         });

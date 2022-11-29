@@ -50,14 +50,13 @@ export class GameRoom extends Room<StateHandlerSchema> {
             if(this.state.players.size > 0){
                 this.state.players.forEach(player => {
                     let playerClient = this.clients.hashedArray[player.sessionId];
-                    this.database.updatePlayer(playerClient.auth.id, {
+                    this.database.updateCharacter(playerClient.auth.id, {
                         location: player.location,
                         x: player.x,
                         y: player.y,
                         z: player.z,
                         rot: player.rot,
                     });
-                    
                 });
 
                 Logger.info("Saving data for "+this.state.players.size+" players / every 5 seconds.");
@@ -68,14 +67,12 @@ export class GameRoom extends Room<StateHandlerSchema> {
 
     // Authorize client based on provided options before WebSocket handshake is complete
     async onAuth (client: Client, data: any, request: http.IncomingMessage) { 
-        /*
-        const user = await this.database.checkLogin(data.token)
-        if (user) {
-            return user;
+        const character = await this.database.getCharacter(data.character_id)
+        if (character) {
+            return character;
         } else {
             return false;
-        } */
-        return true;
+        }
     }
 
     async onJoin(client: Client, options: any) {

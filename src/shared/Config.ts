@@ -4,7 +4,7 @@ let Config = {
 
     // basic server settings
     serverUrlLocal: "ws://localhost:3000",
-    loginUrlLocal: "http://localhost:3001",
+    apiUrlLocal: "http://localhost:3001",
     serverUrlProduction: "wss://t5c.onrender.com",
     loginUrlProduction: "https://t5c.onrender.com:3001",
     

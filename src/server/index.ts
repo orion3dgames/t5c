@@ -128,6 +128,30 @@ clientApp.post('/check', function (req, res) {
   }
 });
 
+clientApp.post('/create_character', function (req, res) {
+  const token:string = req.query.token as string ?? '';
+  const name:string = req.query.name as string ?? '';
+  if(token !== ""){
+    database.createCharacter(token, name).then((character)=>{
+      if(!character) {
+        return res.status(400).send({
+          message: "Create Failed"
+        });
+      }else{
+        return res.send({
+          message: "Create Successful",
+          character: character
+        });
+      }
+    })
+  }else{
+    return res.status(400).send({
+      message: "Create Failed"
+    });
+  }
+});
+
+
 clientApp.get('/register', function (req, res) {
   
 });

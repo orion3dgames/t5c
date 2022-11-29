@@ -6,6 +6,7 @@ import { roundToTwo } from "../Utils"
 import Config from "../Config";
 import State from "../../client/Screens/Screens";
 import { PlayerInputs } from "../types";
+import { PlayerCamera } from "./Player/PlayerCamera";
 
 export class Player extends TransformNode {
     public camera;
@@ -77,14 +78,6 @@ export class Player extends TransformNode {
         const box = MeshBuilder.CreateBox("collision", {width: 2, height: 4}, this.scene);
         box.visibility = 0;
 
-        // show debug axis
-        /*
-        const axes = new AxesViewer(this._scene, 2);
-        axes.xAxis.parent = box;
-        axes.yAxis.parent = box;
-        axes.zAxis.parent = box;
-        */
-
         // set mesh
         this.mesh = box;
         this.mesh.parent = this;
@@ -123,14 +116,14 @@ export class Player extends TransformNode {
 
         // if myself, add all player related stuff
         if (this.isCurrentPlayer) {
-            this._setupPlayerCamera();
+            this.camera = new PlayerCamera(this._scene);
         }
 
         // render loop
         this.scene.registerBeforeRender(() => {
             this._animatePlayer();
             if (this.isCurrentPlayer) {
-                this._updateCamera();
+                this.camera.updateCamera(this.mesh, this._input);
             }    
         });
 
@@ -145,11 +138,15 @@ export class Player extends TransformNode {
             this.playerNextPosition = new Vector3(this.entity.x, this.entity.y, this.entity.z);
             this.playerNextRotation = new Vector3(0, this.entity.rot, 0);
 
-            // store latest sequence processed by server
-            this.playerLatestSequence = this.entity.sequence;
+            // do server reconciliation if current player
+            if (this.isCurrentPlayer) {
 
-            // do server reconciliation
-            this.processLocalMove();
+                // store latest sequence processed by server
+                this.playerLatestSequence = this.entity.sequence;   
+
+                // process
+                this.processLocalMove();
+            }
 
         });
 
@@ -277,50 +274,6 @@ export class Player extends TransformNode {
             this._currentAnim.play(this._currentAnim.loopAnimation);
             this._prevAnim = this._currentAnim;
         }
-    }
-
-    private _updateCamera(): void {
-
-        // camera must follow player 
-        let centerPlayer = this.mesh.position.y + 2;
-        this._camRoot.position = Vector3.Lerp(this._camRoot.position, new Vector3(this.mesh.position.x, centerPlayer, this.mesh.position.z), 0.4);
-
-        // rotate camera around the Y position if right click is true
-        if (this._input.right_click) {
-
-            // ddaydd to implement
-            //let rotationY = this.camera.rotation.y -= this._input.h;
-            //this.camera.rotation = new Vector3(0, rotationY, 0);
-        }
-    }
-
-    private _setupPlayerCamera() {
-
-        // root camera parent that handles positioning of the camera to follow the player
-        this._camRoot = new TransformNode("root");
-        this._camRoot.position = new Vector3(0, 0, 0); //initialized at (0,0,0)
-
-        // to face the player from behind (180 degrees)
-        this._camRoot.rotation = new Vector3(0, Math.PI, 0);
-
-        // rotations along the x-axis (up/down tilting)
-        let yTilt = new TransformNode("ytilt");
-
-        // adjustments to camera view to point down at our player
-        yTilt.rotation = new Vector3(0.50, 0, 0);
-        this._yTilt = yTilt;
-        yTilt.parent = this._camRoot;
-
-        // our actual camera that's pointing at our root's position
-        this.camera = new UniversalCamera("cam", new Vector3(0, 0, -40), this.scene);
-        this.camera.lockedTarget = this._camRoot.position;
-        this.camera.fov = 0.35;
-        this.camera.parent = yTilt;
-
-        // set as active camera
-        this.scene.activeCamera = this.camera;
-
-        return this.camera;
     }
 
 }
