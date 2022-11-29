@@ -5,8 +5,9 @@ let Config = {
     // basic server settings
     serverUrlLocal: "ws://localhost:3000",
     apiUrlLocal: "http://localhost:3001",
+
     serverUrlProduction: "wss://t5c.onrender.com",
-    apiUrlProduction: "127.0.0.1:3001",
+    apiUrlProduction: "https://t5c.onrender.com",
     
     maxClients: 64, // set maximum clients per room
     updateRate: 100, // Set frequency the patched state should be sent to all clients, in milliseconds

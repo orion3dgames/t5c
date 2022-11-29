@@ -118,7 +118,7 @@ export class LoginScene {
 
     async connect(username:string, password:string){
 
-        let req = await request('post', apiUrl()+'/login', {
+        let req = await request('get', apiUrl()+'/login', {
             username: username,
             password: password
         });

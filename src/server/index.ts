@@ -70,19 +70,15 @@ let indexPath = "dist/client/";
 let clientFile = "index.html";
 const clientApp = express();
 clientApp.use(cors());
+
+// serve client
 app.use(express.static(indexPath));
 let indexFile = path.resolve(indexPath + clientFile);
-
 clientApp.get('/', function (req, res) {
   res.sendFile(indexFile);
 });
 
-// small api to interact with database
-clientApp.listen(3001, () =>
-  Logger.info("api listening on http://localhost:3001")
-);
-
-clientApp.post('/login', function (req, res) {
+clientApp.get('/login', function (req, res) {
   const username:string = req.query.username as string ?? '';
   const password:string = req.query.password as string ?? '';
   if(username && password){
@@ -148,7 +144,6 @@ clientApp.post('/create_character', function (req, res) {
     });
   }
 });
-
 
 clientApp.get('/register', function (req, res) {
   

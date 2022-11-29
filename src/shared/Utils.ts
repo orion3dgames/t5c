@@ -17,12 +17,10 @@ const roundToTwo = function(num: number) {
 const apiUrl = function() {
     let url = Config.apiUrlProduction;
     if (window.location.host === "localhost:8080") {
-        //url = Config.apiUrlLocal;
+        url = Config.apiUrlLocal;
     }
     return url;
 }
-
-
 
 var nameList = [
     'Time','Past','Future','Dev',
