@@ -65,7 +65,6 @@ import { PlayerUser } from "../shared/types";
 let database = new databaseInstance();
 
 // default to built client index.html
-require('dotenv').config();
 let indexPath = "dist/client/";
 let clientFile = "index.html";
 const clientApp = express();
@@ -74,11 +73,11 @@ clientApp.use(cors());
 // serve client
 app.use(express.static(indexPath));
 let indexFile = path.resolve(indexPath + clientFile);
-clientApp.get('/', function (req, res) {
+app.get('/', function (req, res) {
   res.sendFile(indexFile);
 });
 
-clientApp.get('/login', function (req, res) {
+app.get('/login', function (req, res) {
   const username:string = req.query.username as string ?? '';
   const password:string = req.query.password as string ?? '';
   if(username && password){
@@ -100,7 +99,7 @@ clientApp.get('/login', function (req, res) {
   }
 });
 
-clientApp.post('/check', function (req, res) {
+app.post('/check', function (req, res) {
   const token:string = req.query.token as string ?? '';
   if(token !== ""){
     database.checkToken(token).then((user)=>{
@@ -122,7 +121,7 @@ clientApp.post('/check', function (req, res) {
   }
 });
 
-clientApp.post('/create_character', function (req, res) {
+app.post('/create_character', function (req, res) {
   const token:string = req.query.token as string ?? '';
   const name:string = req.query.name as string ?? '';
   if(token !== ""){
@@ -145,7 +144,7 @@ clientApp.post('/create_character', function (req, res) {
   }
 });
 
-clientApp.get('/register', function (req, res) {
+app.get('/register', function (req, res) {
   
 });
 
