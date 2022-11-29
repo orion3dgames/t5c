@@ -67,8 +67,6 @@ let database = new databaseInstance();
 // default to built client index.html
 let indexPath = "dist/client/";
 let clientFile = "index.html";
-const clientApp = express();
-clientApp.use(cors());
 
 // serve client
 app.use(express.static(indexPath));

@@ -22,9 +22,9 @@ let Config = {
             key: 'town',
             mesh: "town.glb",
             spawnPoint: {
-                x: -45.80,
+                x: -44.463,
                 y: 0,
-                z: -1.64
+                z: -1.671
             },
         },
         "island": {

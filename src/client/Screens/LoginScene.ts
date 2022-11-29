@@ -48,6 +48,15 @@ export class LoginScene {
         title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         guiMenu.addControl(title);
 
+        const welcomeText = new TextBlock("back", "Use 'test' / 'test' or create a new one");
+        welcomeText.width = 0.5
+        welcomeText.height = "40px";
+        welcomeText.color = "white";
+        welcomeText.top = "80px";
+        welcomeText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        welcomeText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        guiMenu.addControl(welcomeText);
+
         /*
         const backButton = Button.CreateSimpleButton("back", "Back");
         backButton.width = 0.2
