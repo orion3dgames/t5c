@@ -1,5 +1,5 @@
 import http from "http";
-import { Room, Client, Delayed } from "@colyseus/core";
+import { Room, Client, Delayed, ServerError } from "@colyseus/core";
 import {StateHandlerSchema} from './schema/StateHandlerSchema';
 
 import databaseInstance from "../../shared/Database";
@@ -69,10 +69,10 @@ export class GameRoom extends Room<StateHandlerSchema> {
     async onAuth (client: Client, data: any, request: http.IncomingMessage) { 
         const character = await this.database.getCharacter(data.character_id)
         console.log('found', character, data);
-        if (character) {
-            return character;
+        if (character == null) {
+            throw new ServerError(400, "bad access token");
         } else {
-            return false;
+            return character;
         }
     }
 

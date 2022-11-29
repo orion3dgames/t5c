@@ -124,11 +124,6 @@ class Database {
     const sql = `SELECT * FROM characters WHERE user_id=?;` 
     return <PlayerCharacter[]> await this.all(sql, [user_id]);
   }
-
-  async getCharacter(id: number):Promise<PlayerCharacter> {
-    const sql = `SELECT * FROM characters WHERE id=?;` 
-    return <PlayerCharacter> await this.get(sql, [id]);
-  }
    
   async hasUser(username:string) {
     const sql = `SELECT * FROM users WHERE username=?;` 
@@ -164,9 +159,9 @@ class Database {
   ///////////////////////////////////////
   ///////////////////////////////////////
 
-  async getPlayer(character_id: any) {
+  async getCharacter(id: number){
     const sql = `SELECT * FROM characters WHERE id=?;` 
-    return await this.get(sql, [character_id]);
+    return await this.get(sql, [id]);
   }
 
   async createCharacter(token, name) {
