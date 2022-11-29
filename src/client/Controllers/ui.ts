@@ -45,7 +45,7 @@ export class Hud {
 
         quitButton.onPointerDownObservable.add(() => { 
             room.leave();
-            Config.goToScene(State.START);
+            Config.goToScene(State.CHARACTER_SELECTION);
         });
 
         ////////////////////////////

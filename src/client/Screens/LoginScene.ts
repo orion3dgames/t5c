@@ -125,7 +125,7 @@ export class LoginScene {
 
         global.T5C.currentUser = JSON.parse(req.data).user;
 
-        Config.goToScene(State.START);
+        Config.goToScene(State.CHARACTER_SELECTION);
 
     }
 

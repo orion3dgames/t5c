@@ -107,9 +107,12 @@ class Database {
     return await this.get(sql, [username, password]);
   }
 
-  async getUserById(user_id: number) {
+  async getUserById(user_id: number):Promise<PlayerUser> {
     const sql = `SELECT * FROM users WHERE id=?;` 
-    return await this.get(sql, [user_id]);
+    let user = await <any> this.get(sql, [user_id]);
+    console.log(user);
+    user.characters = await this.getCharactersForUser(user.id);
+    return user;
   }
 
   async getUserByToken(token: any):Promise<PlayerUser> { 
@@ -126,7 +129,7 @@ class Database {
     const sql = `SELECT * FROM characters WHERE id=?;` 
     return <PlayerCharacter> await this.get(sql, [id]);
   }
-  
+   
   async hasUser(username:string) {
     const sql = `SELECT * FROM users WHERE username=?;` 
     return await this.get(sql, [username]);
@@ -142,16 +145,19 @@ class Database {
 
   async checkToken(token: string):Promise<PlayerUser> {
     let user = await this.getUserByToken(token);
+    console.log(user);
     user.characters = await this.getCharactersForUser(user.id);
     return user;
   }
 
-  async saveUser(data: { username: any; password: any; }) {
-    const sql = `INSERT INTO users ("username","password") VALUES (
-        "${data.username}", 
-        "${data.password}", 
-      );` 
-    return this.db.run(sql);
+  async saveUser(username: string, password: string, token:string = nanoid()) {
+    const sql = `INSERT INTO users ("username","password", "token") VALUES (
+        "${username}", 
+        "${password}", 
+        "${token}" 
+      );`;
+    let c = await <any> this.run(sql);
+    return await this.getUserById(c.id);
   }
 
   ///////////////////////////////////////

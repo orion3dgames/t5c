@@ -95,12 +95,12 @@ export class GameRoom extends Room<StateHandlerSchema> {
         this.onMessage("playerTeleport", (client, location) => {
             console.log("playerTeleport", client.sessionId, location);
             let newLocation = Config.locations[location];
-            this.database.updatePlayer(client.auth.id, {
-                location: location,
+            this.database.updateCharacter(client.auth.id, {
+                location: newLocation.key,
                 x: newLocation.x,
                 y: newLocation.y,
                 z: newLocation.z,
-                rot: 0
+                rot: 0,
             });
             this.state.setLocation(client.sessionId, location);
             client.send('playerTeleportConfirm', location)

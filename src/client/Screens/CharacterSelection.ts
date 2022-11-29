@@ -18,13 +18,6 @@ export class CharacterSelectionScene {
 
     public async createScene(engine) {
 
-        global.T5C.currentUser = {
-            id: 1,
-            username: 'test',
-            password: 'test',
-            token: 'G5IgCLfAcBFgifKFLVycT'
-        }
-
         // create scene
         let scene = new Scene(engine);
 

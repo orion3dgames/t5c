@@ -1,9 +1,9 @@
 // Colyseus + Express
-
 import { createServer } from "http";
 import express, { Request } from "express";
 import cors from "cors";
 import path from "path";
+import fs from "fs";
 
 import { Server, matchMaker, LobbyRoom } from "@colyseus/core";
 import { WebSocketTransport } from '@colyseus/ws-transport';
@@ -11,6 +11,13 @@ import { GameRoom } from "./rooms/GameRoom";
 import { ChatRoom } from "./rooms/ChatRoom";
 
 import Logger from "../shared/Logger";
+
+///  REMOVE DATABASE
+try {
+  fs.unlinkSync('./database.db')
+} catch(err) {
+  console.error(err)
+}
 
 //////////////////////////////////////////////////
 ///////////// COLYSEUS GAME SERVER ///////////////
@@ -83,14 +90,12 @@ clientApp.listen(3001, () =>
 );
 
 clientApp.post('/login', function (req, res) {
-  let username = req.query.username;
-  let password = req.query.password;
+  const username:string = req.query.username as string ?? '';
+  const password:string = req.query.password as string ?? '';
   if(username && password){
-    database.getUser(username, password).then((user:any)=>{
+    database.getUser(username, password).then((user:PlayerUser)=>{
       if(!user) {
-        return res.status(400).send({
-          message: "Login Failed"
-        });
+        return database.saveUser(username, password);
       }
       return database.refreshToken(user.id);
     }).then((user)=>{
