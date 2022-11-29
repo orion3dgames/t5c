@@ -42,7 +42,7 @@ if (process.env.NODE_ENV !== "production") {
 gameServer.listen(port).then(()=>{
   
   // server is now running
-  Logger.info("listening on http://localhost:"+ port)
+  Logger.info("gameserver listening on http://localhost:"+ port)
   
   // create town room
   matchMaker.createRoom("game_room", { location: "town" });
@@ -61,6 +61,7 @@ gameServer.listen(port).then(()=>{
 import databaseInstance from "../shared/Database";
 let database = new databaseInstance();
 
+// default to built client index.html
 require('dotenv').config();
 let indexPath = "dist/client/";
 let clientFile = "index.html";
@@ -72,6 +73,11 @@ let indexFile = path.resolve(indexPath + clientFile);
 clientApp.get('/', function (req, res) {
   res.sendFile(indexFile);
 });
+
+// small api to interact with database
+clientApp.listen(3001, () =>
+  Logger.info("api listening on http://localhost:3001")
+);
 
 clientApp.post('/login', function (req, res) {
   let username = req.query.username;
@@ -97,10 +103,31 @@ clientApp.post('/login', function (req, res) {
   }
 });
 
+clientApp.post('/check', function (req, res) {
+  let token = req.query.token;
+  if(token){
+    database.checkToken(token).then((user:any)=>{
+      if(!user) {
+        return res.status(400).send({
+          message: "Check Failed"
+        });
+      }else{
+        return res.send({
+          message: "Check Successful",
+          user: user
+        });
+      }
+    })
+  }else{
+    return res.status(400).send({
+      message: "Check Failed"
+    });
+  }
+});
+
 clientApp.get('/register', function (req, res) {
   
 });
 
-clientApp.listen(3001, () =>
-  console.log(`Example app listening on port 3001!`),
-);
+
+

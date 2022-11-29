@@ -5,6 +5,8 @@ export {
     PlayerInputs,
     PlayerLocation,
     PlayerMessage,
+    PlayerUser,
+    PlayerCharacter
 };
 
 type PlayerInputs = {
@@ -28,9 +30,23 @@ type PlayerMessage = {
     createdAt: string
 };
 
-type PlayerLogin = {
+type PlayerUser = {
+    id: number,
     username: string,
-    password: string
+    password: string,
+    token: string,
+    characters?: PlayerCharacter[]
+}
+
+type PlayerCharacter = {
+    id: number,
+    user_id: number,
+    name: string,
+    location: string,
+    x: number,
+    y: number,
+    z: number,
+    rot: number
 }
 
 declare global {

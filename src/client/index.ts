@@ -15,6 +15,7 @@ import Config from "../shared/Config";
 import * as Colyseus from "colyseus.js";
 import { GameNetwork } from "./Controllers/network";
 import { LoginScene } from "./Screens/LoginScene";
+import { CharacterSelectionScene } from "./Screens/CharacterSelection";
 
 // App class is our entire game application
 class App {
@@ -86,6 +87,17 @@ class App {
                 case State.LOGIN:
                     this.clearScene();
                     this._currentScene = new LoginScene();
+                    this._currentScene.createScene(this._engine, this._client);
+                    this._scene = this._currentScene._scene;
+                    this._state = State.NULL;
+                    break;
+
+                ///////////////////////////////////////
+                ///////////////////////////////////////
+                ///////////////////////////////////////
+                case State.CHARACTER_SELECTION:
+                    this.clearScene();
+                    this._currentScene = new CharacterSelectionScene();
                     this._currentScene.createScene(this._engine, this._client);
                     this._scene = this._currentScene._scene;
                     this._state = State.NULL;

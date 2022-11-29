@@ -1,8 +1,11 @@
 import { Scene, Engine, Color4, Vector3, FreeCamera } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button } from "@babylonjs/gui";
+import { debug } from "console";
+import Config from "../../shared/Config";
+import { request } from "../../shared/Requests";
 import State from "./Screens";
 
-export class StartScene {
+export class CharacterSelectionScene {
     
     public _scene: Scene;
     private _gui: AdvancedDynamicTexture;
@@ -13,6 +16,13 @@ export class StartScene {
     }
 
     public async createScene(engine) {
+
+        global.T5C.currentUser = {
+            id: 1,
+            username: 'test',
+            password: 'test',
+            token: 'G5IgCLfAcBFgifKFLVycT'
+        }
 
         // create scene
         let scene = new Scene(engine);
@@ -63,6 +73,24 @@ export class StartScene {
         this._scene = scene;
 
         await this._scene.whenReadyAsync();
+
+        // 
+        let user = await this.checkLogin();
+        console.log(user);
+        if(!user){
+            Config.goToScene(State.LOGIN);
+        }
+
+    }
+
+    async checkLogin(){
+
+        // check user exists else send back to login
+        let req = await request('post', Config.loginUrlLocal+'/check', {
+            token: global.T5C.currentUser.token,
+        });
+
+        return JSON.parse(req.data).user;
     }
 
 }

@@ -2,6 +2,7 @@ const sqlite3 = require('sqlite3');
 const dbFilePath = './database.db';
 import Logger from "./Logger";
 import { nanoid } from 'nanoid';
+import { PlayerCharacter, PlayerUser } from "./types";
 
 class Database {
 
@@ -13,8 +14,6 @@ class Database {
         Logger.error("Could not connect to database: "+dbFilePath, err);
       } else {
         Logger.info("Connected to database: "+dbFilePath);
-
-        // initialize all tables
         this.create();
       }
     });
@@ -32,17 +31,20 @@ class Database {
     const playersSql = `CREATE TABLE IF NOT EXISTS "characters" (
       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
       "user_id" INTEGER,
+      "name" TEXT,
       "location" TEXT,
       "x" REAL DEFAULT 0.0,
       "y"	REAL DEFAULT 0.0,
-      "z"	REAL DEFAULT 0.0,
-      "rot" REAL DEFAULT 0.0,
-      "token" TEXT
+      "z"	REAL DEFAULT 0.0, 
+      "rot" REAL DEFAULT 0.0
     );`
+
+    //const defaultUser = `INSERT INTO users ("username","password") VALUES ("test", "test");`  
 
     this.db.serialize(() => {
       this.db.run(usersSql);
       this.db.run(playersSql);
+      //this.db.run(defaultUser);
     });
 
     Logger.info("Creating default database structure.");
@@ -108,6 +110,16 @@ class Database {
     return await this.get(sql, [user_id]);
   }
 
+  async getUserByToken(token):Promise<PlayerUser> {
+    const sql = `SELECT * FROM users WHERE token=?;` 
+    return await this.get(sql, [token]);
+  }
+
+  async getCharactersForUser(user_id):Promise<PlayerCharacter[]> {
+    const sql = `SELECT * FROM characters WHERE user_id=?;` 
+    return await this.all(sql, [user_id]);
+  }
+
   async hasUser(username) {
     const sql = `SELECT * FROM users WHERE username=?;` 
     return await this.get(sql, [username]);
@@ -120,6 +132,14 @@ class Database {
     console.log("TOKEN REFRESHED", token);
     let user = await this.getUserById(user_id);
     console.log("USER FOUND", user);
+    return user;
+  }
+
+  async checkToken(token) {
+    let sql = `SELECT * FROM users WHERE token=?;` 
+    let user:PlayerUser = await this.getUserByToken(token);
+    console.log(user);
+    user.characters = await this.getCharactersForUser(user.id);
     return user;
   }
 

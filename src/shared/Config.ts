@@ -44,7 +44,7 @@ let Config = {
     // functions
     setDefault(){
         global.T5C = {
-            nextScene: State.START,
+            nextScene: State.CHARACTER_SELECTION,
             currentRoomID: "",
             currentSessionID: "",
             currentLocation: Config.locations[Config.initialLocation],
