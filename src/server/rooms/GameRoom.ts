@@ -59,7 +59,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
                 });
                 Logger.info("Saving data for "+this.state.players.size+" players / every 5 seconds.");
             }
-        }, 5000);
+        }, 1000);
     }
 
     // Authorize client based on provided options before WebSocket handshake is complete
