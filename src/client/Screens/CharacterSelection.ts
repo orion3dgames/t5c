@@ -5,6 +5,7 @@ import Config from "../../shared/Config";
 import { request } from "../../shared/Requests";
 import State from "./Screens";
 import { PlayerCharacter, PlayerUser } from "../../shared/types";
+import { apiUrl } from "../../shared/Utils";
 
 export class CharacterSelectionScene {
     
@@ -145,7 +146,7 @@ export class CharacterSelectionScene {
     async checkLogin(){
 
         // check user exists else send back to login
-        let req = await request('post', Config.apiUrlLocal+'/check', {
+        let req = await request('post', apiUrl()+'/check', {
             token: global.T5C.currentUser.token,
         });
 
@@ -156,7 +157,7 @@ export class CharacterSelectionScene {
     async createCharacter(name){
 
         // check user exists else send back to login
-        let req = await request('post', Config.apiUrlLocal+'/create_character', {
+        let req = await request('post', apiUrl()+'/create_character', {
             token: global.T5C.currentUser.token,
             name: name
         });

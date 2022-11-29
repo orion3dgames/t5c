@@ -2,7 +2,7 @@ import { Engine, Scene, Color4, Vector3, FreeCamera } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText, InputPassword } from "@babylonjs/gui";
 import Config from "../../shared/Config";
 import State from "./Screens";
-import { generateRandomPlayerName } from "../../shared/Utils";
+import { apiUrl, generateRandomPlayerName } from "../../shared/Utils";
 import { request } from "../../shared/Requests"
 export class LoginScene {
     
@@ -118,7 +118,7 @@ export class LoginScene {
 
     async connect(username:string, password:string){
 
-        let req = await request('post', Config.apiUrlLocal+'/login', {
+        let req = await request('post', apiUrl()+'/login', {
             username: username,
             password: password
         });

@@ -1,3 +1,4 @@
+import Config from "./Config";
 
 const countPlayers = function(object){
     var length = 0;
@@ -12,6 +13,16 @@ const countPlayers = function(object){
 const roundToTwo = function(num: number) {
     return Math.round(num * 100) / 100;
 }
+
+const apiUrl = function() {
+    let url = Config.apiUrlProduction;
+    if (window.location.host === "localhost:8080") {
+        url = Config.apiUrlLocal;
+    }
+    return url;
+}
+
+
 
 var nameList = [
     'Time','Past','Future','Dev',
@@ -45,5 +56,6 @@ const generateRandomPlayerName = function() {
 export {
     generateRandomPlayerName,
     countPlayers,
-    roundToTwo
+    roundToTwo,
+    apiUrl
 }
