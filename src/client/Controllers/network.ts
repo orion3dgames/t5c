@@ -23,10 +23,15 @@ export class GameNetwork {
     }
 
     public async joinRoom(roomId, token, character_id):Promise<any> {
+        console.log('joinRoom',{ 
+            token: token,
+            character_id: character_id
+        });
         return await this._client.joinById(roomId, { 
             token: token,
             character_id: character_id
         });
+        
     }
     
 

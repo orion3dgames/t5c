@@ -80,7 +80,7 @@ export class Hud {
         chat_input.onKeyboardEventProcessedObservable.add((ev) => { 
             if((ev.key==="Enter" || ev.code==="Enter") && chat_input.text != ""){
                 chatRoom.send("message", {
-                    username: global.T5C.currentUser.user.displayName,
+                    username: global.T5C.currentCharacter.name,
                     message: chat_input.text
                 });
                 chat_input.text = "";

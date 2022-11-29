@@ -94,6 +94,11 @@ export class GameScene {
             let currentLocationKey = global.T5C.currentLocation.key;
             let room = await this._client.findCurrentRoom(currentLocationKey);
 
+            console.log(user);
+            console.log(character);
+            console.log(currentLocationKey);
+            console.log(room);
+
             if(room){
 
                 // join game room
