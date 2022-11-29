@@ -12,13 +12,6 @@ import { ChatRoom } from "./rooms/ChatRoom";
 
 import Logger from "../shared/Logger";
 
-///  REMOVE DATABASE
-try {
-  fs.unlinkSync('./database.db')
-} catch(err) {
-  console.error(err)
-}
-
 //////////////////////////////////////////////////
 ///////////// COLYSEUS GAME SERVER ///////////////
 //////////////////////////////////////////////////

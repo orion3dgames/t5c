@@ -68,7 +68,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
     // Authorize client based on provided options before WebSocket handshake is complete
     async onAuth (client: Client, data: any, request: http.IncomingMessage) { 
         const character = await this.database.getCharacter(data.character_id)
-        console.log(data, character);
+        console.log('found', character, data);
         if (character) {
             return character;
         } else {
