@@ -90,13 +90,14 @@ export class GameScene {
         try {
 
             let user = global.T5C.currentUser;
+            let character = global.T5C.currentCharacter;
             let currentLocationKey = global.T5C.currentLocation.key;
             let room = await this._client.findCurrentRoom(currentLocationKey);
 
             if(room){
 
                 // join game room
-                this.room = await this._client.joinRoom(room.roomId, user.token);
+                this.room = await this._client.joinRoom(room.roomId, user.token, character.id);
 
                 // join global chat room
                 this.chatRoom = await this._client.joinChatRoom();

@@ -68,23 +68,13 @@ export class GameRoom extends Room<StateHandlerSchema> {
 
     // Authorize client based on provided options before WebSocket handshake is complete
     async onAuth (client: Client, data: any, request: http.IncomingMessage) { 
-
         /*
-        // find user in database
-        const userData = await this.database.getPlayer(data.username)
-        if (userData) {
-            return userData;
+        const user = await this.database.checkLogin(data.token)
+        if (user) {
+            return user;
         } else {
-            let defaultSpawnPoint = Config.locations[Config.initialLocation].spawnPoint;
-            return this.database.savePlayer({
-                username: data.username,
-                location: data.location,
-                x: defaultSpawnPoint.x,
-                y: defaultSpawnPoint.y,
-                z: defaultSpawnPoint.z,
-                rot: 0,
-            })
-        }*/
+            return false;
+        } */
         return true;
     }
 
@@ -94,8 +84,9 @@ export class GameRoom extends Room<StateHandlerSchema> {
         Logger.info(`player ${client.sessionId} joined room ${this.roomId}.`, options);
 
         // find player in database and set database data to player
-        let player = await this.database.getPlayer(options.username)
-        this.state.addPlayer(client.sessionId, player);
+        const user = await this.database.checkToken(options.token)
+        const character = await this.database.getCharacter(options.character_id)
+        this.state.addPlayer(client.sessionId, character);
         
         // on player input event
         this.onMessage("playerInput", (client, data: any) => {

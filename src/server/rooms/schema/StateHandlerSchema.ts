@@ -2,6 +2,7 @@ import {Schema, type, MapSchema} from '@colyseus/schema';
 import {PlayerSchema} from './PlayerSchema';
 import Logger from "../../../shared/Logger";
 import Config from '../../../shared/Config';
+import { PlayerCharacter } from '../../../shared/types';
 
 export class StateHandlerSchema extends Schema {
 
@@ -9,10 +10,10 @@ export class StateHandlerSchema extends Schema {
     @type("number") serverTime: number = 0.0;
     public navMesh: any;
 
-    addPlayer(sessionId: string, data:PlayerSchema) {
+    addPlayer(sessionId: string, data:PlayerCharacter) {
         this.players.set(sessionId, new PlayerSchema().assign({
             sessionId: sessionId,
-            username: data.username,
+            username: data.name,
             location: data.location,
             x: data.x,
             y: data.y,
