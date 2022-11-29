@@ -46,7 +46,6 @@ export class GameRoom extends Room<StateHandlerSchema> {
         // Set an interval and store a reference to it
         // so that we may clear it later
         this.delayedInterval = this.clock.setInterval(() => {
-
             if(this.state.players.size > 0){
                 this.state.players.forEach(player => {
                     let playerClient = this.clients.hashedArray[player.sessionId];
@@ -58,22 +57,21 @@ export class GameRoom extends Room<StateHandlerSchema> {
                         rot: player.rot,
                     });
                 });
-
                 Logger.info("Saving data for "+this.state.players.size+" players / every 5 seconds.");
             }
-
         }, 5000);
     }
 
     // Authorize client based on provided options before WebSocket handshake is complete
     async onAuth (client: Client, data: any, request: http.IncomingMessage) { 
         const character = await this.database.getCharacter(data.character_id)
-        console.log('found', character, data);
-        if (character == null) {
+        console.log('onAuth server', character, data);
+        if (!character) {
             throw new ServerError(400, "bad access token");
-        } else {
+        }else{
             return character;
         }
+        return false;
     }
 
     async onJoin(client: Client, options: any) {
