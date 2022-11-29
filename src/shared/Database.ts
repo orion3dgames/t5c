@@ -61,7 +61,7 @@ class Database {
           console.log(err)
           reject(err)
         } else {
-          console.log('sql: ' + sql, result)
+          console.log('sql: ' + sql, params, result)
           resolve(result)
         }
       })
