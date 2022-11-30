@@ -1,5 +1,5 @@
 import { Scene, Color4, Vector3, FreeCamera } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText, Image } from "@babylonjs/gui";
+import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText, Image, ScrollViewer } from "@babylonjs/gui";
 import State from "./Screens";
 import { PlayerCharacter, PlayerUser } from "../../shared/types";
 
@@ -77,26 +77,36 @@ export class CharacterSelectionScene {
         leftColumnRect.addControl(leftColumnRectPad);
         this.leftColumnRect = leftColumnRectPad;
 
-        // logo text
-        const title = new TextBlock("title", Config.title);
-        title.top = "-40px";
-        title.resizeToFit = true;
-        title.fontSize = "40px";
-        title.color = "white";
-        title.width = 0.8;
-        title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        this.leftColumnRect.addControl(title);
+       // logo
+       const title = new TextBlock("title", Config.title);
+       title.top = "30px";
+       title.fontSize = "40px";
+       title.color = "white";
+       title.width = 0.8;
+       title.height = "40px";
+       title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+       leftColumnRect.addControl(title);
 
-        // welcome text
-        const titleScec = new TextBlock("title", "Welcome \n "+global.T5C.currentUser.username);
-        title.top = "80px";
-        title.resizeToFit = true;
-        title.fontSize = "30px";
-        title.color = "white";
-        title.resizeToFit = true;
-        title.width = 0.8;
-        title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        this.leftColumnRect.addControl(titleScec);
+       // welcome text
+       const welcomeText = new TextBlock("infotext", "Welcome "+global.T5C.currentUser.username);
+       welcomeText.width = 0.8
+       welcomeText.height = "40px";
+       welcomeText.color = "white";
+       welcomeText.top = "80px";
+       welcomeText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+       welcomeText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+       leftColumnRect.addControl(welcomeText);
+
+        // add scrollable container
+        var scrollViewerBloc = new ScrollViewer("chat-scroll-viewer");
+        scrollViewerBloc.width = 1;
+        scrollViewerBloc.height = .4;
+        scrollViewerBloc.left = '0px';
+        scrollViewerBloc.top = "160px";
+        scrollViewerBloc.background = "#222222";
+        scrollViewerBloc.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        scrollViewerBloc.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        this.leftColumnRect.addControl(scrollViewerBloc);
 
         // logout btn
         const logoutBtn = Button.CreateSimpleButton("logoutBtn", "Logout");
@@ -126,7 +136,7 @@ export class CharacterSelectionScene {
         }
 
         // SHOW AVAILABLE CHARACTERS GUI
-        await this.displayCharactersGUI(user.characters as PlayerCharacter[]);
+        await this.displayCharactersGUI(user.characters as PlayerCharacter[], scrollViewerBloc);
         
         // SHOW NEW PLAYER GUI
         await this.displayCreateNewCharacterGUI();
@@ -170,9 +180,9 @@ export class CharacterSelectionScene {
 
     }
 
-    async displayCharactersGUI(characters:PlayerCharacter[]){
+    async displayCharactersGUI(characters:PlayerCharacter[], scrollViewerBloc){
 
-        let top = 200;
+        let top = 0;
         characters.forEach(char => {
 
             const createBtn = Button.CreateSimpleButton("characterBtn-"+char.id, "Play as: "+char.name);
@@ -184,7 +194,7 @@ export class CharacterSelectionScene {
             createBtn.thickness = 1;
             createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
             createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-            this.leftColumnRect.addControl(createBtn);
+            scrollViewerBloc.addControl(createBtn);
 
             createBtn.onPointerDownObservable.add(() => { 
                 this.loginAs(char);

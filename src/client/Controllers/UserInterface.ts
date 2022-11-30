@@ -33,11 +33,11 @@ export class UserInterface {
         // add a quit button
         const quitButton = Button.CreateSimpleButton("quit", "Quit");;
         quitButton.width = 0.2
-        quitButton.height = "40px";
+        quitButton.height = "30px";
         quitButton.color = "white";
         quitButton.top = "20px"; 
         quitButton.left = "-20px";
-        quitButton.background = "#222"; 
+        quitButton.background = "#000"; 
         quitButton.thickness = 1;
         quitButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         quitButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
@@ -72,6 +72,7 @@ export class UserInterface {
         chat_input.left = '20px';
         chat_input.top = "-20px";
         chat_input.color = "#FFF";
+        chat_input.placeholderText = "Write message here...";
         chat_input.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         chat_input.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         this._playerUI.addControl(chat_input);
