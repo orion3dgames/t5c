@@ -110,6 +110,15 @@ export class UserInterface {
             createdAt: ""
         }); 
 
+        // add default chat message
+        this.messages.push({
+            senderID: "SYSTEM",
+            message: "Please note: When you change zones, you can end up stuck, just use the quit button a create new character until I fix this bug.",
+            username: "SYSTEM",
+            timestamp: 0,
+            createdAt: ""
+        }); 
+
         // add scrollable container
         var sv = new ScrollViewer("chat-scroll-viewer");
         sv.width = 0.5;
