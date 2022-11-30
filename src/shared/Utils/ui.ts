@@ -1,10 +1,9 @@
-
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 
-export default function alertMessage(gui, message) {
+const createBtn = function(gui, message) {
    
    // add background 
    const imageRect = new Rectangle("popupContainer");
@@ -49,4 +48,8 @@ export default function alertMessage(gui, message) {
       imageRect.dispose();
    });
    
+}
+
+export {
+    createBtn
 }
