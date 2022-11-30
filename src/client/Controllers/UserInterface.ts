@@ -15,7 +15,7 @@ export class UserInterface {
 
     //UI Elements
     private _playerUI;
-    private _chatUI;
+    private _chatUI; 
 
     //Chat
     public messages: PlayerMessage[] = [];
