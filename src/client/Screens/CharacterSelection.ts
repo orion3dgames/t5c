@@ -61,7 +61,17 @@ export class CharacterSelectionScene {
         leftColumnRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         leftColumnRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         imageRect.addControl(leftColumnRect);
-        this.leftColumnRect = leftColumnRect;
+
+
+        const leftColumnRectPad = new Rectangle("leftColumnRectPad");
+        leftColumnRectPad.top = 0;
+        leftColumnRectPad.width = .9;
+        leftColumnRectPad.height = 1;
+        leftColumnRectPad.thickness = 0;
+        leftColumnRectPad.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        leftColumnRectPad.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        leftColumnRect.addControl(leftColumnRectPad);
+        this.leftColumnRect = leftColumnRectPad;
 
         // logo
         const title = new TextBlock("title", Config.title);
@@ -69,7 +79,7 @@ export class CharacterSelectionScene {
         title.fontSize = "40px";
         title.color = "white";
         title.resizeToFit = true;
-        title.top = "20px";
+        title.top = "0px";
         title.width = 0.8;
         title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         leftColumnRect.addControl(title);
@@ -85,7 +95,7 @@ export class CharacterSelectionScene {
         leftColumnRect.addControl(titleScec);
 
         const logoutBtn = Button.CreateSimpleButton("logoutBtn", "Logout");
-        logoutBtn.top = "30px";
+        logoutBtn.top = "-30px";
         logoutBtn.width = 1;
         logoutBtn.height = "30px";
         logoutBtn.color = "white";
