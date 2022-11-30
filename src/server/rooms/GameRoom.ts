@@ -43,6 +43,8 @@ export class GameRoom extends Room<StateHandlerSchema> {
         this.database = new databaseInstance();
 
         // if players are in a room, make sure we save any changes to the database.
+        // still a bug here when the databse saves at the same times as the player move is coming 
+        // to investigate
         this.delayedInterval = this.clock.setInterval(() => {
             if(this.state.players.size > 0){
                 this.state.players.forEach(player => {
@@ -93,13 +95,14 @@ export class GameRoom extends Room<StateHandlerSchema> {
 
             // update player location in database
             let newLocation = Config.locations[location];
-            this.database.updateCharacter(client.auth.id, {
+            let updateObj = {
                 location: newLocation.key,
-                x: newLocation.x,
-                y: newLocation.y,
-                z: newLocation.z,
+                x: newLocation.spawnPoint.x,
+                y: newLocation.spawnPoint.y,
+                z: newLocation.spawnPoint.z,
                 rot: 0,
-            });
+            };
+            this.database.updateCharacter(client.auth.id, updateObj);
             
             // update player state
             this.state.setLocation(client.sessionId, location);

@@ -91,7 +91,7 @@ class Database {
           console.log(err)
           reject(err)
         } else {
-          //console.log('sql: ' + sql)
+          //console.log('sql: ' + sql, params)
           resolve({ id: this.lastID })
         }
       })
@@ -180,7 +180,7 @@ class Database {
 
   async updateCharacter(character_id:number, data: { location: any; x: any; y: any; z: any; rot: any; }) {
     const sql = `UPDATE characters SET location=?, x=?, y=?, z=?, rot=? WHERE id=? ;` 
-    return this.db.run(sql, [
+    return this.run(sql, [
       data.location,
       data.x,
       data.y,

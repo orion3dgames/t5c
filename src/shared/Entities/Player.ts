@@ -99,7 +99,7 @@ export class Player extends TransformNode {
         this.moveController.setPositionAndRotation(entity); // set default entity position
 
         // add player nameplate
-        this.characterLabel = this.utilsController.addLabel(this.mesh, this.ui, entity.username);
+        this.characterLabel = this.addLabel(entity.username);
 
         // render loop
         this.scene.registerBeforeRender(() => {
@@ -155,8 +155,37 @@ export class Player extends TransformNode {
 
         // listen to playerTeleportConfirm event
         this._room.onMessage('playerTeleportConfirm', (location) => {
-            this.utilsController.teleport(location)
+            this.teleport(location)
         });
+    }
+
+    public async teleport(location){
+        await this._room.leave();
+        global.T5C.currentLocation = Config.locations[location];
+        global.T5C.currentLocationKey = location;
+        global.T5C.currentCharacter.location = location;
+        global.T5C.currentRoomID = "";
+        global.T5C.nextScene = State.GAME;
+    }
+
+    public addLabel(text) {
+
+        var rect1 = new Rectangle();
+        rect1.width = "100px";
+        rect1.height = "40px";
+        rect1.cornerRadius = 20;
+        rect1.color = "white";
+        rect1.thickness = 4;
+        rect1.background = "black";
+        this.ui._playerUI.addControl(rect1);
+        rect1.linkWithMesh(this.mesh);
+        rect1.linkOffsetY = -150;
+
+        var label = new TextBlock();
+        label.text = text;
+        rect1.addControl(label);
+
+        return rect1;
     }
 
     public removePlayer() {

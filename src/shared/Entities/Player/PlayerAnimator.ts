@@ -1,6 +1,6 @@
 import { AnimationGroup } from "@babylonjs/core";
 import { Vector3 } from "babylonjs";
-import { roundToTwo } from "../../Utils";
+import { roundToTwo, roundTo } from "../../Utils";
 
 export class PlayerAnimator {
 
@@ -42,12 +42,10 @@ export class PlayerAnimator {
 
     public animate(currentPos, nextPos): void {
 
-        console.log(currentPos, nextPos);
-
         // if position has changed
         if(currentPos && nextPos && (
-            roundToTwo(currentPos.x) !== roundToTwo(nextPos.x) ||
-            roundToTwo(currentPos.y) !== roundToTwo(nextPos.y)
+            roundTo(currentPos.x, 2) !== roundTo(nextPos.x, 2) ||
+            roundTo(currentPos.y, 2) !== roundTo(nextPos.y, 2)
         )) {
             this._currentAnim = this._walk;
         } else {

@@ -16,6 +16,10 @@ const roundToTwo = function(num: number) {
     return Math.round(num * 100) / 100;
 }
 
+const roundTo = function(num: number, decimal:number = 2) {
+    return num.toFixed(decimal);
+}
+
 const apiUrl = function() {
     let url = Config.apiUrlProduction;
     if (window.location.host === "localhost:8080") {
@@ -59,5 +63,6 @@ export {
     generateRandomPlayerName,
     apiUrl,
     roundToTwo,
+    roundTo,
     countPlayers
 }
