@@ -1,6 +1,8 @@
 import State from "../client/Screens/Screens"
 
 let Config = {
+    
+    title: "T5C",
 
     // basic server settings
     serverUrlLocal: "ws://localhost:3000",
@@ -47,7 +49,7 @@ let Config = {
     // functions
     setDefault(){
         global.T5C = {
-            nextScene: State.LOGIN,
+            nextScene: State.CHARACTER_SELECTION,
             currentRoomID: "",
             currentSessionID: "",
             currentLocation: Config.locations[Config.initialLocation],

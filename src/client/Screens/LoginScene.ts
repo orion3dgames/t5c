@@ -30,15 +30,25 @@ export class LoginScene {
         const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
         guiMenu.idealHeight = 720;
 
-        //background image
-        const imageRect = new Rectangle("titleContainer");
+        // background image
+        const imageRect = new Rectangle("background");
         imageRect.width = 1;
         imageRect.height = 1;
         imageRect.background = "#999999";
         imageRect.thickness = 0;
         guiMenu.addControl(imageRect);
 
-        const title = new TextBlock("title", "T5C");
+        // middle columm
+        const columnRect = new Rectangle("column");
+        columnRect.width = .4;
+        columnRect.height = 1;
+        columnRect.background = "#000000";
+        columnRect.thickness = 0;
+        columnRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        imageRect.addControl(columnRect);
+
+        // logo
+        const title = new TextBlock("title", Config.title);
         title.resizeToFit = true;
         title.fontSize = "40px";
         title.color = "white";
@@ -46,40 +56,29 @@ export class LoginScene {
         title.top = "30px";
         title.width = 0.8;
         title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        guiMenu.addControl(title);
+        columnRect.addControl(title);
 
+        // welcome text
         const welcomeText = new TextBlock("infotext", "if account does not \n exist, it will create one");
-        welcomeText.width = 0.5
+        welcomeText.width = 0.8
         welcomeText.height = "40px";
         welcomeText.color = "white";
         welcomeText.top = "80px";
         welcomeText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         welcomeText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        guiMenu.addControl(welcomeText);
+        columnRect.addControl(welcomeText);
 
-        const joinBtn = Button.CreateSimpleButton("back", "Connect To Game");
-        joinBtn.width = 0.5
-        joinBtn.height = "40px";
-        joinBtn.color = "white";
-        joinBtn.top = "40px";
-        joinBtn.thickness = 1;
-        joinBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        joinBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-        guiMenu.addControl(joinBtn);
-
-        ////////////////////////////
-        // add username input 
-
+        ///////////////////////////////////////////
+        // username input 
         const usernameInput = new InputText("usernameInput");
-        usernameInput.top = "-35px;";
-        usernameInput.width = .5;
+        usernameInput.top = "-120px";
+        usernameInput.width = .8;
         usernameInput.height = '30px;'
-        usernameInput.left = .25;
         usernameInput.color = "#FFF";
         usernameInput.placeholderText = "Enter username";
         usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        usernameInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-        guiMenu.addControl(usernameInput); 
+        usernameInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        columnRect.addControl(usernameInput); 
 
         usernameInput.onKeyboardEventProcessedObservable.add(ev => {
             if (ev.key === "Tab") {
@@ -88,15 +87,17 @@ export class LoginScene {
             }
         })
 
+        ///////////////////////////////////////////
+        // password input
         const passwordInput = new InputPassword("passwordInput");
-        passwordInput.width = .5;
+        passwordInput.width = .8;
         passwordInput.height = '30px;'
-        passwordInput.left = .25;
         passwordInput.color = "#FFF";
+        passwordInput.top = "-80px";
         passwordInput.placeholderText = "Enter password";
         passwordInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        passwordInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-        guiMenu.addControl(passwordInput);  
+        passwordInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        columnRect.addControl(passwordInput);  
 
         passwordInput.onKeyboardEventProcessedObservable.add(ev => {
             if (ev.key === "Enter") {
@@ -106,17 +107,27 @@ export class LoginScene {
             }
         })
 
+        ///////////////////////////////////////////
         // login button
+        const joinBtn = Button.CreateSimpleButton("back", "Connect To Game");
+        joinBtn.width = .8;
+        joinBtn.height = "30px";
+        joinBtn.color = "white";
+        joinBtn.top = "-40px";
+        joinBtn.thickness = 1;
+        joinBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        joinBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        columnRect.addControl(joinBtn);
+
         joinBtn.onPointerDownObservable.add(() => { 
             this.connect(usernameInput.text, passwordInput.text);
             usernameInput.text = "";
             passwordInput.text = "";
         });
 
+        // load scene
         this._ui = guiMenu;
-
         this._scene = scene;
-
         await this._scene.whenReadyAsync();
 
     }

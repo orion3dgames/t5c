@@ -1,10 +1,11 @@
 import { Scene, Color4, Vector3, FreeCamera } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText } from "@babylonjs/gui";
+import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText, StackPanel } from "@babylonjs/gui";
 import State from "./Screens";
 import { PlayerCharacter, PlayerUser } from "../../shared/types";
 
 import Config from "../../shared/Config";
 import { request, apiUrl} from "../../shared/Utils";
+import { create } from "domain";
 
 export class CharacterSelectionScene {
     
@@ -12,7 +13,16 @@ export class CharacterSelectionScene {
     private _gui: AdvancedDynamicTexture;
     public _button: Button;
 
+    private leftColumnRect;
+
     public async createScene(engine) {
+
+        global.T5C.currentUser = {
+            id: 1,
+            username: "Test User",
+            password: "test",
+            token: "l0XcwV3kgVTgIvPFM13mF"
+        }
 
         // create scene
         let scene = new Scene(engine);
@@ -28,26 +38,69 @@ export class CharacterSelectionScene {
         const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI"); 
         guiMenu.idealHeight = 720;
 
-        const imageRect = new Rectangle("titleContainer");
+        // background image
+        const imageRect = new Rectangle("background");
         imageRect.width = 1;
         imageRect.height = 1;
         imageRect.background = "#999999";
         imageRect.thickness = 0;
         guiMenu.addControl(imageRect);
 
-        const title = new TextBlock("title", "Welcome \n "+global.T5C.currentUser.username);
+        //////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////
+
+        // left columm
+        const leftColumnRect = new Rectangle("columnLeft");
+        leftColumnRect.top = 0;
+        leftColumnRect.left = "30px";
+        leftColumnRect.width = .3;
+        leftColumnRect.height = 1;
+        leftColumnRect.background = "#000000";
+        leftColumnRect.thickness = 0;
+        leftColumnRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        leftColumnRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        imageRect.addControl(leftColumnRect);
+        this.leftColumnRect = leftColumnRect;
+
+        // logo
+        const title = new TextBlock("title", Config.title);
+        title.resizeToFit = true;
+        title.fontSize = "40px";
+        title.color = "white";
+        title.resizeToFit = true;
+        title.top = "20px";
+        title.width = 0.8;
+        title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        leftColumnRect.addControl(title);
+
+        const titleScec = new TextBlock("title", "Welcome \n "+global.T5C.currentUser.username);
+        title.top = "50px";
         title.resizeToFit = true;
         title.fontSize = "30px";
         title.color = "white";
         title.resizeToFit = true;
-        title.top = "30px";
         title.width = 0.8;
         title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        imageRect.addControl(title);
+        leftColumnRect.addControl(titleScec);
 
+        const logoutBtn = Button.CreateSimpleButton("logoutBtn", "Logout");
+        logoutBtn.top = "30px";
+        logoutBtn.width = 1;
+        logoutBtn.height = "30px";
+        logoutBtn.color = "white";
+        logoutBtn.thickness = 1;
+        logoutBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        logoutBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        this.leftColumnRect.addControl(logoutBtn);
+
+        logoutBtn.onPointerDownObservable.add(() => { 
+            this.logout();
+        });
+
+        // load scene
         this._scene = scene;
         this._gui = guiMenu;
-
         await this._scene.whenReadyAsync();
 
         // check if user token is valid
@@ -67,25 +120,24 @@ export class CharacterSelectionScene {
     async displayCreateNewCharacterGUI(){
 
         const usernameInput = new InputText("newCharacterInput");
-        usernameInput.top = "-90px;";
-        usernameInput.width = .5;
+        usernameInput.top = "-130px;";
+        usernameInput.width = 1;
         usernameInput.height = '30px;'
-        usernameInput.left = .25;
         usernameInput.color = "#FFF";
         usernameInput.placeholderText = "Enter username";
-        usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         usernameInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        this._gui.addControl(usernameInput); 
+        this.leftColumnRect.addControl(usernameInput); 
 
         const createBtn = Button.CreateSimpleButton("newCharacterBtn", "Create New Character");
-        createBtn.top = "-60px";
-        createBtn.width = .5;
+        createBtn.top = "-100px";
+        createBtn.width = 1;
         createBtn.height = "30px";
         createBtn.color = "white";
         createBtn.thickness = 1;
-        createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        this._gui.addControl(createBtn);
+        this.leftColumnRect.addControl(createBtn);
 
         createBtn.onPointerDownObservable.add(() => { 
             
@@ -110,13 +162,14 @@ export class CharacterSelectionScene {
 
             const createBtn = Button.CreateSimpleButton("characterBtn-"+char.id, "Play as: "+char.name);
             createBtn.top = top+"px";
-            createBtn.width = .5;
+            createBtn.width = 1;
             createBtn.height = "30px";
+            createBtn.background = "#000000";
             createBtn.color = "white";
             createBtn.thickness = 1;
             createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
             createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-            this._gui.addControl(createBtn);
+            this.leftColumnRect.addControl(createBtn);
 
             createBtn.onPointerDownObservable.add(() => { 
                 this.loginAs(char);
@@ -134,6 +187,15 @@ export class CharacterSelectionScene {
         global.T5C.currentLocation = Config.locations[character.location];
         Config.goToScene(State.GAME);
     }
+
+     // logout
+     logout(){
+        global.T5C.currentCharacter = null;
+        global.T5C.currentLocationKey = null;
+        global.T5C.currentLocation = null;
+        Config.goToScene(State.LOGIN);
+    }
+
 
     // check login details
     async checkLogin(){
