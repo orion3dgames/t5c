@@ -61,7 +61,7 @@ class Database {
           console.log(err)
           reject(err)
         } else {
-          console.log('sql: ' + sql, params, result)
+          //console.log('sql: ' + sql, params, result)
           resolve(result)
         }
       })
@@ -76,7 +76,7 @@ class Database {
           console.log(err)
           reject(err)
         } else {
-          console.log('sql: ' + sql)
+          //console.log('sql: ' + sql)
           resolve(rows)
         }
       })
@@ -91,7 +91,7 @@ class Database {
           console.log(err)
           reject(err)
         } else {
-          console.log('sql: ' + sql)
+          //console.log('sql: ' + sql)
           resolve({ id: this.lastID })
         }
       })
@@ -110,7 +110,6 @@ class Database {
   async getUserById(user_id: number):Promise<PlayerUser> {
     const sql = `SELECT * FROM users WHERE id=?;` 
     let user = await <any> this.get(sql, [user_id]);
-    console.log(user);
     user.characters = await this.getCharactersForUser(user.id);
     return user;
   }
@@ -140,7 +139,6 @@ class Database {
 
   async checkToken(token: string):Promise<PlayerUser> {
     let user = await this.getUserByToken(token);
-    console.log(user);
     user.characters = await this.getCharactersForUser(user.id);
     return user;
   }

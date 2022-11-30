@@ -61,7 +61,7 @@
     };
   }
   
-  export function request(method: 'get' | 'post',
+  export default function request(method: 'get' | 'post',
     url: string,
     queryParams: any = {},
     body: any = null,

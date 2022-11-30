@@ -8,9 +8,9 @@ import { Player } from "../../shared/Entities/Player";
 import { countPlayers, roundToTwo } from "../../shared/Utils";
 import { PlayerMessage } from "../../shared/types";
 import Config from "../../shared/Config";
-import { createLogger } from "winston";
 
-export class Hud {
+export class UserInterface {
+    
     private _scene: Scene;
 
     //UI Elements

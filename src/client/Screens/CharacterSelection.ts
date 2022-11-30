@@ -1,21 +1,16 @@
-import { Scene, Engine, Color4, Vector3, FreeCamera } from "@babylonjs/core";
+import { Scene, Color4, Vector3, FreeCamera } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText } from "@babylonjs/gui";
-import { debug } from "console";
-import Config from "../../shared/Config";
-import { request } from "../../shared/Requests";
 import State from "./Screens";
 import { PlayerCharacter, PlayerUser } from "../../shared/types";
-import { apiUrl } from "../../shared/Utils";
+
+import Config from "../../shared/Config";
+import { request, apiUrl} from "../../shared/Utils";
 
 export class CharacterSelectionScene {
     
     public _scene: Scene;
     private _gui: AdvancedDynamicTexture;
     public _button: Button;
-
-    constructor() {
-
-    }
 
     public async createScene(engine) {
 
@@ -97,8 +92,6 @@ export class CharacterSelectionScene {
             // create new character via database 
             this.createCharacter(usernameInput.text).then((char)=>{
 
-                console.log('CREATED', char);
-
                 // login as this character
                 this.loginAs(char);
 
@@ -156,13 +149,24 @@ export class CharacterSelectionScene {
     // create character
     async createCharacter(name){
 
+        // make sure both the username and password is entered.
+        if(!name){
+            return false;
+        }
+
         // check user exists else send back to login
         let req = await request('post', apiUrl()+'/create_character', {
             token: global.T5C.currentUser.token,
             name: name
         });
 
-        return JSON.parse(req.data).character;
+        // check req status
+        if(req.status === 200){
+            return JSON.parse(req.data).character;
+        }else{
+            return false;
+        }
+
     }
 
 

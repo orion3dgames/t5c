@@ -4,7 +4,7 @@ import { Scene } from '@babylonjs/core';
 import { Client, Room } from "colyseus.js";
 import Config from '../../shared/Config';
 
-export class GameNetwork {
+export class Network {
 
     public _client;
     public _scene;

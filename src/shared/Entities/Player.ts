@@ -1,48 +1,37 @@
-import { TransformNode, Scene, UniversalCamera, MeshBuilder,AxesViewer, Space,Vector3,Axis, AnimationGroup, SceneLoader, AbstractMesh, ActionManager, ExecuteCodeAction} from "@babylonjs/core";
+import { TransformNode, Scene, MeshBuilder, Vector3, AnimationGroup, SceneLoader, AbstractMesh, ActionManager, ExecuteCodeAction} from "@babylonjs/core";
 import { Rectangle, TextBlock } from "@babylonjs/gui";
 import { PlayerSchema } from "../../server/rooms/schema/PlayerSchema";
 
-import { roundToTwo } from "../Utils"
 import Config from "../Config";
 import State from "../../client/Screens/Screens";
 import { PlayerInputs } from "../types";
 import { PlayerCamera } from "./Player/PlayerCamera";
+import { PlayerAnimator } from "./Player/PlayerAnimator";
+import { PlayerMove } from "./Player/PlayerMove";
+import { PlayerUtils } from "./Player/PlayerUtils";
 
 export class Player extends TransformNode {
-    public camera;
+    
     public scene: Scene;
     public _room;
     public ui;
     private _input;
     private _shadow;
 
+    // controllers
+    public cameraController: PlayerCamera;
+    public animatorController: PlayerAnimator;
+    public moveController: PlayerMove;
+    public utilsController: PlayerUtils;
+
     //Player
     public mesh: AbstractMesh; //outer collisionbox of player
     public characterLabel: Rectangle;
-
-    //Camera
-    private _camRoot: TransformNode;
-    private _yTilt: TransformNode;
-
-    //player movement vars
-    private _deltaTime: number = 0;
-    private _h: number;
-    private _v: number;
-
-    // animation trackers
-    private playerAnimations: AnimationGroup[];
-    private _currentAnim: AnimationGroup = null;
-    private _prevAnim: AnimationGroup;
-
-    //animations
-    private _walk: AnimationGroup;
-    private _idle: AnimationGroup;
 
     public playerPosition: Vector3;
     public playerDirection: Vector3;
     public playerNextPosition: Vector3;
     public playerNextRotation: Vector3;
-    public playerMove: any;
     public playerInputs: PlayerInputs[];
     public playerLatestSequence: number;
     public playerNextLocation: string;
@@ -88,7 +77,6 @@ export class Player extends TransformNode {
         // load player mesh
         const result = await SceneLoader.ImportMeshAsync(null, "./models/", "player_hobbit.glb", this._scene);
         const playerMesh = result.meshes[0];
-        this.playerAnimations = result.animationGroups;
 
         // set initial player scale & rotation
         playerMesh.name = "player_mesh";
@@ -100,30 +88,29 @@ export class Player extends TransformNode {
         // add mesh to shadow generator
         this._shadow.addShadowCaster(playerMesh, true);
 
-        // save initial entity details
-        this.playerNextPosition = new Vector3(this.entity.x, this.entity.y, this.entity.z);
-        this.playerNextRotation = new Vector3(0, this.entity.rot, 0);
-
-        // add player nameplate
-        this.addLabel(this.mesh, entity.username);
-
-        // find animations
-        this._idle = this.playerAnimations.find(o => o.name === 'Hobbit_Idle');
-        this._walk = this.playerAnimations.find(o => o.name === 'Hobbit_Walk');
-
-        // prepare animations
-        this._setUpAnimations();
 
         // if myself, add all player related stuff
         if (this.isCurrentPlayer) {
-            this.camera = new PlayerCamera(this._scene);
+            this.utilsController = new PlayerUtils(this._scene, this._room);
+            this.cameraController = new PlayerCamera(this._scene, this._input);
         }
+        this.animatorController = new PlayerAnimator(result.animationGroups);
+        this.moveController = new PlayerMove(this.mesh);
+        this.moveController.setPositionAndRotation(entity); // set default entity position
+
+        // add player nameplate
+        this.characterLabel = this.utilsController.addLabel(this.mesh, this.ui, entity.username);
 
         // render loop
         this.scene.registerBeforeRender(() => {
-            this._animatePlayer();
+
+            // animate player continuously
+            this.animatorController.animate(this.mesh.position, this.playerNextPosition);
+
             if (this.isCurrentPlayer) {
-                this.camera.updateCamera(this.mesh, this._input);
+
+                // mova camera as player moves
+                this.cameraController.follow(this.mesh.position);
             }    
         });
 
@@ -135,17 +122,11 @@ export class Player extends TransformNode {
             console.log('#UPDATE SERVER', this.entity);
 
             // update player movement from server
-            this.playerNextPosition = new Vector3(this.entity.x, this.entity.y, this.entity.z);
-            this.playerNextRotation = new Vector3(0, this.entity.rot, 0);
+            this.moveController.setPositionAndRotation(this.entity);
 
-            // do server reconciliation if current player
+            // do server reconciliation if current player only
             if (this.isCurrentPlayer) {
-
-                // store latest sequence processed by server
-                this.playerLatestSequence = this.entity.sequence;   
-
-                // process
-                this.processLocalMove();
+                this.moveController.reconcileMove(this.entity.sequence); // set default entity position
             }
 
         });
@@ -172,108 +153,14 @@ export class Player extends TransformNode {
 
         }
 
+        // listen to playerTeleportConfirm event
         this._room.onMessage('playerTeleportConfirm', (location) => {
-            console.log("playerTeleportConfirm", location);
-            this.teleport(location);
+            this.utilsController.teleport(location)
         });
     }
 
-    private addLabel(mesh, text) {
-
-        var rect1 = new Rectangle();
-        rect1.width = "100px";
-        rect1.height = "40px";
-        rect1.cornerRadius = 20;
-        rect1.color = "white";
-        rect1.thickness = 4;
-        rect1.background = "black";
-        this.ui._playerUI.addControl(rect1);
-        rect1.linkWithMesh(mesh);
-        rect1.linkOffsetY = -150;
-
-        var label = new TextBlock();
-        label.text = text;
-        rect1.addControl(label);
-
-        this.characterLabel = rect1;
-
+    public removePlayer() {
+       this.characterLabel.dispose();
+       this.mesh.dispose();
     }
-
-    // teleport player
-    public teleport(location){
-        this._room.leave();
-        global.T5C.currentLocation = Config.locations[location];
-        global.T5C.currentLocationKey = location;
-        global.T5C.currentCharacter.location = location;
-        global.T5C.currentRoomID = "";
-        global.T5C.nextScene = State.GAME;
-    }
-
-    // server Reconciliation. Re-apply all the inputs not yet processed by the server
-    public processLocalMove() {
-
-        // if nothing to apply, do nothin
-        if (!this.playerInputs.length) return false
-
-        var j = 0;
-        while (j < this.playerInputs.length) {
-
-            var nextInput = this.playerInputs[j];
-
-            if (nextInput.seq <= this.playerLatestSequence) {
-                // Already processed. Its effect is already taken into account into the world update
-                // we just got, so we can drop it.
-                this.playerInputs.splice(j, 1);
-            } else {
-                // Not processed by the server yet. Re-apply it.
-                this.move(nextInput);
-                //console.log('#' + nextInput.seq + ' MOVING LOCALLY', this.playerNextPosition.x, this.playerNextPosition.z, this.playerNextRotation.y);
-                j++;
-            }
-
-        }
-
-    }
-
-    // apply movement
-    public move(input) {
-        let rotationY = Math.atan2(input.h, input.v);
-        this.playerNextPosition.x -= input.h * Config.PLAYER_SPEED;
-        this.playerNextPosition.z -= input.v * Config.PLAYER_SPEED;
-        this.playerNextRotation.y = this.playerNextRotation.y + (rotationY - this.playerNextRotation.y);
-    }
-
-    private _setUpAnimations(): void {
-
-        this.scene.stopAllAnimations();
-
-        this._idle.loopAnimation = true;
-        this._walk.loopAnimation = true;
-
-        //initialize current and previous
-        this._currentAnim = this._idle;
-        this._prevAnim = this._walk;
-    }
-
-    private _animatePlayer(): void {
-
-        // if position has changed
-        if (
-            (
-                roundToTwo(this.mesh.position.x) !== roundToTwo(this.playerNextPosition.x) ||
-                roundToTwo(this.mesh.position.y) !== roundToTwo(this.playerNextPosition.y)
-            )
-        ) {
-            this._currentAnim = this._walk;
-        } else {
-            this._currentAnim = this._idle;
-        }
-
-        if (this._currentAnim != null && this._prevAnim !== this._currentAnim) {
-            this._prevAnim.stop();
-            this._currentAnim.play(this._currentAnim.loopAnimation);
-            this._prevAnim = this._currentAnim;
-        }
-    }
-
 }

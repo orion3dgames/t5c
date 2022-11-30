@@ -1,4 +1,6 @@
-import Config from "./Config";
+import alertMessage from './alertMessage'
+import request from './requests'
+import Config from "../Config";
 
 const countPlayers = function(object){
     var length = 0;
@@ -52,8 +54,10 @@ const generateRandomPlayerName = function() {
 }
 
 export {
+    alertMessage,
+    request,
     generateRandomPlayerName,
-    countPlayers,
+    apiUrl,
     roundToTwo,
-    apiUrl
+    countPlayers
 }

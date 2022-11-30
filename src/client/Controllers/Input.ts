@@ -1,7 +1,6 @@
-import { Scene, ActionManager, ExecuteCodeAction, Observer, Scalar, PointerEventTypes } from '@babylonjs/core';
-import { Hud } from './ui';
+import { Scene, PointerEventTypes } from '@babylonjs/core';
 
-export class PlayerInput {
+export class Input {
 
     public inputMap: {};
     private _scene: Scene;

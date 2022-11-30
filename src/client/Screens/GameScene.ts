@@ -9,15 +9,14 @@ import { AdvancedDynamicTexture, Button } from "@babylonjs/gui";
 import { } from "@babylonjs/materials";
 import State from "./Screens";
 
-import { PlayerInput } from "../Controllers/inputController";
-import { Environment } from "../Controllers/environment";
-import { Hud } from "../Controllers/ui";
+import { Input } from "../Controllers/Input";
+import { Environment } from "../Controllers/Environment";
+import { UserInterface } from "../Controllers/UserInterface";
 import { Player } from "../../shared/Entities/Player";
 import Config from '../../shared/Config';
 
 import { Room } from "colyseus.js";
 import { PlayerInputs } from "../../shared/types";
-import { generateRandomPlayerName } from "../../shared/Utils";
 
 export class GameScene {
 
@@ -124,10 +123,7 @@ export class GameScene {
     
     private async _loadAssets(): Promise<void> {
 
-        console.log(this._scene.metadata);
-
         // load environment
-        // should load global.T5C.currentLocation GLB file only
         const environment = new Environment(this._scene);
         this._environment = environment;
         await this._environment.load(); //environment
@@ -198,12 +194,11 @@ export class GameScene {
 
         await this._scene.whenReadyAsync();
 
-        // setup player input
-        // todo: probably should be in the player class
-        this._input = new PlayerInput(this._scene);
+        // setup input Controller
+        this._input = new Input(this._scene);
 
         // setup hud
-        this._ui = new Hud(this._scene, this._engine, this.room, this.chatRoom, this.playerEntities);
+        this._ui = new UserInterface(this._scene, this._engine, this.room, this.chatRoom, this.playerEntities);
 
         // when someone joins the room event
         this.room.state.players.onAdd((entity, sessionId) => {
@@ -215,12 +210,8 @@ export class GameScene {
 
             // if current player, save entity ref
             if (isCurrentPlayer) {
-
-                // set currentPlayer (probably not useful)
+                // set currentPlayer
                 this._currentPlayer = _player;
-
-                //this._setupGUI();
-                console.log('ADDING CURRENT PLAYER', entity, this._currentPlayer);
             }
 
             // save entity
@@ -230,8 +221,7 @@ export class GameScene {
 
         // when someone leave the room event
         this.room.state.players.onRemove((player, sessionId) => {
-            this.playerEntities[sessionId].characterLabel.dispose();
-            this.playerEntities[sessionId].mesh.dispose();
+            this.playerEntities[sessionId].removePlayer();
             delete this.playerEntities[sessionId];
         });
 
@@ -242,18 +232,13 @@ export class GameScene {
         let latestInput: PlayerInputs;
         this._scene.registerBeforeRender(() => {
 
-            
             let timeNow = Date.now();
             let timePassed = (timeNow - timeThen) / 1000;
             let updateRate = Config.updateRate / 1000; // game is networked update every 100ms
 
             // continuously lerp movement at 60fps
             for (let sessionId in this.playerEntities) {
-                const entity = this.playerEntities[sessionId];
-                if(entity.mesh){
-                    entity.mesh.position = Vector3.Lerp(entity.mesh.position, entity.playerNextPosition, 0.2);
-                    entity.mesh.rotation = Vector3.Lerp(entity.mesh.rotation, entity.playerNextRotation, 0.8);
-                }
+                this.playerEntities[sessionId].moveController.tween()
             }
 
             // every 100ms loop
@@ -272,14 +257,11 @@ export class GameScene {
                         v: this._input.vertical
                     }
 
-                    // sent current input to server for processing
+                    // sent current input to server for processing 
                     this.room.send("playerInput", latestInput);
 
                     // do client side prediction
-                    this._currentPlayer.move(latestInput);
-
-                    // Save this input for later reconciliation.
-                    this._currentPlayer.playerInputs.push(latestInput);
+                    this._currentPlayer.moveController.predictionMove(latestInput);
                    
                 }
 

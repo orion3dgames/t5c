@@ -56,8 +56,6 @@ export class Environment {
     //Load all necessary meshes for the environment
     public async _loadAsset() {
 
-        console.log("LOADING ZONE: ", global.T5C.currentLocation);
-
         //loads game environment
         const result = await SceneLoader.ImportMeshAsync(null, "./models/", global.T5C.currentLocation.mesh, this._scene);
 
@@ -66,8 +64,7 @@ export class Environment {
 
         return {
             env: env,
-            allMeshes: allMeshes,
-            //animationGroups: animGroup
+            allMeshes: allMeshes
         }
     }
 

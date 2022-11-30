@@ -2,8 +2,8 @@ import { Engine, Scene, Color4, Vector3, FreeCamera } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText, InputPassword } from "@babylonjs/gui";
 import Config from "../../shared/Config";
 import State from "./Screens";
-import { apiUrl, generateRandomPlayerName } from "../../shared/Utils";
-import { request } from "../../shared/Requests"
+import { alertMessage, request, apiUrl } from "../../shared/Utils"
+
 export class LoginScene {
     
     private _engine: Engine;
@@ -48,7 +48,7 @@ export class LoginScene {
         title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         guiMenu.addControl(title);
 
-        const welcomeText = new TextBlock("back", "Use 'test' / 'test' or create a new one");
+        const welcomeText = new TextBlock("infotext", "if account does not \n exist, it will create one");
         welcomeText.width = 0.5
         welcomeText.height = "40px";
         welcomeText.color = "white";
@@ -56,16 +56,6 @@ export class LoginScene {
         welcomeText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         welcomeText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         guiMenu.addControl(welcomeText);
-
-        /*
-        const backButton = Button.CreateSimpleButton("back", "Back");
-        backButton.width = 0.2
-        backButton.height = "40px";
-        backButton.color = "white";
-        backButton.top = "-60px";
-        backButton.thickness = 1;
-        backButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        guiMenu.addControl(backButton);*/
 
         const joinBtn = Button.CreateSimpleButton("back", "Connect To Game");
         joinBtn.width = 0.5
@@ -79,8 +69,6 @@ export class LoginScene {
 
         ////////////////////////////
         // add username input 
-
-        let randomName = generateRandomPlayerName();
 
         const usernameInput = new InputText("usernameInput");
         usernameInput.top = "-35px;";
@@ -110,7 +98,15 @@ export class LoginScene {
         passwordInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
         guiMenu.addControl(passwordInput);  
 
-        // connetc button
+        passwordInput.onKeyboardEventProcessedObservable.add(ev => {
+            if (ev.key === "Enter") {
+                this.connect(usernameInput.text, passwordInput.text);
+                usernameInput.text = "";
+                passwordInput.text = "";
+            }
+        })
+
+        // login button
         joinBtn.onPointerDownObservable.add(() => { 
             this.connect(usernameInput.text, passwordInput.text);
             usernameInput.text = "";
@@ -127,14 +123,32 @@ export class LoginScene {
 
     async connect(username:string, password:string){
 
+        // make sure both the username and password is entered.
+        if(!username || !password){
+            alertMessage(this._ui, "Please enter both the username and the password.");
+            return false;
+        }
+
+        // send login data
         let req = await request('get', apiUrl()+'/login', {
             username: username,
             password: password
-        });
+        })
 
-        global.T5C.currentUser = JSON.parse(req.data).user;
+        // check req status
+        if(req.status === 200){
+            
+            // user was found or created
+            global.T5C.currentUser = JSON.parse(req.data).user;
 
-        Config.goToScene(State.CHARACTER_SELECTION);
+            // go to character selection page
+            Config.goToScene(State.CHARACTER_SELECTION);
+
+        }else{
+
+            // something went wrong
+            alertMessage(this._ui, "Something went wrong.");
+        }
 
     }
 

@@ -1,21 +1,16 @@
-import "@babylonjs/core/Debug/debugLayer";
-import "@babylonjs/inspector";
+//import "@babylonjs/core/Debug/debugLayer";
+//import "@babylonjs/inspector";
 
 import { Engine, Scene, EngineFactory } from "@babylonjs/core";
 
 // IMPORT SCREEN
 import State from "./Screens/Screens";
 import { StartScene } from "./Screens/StartScene";
-import { LobbyScene } from "./Screens/LobbyScene";
 import { GameScene } from "./Screens/GameScene";
-
-import Config from "../shared/Config";
-
-// colyseus
-import * as Colyseus from "colyseus.js";
-import { GameNetwork } from "./Controllers/network";
 import { LoginScene } from "./Screens/LoginScene";
 import { CharacterSelectionScene } from "./Screens/CharacterSelection";
+import Config from "../shared/Config";
+import { Network } from "./Controllers/Network";
 
 // App class is our entire game application
 class App {
@@ -53,7 +48,7 @@ class App {
  
         // create colyseus client
         // this should use environement values
-        this._client = new GameNetwork(this._scene);
+        this._client = new Network(this._scene);
 
         //MAIN render loop & state machine
         await this._render();
@@ -123,6 +118,7 @@ class App {
         });
 
         //**for development: make inspector visible/invisible
+        /*
         window.addEventListener("keydown", (ev) => {
             //Shift+Ctrl+Alt+I
             if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.keyCode === 73) {
@@ -132,7 +128,7 @@ class App {
                     this._scene.debugLayer.show();
                 }
             }
-        });
+        });*/
 
         //resize if the screen is resized/rotated
         window.addEventListener('resize', () => {
@@ -156,12 +152,10 @@ class App {
 
     private clearScene() {
         if(this._scene){
-            console.log('CLEAR SCENE');
             this._engine.displayLoadingUI();
             this._scene.detachControl();
             this._scene.dispose();
             this._currentScene = null;
-            this._scene = null;
         }
     }
 

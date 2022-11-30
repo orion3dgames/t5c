@@ -1,15 +1,16 @@
 // Colyseus + Express
 import { createServer } from "http";
-import express, { Request } from "express";
+import express from "express";
 import cors from "cors";
 import path from "path";
-import fs from "fs";
 
 import { Server, matchMaker, LobbyRoom } from "@colyseus/core";
 import { WebSocketTransport } from '@colyseus/ws-transport';
 import { GameRoom } from "./rooms/GameRoom";
 import { ChatRoom } from "./rooms/ChatRoom";
 
+import databaseInstance from "../shared/Database";
+import { PlayerUser } from "../shared/types";
 import Logger from "../shared/Logger";
 
 //////////////////////////////////////////////////
@@ -57,10 +58,6 @@ gameServer.listen(port).then(()=>{
 //// SERVING CLIENT DIST FOLDER TO EXPRESS ///////
 //////////////////////////////////////////////////
 
-// initialize database
-import databaseInstance from "../shared/Database";
-import { PlayerUser } from "../shared/types";
-
 // start db
 let database = new databaseInstance();
 
@@ -75,22 +72,36 @@ app.get('/', function (req, res) {
   res.sendFile(indexFile);
 });
 
+//////////////////////////////////////////////////
+///////////// ESPRESS MINI API ///////////////////
+//////////////////////////////////////////////////
+
 app.get('/login', function (req, res) {
   const username:string = req.query.username as string ?? '';
   const password:string = req.query.password as string ?? '';
   if(username && password){
+
+    Logger.info("[api][/login] checking password.");
     database.getUser(username, password).then((user:PlayerUser)=>{
       if(!user) {
+
+        Logger.info("[api][/login] user not found, creating new user.");
         return database.saveUser(username, password);
       }
+
+      Logger.info("[api][/login] user found, refreshing login token.");
       return database.refreshToken(user.id);
     }).then((user)=>{
+
+      Logger.info("[api][/login] login succesful.");
       return res.send({
         message: "Login Successful",
         user: user
       });
     })
   }else{
+    
+    Logger.error("[api][/login] login failed.");
     return res.status(400).send({
       message: "Wrong Parameters"
     });

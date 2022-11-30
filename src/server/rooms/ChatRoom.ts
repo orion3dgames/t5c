@@ -1,6 +1,8 @@
 import {Room, Client} from '@colyseus/core';
 import { ChatSchema } from './schema/ChatSchema';
 
+import Logger from "../../shared/Logger";
+
 export class ChatRoom extends Room {
     
     public maxClients = 64;
@@ -10,17 +12,21 @@ export class ChatRoom extends Room {
     // When room is initialized
     onCreate(options: any){
 
-        console.log("ChatRoom created!", options);
+        Logger.info("[chat_room][onCreate] room created.", options);
 
         //For chat
         this.onMessage("message", (client, message) => {
-            console.log("ChatRoom received message from: ", client.sessionId, ":", message);
+
+            Logger.info("[chat_room][message] message received from "+client.sessionId, message);
+
             this.broadcast("messages", this.generateMessage(client.sessionId, message));
         });
     }
     
     // When client successfully join the room
     onJoin (client: Client, options: any, auth: any){
+
+        Logger.info("[chat_room][message] client joined "+client.sessionId);
 
         // sent initial help message
         client.send('messages', this.generateMessage(client.sessionId, "Welcome to T5C, you can move around by left clicking and dragging the mouse around."));

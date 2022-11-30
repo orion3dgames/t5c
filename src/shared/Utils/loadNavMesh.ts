@@ -1,9 +1,13 @@
-import fs from 'fs-extra'
-import wavefrontObjParser from 'wavefront-obj-parser'
+///////////////////////////////////////////////////////////
+// CAPTAIN OBVIOUS HERE: 
+// this can only be used in a NODE ENVIRONMENT, do not use to import in the client as fs is not available.
+
+import { readFile } from 'fs/promises';
+import wavefrontObjParser from 'wavefront-obj-parser';
 import NavMesh from 'navmesh';
 
-export async function loadNavMesh(fileNameNavMesh: string) {
-    const fileNavMesh = await fs.readFile(`./public/models/${fileNameNavMesh}/navmesh.obj`, 'utf8')
+export default async function loadNavMesh(fileNameNavMesh: string) {
+    const fileNavMesh = await readFile(`./public/models/${fileNameNavMesh}/navmesh.obj`, 'utf8')
     var jsonNavMesh = wavefrontObjParser(fileNavMesh)
     const meshPolygonPoints = []
     const vertexPositions = jsonNavMesh.vertexPositions
