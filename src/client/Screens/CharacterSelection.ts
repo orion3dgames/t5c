@@ -73,7 +73,7 @@ export class CharacterSelectionScene {
         leftColumnRect.addControl(leftColumnRectPad);
         this.leftColumnRect = leftColumnRectPad;
 
-        // logo
+        // logo text
         const title = new TextBlock("title", Config.title);
         title.resizeToFit = true;
         title.fontSize = "40px";
@@ -82,18 +82,20 @@ export class CharacterSelectionScene {
         title.top = "0px";
         title.width = 0.8;
         title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        leftColumnRect.addControl(title);
+        this.leftColumnRect.addControl(title);
 
+        // welcome text
         const titleScec = new TextBlock("title", "Welcome \n "+global.T5C.currentUser.username);
-        title.top = "50px";
+        title.top = "80px";
         title.resizeToFit = true;
         title.fontSize = "30px";
         title.color = "white";
         title.resizeToFit = true;
         title.width = 0.8;
         title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        leftColumnRect.addControl(titleScec);
+        this.leftColumnRect.addControl(titleScec);
 
+        // logout btn
         const logoutBtn = Button.CreateSimpleButton("logoutBtn", "Logout");
         logoutBtn.top = "-30px";
         logoutBtn.width = 1;
@@ -167,7 +169,7 @@ export class CharacterSelectionScene {
 
     async displayCharactersGUI(characters:PlayerCharacter[]){
 
-        let top = 100;
+        let top = 140;
         characters.forEach(char => {
 
             const createBtn = Button.CreateSimpleButton("characterBtn-"+char.id, "Play as: "+char.name);

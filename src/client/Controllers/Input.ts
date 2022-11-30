@@ -8,11 +8,7 @@ export class Input {
     //simple movement
     public horizontal: number = 0;
     public vertical: number = 0;
-
-    //jumping and dashing
-    public jumpKeyDown: boolean = false;
-    public dashing: boolean = false;
-
+    
     // moving
     public left_click: boolean;
     public right_click: boolean;
@@ -46,7 +42,6 @@ export class Input {
             }
 
             if (pointerInfo.type === PointerEventTypes.POINTERMOVE) {
-
                 if (this.left_click) {
                     const x = (pointerInfo.event.clientX / pointerInfo.event.target.width) * 2 - 1;
                     const y = (pointerInfo.event.clientY / pointerInfo.event.target.height) * 2 - 1;

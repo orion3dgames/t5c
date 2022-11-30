@@ -30,22 +30,21 @@ export class Environment {
                 m.isPickable = false;
             }
 
-            //collision meshes
-            if (m.name.includes("collision")) {
-                Tags.AddTagsTo(m, 'collisions');
-            }
-
             //trigger meshes
             if (m.name.includes("trigger")) {
+
                 m.isVisible = true;
                 m.isPickable = false;
                 m.checkCollisions = false;
+
                 if(m.name.includes("teleporttoisland")){
                     m.metadata.location = "island";
                 }
+
                 if(m.name.includes("teleporttotown")){
                     m.metadata.location = "town";
                 }
+
                 m.name = "teleport";
             }
         });
