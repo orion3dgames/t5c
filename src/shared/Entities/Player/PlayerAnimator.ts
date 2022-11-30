@@ -42,8 +42,10 @@ export class PlayerAnimator {
 
     public animate(currentPos, nextPos): void {
 
+        console.log(currentPos, nextPos);
+
         // if position has changed
-        if((
+        if(currentPos && nextPos && (
             roundToTwo(currentPos.x) !== roundToTwo(nextPos.x) ||
             roundToTwo(currentPos.y) !== roundToTwo(nextPos.y)
         )) {

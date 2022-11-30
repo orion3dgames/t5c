@@ -79,7 +79,7 @@ export class PlayerMove {
         let rotationY = Math.atan2(input.h, input.v);
         this.nextPosition.x -= input.h * Config.PLAYER_SPEED;
         this.nextPosition.z -= input.v * Config.PLAYER_SPEED;
-        this.nextPosition.y = this.nextRotation.y + (rotationY - this.nextRotation.y);
+        this.nextRotation.y = this.nextRotation.y + (rotationY - this.nextRotation.y);
     }
 
 }

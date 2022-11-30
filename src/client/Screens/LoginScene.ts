@@ -1,5 +1,5 @@
 import { Engine, Scene, Color4, Vector3, FreeCamera } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText, InputPassword } from "@babylonjs/gui";
+import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText, InputPassword, Image } from "@babylonjs/gui";
 import Config from "../../shared/Config";
 import State from "./Screens";
 import { alertMessage, request, apiUrl } from "../../shared/Utils"
@@ -38,9 +38,12 @@ export class LoginScene {
         imageRect.thickness = 0;
         guiMenu.addControl(imageRect);
 
+        var img = new Image("image", "./images/background_mainmenu_1.jpg")
+        imageRect.addControl(img);
+
         // middle columm
         const columnRect = new Rectangle("column");
-        columnRect.width = .4;
+        columnRect.width = "320px";
         columnRect.height = 1;
         columnRect.background = "#000000";
         columnRect.thickness = 0;
@@ -49,12 +52,11 @@ export class LoginScene {
 
         // logo
         const title = new TextBlock("title", Config.title);
-        title.resizeToFit = true;
+        title.top = "30px";
         title.fontSize = "40px";
         title.color = "white";
-        title.resizeToFit = true;
-        title.top = "30px";
         title.width = 0.8;
+        title.height = "40px";
         title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         columnRect.addControl(title);
 
@@ -75,6 +77,7 @@ export class LoginScene {
         usernameInput.width = .8;
         usernameInput.height = '30px;'
         usernameInput.color = "#FFF";
+        usernameInput.text = "test";
         usernameInput.placeholderText = "Enter username";
         usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         usernameInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
@@ -94,6 +97,7 @@ export class LoginScene {
         passwordInput.height = '30px;'
         passwordInput.color = "#FFF";
         passwordInput.top = "-80px";
+        passwordInput.text = "test";
         passwordInput.placeholderText = "Enter password";
         passwordInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         passwordInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;

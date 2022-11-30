@@ -105,7 +105,7 @@ export class Player extends TransformNode {
         this.scene.registerBeforeRender(() => {
 
             // animate player continuously
-            this.animatorController.animate(this.mesh.position, this.playerNextPosition);
+            this.animatorController.animate(this.mesh.position, this.moveController.getNextPosition());
 
             if (this.isCurrentPlayer) {
 

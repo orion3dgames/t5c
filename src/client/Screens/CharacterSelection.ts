@@ -1,10 +1,10 @@
 import { Scene, Color4, Vector3, FreeCamera } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText, StackPanel } from "@babylonjs/gui";
+import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText, Image } from "@babylonjs/gui";
 import State from "./Screens";
 import { PlayerCharacter, PlayerUser } from "../../shared/types";
 
 import Config from "../../shared/Config";
-import { request, apiUrl} from "../../shared/Utils";
+import { request, apiUrl, alertMessage} from "../../shared/Utils";
 import { create } from "domain";
 
 export class CharacterSelectionScene {
@@ -17,12 +17,13 @@ export class CharacterSelectionScene {
 
     public async createScene(engine) {
 
+        /*
         global.T5C.currentUser = {
             id: 1,
-            username: "Test User",
+            username: "test",
             password: "test",
-            token: "l0XcwV3kgVTgIvPFM13mF"
-        }
+            token: "xTRbu2G78ItehcX8hnyGW"
+        }*/
 
         // create scene
         let scene = new Scene(engine);
@@ -46,15 +47,18 @@ export class CharacterSelectionScene {
         imageRect.thickness = 0;
         guiMenu.addControl(imageRect);
 
-        //////////////////////////////////////////////////////////////
-        //////////////////////////////////////////////////////////////
-        //////////////////////////////////////////////////////////////
+        var img = new Image("image", "./images/background_mainmenu_1.jpg")
+        imageRect.addControl(img);
 
+        //////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////
+ 
         // left columm
         const leftColumnRect = new Rectangle("columnLeft");
         leftColumnRect.top = 0;
         leftColumnRect.left = "30px";
-        leftColumnRect.width = .3;
+        leftColumnRect.width = "320px";
         leftColumnRect.height = 1;
         leftColumnRect.background = "#000000";
         leftColumnRect.thickness = 0;
@@ -75,11 +79,10 @@ export class CharacterSelectionScene {
 
         // logo text
         const title = new TextBlock("title", Config.title);
+        title.top = "-40px";
         title.resizeToFit = true;
         title.fontSize = "40px";
         title.color = "white";
-        title.resizeToFit = true;
-        title.top = "0px";
         title.width = 0.8;
         title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         this.leftColumnRect.addControl(title);
@@ -169,7 +172,7 @@ export class CharacterSelectionScene {
 
     async displayCharactersGUI(characters:PlayerCharacter[]){
 
-        let top = 140;
+        let top = 200;
         characters.forEach(char => {
 
             const createBtn = Button.CreateSimpleButton("characterBtn-"+char.id, "Play as: "+char.name);
@@ -194,9 +197,11 @@ export class CharacterSelectionScene {
 
     // login as this character
     loginAs(character:PlayerCharacter){
+
         global.T5C.currentCharacter = character;
         global.T5C.currentLocationKey = character.location;
         global.T5C.currentLocation = Config.locations[character.location];
+
         Config.goToScene(State.GAME);
     }
 
@@ -217,7 +222,14 @@ export class CharacterSelectionScene {
             token: global.T5C.currentUser.token,
         });
 
-        return JSON.parse(req.data).user;
+        // check req status
+        if(req.status === 200){
+            return JSON.parse(req.data).user;
+        }else{
+            // something went wrong
+            alertMessage(this._gui, "Something went wrong.");
+        }
+ 
     }
 
     // create character
