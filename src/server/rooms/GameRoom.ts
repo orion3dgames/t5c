@@ -64,22 +64,25 @@ export class GameRoom extends Room<StateHandlerSchema> {
 
     // authorize client based on provided options before WebSocket handshake is complete
     async onAuth (client: Client, data: any, request: http.IncomingMessage) { 
+
+        // try to find char
         const character = await this.database.getCharacter(data.character_id);
+
+        // if no character found, then refuse auth
         if (!character) {
-            Logger.error("[gameroom][onAuth] client could not authentified, joining failed.");
+            Logger.error("[gameroom][onAuth] client could not authentified, joining failed.", data.character_id);
             return false
-        }else{
-
-            let check = await this.alreadyJoined(character.id);
-
-            if(check){
-                Logger.error("[gameroom][onAuth] client already connected. "+this.state.players.size);
-                return false
-            }
-
-            Logger.info("[gameroom][onAuth] client authentified.");
-            return character;
         }
+
+        // character found, check if already logged in
+        if(character.online > 0){
+            Logger.error("[gameroom][onAuth] client already connected. "+ character);
+            return false
+        }
+
+        // all checks are good, proceed
+        Logger.info("[gameroom][onAuth] client authentified.", character);
+        return character;
     }
 
     // on client join

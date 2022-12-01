@@ -1,5 +1,7 @@
 import { Scene, SceneLoader, Tags} from "@babylonjs/core";
 
+import "@babylonjs/loaders/glTF";
+
 export class Environment {
 
     private _scene: Scene;
