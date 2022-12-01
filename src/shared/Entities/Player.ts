@@ -113,13 +113,15 @@ export class Player extends TransformNode {
             console.log('#UPDATE SERVER', this.entity);
 
             // update player movement from server
-            this.moveController.setPositionAndRotation(this.entity);
+            // only do it, if player is not blocked.
+            if(!this.blocked){
+                this.moveController.setPositionAndRotation(this.entity);
 
-            // do server reconciliation if current player only
-            if (this.isCurrentPlayer) {
-                this.moveController.reconcileMove(this.entity.sequence); // set default entity position
+                // do server reconciliation if current player only
+                if (this.isCurrentPlayer) {
+                    this.moveController.reconcileMove(this.entity.sequence); // set default entity position
+                }
             }
-
         });
 
         // collision with  other meshes
