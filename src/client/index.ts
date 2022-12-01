@@ -1,5 +1,6 @@
-import "@babylonjs/core/Debug/debugLayer";
-import "@babylonjs/inspector";
+
+import { isLocal } from "../shared/Utils";
+
 
 import { Engine, Scene, EngineFactory } from "@babylonjs/core";
 
@@ -117,17 +118,6 @@ class App {
 
         });
 
-        //**for development: make inspector visible/invisible
-        window.addEventListener("keydown", (ev) => {
-            //Shift+Ctrl+Alt+I
-            if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.keyCode === 73) {
-                if (this._scene.debugLayer.isVisible()) {
-                    this._scene.debugLayer.hide();
-                } else {
-                    this._scene.debugLayer.show();
-                }
-            }
-        });
 
         //resize if the screen is resized/rotated
         window.addEventListener('resize', () => {

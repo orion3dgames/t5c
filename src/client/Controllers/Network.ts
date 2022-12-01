@@ -2,6 +2,7 @@ import { Scene } from '@babylonjs/core';
 
 // colyseus
 import { Client, Room } from "colyseus.js";
+import { isLocal } from "../../shared/Utils";
 import Config from '../../shared/Config';
 
 export class Network {
@@ -15,7 +16,7 @@ export class Network {
 
         // create colyseus client
         // this should use environement values
-        if (window.location.host === "localhost:8080") {
+        if (isLocal()) {
             this._client = new Client(Config.serverUrlLocal); // local
         }else{
             this._client = new Client(Config.serverUrlProduction); // online

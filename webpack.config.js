@@ -2,6 +2,7 @@ const path = require("path");
 const fs = require('fs');
 const appDirectory = fs.realpathSync(process.cwd());
 const CopyPlugin = require("copy-webpack-plugin");
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
     entry: path.resolve(appDirectory, "src/client/index.ts"),
@@ -46,7 +47,8 @@ module.exports = {
             patterns: [
                 { from: "public/", to: "./" },
             ],
-        })
+        }),
+        new BundleAnalyzerPlugin()
     ],
     mode: "development"
 };

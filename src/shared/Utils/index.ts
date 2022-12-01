@@ -26,6 +26,10 @@ const apiUrl = function() {
         url = Config.apiUrlLocal;
     }
     return url;
+} 
+
+const isLocal = function() {
+    return window.location.host === "localhost:8080"
 }
 
 var nameList = [
@@ -64,5 +68,6 @@ export {
     apiUrl,
     roundToTwo,
     roundTo,
-    countPlayers
+    countPlayers,
+    isLocal
 }
