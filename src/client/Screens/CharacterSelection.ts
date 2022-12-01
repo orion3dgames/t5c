@@ -4,7 +4,7 @@ import State from "./Screens";
 import { PlayerCharacter, PlayerUser } from "../../shared/types";
 
 import Config from "../../shared/Config";
-import { request, apiUrl, alertMessage} from "../../shared/Utils";
+import { request, apiUrl, alertMessage, generateRandomPlayerName} from "../../shared/Utils";
 import { create } from "domain";
 
 export class CharacterSelectionScene {
@@ -149,6 +149,7 @@ export class CharacterSelectionScene {
         usernameInput.width = 1;
         usernameInput.height = '30px;'
         usernameInput.color = "#FFF";
+        usernameInput.text = generateRandomPlayerName();
         usernameInput.placeholderText = "Enter username";
         usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         usernameInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;

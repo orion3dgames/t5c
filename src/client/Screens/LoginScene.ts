@@ -2,7 +2,7 @@ import { Engine, Scene, Color4, Vector3, FreeCamera } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText, InputPassword, Image } from "@babylonjs/gui";
 import Config from "../../shared/Config";
 import State from "./Screens";
-import { alertMessage, request, apiUrl } from "../../shared/Utils"
+import { alertMessage, request, apiUrl, generateRandomPlayerName } from "../../shared/Utils"
 
 export class LoginScene {
     
@@ -77,7 +77,7 @@ export class LoginScene {
         usernameInput.width = .8;
         usernameInput.height = '30px;'
         usernameInput.color = "#FFF";
-        usernameInput.text = "test";
+        usernameInput.text = generateRandomPlayerName();
         usernameInput.placeholderText = "Enter username";
         usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         usernameInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;

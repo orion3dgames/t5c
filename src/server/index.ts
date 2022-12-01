@@ -13,10 +13,20 @@ import { ChatRoom } from "./rooms/ChatRoom";
 import databaseInstance from "../shared/Database";
 import { PlayerUser } from "../shared/types";
 import Logger from "../shared/Logger";
+import Config from "../shared/Config";
 
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
+
+if (fs.existsSync(Config.databaseLocation)) {
+  fs.unlink(Config.databaseLocation, (err) => {
+    if (err) {
+      Logger.error("Could not delete the file: "+Config.databaseLocation, err);
+    }
+    Logger.info("File is deleted: "+Config.databaseLocation);
+  });
+}
 
 // start db
 let database = new databaseInstance();

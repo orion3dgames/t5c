@@ -9,7 +9,6 @@ import Config from "./Config";
 class Database {
 
   private db;
-  private dbFilePath:string = './database.db';
   private debug: boolean = true;
   
   constructor() {
@@ -57,11 +56,12 @@ class Database {
   }
 
   async connectDatabase(){
-    return new sqlite3.Database(this.dbFilePath, (err: any) => {
+    let dbFilePath = Config.databaseLocation;
+    return new sqlite3.Database(dbFilePath, (err: any) => {
       if (err) {
-        Logger.error("[database] Could not connect to database: "+this.dbFilePath, err);
+        Logger.error("[database] Could not connect to database: "+dbFilePath, err);
       } else {
-        Logger.info("[database] Connected to database: "+this.dbFilePath);
+        Logger.info("[database] Connected to database: "+dbFilePath);
       }
     });
   }

@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import State from "../client/Screens/Screens"
 
 let Config = {
@@ -11,6 +12,8 @@ let Config = {
 
     serverUrlProduction: "wss://t5c.onrender.com",
     apiUrlProduction: "https://t5c.onrender.com",
+
+    databaseLocation: './database.db',
     
     maxClients: 64, // set maximum clients per room
     updateRate: 100, // Set frequency the patched state should be sent to all clients, in milliseconds
