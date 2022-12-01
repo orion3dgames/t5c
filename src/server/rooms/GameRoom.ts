@@ -27,7 +27,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
         this.setPatchRate(Config.updateRate);
 
         // Set the simulation interval callback
-        this.setSimulationInterval(dt => {
+        this.setSimulationInterval(dt => { 
             this.state.serverTime += dt; 
         });  
 
@@ -46,6 +46,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
         // still a bug here when the databse saves at the same times as the player move is coming 
         // to investigate
         this.delayedInterval = this.clock.setInterval(() => {
+            /*
             if(this.state.players.size > 0){
                 this.state.players.forEach(player => {
                     let playerClient = this.clients.hashedArray[player.sessionId];
@@ -57,8 +58,8 @@ export class GameRoom extends Room<StateHandlerSchema> {
                         rot: player.rot,
                     });
                 });
-                //Logger.info("[gameroom][onCreate] Saving data for room "+options.location+" with "+this.state.players.size+" players");
-            }
+                Logger.info("[gameroom][onCreate] Saving data for room "+options.location+" with "+this.state.players.size+" players");
+            }*/
         }, Config.databaseUpdateRate);
     }
 
@@ -67,14 +68,14 @@ export class GameRoom extends Room<StateHandlerSchema> {
         const character = await this.database.getCharacter(data.character_id);
         if (!character) {
             Logger.error("[gameroom][onAuth] client could not authentified, joining failed.");
-            throw new ServerError(400, "bad access token");
+            return false
         }else{
 
             let check = await this.alreadyJoined(character.id);
 
             if(check){
-                Logger.error("[gameroom][onAuth] client already connected.");
-                return false;
+                Logger.error("[gameroom][onAuth] client already connected. "+this.state.players.size);
+                return false
             }
 
             Logger.info("[gameroom][onAuth] client authentified.");
@@ -130,9 +131,9 @@ export class GameRoom extends Room<StateHandlerSchema> {
     onLeave(client: Client) {
 
         // if client is found on server
-        if(this.state.players.has(client.sessionId)){
+        if(this.state.players.has(client.sessionId)){ 
 
-            // log
+            // log 
             Logger.info(`[onLeave] player ${client.auth.name} left`);
 
             // inform other clients player has quit
@@ -141,7 +142,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
             // remove player from state
             this.state.removePlayer(client.sessionId);
             this.database.toggleOnlineStatus(client.auth.id, 0);
-        }
+        } 
     }
 
     // cleanup callback, called after there are no more clients in the room. (see `autoDispose`)
@@ -149,8 +150,12 @@ export class GameRoom extends Room<StateHandlerSchema> {
 
         //log
         Logger.warning(`[onDispose] game room removed. `);
-    }
 
+        // set all users as offline,
+        this.database.toggleOnlineForAll(0);
+
+    }
+ 
 
     async alreadyJoined(character_id) {
         let user = await this.database.getCharacter(character_id);

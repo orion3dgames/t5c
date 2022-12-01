@@ -36,14 +36,15 @@ gameServer.define("chat_room", ChatRoom);
 
 // on localhost, simulate bad latency
 if (process.env.NODE_ENV !== "production") {
-  gameServer.simulateLatency(250);
+  Logger.info("[gameserver] Simulating 500ms of latency.")
+  gameServer.simulateLatency(500);
 }
 
 // listen
 gameServer.listen(port).then(()=>{
   
   // server is now running
-  Logger.info("gameserver listening on http://localhost:"+ port)
+  Logger.info("[gameserver] listening on http://localhost:"+ port)
   
   // create town room
   matchMaker.createRoom("game_room", { location: "town" });

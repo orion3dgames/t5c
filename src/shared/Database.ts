@@ -11,7 +11,8 @@ class Database {
 
   private db: typeof sqlite3;
   private dbFilePath:string = './database.db';
-
+  private debug: boolean = true;
+  
   constructor() {
 
     this.getDatabase();
@@ -23,7 +24,7 @@ class Database {
     if (!fs.existsSync(this.dbFilePath)) {
 
       this.db = await this.connectDatabase();
-      Logger.info("Creating database.");
+      Logger.info("[database] Creating database.");
 
       const usersSql = `CREATE TABLE IF NOT EXISTS "users" (
         "id" INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -49,7 +50,7 @@ class Database {
         this.db.run(playersSql);
       });
   
-      Logger.info("Creating default database structure.");
+      Logger.info("[database] Creating default database structure.");
 
     }else{
 
@@ -60,11 +61,15 @@ class Database {
   }
 
   async connectDatabase(){
+
     return new sqlite3.Database(this.dbFilePath, (err: any) => {
       if (err) {
-        Logger.error("Could not connect to database: "+this.dbFilePath, err);
+        Logger.error("[database] Could not connect to database: "+this.dbFilePath, err);
       } else {
-        Logger.info("Connected to database: "+this.dbFilePath);
+        Logger.info("[database] Connected to database: "+this.dbFilePath);
+
+        // reset some tables
+        this.resetCharactersTable();
       }
     });
   }
@@ -77,7 +82,9 @@ class Database {
           console.log(err)
           reject(err)
         } else {
-          //console.log('sql: ' + sql, params, result)
+          if(this.debug){
+            console.log('sql: ' + sql, params)
+          }
           resolve(result)
         }
       })
@@ -92,7 +99,9 @@ class Database {
           console.log(err)
           reject(err)
         } else {
-          //console.log('sql: ' + sql)
+          if(this.debug){
+            console.log('sql: ' + sql, params)
+          }
           resolve(rows)
         }
       })
@@ -107,7 +116,9 @@ class Database {
           console.log(err)
           reject(err)
         } else {
-          //console.log('sql: ' + sql, params)
+          if(this.debug){
+            console.log('sql: ' + sql, params)
+          }
           resolve({ id: this.lastID })
         }
       })
@@ -212,6 +223,17 @@ class Database {
   async toggleOnlineStatus(character_id:number, online: number) {
     const sql = `UPDATE characters SET online=? WHERE id=? ;` 
     return this.run(sql, [online, character_id]);
+  }
+  
+  // will run on server server start
+  resetCharactersTable() {
+    this.db.serialize(() => {
+
+      // reset online to 0
+      this.db.run(`UPDATE characters SET online=0 ;`);
+
+
+    });
   }
 
 }
