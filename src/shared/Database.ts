@@ -139,8 +139,11 @@ class Database {
 
   async checkToken(token: string):Promise<PlayerUser> {
     let user = await this.getUserByToken(token);
-    user.characters = await this.getCharactersForUser(user.id);
-    return user;
+    if(user){
+      user.characters = await this.getCharactersForUser(user.id);
+      return user;
+    }
+    return null;
   }
 
   async saveUser(username: string, password: string, token:string = nanoid()) {
