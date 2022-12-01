@@ -3,6 +3,7 @@ import State from "../client/Screens/Screens"
 let Config = {
     
     title: "T5C",
+    version: "Version 0.1.9",
 
     // basic server settings
     serverUrlLocal: "ws://localhost:3000",

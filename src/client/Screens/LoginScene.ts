@@ -61,7 +61,7 @@ export class LoginScene {
         columnRect.addControl(title);
 
         // welcome text
-        const welcomeText = new TextBlock("infotext", "if account does not \n exist, it will create one");
+        const welcomeText = new TextBlock("infotext", Config.version);
         welcomeText.width = 0.8
         welcomeText.height = "40px";
         welcomeText.color = "white";

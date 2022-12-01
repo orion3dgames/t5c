@@ -12,6 +12,7 @@ export class StateHandlerSchema extends Schema {
 
     addPlayer(sessionId: string, data:PlayerCharacter) {
         this.players.set(sessionId, new PlayerSchema().assign({
+            id: data.id,
             sessionId: sessionId,
             username: data.name,
             location: data.location,

@@ -115,7 +115,10 @@ export class GameScene {
             }
 
         } catch (e) {
-            console.error("join error", e);
+
+            alert('Could not connect / Already Connected with this character.');
+            Config.goToScene(State.CHARACTER_SELECTION);
+            
         }
 
     }

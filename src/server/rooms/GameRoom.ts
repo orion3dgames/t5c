@@ -57,18 +57,26 @@ export class GameRoom extends Room<StateHandlerSchema> {
                         rot: player.rot,
                     });
                 });
-                Logger.info("[gameroom][onCreate] Saving data for room "+options.location+" with "+this.state.players.size+" players");
+                //Logger.info("[gameroom][onCreate] Saving data for room "+options.location+" with "+this.state.players.size+" players");
             }
         }, Config.databaseUpdateRate);
     }
 
     // authorize client based on provided options before WebSocket handshake is complete
     async onAuth (client: Client, data: any, request: http.IncomingMessage) { 
-        const character = await this.database.getCharacter(data.character_id)
+        const character = await this.database.getCharacter(data.character_id);
         if (!character) {
             Logger.error("[gameroom][onAuth] client could not authentified, joining failed.");
             throw new ServerError(400, "bad access token");
         }else{
+
+            let check = await this.alreadyJoined(character.id);
+
+            if(check){
+                Logger.error("[gameroom][onAuth] client already connected.");
+                return false;
+            }
+
             Logger.info("[gameroom][onAuth] client authentified.");
             return character;
         }
@@ -82,6 +90,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
 
         // add player using auth data
         this.state.addPlayer(client.sessionId, client.auth);
+        this.database.toggleOnlineStatus(client.auth.id, 1);
         Logger.info(`[gameroom][onJoin] player added `);
 
         // on player input event
@@ -131,6 +140,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
 
             // remove player from state
             this.state.removePlayer(client.sessionId);
+            this.database.toggleOnlineStatus(client.auth.id, 0);
         }
     }
 
@@ -140,5 +150,12 @@ export class GameRoom extends Room<StateHandlerSchema> {
         //log
         Logger.warning(`[onDispose] game room removed. `);
     }
+
+
+    async alreadyJoined(character_id) {
+        let user = await this.database.getCharacter(character_id);
+        return user.online > 0 ? true : false;
+    }
+
 
 }

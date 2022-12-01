@@ -1,7 +1,7 @@
 import { Schema, type } from "@colyseus/schema";
 
 export class PlayerSchema extends Schema {
-  @type("string") id: string = "ID";
+  @type("number") id: number = 0;
   @type('string') public sessionId: string;
   @type("number") timestamp: number = 0.0;
   @type("string") public username: string = "";

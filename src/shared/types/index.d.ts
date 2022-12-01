@@ -46,7 +46,8 @@ type PlayerCharacter = {
     x: number,
     y: number,
     z: number,
-    rot: number
+    rot: number,
+    online: number
 }
 
 declare global {

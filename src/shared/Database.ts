@@ -1,5 +1,6 @@
 const sqlite3 = require('sqlite3');
-const dbFilePath = './database.db';
+const fs = require('fs')
+
 import Logger from "./Logger";
 import { nanoid } from 'nanoid';
 import { PlayerCharacter, PlayerUser } from "./types";
@@ -9,48 +10,63 @@ import Config from "./Config";
 class Database {
 
   private db: typeof sqlite3;
+  private dbFilePath:string = './database.db';
 
   constructor() {
-    this.db = new sqlite3.Database(dbFilePath, (err: any) => {
-      if (err) {
-        Logger.error("Could not connect to database: "+dbFilePath, err);
-      } else {
-        Logger.info("Connected to database: "+dbFilePath);
-        this.create();
-      }
-    });
+
+    this.getDatabase();
+
   }
 
-  create() {
+  async getDatabase() {
 
-    const usersSql = `CREATE TABLE IF NOT EXISTS "users" (
-      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-      "username" TEXT NOT NULL UNIQUE,
-      "password" TEXT,
-      "token" TEXT
-    );` 
+    if (!fs.existsSync(this.dbFilePath)) {
 
-    const playersSql = `CREATE TABLE IF NOT EXISTS "characters" (
-      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-      "user_id" INTEGER,
-      "name" TEXT,
-      "location" TEXT,
-      "x" REAL DEFAULT 0.0,
-      "y"	REAL DEFAULT 0.0,
-      "z"	REAL DEFAULT 0.0, 
-      "rot" REAL DEFAULT 0.0
-    );`
+      this.db = await this.connectDatabase();
+      Logger.info("Creating database.");
 
-    //const defaultUser = `INSERT INTO users ("username","password") VALUES ("test", "test");`  
+      const usersSql = `CREATE TABLE IF NOT EXISTS "users" (
+        "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+        "username" TEXT NOT NULL UNIQUE,
+        "password" TEXT,
+        "token" TEXT
+      );`  
+  
+      const playersSql = `CREATE TABLE IF NOT EXISTS "characters" (
+        "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+        "user_id" INTEGER,
+        "name" TEXT,
+        "location" TEXT,
+        "x" REAL DEFAULT 0.0,
+        "y"	REAL DEFAULT 0.0,
+        "z"	REAL DEFAULT 0.0, 
+        "rot" REAL DEFAULT 0.0,
+        "online" INTEGER
+      );`
+  
+      this.db.serialize(() => {
+        this.db.run(usersSql);
+        this.db.run(playersSql);
+      });
+  
+      Logger.info("Creating default database structure.");
 
-    this.db.serialize(() => {
-      this.db.run(usersSql);
-      this.db.run(playersSql);
-      //this.db.run(defaultUser);
+    }else{
+
+      this.db = await this.connectDatabase();
+
+    }
+
+  }
+
+  async connectDatabase(){
+    return new sqlite3.Database(this.dbFilePath, (err: any) => {
+      if (err) {
+        Logger.error("Could not connect to database: "+this.dbFilePath, err);
+      } else {
+        Logger.info("Connected to database: "+this.dbFilePath);
+      }
     });
-
-    Logger.info("Creating default database structure.");
-
   }
 
   get(sql: string, params = []) {
@@ -192,6 +208,12 @@ class Database {
       character_id
     ]);
   }
+
+  async toggleOnlineStatus(character_id:number, online: number) {
+    const sql = `UPDATE characters SET online=? WHERE id=? ;` 
+    return this.run(sql, [online, character_id]);
+  }
+
 }
 
 
