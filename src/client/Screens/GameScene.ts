@@ -116,8 +116,10 @@ export class GameScene {
 
         } catch (e) {
 
+            console.error('FAILED TO CONNECT/CREATE ROOM', e);
+
             alert('Could not connect / Already Connected with this character.');
-            Config.goToScene(State.CHARACTER_SELECTION);
+            //Config.goToScene(State.CHARACTER_SELECTION);
             
         }
 
