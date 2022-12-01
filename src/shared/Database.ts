@@ -1,6 +1,5 @@
-const sqlite3 = require('sqlite3');
-const fs = require('fs')
-
+import fs from "fs";
+import sqlite3 from "sqlite3";
 import Logger from "./Logger";
 import { nanoid } from 'nanoid';
 import { PlayerCharacter, PlayerUser } from "./types";
@@ -9,7 +8,7 @@ import Config from "./Config";
 
 class Database {
 
-  private db: typeof sqlite3;
+  private db;
   private dbFilePath:string = './database.db';
   private debug: boolean = true;
   
@@ -21,43 +20,39 @@ class Database {
 
   async getDatabase() {
 
-    if (!fs.existsSync(this.dbFilePath)) {
+    this.db = await this.connectDatabase();
+    
+    Logger.info("[database] Creating database.");
 
-      this.db = await this.connectDatabase();
-      Logger.info("[database] Creating database.");
+    const usersSql = `CREATE TABLE IF NOT EXISTS "users" (
+      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+      "username" TEXT NOT NULL UNIQUE,
+      "password" TEXT,
+      "token" TEXT
+    );`  
 
-      const usersSql = `CREATE TABLE IF NOT EXISTS "users" (
-        "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-        "username" TEXT NOT NULL UNIQUE,
-        "password" TEXT,
-        "token" TEXT
-      );`  
-  
-      const playersSql = `CREATE TABLE IF NOT EXISTS "characters" (
-        "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-        "user_id" INTEGER,
-        "name" TEXT,
-        "location" TEXT,
-        "x" REAL DEFAULT 0.0,
-        "y"	REAL DEFAULT 0.0,
-        "z"	REAL DEFAULT 0.0, 
-        "rot" REAL DEFAULT 0.0,
-        "online" INTEGER
-      );`
-  
-      this.db.serialize(() => {
-        this.db.run(usersSql);
-        this.db.run(playersSql);
-      });
-  
+    const playersSql = `CREATE TABLE IF NOT EXISTS "characters" (
+      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+      "user_id" INTEGER,
+      "name" TEXT,
+      "location" TEXT,
+      "x" REAL DEFAULT 0.0,
+      "y"	REAL DEFAULT 0.0,
+      "z"	REAL DEFAULT 0.0, 
+      "rot" REAL DEFAULT 0.0,
+      "online" INTEGER
+    );`
+
+    this.db.serialize(() => {
+
       Logger.info("[database] Creating default database structure.");
+      this.run(usersSql);
+      this.run(playersSql);
 
-    }else{
+      Logger.info("[database] Reset all characters to offline. ");
+      this.run(`UPDATE characters SET online=0 ;`);
 
-      this.db = await this.connectDatabase();
-      this.resetCharactersTable();
-
-    }
+    });
 
   }
 
@@ -68,17 +63,6 @@ class Database {
       } else {
         Logger.info("[database] Connected to database: "+this.dbFilePath);
       }
-    });
-  }
-
-  // will run on server server start
-  resetCharactersTable() {
-    this.db.serialize(() => {
-
-      // reset online to 0
-      this.db.run(`UPDATE characters SET online=0 ;`);
-
-
     });
   }
 

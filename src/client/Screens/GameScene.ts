@@ -248,7 +248,10 @@ export class GameScene {
             if (timePassed >= updateRate) { 
 
                 // detect movement
-                if (this._input.left_click && (this._input.horizontal && this._input.vertical)) {
+                if (this._input.left_click && 
+                    (this._input.horizontal && this._input.vertical) && 
+                    !this._currentPlayer.blocked
+                    ) {
 
                     // increment seq
                     sequence++;

@@ -3,6 +3,7 @@ import { createServer } from "http";
 import express from "express";
 import cors from "cors";
 import path from "path";
+import fs from "fs";
 
 import { Server, matchMaker, LobbyRoom } from "@colyseus/core";
 import { WebSocketTransport } from '@colyseus/ws-transport';
@@ -12,6 +13,13 @@ import { ChatRoom } from "./rooms/ChatRoom";
 import databaseInstance from "../shared/Database";
 import { PlayerUser } from "../shared/types";
 import Logger from "../shared/Logger";
+
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+
+// start db
+let database = new databaseInstance();
 
 //////////////////////////////////////////////////
 ///////////// COLYSEUS GAME SERVER ///////////////
@@ -58,9 +66,6 @@ gameServer.listen(port).then(()=>{
 //////////////////////////////////////////////////
 //// SERVING CLIENT DIST FOLDER TO EXPRESS ///////
 //////////////////////////////////////////////////
-
-// start db
-let database = new databaseInstance();
 
 // default to built client index.html
 let indexPath = "dist/client/";

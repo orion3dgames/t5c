@@ -46,7 +46,6 @@ export class GameRoom extends Room<StateHandlerSchema> {
         // still a bug here when the databse saves at the same times as the player move is coming 
         // to investigate
         this.delayedInterval = this.clock.setInterval(() => {
-            /*
             if(this.state.players.size > 0){
                 this.state.players.forEach(player => {
                     let playerClient = this.clients.hashedArray[player.sessionId];
@@ -59,7 +58,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
                     });
                 });
                 Logger.info("[gameroom][onCreate] Saving data for room "+options.location+" with "+this.state.players.size+" players");
-            }*/
+            }
         }, Config.databaseUpdateRate);
     }
 
@@ -114,7 +113,8 @@ export class GameRoom extends Room<StateHandlerSchema> {
             };
             this.database.updateCharacter(client.auth.id, updateObj);
             
-            // update player state
+            // update player state on server
+            this.state.setPosition(client.sessionId, updateObj.x, updateObj.y, updateObj.z, 0);
             this.state.setLocation(client.sessionId, location);
 
             // inform client he cand now teleport to new zone
@@ -152,7 +152,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
         Logger.warning(`[onDispose] game room removed. `);
 
         // set all users as offline,
-        this.database.toggleOnlineForAll(0);
+        this.database.resetCharactersTable();
 
     }
  

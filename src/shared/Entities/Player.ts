@@ -27,22 +27,13 @@ export class Player extends TransformNode {
     //Player
     public mesh: AbstractMesh; //outer collisionbox of player
     public characterLabel: Rectangle;
-
-    public playerPosition: Vector3;
-    public playerDirection: Vector3;
-    public playerNextPosition: Vector3;
-    public playerNextRotation: Vector3;
     public playerInputs: PlayerInputs[];
-    public playerLatestSequence: number;
-    public playerNextLocation: string;
     private isCurrentPlayer: boolean;
     public sessionId: string;
-
     public entity: PlayerSchema;
-    public x: number;
-    public y: number;
-    public z: number;
-    public rot: number;
+
+    // flags
+    public blocked: boolean = false; // if true, player will not moved
 
     constructor(entity, room, scene: Scene, _ui, input, _shadow) {
         super("player", scene);
@@ -145,6 +136,7 @@ export class Player extends TransformNode {
                         parameter: targetMesh
                     },() => {
                         if(this.mesh.metadata.sessionId === this.entity.sessionId){
+                            this.blocked = true;
                             this._room.send("playerTeleport", targetMesh.metadata.location);
                         }
                     }

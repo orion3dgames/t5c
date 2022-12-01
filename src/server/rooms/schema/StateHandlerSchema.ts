@@ -36,6 +36,14 @@ export class StateHandlerSchema extends Schema {
         player.location = location;
     }
 
+    setPosition(sessionId: string, x, y, z, rot) {
+        const player = this.getPlayer(sessionId);
+        player.x = x;
+        player.y = y;
+        player.z = z;
+        player.rot = rot;
+    }
+
     calculatePosition(sessionId: string, h: number, v: number, seq: number) {
         const player = this.getPlayer(sessionId);
 
