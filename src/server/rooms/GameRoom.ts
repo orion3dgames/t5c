@@ -151,9 +151,6 @@ export class GameRoom extends Room<StateHandlerSchema> {
         //log
         Logger.warning(`[onDispose] game room removed. `);
 
-        // set all users as offline,
-        this.database.resetCharactersTable();
-
     }
  
 
