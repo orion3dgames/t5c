@@ -55,22 +55,30 @@ class Database {
     }else{
 
       this.db = await this.connectDatabase();
+      this.resetCharactersTable();
 
     }
 
   }
 
   async connectDatabase(){
-
     return new sqlite3.Database(this.dbFilePath, (err: any) => {
       if (err) {
         Logger.error("[database] Could not connect to database: "+this.dbFilePath, err);
       } else {
         Logger.info("[database] Connected to database: "+this.dbFilePath);
-
-        // reset some tables
-        this.resetCharactersTable();
       }
+    });
+  }
+
+  // will run on server server start
+  resetCharactersTable() {
+    this.db.serialize(() => {
+
+      // reset online to 0
+      this.db.run(`UPDATE characters SET online=0 ;`);
+
+
     });
   }
 
@@ -223,17 +231,6 @@ class Database {
   async toggleOnlineStatus(character_id:number, online: number) {
     const sql = `UPDATE characters SET online=? WHERE id=? ;` 
     return this.run(sql, [online, character_id]);
-  }
-  
-  // will run on server server start
-  resetCharactersTable() {
-    this.db.serialize(() => {
-
-      // reset online to 0
-      this.db.run(`UPDATE characters SET online=0 ;`);
-
-
-    });
   }
 
 }
