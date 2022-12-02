@@ -1,36 +1,35 @@
 import {
-    Scene, Engine, Vector3, MeshBuilder, Color3, Color4, SpotLight,
-    ShadowGenerator, CubeTexture, Texture, StandardMaterial,
-    Mesh, Matrix, Quaternion, SceneLoader, CascadedShadowGenerator,
-    DirectionalLight, PointLight, HemisphericLight,
-    AssetsManager, AssetContainer, MeshAssetTask, ContainerAssetTask
+    Scene, Engine, Vector3, Color3, Color4,
+    ShadowGenerator, CascadedShadowGenerator,
+    DirectionalLight, HemisphericLight,
+    AssetsManager, AssetContainer,
 } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Button } from "@babylonjs/gui";
-import { } from "@babylonjs/materials";
-import State from "./Screens";
 
+import { AdvancedDynamicTexture } from "@babylonjs/gui";
+import State from "./Screens";
 import { Input } from "../Controllers/Input";
 import { Environment } from "../Controllers/Environment";
 import { UserInterface } from "../Controllers/UserInterface";
 import { Player } from "../../shared/Entities/Player";
+
 import Config from '../../shared/Config';
 
 import { Room } from "colyseus.js";
 import { PlayerInputs } from "../../shared/types";
+import { resolve } from "path";
+import { Mesh } from "babylonjs";
 
 export class GameScene {
 
     public _scene: Scene;
     public _client;
     private _engine: Engine;
-    public _newState: State;
     private _gui: AdvancedDynamicTexture;
-    public _button: Button;
-    public _assetsManager: AssetsManager;
-    public _assets = [];
+    private _assetsManager: AssetsManager;
+    public assetsContainer: AssetContainer;
     private _input;
     private _ui;
-    private _shadow: ShadowGenerator;
+    private _shadow: CascadedShadowGenerator;
     private _environment: Environment;
 
     public _roomId: string;
@@ -52,6 +51,10 @@ export class GameScene {
 
         // create scene
         let scene = new Scene(engine);
+
+            // set scene
+    this._scene = scene;
+
         scene.shadowsEnabled = true;
 
         // black background
@@ -69,7 +72,6 @@ export class GameScene {
 
         // shadow light
         var light = new DirectionalLight("DirectionalLight", new Vector3(0, -1, 0), scene);
-        //light.position = new Vector3(1,1,1);
         light.intensity = 4; 
 
         // shadow generator
@@ -77,11 +79,30 @@ export class GameScene {
         this._shadow.filteringQuality = ShadowGenerator.QUALITY_MEDIUM;
         this._shadow.bias = 0.018;
 
-        // set scene
-        this._scene = scene;
+        // load assets
+        this._loadedAssets = await this._loadAssets();
 
         await this._initNetwork();
+    }
 
+    private async _loadAssets(): Promise<any[ ]> {
+        return new Promise( resolve => {
+            this._assetsManager = new AssetsManager(this._scene);
+            this._assetsManager.addMeshTask("town", "", "./models/", global.T5C.currentLocationKey+".glb");
+            this._assetsManager.addMeshTask("player_mesh_1", "", "./models/", "player_hobbit.glb");
+            this._assetsManager.load();
+            this._assetsManager.onProgress = function(remainingCount, totalCount, lastFinishedTask) {
+                console.log('We are loading the scene. ' + remainingCount + ' out of ' + totalCount + ' items still need to be loaded.');
+            };
+            this._assetsManager.onFinish = function(assets) {
+                console.log('all meshes are now loaded...', assets);
+                let meshes = [];
+                assets.forEach((el)=>{
+                    meshes[el.name] = el;
+                })
+                resolve(meshes);
+            };
+        });
     }
 
     private async _initNetwork(): Promise<void> {
@@ -106,7 +127,8 @@ export class GameScene {
                 global.T5C.currentRoomID = this._roomId;
                 global.T5C.currentSessionID = this.room.sessionId;
 
-                await this._loadAssets();
+
+                await this._loadEnvironment();
 
             }else{
 
@@ -117,82 +139,22 @@ export class GameScene {
         } catch (e) {
 
             console.error('FAILED TO CONNECT/CREATE ROOM', e);
+            alert('Failed to connect.');
 
-            alert('Could not connect / Already Connected with this character.');
-            //Config.goToScene(State.CHARACTER_SELECTION);
+            Config.goToScene(State.CHARACTER_SELECTION);
             
         }
 
     }
 
-    
-    private async _loadAssets(): Promise<void> {
-
+    private async _loadEnvironment(): Promise<void> {
+        
         // load environment
         const environment = new Environment(this._scene);
         this._environment = environment;
-        await this._environment.load(); //environment
-
-        /*
-        this._loadedAssets = [];
-        var container = new AssetContainer(this._scene);
-        this._assetsManager = new AssetsManager(this._scene);
-        this._assetsManager.addContainerTask("player_mesh", "", "./models/", "player_fixed.glb");
-        this._assetsManager.load();
-        this._assetsManager.onFinish = function(meshes) {
-           console.log('MESH LOADED', meshes);
-           meshes.forEach((task: MeshAssetTask) => {
-                console.log(task);
-                this._loadedAssets.push({
-                    "meshes": task.loadedMeshes[0]
-                })
-           });
-          
-        };*/
+        await this._environment.load(this._loadedAssets); //environment
 
         await this._initEvents();
-    }
-
-    //load the character model
-    private async _loadCharacterAssets(scene): Promise<any> {
-
-        async function loadCharacter() {
-            //collision mesh
-            const outer = MeshBuilder.CreateBox("outer", { width: 2, depth: 1, height: 3 }, scene);
-            outer.isVisible = false;
-            outer.isPickable = false;
-            outer.checkCollisions = true;
-
-            //move origin of box collider to the bottom of the mesh (to match player mesh)
-            outer.bakeTransformIntoVertices(Matrix.Translation(0, 1.5, 0))
-            //for collisions
-            outer.ellipsoid = new Vector3(1, 1.5, 1);
-            outer.ellipsoidOffset = new Vector3(0, 1.5, 0);
-
-            outer.rotationQuaternion = new Quaternion(0, 1, 0, 0); // rotate the player mesh 180 since we want to see the back of the player
-
-            //--IMPORTING MESH--
-            return SceneLoader.ImportMeshAsync(null, "./models/", "player_fixed.glb", scene).then((result) => {
-                const root = result.meshes[0];
-                //body is our actual player mesh
-                const body = root;
-                body.parent = outer;
-                body.isPickable = false;
-                body.getChildMeshes().forEach(m => {
-                    m.isPickable = false;
-                })
-
-                //return the mesh and animations
-                return {
-                    mesh: outer as Mesh,
-                    animationGroups: result.animationGroups
-                }
-            });
-        }
-
-        return loadCharacter().then(assets => {
-            this._loadedAssets = assets;
-        });
     }
 
     private async _initEvents() {
@@ -211,7 +173,7 @@ export class GameScene {
             var isCurrentPlayer = sessionId === this.room.sessionId;
 
             // create player entity
-            let _player = new Player(entity, this.room, this._scene, this._ui, this._input, this._shadow);
+            let _player = new Player(entity, this.room, this._scene, this._ui, this._input, this._shadow, this._loadedAssets);
 
             // if current player, save entity ref
             if (isCurrentPlayer) {

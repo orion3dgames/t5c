@@ -39,7 +39,7 @@ export class CharacterSelectionScene {
         const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI"); 
         guiMenu.idealHeight = 720;
 
-        // background image
+        // add main ui container
         const imageRect = new Rectangle("background");
         imageRect.width = 1;
         imageRect.height = 1;
@@ -47,7 +47,9 @@ export class CharacterSelectionScene {
         imageRect.thickness = 0;
         guiMenu.addControl(imageRect);
 
+        // add image
         var img = new Image("image", "./images/background_mainmenu_1.jpg")
+        img.stretch = Image.STRETCH_EXTEND;
         imageRect.addControl(img);
 
         //////////////////////////////////////////////////////////////

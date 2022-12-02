@@ -39,6 +39,7 @@ export class LoginScene {
         guiMenu.addControl(imageRect);
 
         var img = new Image("image", "./images/background_mainmenu_1.jpg")
+        img.stretch = Image.STRETCH_EXTEND;
         imageRect.addControl(img);
 
         // middle columm

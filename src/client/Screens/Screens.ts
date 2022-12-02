@@ -5,7 +5,7 @@ enum State {
     CHARACTER_SELECTION = 3,
     REGISTER = 4,
     GAME = 5,
-    ERROR = 9
+    LOADING = 9
 }
 
 export default State;

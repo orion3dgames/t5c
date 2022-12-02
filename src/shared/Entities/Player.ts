@@ -17,6 +17,7 @@ export class Player extends TransformNode {
     public ui;
     private _input;
     private _shadow;
+    private _assets;
 
     // controllers
     public cameraController: PlayerCamera;
@@ -35,13 +36,14 @@ export class Player extends TransformNode {
     // flags
     public blocked: boolean = false; // if true, player will not moved
 
-    constructor(entity, room, scene: Scene, _ui, input, _shadow) {
+    constructor(entity, room, scene: Scene, ui, input, shadow, assets) {
         super("player", scene);
 
         this.scene = scene;
         this._room = room;
-        this.ui = _ui;
-        this._shadow = _shadow;
+        this._assets = assets;
+        this.ui = ui;
+        this._shadow = shadow;
         this.sessionId = entity.sessionId; // network id from colyseus
         this.entity = entity;
         this.isCurrentPlayer = this._room.sessionId === entity.sessionId;
@@ -68,6 +70,10 @@ export class Player extends TransformNode {
         // load player mesh
         const result = await SceneLoader.ImportMeshAsync(null, "./models/", "player_hobbit.glb", this._scene);
         const playerMesh = result.meshes[0];
+        /*
+        const result = this._assets['player_mesh_1'];
+        console.log(result);
+        const playerMesh = result.loadedMeshes[0];*/
 
         // set initial player scale & rotation
         playerMesh.name = "player_mesh";
