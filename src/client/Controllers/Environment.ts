@@ -16,12 +16,10 @@ export class Environment {
     //handles setting the necessary flags for collision and trigger meshes,
      public async load(allMeshes) {
        
-        //const assets = await this._loadAsset();
-
-        console.log(allMeshes);
+        const assets = await this._loadAsset();
 
         //Loop through all environment meshes that were imported
-        allMeshes.forEach(m => {
+        assets.allMeshes.forEach(m => {
 
             // default values
             m.checkCollisions = true;
