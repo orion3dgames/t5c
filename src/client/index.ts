@@ -68,17 +68,6 @@ class App {
             this._state = Config.checkForSceneChange();
 
             switch (this._state) {
-
-                ///////////////////////////////////////
-                ///////////////////////////////////////
-                ///////////////////////////////////////
-                case State.START:
-                    this.clearScene();
-                    this._currentScene = new StartScene();
-                    this._currentScene.createScene(this._engine);
-                    this._scene = this._currentScene._scene;
-                    this._state = State.NULL;
-                    break;
     
                 ///////////////////////////////////////
                 ///////////////////////////////////////

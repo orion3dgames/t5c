@@ -32,7 +32,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
         });  
 
         // set max clients
-        this.maxClients = Config.maxClients; 
+        this.maxClients = Config.maxClients;
 
         // load navmesh
         const navMesh = await loadNavMesh(options.location)

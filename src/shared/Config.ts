@@ -3,23 +3,26 @@ import State from "../client/Screens/Screens"
 
 let Config = {
     
+    // general settings
     title: "T5C",
     version: "Version 0.1.9",
 
-    // basic server settings
+    // server settings
     serverUrlLocal: "ws://localhost:3000",
     apiUrlLocal: "http://localhost:3000",
-
     serverUrlProduction: "wss://t5c.onrender.com",
     apiUrlProduction: "https://t5c.onrender.com",
 
+    maxClients: 20, // set maximum clients per room
+    updateRate: 100, // Set frequency the patched state should be sent to all clients, in milliseconds 
+    databaseUpdateRate: 1000, // the frequency at which server save players position
+    logLevel: "info",
+
+    // database settings
     databaseLocation: './database.db',
     
-    maxClients: 64, // set maximum clients per room
-    updateRate: 100, // Set frequency the patched state should be sent to all clients, in milliseconds
-    logLevel: "info", 
-    databaseUpdateRate: 1000,
-    
+    // players settings
+    PLAYER_SPEED: 0.50,
 
     // basic locations
     initialLocation: "town",
@@ -47,8 +50,6 @@ let Config = {
         },
     },
 
-    // player defaults
-    PLAYER_SPEED: 0.50,
 
     // functions
     setDefault(){
