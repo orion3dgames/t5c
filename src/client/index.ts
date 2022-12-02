@@ -9,7 +9,6 @@ import { Engine, Scene, EngineFactory } from "@babylonjs/core";
 
 // IMPORT SCREEN
 import State from "./Screens/Screens";
-import { StartScene } from "./Screens/StartScene";
 import { GameScene } from "./Screens/GameScene";
 import { LoginScene } from "./Screens/LoginScene";
 import { CharacterSelectionScene } from "./Screens/CharacterSelection";

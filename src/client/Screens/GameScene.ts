@@ -80,7 +80,7 @@ export class GameScene {
         this._shadow.bias = 0.018;
 
         // load assets
-        this._loadedAssets = await this._loadAssets();
+        //this._loadedAssets = await this._loadAssets();
 
         await this._initNetwork();
     }

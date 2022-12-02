@@ -49,7 +49,7 @@ export class CharacterSelectionScene {
 
         // add image
         var img = new Image("image", "./images/background_mainmenu_1.jpg")
-        img.stretch = Image.STRETCH_EXTEND;
+        img.stretch = Image.STRETCH_FILL;
         imageRect.addControl(img);
 
         //////////////////////////////////////////////////////////////
