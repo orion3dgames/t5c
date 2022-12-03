@@ -5,14 +5,19 @@ import { PlayerInputs } from "../../types";
 export class PlayerMove {
 
     private _mesh;
+    private _navMesh;
     public playerInputs = [];
     private playerLatestSequence: number;
 
     private nextPosition: Vector3;
     private nextRotation: Vector3;
 
-    constructor(mesh) {
+    private isCurrentPlayer: boolean;
+
+    constructor(mesh, navMesh, isCurrentPlayer) {
         this._mesh = mesh;
+        this._navMesh = navMesh
+        this.isCurrentPlayer = isCurrentPlayer
     }
 
     public getNextPosition() {
@@ -69,17 +74,51 @@ export class PlayerMove {
     }
 
     public tween(){
-        if(this._mesh){
-            this._mesh.position = Vector3.Lerp(this._mesh.position, this.nextPosition, 0.2);
-            this._mesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.8);
+
+        if(!this._mesh){
+            return false;
         }
+
+        this._mesh.position = Vector3.Lerp(this._mesh.position, this.nextPosition, 0.2);
+        this._mesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.8);
     }
 
     public move(input:PlayerInputs):void {
+
+        // save current position
+        let oldX = this.nextPosition.x;
+        let oldZ = this.nextPosition.z;
+
+        // calculate new position
+        let newX = oldX - (input.h * Config.PLAYER_SPEED);
+        let newZ = oldZ - (input.v * Config.PLAYER_SPEED);
+        let newRot = Math.atan2(input.h, input.v);
+
+        // check it fits in navmesh
+        if(this.isCurrentPlayer){
+
+            const foundPath: any = this._navMesh.findPath({ x: oldX, y: oldZ}, { x: newX, y: newZ });
+            if (foundPath && foundPath.length > 0){
+                this.nextPosition.x = newX;
+                this.nextPosition.z = newZ;
+                this.nextRotation.y = this.nextRotation.y + (newRot - this.nextRotation.y);
+            }
+            
+        }else{
+
+            this.nextPosition.x = newX;
+            this.nextPosition.z = newZ;
+            this.nextRotation.y = this.nextRotation.y + (newRot - this.nextRotation.y);
+
+        }
+
+        /*
         let rotationY = Math.atan2(input.h, input.v);
         this.nextPosition.x -= input.h * Config.PLAYER_SPEED;
         this.nextPosition.z -= input.v * Config.PLAYER_SPEED;
         this.nextRotation.y = this.nextRotation.y + (rotationY - this.nextRotation.y);
+        */
+
     }
 
 }

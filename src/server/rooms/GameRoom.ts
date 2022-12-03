@@ -4,7 +4,7 @@ import {StateHandlerSchema} from './schema/StateHandlerSchema';
 import databaseInstance from "../../shared/Database";
 import Config from '../../shared/Config';
 import Logger from "../../shared/Logger";
-import loadNavMesh from "../../shared/Utils/loadNavMesh";
+import loadNavMeshFromFile from "../../shared/Utils/loadNavMeshFromFile";
 
 export class GameRoom extends Room<StateHandlerSchema> {
 
@@ -35,7 +35,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
         this.maxClients = Config.maxClients;
 
         // load navmesh
-        const navMesh = await loadNavMesh(options.location)
+        const navMesh = await loadNavMeshFromFile(options.location)
         this.state.navMesh = navMesh;
         Logger.info("[gameroom][onCreate] navmesh initialized.");
 

@@ -11,13 +11,11 @@ import { Input } from "../Controllers/Input";
 import { Environment } from "../Controllers/Environment";
 import { UserInterface } from "../Controllers/UserInterface";
 import { Player } from "../../shared/Entities/Player";
-
 import Config from '../../shared/Config';
-
 import { Room } from "colyseus.js";
 import { PlayerInputs } from "../../shared/types";
-import { resolve } from "path";
-import { Mesh } from "babylonjs";
+import { request } from "../../shared/Utils";
+import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
 
 export class GameScene {
 
@@ -31,6 +29,7 @@ export class GameScene {
     private _ui;
     private _shadow: CascadedShadowGenerator;
     private _environment: Environment;
+    private _navMesh;
 
     public _roomId: string;
     private room: Room<any>;
@@ -154,6 +153,10 @@ export class GameScene {
         this._environment = environment;
         await this._environment.load(this._loadedAssets); //environment
 
+        // load navmesh
+        let req = await request('get', '/models/'+global.T5C.currentLocation.key+'.obj');
+        this._navMesh = await loadNavMeshFromString(req.data);
+
         await this._initEvents();
     }
 
@@ -173,7 +176,7 @@ export class GameScene {
             var isCurrentPlayer = sessionId === this.room.sessionId;
 
             // create player entity
-            let _player = new Player(entity, this.room, this._scene, this._ui, this._input, this._shadow, this._loadedAssets);
+            let _player = new Player(entity, this.room, this._scene, this._ui, this._input, this._shadow, this._navMesh);
 
             // if current player, save entity ref
             if (isCurrentPlayer) {
@@ -205,7 +208,8 @@ export class GameScene {
 
             // continuously lerp movement at 60fps
             for (let sessionId in this.playerEntities) {
-                this.playerEntities[sessionId].moveController.tween()
+                const player = this.playerEntities[sessionId];
+                player.moveController.tween();
             }
 
             // every 100ms loop
