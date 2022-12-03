@@ -78,7 +78,8 @@ export class LoginScene {
         usernameInput.width = .8;
         usernameInput.height = '30px;'
         usernameInput.color = "#FFF";
-        usernameInput.text = generateRandomPlayerName();
+        //usernameInput.text = generateRandomPlayerName();
+        usernameInput.text = "test";
         usernameInput.placeholderText = "Enter username";
         usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         usernameInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;

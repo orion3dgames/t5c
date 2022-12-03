@@ -31,6 +31,8 @@ let Config = {
             title: "Town",
             key: 'lh_town',
             mesh: "lh_town.glb",
+            sun: true,
+            sunIntensity: 4,
             spawnPoint: {
                 x: 7.50,
                 y: 0,
@@ -42,6 +44,8 @@ let Config = {
             title: "Dungeon Level 1",
             key: 'lh_dungeon_01',
             mesh: "lh_dungeon_01.glb",
+            sun: false,
+            sunIntensity: 1,
             spawnPoint: {
                 x: 11.33,
                 y: 0,

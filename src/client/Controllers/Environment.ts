@@ -1,14 +1,16 @@
-import { Scene, SceneLoader, Tags} from "@babylonjs/core";
+import { CascadedShadowGenerator, Scene, SceneLoader, Tags} from "@babylonjs/core";
 
 import "@babylonjs/loaders/glTF";
 
 export class Environment {
 
     private _scene: Scene;
+    private _shadow: CascadedShadowGenerator;
 
-    constructor(scene: Scene) {
+    constructor(scene: Scene, shadow:CascadedShadowGenerator) {
 
         this._scene = scene;
+        this._shadow = shadow;
 
     }
 
@@ -20,16 +22,23 @@ export class Environment {
 
         //Loop through all environment meshes that were imported
         assets.allMeshes.forEach(m => {
-
+            
             // default values
-            m.checkCollisions = true;
+            m.checkCollisions = false;
             m.isPickable = false;
+            
+            if (m.name.includes("ground")) {
+                console.log(m.name, m);
+                //m.receiveShadows = true;
+            }
 
-            //dont check for collisions, dont allow for raycasting to detect it(cant land on it)
-            if (m.name == "ground") { 
-                m.receiveShadows = true;
-                m.checkCollisions = false;
-                m.isPickable = false;
+            if (m.name.includes("Preview")) {
+                console.log("Preview", m);
+                m.dispose();
+            }
+
+            if (m.name.includes("shadow")) {
+                //this._shadow.addShadowCaster(m);
             }
 
             //trigger meshes
@@ -38,7 +47,7 @@ export class Environment {
                 m.isVisible = false;
                 m.isPickable = false;
                 m.checkCollisions = false;
-
+                m.receiveShadows = false;
          
                 if(m.name.includes("teleport_lh_town")){
                     m.metadata.location = "lh_town";
@@ -50,6 +59,7 @@ export class Environment {
 
                 m.name = "teleport";
             }
+
         });
 
      }

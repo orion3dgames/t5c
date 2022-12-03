@@ -1,4 +1,4 @@
-import { TransformNode, Scene, MeshBuilder, Vector3, AnimationGroup, SceneLoader, AbstractMesh, ActionManager, ExecuteCodeAction} from "@babylonjs/core";
+import { TransformNode, Scene, MeshBuilder, Vector3, AnimationGroup, SceneLoader, AbstractMesh, ActionManager, ExecuteCodeAction, CascadedShadowGenerator} from "@babylonjs/core";
 import { Rectangle, TextBlock } from "@babylonjs/gui";
 import { PlayerSchema } from "../../server/rooms/schema/PlayerSchema";
 
@@ -36,7 +36,7 @@ export class Player extends TransformNode {
     // flags
     public blocked: boolean = false; // if true, player will not moved
 
-    constructor(entity, room, scene: Scene, ui, input, shadow, navMesh) {
+    constructor(entity, room, scene: Scene, ui, input, shadow:CascadedShadowGenerator, navMesh) {
         super("player", scene);
 
         this.scene = scene;
@@ -79,8 +79,8 @@ export class Player extends TransformNode {
         playerMesh.scaling.set(0.02, 0.02, 0.02);
 
         // add mesh to shadow generator
-        this._shadow.addShadowCaster(playerMesh, true);
-
+        //console.log(this._shadow);
+        //this._shadow.addShadowCaster(playerMesh, true);
 
         // if myself, add all player related stuff
         if (this.isCurrentPlayer) {

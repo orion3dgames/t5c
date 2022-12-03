@@ -51,27 +51,31 @@ export class GameScene {
         // create scene
         let scene = new Scene(engine);
 
-            // set scene
-    this._scene = scene;
+        // set scene
+        this._scene = scene;
 
-        scene.shadowsEnabled = true;
+        let location = global.T5C.currentLocation;
 
         // black background
         scene.clearColor = new Color4(0, 0, 0, 1);
 
-        // ambient light
-        var ambientLight = new HemisphericLight(
-            "light1",
-            new Vector3(0, 1, 0),
-            scene
-        );
-        ambientLight.intensity = 1;
-        ambientLight.groundColor = new Color3(0.13, 0.13, 0.13);
-        ambientLight.specular = Color3.Black();
+        if(location.sun){
+            // ambient light
+            var ambientLight = new HemisphericLight(
+                "light1",
+                new Vector3(0, 1, 0),
+                scene
+            );
+            ambientLight.intensity = 1;
+            ambientLight.groundColor = new Color3(0.13, 0.13, 0.13);
+            ambientLight.specular = Color3.Black();
+        }
 
         // shadow light
-        var light = new DirectionalLight("DirectionalLight", new Vector3(0, -1, 0), scene);
-        light.intensity = 4; 
+        var light = new DirectionalLight("DirectionalLight", new Vector3(-1, -2, -1), scene);
+        light.position = new Vector3(100,100,100);
+        light.radius = 0.27;
+        light.intensity = location.sunIntensity;
 
         // shadow generator
         this._shadow = new CascadedShadowGenerator(1024, light);
@@ -149,7 +153,7 @@ export class GameScene {
     private async _loadEnvironment(): Promise<void> {
         
         // load environment
-        const environment = new Environment(this._scene);
+        const environment = new Environment(this._scene, this._shadow);
         this._environment = environment;
         await this._environment.load(this._loadedAssets); //environment
 
