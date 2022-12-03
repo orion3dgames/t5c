@@ -81,6 +81,7 @@ export class PlayerMove {
 
         this._mesh.position = Vector3.Lerp(this._mesh.position, this.nextPosition, 0.2);
         this._mesh.rotation = this.nextRotation;
+        // this._mesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.1);
     }
 
     public move(input: PlayerInputs): void {
@@ -107,7 +108,7 @@ export class PlayerMove {
 
         }
 
-        this.nextRotation.y = Math.atan2(input.h, input.v);
+        // this.nextRotation.y = this.nextRotation.y + (Math.atan2(input.h, input.v) - this.nextRotation.y % Math.PI);
     }
 
 }
