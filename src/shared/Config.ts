@@ -25,27 +25,28 @@ let Config = {
     PLAYER_SPEED: 0.50,
 
     // basic locations
-    initialLocation: "town",
-    secondaryLocation: "island",
+    initialLocation: "lh_town",
     locations: {
-        "town": {
+        "lh_town": {
             title: "Town",
-            key: 'town',
-            mesh: "town.glb",
+            key: 'lh_town',
+            mesh: "lh_town.glb",
             spawnPoint: {
-                x: -44.463,
+                x: 7.50,
                 y: 0,
-                z: -1.671
+                z: -14.27,
+                rot: -180
             },
         },
-        "island": {
-            title: "Island",
-            key: 'island',
-            mesh: "island.glb",
+        "lh_dungeon_01": {
+            title: "Dungeon Level 1",
+            key: 'lh_dungeon_01',
+            mesh: "lh_dungeon_01.glb",
             spawnPoint: {
-                x: 20,
+                x: 11.33,
                 y: 0,
-                z: -23
+                z: -2.51,
+                rot: -180
             },
         },
     },

@@ -191,9 +191,9 @@ class Database {
         "${user.id}",
         "${name}",
         "${defaultLocation.key}",
-        "${defaultLocation.spawnPoint.x}",
-        "${defaultLocation.spawnPoint.y}",
-        "${defaultLocation.spawnPoint.z}",
+        "0",
+        "0",
+        "0",
         "0"
       );`
     let c = await <any> this.run(sql);

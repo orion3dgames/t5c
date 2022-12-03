@@ -35,16 +35,17 @@ export class Environment {
             //trigger meshes
             if (m.name.includes("trigger")) {
 
-                m.isVisible = true;
+                m.isVisible = false;
                 m.isPickable = false;
                 m.checkCollisions = false;
 
-                if(m.name.includes("teleporttoisland")){
-                    m.metadata.location = "island";
+         
+                if(m.name.includes("teleport_lh_town")){
+                    m.metadata.location = "lh_town";
                 }
 
-                if(m.name.includes("teleporttotown")){
-                    m.metadata.location = "town";
+                if(m.name.includes("teleport_lh_dungeon_01")){
+                    m.metadata.location = "lh_dungeon_01";
                 }
 
                 m.name = "teleport";

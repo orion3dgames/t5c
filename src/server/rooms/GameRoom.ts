@@ -105,6 +105,9 @@ export class GameRoom extends Room<StateHandlerSchema> {
         // on player teleport
         this.onMessage("playerTeleport", (client, location) => {
 
+            // log
+            Logger.info(`[gameroom][playerTeleport] player teleported to ${location}`);
+
             // update player location in database
             let newLocation = Config.locations[location];
             let updateObj = {
@@ -123,8 +126,7 @@ export class GameRoom extends Room<StateHandlerSchema> {
             // inform client he cand now teleport to new zone
             client.send('playerTeleportConfirm', location)
 
-            // log
-            Logger.info(`[gameroom][playerTeleport] player teleported to ${location}`);
+            
         });
 
 

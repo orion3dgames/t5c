@@ -65,10 +65,10 @@ gameServer.listen(port).then(()=>{
   Logger.info("[gameserver] listening on http://localhost:"+ port)
   
   // create town room
-  matchMaker.createRoom("game_room", { location: "town" });
+  matchMaker.createRoom("game_room", { location: "lh_town" });
 
   // create island room
-  matchMaker.createRoom("game_room", { location: "island" });
+  matchMaker.createRoom("game_room", { location: "lh_dungeon_01" });
 
 });
 

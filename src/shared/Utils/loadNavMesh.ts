@@ -7,7 +7,7 @@ import wavefrontObjParser from 'wavefront-obj-parser';
 import NavMesh from 'navmesh';
 
 export default async function loadNavMesh(fileNameNavMesh: string) {
-    const fileNavMesh = await readFile(`./public/models/${fileNameNavMesh}/navmesh.obj`, 'utf8')
+    const fileNavMesh = await readFile(`./public/models/${fileNameNavMesh}.obj`, 'utf8')
     var jsonNavMesh = wavefrontObjParser(fileNavMesh)
     const meshPolygonPoints = []
     const vertexPositions = jsonNavMesh.vertexPositions
