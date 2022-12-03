@@ -91,9 +91,6 @@ export class Player extends TransformNode {
         this.moveController = new PlayerMove(this.mesh, this._navMesh, this.isCurrentPlayer);
         this.moveController.setPositionAndRotation(entity); // set default entity position
 
-        // add player nameplate
-        this.characterLabel = this.addLabel(entity.username);
-
         // render loop
         this.scene.registerBeforeRender(() => {
 
@@ -106,6 +103,9 @@ export class Player extends TransformNode {
                 this.cameraController.follow(this.mesh.position);
             }    
         });
+
+        // add player nameplate
+        this.characterLabel = this.addLabel(entity.username);
 
         ///////////////////////////////////////////////////////////
         // entity network event

@@ -31,11 +31,11 @@ export class PlayerCamera {
         let yTilt = new TransformNode("ytilt");
 
         // adjustments to camera view to point down at our player
-        yTilt.rotation = new Vector3(0.50, 0, 0);
+        yTilt.rotation = new Vector3(0.60, 0, 0);
         yTilt.parent = this._camRoot;
 
         // our actual camera that's pointing at our root's position
-        this.camera = new UniversalCamera("cam", new Vector3(0, 0, -40), this._scene);
+        this.camera = new UniversalCamera("cam", new Vector3(0, 0, -45), this._scene);
         this.camera.lockedTarget = this._camRoot.position;
         this.camera.fov = 0.35;
         this.camera.parent = yTilt;

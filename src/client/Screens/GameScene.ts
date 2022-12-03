@@ -14,7 +14,7 @@ import { Player } from "../../shared/Entities/Player";
 import Config from '../../shared/Config';
 import { Room } from "colyseus.js";
 import { PlayerInputs } from "../../shared/types";
-import { request } from "../../shared/Utils";
+import { apiUrl, isLocal, request } from "../../shared/Utils";
 import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
 
 export class GameScene {
@@ -112,6 +112,25 @@ export class GameScene {
 
         try {
 
+            if(isLocal()){
+                global.T5C.currentUser = {
+                    id: 2,
+                    username: 'Code_Code',
+                    password: 'test',
+                    token: 'E3Hcyxx6QCiHWpcMukff8',
+                }
+                global.T5C.currentCharacter = {
+                    id: 1,
+                    user_id: 2,
+                    name: "Test",
+                    location: 'lh_town',
+                    x: 0,
+                    y: 0,
+                    z: 0,
+                    rot: 0
+                };
+            }
+
             let user = global.T5C.currentUser;
             let character = global.T5C.currentCharacter;
             let currentLocationKey = global.T5C.currentLocation.key;
@@ -181,11 +200,14 @@ export class GameScene {
 
             // create player entity
             let _player = new Player(entity, this.room, this._scene, this._ui, this._input, this._shadow, this._navMesh);
+            
 
             // if current player, save entity ref
             if (isCurrentPlayer) {
                 // set currentPlayer
                 this._currentPlayer = _player;
+
+                
             }
 
             // save entity

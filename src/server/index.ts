@@ -19,6 +19,7 @@ import Config from "../shared/Config";
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 
+/*
 if (fs.existsSync(Config.databaseLocation)) {
   fs.unlink(Config.databaseLocation, (err) => {
     if (err) {
@@ -26,7 +27,7 @@ if (fs.existsSync(Config.databaseLocation)) {
     }
     Logger.info("File is deleted: "+Config.databaseLocation);
   });
-}
+}*/
 
 // start db
 let database = new databaseInstance();

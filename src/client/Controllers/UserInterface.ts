@@ -1,5 +1,5 @@
 import { TextBlock, AdvancedDynamicTexture, Button, Control, InputText, ScrollViewer, Rectangle, TextWrapping, StackPanel } from "@babylonjs/gui";
-import { Scene, Engine } from "@babylonjs/core";
+import { Scene, Engine, Color4 } from "@babylonjs/core";
 
 import { Room } from "colyseus.js";
 
@@ -8,6 +8,7 @@ import { Player } from "../../shared/Entities/Player";
 import { countPlayers, roundToTwo } from "../../shared/Utils";
 import { PlayerMessage } from "../../shared/types";
 import Config from "../../shared/Config";
+import { debug } from "console";
 
 export class UserInterface {
     
@@ -32,15 +33,15 @@ export class UserInterface {
         ////////////////////////////
         // add a quit button
         const quitButton = Button.CreateSimpleButton("quit", "Quit");;
-        quitButton.width = 0.2
+        quitButton.width = "200px;";
         quitButton.height = "30px";
         quitButton.color = "white";
         quitButton.top = "20px"; 
-        quitButton.left = "-20px";
+        quitButton.left = "20px";
         quitButton.background = "#000"; 
         quitButton.thickness = 1;
         quitButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        quitButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        quitButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         this._playerUI.addControl(quitButton);
 
         quitButton.onPointerDownObservable.add(() => { 
@@ -49,33 +50,70 @@ export class UserInterface {
         });
 
         ////////////////////////////
-        // add location debug info
+        // add debug info panel
+
+        // add stack panel
+        const debugPanel = new Rectangle("debugPanel");
+        debugPanel.top = "60px;"
+        debugPanel.left = "20px;"
+        debugPanel.width = "200px;"
+        debugPanel.height = .2;
+        debugPanel.background = "rgba(0,0,0,.5)";
+        debugPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        debugPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        this._playerUI.addControl(debugPanel);
+
         const locationBtn = new TextBlock("location", "");
-        locationBtn.width = 0.5
-        locationBtn.height = 0.3;
         locationBtn.color = "#FFF";
-        locationBtn.top = "20px"; 
-        locationBtn.left = "20px";
-        locationBtn.fontSize = "24px;";
+        locationBtn.top = "5px"; 
+        locationBtn.left = "5px";
+        locationBtn.fontSize = "18px;";
         locationBtn.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         locationBtn.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         locationBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         locationBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        this._playerUI.addControl(locationBtn);
+        debugPanel.addControl(locationBtn);
 
+        ////////////////////////////
+        // add character panel
+
+        // add stack panel
+        const characterPanel = new Rectangle("debugPanel");
+        characterPanel.top = "20px;"
+        characterPanel.left = "-20px;"
+        characterPanel.width = "200px;"
+        characterPanel.height = "60px;";
+        characterPanel.background = "rgba(0,0,0,.5)";
+        characterPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        characterPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        this._playerUI.addControl(characterPanel);
+
+        const characterText = new TextBlock("location", "");
+        characterText.text = global.T5C.currentCharacter.name+"\nHealth: 100";
+        characterText.color = "#FFF";
+        characterText.top = "5px"; 
+        characterText.left = "-5px";
+        characterText.fontSize = "24px;";
+        characterText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        characterText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        characterText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        characterText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        characterPanel.addControl(characterText);
 
         ////////////////////////////
         // add chat input
         const chat_input = new InputText();
-        chat_input.width = .5;
+        chat_input.width = .4;
         chat_input.height = '30px;'
         chat_input.left = '20px';
         chat_input.top = "-20px";
         chat_input.color = "#FFF";
         chat_input.placeholderText = "Write message here...";
-        chat_input.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        chat_input.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         chat_input.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         this._playerUI.addControl(chat_input);
+
+        chat_input.focus();
 
         // chatbox on enter event
         chat_input.onKeyboardEventProcessedObservable.add((ev) => { 
@@ -112,12 +150,13 @@ export class UserInterface {
 
         // add scrollable container
         var sv = new ScrollViewer("chat-scroll-viewer");
-        sv.width = 0.5;
-        sv.height = 0.2;
+        sv.width = 0.4;
+        sv.height = "100px";
         sv.left = '20px';
-        sv.top = "-60px";
-        sv.background = "#CCCCCC";
-        sv.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        sv.top = "-50px";
+        sv.background = "rgba(0,0,0,.5)";
+        sv.alpha = 1;
+        sv.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         sv.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
 
         // add stack panel
@@ -162,7 +201,7 @@ export class UserInterface {
             var headlineRect = new Rectangle("chatmessage_"+msg.timestamp);
             headlineRect.width = "100%";
             headlineRect.thickness = 0;
-            headlineRect.paddingBottom = "10px";
+            headlineRect.paddingBottom = "5px";
             headlineRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             headlineRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             headlineRect.adaptHeightToChildren = true;
@@ -174,7 +213,7 @@ export class UserInterface {
             roomTxt.text = "[GLOBAL] "+msg.username+': ' +msg.message;
             roomTxt.textHorizontalAlignment = 0;
             roomTxt.fontSize = "12px";
-            roomTxt.color = "#000";
+            roomTxt.color = "#FFF";
             roomTxt.left = "0px";
             roomTxt.textWrapping = TextWrapping.WordWrap;
             roomTxt.resizeToFit = true;
