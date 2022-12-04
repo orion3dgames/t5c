@@ -8,7 +8,7 @@ export class Input {
     //simple movement
     public horizontal: number = 0;
     public vertical: number = 0;
-    
+
     // moving
     public left_click: boolean;
     public right_click: boolean;
@@ -59,8 +59,8 @@ export class Input {
 
         //forward - backwards movement
         if (this.inputMap["rotY"] !== null) {
-            this.vertical = -Math.cos(this.inputMap["rotY"]);
-            this.horizontal = Math.sin(this.inputMap["rotY"]);
+            this.vertical = -Math.cos(this.inputMap["rotY"] + Math.PI / 4);
+            this.horizontal = Math.sin(this.inputMap["rotY"] + Math.PI / 4);
         }
     }
 }

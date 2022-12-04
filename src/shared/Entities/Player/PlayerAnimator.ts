@@ -13,7 +13,7 @@ export class PlayerAnimator {
     private _currentAnim: AnimationGroup = null;
     private _prevAnim: AnimationGroup;
 
-    constructor(player_animations:AnimationGroup[]) {
+    constructor(player_animations: AnimationGroup[]) {
 
         this._playerAnimations = player_animations;
 
@@ -37,17 +37,16 @@ export class PlayerAnimator {
         //initialize current and previous
         this._currentAnim = this._idle;
         this._prevAnim = this._walk;
-        
+
     }
 
     public animate(currentPos, nextPos): void {
 
+        const precision = 2;
         // if position has changed
-        if(currentPos && nextPos && (
-            roundTo(currentPos.x, 2) !== roundTo(nextPos.x, 2) ||
-            roundTo(currentPos.y, 2) !== roundTo(nextPos.y, 2)
-        )) {
+        if (currentPos.x.toFixed(precision) !== nextPos.x.toFixed(precision) || currentPos.z.toFixed(precision) !== nextPos.z.toFixed(precision)) {
             this._currentAnim = this._walk;
+            // console.log(nextPos.x.toFixed(precision) - currentPos.x.toFixed(precision), nextPos.z.toFixed(precision) - currentPos.z.toFixed(precision))
         } else {
             this._currentAnim = this._idle;
         }
