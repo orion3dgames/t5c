@@ -24,10 +24,6 @@ export class Network {
     }
 
     public async joinRoom(roomId, token, character_id):Promise<any> {
-        console.log('joinRoom',{ 
-            token: token,
-            character_id: character_id
-        });
         return await this._client.joinById(roomId, { 
             token: token,
             character_id: character_id
@@ -36,8 +32,8 @@ export class Network {
     }
     
 
-    public async joinChatRoom():Promise<any> {
-        return await this._client.joinOrCreate("chat_room");
+    public async joinChatRoom(data):Promise<any> {
+        return await this._client.joinOrCreate("chat_room", data);
     }
 
     public async findCurrentRoom(currentRoomKey):Promise<any> {

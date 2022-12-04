@@ -24,7 +24,9 @@ export class ChatRoom extends Room {
     // When client successfully join the room
     onJoin (client: Client, options: any, auth: any){
 
-        Logger.info("[chat_room][message] client joined "+client.sessionId);
+        client.sessionId = options.sessionId;
+
+        Logger.info("[chat_room][message] client joined "+client.sessionId, options);
 
         // sent initial help message
         client.send('messages', this.generateMessage(client.sessionId, "Welcome to T5C, you can move around by left clicking and dragging the mouse around."));

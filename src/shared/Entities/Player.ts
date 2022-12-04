@@ -1,5 +1,5 @@
 import { TransformNode, Scene, MeshBuilder, Vector3, AnimationGroup, SceneLoader, AbstractMesh, ActionManager, ExecuteCodeAction, CascadedShadowGenerator, Color3} from "@babylonjs/core";
-import { Rectangle, TextBlock } from "@babylonjs/gui";
+import { Control, Rectangle, TextBlock, TextWrapping } from "@babylonjs/gui";
 import { PlayerSchema } from "../../server/rooms/schema/PlayerSchema";
 
 import Config from "../Config";
@@ -9,6 +9,7 @@ import { PlayerCamera } from "./Player/PlayerCamera";
 import { PlayerAnimator } from "./Player/PlayerAnimator";
 import { PlayerMove } from "./Player/PlayerMove";
 import { PlayerUtils } from "./Player/PlayerUtils";
+import { PlayerActions } from "./Player/PlayerActions";
 
 export class Player extends TransformNode {
     
@@ -24,10 +25,12 @@ export class Player extends TransformNode {
     public animatorController: PlayerAnimator;
     public moveController: PlayerMove;
     public utilsController: PlayerUtils;
+    public actionsController: PlayerActions;
 
     //Player
     public mesh: AbstractMesh; //outer collisionbox of player
     public playerMesh: AbstractMesh; //outer collisionbox of player
+    public characterChatLabel: Rectangle;
     public characterLabel: Rectangle;
     public playerInputs: PlayerInputs[];
     private isCurrentPlayer: boolean;
@@ -100,6 +103,7 @@ export class Player extends TransformNode {
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
         playerMesh.rotation.set(0, 0, 0);
         playerMesh.scaling.set(0.02, 0.02, 0.02);
+        playerMesh.visibility = 0;
         this.playerMesh = playerMesh;
 
         // add mesh to shadow generator
@@ -110,6 +114,7 @@ export class Player extends TransformNode {
         if (this.isCurrentPlayer) {
             this.utilsController = new PlayerUtils(this._scene, this._room);
             this.cameraController = new PlayerCamera(this._scene, this._input);
+            this.actionsController = new PlayerActions();
         }
         this.animatorController = new PlayerAnimator(result.animationGroups);
         this.moveController = new PlayerMove(this.mesh, this._navMesh, this.isCurrentPlayer);
@@ -128,28 +133,31 @@ export class Player extends TransformNode {
             }    
         });
 
-        // add player nameplate
-        this.characterLabel = this.addLabel(entity.name);
+        // add player chatbox
+        this.characterLabel = this.createLabel(entity.name);
+        this.characterChatLabel = this.createChatLabel(entity.name);
 
         ///////////////////////////////////////////////////////////
         // entity network event
         // colyseus automatically sends entity updates, so let's listen to those changes
         this.entity.onChange(() => {
 
-            console.log('#UPDATE SERVER', this.entity);
-
-            this.name = entity.name;
-            this.x = entity.x;
-            this.y = entity.y;
-            this.z = entity.z;
-            this.rot = entity.rot;
-            this.health = entity.health;
-            this.level = entity.level;
-            this.experience = entity.experience;
+            this.playerMesh.visibility = 1;
 
             // update player movement from server
             // only do it, if player is not blocked.
             if(!this.blocked){
+
+                //console.log('#UPDATE SERVER', this.entity);
+                this.name = entity.name;
+                this.x = entity.x;
+                this.y = entity.y;
+                this.z = entity.z;
+                this.rot = entity.rot;
+                this.health = entity.health;
+                this.level = entity.level;
+                this.experience = entity.experience;
+
                 this.moveController.setPositionAndRotation(this.entity);
 
                 // do server reconciliation if current player only
@@ -182,36 +190,37 @@ export class Player extends TransformNode {
                 );
             }
 
-            this.mesh.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, function(ev){
+            this.mesh.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
                 let mesh = ev.meshUnderPointer.getChildMeshes()[1];
                 mesh.outlineColor = Color3.Green();
                 mesh.outlineWidth = 3;
                 mesh.renderOutline = true;
+                this.characterLabel.isVisible = true;
             }));
             
-            this.mesh.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, function(ev){
+            this.mesh.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
                 let mesh = ev.meshUnderPointer.getChildMeshes()[1];
                 mesh.renderOutline = false;
+                this.characterLabel.isVisible = false;
             }));
 
         }
 
         if(this.isCurrentPlayer){
 
-            // listen to playerTeleportConfirm event
             this._room.onMessage('playerTeleportConfirm', (location) => {
-                this.teleport(location)
+                this.actionsController.processAction('teleport', {
+                    room: this._room,
+                    location: location
+                })
             });
 
             this._room.onMessage('playerActionConfirmation', (data) => {
                 console.log('playerActionConfirmation', data);
-                this.ui.addChatMessage({
-                    senderID: "SYSTEM",
-                    message: data.message,
-                    name: "SYSTEM",
-                    timestamp: 0,
-                    createdAt: ""
-                });
+                this.actionsController.processAction(data.action, {
+                    ui: this.ui,
+                    data: data,
+                })
             });
         }
     }
@@ -225,29 +234,56 @@ export class Player extends TransformNode {
         global.T5C.nextScene = State.GAME;
     }
 
-    public addLabel(text) {
+    public createChatLabel(text) {
 
-        var rect1 = new Rectangle();
+        var rect1 = new Rectangle('player_chat_'+this.sessionId);
+        rect1.isVisible = false;
         rect1.width = "100px";
-        rect1.height = "40px";
-        rect1.cornerRadius = 20;
-        rect1.color = "white";
-        rect1.thickness = 4;
-        rect1.background = "black";
+        rect1.adaptHeightToChildren = true;
+        rect1.thickness = 1;
+        rect1.cornerRadius = 5;
+        rect1.background = "rgba(0,0,0,.5)";
+        rect1.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         this.ui._playerUI.addControl(rect1);
         rect1.linkWithMesh(this.mesh);
-        rect1.linkOffsetY = -150;
+        rect1.linkOffsetY = -130;
 
-        var label = new TextBlock();
+        var label = new TextBlock('player_chat_label_'+this.sessionId);
         label.text = text;
         label.color = "white";
+        label.paddingLeft = '5px;';
+        label.paddingTop = '5px';
+        label.paddingBottom = '5px';
+        label.paddingRight = '5px';
+        label.textWrapping = TextWrapping.WordWrap;
+        label.resizeToFit = true; 
         rect1.addControl(label);
 
         return rect1;
     }
 
+    // obsolete, keeping just in case
+    public createLabel(text) {
+        var rect1 = new Rectangle('player_nameplate_'+this.sessionId);
+        rect1.isVisible = false;
+        rect1.width = "200px";
+        rect1.height = "40px";
+        rect1.thickness = 0;
+        this.ui._playerUI.addControl(rect1);
+        rect1.linkWithMesh(this.mesh);
+        rect1.linkOffsetY = -100;
+        var label = new TextBlock('player_nameplate_text_'+this.sessionId);
+        label.text = text;
+        label.color = "blue";
+        label.fontWeight = "bold";
+        rect1.addControl(label);
+        return rect1;
+    }
+
+
     public removePlayer() {
        this.characterLabel.dispose();
+       this.characterChatLabel.dispose();
        this.mesh.dispose();
     }
 }

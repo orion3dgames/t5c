@@ -54,7 +54,7 @@ export class UserInterface {
             this._refreshDebugPanel(debugTextUI);
 
             // refresh 
-            this.addPlayersLabel();
+            //this.addPlayersLabel();
             
         });
 
@@ -84,13 +84,28 @@ export class UserInterface {
         return color;
     }
 
-    public addPlayersLabel() {
 
+    /*
+    public addPlayersLabel() {
         for(let sessionId in this._players){
             let player = this._players[sessionId];
-            player.characterLabel.color = this.healthColor(player.health);
-        }
-        
+            if(player && player.characterLabel){
+                player.characterLabel.color = this.healthColor(player.health);
+            }
+        } 
+    }*/
+
+    public showChatMessage(msg:PlayerMessage){
+        for(let sessionId in this._players){
+            let player = this._players[msg.senderID];
+            if(player && player.characterLabel){
+                let el = player.characterLabel;
+                console.log('showChatMessage', el);
+                player.characterChatLabel.isVisible = true;
+                player.characterChatLabel._children[0].text = msg.message;
+                setTimeout(function(){ player.characterChatLabel.isVisible = false; }, 20000);
+            }
+        } 
     }
 
     // set current player
@@ -176,18 +191,18 @@ export class UserInterface {
         characterPanel.top = "20px;"
         characterPanel.left = "-20px;"
         characterPanel.width = "200px;"
-        characterPanel.height = "60px;";
+        characterPanel.height = "30px;";
         characterPanel.background = "rgba(0,0,0,.5)";
         characterPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         characterPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         this._playerUI.addControl(characterPanel);
 
         const characterText = new TextBlock("location", "");
-        characterText.text = this._currentPlayer.name+"\nHealth: "+this._currentPlayer.health;
+        characterText.text = "Health: "+this._currentPlayer.health;
         characterText.color = "#FFF";
         characterText.top = "5px"; 
         characterText.left = "-5px";
-        characterText.fontSize = "24px;";
+        characterText.fontSize = "16px;";
         characterText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         characterText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         characterText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
@@ -196,7 +211,7 @@ export class UserInterface {
 
          // some ui must be constantly refreshed as things change
          this._scene.registerBeforeRender(() => {
-            characterText.text = this._currentPlayer.name+"\nHealth: "+this._currentPlayer.health;
+            characterText.text = "Health: "+this._currentPlayer.health;
         });
     }
 
@@ -237,6 +252,7 @@ export class UserInterface {
         this._chatRoom.onMessage("messages", (message:PlayerMessage) => {
            this.messages.push(message); 
            this._refreshChatBox();
+           this.showChatMessage(message);
         });
 
         // add default chat message
@@ -291,8 +307,6 @@ export class UserInterface {
 
         this.messages.slice().reverse().forEach((msg:PlayerMessage) => {
 
-            console.log(msg);
-
             // container
             var headlineRect = new Rectangle("chatmessage_"+msg.timestamp);
             headlineRect.width = "100%";
@@ -303,10 +317,16 @@ export class UserInterface {
             headlineRect.adaptHeightToChildren = true;
             this._chatUI.addControl(headlineRect);
 
+            
+            let prefix = '[GLOBAL] '+msg.name+': ';
+            if(this._currentPlayer){
+                prefix = msg.senderID == this._currentPlayer.sessionId ? 'You said: ' : '[GLOBAL] '+msg.name+': ';
+            }
+            
             // message
             var roomTxt = new TextBlock();
             roomTxt.paddingLeft = "5px";
-            roomTxt.text = "[GLOBAL] "+msg.name+': ' +msg.message;
+            roomTxt.text = prefix+msg.message;
             roomTxt.textHorizontalAlignment = 0;
             roomTxt.fontSize = "12px";
             roomTxt.color = "#FFF";

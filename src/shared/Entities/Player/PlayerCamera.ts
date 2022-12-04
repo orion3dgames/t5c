@@ -24,7 +24,6 @@ export class PlayerCamera {
         this._camRoot.position = new Vector3(0, 0, 0); //initialized at (0,0,0)
 
         // to face the player from behind (180 degrees)
-        console.log(this.degrees_to_radians(145));
         this._camRoot.rotation = new Vector3(0, this.degrees_to_radians(145), 0);
 
         // rotations along the x-axis (up/down tilting)

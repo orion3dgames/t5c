@@ -134,7 +134,6 @@ export class GameScene {
             let user = global.T5C.currentUser;
             let character = global.T5C.currentCharacter;
             let currentLocationKey = character.location;
-            console.log(character.location);
             let room = await this._client.findCurrentRoom(currentLocationKey);
 
             if(room){
@@ -142,8 +141,8 @@ export class GameScene {
                 // join game room
                 this.room = await this._client.joinRoom(room.roomId, user.token, character.id);
 
-                // join global chat room
-                this.chatRoom = await this._client.joinChatRoom();
+                // join global chat room (match sessionId to gameRoom)
+                this.chatRoom = await this._client.joinChatRoom({sessionId: this.room.sessionId});
        
                 // set global vars
                 this._roomId = this.room.roomId;
@@ -235,7 +234,9 @@ export class GameScene {
             // continuously lerp movement at 60fps
             for (let sessionId in this.playerEntities) {
                 const player = this.playerEntities[sessionId];
-                player.moveController.tween();
+                if(player && player.moveController){
+                    player.moveController.tween();
+                }
             }
 
             // every 100ms loop
