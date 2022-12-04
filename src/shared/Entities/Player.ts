@@ -124,7 +124,7 @@ export class Player extends TransformNode {
         this.scene.registerBeforeRender(() => {
 
             // animate player continuously
-            this.animatorController.animate(this.mesh.position, this.moveController.getNextPosition());
+            this.animatorController.animate(this, this.mesh.position, this.moveController.getNextPosition());
 
             if (this.isCurrentPlayer) {
 
@@ -148,6 +148,10 @@ export class Player extends TransformNode {
             // only do it, if player is not blocked.
             if(!this.blocked){
 
+                if(entity.health < 1){
+                    this.blocked = true;
+                }
+
                 //console.log('#UPDATE SERVER', this.entity);
                 this.name = entity.name;
                 this.x = entity.x;
@@ -157,7 +161,6 @@ export class Player extends TransformNode {
                 this.health = entity.health;
                 this.level = entity.level;
                 this.experience = entity.experience;
-
                 this.moveController.setPositionAndRotation(this.entity);
 
                 // do server reconciliation if current player only

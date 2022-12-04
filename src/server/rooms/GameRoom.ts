@@ -56,11 +56,11 @@ export class GameRoom extends Room<StateHandlerSchema> {
                         z: player.z,
                         rot: player.rot,
                     });
-                    /*
-                    player.health -= 5;
+                    
+                    ///player.health -= 50;
                     if(player.health == 0){
-                        player.health = 100; 
-                    }*/
+                        //player.health = 100; 
+                    }
                 });
                 Logger.info("[gameroom][onCreate] Saving data for room "+options.location+" with "+this.state.players.size+" players");
             }

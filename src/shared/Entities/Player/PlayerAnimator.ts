@@ -8,10 +8,14 @@ export class PlayerAnimator {
     private _playerAnimations: AnimationGroup[];
     private _idle: AnimationGroup;
     private _walk: AnimationGroup;
+    private _death: AnimationGroup;
 
     // current anim status
     private _currentAnim: AnimationGroup = null;
     private _prevAnim: AnimationGroup;
+
+    // case 
+    private _state:string;
 
     constructor(player_animations: AnimationGroup[]) {
 
@@ -25,6 +29,7 @@ export class PlayerAnimator {
         // find animations
         this._idle = this._playerAnimations.find(o => o.name === 'Hobbit_Idle');
         this._walk = this._playerAnimations.find(o => o.name === 'Hobbit_Walk');
+        this._death = this._playerAnimations.find(o => o.name === 'Hobbit_Death');
 
         // prepare animations
         //this._scene.stopAllAnimations();
@@ -33,6 +38,7 @@ export class PlayerAnimator {
         //
         this._idle.loopAnimation = true;
         this._walk.loopAnimation = true;
+        this._death.loopAnimation = false;
 
         //initialize current and previous
         this._currentAnim = this._idle;
@@ -40,13 +46,15 @@ export class PlayerAnimator {
 
     }
 
-    public animate(currentPos, nextPos): void {
+    public animate(player, currentPos, nextPos): void {
 
         const precision = 2;
         // if position has changed
-        if (currentPos.x.toFixed(precision) !== nextPos.x.toFixed(precision) || currentPos.z.toFixed(precision) !== nextPos.z.toFixed(precision)) {
+        if(player.health < 1){
+            this._currentAnim = this._death;
+            console.log('DEAD')
+        }else if (currentPos.x.toFixed(precision) !== nextPos.x.toFixed(precision) || currentPos.z.toFixed(precision) !== nextPos.z.toFixed(precision)) {
             this._currentAnim = this._walk;
-            // console.log(nextPos.x.toFixed(precision) - currentPos.x.toFixed(precision), nextPos.z.toFixed(precision) - currentPos.z.toFixed(precision))
         } else {
             this._currentAnim = this._idle;
         }
