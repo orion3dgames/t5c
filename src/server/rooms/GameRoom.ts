@@ -5,6 +5,7 @@ import databaseInstance from "../../shared/Database";
 import Config from '../../shared/Config';
 import Logger from "../../shared/Logger";
 import loadNavMeshFromFile from "../../shared/Utils/loadNavMeshFromFile";
+import { Player } from "../../shared/Entities/Player";
 
 export class GameRoom extends Room<StateHandlerSchema> {
 
@@ -142,6 +143,17 @@ export class GameRoom extends Room<StateHandlerSchema> {
             // inform target hes been hurt
             this.clients.get(target.sessionId).send('playerActionConfirmation', {
                 action: 'attack',
+                fromSenderId: client.sessionId,
+                fromPosition: {
+                    x: sender.x,
+                    y: sender.y,
+                    z: sender.z,
+                },
+                toPosition: {
+                    x: target.x,
+                    y: target.y,
+                    z: target.z,
+                },
                 message: sender.name +" attacked you and you lost 5 health"
             })
         });

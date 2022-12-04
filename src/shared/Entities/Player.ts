@@ -1,4 +1,4 @@
-import { TransformNode, Scene, MeshBuilder, Vector3, AnimationGroup, SceneLoader, AbstractMesh, ActionManager, ExecuteCodeAction, CascadedShadowGenerator, Color3} from "@babylonjs/core";
+import { TransformNode, Scene, MeshBuilder, Vector3, AnimationGroup, SceneLoader, AbstractMesh, ActionManager, ExecuteCodeAction, CascadedShadowGenerator, Color3, PointerEventTypes} from "@babylonjs/core";
 import { Control, Rectangle, TextBlock, TextWrapping } from "@babylonjs/gui";
 import { PlayerSchema } from "../../server/rooms/schema/PlayerSchema";
 
@@ -88,6 +88,7 @@ export class Player extends TransformNode {
         // set mesh
         this.mesh = box;
         this.mesh.parent = this;
+        this.mesh.checkCollisions = true;
         this.mesh.metadata = {
             sessionId: entity.sessionId,
             type: 'player',
@@ -177,6 +178,7 @@ export class Player extends TransformNode {
         if(this.mesh){
 
             if(this.isCurrentPlayer){
+
                 // teleport collision
                 let targetMesh = this.scene.getMeshByName("teleport");
                 this.mesh.actionManager.registerAction(
@@ -191,8 +193,10 @@ export class Player extends TransformNode {
                         }
                     )
                 );
+
             }
 
+            // register hover over player
             this.mesh.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
                 let mesh = ev.meshUnderPointer.getChildMeshes()[1];
                 mesh.outlineColor = new Color3(0,1,0);
@@ -201,6 +205,7 @@ export class Player extends TransformNode {
                 this.characterLabel.isVisible = true;
             }));
             
+            // register hover out player
             this.mesh.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
                 let mesh = ev.meshUnderPointer.getChildMeshes()[1];
                 mesh.renderOutline = false;
@@ -210,6 +215,8 @@ export class Player extends TransformNode {
         }
 
         if(this.isCurrentPlayer){
+
+            // on teleport confirmation
             this._room.onMessage('playerTeleportConfirm', (location) => {
                 this.actionsController.processAction('teleport', {
                     room: this._room,
@@ -217,6 +224,7 @@ export class Player extends TransformNode {
                 })
             });
 
+            // on player action
             this._room.onMessage('playerActionConfirmation', (data) => {
                 console.log('playerActionConfirmation', data);
                 this.actionsController.processAction(data.action, {
@@ -225,8 +233,45 @@ export class Player extends TransformNode {
                     entity: this.entity,
                     player_mesh: this.playerMesh
                 })
+                // send bullet locally
+                let start = data.fromPosition;
+                let end = data.toPosition;
+                this.utilsController.fire(
+                    new Vector3(start.x, start.y, start.z), 
+                    new Vector3(end.x, end.y, end.z), 
+                    this.mesh
+                );
+            });
+
+            // on player click
+            this._scene.onPointerObservable.add((pointerInfo:any) => {
+            
+                // if other player, send to server: target loses 5 health
+                if (pointerInfo.type === PointerEventTypes.POINTERDOWN) {
+                    if (pointerInfo._pickInfo.pickedMesh && 
+                        pointerInfo._pickInfo.pickedMesh.metadata !== null && 
+                        pointerInfo._pickInfo.pickedMesh.metadata.type == 'player' && 
+                        pointerInfo._pickInfo.pickedMesh.metadata.sessionId !== this.sessionId){
+                          
+                        let targetSessionId = pointerInfo._pickInfo.pickedMesh.metadata.sessionId;    
+                        this._room.send("playerAction", {
+                            type: 'attack',
+                            senderId: this.sessionId,
+                            targetId: targetSessionId
+                        });
+
+                        // send bullet locally
+                        let start = this.mesh.position;
+                        let end = pointerInfo._pickInfo.pickedMesh.position;
+                        this.utilsController.fire(start, end, this.ui._players[targetSessionId].mesh);
+                    }
+                }
+
+                // other actions here
+
             });
         }
+      
     }
 
     public async teleport(location){

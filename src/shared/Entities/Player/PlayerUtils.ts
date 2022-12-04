@@ -1,7 +1,4 @@
-import { Scene } from "@babylonjs/core";
-import { Rectangle, TextBlock } from "@babylonjs/gui";
-import State from "../../../client/Screens/Screens";
-import Config from "../../Config";
+import { Scene, MeshBuilder, Path3D} from "@babylonjs/core";
 
 export class PlayerUtils {
 
@@ -12,35 +9,34 @@ export class PlayerUtils {
         this._scene = scene;
         this._room = room;
     }
+    
+    public fire(start, end, mesh) {
+        console.log('FIRE', start, end);
+        var angle = Math.atan2((start.z - end.z), (start.x - end.x ));
+        var projectile = MeshBuilder.CreateSphere('Projectile', {diameter: 0.4}, this._scene);
+        projectile.position = start.clone();
+        projectile.position.y = 2;
+        projectile.rotation.y = (Math.PI/2) - angle;
+  
+        var endVector = projectile.calcMovePOV(0,0, 72).addInPlace(projectile.position);
+        var points = [start, endVector];
+        var path = new Path3D(points);
 
-    // teleport player
-    public teleport(location){
-        this._room.leave();
-        global.T5C.currentLocation = Config.locations[location];
-        global.T5C.currentLocationKey = location;
-        global.T5C.currentCharacter.location = location;
-        global.T5C.currentRoomID = "";
-        global.T5C.nextScene = State.GAME;
-    }
+        var i = 0;
+        var loop =  this._scene.onBeforeRenderObservable.add(() => {
+            if (i <= 1) {
+                console.log('NO COLLISION');
+                projectile.position = path.getPointAt(i); 
+                i += 0.001;
+            } 
 
-    public addLabel(mesh, ui, text) {
+            if(projectile.intersectsMesh(mesh)){
+                console.log('COLLISION', mesh);
+                projectile.dispose(true, true);
+                this._scene.onBeforeRenderObservable.remove(loop);
+            }
 
-        var rect1 = new Rectangle();
-        rect1.width = "100px";
-        rect1.height = "40px";
-        rect1.cornerRadius = 20;
-        rect1.color = "white";
-        rect1.thickness = 4;
-        rect1.background = "black";
-        ui._playerUI.addControl(rect1);
-        rect1.linkWithMesh(mesh);
-        rect1.linkOffsetY = -150;
-
-        var label = new TextBlock();
-        label.text = text;
-        rect1.addControl(label);
-
-        return rect1;
+        });
 
     }
 

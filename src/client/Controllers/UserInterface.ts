@@ -16,7 +16,7 @@ export class UserInterface {
 
     private _gameRoom: Room;
     private _chatRoom: Room;
-    private _players;
+    public _players;
     private _currentPlayer;
 
     //UI Elements
@@ -56,22 +56,6 @@ export class UserInterface {
             // refresh 
             this.refreshPlayerUI();
             
-        });
-
-        // on player click, target loses 5 health
-        this._scene.onPointerObservable.add((pointerInfo:any) => {
-            if (pointerInfo.type === PointerEventTypes.POINTERDOWN) {
-                if (pointerInfo._pickInfo.pickedMesh && 
-                    pointerInfo._pickInfo.pickedMesh.metadata !== null && 
-                    pointerInfo._pickInfo.pickedMesh.metadata.type == 'player' && 
-                    pointerInfo._pickInfo.pickedMesh.metadata.sessionId !== this._currentPlayer.sessionId){
-                    this._gameRoom.send("playerAction", {
-                        type: 'attack',
-                        senderId: this._currentPlayer.sessionId,
-                        targetId: pointerInfo._pickInfo.pickedMesh.metadata.sessionId
-                    });
-                }
-            }
         });
 
     }
