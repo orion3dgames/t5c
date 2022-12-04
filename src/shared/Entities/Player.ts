@@ -144,13 +144,13 @@ export class Player extends TransformNode {
 
             this.playerMesh.visibility = 1;
 
-            if(entity.health < 1){
-                this.blocked = true;
-            }
-
             // update player movement from server
             // only do it, if player is not blocked.
             if(!this.blocked){
+
+                if(entity.health == 0){
+                    this.blocked = true;
+                }
 
                 //console.log('#UPDATE SERVER', this.entity);
                 this.name = entity.name;

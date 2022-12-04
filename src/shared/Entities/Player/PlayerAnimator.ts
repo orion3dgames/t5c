@@ -50,7 +50,7 @@ export class PlayerAnimator {
 
         const precision = 2;
         // if position has changed
-        if(player.health < 1){
+        if(player.health == 0){
             this._currentAnim = this._death;
         }else if (currentPos.x.toFixed(precision) !== nextPos.x.toFixed(precision) || currentPos.z.toFixed(precision) !== nextPos.z.toFixed(precision)) {
             this._currentAnim = this._walk;
