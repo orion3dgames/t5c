@@ -22,7 +22,7 @@ let Config = {
     databaseLocation: './database.db',
     
     // players settings
-    PLAYER_SPEED: 0.50,
+    PLAYER_SPEED: 0.40,
 
     // basic locations
     initialLocation: "lh_town",

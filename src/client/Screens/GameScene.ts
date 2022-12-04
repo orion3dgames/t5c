@@ -122,7 +122,7 @@ export class GameScene {
                     id: 3,
                     username: 'Code_Code',
                     password: 'test',
-                    token: 'lqTReIZaUe8UaQLEojlo4',
+                    token: 'B5G6yYesNgob3weIn9HDs',
                 }
                 global.T5C.currentCharacter = {
                     id: 2,

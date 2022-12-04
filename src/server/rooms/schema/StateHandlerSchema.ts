@@ -58,6 +58,8 @@ export class StateHandlerSchema extends Schema {
         // calculate new position
         let newX = player.x - (h * Config.PLAYER_SPEED);
         let newZ = player.z - (v * Config.PLAYER_SPEED);
+        let newRot = Math.atan2(h, v);
+        /*
         let newRot;
         const newAngle = Math.atan2(h, v);
 
@@ -78,7 +80,7 @@ export class StateHandlerSchema extends Schema {
             }
             else
                 newRot = oldRot - (oldRot - newAngle) / rotSpeed
-        }
+        }*/
 
         // check it fits in navmesh
         const foundPath: any = this.navMesh.findPath({ x: player.x, y: player.z }, { x: newX, y: newZ });
