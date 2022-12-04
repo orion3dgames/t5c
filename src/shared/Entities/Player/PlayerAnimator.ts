@@ -52,7 +52,6 @@ export class PlayerAnimator {
         // if position has changed
         if(player.health < 1){
             this._currentAnim = this._death;
-            console.log('DEAD')
         }else if (currentPos.x.toFixed(precision) !== nextPos.x.toFixed(precision) || currentPos.z.toFixed(precision) !== nextPos.z.toFixed(precision)) {
             this._currentAnim = this._walk;
         } else {

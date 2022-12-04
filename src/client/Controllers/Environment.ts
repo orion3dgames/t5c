@@ -28,12 +28,10 @@ export class Environment {
             m.isPickable = false;
             
             if (m.name.includes("ground")) {
-                console.log(m.name, m);
                 //m.receiveShadows = true;
             }
 
             if (m.name.includes("Preview")) {
-                console.log("Preview", m);
                 m.dispose();
             }
 

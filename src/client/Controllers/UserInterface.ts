@@ -98,7 +98,6 @@ export class UserInterface {
             // update player color outline
             let mesh = player.playerMesh.getChildMeshes()[0];
             if(mesh){
-                console.log(this.healthColor(player.health));
                 mesh.outlineColor = Color3.FromHexString(this.healthColor(player.health));
             }
 
