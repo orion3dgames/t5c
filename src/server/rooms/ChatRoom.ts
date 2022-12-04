@@ -1,13 +1,11 @@
 import {Room, Client} from '@colyseus/core';
 import { ChatSchema } from './schema/ChatSchema';
-
 import Logger from "../../shared/Logger";
 
 export class ChatRoom extends Room {
     
     public maxClients = 64;
-    private utc = new Date().toLocaleString();
-    public autoDispose = false;
+    public autoDispose = true;
 
     // When room is initialized
     onCreate(options: any){
@@ -45,7 +43,7 @@ export class ChatRoom extends Room {
     generateMessage(sessionId: string, incomingMsg:any) {
         let msg = new ChatSchema;
         msg.senderID = sessionId;
-        msg.username = incomingMsg.username;
+        msg.name = incomingMsg.name;
         msg.message = incomingMsg.message;
         return msg;
     }

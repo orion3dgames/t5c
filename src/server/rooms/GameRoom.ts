@@ -129,6 +129,18 @@ export class GameRoom extends Room<StateHandlerSchema> {
             
         });
 
+        this.onMessage("playerAction", (client, data: any) => {
+            console.log('playerAction', data);
+            let sender = this.state.players[client.sessionId];
+            let target = this.state.players[data.targetId];
+            target.health -= 5;
+            // inform target hes been hurt
+            this.clients.get(target.sessionId).send('playerActionConfirmation', {
+                action: 'attack',
+                message: sender.name +" attacked you and you lost 5 health"
+            })
+        });
+
 
     }
 

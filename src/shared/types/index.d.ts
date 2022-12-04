@@ -24,7 +24,7 @@ type PlayerLocation = {
 
 type PlayerMessage = {
     senderID: string,
-    username: string;
+    name: string;
     message: string,
     timestamp: number,
     createdAt: string
@@ -47,7 +47,10 @@ type PlayerCharacter = {
     y: number,
     z: number,
     rot: number,
-    online: number
+    online: number,
+    health: number,
+    level: number,
+    experience: number
 }
 
 declare global {

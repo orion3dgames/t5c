@@ -35,6 +35,9 @@ class Database {
       "user_id" INTEGER,
       "name" TEXT,
       "location" TEXT,
+      "level" int,
+      "experience" int,
+      "health" int,
       "x" REAL DEFAULT 0.0,
       "y"	REAL DEFAULT 0.0,
       "z"	REAL DEFAULT 0.0, 
@@ -51,6 +54,12 @@ class Database {
       Logger.info("[database] Reset all characters to offline. ");
       this.run(`UPDATE characters SET online=0 ;`);
 
+      /*
+      let req = this.run(`INSERT INTO users SET username=?, password=?, token=?`, ['test', 'test', 'test']);
+      console.log(req);
+      this.run(`INSERT INTO characters SET name=?, location=?, x=?, y=?, z=?, rot=?, level=?, experience=?, health=?`, 
+        ['Orion', 'lh_town', 0,0,0,0,1,0,100]);
+      */
     });
 
   }
@@ -187,14 +196,17 @@ class Database {
   async createCharacter(token, name) {
     let user = await this.getUserByToken(token);
     let defaultLocation = Config.locations[Config.initialLocation];
-    const sql = `INSERT INTO characters ("user_id", "name","location","x","y","z","rot") VALUES (
+    const sql = `INSERT INTO characters ("user_id", "name","location","x","y","z","rot","level","experience","health") VALUES (
         "${user.id}",
         "${name}",
         "${defaultLocation.key}",
         "0",
         "0",
         "0",
-        "0"
+        "0",
+        "1",
+        "0",
+        "100"
       );`
     let c = await <any> this.run(sql);
     return await this.getCharacter(c.id);

@@ -14,12 +14,15 @@ export class StateHandlerSchema extends Schema {
         this.players.set(sessionId, new PlayerSchema().assign({
             id: data.id,
             sessionId: sessionId,
-            username: data.name,
+            name: data.name,
             location: data.location,
             x: data.x,
             y: data.y,
             z: data.z,
             rot: data.rot,
+            health: data.health,
+            level: data.level,
+            experience: data.experience,
         }));
     }
 
@@ -68,9 +71,9 @@ export class StateHandlerSchema extends Schema {
             player.z = newZ;
             player.rot = newRot;
             player.sequence = seq;
-
+ 
              // add player to server
-            Logger.info('Valid position for '+player.username+': ( x: '+player.x+', y: '+player.y+', z: '+player.z+', rot: '+player.rot);
+            Logger.info('Valid position for '+player.name+': ( x: '+player.x+', y: '+player.y+', z: '+player.z+', rot: '+player.rot);
 
         }else{
 
@@ -81,7 +84,7 @@ export class StateHandlerSchema extends Schema {
             player.rot = oldRot;
             player.sequence = seq;
 
-            Logger.warning('Invalid position for '+player.username+': ( x: '+player.x+', y: '+player.y+', z: '+player.z+', rot: '+player.rot);
+            Logger.warning('Invalid position for '+player.name+': ( x: '+player.x+', y: '+player.y+', z: '+player.z+', rot: '+player.rot);
         }
     }
    

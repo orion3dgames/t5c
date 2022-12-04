@@ -112,28 +112,29 @@ export class GameScene {
 
         try {
 
+            /*
             if(isLocal()){
+                global.T5C.currentLocation = {
+                    key: "lh_dungeon_01",
+                    mesh: "lh_dungeon_01.glb"
+                }; 
                 global.T5C.currentUser = {
-                    id: 2,
+                    id: 3,
                     username: 'Code_Code',
                     password: 'test',
-                    token: 'E3Hcyxx6QCiHWpcMukff8',
+                    token: 'lqTReIZaUe8UaQLEojlo4',
                 }
                 global.T5C.currentCharacter = {
-                    id: 1,
-                    user_id: 2,
-                    name: "Test",
-                    location: 'lh_town',
-                    x: 0,
-                    y: 0,
-                    z: 0,
-                    rot: 0
+                    id: 2,
+                    user_id: 3,
+                    location: 'lh_dungeon_01'
                 };
-            }
+            }*/
 
             let user = global.T5C.currentUser;
             let character = global.T5C.currentCharacter;
-            let currentLocationKey = global.T5C.currentLocation.key;
+            let currentLocationKey = character.location;
+            console.log(character.location);
             let room = await this._client.findCurrentRoom(currentLocationKey);
 
             if(room){
@@ -191,7 +192,7 @@ export class GameScene {
         this._input = new Input(this._scene);
 
         // setup hud
-        this._ui = new UserInterface(this._scene, this._engine, this.room, this.chatRoom, this.playerEntities);
+        this._ui = new UserInterface(this._scene, this._engine, this.room, this.chatRoom, this.playerEntities, this._currentPlayer);
 
         // when someone joins the room event
         this.room.state.players.onAdd((entity, sessionId) => {
@@ -201,13 +202,12 @@ export class GameScene {
             // create player entity
             let _player = new Player(entity, this.room, this._scene, this._ui, this._input, this._shadow, this._navMesh);
             
-
             // if current player, save entity ref
             if (isCurrentPlayer) {
                 // set currentPlayer
                 this._currentPlayer = _player;
-
-                
+                // add player specific  ui
+                this._ui.setCurrentPlayer(_player);
             }
 
             // save entity

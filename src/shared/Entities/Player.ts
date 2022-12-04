@@ -1,4 +1,4 @@
-import { TransformNode, Scene, MeshBuilder, Vector3, AnimationGroup, SceneLoader, AbstractMesh, ActionManager, ExecuteCodeAction, CascadedShadowGenerator} from "@babylonjs/core";
+import { TransformNode, Scene, MeshBuilder, Vector3, AnimationGroup, SceneLoader, AbstractMesh, ActionManager, ExecuteCodeAction, CascadedShadowGenerator, Color3} from "@babylonjs/core";
 import { Rectangle, TextBlock } from "@babylonjs/gui";
 import { PlayerSchema } from "../../server/rooms/schema/PlayerSchema";
 
@@ -27,11 +27,23 @@ export class Player extends TransformNode {
 
     //Player
     public mesh: AbstractMesh; //outer collisionbox of player
+    public playerMesh: AbstractMesh; //outer collisionbox of player
     public characterLabel: Rectangle;
     public playerInputs: PlayerInputs[];
     private isCurrentPlayer: boolean;
     public sessionId: string;
     public entity: PlayerSchema;
+
+    // character
+    public name: string = "";
+    public x: number;
+    public y: number;
+    public z: number;
+    public rot: number;
+    public health: number;
+    public level: number;
+    public experience: number;
+    public location: string = "";
 
     // flags
     public blocked: boolean = false; // if true, player will not moved
@@ -50,6 +62,16 @@ export class Player extends TransformNode {
         this._input = input;
         this.playerInputs = [];
 
+        // default
+        this.name = entity.name;
+        this.x = entity.x;
+        this.y = entity.y;
+        this.z = entity.z;
+        this.rot = entity.rot;
+        this.health = entity.health;
+        this.level = entity.level;
+        this.experience = entity.experience;
+
         // spawn player
         this.spawn(entity);
     }
@@ -64,7 +86,8 @@ export class Player extends TransformNode {
         this.mesh = box;
         this.mesh.parent = this;
         this.mesh.metadata = {
-            sessionId: entity.sessionId
+            sessionId: entity.sessionId,
+            type: 'player',
         }
 
         // load player mesh
@@ -77,6 +100,7 @@ export class Player extends TransformNode {
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
         playerMesh.rotation.set(0, 0, 0);
         playerMesh.scaling.set(0.02, 0.02, 0.02);
+        this.playerMesh = playerMesh;
 
         // add mesh to shadow generator
         //console.log(this._shadow);
@@ -105,7 +129,7 @@ export class Player extends TransformNode {
         });
 
         // add player nameplate
-        this.characterLabel = this.addLabel(entity.username);
+        this.characterLabel = this.addLabel(entity.name);
 
         ///////////////////////////////////////////////////////////
         // entity network event
@@ -113,6 +137,15 @@ export class Player extends TransformNode {
         this.entity.onChange(() => {
 
             console.log('#UPDATE SERVER', this.entity);
+
+            this.name = entity.name;
+            this.x = entity.x;
+            this.y = entity.y;
+            this.z = entity.z;
+            this.rot = entity.rot;
+            this.health = entity.health;
+            this.level = entity.level;
+            this.experience = entity.experience;
 
             // update player movement from server
             // only do it, if player is not blocked.
@@ -126,33 +159,61 @@ export class Player extends TransformNode {
             }
         });
 
+        // start action manager
+        this.mesh.actionManager = new ActionManager(this.scene);
+
         // collision with  other meshes
-        if(this.mesh && this.isCurrentPlayer){
+        if(this.mesh){
 
-            // start action manager
-            this.mesh.actionManager = new ActionManager(this.scene);
-
-            // teleport collision
-            let targetMesh = this.scene.getMeshByName("teleport");
-            this.mesh.actionManager.registerAction(
-                new ExecuteCodeAction({
-                        trigger: ActionManager.OnIntersectionEnterTrigger,
-                        parameter: targetMesh
-                    },() => {
-                        if(this.mesh.metadata.sessionId === this.entity.sessionId){
-                            this.blocked = true;
-                            this._room.send("playerTeleport", targetMesh.metadata.location);
+            if(this.isCurrentPlayer){
+                // teleport collision
+                let targetMesh = this.scene.getMeshByName("teleport");
+                this.mesh.actionManager.registerAction(
+                    new ExecuteCodeAction({
+                            trigger: ActionManager.OnIntersectionEnterTrigger,
+                            parameter: targetMesh
+                        },() => {
+                            if(this.mesh.metadata.sessionId === this.entity.sessionId){
+                                this.blocked = true;
+                                this._room.send("playerTeleport", targetMesh.metadata.location);
+                            }
                         }
-                    }
-                )
-            );
+                    )
+                );
+            }
+
+            this.mesh.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, function(ev){
+                let mesh = ev.meshUnderPointer.getChildMeshes()[1];
+                mesh.outlineColor = Color3.Green();
+                mesh.outlineWidth = 3;
+                mesh.renderOutline = true;
+            }));
+            
+            this.mesh.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, function(ev){
+                let mesh = ev.meshUnderPointer.getChildMeshes()[1];
+                mesh.renderOutline = false;
+            }));
 
         }
 
-        // listen to playerTeleportConfirm event
-        this._room.onMessage('playerTeleportConfirm', (location) => {
-            this.teleport(location)
-        });
+        if(this.isCurrentPlayer){
+
+            // listen to playerTeleportConfirm event
+            this._room.onMessage('playerTeleportConfirm', (location) => {
+                this.teleport(location)
+            });
+
+            this._room.onMessage('playerActionConfirmation', (data) => {
+                console.log('playerActionConfirmation', data);
+                this.ui.addChatMessage({
+                    senderID: "SYSTEM",
+                    message: data.message,
+                    name: "SYSTEM",
+                    timestamp: 0,
+                    createdAt: ""
+                });
+            });
+        }
     }
 
     public async teleport(location){
@@ -179,6 +240,7 @@ export class Player extends TransformNode {
 
         var label = new TextBlock();
         label.text = text;
+        label.color = "white";
         rect1.addControl(label);
 
         return rect1;
