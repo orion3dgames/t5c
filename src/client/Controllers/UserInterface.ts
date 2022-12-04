@@ -1,5 +1,5 @@
 import { TextBlock, AdvancedDynamicTexture, Button, Control, InputText, ScrollViewer, Rectangle, TextWrapping, StackPanel } from "@babylonjs/gui";
-import { Scene, Engine, PointerEventTypes } from "@babylonjs/core";
+import { Scene, Engine, PointerEventTypes, Color3 } from "@babylonjs/core";
 
 import { Room } from "colyseus.js";
 
@@ -54,7 +54,7 @@ export class UserInterface {
             this._refreshDebugPanel(debugTextUI);
 
             // refresh 
-            //this.addPlayersLabel();
+            this.refreshPlayerUI();
             
         });
 
@@ -76,36 +76,45 @@ export class UserInterface {
 
     }
 
-    public healthColor(health:number) {
-        let color = "";
-        if (health > 75) { color = "green" } else
-        if (health > 50) { color = "orange" } else
-        { color = "red" }
-        return color;
-    }
+    /**
+     * Generate a hexadecimal color from a number between 0-100
+     * @param value number between 0 - 100
+     * @returns 
+     */
+    healthColor(value){
+        let gHex = Math.round(value * 255 / 100) // rule of three to calibrate [0, 100] to [00, FF] (= [0, 255])
+        let rHex = 255 - gHex // just the mirror of gHex
+        let gHexString = gHex.toString(16) // converting to traditional hex representation
+        let rHexString = rHex.toString(16)
+        gHexString = gHexString.length === 1 ? `0${gHex}` : gHexString // compensating missing digit in case of single digit values
+        rHexString = rHexString.length === 1 ? `0${rHex}` : rHexString
+        return `#${rHexString}${gHexString}00` // composing both in a color code
+      }
 
-
-    /*
-    public addPlayersLabel() {
+    public refreshPlayerUI(){
         for(let sessionId in this._players){
             let player = this._players[sessionId];
-            if(player && player.characterLabel){
-                player.characterLabel.color = this.healthColor(player.health);
+
+            // update player color outline
+            let mesh = player.playerMesh.getChildMeshes()[0];
+            if(mesh){
+                console.log(this.healthColor(player.health));
+                mesh.outlineColor = Color3.FromHexString(this.healthColor(player.health));
             }
-        } 
-    }*/
+
+        }        
+    }
 
     public showChatMessage(msg:PlayerMessage){
-        for(let sessionId in this._players){
-            let player = this._players[msg.senderID];
-            if(player && player.characterLabel){
-                let el = player.characterLabel;
-                console.log('showChatMessage', el);
-                player.characterChatLabel.isVisible = true;
-                player.characterChatLabel._children[0].text = msg.message;
-                setTimeout(function(){ player.characterChatLabel.isVisible = false; }, 20000);
-            }
-        } 
+        let player = this._players[msg.senderID];
+        if(player && player.characterLabel){
+            let el = player.characterLabel;
+            console.log('showChatMessage', el);
+            player.characterChatLabel.isVisible = true;
+            player.characterChatLabel._children[0].text = msg.message;
+            setTimeout(function(){ player.characterChatLabel.isVisible = false; }, 20000);
+        }
+        
     }
 
     // set current player
@@ -196,7 +205,18 @@ export class UserInterface {
         characterPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         characterPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         this._playerUI.addControl(characterPanel);
-
+        
+        const characterPanelInside = new Rectangle("debugPanel");
+        characterPanelInside.top = "0px;"
+        characterPanelInside.left = "0px;"
+        characterPanelInside.width = "200px;"
+        characterPanelInside.thickness = 0;
+        characterPanelInside.height = "30px;";
+        characterPanelInside.background = "green";
+        characterPanelInside.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        characterPanelInside.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        characterPanel.addControl(characterPanelInside);
+        
         const characterText = new TextBlock("location", "");
         characterText.text = "Health: "+this._currentPlayer.health;
         characterText.color = "#FFF";
@@ -207,11 +227,13 @@ export class UserInterface {
         characterText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         characterText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         characterText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        characterPanel.addControl(characterText);
+        characterPanelInside.addControl(characterText);
 
          // some ui must be constantly refreshed as things change
          this._scene.registerBeforeRender(() => {
-            characterText.text = "Health: "+this._currentPlayer.health;
+            characterText.text = this._currentPlayer.health;
+            characterPanelInside.background = this.healthColor(this._currentPlayer.health);
+            characterPanelInside.width = (this._currentPlayer.health * 2)+"px";
         });
     }
 

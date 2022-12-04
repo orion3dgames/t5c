@@ -192,7 +192,7 @@ export class Player extends TransformNode {
 
             this.mesh.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
                 let mesh = ev.meshUnderPointer.getChildMeshes()[1];
-                mesh.outlineColor = Color3.Green();
+                mesh.outlineColor = new Color3(0,1,0);
                 mesh.outlineWidth = 3;
                 mesh.renderOutline = true;
                 this.characterLabel.isVisible = true;
@@ -207,7 +207,6 @@ export class Player extends TransformNode {
         }
 
         if(this.isCurrentPlayer){
-
             this._room.onMessage('playerTeleportConfirm', (location) => {
                 this.actionsController.processAction('teleport', {
                     room: this._room,
@@ -220,6 +219,8 @@ export class Player extends TransformNode {
                 this.actionsController.processAction(data.action, {
                     ui: this.ui,
                     data: data,
+                    entity: this.entity,
+                    player_mesh: this.playerMesh
                 })
             });
         }
