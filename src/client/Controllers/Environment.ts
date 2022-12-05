@@ -26,9 +26,9 @@ export class Environment {
             // default values
             m.checkCollisions = false;
             m.isPickable = false;
-            
-            if (m.name.includes("ground")) {
-                //m.receiveShadows = true;
+   
+            if (m.getClassName() !== 'InstancedMesh') {
+                m.receiveShadows = true;
             }
 
             if (m.name.includes("Preview")) {

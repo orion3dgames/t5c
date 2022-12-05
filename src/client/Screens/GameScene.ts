@@ -76,11 +76,13 @@ export class GameScene {
         light.position = new Vector3(100,100,100);
         light.radius = 0.27;
         light.intensity = location.sunIntensity;
+        light.autoCalcShadowZBounds = true;
 
         // shadow generator
         this._shadow = new CascadedShadowGenerator(1024, light);
         this._shadow.filteringQuality = ShadowGenerator.QUALITY_MEDIUM;
         this._shadow.bias = 0.018;
+        this._shadow.autoCalcDepthBounds = true;
 
         // load assets
         //this._loadedAssets = await this._loadAssets();
@@ -111,7 +113,7 @@ export class GameScene {
     private async _initNetwork(): Promise<void> {
 
         try {
-
+            /*
             if(isLocal()){
                 global.T5C.currentLocation = {
                     key: "lh_dungeon_01",
@@ -128,7 +130,7 @@ export class GameScene {
                     user_id: 3,
                     location: 'lh_dungeon_01'
                 };
-            }
+            }*/
 
             let user = global.T5C.currentUser;
             let character = global.T5C.currentCharacter;
