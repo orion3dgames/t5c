@@ -112,7 +112,6 @@ export class GameScene {
 
         try {
 
-            /*
             if(isLocal()){
                 global.T5C.currentLocation = {
                     key: "lh_dungeon_01",
@@ -129,7 +128,7 @@ export class GameScene {
                     user_id: 3,
                     location: 'lh_dungeon_01'
                 };
-            }*/
+            }
 
             let user = global.T5C.currentUser;
             let character = global.T5C.currentCharacter;

@@ -10,6 +10,7 @@ import { PlayerAnimator } from "./Player/PlayerAnimator";
 import { PlayerMove } from "./Player/PlayerMove";
 import { PlayerUtils } from "./Player/PlayerUtils";
 import { PlayerActions } from "./Player/PlayerActions";
+import { PlayerMesh } from "./Player/PlayerMesh";
 
 export class Player extends TransformNode {
     
@@ -26,7 +27,8 @@ export class Player extends TransformNode {
     public moveController: PlayerMove;
     public utilsController: PlayerUtils;
     public actionsController: PlayerActions;
-
+    public meshController: PlayerMesh;
+    
     //Player
     public mesh: AbstractMesh; //outer collisionbox of player
     public playerMesh: AbstractMesh; //outer collisionbox of player
@@ -81,35 +83,13 @@ export class Player extends TransformNode {
 
     private async spawn(entity) {
 
-        // create collision cube
-        const box = MeshBuilder.CreateBox("collision", {width: 2, height: 4}, this.scene);
-        box.visibility = 0;
-
-        // set mesh
-        this.mesh = box;
-        this.mesh.parent = this;
-        this.mesh.checkCollisions = true;
-        this.mesh.metadata = {
-            sessionId: entity.sessionId,
-            type: 'player',
-        }
-
-        // load player mesh
-        const result = await SceneLoader.ImportMeshAsync(null, "./models/", "player_hobbit.glb", this._scene);
-        const playerMesh = result.meshes[0];
-
-        // set initial player scale & rotation
-        playerMesh.name = "player_mesh";
-        playerMesh.parent = box;
-        playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
-        playerMesh.rotation.set(0, 0, 0);
-        playerMesh.scaling.set(0.02, 0.02, 0.02);
-        playerMesh.visibility = 0;
-        this.playerMesh = playerMesh;
+        this.meshController = new PlayerMesh(this._scene);
+        await this.meshController.load(this.entity);
+        this.mesh = this.meshController.mesh;
+        this.playerMesh = this.meshController.playerMesh;
 
         // add mesh to shadow generator
-        //console.log(this._shadow);
-        //this._shadow.addShadowCaster(playerMesh, true);
+        this._shadow.addShadowCaster(this.meshController.mesh, true);
 
         // if myself, add all player related stuff
         if (this.isCurrentPlayer) {
@@ -117,7 +97,7 @@ export class Player extends TransformNode {
             this.cameraController = new PlayerCamera(this._scene, this._input);
             this.actionsController = new PlayerActions();
         }
-        this.animatorController = new PlayerAnimator(result.animationGroups);
+        this.animatorController = new PlayerAnimator(this.meshController.getAnimation());
         this.moveController = new PlayerMove(this.mesh, this._navMesh, this.isCurrentPlayer);
         this.moveController.setPositionAndRotation(entity); // set default entity position
 
