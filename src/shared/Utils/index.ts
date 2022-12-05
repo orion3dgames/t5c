@@ -61,6 +61,14 @@ const generateRandomPlayerName = function() {
         + "_"+ nameList[Math.floor( Math.random() * nameList.length )];
 }
 
+const distanceBetweenPlayers = function(a, b): number {
+	return Math.sqrt(Math.pow(a.xPos - b.xPos, 2) + Math.pow(a.yPos - b.yPos, 2) + Math.pow(a.zPos - b.zPos, 2));
+}
+
+const clamp = function(value: number, min: number, max: number): number {
+	return Math.min(Math.max(value, min), max);
+}
+
 export {
     alertMessage,
     request,
@@ -69,5 +77,7 @@ export {
     roundToTwo,
     roundTo,
     countPlayers,
-    isLocal
+    isLocal,
+    clamp, 
+    distanceBetweenPlayers
 }

@@ -1,6 +1,6 @@
 import { TransformNode, Scene, MeshBuilder, Vector3, AnimationGroup, SceneLoader, AbstractMesh, ActionManager, ExecuteCodeAction, CascadedShadowGenerator, Color3, PointerEventTypes} from "@babylonjs/core";
 import { Control, Rectangle, TextBlock, TextWrapping } from "@babylonjs/gui";
-import { PlayerSchema } from "../../server/rooms/schema/PlayerSchema";
+import { PlayerSchema } from "../../server/rooms/schema/PlayerState";
 
 import Config from "../Config";
 import State from "../../client/Screens/Screens";
@@ -143,17 +143,19 @@ export class Player extends TransformNode {
         // colyseus automatically sends entity updates, so let's listen to those changes
         this.entity.onChange(() => {
 
+            // make sure players are visible
             this.playerMesh.visibility = 1;
 
             // update player movement from server
             // only do it, if player is not blocked.
             if(!this.blocked){
 
+                // if player has no health, prevent moving
                 if(entity.health == 0){
                     this.blocked = true;
                 }
 
-                //console.log('#UPDATE SERVER', this.entity);
+                // update player data from server data
                 this.name = entity.name;
                 this.x = entity.x;
                 this.y = entity.y;

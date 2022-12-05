@@ -210,11 +210,9 @@ export class CharacterSelectionScene {
 
     // login as this character
     loginAs(character:PlayerCharacter){
-
         global.T5C.currentCharacter = character;
         global.T5C.currentLocationKey = character.location;
         global.T5C.currentLocation = Config.locations[character.location];
-
         Config.goToScene(State.GAME);
     }
 
