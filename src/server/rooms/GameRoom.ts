@@ -206,6 +206,7 @@ export class GameRoom extends Room<GameRoomState> {
     //////////////////////////////////////////////////////////////////////////
     // when a client leaves the room
     async onLeave(client: Client, consented: boolean) {
+        /*
 		try {
 			if (consented) {
 				throw new Error('consented leave!');
@@ -223,6 +224,12 @@ export class GameRoom extends Room<GameRoomState> {
 			this.state.players.delete(client.sessionId);
             this.database.toggleOnlineStatus(client.auth.id, 0);
 		}
+        */
+
+        Logger.info(`[onLeave] player ${client.auth.name} left`);
+
+        this.state.players.delete(client.sessionId);
+        this.database.toggleOnlineStatus(client.auth.id, 0);
 	}
 
     //////////////////////////////////////////////////////////////////////////
