@@ -1,6 +1,6 @@
 import { TransformNode, Scene, MeshBuilder, Vector3, AnimationGroup, SceneLoader, AbstractMesh, ActionManager, ExecuteCodeAction, CascadedShadowGenerator, Color3, PointerEventTypes} from "@babylonjs/core";
 import { Control, Rectangle, TextBlock, TextWrapping } from "@babylonjs/gui";
-import { PlayerSchema } from "../../server/rooms/schema/PlayerState";
+import { PlayerState } from "../../server/rooms/schema/PlayerState";
 
 import Config from "../Config";
 import State from "../../client/Screens/Screens";
@@ -35,7 +35,7 @@ export class Player extends TransformNode {
     public playerInputs: PlayerInputs[];
     private isCurrentPlayer: boolean;
     public sessionId: string;
-    public entity: PlayerSchema;
+    public entity: PlayerState;
 
     // character
     public name: string = "";
