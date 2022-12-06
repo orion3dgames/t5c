@@ -4,8 +4,8 @@ import State from "./Screens";
 import { PlayerCharacter, PlayerUser } from "../../shared/types";
 
 import Config from "../../shared/Config";
-import { request, apiUrl, alertMessage, generateRandomPlayerName} from "../../shared/Utils";
-import { create } from "domain";
+import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
+import alertMessage from "../../shared/Utils/alertMessage";
 
 export class CharacterSelectionScene {
     

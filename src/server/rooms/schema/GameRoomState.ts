@@ -2,6 +2,7 @@ import { Schema, type, MapSchema } from '@colyseus/schema';
 import { PlayerState } from './PlayerState';
 import { PlayerCharacter } from '../../../shared/types';
 import { GameRoom } from '../GameRoom';
+import { PlayerCurrentState } from '../../../shared/Entities/Player/PlayerCurrentState';
 
 export class GameRoomState extends Schema {
 
@@ -31,6 +32,7 @@ export class GameRoomState extends Schema {
             health: data.health,
             level: data.level,
             experience: data.experience,
+            state: PlayerCurrentState.IDLE
         }));
 
     }

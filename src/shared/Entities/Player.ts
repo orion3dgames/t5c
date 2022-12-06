@@ -1,9 +1,8 @@
-import { TransformNode, Scene, MeshBuilder, Vector3, AnimationGroup, SceneLoader, AbstractMesh, ActionManager, ExecuteCodeAction, CascadedShadowGenerator, Color3, PointerEventTypes} from "@babylonjs/core";
+import { TransformNode, Scene, Vector3, AbstractMesh, CascadedShadowGenerator, PointerEventTypes} from "@babylonjs/core";
 import { Control, Rectangle, TextBlock, TextWrapping } from "@babylonjs/gui";
 import { PlayerState } from "../../server/rooms/schema/PlayerState";
 
 import Config from "../Config";
-import State from "../../client/Screens/Screens";
 import { PlayerInputs } from "../types";
 import { PlayerCamera } from "./Player/PlayerCamera";
 import { PlayerAnimator } from "./Player/PlayerAnimator";
@@ -11,10 +10,12 @@ import { PlayerMove } from "./Player/PlayerMove";
 import { PlayerUtils } from "./Player/PlayerUtils";
 import { PlayerActions } from "./Player/PlayerActions";
 import { PlayerMesh } from "./Player/PlayerMesh";
+import State from "../../client/Screens/Screens";
+import { Room } from "colyseus.js";
 
-export class Player extends TransformNode {
+export class Player {
     
-    public scene: Scene;
+    public _scene: Scene;
     public _room;
     public ui;
     private _input;
@@ -49,14 +50,23 @@ export class Player extends TransformNode {
     public level: number;
     public experience: number;
     public location: string = "";
+    public state: number = 0;
 
     // flags
     public blocked: boolean = false; // if true, player will not moved
 
-    constructor(entity, room, scene: Scene, ui, input, shadow:CascadedShadowGenerator, navMesh) {
-        super("player", scene);
-
-        this.scene = scene;
+    constructor(
+        entity:PlayerState,
+        room:Room, 
+        scene: Scene, 
+        ui,
+        input, 
+        shadow:CascadedShadowGenerator, 
+        navMesh
+    ) {
+ 
+        // setup class variables
+        this._scene = scene;
         this._room = room;
         this._navMesh = navMesh;
         this.ui = ui;
@@ -67,15 +77,8 @@ export class Player extends TransformNode {
         this._input = input;
         this.playerInputs = [];
 
-        // default
-        this.name = entity.name;
-        this.x = entity.x;
-        this.y = entity.y;
-        this.z = entity.z;
-        this.rot = entity.rot;
-        this.health = entity.health;
-        this.level = entity.level;
-        this.experience = entity.experience;
+        // update player data from server data
+        Object.assign(this, this.entity);
 
         // spawn player
         this.spawn(entity);
@@ -83,8 +86,9 @@ export class Player extends TransformNode {
 
     private async spawn(entity) {
 
-        this.meshController = new PlayerMesh(this._scene);
-        await this.meshController.load(this.entity);
+        // load mesh controllers
+        this.meshController = new PlayerMesh(this._scene, this.entity, this._room, this.isCurrentPlayer);
+        await this.meshController.load();
         this.mesh = this.meshController.mesh;
         this.playerMesh = this.meshController.playerMesh;
 
@@ -95,141 +99,46 @@ export class Player extends TransformNode {
         if (this.isCurrentPlayer) {
             this.utilsController = new PlayerUtils(this._scene, this._room);
             this.cameraController = new PlayerCamera(this._scene, this._input);
-            this.actionsController = new PlayerActions();
+            this.actionsController = new PlayerActions(this._scene);
         }
         this.animatorController = new PlayerAnimator(this.meshController.getAnimation());
         this.moveController = new PlayerMove(this.mesh, this._navMesh, this.isCurrentPlayer);
-        this.moveController.setPositionAndRotation(entity); // set default entity position
-
-        // render loop
-        this.scene.registerBeforeRender(() => {
-
-            // animate player continuously
-            this.animatorController.animate(this, this.mesh.position, this.moveController.getNextPosition());
-
-            if (this.isCurrentPlayer) {
-
-                // mova camera as player moves
-                this.cameraController.follow(this.mesh.position);
-            }    
-        });
-
-        // add player chatbox
-        this.characterLabel = this.createLabel(entity.name);
-        this.characterChatLabel = this.createChatLabel(entity.name);
+        this.moveController.setPositionAndRotation(entity); // set next default position from server entity
 
         ///////////////////////////////////////////////////////////
         // entity network event
         // colyseus automatically sends entity updates, so let's listen to those changes
         this.entity.onChange(() => {
 
-            // make sure players are visible
+            // make sure players are always visible
             this.playerMesh.visibility = 1;
 
-            // update player movement from server
-            // only do it, if player is not blocked.
-            if(!this.blocked){
+            // update player data from server data
+            Object.assign(this, this.entity);
 
-                // if player has no health, prevent moving
-                if(entity.health == 0){
-                    this.blocked = true;
-                }
+            // update player position
+            this.moveController.setPositionAndRotation(this.entity);
 
-                // update player data from server data
-                this.name = entity.name;
-                this.x = entity.x;
-                this.y = entity.y;
-                this.z = entity.z;
-                this.rot = entity.rot;
-                this.health = entity.health;
-                this.level = entity.level;
-                this.experience = entity.experience;
-                this.moveController.setPositionAndRotation(this.entity);
-
-                // do server reconciliation if current player only
-                if (this.isCurrentPlayer) {
-                    this.moveController.reconcileMove(this.entity.sequence); // set default entity position
-                }
+            // do server reconciliation on client if current player only & not blocked
+            if (this.isCurrentPlayer && !this.blocked) {
+                this.moveController.reconcileMove(this.entity.sequence); // set default entity position
             }
+            
         });
 
-        // start action manager
-        this.mesh.actionManager = new ActionManager(this.scene);
-
-        // collision with  other meshes
-        if(this.mesh){
-
-            if(this.isCurrentPlayer){
-
-                // teleport collision
-                let targetMesh = this.scene.getMeshByName("teleport");
-                this.mesh.actionManager.registerAction(
-                    new ExecuteCodeAction({
-                            trigger: ActionManager.OnIntersectionEnterTrigger,
-                            parameter: targetMesh
-                        },() => {
-                            if(this.mesh.metadata.sessionId === this.entity.sessionId){
-                                this.blocked = true;
-                                this._room.send("playerTeleport", targetMesh.metadata.location);
-                            }
-                        }
-                    )
-                );
-
-            }
-
-            // register hover over player
-            this.mesh.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
-                let mesh = ev.meshUnderPointer.getChildMeshes()[1];
-                mesh.outlineColor = new Color3(0,1,0);
-                mesh.outlineWidth = 3;
-                mesh.renderOutline = true;
-                this.characterLabel.isVisible = true;
-            }));
-            
-            // register hover out player
-            this.mesh.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
-                let mesh = ev.meshUnderPointer.getChildMeshes()[1];
-                mesh.renderOutline = false;
-                this.characterLabel.isVisible = false;
-            }));
-
-        }
-
+        //////////////////////////////////////////////////////////////////////////
+        // player register event
         if(this.isCurrentPlayer){
 
-            // on teleport confirmation
-            this._room.onMessage('playerTeleportConfirm', (location) => {
-                this.actionsController.processAction('teleport', {
-                    room: this._room,
-                    location: location
-                })
-            });
+            // register serevr messages
+            this.registerServerMessages();
 
-            // on player action
-            this._room.onMessage('playerActionConfirmation', (data) => {
-                console.log('playerActionConfirmation', data);
-                this.actionsController.processAction(data.action, {
-                    ui: this.ui,
-                    data: data,
-                    entity: this.entity,
-                    player_mesh: this.playerMesh
-                })
-                // send bullet locally
-                let start = data.fromPosition;
-                let end = data.toPosition;
-                this.utilsController.fire(
-                    new Vector3(start.x, start.y, start.z), 
-                    new Vector3(end.x, end.y, end.z), 
-                    this.mesh
-                );
-            });
-
-            // on player click
+            // mouse events
             this._scene.onPointerObservable.add((pointerInfo:any) => {
             
+                // on left mouse click
                 // if other player, send to server: target loses 5 health
-                if (pointerInfo.type === PointerEventTypes.POINTERDOWN) {
+                if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 0) {
                     if (pointerInfo._pickInfo.pickedMesh && 
                         pointerInfo._pickInfo.pickedMesh.metadata !== null && 
                         pointerInfo._pickInfo.pickedMesh.metadata.type == 'player' && 
@@ -245,16 +154,64 @@ export class Player extends TransformNode {
                         // send bullet locally
                         let start = this.mesh.position;
                         let end = pointerInfo._pickInfo.pickedMesh.position;
-                        this.utilsController.fire(start, end, this.ui._players[targetSessionId].mesh);
+                        this.actionsController.fire(start, end, this.ui._players[targetSessionId].mesh);
                     }
                 }
 
-                // other actions here
-
             });
         }
+
+        //////////////////////////////////////////////////////////////////////////
+        // player render loop
+        this._scene.registerBeforeRender(() => {
+
+            // animate player continuously
+            this.animatorController.animate(this, this.mesh.position, this.moveController.getNextPosition());
+
+            if (this.isCurrentPlayer) {
+
+                // mova camera as player moves
+                this.cameraController.follow(this.mesh.position);
+            }    
+        });
+
+        //////////////////////////////////////////////////////////////////////////
+        // misc
+        this.characterLabel = this.createLabel(entity.name);
+        this.characterChatLabel = this.createChatLabel(entity.name);
       
     }
+
+    //////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
+    // server message handler
+
+    private registerServerMessages(){
+
+        // on teleport confirmation
+        this._room.onMessage('playerTeleportConfirm', (location) => {
+            this.actionsController.teleport(this._room, location);
+        });
+
+        // on player action
+        this._room.onMessage('playerActionConfirmation', (data) => {
+            console.log('playerActionConfirmation', data);
+            
+            switch(data.action){
+                case 'atack':
+                    this.actionsController.attack(data, this.mesh, this.ui);
+                    break;
+            }
+            
+        });
+
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
+    // to refactor
 
     public async teleport(location){
         await this._room.leave();

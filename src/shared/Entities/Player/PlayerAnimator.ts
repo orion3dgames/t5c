@@ -1,6 +1,5 @@
 import { AnimationGroup } from "@babylonjs/core";
-import { Vector3 } from "babylonjs";
-import { roundToTwo, roundTo } from "../../Utils";
+import { PlayerCurrentState } from "./PlayerCurrentState";
 
 export class PlayerAnimator {
 
@@ -48,6 +47,15 @@ export class PlayerAnimator {
 
     public animate(player, currentPos, nextPos): void {
 
+        if(player.state === PlayerCurrentState.DEAD){
+            this._currentAnim = this._death;
+        }else if(player.state === PlayerCurrentState.WALKING){
+            this._currentAnim = this._walk;
+        }else{
+            this._currentAnim = this._idle;
+        }
+
+        /*
         const precision = 2;
         // if position has changed
         if(player.health == 0){
@@ -57,6 +65,7 @@ export class PlayerAnimator {
         } else {
             this._currentAnim = this._idle;
         }
+        */
 
         if (this._currentAnim != null && this._prevAnim !== this._currentAnim) {
             this._prevAnim.stop();

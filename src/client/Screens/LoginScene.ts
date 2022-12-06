@@ -2,7 +2,8 @@ import { Engine, Scene, Color4, Vector3, FreeCamera } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText, InputPassword, Image } from "@babylonjs/gui";
 import Config from "../../shared/Config";
 import State from "./Screens";
-import { alertMessage, request, apiUrl, generateRandomPlayerName } from "../../shared/Utils"
+import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils"
+import alertMessage from "../../shared/Utils/alertMessage";
 
 export class LoginScene {
     

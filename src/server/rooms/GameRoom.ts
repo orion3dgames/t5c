@@ -7,6 +7,7 @@ import Logger from "../../shared/Logger";
 import loadNavMeshFromFile from "../../shared/Utils/loadNavMeshFromFile";
 import { PlayerState } from "./schema/PlayerState";
 import { PlayerInputs } from "../../shared/types";
+import { PlayerCurrentState } from "../../shared/Entities/Player/PlayerCurrentState";
 
 export class GameRoom extends Room<GameRoomState> {
 
@@ -54,20 +55,32 @@ export class GameRoom extends Room<GameRoomState> {
         // initialize database
         this.database = new databaseInstance();
 
+        ///////////////////////////////////////////////////////////////////////////
         // if players are in a room, make sure we save any changes to the database.
         this.delayedInterval = this.clock.setInterval(() => {
+
+            // only save if there is any players
             if(this.state.players.size > 0){
-                this.state.players.forEach(player => {
-                    let playerClient = this.clients.hashedArray[player.sessionId];
-                    this.database.updateCharacter(playerClient.auth.id, {
-                        location: player.location,
-                        x: player.x,
-                        y: player.y,
-                        z: player.z,
-                        rot: player.rot,
-                    });
-                });
                 Logger.info("[gameroom][onCreate] Saving data for room "+options.location+" with "+this.state.players.size+" players");
+                this.state.players.forEach(player => {
+
+                    // do not save if players is blocked
+                    if(player.blocked){
+
+                        // update player
+                        let playerClient = this.clients.hashedArray[player.sessionId];
+                        this.database.updateCharacter(playerClient.auth.id, {
+                            location: player.location,
+                            x: player.x,
+                            y: player.y,
+                            z: player.z,
+                            rot: player.rot,
+                        });
+
+                        Logger.info("[gameroom][onCreate] player "+playerClient.auth.name+" saved to database.");
+                    }
+                });
+                
             }
         }, Config.databaseUpdateRate);
     }
@@ -117,7 +130,7 @@ export class GameRoom extends Room<GameRoomState> {
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
-    // messages handler
+    // client message handler
 
     private registerMessageHandlers() {
 
@@ -177,6 +190,9 @@ export class GameRoom extends Room<GameRoomState> {
             
             // player loses health
             target.loseHealth(5);
+
+            // sender state
+            sender.state = PlayerCurrentState.SPELL_ATTACK;
 
             // inform target hes been hurt
             this.clients.get(target.sessionId).send('playerActionConfirmation', {

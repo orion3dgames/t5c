@@ -1,4 +1,3 @@
-import alertMessage from './alertMessage'
 import request from './requests'
 import Config from "../Config";
 
@@ -61,8 +60,8 @@ const generateRandomPlayerName = function() {
         + "_"+ nameList[Math.floor( Math.random() * nameList.length )];
 }
 
-const distanceBetweenPlayers = function(a, b): number {
-	return Math.sqrt(Math.pow(a.xPos - b.xPos, 2) + Math.pow(a.yPos - b.yPos, 2) + Math.pow(a.zPos - b.zPos, 2));
+const distanceBetween = function(a, b): number {
+	return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2));
 }
 
 const clamp = function(value: number, min: number, max: number): number {
@@ -70,7 +69,6 @@ const clamp = function(value: number, min: number, max: number): number {
 }
 
 export {
-    alertMessage,
     request,
     generateRandomPlayerName,
     apiUrl,
@@ -79,5 +77,5 @@ export {
     countPlayers,
     isLocal,
     clamp, 
-    distanceBetweenPlayers
+    distanceBetween
 }
