@@ -188,6 +188,9 @@ export class GameRoom extends Room<GameRoomState> {
             let sender:PlayerState = this.state.players[client.sessionId];
             let target:PlayerState = this.state.players[data.targetId];
             
+            if(!sender) throw new Error('sender does not exists!');
+            if(!target) throw new Error('target does not exists!');
+
             // player loses health
             target.loseHealth(5);
 

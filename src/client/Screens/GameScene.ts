@@ -83,6 +83,7 @@ export class GameScene {
         this._shadow.filteringQuality = ShadowGenerator.QUALITY_MEDIUM;
         this._shadow.bias = 0.018;
         this._shadow.autoCalcDepthBounds = true;
+        this._shadow.shadowMaxZ = 95;
 
         // load assets
         //this._loadedAssets = await this._loadAssets();

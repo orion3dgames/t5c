@@ -12,6 +12,8 @@ import { PlayerActions } from "./Player/PlayerActions";
 import { PlayerMesh } from "./Player/PlayerMesh";
 import State from "../../client/Screens/Screens";
 import { Room } from "colyseus.js";
+import { PlayerCurrentState } from "./Player/PlayerCurrentState";
+import { distanceBetween } from "../Utils";
 
 export class Player {
     
@@ -155,6 +157,21 @@ export class Player {
                         let start = this.mesh.position;
                         let end = pointerInfo._pickInfo.pickedMesh.position;
                         this.actionsController.fire(start, end, this.ui._players[targetSessionId].mesh);
+                    }
+                }
+
+                // on right mouse click
+                // display nameplate for a certain time for any player right clicked
+                if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 2) {
+                    if (pointerInfo._pickInfo.pickedMesh && 
+                        pointerInfo._pickInfo.pickedMesh.metadata !== null && 
+                        pointerInfo._pickInfo.pickedMesh.metadata.type == 'player'){
+                            let targetSessionId = pointerInfo._pickInfo.pickedMesh.metadata.sessionId;  
+                            let target = this.ui._players[targetSessionId];
+                            target.characterLabel.isVisible = true;
+                            setTimeout(function(){
+                                target.characterLabel.isVisible = false;
+                            }, 3000)
                     }
                 }
 

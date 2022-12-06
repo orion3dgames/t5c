@@ -13,6 +13,9 @@ export class Input {
     public left_click: boolean;
     public right_click: boolean;
 
+    // moving 
+    public player_moving: boolean;
+
     constructor(scene: Scene) {
 
         this._scene = scene;
@@ -39,10 +42,12 @@ export class Input {
                 if (pointerInfo.event.button == 2) {
                     this.right_click = false
                 }
+                this.player_moving = false;
             }
 
             if (pointerInfo.type === PointerEventTypes.POINTERMOVE) {
                 if (this.left_click) {
+                    this.player_moving = true;
                     const x = (pointerInfo.event.clientX / pointerInfo.event.target.width) * 2 - 1;
                     const y = (pointerInfo.event.clientY / pointerInfo.event.target.height) * 2 - 1;
                     this.inputMap = { rotY: Math.atan2(x, y) }

@@ -30,6 +30,7 @@ export class PlayerMesh {
         this.mesh.metadata = {
             sessionId: this._entity.sessionId,
             type: 'player',
+            name: this._entity.name,
         }
 
         // load player mesh

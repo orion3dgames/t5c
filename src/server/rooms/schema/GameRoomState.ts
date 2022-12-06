@@ -16,7 +16,7 @@ export class GameRoomState extends Schema {
 	}
 
     public update(deltaTime: number) {
-		//console.log(deltaTime);
+
 	}
 
     addPlayer(sessionId: string, data: PlayerCharacter) {

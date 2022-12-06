@@ -1,4 +1,5 @@
 import { AnimationGroup } from "@babylonjs/core";
+import { distanceBetween } from "../../Utils";
 import { PlayerCurrentState } from "./PlayerCurrentState";
 
 export class PlayerAnimator {
@@ -45,28 +46,30 @@ export class PlayerAnimator {
 
     }
 
+    // 
+    private checkIfPlayerIsMoving(currentPos, nextPos, precision = 2){
+        return  currentPos.x.toFixed(precision) !== nextPos.x.toFixed(precision) || 
+                currentPos.z.toFixed(precision) !== nextPos.z.toFixed(precision)
+    }
+
+    ///////////////////////////
+    // todo: to be improved so we can better control the states... have no idea how yet
     public animate(player, currentPos, nextPos): void {
 
+        // if player has died
         if(player.state === PlayerCurrentState.DEAD){
             this._currentAnim = this._death;
-        }else if(player.state === PlayerCurrentState.WALKING){
-            this._currentAnim = this._walk;
-        }else{
-            this._currentAnim = this._idle;
-        }
 
-        /*
-        const precision = 2;
         // if position has changed
-        if(player.health == 0){
-            this._currentAnim = this._death;
-        }else if (currentPos.x.toFixed(precision) !== nextPos.x.toFixed(precision) || currentPos.z.toFixed(precision) !== nextPos.z.toFixed(precision)) {
+        }else if (this.checkIfPlayerIsMoving(currentPos, nextPos)) {
             this._currentAnim = this._walk;
+
+        // all other cases, should be idle    
         } else {
             this._currentAnim = this._idle;
         }
-        */
 
+        //
         if (this._currentAnim != null && this._prevAnim !== this._currentAnim) {
             this._prevAnim.stop();
             this._currentAnim.play(this._currentAnim.loopAnimation);
