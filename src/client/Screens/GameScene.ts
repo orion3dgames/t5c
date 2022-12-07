@@ -11,6 +11,7 @@ import { Input } from "../Controllers/Input";
 import { Environment } from "../Controllers/Environment";
 import { UserInterface } from "../Controllers/UserInterface";
 import { Player } from "../../shared/Entities/Player";
+import { Entity } from "../../shared/Entities/Entity";
 import Config from '../../shared/Config';
 import { Room } from "colyseus.js";
 import { PlayerInputs } from "../../shared/types";
@@ -35,6 +36,7 @@ export class GameScene {
     private room: Room<any>;
     private chatRoom: Room<any>;
     private playerEntities: Player[] = [];
+    private entities: Entity[] = [];
     private _currentPlayer;
 
     public _loadedAssets;
@@ -114,6 +116,7 @@ export class GameScene {
     private async _initNetwork(): Promise<void> {
 
         try {
+            
             /*
             if(isLocal()){
                 global.T5C.currentLocation = {
@@ -193,7 +196,7 @@ export class GameScene {
         this._input = new Input(this._scene);
 
         // setup hud
-        this._ui = new UserInterface(this._scene, this._engine, this.room, this.chatRoom, this.playerEntities, this._currentPlayer);
+        this._ui = new UserInterface(this._scene, this._engine, this.room, this.chatRoom, this.playerEntities, this.entities, this._currentPlayer);
 
         // when someone joins the room event
         this.room.state.players.onAdd((entity, sessionId) => {
@@ -216,6 +219,12 @@ export class GameScene {
 
         });
 
+        // when someone joins the room event
+        this.room.state.entities.onAdd((entity, sessionId) => {
+            this.entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._input, this._shadow, this._navMesh);
+            console.log('spawned entity', this.entities[sessionId]);
+        });
+
         // when someone leave the room event
         this.room.state.players.onRemove((player, sessionId) => {
             this.playerEntities[sessionId].removePlayer();
@@ -233,11 +242,19 @@ export class GameScene {
             let timePassed = (timeNow - timeThen) / 1000;
             let updateRate = Config.updateRate / 1000; // game is networked update every 100ms
 
-            // continuously lerp movement at 60fps
+            // continuously move players 60fps
             for (let sessionId in this.playerEntities) {
                 const player = this.playerEntities[sessionId];
                 if(player && player.moveController){
                     player.moveController.tween();
+                }
+            }
+
+            // continuously lerp movement at 60fps
+            for (let sessionId in this.entities) {
+                const entity = this.entities[sessionId];
+                if(entity && entity.moveController){
+                    entity.moveController.tween();
                 }
             }
 

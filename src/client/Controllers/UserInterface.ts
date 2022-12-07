@@ -5,6 +5,7 @@ import { Room } from "colyseus.js";
 
 import State from "../Screens/Screens";
 import { Player } from "../../shared/Entities/Player";
+import { Entity } from "../../shared/Entities/Entity";
 import { countPlayers, roundToTwo } from "../../shared/Utils";
 import { PlayerMessage } from "../../shared/types";
 import Config from "../../shared/Config";
@@ -16,7 +17,8 @@ export class UserInterface {
 
     private _gameRoom: Room;
     private _chatRoom: Room;
-    public _players;
+    public _players:Player[];
+    public _entities:Entity[];
     private _currentPlayer;
 
     //UI Elements
@@ -27,7 +29,7 @@ export class UserInterface {
     //Chat
     public messages: PlayerMessage[] = [];
 
-    constructor(scene: Scene, engine:Engine, gameRoom:Room, chatRoom:Room, players:Player[], currentPlayer) {
+    constructor(scene: Scene, engine:Engine, gameRoom:Room, chatRoom:Room, players:Player[], entities:Entity[], currentPlayer) {
 
         // set var we will be needing
         this._scene = scene;
@@ -35,6 +37,7 @@ export class UserInterface {
         this._gameRoom = gameRoom;
         this._chatRoom = chatRoom;
         this._players = players;
+        this._entities = entities;
         this._currentPlayer = currentPlayer;
  
         // create main io box

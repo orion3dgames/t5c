@@ -12,10 +12,8 @@ import { PlayerActions } from "./Player/PlayerActions";
 import { PlayerMesh } from "./Player/PlayerMesh";
 import State from "../../client/Screens/Screens";
 import { Room } from "colyseus.js";
-import { PlayerCurrentState } from "./Player/PlayerCurrentState";
-import { distanceBetween } from "../Utils";
 
-export class Player {
+export class Entity {
     
     public _scene: Scene;
     public _room;
@@ -93,16 +91,12 @@ export class Player {
         await this.meshController.load();
         this.mesh = this.meshController.mesh;
         this.playerMesh = this.meshController.playerMesh;
+        this.playerMesh.scaling.set(0.01, 0.01, 0.01);
 
         // add mesh to shadow generator
         this._shadow.addShadowCaster(this.meshController.mesh, true);
 
         // if myself, add all player related stuff
-        if (this.isCurrentPlayer) {
-            this.utilsController = new PlayerUtils(this._scene, this._room);
-            this.cameraController = new PlayerCamera(this._scene, this._input);
-            this.actionsController = new PlayerActions(this._scene);
-        }
         this.animatorController = new PlayerAnimator(this.meshController.getAnimation());
         this.moveController = new PlayerMove(this.mesh, this._navMesh, this.isCurrentPlayer);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
@@ -120,68 +114,8 @@ export class Player {
 
             // update player position
             this.moveController.setPositionAndRotation(this.entity);
-
-            // do server reconciliation on client if current player only & not blocked
-            if (this.isCurrentPlayer && !this.blocked) {
-                this.moveController.reconcileMove(this.entity.sequence); // set default entity position
-            }
             
         });
-
-        //////////////////////////////////////////////////////////////////////////
-        // player register event
-        if(this.isCurrentPlayer){
-
-            // register serevr messages
-            this.registerServerMessages();
-
-            // mouse events
-            this._scene.onPointerObservable.add((pointerInfo:any) => {
-            
-                // on left mouse click
-                // if other player, send to server: target loses 5 health
-                if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 0) {
-                    /*
-                    if (pointerInfo._pickInfo.pickedMesh && 
-                        pointerInfo._pickInfo.pickedMesh.metadata !== null && 
-                        pointerInfo._pickInfo.pickedMesh.metadata.type == 'player' && 
-                        pointerInfo._pickInfo.pickedMesh.metadata.sessionId !== this.sessionId){
-                          
-                        let targetSessionId = pointerInfo._pickInfo.pickedMesh.metadata.sessionId;    
-                        this._room.send("playerAction", {
-                            type: 'attack',
-                            senderId: this.sessionId,
-                            targetId: targetSessionId
-                        });
-
-                        // send bullet locally
-                        let start = this.mesh.position;
-                        let end = pointerInfo._pickInfo.pickedMesh.position;
-                        this.actionsController.fire(start, end, this.ui._players[targetSessionId].mesh);
-                    }
-                    */
-                }
-
-                // on right mouse click
-                // display nameplate for a certain time for any entity right clicked
-                if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 2) {
-                    if (pointerInfo._pickInfo.pickedMesh && 
-                        pointerInfo._pickInfo.pickedMesh.metadata !== null ){
-                            let targetMesh = pointerInfo._pickInfo.pickedMesh;
-                            let targetData = targetMesh.metadata;  
-                            let target = this.ui._entities[targetData.sessionId];
-                            if(targetData.type === 'player'){
-                                target = this.ui._players[targetData.sessionId];
-                            }
-                            target.characterLabel.isVisible = true;
-                            setTimeout(function(){
-                                target.characterLabel.isVisible = false;
-                            }, 5000)
-                    }
-                }
-
-            });
-        }
 
         //////////////////////////////////////////////////////////////////////////
         // player render loop
@@ -190,11 +124,6 @@ export class Player {
             // animate player continuously
             this.animatorController.animate(this, this.mesh.position, this.moveController.getNextPosition());
 
-            if (this.isCurrentPlayer) {
-
-                // mova camera as player moves
-                this.cameraController.follow(this.mesh.position);
-            }    
         });
 
         //////////////////////////////////////////////////////////////////////////
@@ -211,38 +140,12 @@ export class Player {
 
     private registerServerMessages(){
 
-        // on teleport confirmation
-        this._room.onMessage('playerTeleportConfirm', (location) => {
-            this.actionsController.teleport(this._room, location);
-        });
-
-        // on player action
-        this._room.onMessage('playerActionConfirmation', (data) => {
-            console.log('playerActionConfirmation', data);
-            
-            switch(data.action){
-                case 'atack':
-                    this.actionsController.attack(data, this.mesh, this.ui);
-                    break;
-            }
-            
-        });
-
     }
 
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     // to refactor
-
-    public async teleport(location){
-        await this._room.leave();
-        global.T5C.currentLocation = Config.locations[location];
-        global.T5C.currentLocationKey = location;
-        global.T5C.currentCharacter.location = location;
-        global.T5C.currentRoomID = "";
-        global.T5C.nextScene = State.GAME;
-    }
 
     public createChatLabel(text) {
 
