@@ -29,7 +29,7 @@ export class PlayerMesh {
         this.mesh = box;
         this.mesh.metadata = {
             sessionId: this._entity.sessionId,
-            type: 'player',
+            type: this._entity.type,
             name: this._entity.name,
         }
 

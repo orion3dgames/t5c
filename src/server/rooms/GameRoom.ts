@@ -8,6 +8,7 @@ import loadNavMeshFromFile from "../../shared/Utils/loadNavMeshFromFile";
 import { PlayerState } from "./schema/PlayerState";
 import { PlayerInputs } from "../../shared/types";
 import { PlayerCurrentState } from "../../shared/Entities/Player/PlayerCurrentState";
+import NavMesh from "navmesh";
 
 export class GameRoom extends Room<GameRoomState> {
 
@@ -15,7 +16,7 @@ export class GameRoom extends Room<GameRoomState> {
     public autoDispose = false;
     public database: any; 
     public delayedInterval!: Delayed;
-    public navMesh;
+    public navMesh:NavMesh;
 
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
@@ -26,6 +27,11 @@ export class GameRoom extends Room<GameRoomState> {
         Logger.info("[gameroom][onCreate] game room created: "+this.roomId, options)
  
         this.setMetadata(options);
+
+        // initialize navmesh
+        const navMesh = await loadNavMeshFromFile(options.location)
+        this.navMesh = navMesh;
+        Logger.info("[gameroom][onCreate] navmesh initialized.");
 
         // Set initial state
         this.setState(new GameRoomState(this, options));
@@ -47,11 +53,6 @@ export class GameRoom extends Room<GameRoomState> {
         // set max clients
         this.maxClients = Config.maxClients;
 
-        // initialize navmesh
-        const navMesh = await loadNavMeshFromFile(options.location)
-        this.navMesh = navMesh;
-        Logger.info("[gameroom][onCreate] navmesh initialized.");
-
         // initialize database
         this.database = new databaseInstance();
 
@@ -61,7 +62,7 @@ export class GameRoom extends Room<GameRoomState> {
 
             // only save if there is any players
             if(this.state.players.size > 0){
-                Logger.info("[gameroom][onCreate] Saving data for room "+options.location+" with "+this.state.players.size+" players");
+                //Logger.info("[gameroom][onCreate] Saving data for room "+options.location+" with "+this.state.players.size+" players");
                 this.state.players.forEach(player => {
 
                     // do not save if players is blocked
@@ -77,7 +78,7 @@ export class GameRoom extends Room<GameRoomState> {
                             rot: player.rot,
                         });
 
-                        Logger.info("[gameroom][onCreate] player "+playerClient.auth.name+" saved to database.");
+                        //Logger.info("[gameroom][onCreate] player "+playerClient.auth.name+" saved to database.");
                     }
                 });
                 

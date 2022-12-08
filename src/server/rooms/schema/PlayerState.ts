@@ -11,15 +11,17 @@ export class PlayerState extends Schema {
   @type("number") id: number = 0;
   @type('string') public sessionId: string;
   @type("string") public name: string = "";
+  @type("string") public type: string = "player";
 
   // position & rotation
+  @type("string") public location: string = "";
   @type("number") public sequence: number = 0; // latest input sequence
   @type('number') public x: number;
   @type('number') public y: number;
   @type('number') public z: number;
   @type('number') public rot: number;
 
-  // character details
+  // player details
   @type('number') public health: number;
   @type('number') public level: number;
   @type('number') public experience: number;
@@ -27,9 +29,6 @@ export class PlayerState extends Schema {
   // flags
   @type('boolean') public blocked: boolean; // if true, used to block player and to prevent movement
   @type('number') public state: PlayerCurrentState = PlayerCurrentState.IDLE;
-
-  // current player zone
-  @type("string") public location: string = "";
 
   private _navmesh;
   private _database;

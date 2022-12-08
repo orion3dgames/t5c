@@ -16,7 +16,8 @@ const roundToTwo = function(num: number) {
 }
 
 const roundTo = function(num: number, decimal:number = 2) {
-    return num.toFixed(decimal);
+    let number = num.toFixed(decimal)
+    return parseFloat(number);
 }
 
 const apiUrl = function() {
