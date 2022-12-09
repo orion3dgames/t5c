@@ -1,11 +1,13 @@
-///////////////////////////////////////////////////////////
-// CAPTAIN OBVIOUS HERE: 
-// this can only be used in a NODE ENVIRONMENT, do not use to import in the client as fs is not available.
+import { NavMesh, NavMeshLoader } from "yuka";
+import { apiUrl } from "./index";
 
-import wavefrontObjParser from 'wavefront-obj-parser';
-import NavMesh, { PolyPoints } from 'navmesh';
-
-export default async function loadNavMeshFromString(fileNameNavMesh: string) {
+export default async function loadNavMeshFromString(fileNameNavMesh: string):NavMesh {
+    let url = '/public/models/navmesh/'+fileNameNavMesh+'.glb' ;
+    const loader = new NavMeshLoader(); 
+    return loader.load(apiUrl()+url).then((navMesh) => {
+        return navMesh;
+    });
+    /*
     var jsonNavMesh = wavefrontObjParser(fileNameNavMesh)
     const meshPolygonPoints:PolyPoints[] = [];
     const vertexPositions = jsonNavMesh.vertexPositions
@@ -31,4 +33,5 @@ export default async function loadNavMeshFromString(fileNameNavMesh: string) {
     }
     const navMesh = new NavMesh(meshPolygonPoints);
     return navMesh
+    */
 }

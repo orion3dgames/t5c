@@ -15,7 +15,9 @@ import { Entity } from "../../shared/Entities/Entity";
 import Config from '../../shared/Config';
 import { Room } from "colyseus.js";
 import { PlayerInputs } from "../../shared/types";
-import { apiUrl, isLocal, request } from "../../shared/Utils";
+import { isLocal, request } from "../../shared/Utils";
+
+import { NavMesh } from "yuka";
 import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
 
 export class GameScene {
@@ -30,7 +32,7 @@ export class GameScene {
     private _ui;
     private _shadow: CascadedShadowGenerator;
     private _environment: Environment;
-    private _navMesh;
+    private _navMesh:NavMesh;
 
     public _roomId: string;
     private room: Room<any>;
@@ -117,7 +119,6 @@ export class GameScene {
 
         try {
             
-            /*
             if(isLocal()){
                 global.T5C.currentLocation = {
                     key: "lh_dungeon_01",
@@ -134,7 +135,7 @@ export class GameScene {
                     user_id: 3,
                     location: 'lh_dungeon_01'
                 };
-            }*/
+            }
 
             let user = global.T5C.currentUser;
             let character = global.T5C.currentCharacter;
@@ -182,8 +183,7 @@ export class GameScene {
         await this._environment.load(this._loadedAssets); //environment
 
         // load navmesh
-        let req = await request('get', '/models/'+global.T5C.currentLocation.key+'.obj');
-        this._navMesh = await loadNavMeshFromString(req.data);
+        this._navMesh = await loadNavMeshFromString(global.T5C.currentLocation.key);
 
         await this._initEvents();
     }

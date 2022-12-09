@@ -1,5 +1,6 @@
 import { Schema, type } from "@colyseus/schema";
 import { PlayerCurrentState } from "../../../shared/Entities/Player/PlayerCurrentState";
+import { Routine } from "../../../shared/Entities/Entity/Routine";
 
 export class EntityState extends Schema {
 
@@ -31,6 +32,11 @@ export class EntityState extends Schema {
 
     this.spawn(args);
 	}
+
+  update(){
+
+
+  }
 
   spawn(args){
 

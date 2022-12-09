@@ -8,7 +8,7 @@ import loadNavMeshFromFile from "../../shared/Utils/loadNavMeshFromFile";
 import { PlayerState } from "./schema/PlayerState";
 import { PlayerInputs } from "../../shared/types";
 import { PlayerCurrentState } from "../../shared/Entities/Player/PlayerCurrentState";
-import NavMesh from "navmesh";
+import { NavMesh } from "yuka";
 
 export class GameRoom extends Room<GameRoomState> {
 
@@ -16,7 +16,7 @@ export class GameRoom extends Room<GameRoomState> {
     public autoDispose = false;
     public database: any; 
     public delayedInterval!: Delayed;
-    public navMesh:NavMesh;
+    public navMesh: NavMesh;
 
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
@@ -29,9 +29,14 @@ export class GameRoom extends Room<GameRoomState> {
         this.setMetadata(options);
 
         // initialize navmesh
+        /*
+        const navMesh = await loadNavMeshFromFile(options.location)
+        this.navMesh = navMesh;
+        Logger.info("[gameroom][onCreate] navmesh initialized.");*/
         const navMesh = await loadNavMeshFromFile(options.location)
         this.navMesh = navMesh;
         Logger.info("[gameroom][onCreate] navmesh initialized.");
+
 
         // Set initial state
         this.setState(new GameRoomState(this, options));

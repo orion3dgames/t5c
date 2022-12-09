@@ -4,9 +4,7 @@ import { EntityState } from "./EntityState";
 import { PlayerCharacter } from '../../../shared/types';
 import { GameRoom } from '../GameRoom';
 import { PlayerCurrentState } from '../../../shared/Entities/Player/PlayerCurrentState';
-import { nanoid } from 'nanoid';
-import NavMesh from 'navmesh';
-import { roundTo } from '../../../shared/Utils';
+import { NavMesh } from "yuka";
 
 export class GameRoomState extends Schema {
 
@@ -21,11 +19,12 @@ export class GameRoomState extends Schema {
     constructor(gameroom: GameRoom, navMesh, ...args: any[]) {
 		super(...args);
 		this._gameroom = gameroom;
-        this._navPoint = this._gameroom.navMesh.getPolygons();
+        //this._navPoint = this._gameroom.navMesh.getPolygons();
 	}
 
     public update(deltaTime: number) {
 
+        /*
         // only spawn in dungeon
         if(this._gameroom.metadata.location === "lh_dungeon_01"){
 
@@ -140,6 +139,7 @@ export class GameRoomState extends Schema {
             });
 
         }
+        */
 
 	}
 

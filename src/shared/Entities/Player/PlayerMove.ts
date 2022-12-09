@@ -97,12 +97,13 @@ export class PlayerMove {
         // check it fits in navmesh
         if(this.isCurrentPlayer){
 
+            /*
             const foundPath: any = this._navMesh.findPath({ x: oldX, y: oldZ}, { x: newX, y: newZ });
-            if (foundPath && foundPath.length > 0){
+            if (foundPath && foundPath.length > 0){*/
                 this.nextPosition.x = newX;
                 this.nextPosition.z = newZ;
                 this.nextRotation.y = this.nextRotation.y + (newRot - this.nextRotation.y);
-            }
+            //}
             
         }else{
 
