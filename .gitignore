@@ -49,3 +49,5 @@ database.db
 
 !public/**/*.obj
 database.db-journal
+
+public/models/Spider/*
