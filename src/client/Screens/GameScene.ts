@@ -19,6 +19,7 @@ import { isLocal, request } from "../../shared/Utils";
 
 import { NavMesh } from "yuka";
 import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
+import { createConvexRegionHelper, createGraphHelper } from "../../shared/Utils/navMeshHelper";
 
 export class GameScene {
 
@@ -184,6 +185,11 @@ export class GameScene {
 
         // load navmesh
         this._navMesh = await loadNavMeshFromString(global.T5C.currentLocation.key);
+        let navMeshGroup = createConvexRegionHelper(this._navMesh, this._scene)
+
+        // visualize graph
+        const graph = this._navMesh.graph
+        let graphHelper = createGraphHelper(this._scene, graph, 0.2)
 
         await this._initEvents();
     }
