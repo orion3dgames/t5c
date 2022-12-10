@@ -2,7 +2,7 @@ import { NavMesh, NavMeshLoader } from "yuka";
 import { apiUrl } from "./index";
 
 export default async function loadNavMeshFromString(fileNameNavMesh: string):NavMesh {
-    let url = '/public/models/navmesh/'+fileNameNavMesh+'.glb' ;
+    let url = '../../public/models/navmesh/'+fileNameNavMesh+'.glb' ;
     const loader = new NavMeshLoader(); 
     return loader.load(apiUrl()+url).then((navMesh) => {
         return navMesh;
