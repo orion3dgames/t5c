@@ -12,8 +12,7 @@ import { PlayerActions } from "./Player/PlayerActions";
 import { PlayerMesh } from "./Player/PlayerMesh";
 import State from "../../client/Screens/Screens";
 import { Room } from "colyseus.js";
-import { PlayerCurrentState } from "./Player/PlayerCurrentState";
-import { distanceBetween } from "../Utils";
+import { NavMesh } from "yuka";
 
 export class Player {
     
@@ -22,7 +21,7 @@ export class Player {
     public ui;
     private _input;
     private _shadow;
-    private _navMesh;
+    private _navMesh:NavMesh;
 
     // controllers
     public cameraController: PlayerCamera;
@@ -64,7 +63,7 @@ export class Player {
         ui,
         input, 
         shadow:CascadedShadowGenerator, 
-        navMesh
+        navMesh:NavMesh
     ) {
  
         // setup class variables

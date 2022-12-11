@@ -5,6 +5,7 @@ import { SimpleMaterial } from "@babylonjs/materials"
     const regions = navMesh.regions
   
     const customMesh = new Mesh('custom', scene)
+    customMesh.position = new Vector3(0,0.01,0);
     const customMeshMaterial = new SimpleMaterial('custom-mesh', scene)
     customMeshMaterial.diffuseColor = Color3.Random()
   

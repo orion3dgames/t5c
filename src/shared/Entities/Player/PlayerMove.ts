@@ -1,11 +1,12 @@
 import { Vector3 } from "@babylonjs/core";
 import Config from "../../Config";
 import { PlayerInputs } from "../../types";
+import { NavMesh } from "yuka";
 
 export class PlayerMove {
 
     private _mesh;
-    private _navMesh;
+    private _navMesh:NavMesh;
     public playerInputs = [];
     private playerLatestSequence: number;
 
@@ -14,7 +15,7 @@ export class PlayerMove {
 
     private isCurrentPlayer: boolean;
 
-    constructor(mesh, navMesh, isCurrentPlayer) {
+    constructor(mesh, navMesh:NavMesh, isCurrentPlayer) {
         this._mesh = mesh;
         this._navMesh = navMesh
         this.isCurrentPlayer = isCurrentPlayer
@@ -87,23 +88,28 @@ export class PlayerMove {
 
         // save current position
         let oldX = this.nextPosition.x;
+        let oldY = this.nextPosition.y;
         let oldZ = this.nextPosition.z;
 
         // calculate new position
         let newX = oldX - (input.h * Config.PLAYER_SPEED);
+        let newY = oldY;
         let newZ = oldZ - (input.v * Config.PLAYER_SPEED);
         let newRot = Math.atan2(input.h, input.v);
 
         // check it fits in navmesh
         if(this.isCurrentPlayer){
 
-            /*
-            const foundPath: any = this._navMesh.findPath({ x: oldX, y: oldZ}, { x: newX, y: newZ });
-            if (foundPath && foundPath.length > 0){*/
+            const foundPath: any = this._navMesh.findPath(new Vector3( oldX, oldY, oldZ), new Vector3(newX, newY, newZ));
+            if (foundPath && foundPath.length > 0){
                 this.nextPosition.x = newX;
                 this.nextPosition.z = newZ;
                 this.nextRotation.y = this.nextRotation.y + (newRot - this.nextRotation.y);
-            //}
+            }else{
+                this.nextPosition.x = oldX;
+                this.nextPosition.z = oldY;
+                this.nextRotation.y = oldZ;
+            }
             
         }else{
 

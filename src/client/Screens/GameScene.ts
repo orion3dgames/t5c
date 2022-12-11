@@ -119,7 +119,7 @@ export class GameScene {
     private async _initNetwork(): Promise<void> {
 
         try {
-            
+
             if(isLocal()){
                 global.T5C.currentLocation = {
                     key: "lh_dungeon_01",
@@ -197,6 +197,10 @@ export class GameScene {
     private async _initEvents() {
 
         await this._scene.whenReadyAsync();
+
+        this.room.onMessage('serverNavMesh', (navmesh) => {
+            console.log(navmesh);
+        });
 
         // setup input Controller
         this._input = new Input(this._scene);
