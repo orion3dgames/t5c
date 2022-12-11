@@ -9,5 +9,5 @@ import * as YUKA from 'yuka';
 export default async function loadNavMeshFromFile(fileNameNavMesh: string) {
     const data = await fs.readFileSync( path.join( __dirname, '../../../public/models/navmesh/'+fileNameNavMesh+'.glb' ) );
     const loader = new YUKA.NavMeshLoader();
-    return await loader.parse( data.buffer )
+    return await loader.parse( data.buffer, "",{ mergeConvexRegions: false })
 }

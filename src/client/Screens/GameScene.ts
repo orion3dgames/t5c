@@ -138,6 +138,7 @@ export class GameScene {
                 };
             }
 
+        
             let user = global.T5C.currentUser;
             let character = global.T5C.currentCharacter;
             let currentLocationKey = character.location;
@@ -190,8 +191,6 @@ export class GameScene {
         // visualize graph
         const graph = this._navMesh.graph
         let graphHelper = createGraphHelper(this._scene, graph, 0.2)
-
-        console.log(this.room.state._navmesh2);
 
         await this._initEvents();
     }
