@@ -35,6 +35,7 @@ export class GameRoom extends Room<GameRoomState> {
         Logger.info("[gameroom][onCreate] navmesh initialized.");*/
         const navMesh = await loadNavMeshFromFile(options.location)
         this.navMesh = navMesh;
+        
         Logger.info("[gameroom][onCreate] navmesh initialized.");
 
 
@@ -131,6 +132,8 @@ export class GameRoom extends Room<GameRoomState> {
         this.database.toggleOnlineStatus(client.auth.id, 1);
         Logger.info(`[gameroom][onJoin] player added `);
 
+        //client.send('sdfsdfsd', element)
+        
     }
 
     //////////////////////////////////////////////////////////////////////////

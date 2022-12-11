@@ -16,10 +16,11 @@ export class GameRoomState extends Schema {
     private _navPoint;
     private timer = 0;
 
-    constructor(gameroom: GameRoom, navMesh, ...args: any[]) {
+    @type("string") _navmesh2:NavMesh;
+
+    constructor(gameroom: GameRoom, navMesh:NavMesh, ...args: any[]) {
 		super(...args);
 		this._gameroom = gameroom;
-        //this._navPoint = this._gameroom.navMesh.getPolygons();
 	}
 
     public update(deltaTime: number) {

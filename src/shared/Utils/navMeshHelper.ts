@@ -1,4 +1,4 @@
-import { Mesh, Color3, VertexData, MeshBuilder, Vector3, TransformNode } from "@babylonjs/core"
+import { Mesh, Color3, VertexData, MeshBuilder, TransformNode, Vector3 } from "@babylonjs/core"
 import { SimpleMaterial } from "@babylonjs/materials"
 
  function createConvexRegionHelper(navMesh, scene) {

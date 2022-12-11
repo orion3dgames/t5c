@@ -3,7 +3,6 @@ import Logger from "../../../shared/Logger";
 import Config from "../../../shared/Config";
 import { PlayerInputs } from "../../../shared/types";
 import { PlayerCurrentState } from "../../../shared/Entities/Player/PlayerCurrentState";
-import { distanceBetween } from "../../../shared/Utils";
 import { NavMesh, Vector3 } from "yuka";
 
 export class PlayerState extends Schema {
@@ -82,10 +81,10 @@ export class PlayerState extends Schema {
       let newRot = Math.atan2(playerInput.h, playerInput.v);
 
       // check it fits in navmesh
-      let check1 = new Vector3(this.x, this.y, this.z);
-      let check2 = new Vector3(newX, newY, newZ);
-      const foundPath: any = this._navmesh.findPath(check1, check2);
-      console.log(foundPath);
+      let check1 = new Vector3(this.x, this.y, this.z); // current pos
+      let check2 = new Vector3(newX, newY, newZ); // new pos
+      const foundPath: any = this._navmesh.findPath(check1, check2); // check if in navmesh
+      console.log(check1, check2, foundPath.length);
       if (foundPath && foundPath.length > 0) {
 
           // next position validated, update player
