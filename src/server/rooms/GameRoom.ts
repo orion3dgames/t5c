@@ -35,12 +35,12 @@ export class GameRoom extends Room<GameRoomState> {
         Logger.info("[gameroom][onCreate] navmesh initialized.");*/
         const navMesh = await loadNavMeshFromFile(options.location)
         this.navMesh = navMesh;
-        
         Logger.info("[gameroom][onCreate] navmesh initialized.");
 
+        console.log(navMesh.regions);
 
         // Set initial state
-        this.setState(new GameRoomState(this, options));
+        this.setState(new GameRoomState(this, this.navMesh, options));
 
         // Register message handlers for messages from the client
         this.registerMessageHandlers();

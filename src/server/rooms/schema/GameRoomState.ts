@@ -4,39 +4,41 @@ import { EntityState } from "./EntityState";
 import { PlayerCharacter } from '../../../shared/types';
 import { GameRoom } from '../GameRoom';
 import { PlayerCurrentState } from '../../../shared/Entities/Player/PlayerCurrentState';
-import { NavMesh, Vehicle, WanderBehavior, EntityManager, Time, GameEntity, SteeringBehavior } from "yuka";
+import { NavMesh, Vehicle, WanderBehavior, EntityManager, Time } from "yuka";
 import { nanoid } from 'nanoid';
-import { ThinSprite } from 'babylonjs/Sprites/thinSprite';
 
 export class GameRoomState extends Schema {
 
     @type({ map: PlayerState }) players = new MapSchema<PlayerState>();
-    @type({ map: Vehicle }) entities = new MapSchema<Vehicle>();
+    @type({ map: EntityState }) entities = new MapSchema<EntityState>();
     @type("number") serverTime: number = 0.0;
     private _gameroom: GameRoom = null;
-    private _navmesh:NavMesh;
+    private _navMesh: NavMesh = null;
     private entityManager;
     private time;
-    private timer: number;
-
-    @type("string") _navmesh2:NavMesh;
 
     constructor(gameroom: GameRoom, navMesh:NavMesh, ...args: any[]) {
 		super(...args);
 		this._gameroom = gameroom;
+		this._navMesh = navMesh;
 
-        /*
+        
         this.entityManager = new EntityManager();
         this.time = new Time()
-         
+          
+        let id = nanoid();
         const vehicle = new Vehicle()
+        vehicle.navMesh = this._navMesh;
+        vehicle._uuid = id;
+        vehicle.name = "rat";
+        vehicle.rotation.fromEuler(0, 2 * Math.PI * Math.random(), 0);
+        vehicle.position.x = 1;
+        vehicle.position.y = 1;
+        vehicle.position.z = 1;
         const wanderBehavior = new WanderBehavior()
         vehicle.steering.add(wanderBehavior)
         this.entityManager.add(vehicle)
 
-        this.entities = this.entityManager.entities;*/
-/*
-        let id = nanoid();
         this.entities.set('TEST', new EntityState(this._gameroom.navMesh, this._gameroom.database).assign({
             sessionId: id,
             type: "entity",
@@ -49,17 +51,19 @@ export class GameRoomState extends Schema {
             health: 100,
             level: 1,
             state: PlayerCurrentState.IDLE
-        }));*/
+        }));
         
 	}
 
     public update(deltaTime: number) {
 
-        /*
+        
         const delta = this.time.update().getDelta()
         this.entityManager.update(delta);
-        */
-        //this.entities['TEST'].x += 0.001; 
+
+        let entity = this.entityManager.entities[0];
+        //this.entities['TEST'].x = entity.position.x;
+        //console.log(entity);
         
 	}
 
@@ -68,7 +72,7 @@ export class GameRoomState extends Schema {
     }
 
     addPlayer(sessionId: string, data: PlayerCharacter) {
-        this.players.set(sessionId, new PlayerState(this._gameroom.navMesh, this._gameroom.database).assign({
+        this.players.set(sessionId, new PlayerState(this._navMesh, this._gameroom.database).assign({
             id: data.id,
             sessionId: sessionId,
             name: data.name,
