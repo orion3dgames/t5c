@@ -4,7 +4,6 @@ export default async function loadNavMeshFromString(fileNameNavMesh: string):Nav
     let url = '/models/navmesh/'+fileNameNavMesh+'.glb' ;
     const loader = new NavMeshLoader(); 
     return loader.load(url, { mergeConvexRegions: false }).then((navMesh) => {
-        console.log(navMesh)
         return navMesh;
     });
 }
