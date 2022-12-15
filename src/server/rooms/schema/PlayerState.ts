@@ -83,9 +83,19 @@ export class PlayerState extends Schema {
       // check it fits in navmesh
       let check1 = new Vector3(this.x, this.y, this.z); // current pos
       let check2 = new Vector3(newX, newY, newZ); // new pos
+
+      // next position validated, update player
+      this.x = newX;
+      this.y = 0;
+      this.z = newZ;
+      this.rot = newRot;
+      this.sequence = playerInput.seq;
+      this.state = PlayerCurrentState.WALKING;
+
+      /*
       const foundPath: any = this._navmesh.findPath(check1, check2); // check if in navmesh
-      console.log(check1, check2, foundPath.length);
-      if (foundPath && foundPath.length > 0) {
+      console.log(check1, check2, foundPath);
+      if (foundPath && foundPath.length > 1) {
 
           // next position validated, update player
           this.x = newX;
@@ -110,6 +120,7 @@ export class PlayerState extends Schema {
 
           Logger.warning('Invalid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
       }
+      */
   }
 
 }

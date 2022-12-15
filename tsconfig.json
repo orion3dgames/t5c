@@ -25,6 +25,7 @@
     "src/server/*",
     "src/**/*.d.ts",
     "src/shared/**/*.ts",
+    "src/shared/**/*.js",
   ],
   "exclude": [
     "node_modules",

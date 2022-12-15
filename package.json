@@ -19,14 +19,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-
-    "@babylonjs/core": "5.32.1",
-    "@babylonjs/gui": "5.32.1",
-    "@babylonjs/gui-editor": "5.32.1",
-    "@babylonjs/inspector": "5.32.1",
-    "@babylonjs/loaders": "5.32.1",
-    "@babylonjs/materials": "5.32.1",
-    "@babylonjs/serializers": "5.32.1",
+    "@babylonjs/core": "5.37.0",
+    "@babylonjs/gui": "5.37.0",
+    "@babylonjs/gui-editor": "5.37.0",
+    "@babylonjs/inspector": "5.37.0",
+    "@babylonjs/loaders": "5.37.0",
+    "@babylonjs/materials": "5.37.0",
+    "@babylonjs/serializers": "5.37.0",
     "@colyseus/loadtest": "0.15.0-preview.0",
     "@colyseus/ws-transport": "0.15.0-preview.0",
     "@types/node": "^17.0.12",
@@ -44,10 +43,10 @@
     "webpack-dev-server": "^4.7.4"
   },
   "dependencies": {
-    "babylonjs": "5.32.1",
-    "babylonjs-gltf2interface": "5.32.1",
-    "babylonjs-gui": "5.32.1",
-    "babylonjs-materials": "5.32.1",
+    "babylonjs": "5.37.0",
+    "babylonjs-gltf2interface": "5.37.0",
+    "babylonjs-gui": "5.37.0",
+    "babylonjs-materials": "5.37.0",
     "colyseus.js": "^0.15.0-preview.0",
     "concurrently": "^7.5.0",
     "cors": "^2.8.5",
@@ -59,7 +58,7 @@
     "sqlite3": "^5.1.2",
     "wavefront-obj-parser": "^2.0.1",
     "winston": "^3.8.2",
-    "yuka": "0.7.8"
+    "yuka": "^0.7.8"
   },
   "peerDependencies": {},
   "browserslist": {

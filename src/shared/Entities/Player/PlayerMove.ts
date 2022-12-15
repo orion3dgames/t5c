@@ -1,7 +1,7 @@
 import { Vector3 } from "@babylonjs/core";
 import Config from "../../Config";
 import { PlayerInputs } from "../../types";
-import { NavMesh } from "yuka";
+import { NavMesh, Vector3 as Vector3Y } from "yuka";
 
 export class PlayerMove {
 
@@ -100,13 +100,16 @@ export class PlayerMove {
         // check it fits in navmesh
         if(this.isCurrentPlayer){
 
-            //const foundPath: any = this._navMesh.findPath(new Vector3( oldX, oldY, oldZ), new Vector3(newX, newY, newZ));
-            //if (foundPath && foundPath.length > 0){
+            const foundPath: any = this._navMesh.findPath(new Vector3Y( oldX, oldY, oldZ), new Vector3Y(newX, newY, newZ));
+            if (foundPath){
                 this.nextPosition.x = newX;
                 this.nextPosition.y = newY;
                 this.nextPosition.z = newZ;
                 this.nextRotation.y = this.nextRotation.y + (newRot - this.nextRotation.y);
-            //}
+                console.log('VALID position for', new Vector3Y( oldX, oldY, oldZ), new Vector3Y(newX, newY, newZ), foundPath);
+            }else{
+                console.error('INVALID position for', new Vector3Y( oldX, oldY, oldZ), new Vector3Y(newX, newY, newZ, foundPath));
+            }
             
         }else{
 
