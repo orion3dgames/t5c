@@ -187,6 +187,7 @@ export class GameScene {
         // load navmesh
         this._navMesh = await loadNavMeshFromString(global.T5C.currentLocation.key);
         let navMeshGroup = createConvexRegionHelper(this._navMesh, this._scene)
+        console.log('NAVMESH LOADED', this._navMesh);
 
         // visualize graph
         const graph = this._navMesh.graph
