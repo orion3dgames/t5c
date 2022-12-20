@@ -37,11 +37,8 @@ export class Network {
     }
 
     public async findCurrentRoom(currentRoomKey):Promise<any> {
-        
         return new Promise(async (resolve: any, reject: any) => {
-            
             let rooms = await this._client.getAvailableRooms("game_room");
-            console.log(rooms);
             if(rooms.length > 0){
                 rooms.forEach((room) => {
                     if(room.metadata.location === currentRoomKey){ 
