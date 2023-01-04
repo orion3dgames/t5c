@@ -41,9 +41,9 @@ export class GameRoomState extends Schema {
 
         this.entities.set('TEST', new EntityState(this._gameroom.navMesh, this._gameroom.database).assign({
             sessionId: id,
-            type: "entity",
-            name: "Rat",
-            location: "lh_dungeon_01",
+            type: "monster_bear",
+            name: "Bear",
+            location: "lh_town",
             x: 0,
             y: 0,
             z: 0,
@@ -75,6 +75,7 @@ export class GameRoomState extends Schema {
         this.players.set(sessionId, new PlayerState(this._navMesh, this._gameroom.database).assign({
             id: data.id,
             sessionId: sessionId,
+            type: 'player_hobbit',
             name: data.name,
             location: data.location,
             x: data.x,

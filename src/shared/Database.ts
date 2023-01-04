@@ -200,13 +200,13 @@ class Database {
         "${user.id}",
         "${name}",
         "${defaultLocation.key}",
+        "${defaultLocation.spawnPoint.x}",
+        "${defaultLocation.spawnPoint.y}",
+        "${defaultLocation.spawnPoint.z}",
+        "${defaultLocation.spawnPoint.rot}",
+        "${Config.PLAYER_START_LEVEL}",
         "0",
-        "0",
-        "0",
-        "0",
-        "1",
-        "0",
-        "100"
+        "${Config.PLAYER_START_HEALTH}"
       );`
     let c = await <any> this.run(sql);
     return await this.getCharacter(c.id);

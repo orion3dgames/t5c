@@ -95,7 +95,6 @@ export class UserInterface {
         let player = this._players[msg.senderID];
         if(player && player.characterLabel){
             let el = player.characterLabel;
-            console.log('showChatMessage', el);
             player.characterChatLabel.isVisible = true;
             player.characterChatLabel._children[0].text = msg.message;
             setTimeout(function(){ player.characterChatLabel.isVisible = false; }, 20000);
@@ -316,7 +315,7 @@ export class UserInterface {
         this.messages.slice().reverse().forEach((msg:PlayerMessage) => {
 
             // container
-            var headlineRect = new Rectangle("chatmessage_"+msg.timestamp);
+            var headlineRect = new Rectangle("chatmessage_"+msg.createdAt);
             headlineRect.width = "100%";
             headlineRect.thickness = 0;
             headlineRect.paddingBottom = "5px";

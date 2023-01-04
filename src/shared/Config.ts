@@ -12,7 +12,6 @@ let Config = {
     apiUrlLocal: "http://localhost:3000",
     serverUrlProduction: "wss://t5c.onrender.com",
     apiUrlProduction: "https://t5c.onrender.com",
-
     maxClients: 20, // set maximum clients per room
     updateRate: 100, // Set frequency the patched state should be sent to all clients, in milliseconds 
     databaseUpdateRate: 1000, // the frequency at which server save players position
@@ -20,9 +19,11 @@ let Config = {
 
     // database settings
     databaseLocation: './database.db',
-    
+
     // players settings
     PLAYER_SPEED: 0.40,
+    PLAYER_START_HEALTH: 100,
+    PLAYER_START_LEVEL: 1,
 
     // basic locations
     initialLocation: "lh_town",
