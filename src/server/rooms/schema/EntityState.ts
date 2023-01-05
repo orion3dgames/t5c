@@ -25,15 +25,25 @@ export class EntityState extends Schema {
   @type('number') public state: PlayerCurrentState = PlayerCurrentState.IDLE;
 
   public destination;
+  public navmesh;
+  public yukaEntity;
 
-  constructor(...args: any[]) {
+  constructor(navmesh, ...args: any[]) {
 		super(args);
+
+    this.navmesh = navmesh;
 
     this.spawn(args);
 	}
 
-  update(){
+  moveRandomly(){
 
+    let randomRegion = this.navmesh.getRandomRegion();
+    let point = randomRegion.centroid;
+    this.x = point.x;
+    this.y = point.y;
+    this.z = point.z;
+    console.log('ENTITY MOVED TO ', point);
 
   }
 

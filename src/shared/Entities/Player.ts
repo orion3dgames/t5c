@@ -12,7 +12,7 @@ import { PlayerActions } from "./Player/PlayerActions";
 import { PlayerMesh } from "./Player/PlayerMesh";
 import State from "../../client/Screens/Screens";
 import { Room } from "colyseus.js";
-import { NavMesh, GameEntity} from "yuka";
+import { NavMesh } from "yuka";
 
 export class Player {
     
@@ -106,13 +106,6 @@ export class Player {
         this.animatorController = new PlayerAnimator(this.meshController.getAnimation());
         this.moveController = new PlayerMove(this.mesh, this._navMesh, this.isCurrentPlayer);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
-
-        /*
-        // ADD YUKA
-        this.yuka = new GameEntity()
-        this.yuka.setRenderComponent(this.mesh, function(test){
-            console.log(test);
-        });*/
 
         ///////////////////////////////////////////////////////////
         // entity network event

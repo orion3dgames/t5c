@@ -79,7 +79,7 @@ export class Entity {
 
         // update player data from server data
         Object.assign(this, this.entity);
-
+        
         // spawn player
         this.spawn(entity);
     }
