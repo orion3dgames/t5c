@@ -84,9 +84,9 @@ export class PlayerState extends Schema {
       let check1 = new Vector3(this.x, this.y, this.z); // current pos
       let check2 = new Vector3(newX, newY, newZ); // new pos
 
-      //const foundPath: any = this._navmesh.findPath(check1, check2); // check if in navmesh
-      //console.log(check1, check2, foundPath);
-      //if (foundPath && foundPath.length > 1) {
+      const foundPath: any = this._navmesh.findPath(check1, check2); // check if in navmesh
+      console.log(check1, check2, foundPath);
+      if (foundPath && foundPath.length > 1) {
 
           // next position validated, update player
           this.x = newX;
@@ -96,7 +96,6 @@ export class PlayerState extends Schema {
           this.sequence = playerInput.seq;
           this.state = PlayerCurrentState.WALKING;
 
-          /*
           // add player to server
           Logger.info('Valid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
 
@@ -111,7 +110,7 @@ export class PlayerState extends Schema {
           this.state = PlayerCurrentState.WALKING;
 
           Logger.warning('Invalid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
-      }*/
+      }
       
   }
 

@@ -18457,7 +18457,7 @@
 			if ( fromRegion === null || toRegion === null ) {
 
 				// if source or target are outside the navmesh, choose the nearest convex region
-
+				return false;
 				if ( fromRegion === null ) fromRegion = this.getClosestRegion( from );
 				if ( toRegion === null ) toRegion = this.getClosestRegion( to );
 

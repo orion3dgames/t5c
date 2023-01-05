@@ -114,7 +114,6 @@ export class PlayerMove {
         }else{
 
             // not current player, just move straight away
-
             this.nextPosition.x = newX;
             this.nextPosition.y = newY;
             this.nextPosition.z = newZ;

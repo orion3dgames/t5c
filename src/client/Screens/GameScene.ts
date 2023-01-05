@@ -186,12 +186,13 @@ export class GameScene {
 
         // load navmesh
         this._navMesh = await loadNavMeshFromString(global.T5C.currentLocation.key);
-        let navMeshGroup = createConvexRegionHelper(this._navMesh, this._scene)
+
+        
         console.log('NAVMESH LOADED', this._navMesh);
 
-        // visualize graph
-        const graph = this._navMesh.graph
-        let graphHelper = createGraphHelper(this._scene, graph, 0.2)
+        // visualize navmesh
+        //let navMeshGroup = createConvexRegionHelper(this._navMesh, this._scene)
+        //let graphHelper = createGraphHelper(this._scene, this._navMesh.graph, 0.2)
 
         await this._initEvents();
     }
@@ -216,8 +217,10 @@ export class GameScene {
             
             // if current player, save entity ref
             if (isCurrentPlayer) {
+
                 // set currentPlayer
                 this._currentPlayer = _player;
+
                 // add player specific  ui
                 this._ui.setCurrentPlayer(_player);
             }
@@ -246,11 +249,7 @@ export class GameScene {
         let latestInput: PlayerInputs;
         this._scene.registerBeforeRender(() => {
 
-            let timeNow = Date.now();
-            let timePassed = (timeNow - timeThen) / 1000;
-            let updateRate = Config.updateRate / 1000; // game is networked update every 100ms
-
-            // continuously move players 60fps
+            // continuously move players at 60fps
             for (let sessionId in this.playerEntities) {
                 const player = this.playerEntities[sessionId];
                 if(player && player.moveController){
@@ -258,7 +257,7 @@ export class GameScene {
                 }
             }
 
-            // continuously lerp movement at 60fps
+            // continuously move entities at 60fps
             for (let sessionId in this.entities) {
                 const entity = this.entities[sessionId];
                 if(entity && entity.moveController){
@@ -267,6 +266,9 @@ export class GameScene {
             }
 
             // every 100ms loop
+            let timeNow = Date.now();
+            let timePassed = (timeNow - timeThen) / 1000;
+            let updateRate = Config.updateRate / 1000; // game is networked update every 100ms
             if (timePassed >= updateRate) { 
 
                 // detect movement
