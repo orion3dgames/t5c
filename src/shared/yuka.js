@@ -18438,6 +18438,27 @@
 		}
 
 		/**
+		* Returns false if from or to position is outside of the navmesh
+		*
+		* @param {Vector3} from - The start/source position.
+		* @param {Vector3} to - The end/destination position.
+		* @return {bool} true = on navmesh, false = outside of navmesh
+		*/
+		checkPath( from, to ) {
+
+			let fromRegion = this.getRegionForPoint( from, this.epsilonContainsTest );
+			let toRegion = this.getRegionForPoint( to, this.epsilonContainsTest );
+
+			if ( fromRegion === null || toRegion === null ) {
+
+				// if source or target are outside the navmesh, return false
+				return false;
+			}
+
+			return true;
+		}
+
+		/**
 		* Returns the shortest path that leads from the given start position to the end position.
 		* The computational overhead of this method for complex navigation meshes can greatly
 		* reduced by using a spatial index.
@@ -18457,7 +18478,6 @@
 			if ( fromRegion === null || toRegion === null ) {
 
 				// if source or target are outside the navmesh, choose the nearest convex region
-				return false;
 				if ( fromRegion === null ) fromRegion = this.getClosestRegion( from );
 				if ( toRegion === null ) toRegion = this.getClosestRegion( to );
 

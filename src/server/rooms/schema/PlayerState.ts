@@ -84,9 +84,9 @@ export class PlayerState extends Schema {
       let check1 = new Vector3(this.x, this.y, this.z); // current pos
       let check2 = new Vector3(newX, newY, newZ); // new pos
 
-      const foundPath: any = this._navmesh.findPath(check1, check2); // check if in navmesh
+      const foundPath: any = this._navmesh.checkPath(check1, check2); // check if in navmesh
       console.log(check1, check2, foundPath);
-      if (foundPath && foundPath.length > 1) {
+      if (foundPath) {
 
           // next position validated, update player
           this.x = newX;
