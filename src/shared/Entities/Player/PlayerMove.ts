@@ -100,7 +100,8 @@ export class PlayerMove {
         // check it fits in navmesh
         if(this.isCurrentPlayer){
 
-            const foundPath: any = this._navMesh.checkPath(new Vector3Y( oldX, oldY, oldZ), new Vector3Y(newX, newY, newZ));
+            let destinationPos = new Vector3(newX, newY, newZ); // new pos
+            const foundPath: any = this._navMesh.getRegionForPoint(destinationPos);
             if (foundPath){
                 this.nextPosition.x = newX;
                 this.nextPosition.y = newY;
@@ -120,13 +121,6 @@ export class PlayerMove {
             this.nextRotation.y = this.nextRotation.y + (newRot - this.nextRotation.y);
 
         }
-
-        /*
-        let rotationY = Math.atan2(input.h, input.v);
-        this.nextPosition.x -= input.h * Config.PLAYER_SPEED;
-        this.nextPosition.z -= input.v * Config.PLAYER_SPEED;
-        this.nextRotation.y = this.nextRotation.y + (rotationY - this.nextRotation.y);
-        */
 
     }
 

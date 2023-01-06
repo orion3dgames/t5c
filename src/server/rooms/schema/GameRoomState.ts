@@ -68,7 +68,6 @@ export class GameRoomState extends Schema {
 
                 // if entity does not have a destination, give it one
                 // ideally should be a point in the navmesh
-                // todo: build a function to get a random point in navmesh in a specific range around spawnpoint
                 if(!entity.destination){
 
                     let randomRegion = this._navMesh.getRandomRegion();

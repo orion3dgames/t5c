@@ -30,12 +30,12 @@ export class PlayerState extends Schema {
   @type('boolean') public blocked: boolean; // if true, used to block player and to prevent movement
   @type('number') public state: PlayerCurrentState = PlayerCurrentState.IDLE;
 
-  private _navmesh:NavMesh;
+  private _navMesh:NavMesh;
   private _database;
 
   constructor(navmesh, database, ...args: any[]) {
 		super(args);
-    this._navmesh = navmesh;
+    this._navMesh = navmesh;
     this._database = database;
 	}
 
@@ -80,12 +80,9 @@ export class PlayerState extends Schema {
       let newZ = this.z - (playerInput.v * Config.PLAYER_SPEED);
       let newRot = Math.atan2(playerInput.h, playerInput.v);
 
-      // check it fits in navmesh
-      let check1 = new Vector3(this.x, this.y, this.z); // current pos
-      let check2 = new Vector3(newX, newY, newZ); // new pos
-
-      const foundPath: any = this._navmesh.checkPath(check1, check2); // check if in navmesh
-      console.log(check1, check2, foundPath);
+      // check if destination is in navmesh
+      let destinationPos = new Vector3(newX, newY, newZ); // new pos
+      const foundPath: any = this._navMesh.getRegionForPoint(destinationPos);
       if (foundPath) {
 
           // next position validated, update player
@@ -107,7 +104,7 @@ export class PlayerState extends Schema {
           this.z = oldZ;
           this.rot = oldRot;
           this.sequence = playerInput.seq;
-          this.state = PlayerCurrentState.WALKING;
+          this.state = PlayerCurrentState.IDLE;
 
           Logger.warning('Invalid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
       }
