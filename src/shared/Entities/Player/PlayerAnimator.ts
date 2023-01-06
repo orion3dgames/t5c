@@ -1,4 +1,5 @@
 import { AnimationGroup } from "@babylonjs/core";
+import { Vector3 } from "babylonjs";
 import { distanceBetween } from "../../Utils";
 import { PlayerCurrentState } from "./PlayerCurrentState";
 
@@ -47,14 +48,18 @@ export class PlayerAnimator {
     }
 
     // 
-    private checkIfPlayerIsMoving(currentPos, nextPos, precision = 2){
+    private checkIfPlayerIsMoving(currentPos, nextPos, precision = 3){
+        return currentPos.equalsWithEpsilon(nextPos);
+        /*
         return  currentPos.x.toFixed(precision) !== nextPos.x.toFixed(precision) || 
-                currentPos.z.toFixed(precision) !== nextPos.z.toFixed(precision)
+                currentPos.z.toFixed(precision) !== nextPos.z.toFixed(precision)*/
     }
 
     ///////////////////////////
     // todo: to be improved so we can better control the states... have no idea how yet
     public animate(player, currentPos, nextPos): void {
+
+        console.log('CHECK IF SOURCE AND DESTINATION ARE THE SAME', this.checkIfPlayerIsMoving(currentPos, nextPos));
 
         // if player has died
         if(player.state === PlayerCurrentState.DEAD){

@@ -96,7 +96,7 @@ export class Entity {
         // add mesh to shadow generator
         this._shadow.addShadowCaster(this.meshController.mesh, true);
 
-        // if myself, add all player related stuff
+        // add all player related stuff
         this.animatorController = new PlayerAnimator(this.meshController.getAnimation());
         this.moveController = new PlayerMove(this.mesh, this._navMesh, this.isCurrentPlayer);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity

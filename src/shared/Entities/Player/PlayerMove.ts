@@ -100,15 +100,20 @@ export class PlayerMove {
         // check it fits in navmesh
         if(this.isCurrentPlayer){
 
+            let sourcePos = new Vector3(oldX, oldY, oldZ); // new pos
             let destinationPos = new Vector3(newX, newY, newZ); // new pos
-            const foundPath: any = this._navMesh.getRegionForPoint(destinationPos);
+            const foundPath: any = this._navMesh.checkPath(sourcePos, destinationPos);
             if (foundPath){
+
                 this.nextPosition.x = newX;
                 this.nextPosition.y = newY;
                 this.nextPosition.z = newZ;
                 this.nextRotation.y = this.nextRotation.y + (newRot - this.nextRotation.y);
+
                 console.log('VALID position for', new Vector3Y( oldX, oldY, oldZ), new Vector3Y(newX, newY, newZ), foundPath);
+
             }else{
+
                 console.error('INVALID position for', new Vector3Y( oldX, oldY, oldZ), new Vector3Y(newX, newY, newZ, foundPath));
             }
             

@@ -28,8 +28,8 @@ export class GameRoomState extends Schema {
         this.time = new Time()
        
         // add to colyseus
-        if(this._gameroom.metadata.location === "lh_town"){
-            let maxEntities = 20;
+        if(this._gameroom.metadata.location === "lh_dungeon_01"){
+            let maxEntities = 4;
             while(this.entities.size < maxEntities){
                 let id = nanoid();
                 let randomRegion = this._navMesh.getRandomRegion();
@@ -40,7 +40,7 @@ export class GameRoomState extends Schema {
                     sessionId: id,
                     type: "entity",
                     name: "Rat",
-                    location: "lh_town",
+                    location: "lh_dungeon_01",
                     x: point.x,
                     y: 0,
                     z: point.y,
@@ -79,7 +79,7 @@ export class GameRoomState extends Schema {
                         { x: destination.x, y: destination.y, z: destination.z }
                     );
 
-                    console.log('first destination', entity.destination[0]);
+                    console.log('New destination for entity #'+entity.id, entity.destination[0]);
           
                     if(entity.destination){
                         entity.destination.shift();

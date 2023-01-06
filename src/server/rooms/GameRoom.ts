@@ -173,7 +173,7 @@ export class GameRoom extends Room<GameRoomState> {
                 this.database.updateCharacter(client.auth.id, updateObj);
                 
                 // update player state on server
-                playerState.setPositionManual(updateObj.x, updateObj.y, updateObj.z, 0);
+                //playerState.setPositionManual(updateObj.x, updateObj.y, updateObj.z, 0);
                 playerState.setLocation(location);
 
                 // inform client he cand now teleport to new zone

@@ -71,6 +71,7 @@ export class PlayerState extends Schema {
 
       // save current position
       let oldX = this.x;
+      let oldY = this.y;
       let oldZ = this.z;
       let oldRot = this.rot;
 
@@ -81,9 +82,10 @@ export class PlayerState extends Schema {
       let newRot = Math.atan2(playerInput.h, playerInput.v);
 
       // check if destination is in navmesh
+      let sourcePos = new Vector3(oldX, oldY, oldZ); // new pos
       let destinationPos = new Vector3(newX, newY, newZ); // new pos
-      const foundPath: any = this._navMesh.getRegionForPoint(destinationPos);
-      if (foundPath) {
+      const foundPath: any = this._navMesh.checkPath(sourcePos, destinationPos);
+      if (foundPath){
 
           // next position validated, update player
           this.x = newX;
