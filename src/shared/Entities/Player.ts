@@ -1,4 +1,4 @@
-import { TransformNode, Scene, Vector3, AbstractMesh, CascadedShadowGenerator, PointerEventTypes} from "@babylonjs/core";
+import { TransformNode, Scene, AxesViewer, Vector3, AbstractMesh, CascadedShadowGenerator, PointerEventTypes} from "@babylonjs/core";
 import { Control, Rectangle, TextBlock, TextWrapping } from "@babylonjs/gui";
 import { PlayerState } from "../../server/rooms/schema/PlayerState";
 
@@ -93,6 +93,12 @@ export class Player {
         await this.meshController.load();
         this.mesh = this.meshController.mesh;
         this.playerMesh = this.meshController.playerMesh;
+
+        //
+        const axes = new AxesViewer(this._scene, 1);
+        axes.xAxis.parent = this.mesh;
+        axes.yAxis.parent = this.mesh;
+        axes.zAxis.parent = this.mesh;
 
         // add mesh to shadow generator
         this._shadow.addShadowCaster(this.meshController.mesh, true);

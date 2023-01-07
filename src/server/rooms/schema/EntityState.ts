@@ -24,28 +24,15 @@ export class EntityState extends Schema {
   @type('boolean') public blocked: boolean; // if true, used to block player and to prevent movement
   @type('number') public state: PlayerCurrentState = PlayerCurrentState.IDLE;
 
-  public destination;
-  public navmesh;
-  public yukaEntity;
+  public currentRegion;
+  public toRegion;
+  public destinationPath;
 
-  constructor(navmesh, ...args: any[]) {
+  constructor(...args: any[]) {
 		super(args);
-
-    this.navmesh = navmesh;
 
     this.spawn(args);
 	}
-
-  moveRandomly(){
-
-    let randomRegion = this.navmesh.getRandomRegion();
-    let point = randomRegion.centroid;
-    this.x = point.x;
-    this.y = point.y;
-    this.z = point.z;
-    console.log('ENTITY MOVED TO ', point);
-
-  }
 
   spawn(args){
 

@@ -48,8 +48,8 @@ export class PlayerAnimator {
     }
 
     // 
-    private checkIfPlayerIsMoving(currentPos, nextPos, precision = 3){
-        return currentPos.equalsWithEpsilon(nextPos);
+    private checkIfPlayerIsMoving(currentPos:Vector3, nextPos:Vector3, precision = 3):boolean{
+        return !currentPos.equalsWithEpsilon(nextPos);
         /*
         return  currentPos.x.toFixed(precision) !== nextPos.x.toFixed(precision) || 
                 currentPos.z.toFixed(precision) !== nextPos.z.toFixed(precision)*/

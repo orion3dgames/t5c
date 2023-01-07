@@ -4,7 +4,7 @@ import { EntityState } from "./EntityState";
 import { PlayerCharacter } from '../../../shared/types';
 import { GameRoom } from '../GameRoom';
 import { PlayerCurrentState } from '../../../shared/Entities/Player/PlayerCurrentState';
-import { NavMesh, EntityManager, Time, Vector3 } from "yuka";
+import { NavMesh, EntityManager, Time, Vector3, MovingEntity,GameEntity, FollowPathBehavior } from "yuka";
 import { nanoid } from 'nanoid';
 import { roundTo } from "../../../shared/Utils";
 
@@ -28,8 +28,8 @@ export class GameRoomState extends Schema {
         this.time = new Time()
        
         // add to colyseus
-        if(this._gameroom.metadata.location === "lh_dungeon_01"){
-            let maxEntities = 4;
+        if(this._gameroom.metadata.location === "lh_town"){
+            let maxEntities = 20;
             while(this.entities.size < maxEntities){
                 let id = nanoid();
                 let randomRegion = this._navMesh.getRandomRegion();
@@ -40,14 +40,16 @@ export class GameRoomState extends Schema {
                     sessionId: id,
                     type: "entity",
                     name: "Rat",
-                    location: "lh_dungeon_01",
+                    location: "lh_town",
                     x: point.x,
                     y: 0,
                     z: point.y,
                     rot: 0,
                     health: 100,
                     level: 1,
-                    state: PlayerCurrentState.IDLE
+                    state: PlayerCurrentState.IDLE,
+                    currentRegion: randomRegion,
+                    toRegion: false,
                 }));
 
             }
@@ -58,40 +60,36 @@ export class GameRoomState extends Schema {
     public update(deltaTime: number) {
 
         this.timer += deltaTime;
-        let spawnTime = 100;
+        let spawnTime = 200;
         if (this.timer >= spawnTime) {
-
+  
             this.timer = 0;
 
             // move entities randomly
             this.entities.forEach(entity => {
 
-                // if entity does not have a destination, give it one
-                // ideally should be a point in the navmesh
-                if(!entity.destination){
+                // save current position
+                let currentPos = new Vector3(entity.x, entity.y,entity.z);
 
-                    let randomRegion = this._navMesh.getRandomRegion();
-                    let point = randomRegion.centroid;
-                    let destination = new Vector3(point.x, point.y, point.z);
-
-                    entity.destination = this._gameroom.navMesh.findPath(
-                        { x: entity.x, y: entity.y, z: entity.z },
-                        { x: destination.x, y: destination.y, z: destination.z }
+                // if entity does not have a destination, find one
+                if(!entity.toRegion){
+                    entity.toRegion = this._navMesh.getRandomRegion();
+                    entity.destinationPath = this._gameroom.navMesh.findPath(
+                        currentPos,
+                        entity.toRegion.centroid
                     );
-
-                    console.log('New destination for entity #'+entity.id, entity.destination[0]);
-          
-                    if(entity.destination){
-                        entity.destination.shift();
+                    if(entity.destinationPath.length === 0){
+                        entity.toRegion = false;
+                        entity.destinationPath = false;
                     }
-                  
                 }
 
-                if(entity.destination.length > 0){
-                    
-                    let destinationOnPath = entity.destination[0];
-                    let precision = 3;
-                    let speed = 0.2;
+                // move entity
+                if(entity.destinationPath.length > 0){
+
+                    let destinationOnPath = entity.destinationPath[0];
+                    destinationOnPath.y = 0;
+                    let speed = 0.3;
 
                     let currentX = entity.x;
                     let currentZ = entity.z;
@@ -125,20 +123,32 @@ export class GameRoomState extends Schema {
                             entity.z = targetZ;
                         }
                     }
-
+                    let updatedPos = new Vector3(entity.x, entity.y,entity.z);
 
                     // calculate rotation
-                    if(
-                        roundTo(destinationOnPath.x, precision) === roundTo(entity.x, precision) && 
-                        roundTo(destinationOnPath.z, precision) === roundTo(entity.z, precision) 
-                    ){
-                        //console.log('ARRIVED AT DESTINATION', roundTo(destinationOnPath.x, precision), roundTo(entity.x, precision));
-                        entity.destination.shift();
-                        if(entity.destination.length < 1){
-                            entity.destination = false;
-                        }
+                    // todo: dayd to find the right rotation here
+                    let newRotation = currentPos.angleTo(updatedPos);
+                    entity.rot = this.radians_to_degrees(newRotation);
+
+                    // check if arrived a path vector
+                    if(destinationOnPath.equals(updatedPos)){
+                        entity.destinationPath.shift();
                     }
-                    
+
+                    // update current region
+                    entity.currentRegion = this._navMesh.getClosestRegion( currentPos );
+
+                    // if arrived at final destination, set toRegion to false so it'll be update at next iteration
+                    if(entity.currentRegion === entity.toRegion){
+                        entity.toRegion = false;
+                        entity.destinationPath = false;
+                    }
+
+                }else{
+
+                    // something is wrong, let's look for a new destination
+                    entity.toRegion = false;
+                    entity.destinationPath = false;
 
                 }
     
@@ -147,6 +157,12 @@ export class GameRoomState extends Schema {
         }
     
 	}
+
+    radians_to_degrees(radians)
+    {
+        var pi = Math.PI;
+        return radians * (180/pi);
+    }
 
     getRandomArbitrary(min, max) {
         return (Math.random() * (max - min) + min);
