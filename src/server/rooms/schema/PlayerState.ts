@@ -11,7 +11,7 @@ export class PlayerState extends Schema {
   @type("number") id: number = 0;
   @type('string') public sessionId: string;
   @type("string") public name: string = "";
-  @type("string") public type: string = "player";
+  @type("string") public type: string = "player_hobbit";
 
   // position & rotation
   @type("string") public location: string = "";

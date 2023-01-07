@@ -34,7 +34,8 @@ export class PlayerMesh {
         }
 
         // load player mesh
-        const result = await SceneLoader.ImportMeshAsync(null, "./models/", "player_hobbit.glb", this._scene);
+        console.log('LOADING ENTITY MESH', this._entity.type);
+        const result = await SceneLoader.ImportMeshAsync(null, "./models/", this._entity.type+".glb", this._scene);
         const playerMesh = result.meshes[0];
         this._animationGroups = result.animationGroups;
 

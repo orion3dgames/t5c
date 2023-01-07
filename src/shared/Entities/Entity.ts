@@ -103,7 +103,7 @@ export class Entity {
         this._shadow.addShadowCaster(this.meshController.mesh, true);
 
         // add all player related stuff
-        this.animatorController = new PlayerAnimator(this.meshController.getAnimation());
+        //this.animatorController = new PlayerAnimator(this.meshController.getAnimation());
         this.moveController = new PlayerMove(this.mesh, this._navMesh, this.isCurrentPlayer);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
 
@@ -128,7 +128,7 @@ export class Entity {
         this._scene.registerBeforeRender(() => {
 
             // animate player continuously
-            this.animatorController.animate(this, this.mesh.position, this.moveController.getNextPosition());
+            //this.animatorController.animate(this, this.mesh.position, this.moveController.getNextPosition());
 
         });
 

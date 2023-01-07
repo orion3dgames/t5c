@@ -30,16 +30,24 @@ export class GameRoomState extends Schema {
         // add to colyseus
         if(this._gameroom.metadata.location === "lh_town"){
             let maxEntities = 20;
+            let monsterTypes = ['monster_bear', 'monster_unicorn'];
             while(this.entities.size < maxEntities){
+
+                // random id
                 let id = nanoid();
+
+                // get starting starting position
                 let randomRegion = this._navMesh.getRandomRegion();
                 let point = randomRegion.centroid;
 
-                // create entity on server
+                // random mesh
+                let type = monsterTypes[Math.floor(Math.random()*monsterTypes.length)];
+
+                // create entity
                 this.entities.set(id, new EntityState(this._gameroom.navMesh, this._gameroom.database).assign({
                     sessionId: id,
-                    type: "entity",
-                    name: "Rat",
+                    type: type,
+                    name: "Bear",
                     location: "lh_town",
                     x: point.x,
                     y: 0,
