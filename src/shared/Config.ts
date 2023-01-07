@@ -33,7 +33,7 @@ let Config = {
             key: 'lh_town',
             mesh: "lh_town.glb",
             sun: true,
-            sunIntensity: 4,
+            sunIntensity: 2,
             spawnPoint: {
                 x: 7.50,
                 y: 0,
@@ -46,7 +46,7 @@ let Config = {
             key: 'lh_dungeon_01',
             mesh: "lh_dungeon_01.glb",
             sun: false,
-            sunIntensity: 1,
+            sunIntensity: 0.2,
             spawnPoint: {
                 x: 11.33,
                 y: 0,
@@ -56,11 +56,35 @@ let Config = {
         },
     },
 
+    // entities 
+    entities: {
+        "player_hobbit": {
+            animations: {
+                "IDLE": 3,
+                "WALK": 6,
+                "DEATH": 5,
+            },
+        },
+        "monster_bear": {
+            animations: {
+                "IDLE": 0,
+                "WALK": 3,
+                "DEATH": 4,
+            },
+        },
+        "monster_unicorn": {
+            animations: {
+                "IDLE": 5,
+                "WALK": 6,
+                "DEATH": 4,
+            },
+        },
+    },
 
     // functions
     setDefault(){
         global.T5C = {
-            nextScene: State.LOGIN,
+            nextScene: State.GAME,
             currentRoomID: "",
             currentSessionID: "",
             currentLocation: Config.locations[Config.initialLocation],

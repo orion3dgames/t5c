@@ -1,9 +1,12 @@
 import { AnimationGroup } from "@babylonjs/core";
 import { Vector3 } from "babylonjs";
+import Config from "../../Config";
 import { distanceBetween } from "../../Utils";
 import { PlayerCurrentState } from "./PlayerCurrentState";
 
 export class PlayerAnimator {
+
+    private entityType;
 
     //animations
     private _playerAnimations: AnimationGroup[];
@@ -18,9 +21,10 @@ export class PlayerAnimator {
     // case 
     private _state:string;
 
-    constructor(player_animations: AnimationGroup[]) {
+    constructor(player_animations: AnimationGroup[], entityType) {
 
         this._playerAnimations = player_animations;
+        this.entityType = entityType;
 
         this._build();
     }
@@ -28,9 +32,17 @@ export class PlayerAnimator {
     private _build(): void {
 
         // find animations
-        this._idle = this._playerAnimations.find(o => o.name === 'Hobbit_Idle');
-        this._walk = this._playerAnimations.find(o => o.name === 'Hobbit_Walk');
-        this._death = this._playerAnimations.find(o => o.name === 'Hobbit_Death');
+        //this._idle = this._playerAnimations.find(o => o.name === 'Hobbit_Idle');
+        //this._walk = this._playerAnimations.find(o => o.name === 'Hobbit_Walk');
+        //this._death = this._playerAnimations.find(o => o.name === 'Hobbit_Death');
+
+        let idleAnimationNumber = Config.entities[this.entityType].animations['IDLE'];
+        let walkAnimationNumber = Config.entities[this.entityType].animations['WALK'];
+        let deathAnimationNumber = Config.entities[this.entityType].animations['DEATH'];
+
+        this._idle = this._playerAnimations[idleAnimationNumber];
+        this._walk = this._playerAnimations[walkAnimationNumber];
+        this._death = this._playerAnimations[deathAnimationNumber];
 
         // prepare animations
         //this._scene.stopAllAnimations();
@@ -43,13 +55,13 @@ export class PlayerAnimator {
 
         //initialize current and previous
         this._currentAnim = this._idle;
-        this._prevAnim = this._walk;
+        this._prevAnim = this._idle;
 
     }
 
     // 
-    private checkIfPlayerIsMoving(currentPos:Vector3, nextPos:Vector3, precision = 3):boolean{
-        return !currentPos.equalsWithEpsilon(nextPos);
+    private checkIfPlayerIsMoving(currentPos:Vector3, nextPos:Vector3, precision = 5):boolean{
+        return !currentPos.equalsWithEpsilon(nextPos, 0.001);
         /*
         return  currentPos.x.toFixed(precision) !== nextPos.x.toFixed(precision) || 
                 currentPos.z.toFixed(precision) !== nextPos.z.toFixed(precision)*/
@@ -59,15 +71,14 @@ export class PlayerAnimator {
     // todo: to be improved so we can better control the states... have no idea how yet
     public animate(player, currentPos, nextPos): void {
 
-        console.log('CHECK IF SOURCE AND DESTINATION ARE THE SAME', this.checkIfPlayerIsMoving(currentPos, nextPos));
+        // if position has changed
+        if (this.checkIfPlayerIsMoving(currentPos, nextPos)) {
+            //console.log('SAME', player.type, currentPos, nextPos, this.checkIfPlayerIsMoving(currentPos, nextPos));
+            this._currentAnim = this._walk;
 
         // if player has died
-        if(player.state === PlayerCurrentState.DEAD){
+        }else if(player.state === PlayerCurrentState.DEAD){
             this._currentAnim = this._death;
-
-        // if position has changed
-        }else if (this.checkIfPlayerIsMoving(currentPos, nextPos)) {
-            this._currentAnim = this._walk;
 
         // all other cases, should be idle    
         } else {

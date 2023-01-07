@@ -28,9 +28,9 @@ export class GameRoomState extends Schema {
         this.time = new Time()
        
         // add to colyseus
-        if(this._gameroom.metadata.location === "lh_town"){
-            let maxEntities = 20;
-            let monsterTypes = ['monster_bear', 'monster_unicorn'];
+        if(this._gameroom.metadata.location === "lh_dungeon_01"){
+            let maxEntities = 4;
+            let monsterTypes = ['monster_unicorn', 'monster_bear'];
             while(this.entities.size < maxEntities){
 
                 // random id
@@ -47,8 +47,8 @@ export class GameRoomState extends Schema {
                 this.entities.set(id, new EntityState(this._gameroom.navMesh, this._gameroom.database).assign({
                     sessionId: id,
                     type: type,
-                    name: "Bear",
-                    location: "lh_town",
+                    name: "Monster "+this.entities.size,
+                    location: "lh_dungeon_01",
                     x: point.x,
                     y: 0,
                     z: point.y,
@@ -68,7 +68,7 @@ export class GameRoomState extends Schema {
     public update(deltaTime: number) {
 
         this.timer += deltaTime;
-        let spawnTime = 200;
+        let spawnTime = 100;
         if (this.timer >= spawnTime) {
   
             this.timer = 0;
@@ -97,7 +97,7 @@ export class GameRoomState extends Schema {
 
                     let destinationOnPath = entity.destinationPath[0];
                     destinationOnPath.y = 0;
-                    let speed = 0.3;
+                    let speed = 0.5;
 
                     let currentX = entity.x;
                     let currentZ = entity.z;

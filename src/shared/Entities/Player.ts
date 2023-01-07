@@ -22,6 +22,7 @@ export class Player {
     private _input;
     private _shadow;
     private _navMesh:NavMesh;
+    private assetsContainer;
 
     // controllers
     public cameraController: PlayerCamera;
@@ -64,13 +65,16 @@ export class Player {
         ui,
         input, 
         shadow:CascadedShadowGenerator, 
-        navMesh:NavMesh
+        navMesh:NavMesh,
+        assetsContainer
     ) {
  
         // setup class variables
         this._scene = scene;
         this._room = room;
         this._navMesh = navMesh;
+        this.assetsContainer = assetsContainer;
+
         this.ui = ui;
         this._shadow = shadow;
         this.sessionId = entity.sessionId; // network id from colyseus
@@ -89,7 +93,7 @@ export class Player {
     private async spawn(entity) {
 
         // load mesh controllers
-        this.meshController = new PlayerMesh(this._scene, this.entity, this._room, this.isCurrentPlayer);
+        this.meshController = new PlayerMesh(this._scene, this.assetsContainer, this.entity, this._room, this.isCurrentPlayer);
         await this.meshController.load();
         this.mesh = this.meshController.mesh;
         this.playerMesh = this.meshController.playerMesh;
@@ -109,7 +113,7 @@ export class Player {
             this.cameraController = new PlayerCamera(this._scene, this._input);
             this.actionsController = new PlayerActions(this._scene);
         }
-        this.animatorController = new PlayerAnimator(this.meshController.getAnimation());
+        this.animatorController = new PlayerAnimator(this.meshController.getAnimation(), entity.type);
         this.moveController = new PlayerMove(this.mesh, this._navMesh, this.isCurrentPlayer);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
 

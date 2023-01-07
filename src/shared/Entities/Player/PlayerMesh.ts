@@ -1,10 +1,11 @@
-import { MeshBuilder, SceneLoader, AnimationGroup, Mesh, Scene, ExecuteCodeAction, ActionManager, Color3 } from "@babylonjs/core";
+import { MeshBuilder, AssetContainer, SceneLoader, AnimationGroup, Mesh, Scene, ExecuteCodeAction, ActionManager, Color3 } from "@babylonjs/core";
 import { Room } from "colyseus.js";
 import { PlayerState } from "../../../server/rooms/schema/PlayerState";
 
 export class PlayerMesh {
 
     private _scene:Scene;
+    private assetsContainer: AssetContainer;
     private _entity: PlayerState;
     private _room: Room;
     private _animationGroups: AnimationGroup[];
@@ -12,17 +13,23 @@ export class PlayerMesh {
     public playerMesh;
     public isCurrentPlayer:boolean;
 
-    constructor(scene:Scene, entity:PlayerState, room: Room, isCurrentPlayer:boolean) {
+    constructor(scene:Scene, assetsContainer, entity:PlayerState, room: Room, isCurrentPlayer:boolean) {
         this._scene = scene;
+        this.assetsContainer = assetsContainer;
         this._entity = entity;
         this._room = room;
         this.isCurrentPlayer = isCurrentPlayer;
     }
 
+    public predicateMesh(name):any {
+        console.log('name');
+        return true;
+    }
+
     public async load() {
 
         // create collision cube
-        const box = MeshBuilder.CreateBox("collision", {width: 2, height: 4}, this._scene);
+        const box = MeshBuilder.CreateBox("root_"+this._entity.type, {width: 2, height: 4}, this._scene);
         box.visibility = 0;
 
         // set collision mesh
@@ -34,18 +41,24 @@ export class PlayerMesh {
         }
 
         // load player mesh
-        console.log('LOADING ENTITY MESH', this._entity.type);
-        const result = await SceneLoader.ImportMeshAsync(null, "./models/", this._entity.type+".glb", this._scene);
-        const playerMesh = result.meshes[0];
+        const result = this.assetsContainer[this._entity.type].instantiateModelsToScene(
+            name => this._entity.sessionId,
+            false,
+            { 
+                doNotInstantiate: true,
+            }
+        );
+        const playerMesh = result.rootNodes[0]; 
         this._animationGroups = result.animationGroups;
+        console.log('LOADED ENTITY MESH', this._entity.type, result);
 
         // set initial player scale & rotation
-        playerMesh.name = "player_mesh";
+        playerMesh.name = this._entity.type+"_mesh";
         playerMesh.parent = box;
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
         playerMesh.rotation.set(0, 0, 0);
         playerMesh.scaling.set(0.02, 0.02, 0.02);
-        playerMesh.visibility = 0;
+        //playerMesh.visibility = 0;
         this.playerMesh = playerMesh;
 
         // start action manager

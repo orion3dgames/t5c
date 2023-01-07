@@ -2,7 +2,7 @@ import {
     Scene, Engine, Vector3, Color3, Color4,
     ShadowGenerator, CascadedShadowGenerator,
     DirectionalLight, HemisphericLight,
-    AssetsManager, AssetContainer,
+    AssetsManager, AssetContainer, KeepAssets, SceneLoader
 } from "@babylonjs/core";
 
 import { AdvancedDynamicTexture } from "@babylonjs/gui";
@@ -28,7 +28,7 @@ export class GameScene {
     private _engine: Engine;
     private _gui: AdvancedDynamicTexture;
     private _assetsManager: AssetsManager;
-    public assetsContainer: AssetContainer;
+    public assetsContainer: AssetContainer[] = [];
     private _input;
     private _ui;
     private _shadow: CascadedShadowGenerator;
@@ -50,6 +50,22 @@ export class GameScene {
 
     async createScene(engine, client): Promise<void> {
 
+        if(isLocal()){
+            let temptLocation = "lh_dungeon_01";
+            global.T5C.currentLocation = Config.locations[temptLocation];
+            global.T5C.currentUser = {
+                id: 3,
+                username: 'Code_Code',
+                password: 'test',
+                token: 'B5G6yYesNgob3weIn9HDs',
+            }
+            global.T5C.currentCharacter = {
+                id: 2,
+                user_id: 3,
+                location: temptLocation
+            };
+        }
+
         this._client = client;
         this._engine = engine;
 
@@ -59,7 +75,12 @@ export class GameScene {
         // set scene
         this._scene = scene;
 
+        // load assets and remove them all from scene
+        await this._loadAssets();
+    
+        //
         let location = global.T5C.currentLocation;
+        console.log(location);
 
         // black background
         scene.clearColor = new Color4(0, 0, 0, 1);
@@ -90,55 +111,44 @@ export class GameScene {
         this._shadow.autoCalcDepthBounds = true;
         this._shadow.shadowMaxZ = 95;
 
-        // load assets
-        //this._loadedAssets = await this._loadAssets();
-
         await this._initNetwork();
     }
 
-    private async _loadAssets(): Promise<any[ ]> {
-        return new Promise( resolve => {
-            this._assetsManager = new AssetsManager(this._scene);
-            this._assetsManager.addMeshTask("town", "", "./models/", global.T5C.currentLocationKey+".glb");
-            this._assetsManager.addMeshTask("player_mesh_1", "", "./models/", "player_hobbit.glb");
-            this._assetsManager.load();
-            this._assetsManager.onProgress = function(remainingCount, totalCount, lastFinishedTask) {
-                console.log('We are loading the scene. ' + remainingCount + ' out of ' + totalCount + ' items still need to be loaded.');
-            };
-            this._assetsManager.onFinish = function(assets) {
-                console.log('all meshes are now loaded...', assets);
-                let meshes = [];
-                assets.forEach((el)=>{
-                    meshes[el.name] = el;
-                })
-                resolve(meshes);
-            };
-        });
+    private async _loadAssets() {
+
+        this.assetsContainer['player_hobbit'] = await SceneLoader.LoadAssetContainerAsync("./models/", "player_hobbit.glb", this._scene);
+        this.assetsContainer['monster_unicorn'] = await SceneLoader.LoadAssetContainerAsync("./models/", "monster_unicorn.glb", this._scene);
+        this.assetsContainer['monster_bear'] = await SceneLoader.LoadAssetContainerAsync("./models/", "monster_bear.glb", this._scene);
+        
+        /*
+        this.assetsContainer = new AssetContainer(this._scene);
+        const keepAssets = new KeepAssets();
+        this.assetsContainer.moveAllFromScene(keepAssets);
+        
+
+        this._assetsManager = new AssetsManager(this._scene);
+        this._assetsManager.addMeshTask("player_hobbit", "", "./models/", "player_hobbit.glb");
+        this._assetsManager.addMeshTask("monster_unicorn", "", "./models/", "monster_unicorn.glb");
+        this._assetsManager.load();
+        this._assetsManager.onProgress = function(remainingCount, totalCount, lastFinishedTask) {
+            console.log('We are loading the scene. ' + remainingCount + ' out of ' + totalCount + ' items still need to be loaded.');
+        };
+        this._assetsManager.onFinish = function(assets) {
+            console.log('all meshes are now loaded...', assets);
+            let meshes = [];
+            assets.forEach((el)=>{
+                meshes[el.name] = el;
+            })
+            resolve(meshes);
+        };
+        */
+    
     }
 
     private async _initNetwork(): Promise<void> {
 
         try {
-            /*
-            if(isLocal()){
-                global.T5C.currentLocation = {
-                    key: "lh_dungeon_01",
-                    mesh: "lh_dungeon_01.glb"
-                }; 
-                global.T5C.currentUser = {
-                    id: 3,
-                    username: 'Code_Code',
-                    password: 'test',
-                    token: 'B5G6yYesNgob3weIn9HDs',
-                }
-                global.T5C.currentCharacter = {
-                    id: 2,
-                    user_id: 3,
-                    location: 'lh_dungeon_01'
-                };
-            }*/
 
-        
             let user = global.T5C.currentUser;
             let character = global.T5C.currentCharacter;
             let currentLocationKey = character.location;
@@ -198,7 +208,8 @@ export class GameScene {
     }
 
     private async _initEvents() {
-
+        
+        console.log('CONTAINER', this.assetsContainer);
         await this._scene.whenReadyAsync();
 
         // setup input Controller
@@ -213,7 +224,7 @@ export class GameScene {
             var isCurrentPlayer = sessionId === this.room.sessionId;
 
             // create player entity
-            let _player = new Player(entity, this.room, this._scene, this._ui, this._input, this._shadow, this._navMesh);
+            let _player = new Player(entity, this.room, this._scene, this._ui, this._input, this._shadow, this._navMesh, this.assetsContainer);
             
             // if current player, save entity ref
             if (isCurrentPlayer) {
@@ -232,7 +243,7 @@ export class GameScene {
 
         // when someone joins the room event
         this.room.state.entities.onAdd((entity, sessionId) => {
-            this.entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._input, this._shadow, this._navMesh);
+            this.entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._input, this._shadow, this._navMesh, this.assetsContainer);
             console.log('spawned entity', this.entities[sessionId]);
         });
 

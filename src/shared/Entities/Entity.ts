@@ -21,6 +21,7 @@ export class Entity {
     private _input;
     private _shadow;
     private _navMesh;
+    private assetsContainer;
 
     // controllers
     public cameraController: PlayerCamera;
@@ -62,13 +63,15 @@ export class Entity {
         ui,
         input, 
         shadow:CascadedShadowGenerator, 
-        navMesh
+        navMesh,
+        assetsContainer
     ) {
  
         // setup class variables
         this._scene = scene;
         this._room = room;
         this._navMesh = navMesh;
+        this.assetsContainer = assetsContainer;
         this.ui = ui;
         this._shadow = shadow;
         this.sessionId = entity.sessionId; // network id from colyseus
@@ -87,7 +90,7 @@ export class Entity {
     private async spawn(entity) {
 
         // load mesh controllers
-        this.meshController = new PlayerMesh(this._scene, this.entity, this._room, this.isCurrentPlayer);
+        this.meshController = new PlayerMesh(this._scene, this.assetsContainer, this.entity, this._room, this.isCurrentPlayer);
         await this.meshController.load();
         this.mesh = this.meshController.mesh;
         this.playerMesh = this.meshController.playerMesh;
@@ -103,7 +106,7 @@ export class Entity {
         this._shadow.addShadowCaster(this.meshController.mesh, true);
 
         // add all player related stuff
-        //this.animatorController = new PlayerAnimator(this.meshController.getAnimation());
+        this.animatorController = new PlayerAnimator(this.meshController.getAnimation(), this.entity.type);
         this.moveController = new PlayerMove(this.mesh, this._navMesh, this.isCurrentPlayer);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
 
@@ -128,7 +131,7 @@ export class Entity {
         this._scene.registerBeforeRender(() => {
 
             // animate player continuously
-            //this.animatorController.animate(this, this.mesh.position, this.moveController.getNextPosition());
+            this.animatorController.animate(this, this.mesh.position, this.moveController.getNextPosition());
 
         });
 
