@@ -28,7 +28,7 @@ export class GameRoomState extends Schema {
         this.time = new Time()
        
         // add to colyseus
-        if(this._gameroom.metadata.location === "lh_dungeon_01"){
+        //if(this._gameroom.metadata.location === "lh_dungeon_01"){
             let maxEntities = 4;
             let monsterTypes = ['monster_unicorn', 'monster_bear'];
             while(this.entities.size < maxEntities){
@@ -61,7 +61,7 @@ export class GameRoomState extends Schema {
                 }));
 
             }
-        }
+        //}
         
 	}
 
