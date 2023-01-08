@@ -47,7 +47,7 @@ export class PlayerActions {
             if (i <= 1) {
                 console.log('NO COLLISION');
                 projectile.position = path.getPointAt(i); 
-                i += 0.001;
+                i += 0.01;
             } 
 
             if(projectile.intersectsMesh(mesh)){

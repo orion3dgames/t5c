@@ -48,6 +48,7 @@
     "babylonjs-gui": "5.37.0",
     "babylonjs-materials": "5.37.0",
     "colyseus.js": "^0.15.0-preview.0",
+    "@colyseus/monitor": "0.15.0-preview.0",
     "concurrently": "^7.5.0",
     "cors": "^2.8.5",
     "dotenv-webpack": "^7.0.3",

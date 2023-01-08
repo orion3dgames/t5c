@@ -46,9 +46,9 @@ export class PlayerMesh {
                 doNotInstantiate: false,
             }
         );
-        const playerMesh = result.rootNodes[0]; 
+        const playerMesh = result.rootNodes[config.meshRootIndex]; 
         this._animationGroups = result.animationGroups;
-        console.log('LOADED ENTITY MESH', this._entity.type, result);
+        //console.log('LOADED ENTITY MESH', this._entity.type, result);
 
         // set initial player scale & rotation
         playerMesh.name = this._entity.type+"_mesh";
@@ -57,10 +57,10 @@ export class PlayerMesh {
         if(config.rotationFix){
             playerMesh.rotation.set(0, config.rotationFix, 0);
         }
-        playerMesh.scaling = new Vector3(config.scale, config.scale, config.scale);
+        playerMesh.scaling.set(config.scale,config.scale,config.scale);
         this.playerMesh = playerMesh;
 
-        console.log(this._entity.type, playerMesh.scaling);
+        console.log(this._entity.type, config.scale, playerMesh.scaling);
 
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);

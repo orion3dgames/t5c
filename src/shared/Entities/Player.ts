@@ -151,10 +151,10 @@ export class Player {
                 // on left mouse click
                 // if other player, send to server: target loses 5 health
                 if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 0) {
-                    /*
+      
                     if (pointerInfo._pickInfo.pickedMesh && 
                         pointerInfo._pickInfo.pickedMesh.metadata !== null && 
-                        pointerInfo._pickInfo.pickedMesh.metadata.type == 'player' && 
+                        pointerInfo._pickInfo.pickedMesh.metadata.type.includes('monster') && 
                         pointerInfo._pickInfo.pickedMesh.metadata.sessionId !== this.sessionId){
                           
                         let targetSessionId = pointerInfo._pickInfo.pickedMesh.metadata.sessionId;    
@@ -167,9 +167,9 @@ export class Player {
                         // send bullet locally
                         let start = this.mesh.position;
                         let end = pointerInfo._pickInfo.pickedMesh.position;
-                        this.actionsController.fire(start, end, this.ui._players[targetSessionId].mesh);
+                        this.actionsController.fire(start, end, this.ui._entities[targetSessionId].mesh);
                     }
-                    */
+                    
                 }
 
                 // on right mouse click

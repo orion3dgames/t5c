@@ -34,7 +34,7 @@ export class GameRoomState extends Schema {
             while(this.entities.size < maxEntities){
 
                 // random id
-                let id = nanoid();
+                let sessionId = nanoid();
 
                 // get starting starting position
                 let randomRegion = this._navMesh.getRandomRegion();
@@ -44,8 +44,8 @@ export class GameRoomState extends Schema {
                 let type = monsterTypes[Math.floor(Math.random()*monsterTypes.length)];
 
                 // create entity
-                this.entities.set(id, new EntityState(this._gameroom.navMesh, this._gameroom.database).assign({
-                    sessionId: id,
+                this.entities.set(sessionId, new EntityState(this._gameroom.navMesh, this._gameroom.database).assign({
+                    sessionId: sessionId,
                     type: type,
                     name: "Monster "+this.entities.size,
                     location: "lh_dungeon_01",
@@ -94,7 +94,7 @@ export class GameRoomState extends Schema {
                 }
 
                 // move entity
-                if(entity.destinationPath.length > 0){
+                if(entity.destinationPath.length > 0 && entity.health > 0){
 
                     let destinationOnPath = entity.destinationPath[0];
                     destinationOnPath.y = 0;
@@ -105,6 +105,7 @@ export class GameRoomState extends Schema {
                     let targetX = destinationOnPath.x;
                     let targetZ = destinationOnPath.z;
 
+                    // todo: must be a better way to do the below checks?
                     if(targetX < currentX){
                         entity.x -= speed;
                         if(entity.x < targetX){
@@ -135,11 +136,8 @@ export class GameRoomState extends Schema {
                     let updatedPos = new Vector3(entity.x, entity.y,entity.z);
 
                     // calculate rotation
-                    // todo: dayd to find the right rotation here
-                    //let newRotation = currentPos.angleTo(destinationOnPath);
                     var newRotation = Math.atan2(currentPos.x - updatedPos.x, currentPos.z - updatedPos.z);
                     entity.rot = newRotation;
-                    console.log(newRotation);
 
                     // check if arrived a path vector
                     if(destinationOnPath.equals(updatedPos)){

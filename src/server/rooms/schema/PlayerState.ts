@@ -55,7 +55,9 @@ export class PlayerState extends Schema {
 
     // if player has no more health
     // todo: send him back to spawnpoint with health back to 50;
-    if(this.health === 0){ 
+    if(this.health == 0 || this.health < 0){ 
+      console.log('DEADDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD')
+      this.health = 0;
       this.state = PlayerCurrentState.DEAD;
       this.blocked = true;
     }

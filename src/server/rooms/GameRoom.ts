@@ -9,6 +9,7 @@ import { PlayerState } from "./schema/PlayerState";
 import { PlayerInputs } from "../../shared/types";
 import { PlayerCurrentState } from "../../shared/Entities/Player/PlayerCurrentState";
 import { NavMesh } from "../../shared/yuka";
+import { loggers } from "winston";
 
 export class GameRoom extends Room<GameRoomState> {
 
@@ -194,17 +195,21 @@ export class GameRoom extends Room<GameRoomState> {
 
             // get players involved
             let sender:PlayerState = this.state.players[client.sessionId];
-            let target:PlayerState = this.state.players[data.targetId];
+            let target:PlayerState = this.state.entities[data.targetId];
             
             if(!sender) throw new Error('sender does not exists!');
             if(!target) throw new Error('target does not exists!');
 
-            // player loses health
-            target.loseHealth(5);
-
             // sender state
             sender.state = PlayerCurrentState.SPELL_ATTACK;
+            target.state = PlayerCurrentState.TAKING_DAMAGE;
 
+            // player loses health
+            target.loseHealth(100);
+
+            console.log("TARGET ", target.health, target.id, target.sessionId)
+
+            /*
             // inform target hes been hurt
             this.clients.get(target.sessionId).send('playerActionConfirmation', {
                 action: 'attack',
@@ -220,7 +225,7 @@ export class GameRoom extends Room<GameRoomState> {
                     z: target.z,
                 },
                 message: sender.name +" attacked you and you lost 5 health"
-            })
+            })*/
 
             Logger.info(`[gameroom][playerAction] player action processed`, data);
 

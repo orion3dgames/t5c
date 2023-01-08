@@ -6,6 +6,8 @@ import path from "path";
 import fs from "fs";
 
 import { Server, matchMaker, LobbyRoom } from "@colyseus/core";
+import { monitor } from "@colyseus/monitor";
+
 import { WebSocketTransport } from '@colyseus/ws-transport';
 import { GameRoom } from "./rooms/GameRoom";
 import { ChatRoom } from "./rooms/ChatRoom";
@@ -74,6 +76,8 @@ gameServer.listen(port).then(()=>{
 });
 
 
+//app.use("/colyseus", monitor());
+
 //////////////////////////////////////////////////
 //// SERVING CLIENT DIST FOLDER TO EXPRESS ///////
 //////////////////////////////////////////////////
@@ -92,7 +96,6 @@ app.get('/', function (req, res) {
 //////////////////////////////////////////////////
 ///////////// ESPRESS MINI API ///////////////////
 //////////////////////////////////////////////////
-
 app.get('/login', function (req, res) {
   const username:string = req.query.username as string ?? '';
   const password:string = req.query.password as string ?? '';

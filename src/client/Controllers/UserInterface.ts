@@ -58,6 +58,9 @@ export class UserInterface {
 
             // refresh 
             this.refreshPlayerUI();
+
+             // refresh 
+             this.refreshEntityUI();
             
         });
 
@@ -81,13 +84,22 @@ export class UserInterface {
     public refreshPlayerUI(){
         for(let sessionId in this._players){
             let player = this._players[sessionId];
-
             // update player color outline
             let mesh = player.playerMesh.getChildMeshes()[0];
             if(mesh){
                 mesh.outlineColor = Color3.FromHexString(this.healthColor(player.health));
             }
+        }        
+    }
 
+    public refreshEntityUI(){
+        for(let sessionId in this._entities){
+            let player = this._entities[sessionId];
+            // update player color outline
+            let mesh = player.playerMesh.getChildMeshes()[0];
+            if(mesh){
+                mesh.outlineColor = Color3.FromHexString(this.healthColor(player.health));
+            }
         }        
     }
 

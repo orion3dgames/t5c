@@ -78,6 +78,7 @@ export class PlayerAnimator {
 
         // if player has died
         }else if(player.state === PlayerCurrentState.DEAD){
+            
             this._currentAnim = this._death;
 
         // all other cases, should be idle    

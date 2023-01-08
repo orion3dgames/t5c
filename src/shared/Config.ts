@@ -63,6 +63,7 @@ let Config = {
     entities: {
         "player_hobbit": {
             scale: 0.02,
+            meshRootIndex: 0,
             animations: {
                 "IDLE": 3,
                 "WALK": 6,
@@ -71,7 +72,8 @@ let Config = {
         },
         "monster_bear": {
             speed: 0.2,
-            scale: 0.06,
+            scale: 0.02,
+            meshRootIndex: 0,
             rotationFix: 3.14,
             animations: {
                 "IDLE": 0,
@@ -80,13 +82,14 @@ let Config = {
             },
         },
         "monster_unicorn": {
-            speed: 0.5,
-            scale: 0.06,
+            speed: 0.4,
+            scale: 0.01,
+            meshRootIndex: 0,
             rotationFix: 3.14,
             animations: {
                 "IDLE": 5,
                 "WALK": 6,
-                "DEATH": 4,
+                "DEATH": 3,
             },
         },
     },

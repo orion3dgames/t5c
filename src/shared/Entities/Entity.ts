@@ -94,7 +94,6 @@ export class Entity {
         await this.meshController.load();
         this.mesh = this.meshController.mesh;
         this.playerMesh = this.meshController.playerMesh;
-        this.playerMesh.scaling.set(0.01, 0.01, 0.01);
 
         //
         const axes = new AxesViewer(this._scene, 1);
@@ -123,6 +122,8 @@ export class Entity {
 
             // update player position
             this.moveController.setPositionAndRotation(this.entity);
+
+            // update health
             
         });
 
