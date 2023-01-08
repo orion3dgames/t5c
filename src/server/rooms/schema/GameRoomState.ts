@@ -29,7 +29,7 @@ export class GameRoomState extends Schema {
        
         // add to colyseus
         //if(this._gameroom.metadata.location === "lh_dungeon_01"){
-            let maxEntities = 40;
+            let maxEntities = 20;
             let monsterTypes = ['monster_unicorn', 'monster_bear'];
             while(this.entities.size < maxEntities){
 

@@ -50,6 +50,7 @@ export class GameScene {
 
     async createScene(engine, client): Promise<void> {
 
+        /*
         if(isLocal()){
             let temptLocation = "lh_town";
             global.T5C.currentLocation = Config.locations[temptLocation];
@@ -64,7 +65,7 @@ export class GameScene {
                 user_id: 3,
                 location: temptLocation
             };
-        }
+        }*/
 
         this._client = client;
         this._engine = engine;
