@@ -4,9 +4,9 @@ import { EntityState } from "./EntityState";
 import { PlayerCharacter } from '../../../shared/types';
 import { GameRoom } from '../GameRoom';
 import { PlayerCurrentState } from '../../../shared/Entities/Player/PlayerCurrentState';
-import { NavMesh, EntityManager, Time, Vector3, MovingEntity,GameEntity, FollowPathBehavior } from "yuka";
+import { NavMesh, EntityManager, Time, Vector3 } from "yuka";
 import { nanoid } from 'nanoid';
-import { roundTo } from "../../../shared/Utils";
+import Config from '../../../shared/Config';
 
 export class GameRoomState extends Schema {
 
@@ -29,7 +29,7 @@ export class GameRoomState extends Schema {
        
         // add to colyseus
         //if(this._gameroom.metadata.location === "lh_dungeon_01"){
-            let maxEntities = 4;
+            let maxEntities = 40;
             let monsterTypes = ['monster_unicorn', 'monster_bear'];
             while(this.entities.size < maxEntities){
 
@@ -58,6 +58,7 @@ export class GameRoomState extends Schema {
                     state: PlayerCurrentState.IDLE,
                     currentRegion: randomRegion,
                     toRegion: false,
+                    config: Config.entities[type]
                 }));
 
             }
@@ -97,7 +98,7 @@ export class GameRoomState extends Schema {
 
                     let destinationOnPath = entity.destinationPath[0];
                     destinationOnPath.y = 0;
-                    let speed = 0.5;
+                    let speed = entity.config.speed;
 
                     let currentX = entity.x;
                     let currentZ = entity.z;
@@ -135,8 +136,10 @@ export class GameRoomState extends Schema {
 
                     // calculate rotation
                     // todo: dayd to find the right rotation here
-                    let newRotation = currentPos.angleTo(updatedPos);
-                    entity.rot = this.radians_to_degrees(newRotation);
+                    //let newRotation = currentPos.angleTo(destinationOnPath);
+                    var newRotation = Math.atan2(currentPos.x - updatedPos.x, currentPos.z - updatedPos.z);
+                    entity.rot = newRotation;
+                    console.log(newRotation);
 
                     // check if arrived a path vector
                     if(destinationOnPath.equals(updatedPos)){

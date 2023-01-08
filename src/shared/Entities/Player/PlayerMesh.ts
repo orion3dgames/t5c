@@ -1,6 +1,7 @@
-import { MeshBuilder, AssetContainer, SceneLoader, AnimationGroup, Mesh, Scene, ExecuteCodeAction, ActionManager, Color3 } from "@babylonjs/core";
+import { MeshBuilder, AssetContainer, Vector3, AnimationGroup, Mesh, Scene, ExecuteCodeAction, ActionManager, Color3 } from "@babylonjs/core";
 import { Room } from "colyseus.js";
 import { PlayerState } from "../../../server/rooms/schema/PlayerState";
+import Config from "../../Config";
 
 export class PlayerMesh {
 
@@ -21,12 +22,9 @@ export class PlayerMesh {
         this.isCurrentPlayer = isCurrentPlayer;
     }
 
-    public predicateMesh(name):any {
-        console.log('name');
-        return true;
-    }
-
     public async load() {
+
+        let config = Config.entities[this._entity.type];
 
         // create collision cube
         const box = MeshBuilder.CreateBox("root_"+this._entity.type, {width: 2, height: 4}, this._scene);
@@ -45,7 +43,7 @@ export class PlayerMesh {
             name => this._entity.sessionId,
             false,
             { 
-                doNotInstantiate: true,
+                doNotInstantiate: false,
             }
         );
         const playerMesh = result.rootNodes[0]; 
@@ -56,10 +54,13 @@ export class PlayerMesh {
         playerMesh.name = this._entity.type+"_mesh";
         playerMesh.parent = box;
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
-        playerMesh.rotation.set(0, 0, 0);
-        playerMesh.scaling.set(0.02, 0.02, 0.02);
-        //playerMesh.visibility = 0;
+        if(config.rotationFix){
+            playerMesh.rotation.set(0, config.rotationFix, 0);
+        }
+        playerMesh.scaling = new Vector3(config.scale, config.scale, config.scale);
         this.playerMesh = playerMesh;
+
+        console.log(this._entity.type, playerMesh.scaling);
 
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);

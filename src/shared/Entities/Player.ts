@@ -186,7 +186,7 @@ export class Player {
                             target.characterLabel.isVisible = true;
                             setTimeout(function(){
                                 target.characterLabel.isVisible = false;
-                            }, 5000)
+                            }, Config.PLAYER_NAMEPLATE_TIMEOUT)
                     }
                 }
 

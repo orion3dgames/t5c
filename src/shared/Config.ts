@@ -20,6 +20,9 @@ let Config = {
     // database settings
     databaseLocation: './database.db',
 
+    // game settings
+    PLAYER_NAMEPLATE_TIMEOUT: 15000, // 15 seconds
+
     // players settings
     PLAYER_SPEED: 0.40,
     PLAYER_START_HEALTH: 100,
@@ -46,7 +49,7 @@ let Config = {
             key: 'lh_dungeon_01',
             mesh: "lh_dungeon_01.glb",
             sun: false,
-            sunIntensity: 0.2,
+            sunIntensity: 5,
             spawnPoint: {
                 x: 11.33,
                 y: 0,
@@ -59,6 +62,7 @@ let Config = {
     // entities 
     entities: {
         "player_hobbit": {
+            scale: 0.02,
             animations: {
                 "IDLE": 3,
                 "WALK": 6,
@@ -66,6 +70,9 @@ let Config = {
             },
         },
         "monster_bear": {
+            speed: 0.2,
+            scale: 0.06,
+            rotationFix: 3.14,
             animations: {
                 "IDLE": 0,
                 "WALK": 3,
@@ -73,6 +80,9 @@ let Config = {
             },
         },
         "monster_unicorn": {
+            speed: 0.5,
+            scale: 0.06,
+            rotationFix: 3.14,
             animations: {
                 "IDLE": 5,
                 "WALK": 6,
@@ -84,7 +94,7 @@ let Config = {
     // functions
     setDefault(){
         global.T5C = {
-            nextScene: State.LOGIN,
+            nextScene: State.GAME,
             currentRoomID: "",
             currentSessionID: "",
             currentLocation: Config.locations[Config.initialLocation],

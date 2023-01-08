@@ -27,6 +27,7 @@ export class EntityState extends Schema {
   public currentRegion;
   public toRegion;
   public destinationPath;
+  public config;
 
   constructor(...args: any[]) {
 		super(args);
