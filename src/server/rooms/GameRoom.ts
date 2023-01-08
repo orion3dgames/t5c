@@ -210,7 +210,7 @@ export class GameRoom extends Room<GameRoomState> {
             target.loseHealth(40);
 
             // 
-            if(target.state === PlayerCurrentState.DEAD){
+            if(target.health === 0){
                 setTimeout(function(){
                     console.log('TARGET IS DEAD, REMOVING');
                     delete state.entities[data.targetId];
