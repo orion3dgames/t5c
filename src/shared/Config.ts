@@ -67,6 +67,7 @@ let Config = {
             animations: {
                 "IDLE": 3,
                 "WALK": 6,
+                "ATTACK": 0,
                 "DEATH": 5,
             },
         },
@@ -78,6 +79,7 @@ let Config = {
             animations: {
                 "IDLE": 0,
                 "WALK": 3,
+                "ATTACK": 0,
                 "DEATH": 4,
             },
         },
@@ -89,6 +91,7 @@ let Config = {
             animations: {
                 "IDLE": 5,
                 "WALK": 6,
+                "ATTACK": 0,
                 "DEATH": 3,
             },
         },
@@ -97,7 +100,7 @@ let Config = {
     // functions
     setDefault(){
         global.T5C = {
-            nextScene: State.LOGIN,
+            nextScene: State.GAME,
             currentRoomID: "",
             currentSessionID: "",
             currentLocation: Config.locations[Config.initialLocation],

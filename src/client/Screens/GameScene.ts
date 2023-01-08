@@ -50,7 +50,7 @@ export class GameScene {
 
     async createScene(engine, client): Promise<void> {
 
-        /*
+
         if(isLocal()){
             let temptLocation = "lh_town";
             global.T5C.currentLocation = Config.locations[temptLocation];
@@ -65,7 +65,7 @@ export class GameScene {
                 user_id: 3,
                 location: temptLocation
             };
-        }*/
+        }
 
         this._client = client;
         this._engine = engine;
@@ -242,6 +242,12 @@ export class GameScene {
 
         });
 
+        // when someone leave the room event
+        this.room.state.players.onRemove((player, sessionId) => {
+            this.playerEntities[sessionId].removePlayer();
+            delete this.playerEntities[sessionId];
+        });
+
         // when someone joins the room event
         this.room.state.entities.onAdd((entity, sessionId) => {
             this.entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._input, this._shadow, this._navMesh, this.assetsContainer);
@@ -249,9 +255,9 @@ export class GameScene {
         });
 
         // when someone leave the room event
-        this.room.state.players.onRemove((player, sessionId) => {
-            this.playerEntities[sessionId].removePlayer();
-            delete this.playerEntities[sessionId];
+        this.room.state.entities.onRemove((player, sessionId) => {
+            this.entities[sessionId].removePlayer();
+            delete this.entities[sessionId];
         });
 
         ///////////////

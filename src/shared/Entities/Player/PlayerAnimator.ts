@@ -12,6 +12,7 @@ export class PlayerAnimator {
     private _playerAnimations: AnimationGroup[];
     private _idle: AnimationGroup;
     private _walk: AnimationGroup;
+    private _attack: AnimationGroup;
     private _death: AnimationGroup;
 
     // current anim status
@@ -38,10 +39,12 @@ export class PlayerAnimator {
 
         let idleAnimationNumber = Config.entities[this.entityType].animations['IDLE'];
         let walkAnimationNumber = Config.entities[this.entityType].animations['WALK'];
+        let attackAnimationNumber = Config.entities[this.entityType].animations['ATTACK'];
         let deathAnimationNumber = Config.entities[this.entityType].animations['DEATH'];
 
         this._idle = this._playerAnimations[idleAnimationNumber];
         this._walk = this._playerAnimations[walkAnimationNumber];
+        this._attack = this._playerAnimations[attackAnimationNumber];
         this._death = this._playerAnimations[deathAnimationNumber];
 
         // prepare animations
@@ -51,6 +54,7 @@ export class PlayerAnimator {
         //
         this._idle.loopAnimation = true;
         this._walk.loopAnimation = true;
+        this._attack.loopAnimation = false;
         this._death.loopAnimation = false;
 
         //initialize current and previous
@@ -80,6 +84,11 @@ export class PlayerAnimator {
         }else if(player.state === PlayerCurrentState.DEAD){
             
             this._currentAnim = this._death;
+
+        // if player is attacking
+        }else if(player.state === PlayerCurrentState.ATTACK){
+                    
+            this._currentAnim = this._attack;
 
         // all other cases, should be idle    
         } else {

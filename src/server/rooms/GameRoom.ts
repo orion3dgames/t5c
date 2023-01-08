@@ -193,21 +193,29 @@ export class GameRoom extends Room<GameRoomState> {
         // player action
         this.onMessage("playerAction", (client, data: any) => {
 
+            let state = this.state;
+
             // get players involved
-            let sender:PlayerState = this.state.players[client.sessionId];
-            let target:PlayerState = this.state.entities[data.targetId];
+            let sender:PlayerState = state.players[client.sessionId];
+            let target:PlayerState = state.entities[data.targetId];
             
             if(!sender) throw new Error('sender does not exists!');
             if(!target) throw new Error('target does not exists!');
 
             // sender state
-            sender.state = PlayerCurrentState.SPELL_ATTACK;
+            sender.state = PlayerCurrentState.ATTACK;
             target.state = PlayerCurrentState.TAKING_DAMAGE;
 
             // player loses health
-            target.loseHealth(100);
+            target.loseHealth(40);
 
-            console.log("TARGET ", target.health, target.id, target.sessionId)
+            // 
+            if(target.state === PlayerCurrentState.DEAD){
+                setTimeout(function(){
+                    console.log('TARGET IS DEAD, REMOVING');
+                    delete state.entities[data.targetId];
+                }, 5000);
+            }
 
             /*
             // inform target hes been hurt

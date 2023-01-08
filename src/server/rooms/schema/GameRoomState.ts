@@ -18,6 +18,7 @@ export class GameRoomState extends Schema {
     private entityManager;
     private time;
     private timer: number = 0;
+    private spawnTimer: number = 0;
 
     constructor(gameroom: GameRoom, navMesh:NavMesh, ...args: any[]) {
 		super(...args);
@@ -25,10 +26,18 @@ export class GameRoomState extends Schema {
 		this._navMesh = navMesh;
 
         this.entityManager = new EntityManager();
-        this.time = new Time()
-       
-        // add to colyseus
-        //if(this._gameroom.metadata.location === "lh_dungeon_01"){
+        this.time = new Time()    
+	}
+
+    public update(deltaTime: number) {
+
+    
+        this.spawnTimer += deltaTime;
+        let spawnTime = 2000;
+        if (this.spawnTimer >= spawnTime) {
+
+            this.spawnTimer = 0;
+
             let maxEntities = 20;
             let monsterTypes = ['monster_unicorn', 'monster_bear'];
             while(this.entities.size < maxEntities){
@@ -62,15 +71,13 @@ export class GameRoomState extends Schema {
                 }));
 
             }
-        //}
-        
-	}
 
-    public update(deltaTime: number) {
+        }
+
 
         this.timer += deltaTime;
-        let spawnTime = 100;
-        if (this.timer >= spawnTime) {
+        let refreshRate = 100;
+        if (this.timer >= refreshRate) {
   
             this.timer = 0;
 
