@@ -8,6 +8,7 @@ import { NavMesh, EntityManager, Time, Vector3 } from "yuka";
 import { nanoid } from 'nanoid';
 import Config from '../../../shared/Config';
 import Logger from "../../../shared/Logger";
+import { randomNumberInRange } from '../../../shared/Utils';
 
 enum AI_STATE { 
     IDLE = 0, 
@@ -58,7 +59,7 @@ export class GameRoomState extends Schema {
             x: point.x,
             y: 0,
             z: point.y,
-            rot: 0, 
+            rot: randomNumberInRange(0, Math.PI), 
             health: 100,
             level: 1,
             state: PlayerCurrentState.IDLE,
@@ -102,9 +103,9 @@ export class GameRoomState extends Schema {
                 this.entities.forEach(entity => { 
 
                     // only find a new AI_STATE if AI_STATE_REMAINING_DURATION is at zero
-                    if(entity.AI_STATE_REMAINING_DURATION === 0){
+                    if(entity.AI_STATE_REMAINING_DURATION === 0 || entity.AI_STATE_REMAINING_DURATION < 0){
                         entity.AI_CURRENT_STATE = Math.random() < 0.5 ? AI_STATE.IDLE : AI_STATE.WALKING;
-                        entity.AI_STATE_REMAINING_DURATION = (Math.random() * 5000) + 1000; // change state every 3 seconds
+                        entity.AI_STATE_REMAINING_DURATION = (Math.random() * 5000); // change state every 3 seconds
                         //console.log('NEW AI STATE', entity.AI_CURRENT_STATE, entity.AI_STATE_REMAINING_DURATION);
                     }
 

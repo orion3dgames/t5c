@@ -11,6 +11,10 @@ const countPlayers = function(object){
     return length;
 }
 
+const randomNumberInRange = function(min, max) { 
+    return Math.random() * (max - min) + min;
+} 
+
 const roundToTwo = function(num: number) {
     return Math.round(num * 100) / 100;
 }
@@ -78,5 +82,6 @@ export {
     countPlayers,
     isLocal,
     clamp, 
-    distanceBetween
+    randomNumberInRange,
+    distanceBetween,
 }
