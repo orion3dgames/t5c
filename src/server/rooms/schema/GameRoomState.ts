@@ -113,9 +113,6 @@ export class GameRoomState extends Schema {
 
                     //console.log('AI_STATE_REMAINING_DURATION', entity.AI_STATE_REMAINING_DURATION);
 
-                    // change of idling for idleDuration
-                    let isIdle = Math.random() > .5 ? true : false;
-
                     // save current position
                     let currentPos = new Vector3(entity.x, entity.y,entity.z);
 
