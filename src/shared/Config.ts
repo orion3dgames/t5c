@@ -22,6 +22,7 @@ let Config = {
 
     // game settings
     PLAYER_NAMEPLATE_TIMEOUT: 15000, // 15 seconds
+    MONSTER_RESPAWN_RATE: 10000,
 
     // players settings
     PLAYER_SPEED: 0.40,
@@ -62,8 +63,8 @@ let Config = {
     // entities 
     entities: {
         "player_hobbit": {
+            speed: 0.2,
             scale: 0.02,
-            meshRootIndex: 0,
             animations: {
                 "IDLE": 3,
                 "WALK": 6,
@@ -74,7 +75,6 @@ let Config = {
         "monster_bear": {
             speed: 0.2,
             scale: 0.02,
-            meshRootIndex: 0,
             rotationFix: 3.14,
             animations: {
                 "IDLE": 0,
@@ -86,7 +86,6 @@ let Config = {
         "monster_unicorn": {
             speed: 0.4,
             scale: 0.01,
-            meshRootIndex: 0,
             rotationFix: 3.14,
             animations: {
                 "IDLE": 5,
@@ -100,7 +99,7 @@ let Config = {
     // functions
     setDefault(){
         global.T5C = {
-            nextScene: State.GAME,
+            nextScene: State.LOGIN,
             currentRoomID: "",
             currentSessionID: "",
             currentLocation: Config.locations[Config.initialLocation],
