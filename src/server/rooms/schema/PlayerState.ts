@@ -33,6 +33,10 @@ export class PlayerState extends Schema {
   private _navMesh:NavMesh;
   private _database;
 
+  public toRegion;
+  public currentRegion;
+  public destinationPath;
+
   constructor(navmesh, database, ...args: any[]) {
 		super(args);
     this._navMesh = navmesh;
@@ -61,6 +65,10 @@ export class PlayerState extends Schema {
         Logger.warning('Player '+this.name+' is blocked, no movment will be processed');
         return false;
       }
+
+      // cancel any moveTo event
+      this.toRegion = false;
+      this.destinationPath = [];
 
       // save current position
       let oldX = this.x;
@@ -104,6 +112,57 @@ export class PlayerState extends Schema {
           Logger.warning('Invalid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
       }
       
+  }
+
+  calculateRotation(v1, v2){
+    return Math.atan2(v1.x - v2.x, v1.z - v2.z);
+  }
+
+  /**
+   * Move entity toward a Vector3 position
+   * @param source
+   * @param destination 
+   * @param speed 
+   * @returns 
+   */
+  moveTo(source: Vector3, destination: Vector3, speed:number):Vector3{
+
+    let currentX = source.x;
+    let currentZ = source.z;
+    let targetX = destination.x;
+    let targetZ = destination.z;
+    let newPos = new Vector3(source.x, source.y, source.z);
+
+    if(targetX < currentX){
+        newPos.x -= speed;
+        if(newPos.x < targetX){
+            newPos.x = targetX;
+        }
+    }
+
+    if(targetX > currentX){
+        newPos.x += speed;
+        if(newPos.x > targetX){
+            newPos.x = targetX;
+        }
+    }
+
+    if(targetZ < currentZ){
+        newPos.z -= speed;
+        if(newPos.z < targetZ){
+            newPos.z = targetZ;
+        }
+    }
+
+    if(targetZ > currentZ){
+        newPos.z += speed;
+        if(newPos.z > targetZ){
+            newPos.z = targetZ;
+        }
+    }
+
+    return newPos;
+
   }
 
 }

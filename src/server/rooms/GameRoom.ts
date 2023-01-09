@@ -8,7 +8,7 @@ import loadNavMeshFromFile from "../../shared/Utils/loadNavMeshFromFile";
 import { PlayerState } from "./schema/PlayerState";
 import { PlayerInputs } from "../../shared/types";
 import { PlayerCurrentState } from "../../shared/Entities/Player/PlayerCurrentState";
-import { NavMesh } from "../../shared/yuka";
+import { NavMesh, Vector3 } from "../../shared/yuka";
 
 export class GameRoom extends Room<GameRoomState> {
 
@@ -185,7 +185,7 @@ export class GameRoom extends Room<GameRoomState> {
 
         /////////////////////////////////////
         // player action
-        this.onMessage("playerAction", (client, data: any) => {
+        this.onMessage("entity_attack", (client, data: any) => {
 
             let state = this.state;
 
@@ -237,7 +237,25 @@ export class GameRoom extends Room<GameRoomState> {
                 message: sender.name +" attacked you and you lost 5 health"
             })*/
 
-            Logger.info(`[gameroom][playerAction] player action processed`, data);
+            Logger.info(`[gameroom][entity_attack] player action processed`, data);
+
+        });
+
+        /////////////////////////////////////
+        // player move to
+        this.onMessage("player_moveTo", (client, data: any) => {
+
+            // get players involved
+            let player:PlayerState = this.state.players[client.sessionId];
+           
+            if(!player) throw new Error('sender does not exists!');
+
+            // set destination
+            let from = new Vector3(player.x, player.y, player.z);
+            let destination = new Vector3(data.to._x, data.to._y, data.to._z);
+            player.toRegion = this.navMesh.getClosestRegion( destination );
+            //console.log('player_moveTo', from, destination, data);
+            player.destinationPath = this.navMesh.findPath(from, destination);
 
         });
 

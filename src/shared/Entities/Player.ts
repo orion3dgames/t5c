@@ -146,14 +146,17 @@ export class Player {
                 // if other player, send to server: target loses 5 health
                 if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 0) {
       
+                    console.log(pointerInfo._pickInfo);
+
                     if (pointerInfo._pickInfo.pickedMesh && 
+                        pointerInfo._pickInfo.pickedMesh.metadata && 
                         pointerInfo._pickInfo.pickedMesh.metadata !== null && 
+                        pointerInfo._pickInfo.pickedMesh.metadata.type && 
                         pointerInfo._pickInfo.pickedMesh.metadata.type.includes('monster') && 
                         pointerInfo._pickInfo.pickedMesh.metadata.sessionId !== this.sessionId){
                           
                         let targetSessionId = pointerInfo._pickInfo.pickedMesh.metadata.sessionId;    
-                        this._room.send("playerAction", {
-                            type: 'attack',
+                        this._room.send("entity_attack", {
                             senderId: this.sessionId,
                             targetId: targetSessionId
                         });
@@ -163,7 +166,16 @@ export class Player {
                         let end = pointerInfo._pickInfo.pickedMesh.position;
                         this.actionsController.fire(start, end, this.ui._entities[targetSessionId].mesh);
                     }
-                    
+
+                   
+                    if (pointerInfo._pickInfo.pickedPoint){
+                        let destination = pointerInfo._pickInfo.pickedPoint;
+                        this._room.send("player_moveTo", {
+                            senderId: this.sessionId,
+                            to: destination
+                        });
+                    }
+    
                 }
 
                 // on right mouse click

@@ -84,7 +84,7 @@ export class GameRoomState extends Schema {
         let spawnTime = 500;
         if (this.spawnTimer >= spawnTime) {
             this.spawnTimer = 0;
-            let maxEntities = 20;
+            let maxEntities = 0;
             if(this.entities.size < maxEntities){
                 this.createEntity();
             }
@@ -98,7 +98,57 @@ export class GameRoomState extends Schema {
         if (this.timer >= refreshRate) {
             this.timer = 0;
 
-            // for each entities
+            // for each player
+            if( this.players.size > 0){
+                this.players.forEach(player => { 
+                    
+                    // move entity
+                    if(player.toRegion && player.destinationPath && player.destinationPath[0]){
+
+                        // save current position
+                        let currentPos = new Vector3(player.x, player.y,player.z);
+
+                        // get next waypoint
+                        let destinationOnPath = player.destinationPath[0];
+                        destinationOnPath.y = 0;
+                        let speed = 0.4;
+
+                        // calculate next position towards destination
+                        let updatedPos = player.moveTo(currentPos, destinationOnPath, speed);
+                        player.x = updatedPos.x;
+                        player.y = updatedPos.y;
+                        player.z = updatedPos.z;
+
+                        // calculate rotation
+                        player.rot = player.calculateRotation(currentPos, updatedPos);
+
+                        //Logger.info("[gameroom][state][update] moved entity: "+entity.sessionId);
+
+                        // check if arrived at waypoint
+                        if(destinationOnPath.equals(updatedPos)){
+                            player.destinationPath.shift();
+                        }
+
+                        // update entity region
+                        player.currentRegion = this.navMesh.getClosestRegion( currentPos );
+
+                        // if arrived at final destination, set toRegion to false so it'll be update at next iteration
+                        if(player.currentRegion === player.toRegion){
+                            player.toRegion = false;
+                            player.destinationPath = false;
+                        }
+
+                    }else{
+
+                        // something is wrong, let's look for a new destination
+                        player.toRegion = false;
+                        player.destinationPath = false;
+
+                    }
+                });
+            }
+
+            // for each entity
             if( this.entities.size > 0){
                 this.entities.forEach(entity => { 
 
