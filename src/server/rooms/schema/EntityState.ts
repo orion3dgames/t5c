@@ -31,6 +31,9 @@ export class EntityState extends Schema {
   public destinationPath;
   public config;
 
+  public AI_CURRENT_STATE:number = 0;
+  public AI_STATE_REMAINING_DURATION:number = 0;
+
   constructor(_gameroom, ...args: any[]) {
 		super(args);
 

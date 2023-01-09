@@ -9,6 +9,11 @@ import { nanoid } from 'nanoid';
 import Config from '../../../shared/Config';
 import Logger from "../../../shared/Logger";
 
+enum AI_STATE { 
+    IDLE = 0, 
+    WALKING = 1
+}
+
 export class GameRoomState extends Schema {
 
     @type({ map: PlayerState }) players = new MapSchema<PlayerState>();
@@ -26,7 +31,7 @@ export class GameRoomState extends Schema {
 		this._gameroom = gameroom;
 		this.navMesh = _navMesh;
         //this.entityManager = new EntityManager();
-        //this.time = new Time()      
+        //this.time = new Time()     
 	}
 
     public createEntity(){
@@ -96,6 +101,21 @@ export class GameRoomState extends Schema {
             if( this.entities.size > 0){
                 this.entities.forEach(entity => { 
 
+                    // only find a new AI_STATE if AI_STATE_REMAINING_DURATION is at zero
+                    if(entity.AI_STATE_REMAINING_DURATION === 0){
+                        entity.AI_CURRENT_STATE = Math.random() < 0.5 ? AI_STATE.IDLE : AI_STATE.WALKING;
+                        entity.AI_STATE_REMAINING_DURATION = (Math.random() * 5000) + 1000; // change state every 3 seconds
+                        //console.log('NEW AI STATE', entity.AI_CURRENT_STATE, entity.AI_STATE_REMAINING_DURATION);
+                    }
+
+                    // 
+                    entity.AI_STATE_REMAINING_DURATION -= Math.random() * 100 + 10;
+
+                    //console.log('AI_STATE_REMAINING_DURATION', entity.AI_STATE_REMAINING_DURATION);
+
+                    // change of idling for idleDuration
+                    let isIdle = Math.random() > .5 ? true : false;
+
                     // save current position
                     let currentPos = new Vector3(entity.x, entity.y,entity.z);
 
@@ -105,7 +125,11 @@ export class GameRoomState extends Schema {
                     }
 
                     // move entity
-                    if(entity.destinationPath.length > 0 && entity.health > 0){
+                    if(
+                        entity.destinationPath.length > 0 && 
+                        entity.health > 0 && 
+                        entity.AI_CURRENT_STATE === AI_STATE.WALKING
+                        ){
 
                         // get next waypoint
                         let destinationOnPath = entity.destinationPath[0];
