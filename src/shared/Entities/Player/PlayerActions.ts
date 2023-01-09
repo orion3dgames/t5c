@@ -1,4 +1,4 @@
-import { MeshBuilder, Vector3, Scene, Path3D } from "@babylonjs/core";
+import { MeshBuilder, Vector3, Scene, Path3D, Color4, Texture, ParticleSystem, VertexBuffer } from "@babylonjs/core";
 import State from "../../../client/Screens/Screens";
 import Config from "../../Config";
 
@@ -37,6 +37,50 @@ export class PlayerActions {
         projectile.position = start.clone();
         projectile.position.y = 2;
         projectile.rotation.y = (Math.PI/2) - angle;
+
+        
+        /////////////////////////////////////////////
+
+        // Create a particle system
+        var particleSystem = new ParticleSystem("particles", 1000, this._scene);
+
+        //Texture of each particle
+        particleSystem.particleTexture = new Texture("textures/flare.png", this._scene);
+
+        // Where the particles come from
+        particleSystem.emitter = projectile; // the starting location
+
+        // Colors of all particles
+        particleSystem.color1 = new Color4(0.29, 0.96, 0.57, 1.0);
+        particleSystem.color2 = new Color4(0.16, 0.8, 0.47, 1.0);
+        particleSystem.colorDead = new Color4(0, 0, 0.2, 0.0);
+
+        // Size of each particle (random between...
+        particleSystem.minSize = 0.2;
+        particleSystem.maxSize = 0.4;
+
+        // Life time of each particle (random between...
+        particleSystem.minLifeTime = 0.4;
+        particleSystem.maxLifeTime = 0.5;
+
+        // Emission rate
+        particleSystem.emitRate = 1000;
+
+
+        /******* Emission Space ********/
+        particleSystem.createSphereEmitter(1);
+
+
+        // Speed
+        particleSystem.minEmitPower = 1;
+        particleSystem.maxEmitPower = 3;
+        particleSystem.updateSpeed = 0.01;
+
+        // Start the particle system
+        particleSystem.start();
+      
+
+        //////////////////////////////////////////////
   
         var endVector = projectile.calcMovePOV(0,0, 72).addInPlace(projectile.position);
         var points = [start, endVector];
@@ -47,12 +91,13 @@ export class PlayerActions {
             if (i <= 1) {
                 console.log('NO COLLISION');
                 projectile.position = path.getPointAt(i); 
-                i += 0.01;
+                i += 0.009;
             } 
 
             if(projectile.intersectsMesh(mesh)){
                 console.log('COLLISION', mesh);
                 projectile.dispose(true, true);
+                particleSystem.dispose(true);
                 this._scene.onBeforeRenderObservable.remove(loop);
             }
 

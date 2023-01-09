@@ -9,7 +9,6 @@ import { PlayerState } from "./schema/PlayerState";
 import { PlayerInputs } from "../../shared/types";
 import { PlayerCurrentState } from "../../shared/Entities/Player/PlayerCurrentState";
 import { NavMesh } from "../../shared/yuka";
-import { loggers } from "winston";
 
 export class GameRoom extends Room<GameRoomState> {
 
@@ -30,14 +29,9 @@ export class GameRoom extends Room<GameRoomState> {
         this.setMetadata(options);
 
         // initialize navmesh
-        /*
-        const navMesh = await loadNavMeshFromFile(options.location)
-        this.navMesh = navMesh;
-        Logger.info("[gameroom][onCreate] navmesh initialized.");*/
         const navMesh = await loadNavMeshFromFile(options.location)
         this.navMesh = navMesh;
         Logger.info("[gameroom][onCreate] navmesh initialized.");
-        //console.log(navMesh.regions); 
    
         // Set initial state
         this.setState(new GameRoomState(this, this.navMesh, options));
@@ -203,18 +197,26 @@ export class GameRoom extends Room<GameRoomState> {
             if(!target) throw new Error('target does not exists!');
 
             // sender state
-            sender.state = PlayerCurrentState.ATTACK;
+            //sender.state = PlayerCurrentState.ATTACK;
             target.state = PlayerCurrentState.TAKING_DAMAGE;
 
-            // player loses health
+            // target loses health
             target.loseHealth(40);
 
-            // 
-            if(target.health === 0){
+            // if target has no more health
+            if(target.health == 0 || target.health < 0){ 
+
+                // set entity as dead
+                target.health = 0;
+                target.state = PlayerCurrentState.DEAD;
+                target.blocked = true;
+                Logger.info(`[gameroom][playerAction] Monster is dead`, data);
+
+                // delete so entity can be respawned
                 setTimeout(function(){
-                    console.log('TARGET IS DEAD, REMOVING');
+                    Logger.info(`[gameroom][playerAction] Monster spawning`, data);
                     delete state.entities[data.targetId];
-                }, 5000);
+                }, Config.MONSTER_RESPAWN_RATE);
             }
 
             /*

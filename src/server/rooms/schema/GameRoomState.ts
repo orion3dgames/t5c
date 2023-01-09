@@ -7,6 +7,7 @@ import { PlayerCurrentState } from '../../../shared/Entities/Player/PlayerCurren
 import { NavMesh, EntityManager, Time, Vector3 } from "yuka";
 import { nanoid } from 'nanoid';
 import Config from '../../../shared/Config';
+import Logger from "../../../shared/Logger";
 
 export class GameRoomState extends Schema {
 
@@ -14,178 +15,144 @@ export class GameRoomState extends Schema {
     @type({ map: EntityState }) entities = new MapSchema<EntityState>();
     @type("number") serverTime: number = 0.0;
     private _gameroom: GameRoom = null;
-    private _navMesh: NavMesh = null;
+    private navMesh: NavMesh = null;
     private entityManager;
     private time;
     private timer: number = 0;
     private spawnTimer: number = 0;
 
-    constructor(gameroom: GameRoom, navMesh:NavMesh, ...args: any[]) {
+    constructor(gameroom: GameRoom, _navMesh: NavMesh, ...args: any[]) {
 		super(...args);
 		this._gameroom = gameroom;
-		this._navMesh = navMesh;
-
-        this.entityManager = new EntityManager();
-        this.time = new Time()    
+		this.navMesh = _navMesh;
+        //this.entityManager = new EntityManager();
+        //this.time = new Time()      
 	}
+
+    public createEntity(){
+
+        // monster pool to chose from
+        let monsterTypes = ['monster_unicorn', 'monster_bear'];
+
+        // random id
+        let sessionId = nanoid();
+
+        // get starting starting position
+        let randomRegion = this.navMesh.getRandomRegion();
+        let point = randomRegion.centroid;
+
+        // random mesh
+        let type = monsterTypes[Math.floor(Math.random()*monsterTypes.length)];
+
+        // create entity
+        let entity = new EntityState(this._gameroom).assign({
+            sessionId: sessionId,
+            type: type,
+            name: "Monster "+sessionId,
+            location: this._gameroom.metadata.location,
+            x: point.x,
+            y: 0,
+            z: point.y,
+            rot: 0, 
+            health: 100,
+            level: 1,
+            state: PlayerCurrentState.IDLE,
+            currentRegion: randomRegion,
+            toRegion: false,
+            config: Config.entities[type]
+        });
+
+        // add to colyseus state
+        this.entities.set(sessionId, entity);
+
+        // log
+        Logger.info("[gameroom][state][createEntity] created new entity "+type+": "+sessionId);
+    }
 
     public update(deltaTime: number) {
 
-    
+        //////////////////////////////////////////////
+        // entity spawning script (span a monster every .5 second)
+
         this.spawnTimer += deltaTime;
-        let spawnTime = 2000;
+        let spawnTime = 500;
         if (this.spawnTimer >= spawnTime) {
-
             this.spawnTimer = 0;
-
             let maxEntities = 20;
-            let monsterTypes = ['monster_unicorn', 'monster_bear'];
-            while(this.entities.size < maxEntities){
-
-                // random id
-                let sessionId = nanoid();
-
-                // get starting starting position
-                let randomRegion = this._navMesh.getRandomRegion();
-                let point = randomRegion.centroid;
-
-                // random mesh
-                let type = monsterTypes[Math.floor(Math.random()*monsterTypes.length)];
-
-                // create entity
-                this.entities.set(sessionId, new EntityState(this._gameroom.navMesh, this._gameroom.database).assign({
-                    sessionId: sessionId,
-                    type: type,
-                    name: "Monster "+this.entities.size,
-                    location: "lh_dungeon_01",
-                    x: point.x,
-                    y: 0,
-                    z: point.y,
-                    rot: 0,
-                    health: 100,
-                    level: 1,
-                    state: PlayerCurrentState.IDLE,
-                    currentRegion: randomRegion,
-                    toRegion: false,
-                    config: Config.entities[type]
-                }));
-
+            if(this.entities.size < maxEntities){
+                this.createEntity();
             }
-
         }
 
+        //////////////////////////////////////////////
+        // entity moving script 
 
         this.timer += deltaTime;
         let refreshRate = 100;
         if (this.timer >= refreshRate) {
-  
             this.timer = 0;
 
-            // move entities randomly
-            this.entities.forEach(entity => {
+            // for each entities
+            if( this.entities.size > 0){
+                this.entities.forEach(entity => { 
 
-                // save current position
-                let currentPos = new Vector3(entity.x, entity.y,entity.z);
+                    // save current position
+                    let currentPos = new Vector3(entity.x, entity.y,entity.z);
 
-                // if entity does not have a destination, find one
-                if(!entity.toRegion){
-                    entity.toRegion = this._navMesh.getRandomRegion();
-                    entity.destinationPath = this._gameroom.navMesh.findPath(
-                        currentPos,
-                        entity.toRegion.centroid
-                    );
-                    if(entity.destinationPath.length === 0){
+                    // if entity does not have a destination, find one
+                    if(!entity.toRegion){
+                        entity.setRandomDestination(currentPos);
+                    }
+
+                    // move entity
+                    if(entity.destinationPath.length > 0 && entity.health > 0){
+
+                        // get next waypoint
+                        let destinationOnPath = entity.destinationPath[0];
+                        destinationOnPath.y = 0;
+                        let speed = entity.config.speed;
+
+                        // calculate next position towards destination
+                        let updatedPos = entity.moveTo(currentPos, destinationOnPath, speed);
+                        entity.x = updatedPos.x;
+                        entity.y = updatedPos.y;
+                        entity.z = updatedPos.z;
+
+                        // calculate rotation
+                        entity.rot = entity.calculateRotation(currentPos, updatedPos);
+
+                        //Logger.info("[gameroom][state][update] moved entity: "+entity.sessionId);
+
+                        // check if arrived at waypoint
+                        if(destinationOnPath.equals(updatedPos)){
+                            entity.destinationPath.shift();
+                        }
+
+                        // update entity region
+                        entity.currentRegion = this.navMesh.getClosestRegion( currentPos );
+
+                        // if arrived at final destination, set toRegion to false so it'll be update at next iteration
+                        if(entity.currentRegion === entity.toRegion){
+                            entity.toRegion = false;
+                            entity.destinationPath = false;
+                        }
+
+                    }else{
+
+                        // something is wrong, let's look for a new destination
                         entity.toRegion = false;
                         entity.destinationPath = false;
+
                     }
-                }
-
-                // move entity
-                if(entity.destinationPath.length > 0 && entity.health > 0){
-
-                    let destinationOnPath = entity.destinationPath[0];
-                    destinationOnPath.y = 0;
-                    let speed = entity.config.speed;
-
-                    let currentX = entity.x;
-                    let currentZ = entity.z;
-                    let targetX = destinationOnPath.x;
-                    let targetZ = destinationOnPath.z;
-
-                    // todo: must be a better way to do the below checks?
-                    if(targetX < currentX){
-                        entity.x -= speed;
-                        if(entity.x < targetX){
-                            entity.x = targetX;
-                        }
-                    }
-                    
-                    if(targetX > currentX){
-                        entity.x += speed;
-                        if(entity.x > targetX){
-                            entity.x = targetX;
-                        }
-                    }
-                    
-                    if(targetZ < currentZ){
-                        entity.z -= speed;
-                        if(entity.z < targetZ){
-                            entity.z = targetZ;
-                        }
-                    }
-                    
-                    if(targetZ > currentZ){
-                        entity.z += speed;
-                        if(entity.z > targetZ){
-                            entity.z = targetZ;
-                        }
-                    }
-                    let updatedPos = new Vector3(entity.x, entity.y,entity.z);
-
-                    // calculate rotation
-                    var newRotation = Math.atan2(currentPos.x - updatedPos.x, currentPos.z - updatedPos.z);
-                    entity.rot = newRotation;
-
-                    // check if arrived a path vector
-                    if(destinationOnPath.equals(updatedPos)){
-                        entity.destinationPath.shift();
-                    }
-
-                    // update current region
-                    entity.currentRegion = this._navMesh.getClosestRegion( currentPos );
-
-                    // if arrived at final destination, set toRegion to false so it'll be update at next iteration
-                    if(entity.currentRegion === entity.toRegion){
-                        entity.toRegion = false;
-                        entity.destinationPath = false;
-                    }
-
-                }else{
-
-                    // something is wrong, let's look for a new destination
-                    entity.toRegion = false;
-                    entity.destinationPath = false;
-
-                }
-    
-            });
-
+        
+                });
+            }
         }
-    
+        
 	}
 
-    radians_to_degrees(radians)
-    {
-        var pi = Math.PI;
-        return radians * (180/pi);
-    }
-
-    getRandomArbitrary(min, max) {
-        return (Math.random() * (max - min) + min);
-    }
-
     addPlayer(sessionId: string, data: PlayerCharacter) {
-        this.players.set(sessionId, new PlayerState(this._navMesh, this._gameroom.database).assign({
+        this.players.set(sessionId, new PlayerState(this.navMesh, this._gameroom.database).assign({
             id: data.id,
             sessionId: sessionId,
             type: 'player_hobbit',

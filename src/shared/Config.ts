@@ -63,7 +63,7 @@ let Config = {
     // entities 
     entities: {
         "player_hobbit": {
-            speed: 0.2,
+            //speed: 0.2,
             scale: 0.02,
             animations: {
                 "IDLE": 3,
@@ -99,7 +99,7 @@ let Config = {
     // functions
     setDefault(){
         global.T5C = {
-            nextScene: State.LOGIN,
+            nextScene: State.GAME,
             currentRoomID: "",
             currentSessionID: "",
             currentLocation: Config.locations[Config.initialLocation],

@@ -1,5 +1,6 @@
 import { Schema, type } from "@colyseus/schema";
 import { PlayerCurrentState } from "../../../shared/Entities/Player/PlayerCurrentState";
+import { Vector3 } from "yuka";
 
 export class EntityState extends Schema {
 
@@ -24,13 +25,16 @@ export class EntityState extends Schema {
   @type('boolean') public blocked: boolean; // if true, used to block player and to prevent movement
   @type('number') public state: PlayerCurrentState = PlayerCurrentState.IDLE;
 
+  public _gameroom;
   public currentRegion;
   public toRegion;
   public destinationPath;
   public config;
 
-  constructor(...args: any[]) {
+  constructor(_gameroom, ...args: any[]) {
 		super(args);
+
+    this._gameroom = _gameroom;
 
     this.spawn(args);
 	}
@@ -39,24 +43,86 @@ export class EntityState extends Schema {
 
   }
 
-  setPositionManual(x, y, z, rot) {
+  /**
+   * Manually set entity position & rotation
+   * @param x 
+   * @param y 
+   * @param z 
+   * @param rot 
+   */
+  setPositionManual(x:number, y:number, z:number, rot:number) {
     this.x = x;
     this.y = y;
     this.z = z;
     this.rot = rot;
   }
 
+  calculateRotation(v1, v2){
+    return Math.atan2(v1.x - v2.x, v1.z - v2.z);
+  }
+
+  /**
+   * Move entity toward a Vector3 position
+   * @param source
+   * @param destination 
+   * @param speed 
+   * @returns 
+   */
+  moveTo(source: Vector3, destination: Vector3, speed:number):Vector3{
+
+    let currentX = source.x;
+    let currentZ = source.z;
+    let targetX = destination.x;
+    let targetZ = destination.z;
+    let newPos = new Vector3(source.x, source.y, source.z);
+
+    if(targetX < currentX){
+        newPos.x -= speed;
+        if(newPos.x < targetX){
+            newPos.x = targetX;
+        }
+    }
+
+    if(targetX > currentX){
+        newPos.x += speed;
+        if(newPos.x > targetX){
+            newPos.x = targetX;
+        }
+    }
+
+    if(targetZ < currentZ){
+        newPos.z -= speed;
+        if(newPos.z < targetZ){
+            newPos.z = targetZ;
+        }
+    }
+
+    if(targetZ > currentZ){
+        newPos.z += speed;
+        if(newPos.z > targetZ){
+            newPos.z = targetZ;
+        }
+    }
+
+    return newPos;
+
+  }
+
+  setRandomDestination(currentPos:Vector3):void{
+    this.toRegion = this._gameroom.navMesh.getRandomRegion();
+    this.destinationPath = this._gameroom.navMesh.findPath(
+        currentPos,
+        this.toRegion.centroid
+    );
+    if(this.destinationPath.length === 0){
+      this.toRegion = false;
+      this.destinationPath = false;
+    }
+  }
+
+
   loseHealth(amount:number) {
     this.health -= amount;
-
-    // if player has no more health
-    // todo: send him back to spawnpoint with health back to 50;
-    if(this.health == 0 || this.health < 0){ 
-      console.log('DEADDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD')
-      this.health = 0;
-      this.state = PlayerCurrentState.DEAD;
-      this.blocked = true;
-    }
   }
 
 }

@@ -50,10 +50,9 @@ export class GameScene {
 
     async createScene(engine, client): Promise<void> {
 
-
         if(isLocal()){
-            let temptLocation = "lh_town";
-            global.T5C.currentLocation = Config.locations[temptLocation];
+            let tempLocation = "lh_town";
+            global.T5C.currentLocation = Config.locations[tempLocation];
             global.T5C.currentUser = {
                 id: 3,
                 username: 'Code_Code',
@@ -63,7 +62,7 @@ export class GameScene {
             global.T5C.currentCharacter = {
                 id: 2,
                 user_id: 3,
-                location: temptLocation
+                location: tempLocation
             };
         }
 
@@ -197,8 +196,6 @@ export class GameScene {
 
         // load navmesh
         this._navMesh = await loadNavMeshFromString(global.T5C.currentLocation.key);
-
-        
         console.log('NAVMESH LOADED', this._navMesh);
 
         // visualize navmesh
@@ -209,8 +206,7 @@ export class GameScene {
     }
 
     private async _initEvents() {
-        
-        console.log('CONTAINER', this.assetsContainer);
+
         await this._scene.whenReadyAsync();
 
         // setup input Controller
@@ -219,7 +215,8 @@ export class GameScene {
         // setup hud
         this._ui = new UserInterface(this._scene, this._engine, this.room, this.chatRoom, this.playerEntities, this.entities, this._currentPlayer);
 
-        // when someone joins the room event
+        ////////////////////////////////////////////////////
+        //  when a player joins the room event
         this.room.state.players.onAdd((entity, sessionId) => {
 
             var isCurrentPlayer = sessionId === this.room.sessionId;
@@ -242,25 +239,28 @@ export class GameScene {
 
         });
 
-        // when someone leave the room event
+        // when a player leaves the room event
         this.room.state.players.onRemove((player, sessionId) => {
             this.playerEntities[sessionId].removePlayer();
             delete this.playerEntities[sessionId];
         });
+        ////////////////////////////////////////////////////
 
-        // when someone joins the room event
+        ////////////////////////////////////////////////////
+        //  when a entity is created  event
         this.room.state.entities.onAdd((entity, sessionId) => {
             this.entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._input, this._shadow, this._navMesh, this.assetsContainer);
             console.log('spawned entity', this.entities[sessionId]);
         });
 
-        // when someone leave the room event
+        // when a entity is removed event
         this.room.state.entities.onRemove((player, sessionId) => {
             this.entities[sessionId].removePlayer();
             delete this.entities[sessionId];
         });
+        ////////////////////////////////////////////////////
 
-        ///////////////
+        ////////////////////////////////////////////////////
         // main game loop
         let timeThen = Date.now();
         let sequence = 0;

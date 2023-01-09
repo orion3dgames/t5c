@@ -52,15 +52,6 @@ export class PlayerState extends Schema {
 
   loseHealth(amount:number) {
     this.health -= amount;
-
-    // if player has no more health
-    // todo: send him back to spawnpoint with health back to 50;
-    if(this.health == 0 || this.health < 0){ 
-      console.log('DEADDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD')
-      this.health = 0;
-      this.state = PlayerCurrentState.DEAD;
-      this.blocked = true;
-    }
   }
 
   processPlayerInput(playerInput:PlayerInputs) {

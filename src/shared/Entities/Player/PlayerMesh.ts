@@ -46,7 +46,7 @@ export class PlayerMesh {
                 doNotInstantiate: false,
             }
         );
-        const playerMesh = result.rootNodes[config.meshRootIndex]; 
+        const playerMesh = result.rootNodes[0]; 
         this._animationGroups = result.animationGroups;
         //console.log('LOADED ENTITY MESH', this._entity.type, result);
 
