@@ -4,13 +4,12 @@ import { PlayerState } from "../../server/rooms/schema/PlayerState";
 
 import Config from "../Config";
 import { PlayerInputs } from "../types";
-import { PlayerCamera } from "./Player/PlayerCamera";
-import { PlayerAnimator } from "./Player/PlayerAnimator";
-import { PlayerMove } from "./Player/PlayerMove";
-import { PlayerUtils } from "./Player/PlayerUtils";
-import { PlayerActions } from "./Player/PlayerActions";
-import { PlayerMesh } from "./Player/PlayerMesh";
-import State from "../../client/Screens/Screens";
+import { EntityCamera } from "./Entity/EntityCamera";
+import { EntityAnimator } from "./Entity/EntityAnimator";
+import { EntityMove } from "./Entity/EntityMove";
+import { EntityUtils } from "./Entity/EntityUtils";
+import { EntityActions } from "./Entity/EntityActions";
+import { EntityMesh } from "./Entity/EntityMesh";
 import { Room } from "colyseus.js";
 
 export class Entity {
@@ -24,19 +23,18 @@ export class Entity {
     public assetsContainer;
 
     // controllers
-    public cameraController: PlayerCamera;
-    public animatorController: PlayerAnimator;
-    public moveController: PlayerMove;
-    public utilsController: PlayerUtils;
-    public actionsController: PlayerActions;
-    public meshController: PlayerMesh;
+    public cameraController: EntityCamera;
+    public animatorController: EntityAnimator;
+    public moveController: EntityMove;
+    public utilsController: EntityUtils;
+    public actionsController: EntityActions;
+    public meshController: EntityMesh;
     
     // entity
     public mesh: AbstractMesh; //outer collisionbox of player
     public playerMesh: AbstractMesh; //outer collisionbox of player
     public characterChatLabel: Rectangle;
     public characterLabel: Rectangle;
-    public playerInputs: PlayerInputs[];
     public sessionId: string;
     public entity: PlayerState;
     public isCurrentPlayer:boolean;
@@ -75,10 +73,10 @@ export class Entity {
         this.ui = ui;
         this._shadow = shadow;
         this.sessionId = entity.sessionId; // network id from colyseus
+        this.isCurrentPlayer = this._room.sessionId === entity.sessionId;
         this.entity = entity;
         this._input = input;
         
-
         // update player data from server data
         Object.assign(this, this.entity);
         
@@ -89,7 +87,7 @@ export class Entity {
     public async spawn(entity) {
 
         // load mesh controllers
-        this.meshController = new PlayerMesh(this._scene, this.assetsContainer, this.entity, this._room, this.isCurrentPlayer);
+        this.meshController = new EntityMesh(this._scene, this.assetsContainer, this.entity, this._room, this.isCurrentPlayer);
         await this.meshController.load();
         this.mesh = this.meshController.mesh;
         this.playerMesh = this.meshController.playerMesh;
@@ -98,8 +96,8 @@ export class Entity {
         this._shadow.addShadowCaster(this.meshController.mesh, true);
 
         // add all player related stuff
-        this.animatorController = new PlayerAnimator(this.meshController.getAnimation(), this.entity.type);
-        this.moveController = new PlayerMove(this.mesh, this._navMesh, this.isCurrentPlayer);
+        this.animatorController = new EntityAnimator(this.meshController.getAnimation(), this.entity.type);
+        this.moveController = new EntityMove(this.mesh, this._navMesh, this.isCurrentPlayer);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
 
         ///////////////////////////////////////////////////////////
@@ -195,7 +193,7 @@ export class Entity {
     }
 
 
-    public removePlayer() {
+    public remove() {
        this.characterLabel.dispose();
        this.characterChatLabel.dispose();
        this.mesh.dispose();

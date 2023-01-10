@@ -1,5 +1,5 @@
 import { Schema, type } from "@colyseus/schema";
-import { PlayerCurrentState } from "../../../shared/Entities/Player/PlayerCurrentState";
+import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { Vector3 } from "yuka";
 
 export class EntityState extends Schema {
@@ -23,7 +23,7 @@ export class EntityState extends Schema {
 
   // flags
   @type('boolean') public blocked: boolean; // if true, used to block player and to prevent movement
-  @type('number') public state: PlayerCurrentState = PlayerCurrentState.IDLE;
+  @type('number') public state: EntityCurrentState = EntityCurrentState.IDLE;
 
   public _gameroom;
   public currentRegion;

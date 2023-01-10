@@ -3,7 +3,7 @@ import Config from "../../Config";
 import { PlayerInputs } from "../../types";
 import { NavMesh, Vector3 as Vector3Y } from "yuka";
 
-export class PlayerMove {
+export class EntityMove {
 
     private _mesh;
     private _navMesh:NavMesh;

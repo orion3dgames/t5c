@@ -7,7 +7,7 @@ import Logger from "../../shared/Logger";
 import loadNavMeshFromFile from "../../shared/Utils/loadNavMeshFromFile";
 import { PlayerState } from "./schema/PlayerState";
 import { PlayerInputs } from "../../shared/types";
-import { PlayerCurrentState } from "../../shared/Entities/Player/PlayerCurrentState";
+import { EntityCurrentState } from "../../shared/Entities/Entity/EntityCurrentState";
 import { NavMesh, Vector3 } from "../../shared/yuka";
 
 export class GameRoom extends Room<GameRoomState> {
@@ -198,7 +198,7 @@ export class GameRoom extends Room<GameRoomState> {
 
             // sender state
             //sender.state = PlayerCurrentState.ATTACK;
-            target.state = PlayerCurrentState.TAKING_DAMAGE;
+            target.state = EntityCurrentState.TAKING_DAMAGE;
 
             // target loses health
             target.loseHealth(40);
@@ -208,7 +208,7 @@ export class GameRoom extends Room<GameRoomState> {
 
                 // set entity as dead
                 target.health = 0;
-                target.state = PlayerCurrentState.DEAD;
+                target.state = EntityCurrentState.DEAD;
                 target.blocked = true;
                 Logger.info(`[gameroom][playerAction] Monster is dead`, data);
 

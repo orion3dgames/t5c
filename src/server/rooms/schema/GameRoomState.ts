@@ -3,7 +3,7 @@ import { PlayerState } from './PlayerState';
 import { EntityState } from "./EntityState";
 import { PlayerCharacter } from '../../../shared/types';
 import { GameRoom } from '../GameRoom';
-import { PlayerCurrentState } from '../../../shared/Entities/Player/PlayerCurrentState';
+import { EntityCurrentState } from '../../../shared/Entities/Entity/EntityCurrentState';
 import { NavMesh, EntityManager, Time, Vector3 } from "yuka";
 import { nanoid } from 'nanoid';
 import Config from '../../../shared/Config';
@@ -62,7 +62,7 @@ export class GameRoomState extends Schema {
             rot: randomNumberInRange(0, Math.PI), 
             health: 100,
             level: 1,
-            state: PlayerCurrentState.IDLE,
+            state: EntityCurrentState.IDLE,
             currentRegion: randomRegion,
             toRegion: false,
             config: Config.entities[type]
@@ -230,7 +230,7 @@ export class GameRoomState extends Schema {
             health: data.health,
             level: data.level,
             experience: data.experience,
-            state: PlayerCurrentState.IDLE
+            state: EntityCurrentState.IDLE
         }));
 
     }

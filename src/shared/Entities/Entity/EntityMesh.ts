@@ -3,7 +3,7 @@ import { Room } from "colyseus.js";
 import { PlayerState } from "../../../server/rooms/schema/PlayerState";
 import Config from "../../Config";
 
-export class PlayerMesh {
+export class EntityMesh {
 
     private _scene:Scene;
     private assetsContainer: AssetContainer;

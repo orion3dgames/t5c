@@ -1,6 +1,6 @@
 import { Scene, MeshBuilder, Path3D} from "@babylonjs/core";
 
-export class PlayerUtils {
+export class EntityUtils {
 
     private _scene: Scene;
     private _room;

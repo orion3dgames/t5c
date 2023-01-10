@@ -2,7 +2,7 @@ import { MeshBuilder, Vector3, Scene, Path3D, Color4, Texture, ParticleSystem, V
 import State from "../../../client/Screens/Screens";
 import Config from "../../Config";
 
-export class PlayerActions {
+export class EntityActions {
 
     private _scene: Scene;
 

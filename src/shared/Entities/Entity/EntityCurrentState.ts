@@ -1,4 +1,4 @@
-export enum PlayerCurrentState { 
+export enum EntityCurrentState { 
     IDLE = 0, 
     WALKING = 1,
     RUNNING = 2,

@@ -1,21 +1,19 @@
-import { Scene, Vector3, MeshBuilder, AbstractMesh, CascadedShadowGenerator, PointerEventTypes, StandardMaterial, Texture} from "@babylonjs/core";
-import { Control, Rectangle, TextBlock, TextWrapping } from "@babylonjs/gui";
+import { Scene, CascadedShadowGenerator, PointerEventTypes } from "@babylonjs/core";
 import { PlayerState } from "../../server/rooms/schema/PlayerState";
 
 import Config from "../Config";
-import { PlayerInputs } from "../types";
-import { PlayerCamera } from "./Player/PlayerCamera";
-import { PlayerAnimator } from "./Player/PlayerAnimator";
-import { PlayerMove } from "./Player/PlayerMove";
-import { PlayerUtils } from "./Player/PlayerUtils";
-import { PlayerActions } from "./Player/PlayerActions";
-import { PlayerMesh } from "./Player/PlayerMesh";
+import { EntityCamera } from "./Entity/EntityCamera";
+import { EntityUtils } from "./Entity/EntityUtils";
+import { EntityActions } from "./Entity/EntityActions";
 import { Entity } from "./Entity";
 import State from "../../client/Screens/Screens";
 import { Room } from "colyseus.js";
 import { NavMesh } from "yuka";
+import { PlayerInputs } from "../types";
 
 export class Player extends Entity {
+
+    public playerInputs: PlayerInputs[];
 
     constructor(
         entity:PlayerState,
@@ -36,9 +34,9 @@ export class Player extends Entity {
     private async spawnPlayer() {
 
         //spawn 
-        this.utilsController = new PlayerUtils(this._scene, this._room);
-        this.cameraController = new PlayerCamera(this._scene, this._input);
-        this.actionsController = new PlayerActions(this._scene);
+        this.utilsController = new EntityUtils(this._scene, this._room);
+        this.cameraController = new EntityCamera(this._scene, this._input);
+        this.actionsController = new EntityActions(this._scene);
        
         ///////////////////////////////////////////////////////////
         // entity network event
@@ -49,7 +47,7 @@ export class Player extends Entity {
             if (this.isCurrentPlayer && !this.blocked) {
                 this.moveController.reconcileMove(this.entity.sequence); // set default entity position
             }
-            
+
         });
 
         //////////////////////////////////////////////////////////////////////////
@@ -166,56 +164,4 @@ export class Player extends Entity {
         global.T5C.nextScene = State.GAME;
     }
 
-    public createChatLabel(text) {
-
-        var rect1 = new Rectangle('player_chat_'+this.sessionId);
-        rect1.isVisible = false;
-        rect1.width = "100px";
-        rect1.adaptHeightToChildren = true;
-        rect1.thickness = 1;
-        rect1.cornerRadius = 5;
-        rect1.background = "rgba(0,0,0,.5)";
-        rect1.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        this.ui._playerUI.addControl(rect1);
-        rect1.linkWithMesh(this.mesh);
-        rect1.linkOffsetY = -130;
-
-        var label = new TextBlock('player_chat_label_'+this.sessionId);
-        label.text = text;
-        label.color = "white";
-        label.paddingLeft = '5px;';
-        label.paddingTop = '5px';
-        label.paddingBottom = '5px';
-        label.paddingRight = '5px';
-        label.textWrapping = TextWrapping.WordWrap;
-        label.resizeToFit = true; 
-        rect1.addControl(label);
-
-        return rect1;
-    }
-
-    // obsolete, keeping just in case
-    public createLabel(text) {
-        var rect1 = new Rectangle('player_nameplate_'+this.sessionId);
-        rect1.isVisible = false;
-        rect1.width = "200px";
-        rect1.height = "40px";
-        rect1.thickness = 0;
-        this.ui._playerUI.addControl(rect1);
-        rect1.linkWithMesh(this.mesh);
-        rect1.linkOffsetY = -100;
-        var label = new TextBlock('player_nameplate_text_'+this.sessionId);
-        label.text = text;
-        label.color = "blue";
-        label.fontWeight = "bold";
-        rect1.addControl(label);
-        return rect1;
-    }
-
-
-    public removePlayer() {
-       this.characterLabel.dispose();
-       this.characterChatLabel.dispose();
-       this.mesh.dispose();
-    }
 }

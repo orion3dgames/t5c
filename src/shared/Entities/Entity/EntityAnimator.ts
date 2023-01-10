@@ -1,10 +1,9 @@
 import { AnimationGroup } from "@babylonjs/core";
 import { Vector3 } from "babylonjs";
+import { EntityCurrentState } from "./EntityCurrentState";
 import Config from "../../Config";
-import { distanceBetween } from "../../Utils";
-import { PlayerCurrentState } from "./PlayerCurrentState";
 
-export class PlayerAnimator {
+export class EntityAnimator {
 
     private entityType;
 
@@ -19,9 +18,6 @@ export class PlayerAnimator {
     private _currentAnim: AnimationGroup = null;
     private _prevAnim: AnimationGroup;
 
-    // case 
-    private _state:string;
-
     constructor(player_animations: AnimationGroup[], entityType) {
 
         this._playerAnimations = player_animations;
@@ -33,10 +29,6 @@ export class PlayerAnimator {
     private _build(): void {
 
         // find animations
-        //this._idle = this._playerAnimations.find(o => o.name === 'Hobbit_Idle');
-        //this._walk = this._playerAnimations.find(o => o.name === 'Hobbit_Walk');
-        //this._death = this._playerAnimations.find(o => o.name === 'Hobbit_Death');
-
         let idleAnimationNumber = Config.entities[this.entityType].animations['IDLE'];
         let walkAnimationNumber = Config.entities[this.entityType].animations['WALK'];
         let attackAnimationNumber = Config.entities[this.entityType].animations['ATTACK'];
@@ -81,12 +73,12 @@ export class PlayerAnimator {
             this._currentAnim = this._walk;
 
         // if player has died
-        }else if(player.state === PlayerCurrentState.DEAD){
+        }else if(player.state === EntityCurrentState.DEAD){
             
             this._currentAnim = this._death;
 
         // if player is attacking
-        }else if(player.state === PlayerCurrentState.ATTACK){
+        }else if(player.state === EntityCurrentState.ATTACK){
                     
             this._currentAnim = this._attack;
 

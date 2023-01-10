@@ -2,7 +2,7 @@ import { Schema, type } from "@colyseus/schema";
 import Logger from "../../../shared/Logger";
 import Config from "../../../shared/Config";
 import { PlayerInputs } from "../../../shared/types";
-import { PlayerCurrentState } from "../../../shared/Entities/Player/PlayerCurrentState";
+import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { NavMesh, Vector3 } from "yuka";
 
 export class PlayerState extends Schema {
@@ -28,7 +28,7 @@ export class PlayerState extends Schema {
 
   // flags
   @type('boolean') public blocked: boolean; // if true, used to block player and to prevent movement
-  @type('number') public state: PlayerCurrentState = PlayerCurrentState.IDLE;
+  @type('number') public state: EntityCurrentState = EntityCurrentState.IDLE;
 
   private _navMesh:NavMesh;
   private _database;
@@ -66,7 +66,7 @@ export class PlayerState extends Schema {
   processPlayerInput(playerInput:PlayerInputs) {
 
       if(this.blocked){
-        this.state = PlayerCurrentState.IDLE;
+        this.state = EntityCurrentState.IDLE;
         Logger.warning('Player '+this.name+' is blocked, no movment will be processed');
         return false;
       }
@@ -99,7 +99,7 @@ export class PlayerState extends Schema {
           this.z = newZ;
           this.rot = newRot;
           this.sequence = playerInput.seq;
-          this.state = PlayerCurrentState.WALKING;
+          this.state = EntityCurrentState.WALKING;
 
           // add player to server
           Logger.info('Valid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
@@ -112,7 +112,7 @@ export class PlayerState extends Schema {
           this.z = oldZ;
           this.rot = oldRot;
           this.sequence = playerInput.seq;
-          this.state = PlayerCurrentState.IDLE;
+          this.state = EntityCurrentState.IDLE;
 
           Logger.warning('Invalid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
       }

@@ -1,6 +1,6 @@
 import { TransformNode, Scene, UniversalCamera, Vector3, Scalar } from "@babylonjs/core";
 
-export class PlayerCamera {
+export class EntityCamera {
     public camera;
     private _scene: Scene;
     private _input;
