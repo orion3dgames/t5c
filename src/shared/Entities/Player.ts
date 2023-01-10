@@ -10,53 +10,12 @@ import { PlayerMove } from "./Player/PlayerMove";
 import { PlayerUtils } from "./Player/PlayerUtils";
 import { PlayerActions } from "./Player/PlayerActions";
 import { PlayerMesh } from "./Player/PlayerMesh";
+import { Entity } from "./Entity";
 import State from "../../client/Screens/Screens";
 import { Room } from "colyseus.js";
-import { NavMesh, Vector3 as Vector3Y } from "yuka";
+import { NavMesh } from "yuka";
 
-export class Player {
-    
-    public _scene: Scene;
-    public _room;
-    public ui;
-    private _input;
-    private _shadow;
-    private _navMesh:NavMesh;
-    private assetsContainer;
-
-    // controllers
-    public cameraController: PlayerCamera;
-    public animatorController: PlayerAnimator;
-    public moveController: PlayerMove;
-    public utilsController: PlayerUtils;
-    public actionsController: PlayerActions;
-    public meshController: PlayerMesh;
-    
-    //Player
-    public mesh: AbstractMesh; //outer collisionbox of player
-    public playerMesh: AbstractMesh; //outer collisionbox of player
-    public characterChatLabel: Rectangle;
-    public characterLabel: Rectangle;
-    public playerInputs: PlayerInputs[];
-    private isCurrentPlayer: boolean;
-    public sessionId: string;
-    public entity: PlayerState;
-    public yuka;
-
-    // character
-    public name: string = "";
-    public x: number;
-    public y: number;
-    public z: number;
-    public rot: number;
-    public health: number;
-    public level: number;
-    public experience: number;
-    public location: string = "";
-    public state: number = 0;
-
-    // flags
-    public blocked: boolean = false; // if true, player will not moved
+export class Player extends Entity {
 
     constructor(
         entity:PlayerState,
@@ -68,62 +27,23 @@ export class Player {
         navMesh:NavMesh,
         assetsContainer
     ) {
- 
-        // setup class variables
-        this._scene = scene;
-        this._room = room;
-        this._navMesh = navMesh;
-        this.assetsContainer = assetsContainer;
-
-        this.ui = ui;
-        this._shadow = shadow;
-        this.sessionId = entity.sessionId; // network id from colyseus
-        this.entity = entity;
-        this.isCurrentPlayer = this._room.sessionId === entity.sessionId;
-        this._input = input;
+        super(entity,room, scene, ui, input, shadow, navMesh, assetsContainer);
         this.playerInputs = [];
 
-        // update player data from server data
-        Object.assign(this, this.entity);
-
-        // spawn player
-        this.spawn(entity);
+        this.spawnPlayer()
     }
 
-    private async spawn(entity) {
+    private async spawnPlayer() {
 
-        // load mesh controllers
-        this.meshController = new PlayerMesh(this._scene, this.assetsContainer, this.entity, this._room, this.isCurrentPlayer);
-        await this.meshController.load();
-        this.mesh = this.meshController.mesh;
-        this.playerMesh = this.meshController.playerMesh;
-
-        // add mesh to shadow generator
-        this._shadow.addShadowCaster(this.meshController.mesh, true);
-
-        // if myself, add all player related stuff
-        if (this.isCurrentPlayer) {
-            this.utilsController = new PlayerUtils(this._scene, this._room);
-            this.cameraController = new PlayerCamera(this._scene, this._input);
-            this.actionsController = new PlayerActions(this._scene);
-        }
-        this.animatorController = new PlayerAnimator(this.meshController.getAnimation(), entity.type);
-        this.moveController = new PlayerMove(this.mesh, this._navMesh, this.isCurrentPlayer);
-        this.moveController.setPositionAndRotation(entity); // set next default position from server entity
-
+        //spawn 
+        this.utilsController = new PlayerUtils(this._scene, this._room);
+        this.cameraController = new PlayerCamera(this._scene, this._input);
+        this.actionsController = new PlayerActions(this._scene);
+       
         ///////////////////////////////////////////////////////////
         // entity network event
         // colyseus automatically sends entity updates, so let's listen to those changes
         this.entity.onChange(() => {
-
-            // make sure players are always visible
-            this.playerMesh.visibility = 1;
-
-            // update player data from server data
-            Object.assign(this, this.entity);
-
-            // update player position
-            this.moveController.setPositionAndRotation(this.entity);
 
             // do server reconciliation on client if current player only & not blocked
             if (this.isCurrentPlayer && !this.blocked) {
@@ -134,116 +54,75 @@ export class Player {
 
         //////////////////////////////////////////////////////////////////////////
         // player register event
-        if(this.isCurrentPlayer){
 
-            // register serevr messages
-            this.registerServerMessages();
+        // register server messages
+        this.registerServerMessages();
 
-            // mouse events
-            this._scene.onPointerObservable.add((pointerInfo:any) => {
-            
-                // on left mouse click
-                if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 0) {
-      
-                    console.log(pointerInfo._pickInfo);
-
-                    /////////////////////////////////////////////////////////////////////
-                    // if click on entity
-                    if (pointerInfo._pickInfo.pickedMesh && 
-                        pointerInfo._pickInfo.pickedMesh.metadata && 
-                        pointerInfo._pickInfo.pickedMesh.metadata !== null && 
-                        pointerInfo._pickInfo.pickedMesh.metadata.type && 
-                        pointerInfo._pickInfo.pickedMesh.metadata.type.includes('monster') && 
-                        pointerInfo._pickInfo.pickedMesh.metadata.sessionId !== this.sessionId){
-                          
-                        // get target
-                        let targetSessionId = pointerInfo._pickInfo.pickedMesh.metadata.sessionId;   
-                        
-                        // send to server
-                        this._room.send("entity_attack", {
-                            senderId: this.sessionId,
-                            targetId: targetSessionId
-                        });
-
-                        // send bullet locally
-                        let start = this.mesh.position;
-                        let end = pointerInfo._pickInfo.pickedMesh.position;
-                        this.actionsController.fire(start, end, this.ui._entities[targetSessionId].mesh);
-                    }
-
-                   
-                    /////////////////////////////////////////////////////////////////////
-                    // if click on environement
-                    if (pointerInfo._pickInfo.pickedPoint && 
-                        pointerInfo._pickInfo.pickedMesh.metadata.gltf){
-
-                        // get destination
-                        let destination = pointerInfo._pickInfo.pickedPoint;
-
-                        // add decal
-                        var decalMaterial = new StandardMaterial("decalMat", this._scene);
-                        decalMaterial.diffuseTexture = new Texture("textures/decal_target.png", this._scene);
-                        decalMaterial.diffuseTexture.hasAlpha = true;
-                        decalMaterial.zOffset = -2;
-                        var newDecal = MeshBuilder.CreateDecal("decal", pointerInfo._pickInfo.pickedMesh, { position: destination, size: new Vector3(1.5, 1.5, 1.5)}); //decal is created 
-                        newDecal.material = decalMaterial; //decal material is added.
-
-                        // send to server
-                        this._room.send("player_moveTo", {
-                            senderId: this.sessionId,
-                            to: destination
-                        });
-
-                        // delete decal after a while
-                        setTimeout(function(){
-                            newDecal.dispose()
-                        }, 2000)
-                        
-                    }
+        // mouse events
+        this._scene.onPointerObservable.add((pointerInfo:any) => {
+        
+            // on left mouse click
+            if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 0) {
     
+                console.log(pointerInfo._pickInfo);
+
+                /////////////////////////////////////////////////////////////////////
+                // if click on entity
+                if (pointerInfo._pickInfo.pickedMesh && 
+                    pointerInfo._pickInfo.pickedMesh.metadata && 
+                    pointerInfo._pickInfo.pickedMesh.metadata !== null && 
+                    pointerInfo._pickInfo.pickedMesh.metadata.type && 
+                    pointerInfo._pickInfo.pickedMesh.metadata.type.includes('monster') && 
+                    pointerInfo._pickInfo.pickedMesh.metadata.sessionId !== this.sessionId){
+                        
+                    // get target
+                    let targetSessionId = pointerInfo._pickInfo.pickedMesh.metadata.sessionId;   
+                    
+                    // send to server
+                    this._room.send("entity_attack", {
+                        senderId: this.sessionId,
+                        targetId: targetSessionId
+                    });
+
+                    // send bullet locally
+                    let start = this.mesh.position;
+                    let end = pointerInfo._pickInfo.pickedMesh.position;
+                    this.actionsController.fire(start, end, this.ui._entities[targetSessionId].mesh);
                 }
 
-                // on right mouse click
-                if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 2) {
 
-                    /////////////////////////////////////////////////////////////////////
-                    // display nameplate for a certain time for any entity right clicked
-                    if (pointerInfo._pickInfo.pickedMesh && 
-                        pointerInfo._pickInfo.pickedMesh.metadata !== null ){
-                            let targetMesh = pointerInfo._pickInfo.pickedMesh;
-                            let targetData = targetMesh.metadata;  
-                            let target = this.ui._entities[targetData.sessionId];
-                            if(targetData.type === 'player'){
-                                target = this.ui._players[targetData.sessionId];
-                            }
-                            target.characterLabel.isVisible = true;
-                            setTimeout(function(){
-                                target.characterLabel.isVisible = false;
-                            }, Config.PLAYER_NAMEPLATE_TIMEOUT)
-                    }
+            }
+
+            // on right mouse click
+            if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 2) {
+
+                /////////////////////////////////////////////////////////////////////
+                // display nameplate for a certain time for any entity right clicked
+                if (pointerInfo._pickInfo.pickedMesh && 
+                    pointerInfo._pickInfo.pickedMesh.metadata !== null ){
+                        let targetMesh = pointerInfo._pickInfo.pickedMesh;
+                        let targetData = targetMesh.metadata;  
+                        let target = this.ui._entities[targetData.sessionId];
+                        if(targetData.type === 'player'){
+                            target = this.ui._players[targetData.sessionId];
+                        }
+                        target.characterLabel.isVisible = true;
+                        setTimeout(function(){
+                            target.characterLabel.isVisible = false;
+                        }, Config.PLAYER_NAMEPLATE_TIMEOUT)
                 }
+            }
 
-            });
-        }
+        });
 
         //////////////////////////////////////////////////////////////////////////
         // player render loop
         this._scene.registerBeforeRender(() => {
 
-            // animate player continuously
-            this.animatorController.animate(this, this.mesh.position, this.moveController.getNextPosition());
-
-            if (this.isCurrentPlayer) {
-
-                // mova camera as player moves
-                this.cameraController.follow(this.mesh.position);
-            }    
+            // mova camera as player moves
+            this.cameraController.follow(this.mesh.position);
+            
         });
-
-        //////////////////////////////////////////////////////////////////////////
-        // misc
-        this.characterLabel = this.createLabel(entity.name);
-        this.characterChatLabel = this.createChatLabel(entity.name);
       
     }
 
@@ -252,7 +131,7 @@ export class Player {
     //////////////////////////////////////////////////////////////////////////
     // server message handler
 
-    private registerServerMessages(){
+    public registerServerMessages(){
 
         // on teleport confirmation
         this._room.onMessage('playerTeleportConfirm', (location) => {

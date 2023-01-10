@@ -18,10 +18,10 @@ export class Entity {
     public _scene: Scene;
     public _room;
     public ui;
-    private _input;
-    private _shadow;
-    private _navMesh;
-    private assetsContainer;
+    public _input;
+    public _shadow;
+    public _navMesh;
+    public assetsContainer;
 
     // controllers
     public cameraController: PlayerCamera;
@@ -31,15 +31,15 @@ export class Entity {
     public actionsController: PlayerActions;
     public meshController: PlayerMesh;
     
-    //Player
+    // entity
     public mesh: AbstractMesh; //outer collisionbox of player
     public playerMesh: AbstractMesh; //outer collisionbox of player
     public characterChatLabel: Rectangle;
     public characterLabel: Rectangle;
     public playerInputs: PlayerInputs[];
-    private isCurrentPlayer: boolean;
     public sessionId: string;
     public entity: PlayerState;
+    public isCurrentPlayer:boolean;
 
     // character
     public name: string = "";
@@ -76,9 +76,8 @@ export class Entity {
         this._shadow = shadow;
         this.sessionId = entity.sessionId; // network id from colyseus
         this.entity = entity;
-        this.isCurrentPlayer = this._room.sessionId === entity.sessionId;
         this._input = input;
-        this.playerInputs = [];
+        
 
         // update player data from server data
         Object.assign(this, this.entity);
@@ -87,7 +86,7 @@ export class Entity {
         this.spawn(entity);
     }
 
-    private async spawn(entity) {
+    public async spawn(entity) {
 
         // load mesh controllers
         this.meshController = new PlayerMesh(this._scene, this.assetsContainer, this.entity, this._room, this.isCurrentPlayer);
@@ -117,8 +116,6 @@ export class Entity {
             // update player position
             this.moveController.setPositionAndRotation(this.entity);
 
-            // update health
-            
         });
 
         //////////////////////////////////////////////////////////////////////////
@@ -142,7 +139,7 @@ export class Entity {
     //////////////////////////////////////////////////////////////////////////
     // server message handler
 
-    private registerServerMessages(){
+    public registerServerMessages(){
 
     }
 

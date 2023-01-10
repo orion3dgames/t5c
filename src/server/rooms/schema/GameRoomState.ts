@@ -99,6 +99,7 @@ export class GameRoomState extends Schema {
             this.timer = 0;
 
             // for each player
+            /*
             if( this.players.size > 0){
                 this.players.forEach(player => { 
                     
@@ -146,7 +147,7 @@ export class GameRoomState extends Schema {
 
                     }
                 });
-            }
+            }*/
 
             // for each entity
             if( this.entities.size > 0){
