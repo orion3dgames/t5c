@@ -1,4 +1,4 @@
-import { TransformNode, Scene, AxesViewer, Vector3, AbstractMesh, CascadedShadowGenerator, PointerEventTypes} from "@babylonjs/core";
+import { Scene, Vector3, MeshBuilder, AbstractMesh, CascadedShadowGenerator, PointerEventTypes, StandardMaterial, Texture} from "@babylonjs/core";
 import { Control, Rectangle, TextBlock, TextWrapping } from "@babylonjs/gui";
 import { PlayerState } from "../../server/rooms/schema/PlayerState";
 
@@ -12,7 +12,7 @@ import { PlayerActions } from "./Player/PlayerActions";
 import { PlayerMesh } from "./Player/PlayerMesh";
 import State from "../../client/Screens/Screens";
 import { Room } from "colyseus.js";
-import { NavMesh } from "yuka";
+import { NavMesh, Vector3 as Vector3Y } from "yuka";
 
 export class Player {
     
@@ -143,11 +143,12 @@ export class Player {
             this._scene.onPointerObservable.add((pointerInfo:any) => {
             
                 // on left mouse click
-                // if other player, send to server: target loses 5 health
                 if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 0) {
       
                     console.log(pointerInfo._pickInfo);
 
+                    /////////////////////////////////////////////////////////////////////
+                    // if click on entity
                     if (pointerInfo._pickInfo.pickedMesh && 
                         pointerInfo._pickInfo.pickedMesh.metadata && 
                         pointerInfo._pickInfo.pickedMesh.metadata !== null && 
@@ -155,7 +156,10 @@ export class Player {
                         pointerInfo._pickInfo.pickedMesh.metadata.type.includes('monster') && 
                         pointerInfo._pickInfo.pickedMesh.metadata.sessionId !== this.sessionId){
                           
-                        let targetSessionId = pointerInfo._pickInfo.pickedMesh.metadata.sessionId;    
+                        // get target
+                        let targetSessionId = pointerInfo._pickInfo.pickedMesh.metadata.sessionId;   
+                        
+                        // send to server
                         this._room.send("entity_attack", {
                             senderId: this.sessionId,
                             targetId: targetSessionId
@@ -168,19 +172,42 @@ export class Player {
                     }
 
                    
-                    if (pointerInfo._pickInfo.pickedPoint){
+                    /////////////////////////////////////////////////////////////////////
+                    // if click on environement
+                    if (pointerInfo._pickInfo.pickedPoint && 
+                        pointerInfo._pickInfo.pickedMesh.metadata.gltf){
+
+                        // get destination
                         let destination = pointerInfo._pickInfo.pickedPoint;
+
+                        // add decal
+                        var decalMaterial = new StandardMaterial("decalMat", this._scene);
+                        decalMaterial.diffuseTexture = new Texture("textures/decal_target.png", this._scene);
+                        decalMaterial.diffuseTexture.hasAlpha = true;
+                        decalMaterial.zOffset = -2;
+                        var newDecal = MeshBuilder.CreateDecal("decal", pointerInfo._pickInfo.pickedMesh, { position: destination, size: new Vector3(1.5, 1.5, 1.5)}); //decal is created 
+                        newDecal.material = decalMaterial; //decal material is added.
+
+                        // send to server
                         this._room.send("player_moveTo", {
                             senderId: this.sessionId,
                             to: destination
                         });
+
+                        // delete decal after a while
+                        setTimeout(function(){
+                            newDecal.dispose()
+                        }, 2000)
+                        
                     }
     
                 }
 
                 // on right mouse click
-                // display nameplate for a certain time for any entity right clicked
                 if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 2) {
+
+                    /////////////////////////////////////////////////////////////////////
+                    // display nameplate for a certain time for any entity right clicked
                     if (pointerInfo._pickInfo.pickedMesh && 
                         pointerInfo._pickInfo.pickedMesh.metadata !== null ){
                             let targetMesh = pointerInfo._pickInfo.pickedMesh;

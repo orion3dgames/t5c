@@ -1,5 +1,6 @@
 import { nanoid } from "nanoid";
 import State from "../client/Screens/Screens"
+import { isLocal } from "./Utils";
 
 let Config = {
     
@@ -99,7 +100,7 @@ let Config = {
     // functions
     setDefault(){
         global.T5C = {
-            nextScene: State.LOGIN,
+            nextScene: isLocal() ? State.GAME : State.LOGIN,
             currentRoomID: "",
             currentSessionID: "",
             currentLocation: Config.locations[Config.initialLocation],

@@ -36,6 +36,7 @@ export class PlayerState extends Schema {
   public toRegion;
   public currentRegion;
   public destinationPath;
+  public destination
 
   constructor(navmesh, database, ...args: any[]) {
 		super(args);
@@ -56,6 +57,10 @@ export class PlayerState extends Schema {
 
   loseHealth(amount:number) {
     this.health -= amount;
+  }
+
+  canMoveTo(sourcePos:Vector3, newPos:Vector3){
+    return this._navMesh.checkPath(sourcePos, newPos);
   }
 
   processPlayerInput(playerInput:PlayerInputs) {

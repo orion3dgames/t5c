@@ -105,37 +105,37 @@ export class GameRoomState extends Schema {
                     // move entity
                     if(player.toRegion && player.destinationPath && player.destinationPath[0]){
 
-                        // save current position
-                        let currentPos = new Vector3(player.x, player.y,player.z);
-
                         // get next waypoint
                         let destinationOnPath = player.destinationPath[0];
-                        destinationOnPath.y = 0;
-                        let speed = 0.4;
+                        let speed = 0.5;
+
+                        // save current position
+                        let currentPos = new Vector3(player.x, player.y, player.z);
 
                         // calculate next position towards destination
                         let updatedPos = player.moveTo(currentPos, destinationOnPath, speed);
-                        player.x = updatedPos.x;
-                        player.y = updatedPos.y;
-                        player.z = updatedPos.z;
 
-                        // calculate rotation
-                        player.rot = player.calculateRotation(currentPos, updatedPos);
+                        //
+                        if (player.canMoveTo(currentPos, updatedPos) === null){
 
-                        //Logger.info("[gameroom][state][update] moved entity: "+entity.sessionId);
-
-                        // check if arrived at waypoint
-                        if(destinationOnPath.equals(updatedPos)){
-                            player.destinationPath.shift();
-                        }
-
-                        // update entity region
-                        player.currentRegion = this.navMesh.getClosestRegion( currentPos );
-
-                        // if arrived at final destination, set toRegion to false so it'll be update at next iteration
-                        if(player.currentRegion === player.toRegion){
                             player.toRegion = false;
                             player.destinationPath = false;
+
+                        }else{
+
+                            player.x = updatedPos.x;
+                            player.y = updatedPos.y;
+                            player.z = updatedPos.z;
+                            
+                            // calculate rotation
+                            player.rot = player.calculateRotation(currentPos, updatedPos);
+
+                            // check if arrived at waypoint
+                            destinationOnPath.y = 0;
+                            if(destinationOnPath.equals(updatedPos)){
+                                player.destinationPath.shift();
+                            }
+
                         }
 
                     }else{
@@ -200,14 +200,6 @@ export class GameRoomState extends Schema {
                             entity.destinationPath.shift();
                         }
 
-                        // update entity region
-                        entity.currentRegion = this.navMesh.getClosestRegion( currentPos );
-
-                        // if arrived at final destination, set toRegion to false so it'll be update at next iteration
-                        if(entity.currentRegion === entity.toRegion){
-                            entity.toRegion = false;
-                            entity.destinationPath = false;
-                        }
 
                     }else{
 

@@ -31,7 +31,7 @@ export class GameRoom extends Room<GameRoomState> {
         // initialize navmesh
         const navMesh = await loadNavMeshFromFile(options.location)
         this.navMesh = navMesh;
-        Logger.info("[gameroom][onCreate] navmesh initialized.");
+        Logger.info("[gameroom][onCreate] navmesh "+options.location+" initialized.");
    
         // Set initial state
         this.setState(new GameRoomState(this, this.navMesh, options));
@@ -254,7 +254,6 @@ export class GameRoom extends Room<GameRoomState> {
             let from = new Vector3(player.x, player.y, player.z);
             let destination = new Vector3(data.to._x, data.to._y, data.to._z);
             player.toRegion = this.navMesh.getClosestRegion( destination );
-            //console.log('player_moveTo', from, destination, data);
             player.destinationPath = this.navMesh.findPath(from, destination);
 
         });
