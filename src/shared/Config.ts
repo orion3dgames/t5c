@@ -67,7 +67,7 @@ let Config = {
             name: "loading...",
             speed: 0.2,
             scale: 0.02,
-            animationSpeed: 2,
+            animationSpeed: 1.3,
             animations: {
                 "IDLE": 3,
                 "WALK": 6,
