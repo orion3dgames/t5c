@@ -299,6 +299,8 @@ export class GameScene {
                     // sent current input to server for processing 
                     this.room.send("playerInput", latestInput);
 
+                    console.log('playerInput', latestInput);
+
                     // do client side prediction
                     this._currentPlayer.moveController.predictionMove(latestInput);
                    

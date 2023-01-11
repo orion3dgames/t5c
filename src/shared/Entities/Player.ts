@@ -31,7 +31,7 @@ export class Player extends Entity {
 
         //spawn 
         this.utilsController = new EntityUtils(this._scene, this._room);
-        //this.cameraController = new EntityCamera(this._scene, this._input);
+        this.cameraController = new EntityCamera(this._scene, this._input);
         this.actionsController = new EntityActions(this._scene);
        
         ///////////////////////////////////////////////////////////
@@ -41,6 +41,7 @@ export class Player extends Entity {
 
             // do server reconciliation on client if current player only & not blocked
             if (this.isCurrentPlayer && !this.blocked) {
+                console.log('reconcileMove', this.entity.sequence);
                 this.moveController.reconcileMove(this.entity.sequence); // set default entity position
             }
 
@@ -113,8 +114,8 @@ export class Player extends Entity {
         // player render loop
         this._scene.registerBeforeRender(() => {
 
-            // mova camera as player moves
-            //this.cameraController.follow(this.mesh.position);
+            // move camera as player moves
+            this.cameraController.follow(this.mesh.position);
             
         });
       

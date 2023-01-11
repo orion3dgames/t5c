@@ -72,6 +72,8 @@ export class EntityMove {
 
         // Save this input for later reconciliation.
         this.playerInputs.push(latestInput);
+
+        console.log('predictionMove', latestInput);
     }
 
     public tween(){
