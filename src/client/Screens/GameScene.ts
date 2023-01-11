@@ -15,11 +15,9 @@ import { Entity } from "../../shared/Entities/Entity";
 import Config from '../../shared/Config';
 import { Room } from "colyseus.js";
 import { PlayerInputs } from "../../shared/types";
-import { isLocal, request } from "../../shared/Utils";
-
+import { isLocal } from "../../shared/Utils";
 import { NavMesh } from "yuka";
 import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
-import { createConvexRegionHelper, createGraphHelper } from "../../shared/Utils/navMeshHelper";
 
 export class GameScene {
 
@@ -38,9 +36,8 @@ export class GameScene {
     public _roomId: string;
     private room: Room<any>;
     private chatRoom: Room<any>;
-    private playerEntities: Player[] = [];
     private entities: Entity[] = [];
-    private _currentPlayer;
+    private _currentPlayer:Player;
 
     public _loadedAssets;
 
@@ -213,47 +210,49 @@ export class GameScene {
         this._input = new Input(this._scene);
 
         // setup hud
-        this._ui = new UserInterface(this._scene, this._engine, this.room, this.chatRoom, this.playerEntities, this.entities, this._currentPlayer);
+        this._ui = new UserInterface(this._scene, this._engine, this.room, this.chatRoom, this.entities, this._currentPlayer);
 
+        
         ////////////////////////////////////////////////////
-        //  when a player joins the room event
-        this.room.state.players.onAdd((entity, sessionId) => {
-
-            var isCurrentPlayer = sessionId === this.room.sessionId;
-
-            // create player entity
-            let _player = new Player(entity, this.room, this._scene, this._ui, this._input, this._shadow, this._navMesh, this.assetsContainer);
+        //  when a entity joins the room event
+        this.room.state.entities.onAdd((entity, sessionId) => {
             
-            // if current player, save entity ref
-            if (isCurrentPlayer) {
 
-                // set currentPlayer
-                this._currentPlayer = _player;
+            // if player type
+            if(entity.type === 'player'){
 
-                // add player specific  ui
-                this._ui.setCurrentPlayer(_player);
+                var isCurrentPlayer = sessionId === this.room.sessionId;
+
+                // create player entity
+                let _player = new Player(entity, this.room, this._scene, this._ui, this._input, this._shadow, this._navMesh, this.assetsContainer);
+                
+                // if current player, save entity ref
+                if (isCurrentPlayer) {
+    
+                    // set currentPlayer
+                    this._currentPlayer = _player;
+    
+                    // add player specific  ui
+                    this._ui.setCurrentPlayer(_player);
+                }
+
+
+                console.log('PLAYER', _player);
+
             }
+            
+            // if entity type
+            if(entity.type === 'entity'){
 
-            // save entity
-            this.playerEntities[sessionId] = _player;
+                let _player = new Entity(entity, this.room, this._scene, this._ui, this._input, this._shadow, this._navMesh, this.assetsContainer);
 
+                // save entity
+                this.entities[sessionId] = _player;
+            }
+            
         });
 
         // when a player leaves the room event
-        this.room.state.players.onRemove((player, sessionId) => {
-            this.playerEntities[sessionId].remove();
-            delete this.playerEntities[sessionId];
-        });
-        ////////////////////////////////////////////////////
-
-        ////////////////////////////////////////////////////
-        //  when a entity is created  event
-        this.room.state.entities.onAdd((entity, sessionId) => {
-            this.entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._input, this._shadow, this._navMesh, this.assetsContainer);
-            console.log('spawned entity', this.entities[sessionId]);
-        });
-
-        // when a entity is removed event
         this.room.state.entities.onRemove((player, sessionId) => {
             this.entities[sessionId].remove();
             delete this.entities[sessionId];
@@ -266,14 +265,6 @@ export class GameScene {
         let sequence = 0;
         let latestInput: PlayerInputs;
         this._scene.registerBeforeRender(() => {
-
-            // continuously move players at 60fps
-            for (let sessionId in this.playerEntities) {
-                const player = this.playerEntities[sessionId];
-                if(player && player.moveController){
-                    player.moveController.tween();
-                }
-            }
 
             // continuously move entities at 60fps
             for (let sessionId in this.entities) {

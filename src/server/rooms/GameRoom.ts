@@ -5,7 +5,7 @@ import databaseInstance from "../../shared/Database";
 import Config from '../../shared/Config';
 import Logger from "../../shared/Logger";
 import loadNavMeshFromFile from "../../shared/Utils/loadNavMeshFromFile";
-import { PlayerState } from "./schema/PlayerState";
+import { EntityState } from "./schema/EntityState";
 import { PlayerInputs } from "../../shared/types";
 import { EntityCurrentState } from "../../shared/Entities/Entity/EntityCurrentState";
 import { NavMesh, Vector3 } from "../../shared/yuka";
@@ -61,28 +61,34 @@ export class GameRoom extends Room<GameRoomState> {
         this.delayedInterval = this.clock.setInterval(() => {
 
             // only save if there is any players
-            if(this.state.players.size > 0){
+            if(this.state.entities.size > 0){
+
                 //Logger.info("[gameroom][onCreate] Saving data for room "+options.location+" with "+this.state.players.size+" players");
-                this.state.players.forEach(player => {
+                this.state.entities.forEach(entity => {
 
-                    // do not save if players is blocked
-                    if(player.blocked){
+                    if(entity.type === 'player'){
 
-                        // update player
-                        let playerClient = this.clients.hashedArray[player.sessionId];
-                        this.database.updateCharacter(playerClient.auth.id, {
-                            location: player.location,
-                            x: player.x,
-                            y: player.y,
-                            z: player.z,
-                            rot: player.rot,
-                        });
+                        // do not save if players is blocked
+                        if(entity.blocked){
 
-                        //Logger.info("[gameroom][onCreate] player "+playerClient.auth.name+" saved to database.");
+                            // update player
+                            let playerClient = this.clients.hashedArray[entity.sessionId];
+                            this.database.updateCharacter(playerClient.auth.id, {
+                                location: entity.location,
+                                x: entity.x,
+                                y: entity.y,
+                                z: entity.z,
+                                rot: entity.rot,
+                            });
+
+                            //Logger.info("[gameroom][onCreate] player "+playerClient.auth.name+" saved to database.");
+                        }
                     }
+
                 });
                 
             }
+           
         }, Config.databaseUpdateRate);
     }
 
@@ -122,7 +128,7 @@ export class GameRoom extends Room<GameRoomState> {
         Logger.info(`[gameroom][onJoin] player ${client.sessionId} joined room ${this.roomId}.`, options);
 
         // add player using auth data
-        this.state.addPlayer(client.sessionId, client.auth);
+        this.state.addEntity(client.sessionId, client.auth);
         this.database.toggleOnlineStatus(client.auth.id, 1);
         Logger.info(`[gameroom][onJoin] player added `);
 
@@ -140,7 +146,7 @@ export class GameRoom extends Room<GameRoomState> {
         /////////////////////////////////////
         // on player input
 		this.onMessage('playerInput', (client, playerInput: PlayerInputs) => {
-            const playerState: PlayerState = this.state.players.get(client.sessionId);
+            const playerState: EntityState = this.state.entities.get(client.sessionId);
             if (playerState) {
                 playerState.processPlayerInput(playerInput);
             } else {
@@ -152,7 +158,7 @@ export class GameRoom extends Room<GameRoomState> {
         // on player teleport
         this.onMessage("playerTeleport", (client, location) => {
 
-            const playerState: PlayerState = this.state.players.get(client.sessionId);
+            const playerState: EntityState = this.state.entities.get(client.sessionId);
 
             if (playerState) {
 
@@ -190,8 +196,8 @@ export class GameRoom extends Room<GameRoomState> {
             let state = this.state;
 
             // get players involved
-            let sender:PlayerState = state.players[client.sessionId];
-            let target:PlayerState = state.entities[data.targetId];
+            let sender:EntityState = state.entities[client.sessionId];
+            let target:EntityState = state.entities[data.targetId];
             
             if(!sender) throw new Error('sender does not exists!');
             if(!target) throw new Error('target does not exists!');
@@ -210,12 +216,13 @@ export class GameRoom extends Room<GameRoomState> {
                 target.health = 0;
                 target.state = EntityCurrentState.DEAD;
                 target.blocked = true;
-                Logger.info(`[gameroom][playerAction] Monster is dead`, data);
+                Logger.info(`[gameroom][playerAction] Entity is dead`, data);
 
                 // delete so entity can be respawned
                 setTimeout(function(){
-                    Logger.info(`[gameroom][playerAction] Monster spawning`, data);
-                    delete state.entities[data.targetId];
+                    Logger.info(`[gameroom][playerAction] Deleting entity from server`, data);
+                    this.entities[target.sessionId].remove();
+                    delete this.entities[target.sessionId];
                 }, Config.MONSTER_RESPAWN_RATE);
             }
 
@@ -246,7 +253,7 @@ export class GameRoom extends Room<GameRoomState> {
         this.onMessage("player_moveTo", (client, data: any) => {
 
             // get players involved
-            let player:PlayerState = this.state.players[client.sessionId];
+            let player:EntityState = this.state.entities[client.sessionId];
            
             if(!player) throw new Error('sender does not exists!');
 
@@ -287,7 +294,7 @@ export class GameRoom extends Room<GameRoomState> {
 
         Logger.info(`[onLeave] player ${client.auth.name} left`);
 
-        this.state.players.delete(client.sessionId);
+        this.state.entities.delete(client.sessionId);
         this.database.toggleOnlineStatus(client.auth.id, 0);
 	}
 

@@ -1,5 +1,5 @@
-import { Scene, CascadedShadowGenerator, PointerEventTypes } from "@babylonjs/core";
-import { PlayerState } from "../../server/rooms/schema/PlayerState";
+import { Scene, CascadedShadowGenerator, PointerEventTypes, AssetContainer } from "@babylonjs/core";
+import { EntityState } from "../../server/rooms/schema/EntityState";
 
 import Config from "../Config";
 import { EntityCamera } from "./Entity/EntityCamera";
@@ -9,24 +9,20 @@ import { Entity } from "./Entity";
 import State from "../../client/Screens/Screens";
 import { Room } from "colyseus.js";
 import { NavMesh } from "yuka";
-import { PlayerInputs } from "../types";
 
 export class Player extends Entity {
 
-    public playerInputs: PlayerInputs[];
-
     constructor(
-        entity:PlayerState,
+        entity:EntityState,
         room:Room, 
         scene: Scene, 
         ui,
         input, 
         shadow:CascadedShadowGenerator, 
         navMesh:NavMesh,
-        assetsContainer
+        assetsContainer:AssetContainer[]
     ) {
-        super(entity,room, scene, ui, input, shadow, navMesh, assetsContainer);
-        this.playerInputs = [];
+        super(entity, room, scene, ui, input, shadow, navMesh, assetsContainer);
 
         this.spawnPlayer()
     }
@@ -35,7 +31,7 @@ export class Player extends Entity {
 
         //spawn 
         this.utilsController = new EntityUtils(this._scene, this._room);
-        this.cameraController = new EntityCamera(this._scene, this._input);
+        //this.cameraController = new EntityCamera(this._scene, this._input);
         this.actionsController = new EntityActions(this._scene);
        
         ///////////////////////////////////////////////////////////
@@ -118,7 +114,7 @@ export class Player extends Entity {
         this._scene.registerBeforeRender(() => {
 
             // mova camera as player moves
-            this.cameraController.follow(this.mesh.position);
+            //this.cameraController.follow(this.mesh.position);
             
         });
       

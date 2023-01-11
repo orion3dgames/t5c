@@ -1,5 +1,4 @@
 import { Schema, type, MapSchema } from '@colyseus/schema';
-import { PlayerState } from './PlayerState';
 import { EntityState } from "./EntityState";
 import { PlayerCharacter } from '../../../shared/types';
 import { GameRoom } from '../GameRoom';
@@ -17,13 +16,13 @@ enum AI_STATE {
 
 export class GameRoomState extends Schema {
 
-    @type({ map: PlayerState }) players = new MapSchema<PlayerState>();
+    // networked variables
     @type({ map: EntityState }) entities = new MapSchema<EntityState>();
     @type("number") serverTime: number = 0.0;
+    
+    // not networked variables
     private _gameroom: GameRoom = null;
     private navMesh: NavMesh = null;
-    private entityManager;
-    private time;
     private timer: number = 0;
     private spawnTimer: number = 0;
 
@@ -31,8 +30,6 @@ export class GameRoomState extends Schema {
 		super(...args);
 		this._gameroom = gameroom;
 		this.navMesh = _navMesh;
-        //this.entityManager = new EntityManager();
-        //this.time = new Time()     
 	}
 
     public createEntity(){
@@ -48,12 +45,13 @@ export class GameRoomState extends Schema {
         let point = randomRegion.centroid;
 
         // random mesh
-        let type = monsterTypes[Math.floor(Math.random()*monsterTypes.length)];
+        let race = monsterTypes[Math.floor(Math.random()*monsterTypes.length)];
 
         // create entity
         let entity = new EntityState(this._gameroom).assign({
             sessionId: sessionId,
-            type: type,
+            type: 'entity',
+            race: race,
             name: "Monster "+sessionId,
             location: this._gameroom.metadata.location,
             x: point.x,
@@ -65,21 +63,22 @@ export class GameRoomState extends Schema {
             state: EntityCurrentState.IDLE,
             currentRegion: randomRegion,
             toRegion: false,
-            config: Config.entities[type]
+            config: Config.entities[race]
         });
+
+    
 
         // add to colyseus state
         this.entities.set(sessionId, entity);
 
         // log
-        Logger.info("[gameroom][state][createEntity] created new entity "+type+": "+sessionId);
+        Logger.info("[gameroom][state][createEntity] created new entity "+race+": "+sessionId, entity.config);
     }
 
     public update(deltaTime: number) {
 
         //////////////////////////////////////////////
         // entity spawning script (span a monster every .5 second)
-
         this.spawnTimer += deltaTime;
         let spawnTime = 500;
         if (this.spawnTimer >= spawnTime) {
@@ -92,122 +91,122 @@ export class GameRoomState extends Schema {
 
         //////////////////////////////////////////////
         // entity moving script 
-
         this.timer += deltaTime;
         let refreshRate = 100;
         if (this.timer >= refreshRate) {
             this.timer = 0;
 
-            // for each player
-            /*
-            if( this.players.size > 0){
-                this.players.forEach(player => { 
-                    
-                    // move entity
-                    if(player.toRegion && player.destinationPath && player.destinationPath[0]){
-
-                        // get next waypoint
-                        let destinationOnPath = player.destinationPath[0];
-                        let speed = 0.5;
-
-                        // save current position
-                        let currentPos = new Vector3(player.x, player.y, player.z);
-
-                        // calculate next position towards destination
-                        let updatedPos = player.moveTo(currentPos, destinationOnPath, speed);
-
-                        //
-                        if (player.canMoveTo(currentPos, updatedPos) === null){
-
-                            player.toRegion = false;
-                            player.destinationPath = false;
-
-                        }else{
-
-                            player.x = updatedPos.x;
-                            player.y = updatedPos.y;
-                            player.z = updatedPos.z;
-                            
-                            // calculate rotation
-                            player.rot = player.calculateRotation(currentPos, updatedPos);
-
-                            // check if arrived at waypoint
-                            destinationOnPath.y = 0;
-                            if(destinationOnPath.equals(updatedPos)){
-                                player.destinationPath.shift();
-                            }
-
-                        }
-
-                    }else{
-
-                        // something is wrong, let's look for a new destination
-                        player.toRegion = false;
-                        player.destinationPath = false;
-
-                    }
-                });
-            }*/
-
             // for each entity
             if( this.entities.size > 0){
                 this.entities.forEach(entity => { 
 
-                    // only find a new AI_STATE if AI_STATE_REMAINING_DURATION is at zero
-                    if(entity.AI_STATE_REMAINING_DURATION === 0 || entity.AI_STATE_REMAINING_DURATION < 0){
-                        entity.AI_CURRENT_STATE = Math.random() < 0.5 ? AI_STATE.IDLE : AI_STATE.WALKING;
-                        entity.AI_STATE_REMAINING_DURATION = (Math.random() * 5000); // change state every 3 seconds
-                        //console.log('NEW AI STATE', entity.AI_CURRENT_STATE, entity.AI_STATE_REMAINING_DURATION);
-                    }
+                    // player specific related 
+                    if(entity.type === 'player'){
 
-                    // 
-                    entity.AI_STATE_REMAINING_DURATION -= Math.random() * 100 + 10;
+                        // move entity
+                        if(entity.toRegion && entity.destinationPath && entity.destinationPath[0]){
 
-                    //console.log('AI_STATE_REMAINING_DURATION', entity.AI_STATE_REMAINING_DURATION);
+                            // get next waypoint
+                            let destinationOnPath = entity.destinationPath[0];
+                            let speed = 0.5;
 
-                    // save current position
-                    let currentPos = new Vector3(entity.x, entity.y,entity.z);
+                            // save current position
+                            let currentPos = new Vector3(entity.x, entity.y, entity.z);
 
-                    // if entity does not have a destination, find one
-                    if(!entity.toRegion){
-                        entity.setRandomDestination(currentPos);
-                    }
+                            // calculate next position towards destination
+                            let updatedPos = entity.moveTo(currentPos, destinationOnPath, speed);
 
-                    // move entity
-                    if(
-                        entity.destinationPath.length > 0 && 
-                        entity.health > 0 && 
-                        entity.AI_CURRENT_STATE === AI_STATE.WALKING
-                        ){
+                            //
+                            if (entity.canMoveTo(currentPos, updatedPos) === null){
 
-                        // get next waypoint
-                        let destinationOnPath = entity.destinationPath[0];
-                        destinationOnPath.y = 0;
-                        let speed = entity.config.speed;
+                                entity.toRegion = false;
+                                entity.destinationPath = false;
 
-                        // calculate next position towards destination
-                        let updatedPos = entity.moveTo(currentPos, destinationOnPath, speed);
-                        entity.x = updatedPos.x;
-                        entity.y = updatedPos.y;
-                        entity.z = updatedPos.z;
+                            }else{
 
-                        // calculate rotation
-                        entity.rot = entity.calculateRotation(currentPos, updatedPos);
+                                entity.x = updatedPos.x;
+                                entity.y = updatedPos.y;
+                                entity.z = updatedPos.z;
+                                
+                                // calculate rotation
+                                entity.rot = entity.calculateRotation(currentPos, updatedPos);
 
-                        //Logger.info("[gameroom][state][update] moved entity: "+entity.sessionId);
+                                // check if arrived at waypoint
+                                destinationOnPath.y = 0;
+                                if(destinationOnPath.equals(updatedPos)){
+                                    entity.destinationPath.shift();
+                                }
 
-                        // check if arrived at waypoint
-                        if(destinationOnPath.equals(updatedPos)){
-                            entity.destinationPath.shift();
+                            }
+
+                        }else{
+
+                            // something is wrong, let's look for a new destination
+                            entity.toRegion = false;
+                            entity.destinationPath = false;
                         }
 
+                    }
 
-                    }else{
+                    // only move non playing entities
+                    if(entity.type === 'entity'){
 
-                        // something is wrong, let's look for a new destination
-                        entity.toRegion = false;
-                        entity.destinationPath = false;
+                        // only find a new AI_STATE if AI_STATE_REMAINING_DURATION is at zero
+                        if(entity.AI_STATE_REMAINING_DURATION === 0 || entity.AI_STATE_REMAINING_DURATION < 0){
+                            entity.AI_CURRENT_STATE = Math.random() < 0.5 ? AI_STATE.IDLE : AI_STATE.WALKING;
+                            entity.AI_STATE_REMAINING_DURATION = (Math.random() * 5000); // change state every 3 seconds
+                            //console.log('NEW AI STATE', entity.AI_CURRENT_STATE, entity.AI_STATE_REMAINING_DURATION);
+                        }
 
+                        // 
+                        entity.AI_STATE_REMAINING_DURATION -= Math.random() * 100 + 10;
+
+                        //console.log('AI_STATE_REMAINING_DURATION', entity.AI_STATE_REMAINING_DURATION);
+
+                        // save current position
+                        let currentPos = new Vector3(entity.x, entity.y,entity.z);
+
+                        // if entity does not have a destination, find one
+                        if(!entity.toRegion){
+                            entity.setRandomDestination(currentPos);
+                        }
+
+                        // move entity
+                        if(
+                            entity.destinationPath.length > 0 && 
+                            entity.health > 0 && 
+                            entity.AI_CURRENT_STATE === AI_STATE.WALKING
+                            ){
+
+                            // get next waypoint
+                            let destinationOnPath = entity.destinationPath[0];
+                            destinationOnPath.y = 0;
+                            let speed = entity.config.speed;
+
+                            // calculate next position towards destination
+                            let updatedPos = entity.moveTo(currentPos, destinationOnPath, speed);
+                            entity.x = updatedPos.x;
+                            entity.y = updatedPos.y;
+                            entity.z = updatedPos.z;
+
+                            // calculate rotation
+                            entity.rot = entity.calculateRotation(currentPos, updatedPos);
+
+                            //Logger.info("[gameroom][state][update] moved entity: "+entity.sessionId);
+
+                            // check if arrived at waypoint
+                            if(destinationOnPath.equals(updatedPos)){
+                                entity.destinationPath.shift();
+                            }
+
+
+                        }else{
+
+                            // something is wrong, let's look for a new destination
+                            entity.toRegion = false;
+                            entity.destinationPath = false;
+
+                        }
                     }
         
                 });
@@ -216,11 +215,13 @@ export class GameRoomState extends Schema {
         
 	}
 
-    addPlayer(sessionId: string, data: PlayerCharacter) {
-        this.players.set(sessionId, new PlayerState(this.navMesh, this._gameroom.database).assign({
+    addEntity(sessionId: string, data: PlayerCharacter) {
+
+        this.entities.set(sessionId, new EntityState(this._gameroom).assign({
             id: data.id,
             sessionId: sessionId,
-            type: 'player_hobbit',
+            type: 'player',
+            race: 'player_hobbit',
             name: data.name,
             location: data.location,
             x: data.x,
@@ -235,8 +236,8 @@ export class GameRoomState extends Schema {
 
     }
 
-    removePlayer(sessionId: string) {
-        this.players.delete(sessionId);
+    removeEntity(sessionId: string) {
+        this.entities.delete(sessionId);
     }
 
 }

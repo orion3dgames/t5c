@@ -1,9 +1,6 @@
-import { TransformNode, Scene, Vector3, AxesViewer, AbstractMesh, CascadedShadowGenerator, PointerEventTypes} from "@babylonjs/core";
+import { TransformNode, Scene, Vector3, AxesViewer, AbstractMesh, CascadedShadowGenerator, AssetContainer} from "@babylonjs/core";
 import { Control, Rectangle, TextBlock, TextWrapping } from "@babylonjs/gui";
-import { PlayerState } from "../../server/rooms/schema/PlayerState";
-
-import Config from "../Config";
-import { PlayerInputs } from "../types";
+import { EntityState } from "../../server/rooms/schema/EntityState";
 import { EntityCamera } from "./Entity/EntityCamera";
 import { EntityAnimator } from "./Entity/EntityAnimator";
 import { EntityMove } from "./Entity/EntityMove";
@@ -36,10 +33,12 @@ export class Entity {
     public characterChatLabel: Rectangle;
     public characterLabel: Rectangle;
     public sessionId: string;
-    public entity: PlayerState;
+    public entity: EntityState;
     public isCurrentPlayer:boolean;
 
     // character
+    public type: string = "";
+    public race: string = "";
     public name: string = "";
     public x: number;
     public y: number;
@@ -55,14 +54,14 @@ export class Entity {
     public blocked: boolean = false; // if true, player will not moved
 
     constructor(
-        entity:PlayerState,
+        entity:EntityState,
         room:Room, 
         scene: Scene, 
         ui,
         input, 
         shadow:CascadedShadowGenerator, 
         navMesh,
-        assetsContainer
+        assetsContainer:AssetContainer[]
     ) {
  
         // setup class variables
@@ -96,7 +95,7 @@ export class Entity {
         this._shadow.addShadowCaster(this.meshController.mesh, true);
 
         // add all player related stuff
-        this.animatorController = new EntityAnimator(this.meshController.getAnimation(), this.entity.type);
+        this.animatorController = new EntityAnimator(this.meshController.getAnimation(), this.entity.race);
         this.moveController = new EntityMove(this.mesh, this._navMesh, this.isCurrentPlayer);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
 

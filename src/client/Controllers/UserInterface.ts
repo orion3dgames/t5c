@@ -29,14 +29,13 @@ export class UserInterface {
     //Chat
     public messages: PlayerMessage[] = [];
 
-    constructor(scene: Scene, engine:Engine, gameRoom:Room, chatRoom:Room, players:Player[], entities:Entity[], currentPlayer) {
+    constructor(scene: Scene, engine:Engine, gameRoom:Room, chatRoom:Room, entities:Entity[], currentPlayer) {
 
         // set var we will be needing
         this._scene = scene;
         this._engine = engine;
         this._gameRoom = gameRoom;
         this._chatRoom = chatRoom;
-        this._players = players;
         this._entities = entities;
         this._currentPlayer = currentPlayer;
  

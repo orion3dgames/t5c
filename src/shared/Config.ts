@@ -38,7 +38,7 @@ let Config = {
             key: 'lh_town',
             mesh: "lh_town.glb",
             sun: true,
-            sunIntensity: 2,
+            sunIntensity: 0,
             spawnPoint: {
                 x: 7.50,
                 y: 0,
@@ -51,7 +51,7 @@ let Config = {
             key: 'lh_dungeon_01',
             mesh: "lh_dungeon_01.glb",
             sun: false,
-            sunIntensity: 5,
+            sunIntensity: 0.5,
             spawnPoint: {
                 x: 11.33,
                 y: 0,
@@ -64,7 +64,7 @@ let Config = {
     // entities 
     entities: {
         "player_hobbit": {
-            //speed: 0.2,
+            speed: 0.2,
             scale: 0.02,
             animations: {
                 "IDLE": 3,
