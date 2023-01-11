@@ -8,6 +8,8 @@ import { EntityUtils } from "./Entity/EntityUtils";
 import { EntityActions } from "./Entity/EntityActions";
 import { EntityMesh } from "./Entity/EntityMesh";
 import { Room } from "colyseus.js";
+import { UserInterface } from "../../client/Controllers/UserInterface";
+import { NavMesh } from "yuka";
 
 export class Entity {
     
@@ -57,11 +59,10 @@ export class Entity {
         entity:EntityState,
         room:Room, 
         scene: Scene, 
-        ui,
-        input, 
+        ui:UserInterface,
         shadow:CascadedShadowGenerator, 
-        navMesh,
-        assetsContainer:AssetContainer[]
+        navMesh:NavMesh,
+        assetsContainer:AssetContainer[],
     ) {
  
         // setup class variables
@@ -74,7 +75,6 @@ export class Entity {
         this.sessionId = entity.sessionId; // network id from colyseus
         this.isCurrentPlayer = this._room.sessionId === entity.sessionId;
         this.entity = entity;
-        this._input = input;
         
         // update player data from server data
         Object.assign(this, this.entity);
@@ -94,7 +94,7 @@ export class Entity {
         // add mesh to shadow generator
         this._shadow.addShadowCaster(this.meshController.mesh, true);
 
-        // add all player related stuff
+        // add all entity related stuff
         this.animatorController = new EntityAnimator(this.meshController.getAnimation(), this.entity.race);
         this.moveController = new EntityMove(this.mesh, this._navMesh, this.isCurrentPlayer);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
@@ -113,6 +113,11 @@ export class Entity {
             // update player position
             this.moveController.setPositionAndRotation(this.entity);
 
+            // do server reconciliation on client if current player only & not blocked
+            if (this.isCurrentPlayer && !this.blocked) {
+                this.moveController.reconcileMove(this.entity.sequence); // set default entity position
+            }
+
         });
 
         //////////////////////////////////////////////////////////////////////////
@@ -129,15 +134,6 @@ export class Entity {
         this.characterLabel = this.createLabel(entity.name);
         this.characterChatLabel = this.createChatLabel(entity.name);
       
-    }
-
-    //////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////
-    // server message handler
-
-    public registerServerMessages(){
-
     }
 
     //////////////////////////////////////////////////////////////////////////

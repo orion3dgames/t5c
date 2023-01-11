@@ -216,7 +216,6 @@ export class GameRoomState extends Schema {
 	}
 
     addEntity(sessionId: string, data: PlayerCharacter) {
-
         this.entities.set(sessionId, new EntityState(this._gameroom).assign({
             id: data.id,
             sessionId: sessionId,
@@ -233,7 +232,6 @@ export class GameRoomState extends Schema {
             experience: data.experience,
             state: EntityCurrentState.IDLE
         }));
-
     }
 
     removeEntity(sessionId: string) {

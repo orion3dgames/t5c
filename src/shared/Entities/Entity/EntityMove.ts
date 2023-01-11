@@ -67,26 +67,20 @@ export class EntityMove {
     // prediction move
     public predictionMove(latestInput:PlayerInputs){
 
+        console.log('predictionMove', latestInput);
+
         // move player locally
         this.move(latestInput);
 
         // Save this input for later reconciliation.
         this.playerInputs.push(latestInput);
 
-        console.log('predictionMove', latestInput);
+        
     }
 
     public tween(){
-
-        if(!this._mesh){
-            return false;
-        }
-
         this._mesh.position = Vector3.Lerp(this._mesh.position, this.nextPosition, 0.2);
         this._mesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.8);
-
-        //this._mesh.position = this.nextPosition;
-        //this._mesh.rotation = this.nextRotation;
     }
 
     public move(input:PlayerInputs):void {
@@ -130,7 +124,7 @@ export class EntityMove {
             this.nextPosition.z = newZ;
             this.nextRotation.y = this.nextRotation.y + (newRot - this.nextRotation.y);
 
-            
+            console.log('entity move');
 
         }
 

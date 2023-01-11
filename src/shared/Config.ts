@@ -23,7 +23,7 @@ let Config = {
 
     // game settings
     PLAYER_NAMEPLATE_TIMEOUT: 15000, // 15 seconds
-    MONSTER_RESPAWN_RATE: 10000,
+    MONSTER_RESPAWN_RATE: 1000,
 
     // players settings
     PLAYER_SPEED: 0.40,

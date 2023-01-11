@@ -2,12 +2,11 @@ import {
     Scene, Engine, Vector3, Color3, Color4,
     ShadowGenerator, CascadedShadowGenerator,
     DirectionalLight, HemisphericLight,
-    AssetsManager, AssetContainer, KeepAssets, SceneLoader
+    AssetsManager, AssetContainer, SceneLoader
 } from "@babylonjs/core";
 
-import { AdvancedDynamicTexture } from "@babylonjs/gui";
 import State from "./Screens";
-import { Input } from "../Controllers/Input";
+import { PlayerInput } from "../Controllers/PlayerInput";
 import { Environment } from "../Controllers/Environment";
 import { UserInterface } from "../Controllers/UserInterface";
 import { Player } from "../../shared/Entities/Player";
@@ -21,25 +20,23 @@ import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
 
 export class GameScene {
 
-    public _scene: Scene;
-    public _client;
+    private _scene: Scene;
+    private _client;
     private _engine: Engine;
-    private _gui: AdvancedDynamicTexture;
-    private _assetsManager: AssetsManager;
-    public assetsContainer: AssetContainer[] = [];
-    private _input;
+    private _assetsContainer: AssetContainer[] = [];
+    private _input: PlayerInput;
     private _ui;
     private _shadow: CascadedShadowGenerator;
     private _environment: Environment;
     private _navMesh:NavMesh;
 
-    public _roomId: string;
+    private _roomId: string;
     private room: Room<any>;
     private chatRoom: Room<any>;
     private entities: Entity[] = [];
     private _currentPlayer:Player;
 
-    public _loadedAssets;
+    private _loadedAssets;
 
     constructor() {
 
@@ -74,7 +71,7 @@ export class GameScene {
 
         // load assets and remove them all from scene
         await this._loadAssets();
-    
+
         //
         let location = global.T5C.currentLocation;
         console.log(location);
@@ -113,33 +110,10 @@ export class GameScene {
 
     private async _loadAssets() {
 
-        this.assetsContainer['player_hobbit'] = await SceneLoader.LoadAssetContainerAsync("./models/", "player_hobbit.glb", this._scene);
-        this.assetsContainer['monster_unicorn'] = await SceneLoader.LoadAssetContainerAsync("./models/", "monster_unicorn.glb", this._scene);
-        this.assetsContainer['monster_bear'] = await SceneLoader.LoadAssetContainerAsync("./models/", "monster_bear.glb", this._scene);
+        this._assetsContainer['player_hobbit'] = await SceneLoader.LoadAssetContainerAsync("./models/", "player_hobbit.glb", this._scene);
+        this._assetsContainer['monster_unicorn'] = await SceneLoader.LoadAssetContainerAsync("./models/", "monster_unicorn.glb", this._scene);
+        this._assetsContainer['monster_bear'] = await SceneLoader.LoadAssetContainerAsync("./models/", "monster_bear.glb", this._scene);
         
-        /*
-        this.assetsContainer = new AssetContainer(this._scene);
-        const keepAssets = new KeepAssets();
-        this.assetsContainer.moveAllFromScene(keepAssets);
-        
-
-        this._assetsManager = new AssetsManager(this._scene);
-        this._assetsManager.addMeshTask("player_hobbit", "", "./models/", "player_hobbit.glb");
-        this._assetsManager.addMeshTask("monster_unicorn", "", "./models/", "monster_unicorn.glb");
-        this._assetsManager.load();
-        this._assetsManager.onProgress = function(remainingCount, totalCount, lastFinishedTask) {
-            console.log('We are loading the scene. ' + remainingCount + ' out of ' + totalCount + ' items still need to be loaded.');
-        };
-        this._assetsManager.onFinish = function(assets) {
-            console.log('all meshes are now loaded...', assets);
-            let meshes = [];
-            assets.forEach((el)=>{
-                meshes[el.name] = el;
-            })
-            resolve(meshes);
-        };
-        */
-    
     }
 
     private async _initNetwork(): Promise<void> {
@@ -207,44 +181,42 @@ export class GameScene {
         await this._scene.whenReadyAsync();
 
         // setup input Controller
-        this._input = new Input(this._scene);
+        this._input = new PlayerInput(this._scene);
 
         // setup hud
         this._ui = new UserInterface(this._scene, this._engine, this.room, this.chatRoom, this.entities, this._currentPlayer);
 
-        
         ////////////////////////////////////////////////////
         //  when a entity joins the room event
         this.room.state.entities.onAdd((entity, sessionId) => {
             
-
+            //////////////////
             // if player type
             if(entity.type === 'player'){
 
                 var isCurrentPlayer = sessionId === this.room.sessionId;
 
                 // create player entity
-                let _player = new Player(entity, this.room, this._scene, this._ui, this._input, this._shadow, this._navMesh, this.assetsContainer);
+                let _player = new Player(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._assetsContainer, this._input);
                 
                 // if current player, save entity ref
                 if (isCurrentPlayer) {
     
                     // set currentPlayer
                     this._currentPlayer = _player;
-    
+
                     // add player specific  ui
                     this._ui.setCurrentPlayer(_player);
                 }
 
-
-                console.log('PLAYER', _player);
-
+                this.entities[sessionId] = _player;
             }
             
+            //////////////////
             // if entity type
             if(entity.type === 'entity'){
 
-                let _player = new Entity(entity, this.room, this._scene, this._ui, this._input, this._shadow, this._navMesh, this.assetsContainer);
+                let _player = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._assetsContainer);
 
                 // save entity
                 this.entities[sessionId] = _player;
@@ -298,8 +270,6 @@ export class GameScene {
 
                     // sent current input to server for processing 
                     this.room.send("playerInput", latestInput);
-
-                    console.log('playerInput', latestInput);
 
                     // do client side prediction
                     this._currentPlayer.moveController.predictionMove(latestInput);

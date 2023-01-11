@@ -1,6 +1,6 @@
 import { Scene, PointerEventTypes } from '@babylonjs/core';
 
-export class Input {
+export class PlayerInput {
 
     public inputMap: {};
     private _scene: Scene;

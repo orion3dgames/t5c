@@ -17,18 +17,18 @@ export class EntityState extends Schema {
   // position & rotation
   @type("string") public location: string = "";
   @type("number") public sequence: number = 0; // latest input sequence
-  @type('number') public x: number;
-  @type('number') public y: number;
-  @type('number') public z: number;
-  @type('number') public rot: number;
+  @type('number') public x: number = 0;
+  @type('number') public y: number = 0;
+  @type('number') public z: number = 0;
+  @type('number') public rot: number = 0;
 
   // player details
-  @type('number') public health: number;
-  @type('number') public level: number;
-  @type('number') public experience: number;
+  @type('number') public health: number = 0;
+  @type('number') public level: number = 0;
+  @type('number') public experience: number = 0;
 
   // flags
-  @type('boolean') public blocked: boolean; // if true, used to block player and to prevent movement
+  @type('boolean') public blocked: boolean = false; // if true, used to block player and to prevent movement
   @type('number') public state: EntityCurrentState = EntityCurrentState.IDLE;
 
   public _navMesh:NavMesh;
@@ -83,7 +83,7 @@ export class EntityState extends Schema {
 
       if(this.blocked){
         this.state = EntityCurrentState.IDLE;
-        Logger.warning('Player '+this.name+' is blocked, no movment will be processed');
+        Logger.warning('Player '+this.name+' is blocked, no movement will be processed');
         return false;
       }
 
@@ -115,7 +115,7 @@ export class EntityState extends Schema {
           this.z = newZ;
           this.rot = newRot;
           this.sequence = playerInput.seq;
-          this.state = EntityCurrentState.WALKING;
+          //this.state = EntityCurrentState.WALKING;
 
           // add player to server
           Logger.info('Valid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
@@ -128,7 +128,7 @@ export class EntityState extends Schema {
           this.z = oldZ;
           this.rot = oldRot;
           this.sequence = playerInput.seq;
-          this.state = EntityCurrentState.IDLE;
+          //this.state = EntityCurrentState.IDLE;
 
           Logger.warning('Invalid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
       }

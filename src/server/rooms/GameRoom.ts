@@ -199,31 +199,33 @@ export class GameRoom extends Room<GameRoomState> {
             let sender:EntityState = state.entities[client.sessionId];
             let target:EntityState = state.entities[data.targetId];
             
-            if(!sender) throw new Error('sender does not exists!');
-            if(!target) throw new Error('target does not exists!');
+            if(sender && target){
+                // sender state
+                //sender.state = PlayerCurrentState.ATTACK;
+                target.state = EntityCurrentState.TAKING_DAMAGE;
 
-            // sender state
-            //sender.state = PlayerCurrentState.ATTACK;
-            target.state = EntityCurrentState.TAKING_DAMAGE;
+                // target loses health
+                target.loseHealth(40);
 
-            // target loses health
-            target.loseHealth(40);
+                // if target has no more health
+                if(target.health == 0 || target.health < 0){ 
 
-            // if target has no more health
-            if(target.health == 0 || target.health < 0){ 
+                    // set entity as dead
+                    target.health = 0;
+                    target.state = EntityCurrentState.DEAD;
+                    target.blocked = true;
+                    Logger.info(`[gameroom][playerAction] Entity is dead`, data);
 
-                // set entity as dead
-                target.health = 0;
-                target.state = EntityCurrentState.DEAD;
-                target.blocked = true;
-                Logger.info(`[gameroom][playerAction] Entity is dead`, data);
+                    // delete so entity can be respawned
+                    setTimeout(function(){
+                        Logger.info(`[gameroom][playerAction] Deleting entity from server`, data);
+                        delete state.entities[target.sessionId];
+                    }, Config.MONSTER_RESPAWN_RATE);
+                }
 
-                // delete so entity can be respawned
-                setTimeout(function(){
-                    Logger.info(`[gameroom][playerAction] Deleting entity from server`, data);
-                    this.entities[target.sessionId].remove();
-                    delete this.entities[target.sessionId];
-                }, Config.MONSTER_RESPAWN_RATE);
+            }else{
+                
+                Logger.error(`[gameroom][playerAction] target or sender is invalid`, data);
             }
 
             /*

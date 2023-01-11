@@ -7,22 +7,28 @@ import { EntityUtils } from "./Entity/EntityUtils";
 import { EntityActions } from "./Entity/EntityActions";
 import { Entity } from "./Entity";
 import State from "../../client/Screens/Screens";
+import { PlayerInput } from "../../client/Controllers/PlayerInput";
+import { UserInterface } from "../../client/Controllers/UserInterface";
 import { Room } from "colyseus.js";
 import { NavMesh } from "yuka";
 
 export class Player extends Entity {
 
+    public input;
+
     constructor(
         entity:EntityState,
         room:Room, 
         scene: Scene, 
-        ui,
-        input, 
+        ui:UserInterface,
         shadow:CascadedShadowGenerator, 
         navMesh:NavMesh,
-        assetsContainer:AssetContainer[]
+        assetsContainer:AssetContainer[],
+        input:PlayerInput
     ) {
-        super(entity, room, scene, ui, input, shadow, navMesh, assetsContainer);
+        super(entity, room, scene, ui, shadow, navMesh, assetsContainer);
+
+        this._input = input;
 
         this.spawnPlayer()
     }
@@ -37,15 +43,7 @@ export class Player extends Entity {
         ///////////////////////////////////////////////////////////
         // entity network event
         // colyseus automatically sends entity updates, so let's listen to those changes
-        this.entity.onChange(() => {
 
-            // do server reconciliation on client if current player only & not blocked
-            if (this.isCurrentPlayer && !this.blocked) {
-                console.log('reconcileMove', this.entity.sequence);
-                this.moveController.reconcileMove(this.entity.sequence); // set default entity position
-            }
-
-        });
 
         //////////////////////////////////////////////////////////////////////////
         // player register event
@@ -66,8 +64,8 @@ export class Player extends Entity {
                 if (pointerInfo._pickInfo.pickedMesh && 
                     pointerInfo._pickInfo.pickedMesh.metadata && 
                     pointerInfo._pickInfo.pickedMesh.metadata !== null && 
-                    pointerInfo._pickInfo.pickedMesh.metadata.type && 
-                    pointerInfo._pickInfo.pickedMesh.metadata.type.includes('monster') && 
+                    pointerInfo._pickInfo.pickedMesh.metadata.race && 
+                    pointerInfo._pickInfo.pickedMesh.metadata.race.includes('monster') && 
                     pointerInfo._pickInfo.pickedMesh.metadata.sessionId !== this.sessionId){
                         
                     // get target
@@ -98,9 +96,6 @@ export class Player extends Entity {
                         let targetMesh = pointerInfo._pickInfo.pickedMesh;
                         let targetData = targetMesh.metadata;  
                         let target = this.ui._entities[targetData.sessionId];
-                        if(targetData.type === 'player'){
-                            target = this.ui._players[targetData.sessionId];
-                        }
                         target.characterLabel.isVisible = true;
                         setTimeout(function(){
                             target.characterLabel.isVisible = false;
