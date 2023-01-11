@@ -26,7 +26,7 @@ let Config = {
     MONSTER_RESPAWN_RATE: 10000,
 
     // players settings
-    PLAYER_SPEED: 0.40,
+    PLAYER_SPEED: 0.50,
     PLAYER_START_HEALTH: 100,
     PLAYER_START_LEVEL: 1,
 
@@ -38,7 +38,7 @@ let Config = {
             key: 'lh_town',
             mesh: "lh_town.glb",
             sun: true,
-            sunIntensity: 0,
+            sunIntensity: 2,
             spawnPoint: {
                 x: 7.50,
                 y: 0,
@@ -67,6 +67,7 @@ let Config = {
             name: "loading...",
             speed: 0.2,
             scale: 0.02,
+            animationSpeed: 2,
             animations: {
                 "IDLE": 3,
                 "WALK": 6,
@@ -79,6 +80,7 @@ let Config = {
             speed: 0.2,
             scale: 0.02,
             rotationFix: 3.14,
+            animationSpeed: 1,
             animations: {
                 "IDLE": 0,
                 "WALK": 3,
@@ -88,9 +90,10 @@ let Config = {
         },
         "monster_unicorn": {
             name: "Unicorn",
-            speed: 0.4,
+            speed: 0.5,
             scale: 0.01,
             rotationFix: 3.14,
+            animationSpeed: 1,
             animations: {
                 "IDLE": 5,
                 "WALK": 6,

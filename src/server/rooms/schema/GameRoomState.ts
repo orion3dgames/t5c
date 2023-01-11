@@ -51,7 +51,7 @@ export class GameRoomState extends Schema {
         let raceData = Config.entities[race];
 
         // create entity
-        let entity = new EntityState(this._gameroom).assign({
+        let data = {
             sessionId: sessionId,
             type: 'entity',
             race: race,
@@ -64,18 +64,19 @@ export class GameRoomState extends Schema {
             health: 100,
             level: 1,
             state: EntityCurrentState.IDLE,
-            currentRegion: randomRegion,
             toRegion: false,
             config: raceData
-        });
+        };
 
-    
+        let entity = new EntityState(this._gameroom).assign(data);
+
+        entity.setRandomDestination(point);
 
         // add to colyseus state
         this.entities.set(sessionId, entity);
 
         // log
-        Logger.info("[gameroom][state][createEntity] created new entity "+race+": "+sessionId, entity.config);
+        Logger.info("[gameroom][state][createEntity] created new entity "+race+": "+sessionId);
     }
 
     public update(deltaTime: number) {

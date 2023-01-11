@@ -28,11 +28,13 @@ export class EntityAnimator {
 
     private _build(): void {
 
+        let raceData = Config.entities[this.entityType];
+
         // find animations
-        let idleAnimationNumber = Config.entities[this.entityType].animations['IDLE'];
-        let walkAnimationNumber = Config.entities[this.entityType].animations['WALK'];
-        let attackAnimationNumber = Config.entities[this.entityType].animations['ATTACK'];
-        let deathAnimationNumber = Config.entities[this.entityType].animations['DEATH'];
+        let idleAnimationNumber = raceData.animations['IDLE'];
+        let walkAnimationNumber = raceData.animations['WALK'];
+        let attackAnimationNumber = raceData.animations['ATTACK'];
+        let deathAnimationNumber = raceData.animations['DEATH'];
 
         this._idle = this._playerAnimations[idleAnimationNumber];
         this._walk = this._playerAnimations[walkAnimationNumber];
@@ -45,7 +47,10 @@ export class EntityAnimator {
 
         //
         this._idle.loopAnimation = true;
+
         this._walk.loopAnimation = true;
+        this._walk.speedRatio = raceData.animationSpeed;
+
         this._attack.loopAnimation = false;
         this._death.loopAnimation = false;
 

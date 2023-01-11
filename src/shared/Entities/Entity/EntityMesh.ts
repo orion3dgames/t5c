@@ -61,8 +61,6 @@ export class EntityMesh {
         playerMesh.scaling.set(config.scale,config.scale,config.scale);
         this.playerMesh = playerMesh;
 
-        console.log(this._entity.race, config.scale, playerMesh.scaling);
-
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);
 
