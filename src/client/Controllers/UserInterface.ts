@@ -17,7 +17,6 @@ export class UserInterface {
 
     private _gameRoom: Room;
     private _chatRoom: Room;
-    public _players:Player[];
     public _entities:Entity[];
     private _currentPlayer;
 
@@ -81,8 +80,8 @@ export class UserInterface {
       }
 
     public refreshPlayerUI(){
-        for(let sessionId in this._players){
-            let player = this._players[sessionId];
+        for(let sessionId in this._entities){
+            let player = this._entities[sessionId];
             // update player color outline
             let mesh = player.playerMesh.getChildMeshes()[0];
             if(mesh){
@@ -103,12 +102,13 @@ export class UserInterface {
     }
 
     public showChatMessage(msg:PlayerMessage){
-        let player = this._players[msg.senderID];
+        let player = this._entities[msg.senderID];
+        clearInterval(player.showTimer);
         if(player && player.characterLabel){
             let el = player.characterLabel;
             player.characterChatLabel.isVisible = true;
             player.characterChatLabel._children[0].text = msg.message;
-            setTimeout(function(){ player.characterChatLabel.isVisible = false; }, 20000);
+            player.showTimer = setTimeout(function(){ player.characterChatLabel.isVisible = false; }, 20000);
         }
         
     }
@@ -179,7 +179,7 @@ export class UserInterface {
         locationText = "Zone: "+(global.T5C.currentLocation.title ?? 'undefined')+"\n";
         locationText += "RoomID: "+this._gameRoom.roomId+" \n";
         locationText += "PlayerID: "+this._gameRoom.sessionId+" \n";
-        locationText += "Total Players: "+countPlayers(this._players)+" \n";
+        locationText += "Total Players: "+countPlayers(this._entities)+" \n";
         locationText += "FPS: "+roundToTwo(this._engine.getFps())+" \n";
         locationText += "Ping: 0.0ms \n";
         debugTextUI.text = locationText;
