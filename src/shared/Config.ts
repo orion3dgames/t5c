@@ -23,7 +23,7 @@ let Config = {
 
     // game settings
     PLAYER_NAMEPLATE_TIMEOUT: 15000, // 15 seconds
-    MONSTER_RESPAWN_RATE: 1000,
+    MONSTER_RESPAWN_RATE: 10000,
 
     // players settings
     PLAYER_SPEED: 0.40,
@@ -64,6 +64,7 @@ let Config = {
     // entities 
     entities: {
         "player_hobbit": {
+            name: "loading...",
             speed: 0.2,
             scale: 0.02,
             animations: {
@@ -74,6 +75,7 @@ let Config = {
             },
         },
         "monster_bear": {
+            name: "Bear",
             speed: 0.2,
             scale: 0.02,
             rotationFix: 3.14,
@@ -85,6 +87,7 @@ let Config = {
             },
         },
         "monster_unicorn": {
+            name: "Unicorn",
             speed: 0.4,
             scale: 0.01,
             rotationFix: 3.14,

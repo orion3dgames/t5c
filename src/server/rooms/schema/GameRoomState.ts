@@ -47,12 +47,15 @@ export class GameRoomState extends Schema {
         // random mesh
         let race = monsterTypes[Math.floor(Math.random()*monsterTypes.length)];
 
+        // get race data
+        let raceData = Config.entities[race];
+
         // create entity
         let entity = new EntityState(this._gameroom).assign({
             sessionId: sessionId,
             type: 'entity',
             race: race,
-            name: "Monster "+sessionId,
+            name: raceData.name,
             location: this._gameroom.metadata.location,
             x: point.x,
             y: 0,
@@ -63,7 +66,7 @@ export class GameRoomState extends Schema {
             state: EntityCurrentState.IDLE,
             currentRegion: randomRegion,
             toRegion: false,
-            config: Config.entities[race]
+            config: raceData
         });
 
     
