@@ -217,7 +217,7 @@ export class GameScene {
             if(entity.type === 'entity'){
 
                 let _player = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._assetsContainer);
-
+                
                 // save entity
                 this.entities[sessionId] = _player;
             }
@@ -241,6 +241,19 @@ export class GameScene {
             // continuously move entities at 60fps
             for (let sessionId in this.entities) {
                 const entity = this.entities[sessionId];
+
+                // basic performance (only enable entities in a range around the player)
+                entity.mesh.setEnabled(false); 
+                if(entity.type === 'entity'){
+                    let entityPos = entity.position();
+                    let playerPos = this._currentPlayer.position();
+                    let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
+                    if(distanceFromPlayer < 15){
+                        entity.mesh.setEnabled(true); 
+                    }
+                }
+
+                // tween entity
                 if(entity && entity.moveController){
                     entity.moveController.tween();
                 }

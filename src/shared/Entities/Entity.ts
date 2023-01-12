@@ -187,6 +187,9 @@ export class Entity {
         return rect1;
     }
 
+    public position() {
+        return new Vector3(this.x, this.y, this.z);
+     }
 
     public remove() {
        this.characterLabel.dispose();

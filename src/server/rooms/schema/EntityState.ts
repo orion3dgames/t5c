@@ -109,6 +109,10 @@ export class EntityState extends Schema {
       const foundPath: any = this._navMesh.checkPath(sourcePos, destinationPos);
       if (foundPath){
 
+          //adjust height of the entity according to the ground
+          //const distance = this.currentRegion.plane.distanceToPoint( this.position );
+          //this.position.y -= distance * CONFIG.NAVMESH.HEIGHT_CHANGE_FACTOR; // smooth transition
+
           // next position validated, update player
           this.x = newX;
           this.y = 0;

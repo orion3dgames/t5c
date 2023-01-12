@@ -87,7 +87,7 @@ export class GameRoomState extends Schema {
         let spawnTime = 500;
         if (this.spawnTimer >= spawnTime) {
             this.spawnTimer = 0;
-            let maxEntities = 20;
+            let maxEntities = 100;
             if(this.entities.size < maxEntities){
                 this.createEntity();
             }
