@@ -84,7 +84,7 @@ export class GameRoomState extends Schema {
         //////////////////////////////////////////////
         // entity spawning script (span a monster every .5 second)
         this.spawnTimer += deltaTime;
-        let spawnTime = 500;
+        let spawnTime = 300;
         if (this.spawnTimer >= spawnTime) {
             this.spawnTimer = 0;
             let maxEntities = 100;

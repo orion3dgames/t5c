@@ -67,8 +67,6 @@ export class EntityMove {
     // prediction move
     public predictionMove(latestInput:PlayerInputs){
 
-        console.log('predictionMove', latestInput);
-
         // move player locally
         this.move(latestInput);
 
@@ -109,11 +107,11 @@ export class EntityMove {
                 this.nextPosition.z = newZ;
                 this.nextRotation.y = this.nextRotation.y + (newRot - this.nextRotation.y);
 
-                console.log('VALID position for', new Vector3Y( oldX, oldY, oldZ), new Vector3Y(newX, newY, newZ), foundPath);
+                //console.log('VALID position for', new Vector3Y( oldX, oldY, oldZ), new Vector3Y(newX, newY, newZ), foundPath);
 
             }else{
 
-                console.error('INVALID position for', new Vector3Y( oldX, oldY, oldZ), new Vector3Y(newX, newY, newZ, foundPath));
+                //console.error('INVALID position for', new Vector3Y( oldX, oldY, oldZ), new Vector3Y(newX, newY, newZ, foundPath));
             }
             
         }else{
