@@ -17,6 +17,7 @@ import { PlayerInputs } from "../../shared/types";
 import { isLocal } from "../../shared/Utils";
 import { NavMesh } from "yuka";
 import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
+import e from "express";
 
 export class GameScene {
 
@@ -190,36 +191,30 @@ export class GameScene {
         //  when a entity joins the room event
         this.room.state.entities.onAdd((entity, sessionId) => {
             
+            var isCurrentPlayer = sessionId === this.room.sessionId;
+
             //////////////////
             // if player type
-            if(entity.type === 'player'){
-
-                var isCurrentPlayer = sessionId === this.room.sessionId;
+            if(entity.type === 'player' && isCurrentPlayer){
 
                 // create player entity
                 let _player = new Player(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._assetsContainer, this._input);
-                
-                // if current player, save entity ref
-                if (isCurrentPlayer) {
-    
-                    // set currentPlayer
-                    this._currentPlayer = _player;
 
-                    // add player specific  ui
-                    this._ui.setCurrentPlayer(_player);
-                }
+                // set currentPlayer
+                this._currentPlayer = _player;
 
+                // add player specific  ui
+                this._ui.setCurrentPlayer(_player);
+
+                // add to entities
                 this.entities[sessionId] = _player;
-            }
-            
+
             //////////////////
-            // if entity type
-            if(entity.type === 'entity'){
+            // else if entity or another player
+            }else{
 
-                let _player = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._assetsContainer);
-                
                 // save entity
-                this.entities[sessionId] = _player;
+                this.entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._assetsContainer);
             }
             
         });
