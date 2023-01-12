@@ -243,8 +243,8 @@ export class GameScene {
                 const entity = this.entities[sessionId];
 
                 // basic performance (only enable entities in a range around the player)
-                entity.mesh.setEnabled(false); 
                 if(entity.type === 'entity'){
+                    entity.mesh.setEnabled(false); 
                     let entityPos = entity.position();
                     let playerPos = this._currentPlayer.position();
                     let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
