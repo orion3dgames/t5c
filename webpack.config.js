@@ -15,7 +15,15 @@ module.exports = {
     },
     resolve: {
         // extensions: [".ts"]
-        extensions: [".tsx", ".ts", ".js"]
+        extensions: [".tsx", ".ts", ".js"],
+        fallback: { 
+            "console": false,
+            "assert": false,
+            "util": false
+        },
+        alias: {
+            '@shared': path.resolve(__dirname, '../src/shared'),
+        }
     },
     devServer: {
         host: '0.0.0.0',
@@ -28,8 +36,6 @@ module.exports = {
     },
     module: {
         rules: [
-            // {test: /\.tsx?$/,
-            // loader: "ts-loader"}
             {
                 test: /\.tsx?$/,
                 exclude: /node_modules/,
@@ -50,5 +56,5 @@ module.exports = {
         }),
         //new BundleAnalyzerPlugin()
     ],
-    mode: "development"
+    mode: "development",
 };

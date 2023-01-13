@@ -174,7 +174,6 @@ export class GameRoom extends Room<GameRoomState> {
                 this.database.updateCharacter(client.auth.id, updateObj);
                 
                 // update player state on server
-                //playerState.setPositionManual(updateObj.x, updateObj.y, updateObj.z, 0);
                 playerState.setLocation(location);
 
                 // inform client he cand now teleport to new zone
@@ -219,7 +218,7 @@ export class GameRoom extends Room<GameRoomState> {
                     // delete so entity can be respawned
                     setTimeout(function(){
                         Logger.info(`[gameroom][playerAction] Deleting entity from server`, data);
-                        delete state.entities[target.sessionId];
+                        this.deleteEntity(target.sessionId);
                     }, Config.MONSTER_RESPAWN_RATE);
                 }
 

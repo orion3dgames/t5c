@@ -120,17 +120,16 @@ export class GameRoomState extends Schema {
                             // calculate next position towards destination
                             let updatedPos = entity.moveTo(currentPos, destinationOnPath, speed);
 
-                            //
+                            // if cannot move to position, clear destination
                             if (entity.canMoveTo(currentPos, updatedPos) === null){
 
-                                entity.toRegion = false;
-                                entity.destinationPath = false;
+                                entity.resetDestination();
 
+                            // else move entity to new position
                             }else{
 
-                                entity.x = updatedPos.x;
-                                entity.y = updatedPos.y;
-                                entity.z = updatedPos.z;
+                                // set new position
+                                entity.setPosition(updatedPos);
                                 
                                 // calculate rotation
                                 entity.rot = entity.calculateRotation(currentPos, updatedPos);
@@ -138,7 +137,7 @@ export class GameRoomState extends Schema {
                                 // check if arrived at waypoint
                                 destinationOnPath.y = 0;
                                 if(destinationOnPath.equals(updatedPos)){
-                                    entity.destinationPath.shift();
+                                    entity.destinationPath.shift(); // entity arrived at waypint, remove waypoint from array
                                 }
 
                             }
@@ -146,8 +145,7 @@ export class GameRoomState extends Schema {
                         }else{
 
                             // something is wrong, let's look for a new destination
-                            entity.toRegion = false;
-                            entity.destinationPath = false;
+                            entity.resetDestination();
                         }
 
                     }
@@ -159,13 +157,10 @@ export class GameRoomState extends Schema {
                         if(entity.AI_STATE_REMAINING_DURATION === 0 || entity.AI_STATE_REMAINING_DURATION < 0){
                             entity.AI_CURRENT_STATE = Math.random() < 0.5 ? AI_STATE.IDLE : AI_STATE.WALKING;
                             entity.AI_STATE_REMAINING_DURATION = (Math.random() * 5000); // change state every 3 seconds
-                            //console.log('NEW AI STATE', entity.AI_CURRENT_STATE, entity.AI_STATE_REMAINING_DURATION);
                         }
 
-                        // 
+                        // calculate new state duration
                         entity.AI_STATE_REMAINING_DURATION -= Math.random() * 100 + 10;
-
-                        //console.log('AI_STATE_REMAINING_DURATION', entity.AI_STATE_REMAINING_DURATION);
 
                         // save current position
                         let currentPos = new Vector3(entity.x, entity.y,entity.z);
@@ -189,9 +184,7 @@ export class GameRoomState extends Schema {
 
                             // calculate next position towards destination
                             let updatedPos = entity.moveTo(currentPos, destinationOnPath, speed);
-                            entity.x = updatedPos.x;
-                            entity.y = updatedPos.y;
-                            entity.z = updatedPos.z;
+                            entity.setPosition(updatedPos);
 
                             // calculate rotation
                             entity.rot = entity.calculateRotation(currentPos, updatedPos);
@@ -207,8 +200,7 @@ export class GameRoomState extends Schema {
                         }else{
 
                             // something is wrong, let's look for a new destination
-                            entity.toRegion = false;
-                            entity.destinationPath = false;
+                            entity.resetDestination();
 
                         }
                     }
@@ -219,7 +211,12 @@ export class GameRoomState extends Schema {
         
 	}
 
-    addEntity(sessionId: string, data: PlayerCharacter) {
+    /**
+     * Add player
+     * @param sessionId 
+     * @param data 
+     */
+    addEntity(sessionId: string, data: PlayerCharacter):void {
         this.entities.set(sessionId, new EntityState(this._gameroom).assign({
             id: data.id,
             sessionId: sessionId,

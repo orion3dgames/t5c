@@ -6,9 +6,9 @@ if (isLocal()) {
 }
 
 import { Engine, Scene, EngineFactory } from "@babylonjs/core";
-
+ 
 // IMPORT SCREEN
-import State from "./Screens/Screens";
+import State from "./Screens/Screens"; 
 import { GameScene } from "./Screens/GameScene";
 import { LoginScene } from "./Screens/LoginScene";
 import { CharacterSelectionScene } from "./Screens/CharacterSelection";
@@ -16,7 +16,7 @@ import Config from "../shared/Config";
 import { Network } from "./Controllers/Network";
 
 // App class is our entire game application
-class App {
+class App { 
 
     // General Entire Application
     private _scene: Scene;
@@ -151,7 +151,7 @@ class App {
             this._currentScene = null;
         }
     }
-
+ 
     //set up the canvas
     private _createCanvas(): HTMLCanvasElement {
 

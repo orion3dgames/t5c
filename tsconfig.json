@@ -7,9 +7,10 @@
     "outDir": "./dist/server",
     "strict": false,
     "experimentalDecorators": true,
-    "esModuleInterop": true,
+    "esModuleInterop": true, 
+    "moduleResolution": "node",
     "types": [
-      "babylonjs",
+      "babylonjs", 
       "babylonjs-gui",
       "babylonjs-materials",
       "node",
@@ -17,6 +18,7 @@
     "typeRoots": [
       "node_modules/@types"
     ],
+    "baseUrl": ".", 
     "paths": {
 			"@shared/*": ["../shared/*"],
 		}
@@ -25,7 +27,7 @@
     "src/server/*",
     "src/**/*.d.ts",
     "src/shared/**/*.ts",
-    "src/shared/**/*.js",
+    "src/shared/**/*.js", 
   ],
   "exclude": [
     "node_modules",

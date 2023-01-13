@@ -22,6 +22,8 @@
  * THE SOFTWARE.
  */
 
+const { debug } = require("console");
+
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -19054,6 +19056,8 @@
 			}
 
 			const json = JSON.parse( data );
+
+			debug(json);
 
 			if ( json.asset === undefined || json.asset.version[ 0 ] < 2 ) {
 

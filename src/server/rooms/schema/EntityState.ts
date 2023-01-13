@@ -48,17 +48,24 @@ export class EntityState extends Schema {
     this._gameroom = gameroom;
 	}
 
-  setLocation(location) {
+  setLocation(location:string):void {
       this.location = location;
   }
 
-  setPositionManual(x, y, z, rot) {
-    this.x = x;
-    this.y = y;
-    this.z = z;
-    this.rot = rot;
+  setPosition(updatedPos:Vector3):void{
+    this.x = updatedPos.x;
+    this.y = updatedPos.y;
+    this.z = updatedPos.z;
   }
 
+  loseHealth(amount:number) {
+    this.health -= amount;
+  }
+
+  /**
+   * Finds a new random valid position on navmesh and sets is as the new destination for this entity
+   * @param {Vector3} currentPos
+   */
   setRandomDestination(currentPos:Vector3):void{
     this.toRegion = this._gameroom.navMesh.getRandomRegion();
     this.destinationPath = this._gameroom.navMesh.findPath(
@@ -71,14 +78,26 @@ export class EntityState extends Schema {
     }
   }
 
-  loseHealth(amount:number) {
-    this.health -= amount;
+  resetDestination():void{
+    this.toRegion = false;
+    this.destinationPath = false;
   }
 
-  canMoveTo(sourcePos:Vector3, newPos:Vector3){
+  /**
+   * Check if player can move from sourcePos to newPos
+   * @param {Vector3} sourcePos source position
+   * @param {Vector3} newPos destination position
+   * @returns boolean
+   */
+  canMoveTo(sourcePos:Vector3, newPos:Vector3):boolean{
     return this._navMesh.checkPath(sourcePos, newPos);
   }
 
+  /**
+   * Calculate next forward position on the navmesh based on playerInput forces
+   * @param {PlayerInputs} playerInput 
+   * @returns 
+   */
   processPlayerInput(playerInput:PlayerInputs) {
 
       if(this.blocked){
@@ -139,16 +158,22 @@ export class EntityState extends Schema {
       
   }
 
-  calculateRotation(v1, v2){
+  /**
+   * Calculate rotation based on moving from v1 to v2
+   * @param {Vector3} v1 
+   * @param {Vector3} v2 
+   * @returns rotation in radians
+   */
+  calculateRotation(v1:Vector3, v2:Vector3):number{
     return Math.atan2(v1.x - v2.x, v1.z - v2.z);
   }
 
   /**
    * Move entity toward a Vector3 position
-   * @param source
-   * @param destination 
-   * @param speed 
-   * @returns 
+   * @param {Vector3} source 
+   * @param {Vector3} destination 
+   * @param {number} speed movement speed
+   * @returns {Vector3} new position
    */
   moveTo(source: Vector3, destination: Vector3, speed:number):Vector3{
 
