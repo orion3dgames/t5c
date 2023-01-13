@@ -3,7 +3,7 @@ import Logger from "../../../shared/Logger";
 import Config from "../../../shared/Config";
 import { PlayerInputs } from "../../../shared/types";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
-import { NavMesh, Vector3 } from "yuka";
+import { NavMesh, Vector3 } from "../../../shared/yuka";
 
 export class EntityState extends Schema {
 

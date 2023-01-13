@@ -10,7 +10,7 @@ import State from "../../client/Screens/Screens";
 import { PlayerInput } from "../../client/Controllers/PlayerInput";
 import { UserInterface } from "../../client/Controllers/UserInterface";
 import { Room } from "colyseus.js";
-import { NavMesh } from "yuka";
+import { NavMesh } from "../yuka";
 
 export class Player extends Entity {
 

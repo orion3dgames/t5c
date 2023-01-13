@@ -58,8 +58,7 @@
     "navmesh": "^2.3.1",
     "sqlite3": "^5.1.2",
     "wavefront-obj-parser": "^2.0.1",
-    "winston": "^3.8.2",
-    "yuka": "0.7.8"
+    "winston": "^3.8.2"
   },
   "peerDependencies": {},
   "browserslist": {

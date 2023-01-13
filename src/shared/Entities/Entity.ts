@@ -9,7 +9,7 @@ import { EntityActions } from "./Entity/EntityActions";
 import { EntityMesh } from "./Entity/EntityMesh";
 import { Room } from "colyseus.js";
 import { UserInterface } from "../../client/Controllers/UserInterface";
-import { NavMesh } from "yuka";
+import { NavMesh } from "../yuka";
 
 export class Entity {
     

@@ -1,7 +1,7 @@
 import { Vector3 } from "@babylonjs/core";
 import Config from "../../Config";
 import { PlayerInputs } from "../../types";
-import { NavMesh, Vector3 as Vector3Y } from "yuka";
+import { NavMesh, Vector3 as Vector3Y } from "../../yuka";
 
 export class EntityMove {
 

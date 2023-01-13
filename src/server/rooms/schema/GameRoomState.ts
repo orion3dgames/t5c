@@ -3,7 +3,7 @@ import { EntityState } from "./EntityState";
 import { PlayerCharacter } from '../../../shared/types';
 import { GameRoom } from '../GameRoom';
 import { EntityCurrentState } from '../../../shared/Entities/Entity/EntityCurrentState';
-import { NavMesh, EntityManager, Time, Vector3 } from "yuka";
+import { NavMesh, EntityManager, Time, Vector3 } from "../../../shared/yuka";
 import { nanoid } from 'nanoid';
 import Config from '../../../shared/Config';
 import Logger from "../../../shared/Logger";

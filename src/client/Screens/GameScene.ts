@@ -15,7 +15,7 @@ import Config from '../../shared/Config';
 import { Room } from "colyseus.js";
 import { PlayerInputs } from "../../shared/types";
 import { isLocal } from "../../shared/Utils";
-import { NavMesh } from "yuka";
+import { NavMesh } from "../../shared/yuka";
 import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
 import e from "express";
 
