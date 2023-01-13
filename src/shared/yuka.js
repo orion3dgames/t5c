@@ -19057,8 +19057,6 @@ const { debug } = require("console");
 
 			const json = JSON.parse( data );
 
-			debug(json);
-
 			if ( json.asset === undefined || json.asset.version[ 0 ] < 2 ) {
 
 				throw new Error( 'YUKA.NavMeshLoader: Unsupported asset version.' );
