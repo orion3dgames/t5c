@@ -51,7 +51,7 @@ export class EntityState extends Schema {
 		super(args);
     this._navMesh = gameroom.navMesh;
     this._gameroom = gameroom;
-    this.raceData = Config.entities[this.race];
+    console.log( this.raceData);
 	}
 
   setLocation(location:string):void {
@@ -97,7 +97,7 @@ for (var i=0; i<MagnetPoints.Length; i++){
         let entityPos = new Vector3(this.x, this.y, this.z);
         let distanceBetween = entityPos.distanceTo(playerPos);
         if(distanceBetween < closestDistance){
-          console.log('CLOSEST PLAYER FROM '+this.name+' IS NOW', closestDistance, distanceBetween, entity.name);
+          //console.log('CLOSEST PLAYER FROM '+this.name+' IS NOW', closestDistance, distanceBetween, entity.name);
           closestDistance = distanceBetween;
           this.AI_CLOSEST_PLAYER_POSITION = new Vector3(entity.x, entity.y, entity.z);
           this.AI_CLOSEST_PLAYER_DISTANCE = distanceBetween;
@@ -115,10 +115,10 @@ for (var i=0; i<MagnetPoints.Length; i++){
       // if player in range, start chasing
       if(this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE < Config.MONSTER_AGGRO_DISTANCE){
         this.AI_CURRENT_STATE = AI_STATE.SEEKING;
-        console.log('FOUND PLAYER. CHASING MODE ON', this.AI_CLOSEST_PLAYER.name);
+        //console.log('FOUND PLAYER. CHASING MODE ON', this.AI_CLOSEST_PLAYER.name);
 
         if(this.AI_CLOSEST_PLAYER_DISTANCE < 2){
-          console.log('CLOSE ENOUGHT TO PLAYER. ATTACK MODE ON', this.AI_CLOSEST_PLAYER.name);
+          //console.log('CLOSE ENOUGHT TO PLAYER. ATTACK MODE ON', this.AI_CLOSEST_PLAYER.name);
           this.AI_CURRENT_STATE = AI_STATE.ATTACKING;
           this.state = EntityCurrentState.ATTACK;
           this.AI_CLOSEST_PLAYER.loseHealth(20);
@@ -128,17 +128,17 @@ for (var i=0; i<MagnetPoints.Length; i++){
 
 
       if(this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE > Config.MONSTER_AGGRO_DISTANCE){
-        console.log('TOO FAR FROM PLAYER. WANDER MODE ON');
+        //console.log('TOO FAR FROM PLAYER. WANDER MODE ON');
         this.AI_CURRENT_STATE = AI_STATE.WANDER;
       }
 
       if(this.health < 0 || this.health === 0){
-        console.log('DEAD. IDLE MODE ON');
+        //console.log('DEAD. IDLE MODE ON');
         this.AI_CURRENT_STATE = AI_STATE.IDLE;
         this.state = EntityCurrentState.DEAD;
       }
 
-      console.log('CURRENT STATE', this.AI_CURRENT_STATE);
+      //console.log('CURRENT STATE', this.AI_CURRENT_STATE);
 
     }
 
@@ -148,7 +148,6 @@ for (var i=0; i<MagnetPoints.Length; i++){
    * SEEK BEHAVIOUR
    */
   seek(){
-    console.log('SEEKING...')
 
     // save current position
     let currentPos = new Vector3(this.x, this.y,this.z);
@@ -160,13 +159,15 @@ for (var i=0; i<MagnetPoints.Length; i++){
     // calculate rotation
     this.rot = this.calculateRotation(currentPos, updatedPos);
 
+    console.log(this.name, this.race,  this.raceData.speed);
+
   }
 
   /**
    * WANDER BEHAVIOUR
    */
   wander(){
-    console.log('wander...')
+    
     // save current position
     let currentPos = new Vector3(this.x, this.y,this.z);
 

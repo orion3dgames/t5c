@@ -61,7 +61,7 @@ export class GameRoomState extends Schema {
             level: 1,
             state: EntityCurrentState.IDLE,
             toRegion: false,
-            config: raceData
+            raceData: raceData
         };
 
         let entity = new EntityState(this._gameroom).assign(data);

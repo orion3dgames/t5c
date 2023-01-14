@@ -92,8 +92,8 @@ let Config = {
         },
         "monster_unicorn": {
             name: "Unicorn",
-            speed: 0.5,
-            scale: 0.01,
+            speed: 0.3,
+            scale: 0.0125,
             rotationFix: 3.14,
             animationSpeed: 1,
             animations: {
