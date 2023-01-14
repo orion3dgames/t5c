@@ -46,8 +46,8 @@ export class GameScene {
     async createScene(engine, client): Promise<void> {
 
         if(isLocal()){
-            //let tempLocation = "lh_town";
-            let tempLocation = "lh_dungeon_01";
+            let tempLocation = "lh_town";
+            //let tempLocation = "lh_dungeon_01";
             global.T5C.currentLocation = Config.locations[tempLocation];
             global.T5C.currentUser = {
                 id: 3,

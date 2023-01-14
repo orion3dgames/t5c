@@ -218,7 +218,7 @@ export class GameRoom extends Room<GameRoomState> {
                     // delete so entity can be respawned
                     setTimeout(function(){
                         Logger.info(`[gameroom][playerAction] Deleting entity from server`, data);
-                        this.deleteEntity(target.sessionId);
+                        state.entities.delete(target.sessionId);
                     }, Config.MONSTER_RESPAWN_RATE);
                 }
 

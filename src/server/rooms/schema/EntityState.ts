@@ -128,13 +128,16 @@ export class EntityState extends Schema {
       const foundPath: any = this._navMesh.checkPath(sourcePos, destinationPos);
       if (foundPath){
 
-          //adjust height of the entity according to the ground
-          //const distance = this.currentRegion.plane.distanceToPoint( this.position );
-          //this.position.y -= distance * CONFIG.NAVMESH.HEIGHT_CHANGE_FACTOR; // smooth transition
+          /*
+          // adjust height of the entity according to the ground
+          let currentRegion = this._navMesh.getClosestRegion( destinationPos );
+          const distance = currentRegion.plane.distanceToPoint( sourcePos );
+          let newY = distance * 0.2; // smooth transition
+          */
 
           // next position validated, update player
           this.x = newX;
-          this.y = 0;
+          this.y = newY;
           this.z = newZ;
           this.rot = newRot;
           this.sequence = playerInput.seq;
