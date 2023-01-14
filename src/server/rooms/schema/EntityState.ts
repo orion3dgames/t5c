@@ -3,14 +3,8 @@ import Logger from "../../../shared/Logger";
 import Config from "../../../shared/Config";
 import { PlayerInputs } from "../../../shared/types";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
+import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 import { NavMesh, Vector3 } from "../../../shared/yuka";
-
-enum AI_STATE { 
-  IDLE = 0, 
-  WANDER = 1,
-  SEEKING = 2,
-  ATTACKING = 3
-}
 
 export class EntityState extends Schema {
 
@@ -46,11 +40,12 @@ export class EntityState extends Schema {
   public raceData;
 
   // AI
-  public AI_CURRENT_STATE:number = 0;
+  @type('number') public AI_CURRENT_STATE:AI_STATE = 0;
   public AI_STATE_REMAINING_DURATION:number = 0;
 
   public AI_CLOSEST_PLAYER_POSITION = new Vector3(0, 0, 0);
   public AI_CLOSEST_PLAYER_DISTANCE = null;
+  public AI_CLOSEST_PLAYER = null;
 
   constructor(gameroom, ...args: any[]) {
 		super(args);
@@ -73,12 +68,25 @@ export class EntityState extends Schema {
     this.health -= amount;
   }
 
+  /*
+  var closestIndex : int =0;
+var closestDistance : float = 100000 //something big
+for (var i=0; i<MagnetPoints.Length; i++){
+  var distance : float = (transform.position - MagnetPoints[i]).magnitude;
+  //You can use sqrMagnitude for a slightly faster calculation, if you do not actually need to know the distance, only which one is smallest
+ 
+  if(distance < closestDistance){
+    closestDistance = distance;
+    closestIndex = i;
+  }
+}*/
+
   // 
   updateBrain(){
 
     //
     let closestPlayer = null;
-    let closestDistance = null;
+    let closestDistance = 1000000;
     this._gameroom.state.entities.forEach(entity => {
 
       // only for entity 
@@ -88,9 +96,12 @@ export class EntityState extends Schema {
         let playerPos = new Vector3(entity.x, entity.y, entity.z);
         let entityPos = new Vector3(this.x, this.y, this.z);
         let distanceBetween = entityPos.distanceTo(playerPos);
-        if(closestDistance === null || closestDistance < distanceBetween){
+        if(distanceBetween < closestDistance){
+          console.log('CLOSEST PLAYER FROM '+this.name+' IS NOW', closestDistance, distanceBetween, entity.name);
+          closestDistance = distanceBetween;
           this.AI_CLOSEST_PLAYER_POSITION = new Vector3(entity.x, entity.y, entity.z);
           this.AI_CLOSEST_PLAYER_DISTANCE = distanceBetween;
+          this.AI_CLOSEST_PLAYER = entity;
         }
       }
  
@@ -104,21 +115,30 @@ export class EntityState extends Schema {
       // if player in range, start chasing
       if(this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE < 6){
         this.AI_CURRENT_STATE = AI_STATE.SEEKING;
+        console.log('FOUND PLAYER. CHASING MODE ON', this.AI_CLOSEST_PLAYER.name);
 
         if(this.AI_CLOSEST_PLAYER_DISTANCE < 2){
+          console.log('CLOSE ENOUGHT TO PLAYER. ATTACK MODE ON', this.AI_CLOSEST_PLAYER.name);
           this.AI_CURRENT_STATE = AI_STATE.ATTACKING;
           this.state = EntityCurrentState.ATTACK;
+          this.AI_CLOSEST_PLAYER.loseHealth(20);
         }
 
       }
 
+
       if(this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE > 6){
-        this.AI_CURRENT_STATE === AI_STATE.WANDER;
+        console.log('TOO FAR FROM PLAYER. WANDER MODE ON');
+        this.AI_CURRENT_STATE = AI_STATE.WANDER;
       }
 
       if(this.health < 0 || this.health === 0){
+        console.log('DEAD. IDLE MODE ON');
         this.AI_CURRENT_STATE = AI_STATE.IDLE;
+        this.state = EntityCurrentState.DEAD;
       }
+
+      console.log('CURRENT STATE', this.AI_CURRENT_STATE);
 
     }
 
@@ -128,6 +148,7 @@ export class EntityState extends Schema {
    * SEEK BEHAVIOUR
    */
   seek(){
+    console.log('SEEKING...')
 
     // save current position
     let currentPos = new Vector3(this.x, this.y,this.z);
@@ -145,10 +166,7 @@ export class EntityState extends Schema {
    * WANDER BEHAVIOUR
    */
   wander(){
-
-    // calculate new state duration
-    this.AI_STATE_REMAINING_DURATION -= Math.random() * 100 + 10;
-
+    console.log('wander...')
     // save current position
     let currentPos = new Vector3(this.x, this.y,this.z);
 

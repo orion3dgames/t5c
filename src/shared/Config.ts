@@ -23,6 +23,7 @@ let Config = {
 
     // game settings
     PLAYER_NAMEPLATE_TIMEOUT: 15000, // 15 seconds
+    PLAYER_VIEW_DISTANCE: 25,
     MONSTER_RESPAWN_RATE: 10000,
 
     // players settings
@@ -84,7 +85,7 @@ let Config = {
             animations: {
                 "IDLE": 0,
                 "WALK": 3,
-                "ATTACK": 0,
+                "ATTACK": 2,
                 "DEATH": 4,
             },
         },

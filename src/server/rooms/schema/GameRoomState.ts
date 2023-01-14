@@ -8,13 +8,7 @@ import { nanoid } from 'nanoid';
 import Config from '../../../shared/Config';
 import Logger from "../../../shared/Logger";
 import { randomNumberInRange } from '../../../shared/Utils';
-
-enum AI_STATE { 
-    IDLE = 0, 
-    WANDER = 1,
-    SEEKING = 2,
-    ATTACKING = 3
-}
+import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 
 export class GameRoomState extends Schema {
 
@@ -34,7 +28,7 @@ export class GameRoomState extends Schema {
 		this.navMesh = _navMesh;
 	}
 
-    public createEntity(){
+    public createEntity(delta){
 
         // monster pool to chose from
         let monsterTypes = ['monster_unicorn', 'monster_bear'];
@@ -57,11 +51,11 @@ export class GameRoomState extends Schema {
             sessionId: sessionId,
             type: 'entity',
             race: race,
-            name: raceData.name,
+            name: raceData.name+" #"+delta,
             location: this._gameroom.metadata.location,
-            x: point.x,
+            x: 0,
             y: 0,
-            z: point.z,
+            z: 0,
             rot: randomNumberInRange(0, Math.PI), 
             health: 100,
             level: 1,
@@ -89,9 +83,9 @@ export class GameRoomState extends Schema {
         let spawnTime = 300;
         if (this.spawnTimer >= spawnTime) {
             this.spawnTimer = 0;
-            let maxEntities = 10;
+            let maxEntities = 20;
             if(this.entities.size < maxEntities){
-                this.createEntity();
+                this.createEntity(this.entities.size);
             }
         }
 
@@ -158,73 +152,18 @@ export class GameRoomState extends Schema {
                     // only move non playing entities
                     if(entity.type === 'entity'){
 
-                         // save current position
-                         let currentPos = new Vector3(entity.x, entity.y,entity.z);
-
                         if (entity.AI_CURRENT_STATE === AI_STATE.IDLE) {
 
 
                         }else if (entity.AI_CURRENT_STATE === AI_STATE.SEEKING) {
 
-                            
+                            entity.seek();
 
                         }else if (entity.AI_CURRENT_STATE === AI_STATE.WANDER) {
 
                             entity.wander();
                         }
 
-                        /*
-                        // only find a new AI_STATE if AI_STATE_REMAINING_DURATION is at zero
-                        if(entity.AI_STATE_REMAINING_DURATION === 0 || entity.AI_STATE_REMAINING_DURATION < 0){
-                            entity.AI_CURRENT_STATE = Math.random() < 0.5 ? AI_STATE.IDLE : AI_STATE.WALKING;
-                            entity.AI_STATE_REMAINING_DURATION = (Math.random() * 5000); // change state every 3 seconds
-                        }
-
-                        // calculate new state duration
-                        entity.AI_STATE_REMAINING_DURATION -= Math.random() * 100 + 10;
-
-                        // save current position
-                        let currentPos = new Vector3(entity.x, entity.y,entity.z);
-
-                        // if entity does not have a destination, find one
-                        if(!entity.toRegion){
-                            entity.setRandomDestination(currentPos);
-                        }
-
-                        // move entity
-                        if(
-                            entity.destinationPath.length > 0 && 
-                            entity.health > 0 && 
-                            entity.AI_CURRENT_STATE === AI_STATE.WALKING
-                            ){
-
-                            // get next waypoint
-                            let destinationOnPath = entity.destinationPath[0];
-                            destinationOnPath.y = 0;
-                            let speed = entity.config.speed;
-
-                            // calculate next position towards destination
-                            let updatedPos = entity.moveTo(currentPos, destinationOnPath, speed);
-                            entity.setPosition(updatedPos);
-
-                            // calculate rotation
-                            entity.rot = entity.calculateRotation(currentPos, updatedPos);
-
-                            //Logger.info("[gameroom][state][update] moved entity: "+entity.sessionId);
-
-                            // check if arrived at waypoint
-                            if(destinationOnPath.equals(updatedPos)){
-                                entity.destinationPath.shift();
-                            }
-
-
-                        }else{
-
-                            // something is wrong, let's look for a new destination
-                            entity.resetDestination();
-
-                        }
-                        */
                     }
                     
         

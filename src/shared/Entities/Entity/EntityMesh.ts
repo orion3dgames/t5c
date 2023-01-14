@@ -13,6 +13,7 @@ export class EntityMesh {
     public mesh: Mesh;
     public playerMesh;
     public isCurrentPlayer:boolean;
+    public debugMesh: Mesh;
 
     constructor(scene:Scene, assetsContainer, entity:EntityState, room: Room, isCurrentPlayer:boolean) {
         this._scene = scene;
@@ -30,6 +31,14 @@ export class EntityMesh {
         const box = MeshBuilder.CreateBox("root_"+this._entity.race, {width: 2, height: 4}, this._scene);
         box.visibility = 0;
 
+        // debug aggro mesh
+        if(this._entity.type === 'entity'){
+            const sphere = MeshBuilder.CreateCylinder("root_"+this._entity.race, {diameter: 12, height: .1}, this._scene);
+            sphere.visibility = .3;
+            sphere.parent = box;
+            this.debugMesh = sphere;
+        }
+
         // set collision mesh
         this.mesh = box;
         this.mesh.metadata = {
@@ -38,6 +47,7 @@ export class EntityMesh {
             race: this._entity.race,
             name: this._entity.name,
         }
+        
 
         // load player mesh
         const result = this.assetsContainer[this._entity.race].instantiateModelsToScene(

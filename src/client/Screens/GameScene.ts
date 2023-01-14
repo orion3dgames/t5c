@@ -45,6 +45,7 @@ export class GameScene {
 
     async createScene(engine, client): Promise<void> {
 
+        
         if(isLocal()){
             let tempLocation = "lh_town";
             //let tempLocation = "lh_dungeon_01";
@@ -237,6 +238,7 @@ export class GameScene {
             // continuously move entities at 60fps
             for (let sessionId in this.entities) {
                 const entity = this.entities[sessionId];
+                entity.update();
 
                 // basic performance (only enable entities in a range around the player)
                 if(entity.type === 'entity'){
@@ -244,14 +246,9 @@ export class GameScene {
                     let entityPos = entity.position();
                     let playerPos = this._currentPlayer.position();
                     let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
-                    if(distanceFromPlayer < 15){
+                    if(distanceFromPlayer < Config.PLAYER_VIEW_DISTANCE){
                         entity.mesh.setEnabled(true); 
                     }
-                }
-
-                // tween entity
-                if(entity && entity.moveController){
-                    entity.moveController.tween();
                 }
             }
 

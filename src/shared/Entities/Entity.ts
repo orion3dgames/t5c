@@ -1,4 +1,4 @@
-import { TransformNode, Scene, Vector3, AxesViewer, AbstractMesh, CascadedShadowGenerator, AssetContainer} from "@babylonjs/core";
+import { TransformNode, Scene, Vector3, AxesViewer, AbstractMesh, Mesh, StandardMaterial, Color3, CascadedShadowGenerator, AssetContainer} from "@babylonjs/core";
 import { Control, Rectangle, TextBlock, TextWrapping } from "@babylonjs/gui";
 import { EntityState } from "../../server/rooms/schema/EntityState";
 import { EntityCamera } from "./Entity/EntityCamera";
@@ -10,6 +10,7 @@ import { EntityMesh } from "./Entity/EntityMesh";
 import { Room } from "colyseus.js";
 import { UserInterface } from "../../client/Controllers/UserInterface";
 import { NavMesh } from "../yuka";
+import { AI_STATE } from "./Entity/AIState";
 
 export class Entity {
     
@@ -32,6 +33,7 @@ export class Entity {
     // entity
     public mesh: AbstractMesh; //outer collisionbox of player
     public playerMesh: AbstractMesh; //outer collisionbox of player
+    public debugMesh: Mesh;
     public characterChatLabel: Rectangle;
     public characterLabel: Rectangle;
     public sessionId: string;
@@ -51,6 +53,7 @@ export class Entity {
     public experience: number;
     public location: string = "";
     public state: number = 0;
+    public AI_CURRENT_STATE: number = 0;
 
     // flags
     public blocked: boolean = false; // if true, player will not moved
@@ -90,6 +93,7 @@ export class Entity {
         await this.meshController.load();
         this.mesh = this.meshController.mesh;
         this.playerMesh = this.meshController.playerMesh;
+        this.debugMesh = this.meshController.debugMesh;
 
         // add mesh to shadow generator
         this._shadow.addShadowCaster(this.meshController.mesh, true);
@@ -134,6 +138,29 @@ export class Entity {
         this.characterLabel = this.createLabel(entity.name);
         this.characterChatLabel = this.createChatLabel(entity.name);
       
+    }
+
+    public update(){
+
+        if(this.AI_CURRENT_STATE === AI_STATE.SEEKING || this.AI_CURRENT_STATE === AI_STATE.ATTACKING){
+            var material = new StandardMaterial('dsadsada');
+            material.alpha = .5;
+            material.diffuseColor = new Color3(1.0, 0.0, 0.0);
+            this.debugMesh.material = material; // <--
+        }
+
+        if(this.AI_CURRENT_STATE === AI_STATE.WANDER){
+            var material = new StandardMaterial('dsadsada');
+            material.alpha = .5;
+            material.diffuseColor = new Color3(1.0, 1.0, 1.0);
+            this.debugMesh.material = material; // <--
+        }
+
+        // tween entity
+        if(this && this.moveController){
+            this.moveController.tween();
+        }
+
     }
 
     //////////////////////////////////////////////////////////////////////////
