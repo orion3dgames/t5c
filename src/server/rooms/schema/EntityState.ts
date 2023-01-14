@@ -5,6 +5,13 @@ import { PlayerInputs } from "../../../shared/types";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { NavMesh, Vector3 } from "../../../shared/yuka";
 
+enum AI_STATE { 
+  IDLE = 0, 
+  WANDER = 1,
+  SEEKING = 2,
+  ATTACKING = 3
+}
+
 export class EntityState extends Schema {
 
   // id and name
@@ -36,16 +43,20 @@ export class EntityState extends Schema {
   public currentRegion;
   public toRegion;
   public destinationPath;
-  public config;
+  public raceData;
 
   // AI
   public AI_CURRENT_STATE:number = 0;
   public AI_STATE_REMAINING_DURATION:number = 0;
 
+  public AI_CLOSEST_PLAYER_POSITION = new Vector3(0, 0, 0);
+  public AI_CLOSEST_PLAYER_DISTANCE = null;
+
   constructor(gameroom, ...args: any[]) {
 		super(args);
     this._navMesh = gameroom.navMesh;
     this._gameroom = gameroom;
+    this.raceData = Config.entities[this.race];
 	}
 
   setLocation(location:string):void {
@@ -60,6 +71,119 @@ export class EntityState extends Schema {
 
   loseHealth(amount:number) {
     this.health -= amount;
+  }
+
+  // 
+  updateBrain(){
+
+    //
+    let closestPlayer = null;
+    let closestDistance = null;
+    this._gameroom.state.entities.forEach(entity => {
+
+      // only for entity 
+      if(this.type === 'entity' && entity.type === 'player' ){
+
+        // entity must always know the closest player at all times
+        let playerPos = new Vector3(entity.x, entity.y, entity.z);
+        let entityPos = new Vector3(this.x, this.y, this.z);
+        let distanceBetween = entityPos.distanceTo(playerPos);
+        if(closestDistance === null || closestDistance < distanceBetween){
+          this.AI_CLOSEST_PLAYER_POSITION = new Vector3(entity.x, entity.y, entity.z);
+          this.AI_CLOSEST_PLAYER_DISTANCE = distanceBetween;
+        }
+      }
+ 
+    });
+
+
+    if(this.type === 'entity' ){
+
+      this.AI_CURRENT_STATE === AI_STATE.IDLE;
+
+      // if player in range, start chasing
+      if(this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE < 6){
+        this.AI_CURRENT_STATE = AI_STATE.SEEKING;
+
+        if(this.AI_CLOSEST_PLAYER_DISTANCE < 2){
+          this.AI_CURRENT_STATE = AI_STATE.ATTACKING;
+          this.state = EntityCurrentState.ATTACK;
+        }
+
+      }
+
+      if(this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE > 6){
+        this.AI_CURRENT_STATE === AI_STATE.WANDER;
+      }
+
+      if(this.health < 0 || this.health === 0){
+        this.AI_CURRENT_STATE = AI_STATE.IDLE;
+      }
+
+    }
+
+  }
+
+  /**
+   * SEEK BEHAVIOUR
+   */
+  seek(){
+
+    // save current position
+    let currentPos = new Vector3(this.x, this.y,this.z);
+
+    // calculate next position towards destination
+    let updatedPos = this.moveTo(currentPos, this.AI_CLOSEST_PLAYER_POSITION, this.raceData.speed);
+    this.setPosition(updatedPos);
+
+    // calculate rotation
+    this.rot = this.calculateRotation(currentPos, updatedPos);
+
+  }
+
+  /**
+   * WANDER BEHAVIOUR
+   */
+  wander(){
+
+    // calculate new state duration
+    this.AI_STATE_REMAINING_DURATION -= Math.random() * 100 + 10;
+
+    // save current position
+    let currentPos = new Vector3(this.x, this.y,this.z);
+
+    // if entity does not have a destination, find one
+    if(!this.toRegion){
+      this.setRandomDestination(currentPos);
+    }
+
+    // move entity
+    if(this.destinationPath.length > 0){
+
+        // get next waypoint
+        let destinationOnPath = this.destinationPath[0];
+        destinationOnPath.y = 0;
+  
+        // calculate next position towards destination
+        let updatedPos = this.moveTo(currentPos, destinationOnPath, this.raceData.speed);
+        this.setPosition(updatedPos);
+
+        // calculate rotation
+        this.rot = this.calculateRotation(currentPos, updatedPos);
+
+        // check if arrived at waypoint
+        if(destinationOnPath.equals(updatedPos)){
+          this.destinationPath.shift();
+        }
+
+
+    }else{
+
+        // something is wrong, let's look for a new destination
+        this.resetDestination();
+
+    }
+
   }
 
   /**
@@ -144,7 +268,7 @@ export class EntityState extends Schema {
           //this.state = EntityCurrentState.WALKING;
 
           // add player to server
-          Logger.info('Valid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
+          //Logger.info('Valid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
 
       } else {
 
@@ -156,7 +280,7 @@ export class EntityState extends Schema {
           this.sequence = playerInput.seq;
           //this.state = EntityCurrentState.IDLE;
 
-          Logger.warning('Invalid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
+          //Logger.warning('Invalid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
       }
       
   }

@@ -51,7 +51,7 @@ export class EntityAnimator {
         this._walk.loopAnimation = true;
         this._walk.speedRatio = raceData.animationSpeed;
 
-        this._attack.loopAnimation = false;
+        this._attack.loopAnimation = true;
         this._death.loopAnimation = false;
 
         //initialize current and previous

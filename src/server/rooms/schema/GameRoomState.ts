@@ -11,7 +11,9 @@ import { randomNumberInRange } from '../../../shared/Utils';
 
 enum AI_STATE { 
     IDLE = 0, 
-    WALKING = 1
+    WANDER = 1,
+    SEEKING = 2,
+    ATTACKING = 3
 }
 
 export class GameRoomState extends Schema {
@@ -59,7 +61,7 @@ export class GameRoomState extends Schema {
             location: this._gameroom.metadata.location,
             x: point.x,
             y: 0,
-            z: point.y,
+            z: point.z,
             rot: randomNumberInRange(0, Math.PI), 
             health: 100,
             level: 1,
@@ -87,7 +89,7 @@ export class GameRoomState extends Schema {
         let spawnTime = 300;
         if (this.spawnTimer >= spawnTime) {
             this.spawnTimer = 0;
-            let maxEntities = 100;
+            let maxEntities = 10;
             if(this.entities.size < maxEntities){
                 this.createEntity();
             }
@@ -103,6 +105,9 @@ export class GameRoomState extends Schema {
             // for each entity
             if( this.entities.size > 0){
                 this.entities.forEach(entity => { 
+
+                    // entity update
+                    entity.updateBrain();
 
                     // player specific related 
                     if(entity.type === 'player'){
@@ -153,6 +158,22 @@ export class GameRoomState extends Schema {
                     // only move non playing entities
                     if(entity.type === 'entity'){
 
+                         // save current position
+                         let currentPos = new Vector3(entity.x, entity.y,entity.z);
+
+                        if (entity.AI_CURRENT_STATE === AI_STATE.IDLE) {
+
+
+                        }else if (entity.AI_CURRENT_STATE === AI_STATE.SEEKING) {
+
+                            
+
+                        }else if (entity.AI_CURRENT_STATE === AI_STATE.WANDER) {
+
+                            entity.wander();
+                        }
+
+                        /*
                         // only find a new AI_STATE if AI_STATE_REMAINING_DURATION is at zero
                         if(entity.AI_STATE_REMAINING_DURATION === 0 || entity.AI_STATE_REMAINING_DURATION < 0){
                             entity.AI_CURRENT_STATE = Math.random() < 0.5 ? AI_STATE.IDLE : AI_STATE.WALKING;
@@ -203,7 +224,9 @@ export class GameRoomState extends Schema {
                             entity.resetDestination();
 
                         }
+                        */
                     }
+                    
         
                 });
             }
