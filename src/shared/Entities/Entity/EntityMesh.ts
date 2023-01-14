@@ -1,4 +1,4 @@
-import { MeshBuilder, AssetContainer, Vector3, AnimationGroup, Mesh, Scene, ExecuteCodeAction, ActionManager, Color3 } from "@babylonjs/core";
+import { MeshBuilder, AssetContainer, StandardMaterial, AnimationGroup, Mesh, Scene, ExecuteCodeAction, ActionManager, Color3 } from "@babylonjs/core";
 import { Room } from "colyseus.js";
 import { EntityState } from "../../../server/rooms/schema/EntityState";
 import Config from "../../Config";
@@ -31,14 +31,6 @@ export class EntityMesh {
         const box = MeshBuilder.CreateBox("root_"+this._entity.race, {width: 2, height: 4}, this._scene);
         box.visibility = 0;
 
-        // debug aggro mesh
-        if(this._entity.type === 'entity'){
-            const sphere = MeshBuilder.CreateCylinder("root_"+this._entity.race, {diameter: 12, height: .1}, this._scene);
-            sphere.visibility = .3;
-            sphere.parent = box;
-            this.debugMesh = sphere;
-        }
-
         // set collision mesh
         this.mesh = box;
         this.mesh.metadata = {
@@ -47,8 +39,18 @@ export class EntityMesh {
             race: this._entity.race,
             name: this._entity.name,
         }
-        
 
+        // debug aggro mesh
+        if(this._entity.type === 'entity'){
+
+            var material = this._scene.getMaterialByName('debug_entity_neutral');
+            const sphere = MeshBuilder.CreateCylinder("debug_"+this._entity.race, {diameter: (Config.MONSTER_AGGRO_DISTANCE * 2), height: .1}, this._scene);
+            sphere.visibility = .3;
+            sphere.parent = box;
+            sphere.material = material;
+            this.debugMesh = sphere;
+        }
+        
         // load player mesh
         const result = this.assetsContainer[this._entity.race].instantiateModelsToScene(
             name => this._entity.sessionId,
@@ -70,6 +72,8 @@ export class EntityMesh {
         }
         playerMesh.scaling.set(config.scale,config.scale,config.scale);
         this.playerMesh = playerMesh;
+
+        
 
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);
@@ -96,7 +100,8 @@ export class EntityMesh {
 
         // register hover over player
         this.mesh.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
-            let mesh = ev.meshUnderPointer.getChildMeshes()[1];
+            let meshes = ev.meshUnderPointer.getChildMeshes();
+            let mesh = meshes.length === 2 ? meshes[1] : meshes[2]
             mesh.outlineColor = new Color3(0,1,0);
             mesh.outlineWidth = 3;
             mesh.renderOutline = true;
@@ -105,7 +110,8 @@ export class EntityMesh {
         
         // register hover out player
         this.mesh.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
-            let mesh = ev.meshUnderPointer.getChildMeshes()[1];
+            let meshes = ev.meshUnderPointer.getChildMeshes();
+            let mesh = meshes.length === 2 ? meshes[1] : meshes[2]
             mesh.renderOutline = false;
             //this.characterLabel.isVisible = false;
         }));

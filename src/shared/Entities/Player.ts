@@ -57,7 +57,7 @@ export class Player extends Entity {
             // on left mouse click
             if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 0) {
     
-                console.log(pointerInfo._pickInfo);
+                //console.log(pointerInfo._pickInfo);
 
                 /////////////////////////////////////////////////////////////////////
                 // if click on entity

@@ -113,7 +113,7 @@ for (var i=0; i<MagnetPoints.Length; i++){
       this.AI_CURRENT_STATE === AI_STATE.IDLE;
 
       // if player in range, start chasing
-      if(this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE < 6){
+      if(this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE < Config.MONSTER_AGGRO_DISTANCE){
         this.AI_CURRENT_STATE = AI_STATE.SEEKING;
         console.log('FOUND PLAYER. CHASING MODE ON', this.AI_CLOSEST_PLAYER.name);
 
@@ -127,7 +127,7 @@ for (var i=0; i<MagnetPoints.Length; i++){
       }
 
 
-      if(this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE > 6){
+      if(this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE > Config.MONSTER_AGGRO_DISTANCE){
         console.log('TOO FAR FROM PLAYER. WANDER MODE ON');
         this.AI_CURRENT_STATE = AI_STATE.WANDER;
       }

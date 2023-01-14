@@ -2,7 +2,8 @@ import {
     Scene, Engine, Vector3, Color3, Color4,
     ShadowGenerator, CascadedShadowGenerator,
     DirectionalLight, HemisphericLight,
-    AssetsManager, AssetContainer, SceneLoader
+    AssetsManager, AssetContainer, SceneLoader,
+    StandardMaterial
 } from "@babylonjs/core";
 
 import State from "./Screens";
@@ -117,6 +118,15 @@ export class GameScene {
         this._assetsContainer['monster_unicorn'] = await SceneLoader.LoadAssetContainerAsync("./models/", "monster_unicorn.glb", this._scene);
         this._assetsContainer['monster_bear'] = await SceneLoader.LoadAssetContainerAsync("./models/", "monster_bear.glb", this._scene);
         
+        // create materials
+        var material = new StandardMaterial('debug_entity_neutral');
+        material.alpha = .5;
+        material.diffuseColor = new Color3(1.0, 1.0, 1.0);
+
+        var material = new StandardMaterial('debug_entity_active');
+        material.alpha = .5;
+        material.diffuseColor = new Color3(1.0, 0, 0);
+
     }
 
     private async _initNetwork(): Promise<void> {

@@ -25,6 +25,7 @@ let Config = {
     PLAYER_NAMEPLATE_TIMEOUT: 15000, // 15 seconds
     PLAYER_VIEW_DISTANCE: 25,
     MONSTER_RESPAWN_RATE: 10000,
+    MONSTER_AGGRO_DISTANCE: 6,
 
     // players settings
     PLAYER_SPEED: 0.50,

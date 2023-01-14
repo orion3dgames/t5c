@@ -11,6 +11,7 @@ import { Room } from "colyseus.js";
 import { UserInterface } from "../../client/Controllers/UserInterface";
 import { NavMesh } from "../yuka";
 import { AI_STATE } from "./Entity/AIState";
+import { ThinSprite } from "babylonjs/Sprites/thinSprite";
 
 export class Entity {
     
@@ -143,17 +144,11 @@ export class Entity {
     public update(){
 
         if(this.AI_CURRENT_STATE === AI_STATE.SEEKING || this.AI_CURRENT_STATE === AI_STATE.ATTACKING){
-            var material = new StandardMaterial('dsadsada');
-            material.alpha = .5;
-            material.diffuseColor = new Color3(1.0, 0.0, 0.0);
-            this.debugMesh.material = material; // <--
+            this.debugMesh.material = this._scene.getMaterialByName('debug_entity_active');
         }
 
         if(this.AI_CURRENT_STATE === AI_STATE.WANDER){
-            var material = new StandardMaterial('dsadsada');
-            material.alpha = .5;
-            material.diffuseColor = new Color3(1.0, 1.0, 1.0);
-            this.debugMesh.material = material; // <--
+            this.debugMesh.material = this._scene.getMaterialByName('debug_entity_meutral');
         }
 
         // tween entity
