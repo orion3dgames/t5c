@@ -123,7 +123,7 @@ for (var i=0; i<MagnetPoints.Length; i++){
 
           // todo: work on a way for the player to lose at an attack interval
           // and animation should be hurting
-          this.AI_CLOSEST_PLAYER.state = EntityCurrentState.TAKING_DAMAGE;
+          
 
         }
 
