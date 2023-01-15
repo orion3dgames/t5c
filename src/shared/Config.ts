@@ -26,9 +26,10 @@ let Config = {
     PLAYER_VIEW_DISTANCE: 25,
     MONSTER_RESPAWN_RATE: 10000,
     MONSTER_AGGRO_DISTANCE: 6,
+    MONSTER_ATTACK_DISTANCE: 2,
 
     // players settings
-    PLAYER_SPEED: 0.50,
+    PLAYER_SPEED: 0.55,
     PLAYER_START_HEALTH: 100,
     PLAYER_START_LEVEL: 1,
 
@@ -67,7 +68,7 @@ let Config = {
     entities: {
         "player_hobbit": {
             name: "loading...",
-            speed: 0.2,
+            speed: 0.3,
             scale: 0.02,
             animationSpeed: 1.3,
             animations: {
@@ -75,6 +76,7 @@ let Config = {
                 "WALK": 6,
                 "ATTACK": 0,
                 "DEATH": 5,
+                "DAMAGE": 1
             },
         },
         "monster_bear": {
@@ -88,6 +90,7 @@ let Config = {
                 "WALK": 3,
                 "ATTACK": 2,
                 "DEATH": 4,
+                "DAMAGE": 5
             },
         },
         "monster_unicorn": {
@@ -101,6 +104,7 @@ let Config = {
                 "WALK": 6,
                 "ATTACK": 0,
                 "DEATH": 3,
+                "DAMAGE": 5
             },
         },
     },

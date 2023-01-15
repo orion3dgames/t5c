@@ -13,6 +13,7 @@ export class EntityAnimator {
     private _walk: AnimationGroup;
     private _attack: AnimationGroup;
     private _death: AnimationGroup;
+    private _damage: AnimationGroup;
 
     // current anim status
     private _currentAnim: AnimationGroup = null;
@@ -35,11 +36,13 @@ export class EntityAnimator {
         let walkAnimationNumber = raceData.animations['WALK'];
         let attackAnimationNumber = raceData.animations['ATTACK'];
         let deathAnimationNumber = raceData.animations['DEATH'];
+        let takingDamageAnimationNumber = raceData.animations['DAMAGE'];
 
         this._idle = this._playerAnimations[idleAnimationNumber];
         this._walk = this._playerAnimations[walkAnimationNumber];
         this._attack = this._playerAnimations[attackAnimationNumber];
         this._death = this._playerAnimations[deathAnimationNumber];
+        this._damage = this._playerAnimations[takingDamageAnimationNumber];
 
         // prepare animations
         //this._scene.stopAllAnimations();
@@ -53,6 +56,7 @@ export class EntityAnimator {
 
         this._attack.loopAnimation = true;
         this._death.loopAnimation = false;
+        this._damage.loopAnimation = true;
 
         //initialize current and previous
         this._currentAnim = this._idle;
@@ -86,6 +90,11 @@ export class EntityAnimator {
         }else if(player.state === EntityCurrentState.ATTACK){
                     
             this._currentAnim = this._attack;
+
+        // if player is being attacked
+        }else if(player.state === EntityCurrentState.TAKING_DAMAGE){
+                            
+            this._currentAnim = this._damage;
 
         // all other cases, should be idle    
         } else {

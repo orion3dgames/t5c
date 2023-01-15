@@ -51,7 +51,6 @@ export class EntityState extends Schema {
 		super(args);
     this._navMesh = gameroom.navMesh;
     this._gameroom = gameroom;
-    console.log( this.raceData);
 	}
 
   setLocation(location:string):void {
@@ -110,35 +109,36 @@ for (var i=0; i<MagnetPoints.Length; i++){
 
     if(this.type === 'entity' ){
 
+      // default behaviour
       this.AI_CURRENT_STATE === AI_STATE.IDLE;
 
-      // if player in range, start chasing
+      // if a player is in range, start chasing it
       if(this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE < Config.MONSTER_AGGRO_DISTANCE){
         this.AI_CURRENT_STATE = AI_STATE.SEEKING;
-        //console.log('FOUND PLAYER. CHASING MODE ON', this.AI_CLOSEST_PLAYER.name);
 
-        if(this.AI_CLOSEST_PLAYER_DISTANCE < 2){
-          //console.log('CLOSE ENOUGHT TO PLAYER. ATTACK MODE ON', this.AI_CLOSEST_PLAYER.name);
+        // if entity is close enough to player, start attacking it
+        if(this.AI_CLOSEST_PLAYER_DISTANCE < Config.MONSTER_ATTACK_DISTANCE){
           this.AI_CURRENT_STATE = AI_STATE.ATTACKING;
           this.state = EntityCurrentState.ATTACK;
-          this.AI_CLOSEST_PLAYER.loseHealth(20);
+
+          // todo: work on a way for the player to lose at an attack interval
+          // and animation should be hurting
+          this.AI_CLOSEST_PLAYER.state = EntityCurrentState.TAKING_DAMAGE;
+
         }
 
       }
 
-
+      // if player is out of range, return to wandering
       if(this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE > Config.MONSTER_AGGRO_DISTANCE){
-        //console.log('TOO FAR FROM PLAYER. WANDER MODE ON');
         this.AI_CURRENT_STATE = AI_STATE.WANDER;
       }
 
+      // if entity is dead
       if(this.health < 0 || this.health === 0){
-        //console.log('DEAD. IDLE MODE ON');
         this.AI_CURRENT_STATE = AI_STATE.IDLE;
         this.state = EntityCurrentState.DEAD;
       }
-
-      //console.log('CURRENT STATE', this.AI_CURRENT_STATE);
 
     }
 
@@ -149,6 +149,9 @@ for (var i=0; i<MagnetPoints.Length; i++){
    */
   seek(){
 
+    // reset any previous path
+    this.resetDestination();
+
     // save current position
     let currentPos = new Vector3(this.x, this.y,this.z);
 
@@ -158,8 +161,6 @@ for (var i=0; i<MagnetPoints.Length; i++){
 
     // calculate rotation
     this.rot = this.calculateRotation(currentPos, updatedPos);
-
-    console.log(this.name, this.race,  this.raceData.speed);
 
   }
 
@@ -214,6 +215,21 @@ for (var i=0; i<MagnetPoints.Length; i++){
     this.destinationPath = this._gameroom.navMesh.findPath(
         currentPos,
         this.toRegion.centroid
+    );
+    if(this.destinationPath.length === 0){
+      this.toRegion = false;
+      this.destinationPath = false;
+    }
+  }
+
+  
+  // todo
+  setDestination(targetPos:Vector3):void{
+    let currentPos = new Vector3(this.x, this.y,this.z);
+    this.toRegion = this._gameroom.navMesh.getClosestRegion(targetPos);
+    this.destinationPath = this._gameroom.navMesh.findPath(
+        currentPos,
+        targetPos
     );
     if(this.destinationPath.length === 0){
       this.toRegion = false;
