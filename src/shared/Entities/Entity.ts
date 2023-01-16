@@ -148,7 +148,7 @@ export class Entity {
         }
 
         if(this.AI_CURRENT_STATE === AI_STATE.WANDER){
-            this.debugMesh.material = this._scene.getMaterialByName('debug_entity_meutral');
+            this.debugMesh.material = this._scene.getMaterialByName('debug_entity_neutral');
         }
 
         // tween entity

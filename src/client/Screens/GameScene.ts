@@ -251,7 +251,7 @@ export class GameScene {
                 entity.update();
 
                 // basic performance (only enable entities in a range around the player)
-                if(entity.type === 'entity'){
+                if(entity.sessionId != this._currentPlayer.sessionId){
                     entity.mesh.setEnabled(false); 
                     let entityPos = entity.position();
                     let playerPos = this._currentPlayer.position();

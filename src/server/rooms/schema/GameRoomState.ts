@@ -101,51 +101,12 @@ export class GameRoomState extends Schema {
                 this.entities.forEach(entity => { 
 
                     // entity update
-                    entity.updateBrain();
+                    entity.update();
 
                     // player specific related 
                     if(entity.type === 'player'){
 
-                        // move entity
-                        if(entity.toRegion && entity.destinationPath && entity.destinationPath[0]){
-
-                            // get next waypoint
-                            let destinationOnPath = entity.destinationPath[0];
-                            let speed = 0.5;
-
-                            // save current position
-                            let currentPos = new Vector3(entity.x, entity.y, entity.z);
-
-                            // calculate next position towards destination
-                            let updatedPos = entity.moveTo(currentPos, destinationOnPath, speed);
-
-                            // if cannot move to position, clear destination
-                            if (entity.canMoveTo(currentPos, updatedPos) === null){
-
-                                entity.resetDestination();
-
-                            // else move entity to new position
-                            }else{
-
-                                // set new position
-                                entity.setPosition(updatedPos);
-                                
-                                // calculate rotation
-                                entity.rot = entity.calculateRotation(currentPos, updatedPos);
-
-                                // check if arrived at waypoint
-                                destinationOnPath.y = 0;
-                                if(destinationOnPath.equals(updatedPos)){
-                                    entity.destinationPath.shift(); // entity arrived at waypint, remove waypoint from array
-                                }
-
-                            }
-
-                        }else{
-
-                            // something is wrong, let's look for a new destination
-                            entity.resetDestination();
-                        }
+                        entity.goToDestination();
 
                     }
 

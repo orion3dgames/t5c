@@ -39,13 +39,13 @@ export class EntityState extends Schema {
   public destinationPath;
   public raceData;
 
-  // AI
+  // AI VARIABLES
   @type('number') public AI_CURRENT_STATE:AI_STATE = 0;
   public AI_STATE_REMAINING_DURATION:number = 0;
+  public AI_CURRENT_TARGET_POSITION = new Vector3(0, 0, 0);
+  public AI_CURRENT_TARGET_DISTANCE = null;
+  public AI_CURRENT_TARGET = null;
 
-  public AI_CLOSEST_PLAYER_POSITION = new Vector3(0, 0, 0);
-  public AI_CLOSEST_PLAYER_DISTANCE = null;
-  public AI_CLOSEST_PLAYER = null;
 
   constructor(gameroom, ...args: any[]) {
 		super(args);
@@ -53,38 +53,10 @@ export class EntityState extends Schema {
     this._gameroom = gameroom;
 	}
 
-  setLocation(location:string):void {
-      this.location = location;
-  }
-
-  setPosition(updatedPos:Vector3):void{
-    this.x = updatedPos.x;
-    this.y = updatedPos.y;
-    this.z = updatedPos.z;
-  }
-
-  loseHealth(amount:number) {
-    this.health -= amount;
-  }
-
-  /*
-  var closestIndex : int =0;
-var closestDistance : float = 100000 //something big
-for (var i=0; i<MagnetPoints.Length; i++){
-  var distance : float = (transform.position - MagnetPoints[i]).magnitude;
-  //You can use sqrMagnitude for a slightly faster calculation, if you do not actually need to know the distance, only which one is smallest
- 
-  if(distance < closestDistance){
-    closestDistance = distance;
-    closestIndex = i;
-  }
-}*/
-
-  // 
-  updateBrain(){
+  // runs on every server iteration
+  update(){
 
     //
-    let closestPlayer = null;
     let closestDistance = 1000000;
     this._gameroom.state.entities.forEach(entity => {
 
@@ -92,15 +64,15 @@ for (var i=0; i<MagnetPoints.Length; i++){
       if(this.type === 'entity' && entity.type === 'player' ){
 
         // entity must always know the closest player at all times
+        // todo: there must be a better way to do this (make )
         let playerPos = new Vector3(entity.x, entity.y, entity.z);
         let entityPos = new Vector3(this.x, this.y, this.z);
         let distanceBetween = entityPos.distanceTo(playerPos);
         if(distanceBetween < closestDistance){
-          //console.log('CLOSEST PLAYER FROM '+this.name+' IS NOW', closestDistance, distanceBetween, entity.name);
           closestDistance = distanceBetween;
-          this.AI_CLOSEST_PLAYER_POSITION = new Vector3(entity.x, entity.y, entity.z);
-          this.AI_CLOSEST_PLAYER_DISTANCE = distanceBetween;
-          this.AI_CLOSEST_PLAYER = entity;
+          this.AI_CURRENT_TARGET_POSITION = new Vector3(entity.x, entity.y, entity.z);
+          this.AI_CURRENT_TARGET_DISTANCE = distanceBetween;
+          this.AI_CURRENT_TARGET = entity;
         }
       }
  
@@ -113,16 +85,19 @@ for (var i=0; i<MagnetPoints.Length; i++){
       this.AI_CURRENT_STATE === AI_STATE.IDLE;
 
       // if a player is in range, start chasing it
-      if(this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE < Config.MONSTER_AGGRO_DISTANCE){
+      if(this.AI_CURRENT_TARGET_DISTANCE != null && this.AI_CURRENT_TARGET_DISTANCE < Config.MONSTER_AGGRO_DISTANCE){
         this.AI_CURRENT_STATE = AI_STATE.SEEKING;
 
         // if entity is close enough to player, start attacking it
-        if(this.AI_CLOSEST_PLAYER_DISTANCE < Config.MONSTER_ATTACK_DISTANCE){
+        if(this.AI_CURRENT_TARGET_DISTANCE < Config.MONSTER_ATTACK_DISTANCE){
+
+          // set ai state to attack
           this.AI_CURRENT_STATE = AI_STATE.ATTACKING;
+
+          // entity animation set to attack
           this.state = EntityCurrentState.ATTACK;
 
-          // todo: work on a way for the player to lose at an attack interval
-          // and animation should be hurting
+          // todo: work on a way for the player to lose health at an attack interval + damage animation 
           
 
         }
@@ -130,7 +105,7 @@ for (var i=0; i<MagnetPoints.Length; i++){
       }
 
       // if player is out of range, return to wandering
-      if(this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE > Config.MONSTER_AGGRO_DISTANCE){
+      if(this.AI_CURRENT_TARGET_DISTANCE != null && this.AI_CURRENT_TARGET_DISTANCE > Config.MONSTER_AGGRO_DISTANCE){
         this.AI_CURRENT_STATE = AI_STATE.WANDER;
       }
 
@@ -156,7 +131,7 @@ for (var i=0; i<MagnetPoints.Length; i++){
     let currentPos = new Vector3(this.x, this.y,this.z);
 
     // calculate next position towards destination
-    let updatedPos = this.moveTo(currentPos, this.AI_CLOSEST_PLAYER_POSITION, this.raceData.speed);
+    let updatedPos = this.moveTo(currentPos, this.AI_CURRENT_TARGET_POSITION, this.raceData.speed);
     this.setPosition(updatedPos);
 
     // calculate rotation
@@ -207,6 +182,43 @@ for (var i=0; i<MagnetPoints.Length; i++){
   }
 
   /**
+   * GO TO DESTINATION BEHAVIOUR
+   */
+  goToDestination(){
+    
+    // save current position
+    let currentPos = new Vector3(this.x, this.y,this.z);
+
+    // move entity
+    if(this.destinationPath.length > 0){
+
+        // get next waypoint
+        let destinationOnPath = this.destinationPath[0];
+        destinationOnPath.y = 0;
+  
+        // calculate next position towards destination
+        let updatedPos = this.moveTo(currentPos, destinationOnPath, this.raceData.speed);
+        this.setPosition(updatedPos);
+
+        // calculate rotation
+        this.rot = this.calculateRotation(currentPos, updatedPos);
+
+        // check if arrived at waypoint
+        if(destinationOnPath.equals(updatedPos)){
+          this.destinationPath.shift();
+        }
+
+
+    }else{
+
+        // something is wrong, let's cancel destination
+        this.resetDestination();
+
+    }
+
+  }
+
+  /**
    * Finds a new random valid position on navmesh and sets is as the new destination for this entity
    * @param {Vector3} currentPos
    */
@@ -223,7 +235,10 @@ for (var i=0; i<MagnetPoints.Length; i++){
   }
 
   
-  // todo
+  /**
+   * Finds a valid position on navmesh matching the supplier targetPos and sets is as the new destination for this entity
+   * @param {Vector3} targetPos
+   */
   setDestination(targetPos:Vector3):void{
     let currentPos = new Vector3(this.x, this.y,this.z);
     this.toRegion = this._gameroom.navMesh.getClosestRegion(targetPos);
@@ -240,6 +255,20 @@ for (var i=0; i<MagnetPoints.Length; i++){
   resetDestination():void{
     this.toRegion = false;
     this.destinationPath = false;
+  }
+
+  setLocation(location:string):void {
+    this.location = location;
+  }
+
+  setPosition(updatedPos:Vector3):void{
+    this.x = updatedPos.x;
+    this.y = updatedPos.y;
+    this.z = updatedPos.z;
+  }
+
+  loseHealth(amount:number) {
+    this.health -= amount;
   }
 
   /**
