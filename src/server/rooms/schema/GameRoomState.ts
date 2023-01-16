@@ -106,7 +106,7 @@ export class GameRoomState extends Schema {
                     // player specific related 
                     if(entity.type === 'player'){
 
-                        entity.goToDestination();
+                        //entity.goToDestination();
 
                     }
 
