@@ -1,4 +1,7 @@
-import { TransformNode, Scene, UniversalCamera, Vector3, Scalar } from "@babylonjs/core";
+import { Scene } from "@babylonjs/core/scene";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { UniversalCamera } from "@babylonjs/core/Cameras/universalCamera";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class EntityCamera {
     public camera;

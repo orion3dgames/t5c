@@ -1,6 +1,6 @@
-import { CascadedShadowGenerator, Scene, SceneLoader, Tags} from "@babylonjs/core";
-
-import "@babylonjs/loaders/glTF";
+import { Scene } from "@babylonjs/core/scene";
+import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
+import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 
 export class Environment {
 

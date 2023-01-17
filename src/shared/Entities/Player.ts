@@ -1,4 +1,8 @@
-import { Scene, CascadedShadowGenerator, PointerEventTypes, AssetContainer } from "@babylonjs/core";
+import { Scene } from "@babylonjs/core/scene";
+import { AssetContainer } from "@babylonjs/core/assetContainer";
+import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
+import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
+
 import { EntityState } from "../../server/rooms/schema/EntityState";
 
 import Config from "../Config";

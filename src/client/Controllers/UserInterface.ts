@@ -1,10 +1,19 @@
-import { TextBlock, AdvancedDynamicTexture, Button, Control, InputText, ScrollViewer, Rectangle, TextWrapping, StackPanel } from "@babylonjs/gui";
-import { Scene, Engine, PointerEventTypes, Color3 } from "@babylonjs/core";
+
+import { Scene } from "@babylonjs/core/scene";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+
+import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
+import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
+import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
+import { Button } from "@babylonjs/gui/2D/controls/button";
+import { Control } from "@babylonjs/gui/2D/controls/control";
+import { InputText } from "@babylonjs/gui/2D/controls/inputText";
+import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
+import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 
 import { Room } from "colyseus.js";
-
 import State from "../Screens/Screens";
-import { Player } from "../../shared/Entities/Player";
 import { Entity } from "../../shared/Entities/Entity";
 import { countPlayers, roundToTwo } from "../../shared/Utils";
 import { PlayerMessage } from "../../shared/types";

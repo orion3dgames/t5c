@@ -1,5 +1,4 @@
-import { AnimationGroup } from "@babylonjs/core";
-import { Vector3 } from "babylonjs";
+import { AnimationGroup, Vector3 } from "@babylonjs/core";
 import { EntityCurrentState } from "./EntityCurrentState";
 import Config from "../../Config";
 

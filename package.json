@@ -19,46 +19,51 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@babylonjs/core": "5.42.1",
-    "@babylonjs/gui": "5.42.1",
+
     "@babylonjs/gui-editor": "5.42.1",
     "@babylonjs/inspector": "5.42.1",
-    "@babylonjs/loaders": "5.42.1",
     "@babylonjs/materials": "5.42.1",
-    "@babylonjs/serializers": "5.42.1",
+
+    "@colyseus/monitor": "0.15.0-preview.0",
     "@colyseus/loadtest": "0.15.0-preview.0",
-    "@colyseus/ws-transport": "0.15.0-preview.0",
+
     "@types/node": "^17.0.12",
     "@types/react": "16.7.3",
     "@types/react-dom": "16.0.9",
+
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^11.0.0",
-    "ts-loader": "^9.2.6",
-    "ts-node": "^10.9.1",
-    "ts-node-dev": "^2.0.0",
     "typescript": "^4.9.3",
+
     "webpack": "^5.66.0",
     "webpack-bundle-analyzer": "^4.7.0",
     "webpack-cli": "^4.9.1",
-    "webpack-dev-server": "^4.7.4"
+    "webpack-dev-server": "^4.7.4",
+
+    "ts-loader": "^9.2.6",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0"
   },
   "dependencies": {
-    "babylonjs": "5.42.1",
+
+    "@babylonjs/core": "5.42.1",
+    "@babylonjs/gui": "5.42.1",
+    "@babylonjs/loaders": "5.42.1",
+    "@babylonjs/serializers": "5.42.1", 
     "babylonjs-gltf2interface": "5.42.1",
-    "babylonjs-gui": "5.42.1",
-    "babylonjs-materials": "5.42.1",
+
     "colyseus.js": "^0.15.0-preview.0",
-    "@colyseus/monitor": "0.15.0-preview.0",
+    "@colyseus/ws-transport": "0.15.0-preview.0",
+
     "concurrently": "^7.5.0",
     "cors": "^2.8.5",
     "dotenv-webpack": "^7.0.3",
     "express": "^4.18.2",
     "fs-extra": "^11.1.0",
     "nanoid": "^3.0.0",
-    "navmesh": "^2.3.1",
     "sqlite3": "^5.1.2",
-    "wavefront-obj-parser": "^2.0.1",
     "winston": "^3.8.2"
+
   },
   "peerDependencies": {},
   "browserslist": {

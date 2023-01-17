@@ -1,4 +1,3 @@
-import { nanoid } from "nanoid";
 import State from "../client/Screens/Screens"
 import { isLocal } from "./Utils";
 
@@ -6,7 +5,7 @@ let Config = {
     
     // general settings
     title: "T5C",
-    version: "Version 0.1.9",
+    version: "Version 0.2.1",
 
     // server settings
     serverUrlLocal: "ws://localhost:3000",

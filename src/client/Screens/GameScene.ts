@@ -1,10 +1,13 @@
-import {
-    Scene, Engine, Vector3, Color3, Color4,
-    ShadowGenerator, CascadedShadowGenerator,
-    DirectionalLight, HemisphericLight,
-    AssetsManager, AssetContainer, SceneLoader,
-    StandardMaterial
-} from "@babylonjs/core";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { Scene } from "@babylonjs/core/scene";
+import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
+import { AssetContainer } from "@babylonjs/core/assetContainer";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
+import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
+import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
+import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 
 import State from "./Screens";
 import { PlayerInput } from "../Controllers/PlayerInput";
@@ -18,7 +21,6 @@ import { PlayerInputs } from "../../shared/types";
 import { isLocal } from "../../shared/Utils";
 import { NavMesh } from "../../shared/yuka";
 import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
-import e from "express";
 
 export class GameScene {
 
@@ -103,7 +105,7 @@ export class GameScene {
 
         // shadow generator
         this._shadow = new CascadedShadowGenerator(1024, light);
-        this._shadow.filteringQuality = ShadowGenerator.QUALITY_MEDIUM;
+        this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_MEDIUM;
         this._shadow.bias = 0.018;
         this._shadow.autoCalcDepthBounds = true;
         this._shadow.shadowMaxZ = 95;

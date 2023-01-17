@@ -5,7 +5,11 @@ if (isLocal()) {
     import("@babylonjs/inspector");
 }
 
-import { Engine, Scene, EngineFactory } from "@babylonjs/core";
+import "@babylonjs/loaders/glTF";
+
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
+import { Scene } from "@babylonjs/core/scene";
  
 // IMPORT SCREEN
 import State from "./Screens/Screens"; 

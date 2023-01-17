@@ -1,8 +1,19 @@
-import { Scene, Color4, Vector3, FreeCamera } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText, Image, ScrollViewer } from "@babylonjs/gui";
+import { Scene } from "@babylonjs/core/scene";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Color4 } from "@babylonjs/core/Maths/math.color";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+
+import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
+import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
+import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
+import { Control } from "@babylonjs/gui/2D/controls/control";
+import { Button } from "@babylonjs/gui/2D/controls/button";
+import { InputText } from "@babylonjs/gui/2D/controls/inputText";
+import { Image } from "@babylonjs/gui/2D/controls/image";
+import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
+
 import State from "./Screens";
 import { PlayerCharacter, PlayerUser } from "../../shared/types";
-
 import Config from "../../shared/Config";
 import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
 import alertMessage from "../../shared/Utils/alertMessage";

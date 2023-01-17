@@ -1,4 +1,13 @@
-import { MeshBuilder, AssetContainer, StandardMaterial, AnimationGroup, Mesh, Scene, ExecuteCodeAction, ActionManager, Color3 } from "@babylonjs/core";
+import { Scene } from "@babylonjs/core/scene";
+import { AssetContainer } from "@babylonjs/core/assetContainer";
+import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { ActionManager } from "@babylonjs/core/Actions/actionManager";
+import { ExecuteCodeAction } from "@babylonjs/core/Actions/directActions";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+
+
 import { Room } from "colyseus.js";
 import { EntityState } from "../../../server/rooms/schema/EntityState";
 import Config from "../../Config";

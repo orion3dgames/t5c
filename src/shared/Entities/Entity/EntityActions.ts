@@ -1,4 +1,11 @@
-import { MeshBuilder, Vector3, Scene, Path3D, Color4, Texture, ParticleSystem, VertexBuffer } from "@babylonjs/core";
+import { Scene } from "@babylonjs/core/scene";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Color4 } from "@babylonjs/core/Maths/math.color";
+import { Path3D } from "@babylonjs/core/Maths/math.path";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { ParticleSystem } from "@babylonjs/core/Particles/particleSystem";
+
 import State from "../../../client/Screens/Screens";
 import Config from "../../Config";
 

@@ -1,4 +1,5 @@
-import { Scene, PointerEventTypes } from '@babylonjs/core';
+import { Scene } from '@babylonjs/core/scene';
+import { PointerEventTypes } from '@babylonjs/core/Events/pointerEvents';
 
 export class PlayerInput {
 

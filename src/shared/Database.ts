@@ -1,4 +1,3 @@
-import fs from "fs";
 import sqlite3 from "sqlite3";
 import Logger from "./Logger";
 import { nanoid } from 'nanoid';

@@ -1,5 +1,14 @@
-import { TransformNode, Scene, Vector3, AxesViewer, AbstractMesh, Mesh, StandardMaterial, Color3, CascadedShadowGenerator, AssetContainer} from "@babylonjs/core";
-import { Control, Rectangle, TextBlock, TextWrapping } from "@babylonjs/gui";
+import { Scene } from "@babylonjs/core/scene";
+import { AssetContainer } from "@babylonjs/core/assetContainer";
+import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+
+import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
+import { Control } from "@babylonjs/gui/2D/controls/control";
+import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
+
 import { EntityState } from "../../server/rooms/schema/EntityState";
 import { EntityCamera } from "./Entity/EntityCamera";
 import { EntityAnimator } from "./Entity/EntityAnimator";
@@ -11,7 +20,6 @@ import { Room } from "colyseus.js";
 import { UserInterface } from "../../client/Controllers/UserInterface";
 import { NavMesh } from "../yuka";
 import { AI_STATE } from "./Entity/AIState";
-import { ThinSprite } from "babylonjs/Sprites/thinSprite";
 
 export class Entity {
     

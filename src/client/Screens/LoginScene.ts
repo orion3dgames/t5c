@@ -1,5 +1,18 @@
-import { Engine, Scene, Color4, Vector3, FreeCamera } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Button, InputText, InputPassword, Image } from "@babylonjs/gui";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { Scene } from "@babylonjs/core/scene";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Color4 } from "@babylonjs/core/Maths/math.color";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+
+import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
+import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
+import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
+import { Control } from "@babylonjs/gui/2D/controls/control";
+import { Button } from "@babylonjs/gui/2D/controls/button";
+import { InputText } from "@babylonjs/gui/2D/controls/inputText";
+import { InputPassword } from "@babylonjs/gui/2D/controls/inputPassword";
+import { Image } from "@babylonjs/gui/2D/controls/image";
+
 import Config from "../../shared/Config";
 import State from "./Screens";
 import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils"
@@ -23,6 +36,7 @@ export class LoginScene {
 
         let scene = new Scene(engine);
         scene.clearColor = new Color4(0, 0, 0, 1);
+
         //creates and positions a free camera
         let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), scene);
         camera.setTarget(Vector3.Zero()); //targets the camera to scene origin

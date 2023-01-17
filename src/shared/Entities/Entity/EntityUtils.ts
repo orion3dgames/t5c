@@ -1,4 +1,4 @@
-import { Scene, MeshBuilder, Path3D} from "@babylonjs/core";
+import { Scene } from "@babylonjs/core/scene";
 
 export class EntityUtils {
 

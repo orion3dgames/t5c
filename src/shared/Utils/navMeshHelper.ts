@@ -1,12 +1,18 @@
-import { Mesh, Color3, VertexData, MeshBuilder, TransformNode, Vector3 } from "@babylonjs/core"
-import { SimpleMaterial } from "@babylonjs/materials"
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial"
 
  function createConvexRegionHelper(navMesh, scene) {
     const regions = navMesh.regions
   
     const customMesh = new Mesh('custom', scene)
     customMesh.position = new Vector3(0,0.01,0);
-    const customMeshMaterial = new SimpleMaterial('custom-mesh', scene)
+    const customMeshMaterial = new StandardMaterial('custom-mesh', scene)
     customMeshMaterial.diffuseColor = Color3.Random()
   
     customMesh.material = customMeshMaterial
@@ -63,7 +69,7 @@ import { SimpleMaterial } from "@babylonjs/materials"
   
     vertexData.applyToMesh(customMesh)
   
-    var mat = new SimpleMaterial('mat', scene)
+    var mat = new StandardMaterial('mat', scene)
     mat.backFaceCulling = false
     customMesh.material = mat
   
@@ -77,7 +83,7 @@ import { SimpleMaterial } from "@babylonjs/materials"
     const parent = new TransformNode('nodes-parent', scene)
   
     for (let node of nodes) {
-      const nodeMaterial = new SimpleMaterial('node', scene)
+      const nodeMaterial = new StandardMaterial('node', scene)
       nodeMaterial.diffuseColor = Color3.FromHexString(nodeColor)
   
       const nodeMesh = MeshBuilder.CreatePolyhedron(
