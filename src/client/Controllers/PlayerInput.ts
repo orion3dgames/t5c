@@ -15,7 +15,7 @@ export class PlayerInput {
     public right_click: boolean;
 
     // moving 
-    public player_moving: boolean;
+    public player_can_move: boolean = false;
 
     constructor(scene: Scene) {
 
@@ -43,16 +43,16 @@ export class PlayerInput {
                 if (pointerInfo.event.button == 2) {
                     this.right_click = false
                 }
-                this.player_moving = false;
+                this.player_can_move = false;
             }
 
             if (pointerInfo.type === PointerEventTypes.POINTERMOVE) {
                 if (this.left_click) {
-                    this.player_moving = true;
+                    this.player_can_move = true;
                     const x = (pointerInfo.event.clientX / pointerInfo.event.target.width) * 2 - 1;
                     const y = (pointerInfo.event.clientY / pointerInfo.event.target.height) * 2 - 1;
                     this.inputMap = { rotY: Math.atan2(x, y) }
-                    this._updateFromMouse();
+                    this._updateFromMouse(pointerInfo);
                 }
             }
         });
@@ -61,7 +61,16 @@ export class PlayerInput {
     }
 
     //handles what is done when mouse is pressed or moved
-    private _updateFromMouse(): void {
+    private _updateFromMouse(pointerInfo): void {
+
+        if (pointerInfo._pickInfo.pickedMesh && 
+            pointerInfo._pickInfo.pickedMesh.metadata && 
+            pointerInfo._pickInfo.pickedMesh.metadata !== null && 
+            pointerInfo._pickInfo.pickedMesh.metadata.type && 
+            pointerInfo._pickInfo.pickedMesh.metadata.type === 'entity'){
+
+            this.player_can_move = false;
+        }
 
         //forward - backwards movement
         if (this.inputMap["rotY"] !== null) {
