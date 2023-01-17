@@ -1,6 +1,6 @@
 import { isLocal } from "../shared/Utils";
 
-if (isLocal()) {
+if (process.env.NODE_ENV !== 'production') {
     import("@babylonjs/core/Debug/debugLayer");
     import("@babylonjs/inspector");
 }
