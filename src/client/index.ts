@@ -5,7 +5,9 @@ if (isLocal()) {
     import("@babylonjs/inspector");
 }
 
-import "@babylonjs/loaders/glTF";
+import "@babylonjs/loaders/glTF/glTFFileLoader";
+import "@babylonjs/core/Animations/animatable";
+import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
 
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
