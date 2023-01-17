@@ -23,7 +23,7 @@ let Config = {
 
     // game settings
     PLAYER_NAMEPLATE_TIMEOUT: 15000, // 15 seconds
-    PLAYER_VIEW_DISTANCE: 25,
+    PLAYER_VIEW_DISTANCE: 20,
     MONSTER_RESPAWN_RATE: 10000,
     MONSTER_AGGRO_DISTANCE: 6,
     MONSTER_ATTACK_DISTANCE: 2,
@@ -113,6 +113,7 @@ let Config = {
     setDefault(){
         global.T5C = {
             nextScene: isLocal() ? State.GAME : State.LOGIN,
+            //nextScene: State.LOGIN,
             currentRoomID: "",
             currentSessionID: "",
             currentLocation: Config.locations[Config.initialLocation],

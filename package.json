@@ -19,13 +19,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@babylonjs/core": "5.37.0",
-    "@babylonjs/gui": "5.37.0",
-    "@babylonjs/gui-editor": "5.37.0",
-    "@babylonjs/inspector": "5.37.0",
-    "@babylonjs/loaders": "5.37.0",
-    "@babylonjs/materials": "5.37.0",
-    "@babylonjs/serializers": "5.37.0",
+    "@babylonjs/core": "5.42.1",
+    "@babylonjs/gui": "5.42.1",
+    "@babylonjs/gui-editor": "5.42.1",
+    "@babylonjs/inspector": "5.42.1",
+    "@babylonjs/loaders": "5.42.1",
+    "@babylonjs/materials": "5.42.1",
+    "@babylonjs/serializers": "5.42.1",
     "@colyseus/loadtest": "0.15.0-preview.0",
     "@colyseus/ws-transport": "0.15.0-preview.0",
     "@types/node": "^17.0.12",
@@ -43,10 +43,10 @@
     "webpack-dev-server": "^4.7.4"
   },
   "dependencies": {
-    "babylonjs": "5.37.0",
-    "babylonjs-gltf2interface": "5.37.0",
-    "babylonjs-gui": "5.37.0",
-    "babylonjs-materials": "5.37.0",
+    "babylonjs": "5.42.1",
+    "babylonjs-gltf2interface": "5.42.1",
+    "babylonjs-gui": "5.42.1",
+    "babylonjs-materials": "5.42.1",
     "colyseus.js": "^0.15.0-preview.0",
     "@colyseus/monitor": "0.15.0-preview.0",
     "concurrently": "^7.5.0",
@@ -61,16 +61,8 @@
     "winston": "^3.8.2"
   },
   "peerDependencies": {},
-  "browserslist": {
-    "production": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+  "browserslist": [
+    "defaults and supports es6-module",
+    "maintained node versions"
+  ]
 }

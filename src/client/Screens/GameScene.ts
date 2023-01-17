@@ -46,7 +46,6 @@ export class GameScene {
 
     async createScene(engine, client): Promise<void> {
 
-        
         if(isLocal()){
             let tempLocation = "lh_town";
             //let tempLocation = "lh_dungeon_01";
@@ -244,6 +243,20 @@ export class GameScene {
         let sequence = 0;
         let latestInput: PlayerInputs;
         this._scene.registerBeforeRender(() => {
+
+            /*
+            if(this._environment.allMeshes){
+                for(let meshId in this._environment.allMeshes){
+                    const mesh = this._environment.allMeshes[meshId];
+                    mesh.setEnabled(false); 
+                    let entityPos = mesh.position;
+                    let playerPos = this._currentPlayer.position();
+                    let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
+                    if(distanceFromPlayer < Config.PLAYER_VIEW_DISTANCE){
+                        mesh.setEnabled(true); 
+                    }
+                }
+            }*/
 
             // continuously move entities at 60fps
             for (let sessionId in this.entities) {

@@ -6,6 +6,7 @@ export class Environment {
 
     private _scene: Scene;
     private _shadow: CascadedShadowGenerator;
+    public allMeshes;
 
     constructor(scene: Scene, shadow:CascadedShadowGenerator) {
 
@@ -20,8 +21,10 @@ export class Environment {
        
         const assets = await this._loadAsset();
 
+        this.allMeshes = assets.allMeshes;
+
         //Loop through all environment meshes that were imported
-        assets.allMeshes.forEach(m => {
+        this.allMeshes.forEach(m => {
             
             // default values
             m.checkCollisions = false;
