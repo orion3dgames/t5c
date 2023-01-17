@@ -61,8 +61,16 @@
     "winston": "^3.8.2"
   },
   "peerDependencies": {},
-  "browserslist": [
-    "defaults and supports es6-module",
-    "maintained node versions"
-  ]
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }
