@@ -20,7 +20,7 @@ import { Entity } from "../../shared/Entities/Entity";
 import Config from '../../shared/Config';
 import { Room } from "colyseus.js";
 import { PlayerInputs } from "../../shared/types";
-import { isLocal } from "../../shared/Utils";
+import { apiUrl, isLocal, request } from "../../shared/Utils";
 import { NavMesh } from "../../shared/yuka";
 import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
 
@@ -50,23 +50,6 @@ export class GameScene {
 
     async createScene(engine, client): Promise<void> {
 
-        if(isLocal()){
-            let tempLocation = "lh_town";
-            //let tempLocation = "lh_dungeon_01";
-            global.T5C.currentLocation = Config.locations[tempLocation];
-            global.T5C.currentUser = {
-                id: 3,
-                username: 'Code_Code',
-                password: 'test',
-                token: 'B5G6yYesNgob3weIn9HDs',
-            }
-            global.T5C.currentCharacter = {
-                id: 2,
-                user_id: 3,
-                location: tempLocation
-            };
-        }
-
         this._client = client;
         this._engine = engine;
 
@@ -78,6 +61,27 @@ export class GameScene {
 
         // load assets and remove them all from scene
         await this._loadAssets();
+
+        ///////////////////// END DEBUG CODE /////////////////////////////
+        ///////////////////// DEBUG CODE /////////////////////////////////
+        // if local skip login screen
+        if(isLocal()){
+            let tempLocation = "lh_town";
+            //let tempLocation = "lh_dungeon_01";
+            global.T5C.currentLocation = Config.locations[tempLocation];
+            let req = await request('get', apiUrl()+'/returnRandomUser');
+            let character = JSON.parse(req.data).user;
+            global.T5C.currentUser = {
+                id: character.user_id,
+                username: character.username,
+                password: character.password,
+                token: character.token,
+            }
+            global.T5C.currentCharacter = character;
+            global.T5C.currentCharacter.tempLocation = tempLocation;
+        }
+        ///////////////////// END DEBUG CODE /////////////////////////////
+        ///////////////////// END DEBUG CODE /////////////////////////////
 
         //
         let location = global.T5C.currentLocation;
@@ -207,14 +211,13 @@ export class GameScene {
         this.room.state.entities.onAdd((entity, sessionId) => {
             
             var isCurrentPlayer = sessionId === this.room.sessionId;
-
             //////////////////
             // if player type
             if(entity.type === 'player' && isCurrentPlayer){
 
                 // create player entity
                 let _player = new Player(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._assetsContainer, this._input);
-
+           
                 // set currentPlayer
                 this._currentPlayer = _player;
 
@@ -286,8 +289,7 @@ export class GameScene {
             if (timePassed >= updateRate) { 
 
                 // detect movement
-                if (this._input.left_click && 
-                    (this._input.horizontal && this._input.vertical) && 
+                if (this._input.player_can_move && 
                     !this._currentPlayer.blocked
                     ) {
 

@@ -228,6 +228,13 @@ class Database {
     return this.run(sql, [online, character_id]);
   }
 
+  ////////////////// DEBUG ONLY 
+
+  async returnRandomUserAndChar() {
+    const sql = `SELECT C.*, U.token, U.username, U.password from characters C LEFT JOIN users U ON U.id=C.user_id ORDER BY random() LIMIT 1;` 
+    return this.get(sql, []);
+  }
+
 }
 
 

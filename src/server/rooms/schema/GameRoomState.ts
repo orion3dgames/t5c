@@ -49,14 +49,14 @@ export class GameRoomState extends Schema {
         // create entity
         let data = {
             sessionId: sessionId,
-            type: 'entity',
+            type: 'entity', 
             race: race,
             name: raceData.name+" #"+delta,
             location: this._gameroom.metadata.location,
             x: point.x,
             y: 0,
             z: point.z,
-            rot: randomNumberInRange(0, Math.PI), 
+            rot: randomNumberInRange(0, Math.PI),  
             health: 100,
             level: 1,
             state: EntityCurrentState.IDLE,
@@ -83,8 +83,8 @@ export class GameRoomState extends Schema {
         let spawnTime = 300;
         if (this.spawnTimer >= spawnTime) {
             this.spawnTimer = 0;
-            let maxEntities = 10;
-            if(this.entities.size < maxEntities){
+            let maxEntities = 0;
+            if(this.entities.size <= maxEntities){
                 this.createEntity(this.entities.size);
             }
         }

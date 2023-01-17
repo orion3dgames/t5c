@@ -44,6 +44,7 @@ export class EntityCamera {
 
         // set as active camera
         this._scene.activeCamera = this.camera;
+
     }
 
     public follow(playerPosition): void {

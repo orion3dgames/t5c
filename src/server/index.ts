@@ -177,5 +177,20 @@ app.get('/register', function (req, res) {
   
 });
 
+app.get('/returnRandomUser', function (req, res) {
+  database.returnRandomUserAndChar().then((user)=>{
+    if(!user) {
+      return res.status(400).send({
+        message: "Failed"
+      });
+    }else{
+      return res.send({
+        message: "Successful",
+        user: user
+      });
+    }
+  })
+});
+
 
 
