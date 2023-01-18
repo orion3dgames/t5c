@@ -203,10 +203,11 @@ export class GameRoom extends Room<GameRoomState> {
             if(sender && target){
                 // sender state
                 //sender.state = PlayerCurrentState.ATTACK;
-                target.state = EntityCurrentState.TAKING_DAMAGE;
+                //target.state = EntityCurrentState.TAKING_DAMAGE;
+                target.setTarget(sender); // set attaker as target
 
                 // target loses health
-                target.loseHealth(40);
+                target.loseHealth(10);
 
                 // if target has no more health
                 if(target.health == 0 || target.health < 0){ 

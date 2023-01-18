@@ -42,10 +42,17 @@ export class EntityState extends Schema {
   // AI VARIABLES
   @type('number') public AI_CURRENT_STATE:AI_STATE = 0;
   public AI_STATE_REMAINING_DURATION:number = 0;
+
   public AI_CURRENT_TARGET_POSITION = new Vector3(0, 0, 0);
   public AI_CURRENT_TARGET_DISTANCE = null;
   public AI_CURRENT_TARGET = null;
+  public AI_CURRENT_TARGET_FOUND = false;
 
+  public AI_SEEKING_ELAPSED_TIME:number = 0;
+
+  public AI_CLOSEST_TARGET_POSITION = new Vector3(0, 0, 0);
+  public AI_CLOSEST_TARGET_DISTANCE = null;
+  public AI_CLOSEST_TARGET = null;
 
   constructor(gameroom, ...args: any[]) {
 		super(args);
@@ -70,10 +77,21 @@ export class EntityState extends Schema {
         let distanceBetween = entityPos.distanceTo(playerPos);
         if(distanceBetween < closestDistance){
           closestDistance = distanceBetween;
+          this.AI_CLOSEST_TARGET_POSITION = new Vector3(entity.x, entity.y, entity.z);
+          this.AI_CLOSEST_TARGET_DISTANCE = distanceBetween;
+          this.AI_CLOSEST_TARGET = entity;
+        }
+
+        // if entity has a target
+        if(this.AI_CURRENT_TARGET != null){
+          let targetPos = entity.getPosition();
+          let entityPos = this.getPosition();
+          let distanceBetween = entityPos.distanceTo(targetPos);
           this.AI_CURRENT_TARGET_POSITION = new Vector3(entity.x, entity.y, entity.z);
           this.AI_CURRENT_TARGET_DISTANCE = distanceBetween;
-          this.AI_CURRENT_TARGET = entity;
         }
+
+
       }
  
     });
@@ -84,8 +102,10 @@ export class EntityState extends Schema {
       // default behaviour
       this.AI_CURRENT_STATE === AI_STATE.IDLE;
 
-      // if a player is in range, start chasing it
-      if(this.AI_CURRENT_TARGET_DISTANCE != null && this.AI_CURRENT_TARGET_DISTANCE < Config.MONSTER_AGGRO_DISTANCE){
+      // if entity has a target, 
+      if(this.AI_CURRENT_TARGET != null){
+        
+        // start chasing player
         this.AI_CURRENT_STATE = AI_STATE.SEEKING;
 
         // if entity is close enough to player, start attacking it
@@ -97,16 +117,35 @@ export class EntityState extends Schema {
           // entity animation set to attack
           this.state = EntityCurrentState.ATTACK;
 
-          // todo: work on a way for the player to lose health at an attack interval + damage animation 
-          
+          this.AI_CURRENT_TARGET_FOUND = true;
 
+        }else{
+          // increment seeking timer
+          this.AI_SEEKING_ELAPSED_TIME += 1;
+        }
+
+        // if entity is seeking and target gets away return to wandering
+        // - found and attacked player, but player managed to get away
+        // - was seeking player for over 50 server iteration but did not manage to catch player
+        if(
+          (this.AI_CURRENT_TARGET_FOUND && this.AI_CURRENT_TARGET_DISTANCE > Config.MONSTER_AGGRO_DISTANCE) || 
+          (this.AI_SEEKING_ELAPSED_TIME > 50) 
+        ){
+          this.AI_CURRENT_STATE = AI_STATE.WANDER;
+          this.AI_CURRENT_TARGET = null;
+          this.AI_CURRENT_TARGET_DISTANCE = 0;
+          this.AI_CURRENT_TARGET_FOUND = false;
+          this.AI_SEEKING_ELAPSED_TIME = 0;
         }
 
       }
 
-      // if player is out of range, return to wandering
-      if(this.AI_CURRENT_TARGET_DISTANCE != null && this.AI_CURRENT_TARGET_DISTANCE > Config.MONSTER_AGGRO_DISTANCE){
+      // if no target, monitor closest player for range distance
+      if(this.AI_CURRENT_TARGET === null){
         this.AI_CURRENT_STATE = AI_STATE.WANDER;
+        if(this.AI_CLOSEST_TARGET_DISTANCE < Config.MONSTER_ATTACK_DISTANCE){
+          this.setTarget(this.AI_CLOSEST_TARGET);
+        }
       }
 
       // if entity is dead
@@ -117,6 +156,14 @@ export class EntityState extends Schema {
 
     }
 
+  }
+
+  getPosition(){
+    return new Vector3(this.x, this.y, this.z);
+  }
+
+  setTarget(target){
+    this.AI_CURRENT_TARGET = target;
   }
 
   /**
