@@ -1,10 +1,11 @@
 import { Scene } from "@babylonjs/core/scene";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Color4 } from "@babylonjs/core/Maths/math.color";
+import { Color4, Color3 } from "@babylonjs/core/Maths/math.color";
 import { Path3D } from "@babylonjs/core/Maths/math.path";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { ParticleSystem } from "@babylonjs/core/Particles/particleSystem";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 
 import State from "../../../client/Screens/Screens";
 import Config from "../../Config";
@@ -38,75 +39,61 @@ export class EntityActions {
     }
 
     public fire(start, end, mesh) {
+
+        // calculate angle
         var angle = Math.atan2((start.z - end.z), (start.x - end.x ));
-        var projectile = MeshBuilder.CreateSphere('Projectile', {diameter: 0.4}, this._scene);
+
+        // reate material
+        var material = new StandardMaterial('player_spell');
+        material.diffuseColor = Color3.FromInts(249, 115, 0);
+
+        // create mesh
+        var projectile = MeshBuilder.CreateSphere('Projectile', {segments: 4, diameter: 0.4}, this._scene);
+        projectile.material = material;
         projectile.position = start.clone();
         projectile.position.y = 2;
         projectile.rotation.y = (Math.PI/2) - angle;
 
-        
-        /////////////////////////////////////////////
-
-        // Create a particle system
-        var particleSystem = new ParticleSystem("particles", 1000, this._scene);
-
-        //Texture of each particle
+        //////////////////////////////////////////////
+        // create a particle system
+        var particleSystem = new ParticleSystem("particles", 2000, this._scene);
         particleSystem.particleTexture = new Texture("textures/flare.png", this._scene);
-
-        // Where the particles come from
         particleSystem.emitter = projectile; // the starting location
-
         // Colors of all particles
-        particleSystem.color1 = new Color4(0.29, 0.96, 0.57, 1.0);
-        particleSystem.color2 = new Color4(0.16, 0.8, 0.47, 1.0);
+        particleSystem.color1 = new Color4(1, 0, 0, 1.0);
+        particleSystem.color2 = new Color4(1, 0.1, 0.1, 1.0);
         particleSystem.colorDead = new Color4(0, 0, 0.2, 0.0);
-
         // Size of each particle (random between...
-        particleSystem.minSize = 0.2;
-        particleSystem.maxSize = 0.4;
-
+        particleSystem.minSize = 0.4;
+        particleSystem.maxSize = 0.5;
         // Life time of each particle (random between...
-        particleSystem.minLifeTime = 0.4;
-        particleSystem.maxLifeTime = 0.5;
-
+        particleSystem.minLifeTime = 0.05;
+        particleSystem.maxLifeTime = 0.2;
         // Emission rate
         particleSystem.emitRate = 1000;
-
-
-        /******* Emission Space ********/
         particleSystem.createSphereEmitter(1);
-
-
         // Speed
         particleSystem.minEmitPower = 1;
-        particleSystem.maxEmitPower = 3;
+        particleSystem.maxEmitPower = 5;
         particleSystem.updateSpeed = 0.01;
-
         // Start the particle system
         particleSystem.start();
-      
-
         //////////////////////////////////////////////
   
-        var endVector = projectile.calcMovePOV(0,0, 72).addInPlace(projectile.position);
+        var endVector = projectile.calcMovePOV(0, 0, 72).addInPlace(projectile.position);
         var points = [start, endVector];
         var path = new Path3D(points);
-
         var i = 0;
         var loop =  this._scene.onBeforeRenderObservable.add(() => {
             if (i <= 1) {
-                console.log('NO COLLISION');
                 projectile.position = path.getPointAt(i); 
-                i += 0.009;
+                i += 0.004;
             } 
-
-            if(projectile.intersectsMesh(mesh)){
-                console.log('COLLISION', mesh);
+            if(projectile.intersectsMesh(mesh) || i === 1){
                 projectile.dispose(true, true);
                 particleSystem.dispose(true);
                 this._scene.onBeforeRenderObservable.remove(loop);
             }
-
         });
 
     }

@@ -133,7 +133,6 @@ export class GameScene {
         var material = new StandardMaterial('debug_entity_active');
         material.alpha = .5;
         material.diffuseColor = new Color3(1.0, 0, 0);
-
     }
 
     private async _initNetwork(): Promise<void> {
