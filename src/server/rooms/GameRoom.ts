@@ -200,22 +200,37 @@ export class GameRoom extends Room<GameRoomState> {
             let sender:EntityState = state.entities[client.sessionId];
             let target:EntityState = state.entities[data.targetId];
             
-            if(sender && target){
-                // sender state
-                //sender.state = PlayerCurrentState.ATTACK;
-                //target.state = EntityCurrentState.TAKING_DAMAGE;
-                target.setTarget(sender); // set attaker as target
+            // if target is not already dead
+            if(sender && target && target.health > 0){
+
+                // set attacker as target
+                target.setTarget(sender); 
 
                 // target loses health
                 target.loseHealth(10);
+
+                // send everyone else the information sender has attacked target
+                this.broadcast("player_update", {
+                    action: 'attack',
+                    fromSenderId: sender.sessionId,
+                    fromPosition: {
+                        x: sender.x,
+                        y: sender.y,
+                        z: sender.z,
+                    },
+                    toPosition: {
+                        x: target.x,
+                        y: target.y,
+                        z: target.z,
+                    },
+                    message: sender.name +" attacked you and you lost 5 health"
+                }, { except: client });
 
                 // if target has no more health
                 if(target.health == 0 || target.health < 0){ 
 
                     // set entity as dead
-                    target.health = 0;
-                    target.state = EntityCurrentState.DEAD;
-                    target.blocked = true;
+                    target.setAsDead();
                     Logger.info(`[gameroom][playerAction] Entity is dead`, data);
 
                     // delete so entity can be respawned
@@ -224,6 +239,7 @@ export class GameRoom extends Room<GameRoomState> {
                         state.entities.delete(target.sessionId);
                     }, Config.MONSTER_RESPAWN_RATE);
                 }
+
 
             }else{
                 

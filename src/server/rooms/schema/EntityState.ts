@@ -166,6 +166,14 @@ export class EntityState extends Schema {
     this.AI_CURRENT_TARGET = target;
   }
 
+  setAsDead(){
+    this.health = 0;
+    this.blocked = true;
+    this.state = EntityCurrentState.DEAD;
+    this.AI_CURRENT_TARGET = false;
+    this.AI_CURRENT_STATE = AI_STATE.IDLE;
+  }
+
   /**
    * SEEK BEHAVIOUR
    */

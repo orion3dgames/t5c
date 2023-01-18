@@ -38,7 +38,6 @@ export class EntityActions {
     }
 
     public fire(start, end, mesh) {
-        console.log('FIRE', start, end);
         var angle = Math.atan2((start.z - end.z), (start.x - end.x ));
         var projectile = MeshBuilder.CreateSphere('Projectile', {diameter: 0.4}, this._scene);
         projectile.position = start.clone();

@@ -133,11 +133,10 @@ export class Player extends Entity {
         });
 
         // on player action
-        this._room.onMessage('playerActionConfirmation', (data) => {
-            console.log('playerActionConfirmation', data);
-            
+        this._room.onMessage('player_update', (data) => {
+            console.log('player_update', data);
             switch(data.action){
-                case 'atack':
+                case 'attack':
                     this.actionsController.attack(data, this.mesh, this.ui);
                     break;
             }
