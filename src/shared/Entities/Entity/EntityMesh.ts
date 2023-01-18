@@ -73,7 +73,7 @@ export class EntityMesh {
         //console.log('LOADED ENTITY MESH', this._entity.race, result);
 
         // set initial player scale & rotation
-        playerMesh.name = this._entity.race+"_mesh";
+        playerMesh.name = this._entity.sessionId+"_mesh";
         playerMesh.parent = box;
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
         if(config.rotationFix){

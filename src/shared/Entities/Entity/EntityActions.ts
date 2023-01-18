@@ -18,24 +18,29 @@ export class EntityActions {
         this._scene = scene;
     }
 
-    public attack(data, mesh, ui) {
+    public attack(data) {
+
+        // get target mesh 
+        let mesh = this._scene.getMeshByName(data.targetId+'_mesh');
+        console.log(data.targetId+'_mesh', mesh);
 
         // send bullet locally
-        let start = data.fromPosition;
-        let end = data.toPosition;
+        let start = data.fromPos;
+        let end = data.targetPos;
         this.fire(
             new Vector3(start.x, start.y, start.z), 
             new Vector3(end.x, end.y, end.z), 
             mesh
         );
 
+        /*
         ui.addChatMessage({
             senderID: "SYSTEM",
             message: data.message,
             name: "SYSTEM",
             timestamp: 0,
             createdAt: ""
-        });
+        });*/
     }
 
     public fire(start, end, mesh) {
@@ -89,7 +94,7 @@ export class EntityActions {
                 projectile.position = path.getPointAt(i); 
                 i += 0.004;
             } 
-            if(projectile.intersectsMesh(mesh) || i === 1){
+            if(projectile.intersectsMesh(mesh)){
                 projectile.dispose(true, true);
                 particleSystem.dispose(true);
                 this._scene.onBeforeRenderObservable.remove(loop);

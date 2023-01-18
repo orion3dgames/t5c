@@ -137,7 +137,7 @@ export class Player extends Entity {
             console.log('player_update', data);
             switch(data.action){
                 case 'attack':
-                    this.actionsController.attack(data, this.mesh, this.ui);
+                    this.actionsController.attack(data);
                     break;
             }
             

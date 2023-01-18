@@ -212,18 +212,18 @@ export class GameRoom extends Room<GameRoomState> {
                 // send everyone else the information sender has attacked target
                 this.broadcast("player_update", {
                     action: 'attack',
-                    fromSenderId: sender.sessionId,
-                    fromPosition: {
+                    fromId: sender.sessionId,
+                    fromPos: {
                         x: sender.x,
                         y: sender.y,
                         z: sender.z,
                     },
-                    toPosition: {
+                    targetId: target.sessionId,
+                    targetPos: {
                         x: target.x,
                         y: target.y,
                         z: target.z,
-                    },
-                    message: sender.name +" attacked you and you lost 5 health"
+                    }
                 }, { except: client });
 
                 // if target has no more health

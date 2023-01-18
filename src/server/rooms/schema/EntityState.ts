@@ -83,11 +83,11 @@ export class EntityState extends Schema {
         }
 
         // if entity has a target
-        if(this.AI_CURRENT_TARGET != null){
-          let targetPos = entity.getPosition();
+        if(this.AI_CURRENT_TARGET !== null && this.AI_CURRENT_TARGET.sessionId){
+          let targetPos = this.AI_CURRENT_TARGET.getPosition();
           let entityPos = this.getPosition();
           let distanceBetween = entityPos.distanceTo(targetPos);
-          this.AI_CURRENT_TARGET_POSITION = new Vector3(entity.x, entity.y, entity.z);
+          this.AI_CURRENT_TARGET_POSITION = targetPos;
           this.AI_CURRENT_TARGET_DISTANCE = distanceBetween;
         }
 
@@ -143,16 +143,21 @@ export class EntityState extends Schema {
       // if no target, monitor closest player for range distance
       if(this.AI_CURRENT_TARGET === null){
         this.AI_CURRENT_STATE = AI_STATE.WANDER;
-        if(this.AI_CLOSEST_TARGET_DISTANCE < Config.MONSTER_ATTACK_DISTANCE){
-          this.setTarget(this.AI_CLOSEST_TARGET);
-        }
+        if(this.AI_CLOSEST_TARGET && this.AI_CLOSEST_TARGET_DISTANCE < Config.MONSTER_AGGRO_DISTANCE){ 
+          this.setTarget(this.AI_CLOSEST_TARGET); 
+        } 
       }
 
       // if entity is dead
       if(this.health < 0 || this.health === 0){
-        this.AI_CURRENT_STATE = AI_STATE.IDLE;
-        this.state = EntityCurrentState.DEAD;
+        this.setAsDead();
       }
+
+      /*
+      console.log(this.sessionId, this.race, AI_STATE[AI_STATE.IDLE], 
+        (this.AI_CURRENT_TARGET ? this.AI_CURRENT_TARGET.name : null),
+         (this.AI_CLOSEST_TARGET ? this.AI_CLOSEST_TARGET.name : null),
+         this.AI_CLOSEST_TARGET_DISTANCE);*/
 
     }
 
