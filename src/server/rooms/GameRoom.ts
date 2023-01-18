@@ -203,6 +203,9 @@ export class GameRoom extends Room<GameRoomState> {
             // if target is not already dead
             if(sender && target && target.health > 0){
 
+                // rotate sender to lookAt target
+                sender.rot = sender.calculateRotation(sender.getPosition(), target.getPosition());
+
                 // set attacker as target
                 target.setTarget(sender); 
 
