@@ -1,5 +1,6 @@
 import { Scene } from '@babylonjs/core/scene';
 import { PointerEventTypes } from '@babylonjs/core/Events/pointerEvents';
+import { KeyboardEventTypes } from '@babylonjs/core/Events/keyboardEvents';
 
 export class PlayerInput {
 
@@ -16,6 +17,12 @@ export class PlayerInput {
 
     // moving 
     public player_can_move: boolean = false;
+
+    // digits
+    public digit1: boolean = false;
+
+    // 
+    public activate_spell_1: boolean = false;
 
     constructor(scene: Scene) {
 
@@ -39,6 +46,7 @@ export class PlayerInput {
                     this.inputMap = { rotY: null }
                     this.vertical = 0;
                     this.horizontal = 0;
+                    this.digit1 = false;
                 }
                 if (pointerInfo.event.button == 2) {
                     this.right_click = false
@@ -57,7 +65,33 @@ export class PlayerInput {
             }
         });
 
+        scene.onKeyboardObservable.add((kbInfo) => {
+            switch (kbInfo.type) {
+              case KeyboardEventTypes.KEYDOWN:
+                if(kbInfo.event.code === 'Digit1'){
+                    this.digit1 = true;
+                }
+                break;
+            }
+        });
 
+        scene.registerAfterRender(() => {
+            document.documentElement.style.cursor = "default";
+            scene.hoverCursor = "default";
+            if (this.digit1 === true) {
+                document.documentElement.style.cursor = " url('/images/Magic.cur') 12 12, auto ";
+                scene.hoverCursor = " url('/images/Magic.cur') 12 12, auto ";
+            }
+           
+        }) 
+    }
+
+    private _showSpellCursor(): void {
+        document.documentElement.style.cursor = " url('./images/cursor_spell.png') 12 12, auto ";
+    }
+
+    private _showDefaultCursor(): void {
+        document.documentElement.style.cursor = "default";
     }
 
     //handles what is done when mouse is pressed or moved

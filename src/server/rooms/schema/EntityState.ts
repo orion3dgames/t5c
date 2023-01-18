@@ -63,6 +63,13 @@ export class EntityState extends Schema {
   // runs on every server iteration
   update(){
 
+    // 
+    this.AI_CURRENT_TARGET_POSITION = null;
+    this.AI_CURRENT_TARGET_DISTANCE = 0;
+    this.AI_CLOSEST_TARGET_POSITION = null;
+    this.AI_CLOSEST_TARGET_DISTANCE = 0;
+    this.AI_CLOSEST_TARGET = null;
+
     //
     let closestDistance = 1000000;
     this._gameroom.state.entities.forEach(entity => {

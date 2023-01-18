@@ -19,6 +19,7 @@ import { NavMesh } from "../yuka";
 export class Player extends Entity {
 
     public input;
+    public interval;
 
     constructor(
         entity:EntityState,
@@ -74,17 +75,33 @@ export class Player extends Entity {
                         
                     // get target
                     let targetSessionId = pointerInfo._pickInfo.pickedMesh.metadata.sessionId;   
-                    
-                    // send to server
-                    this._room.send("entity_attack", {
-                        senderId: this.sessionId,
-                        targetId: targetSessionId
-                    });
+                        
+                    if(this._input.left_click === true && this._input.digit1 === true){
+                        
+                        if(this.interval){
+                            clearInterval(this.interval);
+                        }
 
-                    // send bullet locally
-                    let start = this.mesh.position;
-                    let end = pointerInfo._pickInfo.pickedMesh.position;
-                    this.actionsController.fire(start, end, this.ui._entities[targetSessionId].mesh);
+                        this.interval = setInterval(()=>{
+
+                            // send to server
+                            this._room.send("entity_attack", {
+                                senderId: this.sessionId,
+                                targetId: targetSessionId
+                            });
+
+                            // send bullet locally
+                            let start = this.mesh.position;
+                            let end = pointerInfo._pickInfo.pickedMesh.position;
+                            this.actionsController.fire(start, end, this.ui._entities[targetSessionId].mesh);
+
+                            if(this._room.state.entities[targetSessionId].health <= 0){
+                                clearInterval(this.interval);
+                            }
+
+                        }, 600);
+
+                    }
                 }
 
 
