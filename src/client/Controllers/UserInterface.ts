@@ -13,13 +13,14 @@ import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollVie
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 
+import { UI_Chats } from "./UI/UI_Chats";
+
 import { Room } from "colyseus.js";
 import State from "../Screens/Screens";
 import { Entity } from "../../shared/Entities/Entity";
 import { countPlayers, roundToTwo } from "../../shared/Utils";
 import { PlayerMessage } from "../../shared/types";
 import Config from "../../shared/Config";
-import { Player } from "src/shared/Entities/Player";
 
 export class UserInterface {
     
@@ -35,6 +36,9 @@ export class UserInterface {
     private _playerUI;
     private _chatUI; 
     private _debugUI:Rectangle; 
+
+    // NewUI
+    private _UIChat; 
 
     //Chat
     public messages: PlayerMessage[] = [];
@@ -58,6 +62,9 @@ export class UserInterface {
         this._playerUI = playerUI;
         this._playerUI.idealHeight = 720;
 
+        // CREATE CHAT 
+        //this._UIChat = new UI_Chats(playerUI, chatRoom, currentPlayer);
+
         // create interface
         let debugTextUI = this.createDebugPanel();
         this.createChatPanel();
@@ -77,7 +84,7 @@ export class UserInterface {
              this.refreshEntityUI();
             
         });
-
+        
     }
 
     public createAbilitiesPanel(){
@@ -308,29 +315,50 @@ export class UserInterface {
     ////////////////////////////
     private createChatPanel(){
 
-        // add chat input
-        const chat_input = new InputText();
-        chat_input.width = this.uiWidth;
-        chat_input.height = '30px;'
-        chat_input.top = "-20px";
-        chat_input.color = "#FFF";
-        chat_input.placeholderText = "Write message here...";
-        chat_input.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        chat_input.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        this._playerUI.addControl(chat_input);
+        // add stack panel
+        const chatPanel = new Rectangle("chatPanel");
+        chatPanel.top = "-10px;"
+        chatPanel.width = this.uiWidth;
+        chatPanel.adaptHeightToChildren = true;
+        chatPanel.thickness = 0;
+        chatPanel.background = "rgba(0,0,0,.5)";
+        chatPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        chatPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        this._playerUI.addControl(chatPanel);
 
-        chat_input.focus();
+        // add chat input
+        const chatInput = new InputText("chatInput");
+        chatInput.width = .8;
+        chatInput.height = '30px;'
+        chatInput.top = "0px";
+        chatInput.color = "#FFF";
+        chatInput.placeholderText = "Write message here...";
+        chatInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        chatInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        chatPanel.addControl(chatInput);
+
+        // add chat send button
+        const chatButton = Button.CreateSimpleButton("chatButton", "SEND");
+        chatButton.width = .2;
+        chatButton.height = '30px;'
+        chatButton.top = "0px";
+        chatButton.color = "#FFF";
+        chatButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        chatButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        chatPanel.addControl(chatButton);
+
+        // focus chat
+        chatInput.focus();
+
+        // on click send
+        chatButton.onPointerDownObservable.add(() => { 
+            this.sendMessage(chatPanel);
+        });
+
         // chatbox on enter event
-        chat_input.onKeyboardEventProcessedObservable.add((ev) => { 
-            if((ev.key==="Enter" || ev.code==="Enter") && chat_input.text != ""){
-                
-                this._chatRoom.send("message", {
-                    name: this._currentPlayer.name,
-                    message: chat_input.text
-                });
-                chat_input.text = "";
-                chat_input.focus();
-                this._refreshChatBox();
+        chatInput.onKeyboardEventProcessedObservable.add((ev) => { 
+            if((ev.key==="Enter" || ev.code==="Enter") && chatInput.text != ""){
+                this.sendMessage(chatPanel);
             }
         });
 
@@ -344,34 +372,43 @@ export class UserInterface {
         // add default chat message
         this.messages.push({
             senderID: "SYSTEM",
-            message: "Welcome to T5C, you can move around by left clicking and dragging the mouse around.",
+            message: "Welcome to T5C, you can move around by left clicking and dragging the mouse around. Attack by pressing 1 and clicking on any entity.",
             name: "SYSTEM",
             timestamp: 0,
             createdAt: ""
         }); 
 
         // add scrollable container
-        var sv = new ScrollViewer("chat-scroll-viewer");
-        sv.width = this.uiWidth;
-        sv.height = "100px";
-        sv.top = "-50px";
-        sv.background = "rgba(0,0,0,.5)";
-        sv.alpha = 1;
-        sv.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        sv.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        const chatScrollViewer = new ScrollViewer("chatScrollViewer");
+        chatScrollViewer.width = this.uiWidth;
+        chatScrollViewer.height = "100px";
+        chatScrollViewer.top = "-50px";
+        chatScrollViewer.background = "rgba(0,0,0,.5)";
+        chatScrollViewer.alpha = 1;
+        chatScrollViewer.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        chatScrollViewer.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        this._playerUI.addControl(chatScrollViewer);
 
         // add stack panel
-        const sp = new StackPanel("chat-stack-panel");
-        sp.width = "100%";
-        sp.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        sp.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        sp.paddingTop = "5px;"
-        sv.addControl(sp);
-
-        this._chatUI = sp;
-        this._playerUI.addControl(sv);
-
+        const chatStackPanel = new StackPanel("chatStackPanel");
+        chatStackPanel.width = "100%";
+        chatStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        chatStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        chatStackPanel.paddingTop = "5px;"
+        chatStackPanel.addControl(chatStackPanel);
+        this._chatUI = chatStackPanel;
+        
         // intial refresh chatbox
+        this._refreshChatBox();
+    }
+
+    private sendMessage(input){
+        this._chatRoom.send("message", {
+            name: this._currentPlayer.name,
+            message: input.text
+        });
+        input.text = "";
+        input.focus();
         this._refreshChatBox();
     }
 
@@ -393,7 +430,7 @@ export class UserInterface {
         this.messages.slice().reverse().forEach((msg:PlayerMessage) => {
 
             // container
-            var headlineRect = new Rectangle("chatmessage_"+msg.createdAt);
+            var headlineRect = new Rectangle("chatMsgRect_"+msg.createdAt);
             headlineRect.width = "100%";
             headlineRect.thickness = 0;
             headlineRect.paddingBottom = "5px";
@@ -402,14 +439,13 @@ export class UserInterface {
             headlineRect.adaptHeightToChildren = true;
             this._chatUI.addControl(headlineRect);
 
-            
             let prefix = '[GLOBAL] '+msg.name+': ';
             if(this._currentPlayer){
                 prefix = msg.senderID == this._currentPlayer.sessionId ? 'You said: ' : '[GLOBAL] '+msg.name+': ';
             }
             
             // message
-            var roomTxt = new TextBlock();
+            var roomTxt = new TextBlock("chatMsgTxt_"+msg.createdAt);
             roomTxt.paddingLeft = "5px";
             roomTxt.text = prefix+msg.message;
             roomTxt.textHorizontalAlignment = 0;

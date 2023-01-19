@@ -89,14 +89,15 @@ export class PlayerInput {
     //handles what is done when mouse is pressed or moved
     private _updateFromMouse(pointerInfo): void {
 
+        /*
+        // prevent player moving while hovering an entity
         if (pointerInfo._pickInfo.pickedMesh && 
             pointerInfo._pickInfo.pickedMesh.metadata && 
             pointerInfo._pickInfo.pickedMesh.metadata !== null && 
             pointerInfo._pickInfo.pickedMesh.metadata.type && 
             pointerInfo._pickInfo.pickedMesh.metadata.type === 'entity'){
-
             this.player_can_move = false;
-        }
+        }*/
 
         //forward - backwards movement
         if (this.inputMap["rotY"] !== null) {
