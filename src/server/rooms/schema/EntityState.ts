@@ -43,15 +43,15 @@ export class EntityState extends Schema {
   @type('number') public AI_CURRENT_STATE:AI_STATE = 0;
   public AI_STATE_REMAINING_DURATION:number = 0;
 
-  public AI_CURRENT_TARGET_POSITION = new Vector3(0, 0, 0);
+  public AI_CURRENT_TARGET_POSITION = null;
   public AI_CURRENT_TARGET_DISTANCE = null;
   public AI_CURRENT_TARGET = null;
   public AI_CURRENT_TARGET_FOUND = false;
 
   public AI_SEEKING_ELAPSED_TIME:number = 0;
 
-  public AI_CLOSEST_TARGET_POSITION = new Vector3(0, 0, 0);
-  public AI_CLOSEST_TARGET_DISTANCE = null;
+  public AI_CLOSEST_TARGET_POSITION = null;
+  public AI_CLOSEST_TARGET_DISTANCE:number = 0;
   public AI_CLOSEST_TARGET = null;
 
   constructor(gameroom, ...args: any[]) {
@@ -72,13 +72,13 @@ export class EntityState extends Schema {
 
     //
     let closestDistance = 1000000;
-    this._gameroom.state.entities.forEach(entity => {
+    this._gameroom.state.players.forEach(entity => {
 
       // only for entity 
       if(this.type === 'entity' && entity.type === 'player' ){
 
         // entity must always know the closest player at all times
-        // todo: there must be a better way to do this (make )
+        // todo: there must be a better way to do this
         let playerPos = new Vector3(entity.x, entity.y, entity.z);
         let entityPos = new Vector3(this.x, this.y, this.z);
         let distanceBetween = entityPos.distanceTo(playerPos);
@@ -89,25 +89,28 @@ export class EntityState extends Schema {
           this.AI_CLOSEST_TARGET = entity;
         }
 
-        // if entity has a target
+        // if entity has a target, monitor it's position
         if(this.AI_CURRENT_TARGET !== null && this.AI_CURRENT_TARGET.sessionId){
           let targetPos = this.AI_CURRENT_TARGET.getPosition();
           let entityPos = this.getPosition();
           let distanceBetween = entityPos.distanceTo(targetPos);
           this.AI_CURRENT_TARGET_POSITION = targetPos;
           this.AI_CURRENT_TARGET_DISTANCE = distanceBetween;
+        }else{
+          this.AI_CURRENT_TARGET = null;
+          this.AI_CURRENT_TARGET_POSITION = null;
+          this.AI_CURRENT_TARGET_DISTANCE = distanceBetween;
         }
-
-
+        
       }
- 
+
     });
 
 
     if(this.type === 'entity' ){
 
       // default behaviour
-      this.AI_CURRENT_STATE === AI_STATE.IDLE;
+      this.AI_CURRENT_STATE = AI_STATE.IDLE;
 
       // if entity has a target, 
       if(this.AI_CURRENT_TARGET != null){
@@ -120,9 +123,6 @@ export class EntityState extends Schema {
 
           // set ai state to attack
           this.AI_CURRENT_STATE = AI_STATE.ATTACKING;
-
-          // entity animation set to attack
-          this.state = EntityCurrentState.ATTACK;
 
           this.AI_CURRENT_TARGET_FOUND = true;
 
@@ -160,6 +160,11 @@ export class EntityState extends Schema {
         this.setAsDead();
       }
 
+      // something is wrong
+      if(this.AI_CURRENT_TARGET && !this._gameroom.state.players.get(this.AI_CURRENT_TARGET.sessionId)){
+        this.returnToWandering();
+      }
+
       /*
       console.log(this.sessionId, this.race, AI_STATE[AI_STATE.IDLE], 
         (this.AI_CURRENT_TARGET ? this.AI_CURRENT_TARGET.name : null),
@@ -168,6 +173,11 @@ export class EntityState extends Schema {
 
     }
 
+  }
+
+  returnToWandering(){
+    this.AI_CURRENT_TARGET = null;
+    this.AI_CURRENT_STATE = AI_STATE.WANDER;
   }
 
   getPosition(){
@@ -182,8 +192,19 @@ export class EntityState extends Schema {
     this.health = 0;
     this.blocked = true;
     this.state = EntityCurrentState.DEAD;
-    this.AI_CURRENT_TARGET = false;
     this.AI_CURRENT_STATE = AI_STATE.IDLE;
+    this.AI_CURRENT_TARGET = null;
+  }
+
+
+  /**
+   * ATTACK BEHAVIOUR
+   */
+  attack(){
+
+    // entity animation set to attack
+    this.state = EntityCurrentState.ATTACK;
+
   }
 
   /**
@@ -195,7 +216,7 @@ export class EntityState extends Schema {
     this.resetDestination();
 
     // save current position
-    let currentPos = new Vector3(this.x, this.y,this.z);
+    let currentPos = this.getPosition();
 
     // calculate next position towards destination
     let updatedPos = this.moveTo(currentPos, this.AI_CURRENT_TARGET_POSITION, this.raceData.speed);
@@ -212,7 +233,7 @@ export class EntityState extends Schema {
   wander(){
     
     // save current position
-    let currentPos = new Vector3(this.x, this.y,this.z);
+    let currentPos = this.getPosition();
 
     // if entity does not have a destination, find one
     if(!this.toRegion){
@@ -248,13 +269,12 @@ export class EntityState extends Schema {
 
   }
 
-  /**
-   * GO TO DESTINATION BEHAVIOUR
-   */
+
+
   goToDestination(){
     
     // save current position
-    let currentPos = new Vector3(this.x, this.y,this.z);
+    let currentPos = this.getPosition();
 
     // move entity
     if(this.destinationPath.length > 0){
@@ -470,6 +490,55 @@ export class EntityState extends Schema {
     }
 
     return newPos;
+
+  }
+
+  processAttack(target:EntityState, data){
+
+    // if target is not already dead
+    if(target && target.health > 0){
+
+      // rotate sender to lookAt target
+      this.rot = this.calculateRotation(this.getPosition(), target.getPosition());
+
+      // set attacker as target
+      target.setTarget(this); 
+
+      // target loses health
+      target.loseHealth(10);
+
+      // send everyone else the information sender has attacked target
+      this._gameroom.broadcast("player_update", {
+          action: 'attack',
+          fromId: this.sessionId,
+          fromPos: this.getPosition,
+          targetId: target.sessionId,
+          targetPos: {
+              x: target.x,
+              y: target.y,
+              z: target.z,
+          }
+      });
+
+      // if target has no more health
+      if(target.health == 0 || target.health < 0){ 
+
+          // set entity as dead
+          target.setAsDead();
+          Logger.info(`[gameroom][playerAction] Entity is dead`, data);
+
+          // delete so entity can be respawned
+          setTimeout(function(){
+              Logger.info(`[gameroom][playerAction] Deleting entity from server`, data);
+              this._gameroom.entities.delete(target.sessionId);
+          }, Config.MONSTER_RESPAWN_RATE);
+      }
+
+
+    }else{
+      
+      Logger.error(`[gameroom][playerAction] target or sender is invalid`, data);
+    }
 
   }
 

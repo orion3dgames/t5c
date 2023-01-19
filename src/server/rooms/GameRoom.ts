@@ -6,6 +6,7 @@ import Config from '../../shared/Config';
 import Logger from "../../shared/Logger";
 import loadNavMeshFromFile from "../../shared/Utils/loadNavMeshFromFile";
 import { EntityState } from "./schema/EntityState";
+import { PlayerState } from "./schema/PlayerState";
 import { PlayerInputs } from "../../shared/types";
 import { EntityCurrentState } from "../../shared/Entities/Entity/EntityCurrentState";
 import { NavMesh, Vector3 } from "../../shared/yuka";
@@ -61,30 +62,27 @@ export class GameRoom extends Room<GameRoomState> {
         this.delayedInterval = this.clock.setInterval(() => {
 
             // only save if there is any players
-            if(this.state.entities.size > 0){
+            if(this.state.players.size > 0){
 
                 //Logger.info("[gameroom][onCreate] Saving data for room "+options.location+" with "+this.state.players.size+" players");
-                this.state.entities.forEach(entity => {
+                this.state.players.forEach(entity => {
 
-                    if(entity.type === 'player'){
+                    // do not save if players is blocked
+                    if(entity.blocked){
 
-                        // do not save if players is blocked
-                        if(entity.blocked){
+                        // update player
+                        let playerClient = this.clients.hashedArray[entity.sessionId];
+                        this.database.updateCharacter(playerClient.auth.id, {
+                            location: entity.location,
+                            x: entity.x,
+                            y: entity.y,
+                            z: entity.z,
+                            rot: entity.rot,
+                        });
 
-                            // update player
-                            let playerClient = this.clients.hashedArray[entity.sessionId];
-                            this.database.updateCharacter(playerClient.auth.id, {
-                                location: entity.location,
-                                x: entity.x,
-                                y: entity.y,
-                                z: entity.z,
-                                rot: entity.rot,
-                            });
-
-                            //Logger.info("[gameroom][onCreate] player "+playerClient.auth.name+" saved to database.");
-                        }
+                        //Logger.info("[gameroom][onCreate] player "+playerClient.auth.name+" saved to database.");
                     }
-
+                    
                 });
                 
             }
@@ -130,7 +128,7 @@ export class GameRoom extends Room<GameRoomState> {
         Logger.info(`[gameroom][onJoin] player ${client.sessionId} joined room ${this.roomId}.`, options);
 
         // add player using auth data
-        this.state.addEntity(client.sessionId, client.auth);
+        this.state.addPlayer(client.sessionId, client.auth);
         this.database.toggleOnlineStatus(client.auth.id, 1);
         Logger.info(`[gameroom][onJoin] player added `);
 
@@ -148,7 +146,7 @@ export class GameRoom extends Room<GameRoomState> {
         /////////////////////////////////////
         // on player input
 		this.onMessage('playerInput', (client, playerInput: PlayerInputs) => {
-            const playerState: EntityState = this.state.entities.get(client.sessionId);
+            const playerState: PlayerState = this.state.players.get(client.sessionId);
             if (playerState) {
                 playerState.processPlayerInput(playerInput);
             } else {
@@ -160,7 +158,7 @@ export class GameRoom extends Room<GameRoomState> {
         // on player teleport
         this.onMessage("playerTeleport", (client, location) => {
 
-            const playerState: EntityState = this.state.entities.get(client.sessionId);
+            const playerState: PlayerState = this.state.players.get(client.sessionId);
 
             if (playerState) {
 
@@ -191,81 +189,16 @@ export class GameRoom extends Room<GameRoomState> {
         });
 
         /////////////////////////////////////
-        // player action
+        // player entity_attack
         this.onMessage("entity_attack", (client, data: any) => {
 
-            let state = this.state;
-
             // get players involved
-            let sender:EntityState = state.entities[client.sessionId];
-            let target:EntityState = state.entities[data.targetId];
+            let sender:PlayerState = this.state.players[client.sessionId];
+            let target:EntityState = this.state.entities[data.targetId];
             
-            // if target is not already dead
-            if(sender && target && target.health > 0){
-
-                // rotate sender to lookAt target
-                sender.rot = sender.calculateRotation(sender.getPosition(), target.getPosition());
-
-                // set attacker as target
-                target.setTarget(sender); 
-
-                // target loses health
-                target.loseHealth(10);
-
-                // send everyone else the information sender has attacked target
-                this.broadcast("player_update", {
-                    action: 'attack',
-                    fromId: sender.sessionId,
-                    fromPos: {
-                        x: sender.x,
-                        y: sender.y,
-                        z: sender.z,
-                    },
-                    targetId: target.sessionId,
-                    targetPos: {
-                        x: target.x,
-                        y: target.y,
-                        z: target.z,
-                    }
-                }, { except: client });
-
-                // if target has no more health
-                if(target.health == 0 || target.health < 0){ 
-
-                    // set entity as dead
-                    target.setAsDead();
-                    Logger.info(`[gameroom][playerAction] Entity is dead`, data);
-
-                    // delete so entity can be respawned
-                    setTimeout(function(){
-                        Logger.info(`[gameroom][playerAction] Deleting entity from server`, data);
-                        state.entities.delete(target.sessionId);
-                    }, Config.MONSTER_RESPAWN_RATE);
-                }
-
-
-            }else{
-                
-                Logger.error(`[gameroom][playerAction] target or sender is invalid`, data);
+            if(sender && target){
+                sender.processAttack(target, data);
             }
-
-            /*
-            // inform target hes been hurt
-            this.clients.get(target.sessionId).send('playerActionConfirmation', {
-                action: 'attack',
-                fromSenderId: client.sessionId,
-                fromPosition: {
-                    x: sender.x,
-                    y: sender.y,
-                    z: sender.z,
-                },
-                toPosition: {
-                    x: target.x,
-                    y: target.y,
-                    z: target.z,
-                },
-                message: sender.name +" attacked you and you lost 5 health"
-            })*/
 
             Logger.info(`[gameroom][entity_attack] player action processed`, data);
 
@@ -276,7 +209,7 @@ export class GameRoom extends Room<GameRoomState> {
         this.onMessage("player_moveTo", (client, data: any) => {
 
             // get players involved
-            let player:EntityState = this.state.entities[client.sessionId];
+            let player:PlayerState = this.state.players[client.sessionId];
            
             if(!player) throw new Error('sender does not exists!');
 
@@ -317,7 +250,7 @@ export class GameRoom extends Room<GameRoomState> {
 
         Logger.info(`[onLeave] player ${client.auth.name} left`);
 
-        this.state.entities.delete(client.sessionId);
+        this.state.players.delete(client.sessionId);
         this.database.toggleOnlineStatus(client.auth.id, 0);
 	}
 

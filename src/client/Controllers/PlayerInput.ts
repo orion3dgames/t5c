@@ -76,22 +76,14 @@ export class PlayerInput {
         });
 
         scene.registerAfterRender(() => {
+            /*
             document.documentElement.style.cursor = "default";
             scene.hoverCursor = "default";
             if (this.digit1 === true) {
                 document.documentElement.style.cursor = " url('/images/Magic.cur') 12 12, auto ";
                 scene.hoverCursor = " url('/images/Magic.cur') 12 12, auto ";
-            }
-           
+            }*/  
         }) 
-    }
-
-    private _showSpellCursor(): void {
-        document.documentElement.style.cursor = " url('./images/cursor_spell.png') 12 12, auto ";
-    }
-
-    private _showDefaultCursor(): void {
-        document.documentElement.style.cursor = "default";
     }
 
     //handles what is done when mouse is pressed or moved

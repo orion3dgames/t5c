@@ -1,24 +1,27 @@
 import { Schema, type, MapSchema } from '@colyseus/schema';
 import { EntityState } from "./EntityState";
+import { PlayerState } from './PlayerState';
 import { PlayerCharacter } from '../../../shared/types';
 import { GameRoom } from '../GameRoom';
 import { EntityCurrentState } from '../../../shared/Entities/Entity/EntityCurrentState';
-import { NavMesh, EntityManager, Time, Vector3 } from "../../../shared/yuka";
+import { NavMesh } from "../../../shared/yuka";
 import { nanoid } from 'nanoid';
 import Config from '../../../shared/Config';
 import Logger from "../../../shared/Logger";
 import { randomNumberInRange } from '../../../shared/Utils';
 import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 
+
 export class GameRoomState extends Schema {
 
     // networked variables
     @type({ map: EntityState }) entities = new MapSchema<EntityState>();
+    @type({ map: PlayerState }) players = new MapSchema<PlayerState>();
     @type("number") serverTime: number = 0.0;
     
     // not networked variables
     private _gameroom: GameRoom = null;
-    private navMesh: NavMesh = null;
+    public navMesh: NavMesh = null;
     private timer: number = 0;
     private spawnTimer: number = 0;
 
@@ -83,7 +86,7 @@ export class GameRoomState extends Schema {
         let spawnTime = 300;
         if (this.spawnTimer >= spawnTime) {
             this.spawnTimer = 0;
-            let maxEntities = 10;
+            let maxEntities = 10; 
             if(this.entities.size <= maxEntities){
                 this.createEntity(this.entities.size);
             }
@@ -99,37 +102,32 @@ export class GameRoomState extends Schema {
             // for each entity
             if( this.entities.size > 0){
                 this.entities.forEach(entity => { 
-
+1
                     // entity update
                     entity.update();
 
-                    // player specific related 
-                    if(entity.type === 'player'){
-
-                        //entity.goToDestination();
-
-                    }
-
                     // only move non playing entities
                     if(entity.type === 'entity'){
-
                         if (entity.AI_CURRENT_STATE === AI_STATE.IDLE) {
-
-
+ 
                         }else if (entity.AI_CURRENT_STATE === AI_STATE.SEEKING) {
-
                             entity.seek();
-
                         }else if (entity.AI_CURRENT_STATE === AI_STATE.WANDER) {
-
                             entity.wander();
+                        }else if (entity.AI_CURRENT_STATE === AI_STATE.ATTACKING) {
+                            entity.attack();
                         }
-
                     }
-                    
-        
                 });
             }
+
+            // for each players
+            if( this.players.size > 0){
+                this.players.forEach(entity => {
+                    entity.update();
+                });
+            }
+
         }
         
 	}
@@ -139,8 +137,9 @@ export class GameRoomState extends Schema {
      * @param sessionId 
      * @param data 
      */
-    addEntity(sessionId: string, data: PlayerCharacter):void {
-        this.entities.set(sessionId, new EntityState(this._gameroom).assign({
+    addPlayer(sessionId: string, data: PlayerCharacter):void {
+
+        this.players.set(sessionId, new PlayerState(this._gameroom).assign({
             id: data.id,
             sessionId: sessionId,
             type: 'player',
@@ -156,6 +155,11 @@ export class GameRoomState extends Schema {
             experience: data.experience,
             state: EntityCurrentState.IDLE
         }));
+
+    }
+
+    removePlayer(sessionId: string) {
+        this.players.delete(sessionId);
     }
 
     removeEntity(sessionId: string) {

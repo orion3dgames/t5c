@@ -22,7 +22,7 @@ export class EntityActions {
 
         // get target mesh 
         let mesh = this._scene.getMeshByName(data.targetId+'_mesh');
-        console.log(data.targetId+'_mesh', mesh);
+        console.log(data.targetId+'_mesh', mesh, data);
 
         // send bullet locally
         let start = data.fromPos;

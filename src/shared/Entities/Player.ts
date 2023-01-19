@@ -78,28 +78,17 @@ export class Player extends Entity {
                         
                     if(this._input.left_click === true && this._input.digit1 === true){
                         
-                        if(this.interval){
-                            clearInterval(this.interval);
-                        }
+                        // send to server
+                        this._room.send("entity_attack", {
+                            senderId: this.sessionId,
+                            targetId: targetSessionId
+                        });
 
-                        this.interval = setInterval(()=>{
-
-                            // send to server
-                            this._room.send("entity_attack", {
-                                senderId: this.sessionId,
-                                targetId: targetSessionId
-                            });
-
-                            // send bullet locally
-                            let start = this.mesh.position;
-                            let end = pointerInfo._pickInfo.pickedMesh.position;
-                            this.actionsController.fire(start, end, this.ui._entities[targetSessionId].mesh);
-
-                            if(this._room.state.entities[targetSessionId].health <= 0){
-                                clearInterval(this.interval);
-                            }
-
-                        }, 600);
+                        /*
+                        // send bullet locally
+                        let start = this.mesh.position;
+                        let end = pointerInfo._pickInfo.pickedMesh.position;
+                        this.actionsController.fire(start, end, this.ui._entities[targetSessionId].mesh);*/
 
                     }
                 }
@@ -112,8 +101,12 @@ export class Player extends Entity {
 
                 /////////////////////////////////////////////////////////////////////
                 // display nameplate for a certain time for any entity right clicked
+                console.log('RIGHT CLICK', pointerInfo._pickInfo);
                 if (pointerInfo._pickInfo.pickedMesh && 
-                    pointerInfo._pickInfo.pickedMesh.metadata !== null ){
+                    pointerInfo._pickInfo.pickedMesh.metadata && 
+                    pointerInfo._pickInfo.pickedMesh.metadata.sessionId && 
+                    pointerInfo._pickInfo.pickedMesh.metadata.sessionId != this._room.sessionId
+                    ){
                         let targetMesh = pointerInfo._pickInfo.pickedMesh;
                         let targetData = targetMesh.metadata;  
                         let target = this.ui._entities[targetData.sessionId];

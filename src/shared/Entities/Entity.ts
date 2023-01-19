@@ -20,6 +20,7 @@ import { Room } from "colyseus.js";
 import { UserInterface } from "../../client/Controllers/UserInterface";
 import { NavMesh } from "../yuka";
 import { AI_STATE } from "./Entity/AIState";
+import Config from "../Config";
 
 export class Entity {
     
@@ -163,7 +164,17 @@ export class Entity {
         if(this && this.moveController){
             this.moveController.tween();
         }
+    }
 
+    // basic performance (only enable entities in a range around the player)
+    public lod(_currentPlayer){
+        this.mesh.setEnabled(false); 
+        let entityPos = this.position();
+        let playerPos = _currentPlayer.position();
+        let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
+        if(distanceFromPlayer < Config.PLAYER_VIEW_DISTANCE){
+            this.mesh.setEnabled(true); 
+        } 
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -202,7 +213,7 @@ export class Entity {
     // obsolete, keeping just in case
     public createLabel(text) {
         var rect1 = new Rectangle('player_nameplate_'+this.sessionId);
-        rect1.isVisible = false;
+        rect1.isVisible = true;
         rect1.width = "200px";
         rect1.height = "40px";
         rect1.thickness = 0;

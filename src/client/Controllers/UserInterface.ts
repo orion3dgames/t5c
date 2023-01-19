@@ -11,6 +11,7 @@ import { Control } from "@babylonjs/gui/2D/controls/control";
 import { InputText } from "@babylonjs/gui/2D/controls/inputText";
 import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
+import { Image } from "@babylonjs/gui/2D/controls/image";
 
 import { Room } from "colyseus.js";
 import State from "../Screens/Screens";
@@ -18,6 +19,7 @@ import { Entity } from "../../shared/Entities/Entity";
 import { countPlayers, roundToTwo } from "../../shared/Utils";
 import { PlayerMessage } from "../../shared/types";
 import Config from "../../shared/Config";
+import { Player } from "src/shared/Entities/Player";
 
 export class UserInterface {
     
@@ -37,6 +39,10 @@ export class UserInterface {
     //Chat
     public messages: PlayerMessage[] = [];
 
+    //
+    public maxWidth = "600px";
+    public uiWidth = "0.5";
+
     constructor(scene: Scene, engine:Engine, gameRoom:Room, chatRoom:Room, entities:Entity[], currentPlayer) {
 
         // set var we will be needing
@@ -55,6 +61,7 @@ export class UserInterface {
         // create interface
         let debugTextUI = this.createDebugPanel();
         this.createChatPanel();
+        this.createAbilitiesPanel();
         this.createMisc();
 
         // some ui must be constantly refreshed as things change
@@ -72,6 +79,58 @@ export class UserInterface {
         });
 
     }
+
+    public createAbilitiesPanel(){
+
+
+        // add stack panel
+        const abilityPanel = new Rectangle("abilityPanel");
+        abilityPanel.top = "-160px;"
+        abilityPanel.width = this.uiWidth;
+        abilityPanel.height = "45px;";
+        abilityPanel.thickness = 0;
+        abilityPanel.background = "rgba(0,0,0,.5)";
+        abilityPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        abilityPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        this._playerUI.addControl(abilityPanel);
+
+        for (let i = 0; i <= 9; i++) {
+
+            // container
+            var headlineRect = new Rectangle("chatmessage_"+i);
+            headlineRect.left = (i*10)+"%";
+            headlineRect.width = "10%";
+            headlineRect.height = "50px";
+            headlineRect.thickness = 1;
+            headlineRect.paddingBottom = "5px";
+            headlineRect.background = "rgba(0,0,0,0)";
+            headlineRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            headlineRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            abilityPanel.addControl(headlineRect);
+
+            if(i < 1){
+                var img = new Image("image", "./icons/ABILITY_fireball.png")
+                img.stretch = Image.STRETCH_FILL;
+                headlineRect.addControl(img);
+            }
+
+            var roomTxt = new TextBlock('ability_text_'+i);
+            roomTxt.paddingLeft = "5px";
+            roomTxt.text = ""+(i+1);
+            roomTxt.fontSize = "12px";
+            roomTxt.color = "#FFF";
+            roomTxt.top = "5px";
+            roomTxt.left = "0px";
+            roomTxt.width = "20px";
+            roomTxt.height = "15px";
+            roomTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            roomTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            headlineRect.addControl(roomTxt);
+
+        }
+      
+    }
+
 
     /**
      * Generate a hexadecimal color from a number between 0-100
@@ -112,6 +171,9 @@ export class UserInterface {
 
     public showChatMessage(msg:PlayerMessage){
         let player = this._entities[msg.senderID];
+        if(msg.senderID === this._currentPlayer.sessionId){
+            player = this._currentPlayer;
+        }
         clearInterval(player.showTimer);
         if(player && player.characterLabel){
             let el = player.characterLabel;
@@ -246,13 +308,10 @@ export class UserInterface {
     ////////////////////////////
     private createChatPanel(){
 
-        let size = 0.5;
-
         // add chat input
         const chat_input = new InputText();
-        chat_input.width = size;
+        chat_input.width = this.uiWidth;
         chat_input.height = '30px;'
-        chat_input.left = '20px';
         chat_input.top = "-20px";
         chat_input.color = "#FFF";
         chat_input.placeholderText = "Write message here...";
@@ -293,9 +352,8 @@ export class UserInterface {
 
         // add scrollable container
         var sv = new ScrollViewer("chat-scroll-viewer");
-        sv.width = size;
+        sv.width = this.uiWidth;
         sv.height = "100px";
-        sv.left = '20px';
         sv.top = "-50px";
         sv.background = "rgba(0,0,0,.5)";
         sv.alpha = 1;

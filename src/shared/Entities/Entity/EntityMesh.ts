@@ -51,10 +51,9 @@ export class EntityMesh {
 
         // debug aggro mesh
         if(this._entity.type === 'entity'){
-
             var material = this._scene.getMaterialByName('debug_entity_neutral');
             const sphere = MeshBuilder.CreateCylinder("debug_"+this._entity.race, {diameter: (Config.MONSTER_AGGRO_DISTANCE * 2), height: .1}, this._scene);
-            sphere.visibility = .3;
+            sphere.visibility = 0;
             sphere.parent = box;
             sphere.material = material;
             this.debugMesh = sphere;

@@ -1,4 +1,3 @@
-
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { Scene } from "@babylonjs/core/scene";
@@ -24,6 +23,8 @@ import { apiUrl, isLocal, request } from "../../shared/Utils";
 import { NavMesh } from "../../shared/yuka";
 import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
 
+import { createConvexRegionHelper, createGraphHelper } from "../../shared/Utils/navMeshHelper";
+
 export class GameScene {
 
     private _scene: Scene;
@@ -39,10 +40,13 @@ export class GameScene {
     private _roomId: string;
     private room: Room<any>;
     private chatRoom: Room<any>;
-    private entities: Entity[] = [];
     private _currentPlayer:Player;
-
     private _loadedAssets;
+
+    // networked entities
+    private entities: Entity[] = [];
+    private players: Player[] = [];
+    
 
     constructor() {
 
@@ -207,9 +211,10 @@ export class GameScene {
 
         ////////////////////////////////////////////////////
         //  when a entity joins the room event
-        this.room.state.entities.onAdd((entity, sessionId) => {
+        this.room.state.players.onAdd((entity, sessionId) => {
             
             var isCurrentPlayer = sessionId === this.room.sessionId;
+
             //////////////////
             // if player type
             if(entity.type === 'player' && isCurrentPlayer){
@@ -224,7 +229,7 @@ export class GameScene {
                 this._ui.setCurrentPlayer(_player);
 
                 // add to entities
-                this.entities[sessionId] = _player;
+                this.players[sessionId] = _player;
 
             //////////////////
             // else if entity or another player
@@ -236,6 +241,15 @@ export class GameScene {
             
         });
 
+        this.room.state.entities.onAdd((entity, sessionId) => {
+            this.entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._assetsContainer);
+        });
+
+        // when a player leaves the room event
+        this.room.state.players.onRemove((player, sessionId) => {
+            this.players[sessionId].remove();
+            delete this.players[sessionId];
+        });
         // when a player leaves the room event
         this.room.state.entities.onRemove((player, sessionId) => {
             this.entities[sessionId].remove();
@@ -268,17 +282,12 @@ export class GameScene {
             for (let sessionId in this.entities) {
                 const entity = this.entities[sessionId];
                 entity.update();
+                entity.lod(this._currentPlayer);
+            }
 
-                // basic performance (only enable entities in a range around the player)
-                if(entity.sessionId != this._currentPlayer.sessionId){
-                    entity.mesh.setEnabled(false); 
-                    let entityPos = entity.position();
-                    let playerPos = this._currentPlayer.position();
-                    let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
-                    if(distanceFromPlayer < Config.PLAYER_VIEW_DISTANCE){
-                        entity.mesh.setEnabled(true); 
-                    }
-                }
+            for (let sessionId in this.players) {
+                const entity = this.players[sessionId];
+                entity.update();
             }
 
             // every 100ms loop
