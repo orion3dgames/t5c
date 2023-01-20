@@ -5,9 +5,8 @@ import { Control } from "@babylonjs/gui/2D/controls/control";
 import { InputText } from "@babylonjs/gui/2D/controls/inputText";
 import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
-import { Image } from "@babylonjs/gui/2D/controls/image";
-
-import { PlayerMessage } from "src/shared/types";
+import { PlayerMessage } from "../../../shared/Types";
+import Config from "../../../shared/Config";
 
 export class UI_Chats {
 
@@ -15,32 +14,41 @@ export class UI_Chats {
     private _chatUI;
     private _chatRoom;
     private _currentPlayer;
+    private _entities;
 
     private _chatButton;
     private _chatInput;
 
-    private uiWidth = ".6";
     public messages: PlayerMessage[] = [];
 
-    constructor(_playerUI, _chatRoom, _currentPlayer) {
+    constructor(_playerUI, _chatRoom, _currentPlayer, _entities) {
 
         this._playerUI = _playerUI;
         this._chatRoom = _chatRoom;
         this._currentPlayer = _currentPlayer;
+        this._entities = _entities;
 
-        this._createChatUI();
+        // create ui
+        this._createUI();
+
+        // add ui events
+        this._createEvents();
+
+        // add messages
+        this._refreshChatBox();
 
     }
 
-    _createChatUI(){
+    _createUI(){
         
         // add stack panel
         const chatPanel = new Rectangle("chatPanel");
         chatPanel.top = "-10px;"
-        chatPanel.width = this.uiWidth;
-        chatPanel.adaptHeightToChildren = true;
+        chatPanel.width = Config.UI_CENTER_PANEL_WIDTH;
         chatPanel.thickness = 0;
-        chatPanel.background = "rgba(0,0,0,.5)";
+        chatPanel.background = "none";
+
+        chatPanel.alpha = 1;
         chatPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         chatPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         this._playerUI.addControl(chatPanel);
@@ -68,6 +76,25 @@ export class UI_Chats {
         chatPanel.addControl(chatButton);
         this._chatButton = chatButton;
 
+        // add scrollable container
+        const chatScrollViewer = new ScrollViewer("chatScrollViewer");
+        chatScrollViewer.width = 1;
+        chatScrollViewer.height = "100px";
+        chatScrollViewer.top = "-30px";
+        chatScrollViewer.background = Config.UI_CENTER_PANEL_BG;
+        chatScrollViewer.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        chatScrollViewer.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        chatPanel.addControl(chatScrollViewer);
+
+        // add stack panel
+        const chatStackPanel = new StackPanel("chatStackPanel");
+        chatStackPanel.width = "100%";
+        chatStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        chatStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        chatStackPanel.paddingTop = "5px;"
+        chatScrollViewer.addControl(chatStackPanel);
+        this._chatUI = chatStackPanel;
+
         // focus chat
         chatInput.focus();
 
@@ -80,35 +107,12 @@ export class UI_Chats {
             createdAt: ""
         }); 
 
-        // add scrollable container
-        const chatScrollViewer = new ScrollViewer("chatScrollViewer");
-        chatScrollViewer.width = this.uiWidth;
-        chatScrollViewer.height = "100px";
-        chatScrollViewer.top = "-50px";
-        chatScrollViewer.background = "rgba(0,0,0,.5)";
-        chatScrollViewer.alpha = 1;
-        chatScrollViewer.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        chatScrollViewer.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        this._playerUI.addControl(chatScrollViewer);
-
-        // add stack panel
-        const chatStackPanel = new StackPanel("chatStackPanel");
-        chatStackPanel.width = "100%";
-        chatStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        chatStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        chatStackPanel.paddingTop = "5px;"
-        chatStackPanel.addControl(chatStackPanel);
-        this._chatUI = chatStackPanel;
-
-        // intial refresh chatbox
-        this._createChatEvents();
-
         // intial refresh chatbox
         this._refreshChatBox();
 
     }
 
-    _createChatEvents(){
+    _createEvents(){
         
         // on click send
         this._chatButton.onPointerDownObservable.add(() => { 
@@ -124,13 +128,40 @@ export class UI_Chats {
 
         // receive message event
         this._chatRoom.onMessage("messages", (message:PlayerMessage) => {
-            this.messages.push(message); 
-            this._refreshChatBox();
-            //this.showChatMessage(message);
+            this.processMessage(message);
         });
 
     }
 
+    // set current player
+    public setCurrentPlayer(currentPlayer){
+        this._currentPlayer = currentPlayer;
+    }
+
+    // process incoming messages
+    public processMessage(message){
+        this.messages.push(message); 
+        this._refreshChatBox();
+        this.showChatMessage(message);
+    }
+
+    // show chat message above player
+    public showChatMessage(msg:PlayerMessage){
+        let player = this._entities[msg.senderID];
+        if(msg.senderID === this._currentPlayer.sessionId){
+            player = this._currentPlayer;
+        }
+        clearInterval(player.showTimer);
+        if(player && player.characterLabel){
+            let el = player.characterLabel;
+            player.characterChatLabel.isVisible = true;
+            player.characterChatLabel._children[0].text = msg.message;
+            player.showTimer = setTimeout(function(){ player.characterChatLabel.isVisible = false; }, 20000);
+        }
+        
+    }
+
+    // send message to server
     private sendMessage(){
         this._chatRoom.send("message", {
             name: this._currentPlayer.name,

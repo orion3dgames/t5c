@@ -27,6 +27,10 @@ let Config = {
     MONSTER_AGGRO_DISTANCE: 5,
     MONSTER_ATTACK_DISTANCE: 2,
 
+    // UI SETTINGS
+    UI_CENTER_PANEL_WIDTH: .6,
+    UI_CENTER_PANEL_BG: "rgba(0,0,0,.5)",
+
     // players settings
     PLAYER_SPEED: 0.55,
     PLAYER_START_HEALTH: 100,
@@ -106,6 +110,25 @@ let Config = {
                 "DAMAGE": 5
             },
         },
+    },
+
+    abilities: {
+        "fireball": {
+            name: "Fireball",
+            icon: "./icons/ABILITY_fireball.png",
+            description: "Hurls a massive fiery ball that explodes on contact with target.",
+            damage: 40,
+            damageType: "direct",
+            cooldown: 1, // 1 seconds
+        },  
+        "poisonball": {
+            name: "Poison Cloud",
+            icon: "./icons/ABILITY_poisonball.png",
+            description: "Trow a bottle of viscous poisioneous liquid onto target.",
+            damage: 5,
+            damageType: "dot",
+            cooldown: 5, // 1 seconds
+        },  
     },
 
     // functions
