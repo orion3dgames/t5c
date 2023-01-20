@@ -44,10 +44,10 @@ export class UI_Chats {
         // add stack panel
         const chatPanel = new Rectangle("chatPanel");
         chatPanel.top = "-10px;"
-        chatPanel.width = Config.UI_CENTER_PANEL_WIDTH;
+        chatPanel.height = "131px";
+        chatPanel.width = "400px";
         chatPanel.thickness = 0;
-        chatPanel.background = "none";
-
+        chatPanel.background = Config.UI_CENTER_PANEL_BG;
         chatPanel.alpha = 1;
         chatPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         chatPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;

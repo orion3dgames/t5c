@@ -78,11 +78,13 @@ export class UserInterface {
         // some ui must be constantly refreshed as things change
         this._scene.registerBeforeRender(() => {
 
+            //
+            //this._UIChat.refresh();
+            //this._UIAbilities.refresh();
+
             // refresh 
             this._refreshDebugPanel(debugTextUI);
-
-             // refresh 
-             this.refreshEntityUI();
+            this.refreshEntityUI();
             
         });
         

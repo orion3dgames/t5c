@@ -26,8 +26,8 @@ export class UI_Abilities {
         // add stack panel
         const abilityPanel = new Rectangle("abilityPanel");
         abilityPanel.top = "-150px;"
-        abilityPanel.width = Config.UI_CENTER_PANEL_WIDTH;
-        abilityPanel.height = "45px;";
+        abilityPanel.width = "340px";
+        abilityPanel.adaptHeightToChildren = true;
         abilityPanel.thickness = 0;
         abilityPanel.background = Config.UI_CENTER_PANEL_BG;
         abilityPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
@@ -36,13 +36,15 @@ export class UI_Abilities {
 
         for (let i = 1; i <= this.abylity_number; i++) {
 
-            // calculate responsive width and height
-            let width = abilityPanel.widthInPixels;
+            // calculate responsive width and height 
+            let width = 340;
             let iconWidth = width / this.abylity_number;
-            let leftMargin = i === 1 ? "0px" : (i*iconWidth)+"px";
+            let leftMargin = i > 1 ?  ((i-1)*iconWidth)+"px" : "0px";
+            console.log("LEFT",width, i, iconWidth, leftMargin);
 
             // container
             var headlineRect = new Rectangle("chatmessage_"+i);
+            headlineRect.top = "3px";
             headlineRect.left = leftMargin;
             headlineRect.width = iconWidth+"px";
             headlineRect.height = iconWidth+"px";
