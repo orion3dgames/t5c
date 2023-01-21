@@ -78,7 +78,7 @@ let Config = {
                 "IDLE": 3,
                 "WALK": 6,
                 "ATTACK": 0,
-                "DEATH": 5,
+                "DEATH": 2,
                 "DAMAGE": 1
             },
         },
@@ -117,18 +117,26 @@ let Config = {
             name: "Fireball",
             icon: "./icons/ABILITY_fireball.png",
             description: "Hurls a massive fiery ball that explodes on contact with target.",
-            damage: 40,
-            damageType: "direct",
+            value: 40,
+            type: "direct",
             cooldown: 1, // 1 seconds
         },  
         "poisonball": {
             name: "Poison Cloud",
             icon: "./icons/ABILITY_poisonball.png",
             description: "Trow a bottle of viscous poisioneous liquid onto target.",
-            damage: 5,
-            damageType: "dot",
+            value: 5,
+            type: "dot",
             cooldown: 5, // 1 seconds
         },  
+        "healself": {
+            name: "Heal Self",
+            icon: "./icons/ABILITY_healself.png",
+            description: "A spell from ancient that will leave you feeling revigorated.",
+            value: 25,
+            type: "heal",
+            cooldown: 5, // 1 seconds
+        }, 
     },
 
     // functions

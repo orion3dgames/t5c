@@ -116,6 +116,20 @@ export class UI_Abilities {
                 });
             }
 
+            if(i === 3){
+                var img = new Image("image2", "./icons/ABILITY_healself.png")
+                img.stretch = Image.STRETCH_FILL;
+                headlineRect.addControl(img);
+
+                headlineRect.onPointerEnterObservable.add(() => { 
+                    this.showTooltip(headlineRect, 'healself');
+                });
+
+                headlineRect.onPointerOutObservable.add(() => { 
+                    this.hideTooltip();
+                });
+            }
+
             var roomTxt = new TextBlock('ability_text_'+i);
             roomTxt.paddingLeft = "5px";
             roomTxt.text = ""+i;

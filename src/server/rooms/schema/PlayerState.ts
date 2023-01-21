@@ -39,8 +39,11 @@ export class PlayerState extends Schema {
   public destinationPath;
   public raceData;
 
+
+  public isMoving: boolean = false;
   public player_interval;
-  public player_cooldown: number = 500;
+  public player_cooldown: number = 1000;
+  public player_in_cooldown: boolean = false;
   public player_cooldown_timer: number = 0;
 
   constructor(gameroom:GameRoom, ...args: any[]) {
@@ -51,6 +54,8 @@ export class PlayerState extends Schema {
 
   // runs on every server iteration
   update(){
+
+    this.isMoving = false;
 
     // if player is dead
     if(this.health < 0 || this.health === 0){
@@ -65,6 +70,10 @@ export class PlayerState extends Schema {
       clearInterval(this.player_interval);
     }
 
+    if(this.player_in_cooldown){
+      return false;
+    }
+
     // if target is not already dead
     if(target && target.health > 0){
 
@@ -76,11 +85,22 @@ export class PlayerState extends Schema {
       // set attacker as target
       target.setTarget(this); 
 
+      //
+      this.player_in_cooldown = true;
+      setTimeout(() => {
+        this.player_in_cooldown = false;
+      }, this.player_cooldown);
+
       // let
-      this.player_interval = setInterval(()=>{
+      //this.player_interval = setInterval(()=>{
+
+        // cancel attack
+        if(this.isMoving){
+          clearInterval(this.player_interval);
+        }
 
         // target loses health
-        target.loseHealth(10);
+        target.loseHealth(40);
 
         // send everyone else the information sender has attacked target
         this._gameroom.broadcast("player_update", {
@@ -111,7 +131,7 @@ export class PlayerState extends Schema {
           }, Config.MONSTER_RESPAWN_RATE);
         }
 
-      }, this.player_cooldown);
+      //}, this.player_cooldown);
 
     }else{
       
@@ -128,6 +148,13 @@ export class PlayerState extends Schema {
     this.health = 0;
     this.blocked = true;
     this.state = EntityCurrentState.DEAD;
+
+    setTimeout(()=>{
+      this.health = 100;
+      this.blocked = false;
+      this.state = EntityCurrentState.IDLE
+      this.setPosition(new Vector3(0, 0 , 0));
+    }, 2000);
   }
 
   resetDestination():void{
@@ -208,6 +235,8 @@ export class PlayerState extends Schema {
           this.rot = newRot;
           this.sequence = playerInput.seq;
           //this.state = EntityCurrentState.WALKING;
+
+          this.isMoving = true;
 
           // add player to server
           Logger.info('Valid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);

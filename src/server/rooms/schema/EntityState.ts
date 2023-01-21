@@ -5,6 +5,7 @@ import { PlayerInputs } from "../../../shared/types";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 import { NavMesh, Vector3 } from "../../../shared/yuka";
+import { setInterval } from "timers/promises";
 
 export class EntityState extends Schema {
 
@@ -53,6 +54,9 @@ export class EntityState extends Schema {
   public AI_CLOSEST_TARGET_POSITION = null;
   public AI_CLOSEST_TARGET_DISTANCE:number = 0;
   public AI_CLOSEST_TARGET = null;
+
+  public AI_ATTACK_INTERVAL:number = 0; 
+  public AI_ATTACK_INTERVAL_RATE: number = 1000;
 
   constructor(gameroom, ...args: any[]) {
 		super(args);
@@ -123,7 +127,6 @@ export class EntityState extends Schema {
 
           // set ai state to attack
           this.AI_CURRENT_STATE = AI_STATE.ATTACKING;
-
           this.AI_CURRENT_TARGET_FOUND = true;
 
         }else{
@@ -204,6 +207,13 @@ export class EntityState extends Schema {
 
     // entity animation set to attack
     this.state = EntityCurrentState.ATTACK;
+
+    this.AI_ATTACK_INTERVAL += 100;
+
+    if(this.AI_ATTACK_INTERVAL === this.AI_ATTACK_INTERVAL_RATE){
+      this.AI_ATTACK_INTERVAL = 0;
+      this.AI_CURRENT_TARGET.loseHealth(10);
+    }
 
   }
 
@@ -366,74 +376,6 @@ export class EntityState extends Schema {
    */
   canMoveTo(sourcePos:Vector3, newPos:Vector3):boolean{
     return this._navMesh.checkPath(sourcePos, newPos);
-  }
-
-  /**
-   * Calculate next forward position on the navmesh based on playerInput forces
-   * @param {PlayerInputs} playerInput 
-   * @returns 
-   */
-  processPlayerInput(playerInput:PlayerInputs) {
-
-      if(this.blocked){
-        this.state = EntityCurrentState.IDLE;
-        Logger.warning('Player '+this.name+' is blocked, no movement will be processed');
-        return false;
-      }
-
-      // cancel any moveTo event
-      this.toRegion = false;
-      this.destinationPath = [];
-
-      // save current position
-      let oldX = this.x;
-      let oldY = this.y;
-      let oldZ = this.z;
-      let oldRot = this.rot;
-
-      // calculate new position
-      let newX = this.x - (playerInput.h * Config.PLAYER_SPEED);
-      let newY = this.y;
-      let newZ = this.z - (playerInput.v * Config.PLAYER_SPEED);
-      let newRot = Math.atan2(playerInput.h, playerInput.v);
-
-      // check if destination is in navmesh
-      let sourcePos = new Vector3(oldX, oldY, oldZ); // new pos
-      let destinationPos = new Vector3(newX, newY, newZ); // new pos
-      const foundPath: any = this._navMesh.checkPath(sourcePos, destinationPos);
-      if (foundPath){
-
-          /*
-          // adjust height of the entity according to the ground
-          let currentRegion = this._navMesh.getClosestRegion( destinationPos );
-          const distance = currentRegion.plane.distanceToPoint( sourcePos );
-          let newY = distance * 0.2; // smooth transition
-          */
-
-          // next position validated, update player
-          this.x = newX;
-          this.y = newY;
-          this.z = newZ;
-          this.rot = newRot;
-          this.sequence = playerInput.seq;
-          //this.state = EntityCurrentState.WALKING;
-
-          // add player to server
-          //Logger.info('Valid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
-
-      } else {
-
-          // collision detected, return player old position
-          this.x = oldX;
-          this.y = 0;
-          this.z = oldZ;
-          this.rot = oldRot;
-          this.sequence = playerInput.seq;
-          //this.state = EntityCurrentState.IDLE;
-
-          //Logger.warning('Invalid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
-      }
-      
   }
 
   /**

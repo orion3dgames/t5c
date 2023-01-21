@@ -60,11 +60,11 @@ export class EntityActions {
         particleSystem.color2 = new Color4(1, 0.1, 0.1, 1.0);
         particleSystem.colorDead = new Color4(0, 0, 0.2, 0.0);
         // Size of each particle (random between...
-        particleSystem.minSize = 0.4;
-        particleSystem.maxSize = 0.5;
+        particleSystem.minSize = 0.6;
+        particleSystem.maxSize = 0.8;
         // Life time of each particle (random between...
         particleSystem.minLifeTime = 0.05;
-        particleSystem.maxLifeTime = 0.2;
+        particleSystem.maxLifeTime = 0.3;
         // Emission rate
         particleSystem.emitRate = 1000;
         particleSystem.createSphereEmitter(1);
@@ -81,9 +81,9 @@ export class EntityActions {
         var path = new Path3D(points);
         var i = 0;
         var loop =  this._scene.onBeforeRenderObservable.add(() => {
-            if (i <= 1) {
+            if (i < 1) {
                 projectile.position = path.getPointAt(i); 
-                i += 0.004;
+                i += 5e-3;
             }
             if(projectile.intersectsMesh(mesh) || i === 1){
                 projectile.dispose(true, true);
