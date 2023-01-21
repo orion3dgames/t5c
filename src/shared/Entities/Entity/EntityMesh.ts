@@ -23,6 +23,7 @@ export class EntityMesh {
     public playerMesh;
     public isCurrentPlayer:boolean;
     public debugMesh: Mesh;
+    public selectedMesh: Mesh;
 
     constructor(scene:Scene, assetsContainer, entity:EntityState, room: Room, isCurrentPlayer:boolean) {
         this._scene = scene;
@@ -53,10 +54,20 @@ export class EntityMesh {
         if(this._entity.type === 'entity'){
             var material = this._scene.getMaterialByName('debug_entity_neutral');
             const sphere = MeshBuilder.CreateCylinder("debug_"+this._entity.race, {diameter: (Config.MONSTER_AGGRO_DISTANCE * 2), height: .1}, this._scene);
-            sphere.visibility = 0;
+            sphere.isVisible = false;
             sphere.parent = box;
             sphere.material = material;
             this.debugMesh = sphere;
+        }
+
+        // add selected image
+        if(this._entity.type === 'entity'){
+            var material = this._scene.getMaterialByName('entity_selected');
+            const sphere = MeshBuilder.CreateCylinder("entity_selected_"+this._entity.race, {diameter: 2, height: 0.01}, this._scene);
+            sphere.isVisible = true;
+            sphere.parent = box;
+            sphere.material = material;
+            this.selectedMesh = sphere;
         }
         
         // load player mesh
@@ -79,10 +90,10 @@ export class EntityMesh {
             playerMesh.rotation.set(0, config.rotationFix, 0);
         }
         playerMesh.scaling.set(config.scale,config.scale,config.scale);
+        playerMesh.isVisible = false;
         this.playerMesh = playerMesh;
 
         
-
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);
 

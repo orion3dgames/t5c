@@ -75,25 +75,11 @@ export class Player extends Entity {
                         
                     // get target
                     let targetSessionId = pointerInfo._pickInfo.pickedMesh.metadata.sessionId;   
-                        
-                    if(this._input.left_click === true && this._input.digit1 === true){
-                        
-                        // send to server
-                        this._room.send("entity_attack", {
-                            senderId: this.sessionId,
-                            targetId: targetSessionId
-                        });
-
-                        /*
-                        // send bullet locally
-                        let start = this.mesh.position;
-                        let end = pointerInfo._pickInfo.pickedMesh.position;
-                        this.actionsController.fire(start, end, this.ui._entities[targetSessionId].mesh);*/
-
-                    }
+                    
+                    // 
+                    let target = this.ui._entities[targetSessionId];
+                    global.T5C.selectedEntity = target;
                 }
-
-
             }
 
             // on right mouse click
@@ -126,6 +112,27 @@ export class Player extends Entity {
             // move camera as player moves
             this.cameraController.follow(this.mesh.position);
             
+            if(this._input.digit1 === true){
+
+                let entity = global.T5C.selectedEntity;
+                        
+                // send to server
+                this._room.send("entity_attack", {
+                    senderId: this.sessionId,
+                    targetId: entity.sessionId
+                });
+
+                /*
+                // send bullet locally
+                let start = this.mesh.position;
+                let end = global.T5C.selectedEntity;
+                this.actionsController.fire(start, end, this.ui._entities[entity.sessionId].mesh);
+                */
+               
+                this._input.digit1 = false;
+
+            }
+
         });
       
     }

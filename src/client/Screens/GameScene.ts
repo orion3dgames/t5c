@@ -5,10 +5,10 @@ import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 
 import State from "./Screens";
 import { PlayerInput } from "../Controllers/PlayerInput";
@@ -137,6 +137,12 @@ export class GameScene {
         var material = new StandardMaterial('debug_entity_active');
         material.alpha = .5;
         material.diffuseColor = new Color3(1.0, 0, 0);
+
+        var texture = new Texture("./textures/decal_target.png");
+        texture.hasAlpha = true;
+        var material = new StandardMaterial('entity_selected');
+        material.diffuseTexture = texture;
+        material.useAlphaFromDiffuseTexture = true;
     }
 
     private async _initNetwork(): Promise<void> {

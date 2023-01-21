@@ -1,5 +1,6 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import State from "../../client/Screens/Screens";
+import { Entity } from "../Entities/Entity";
 
 export {
     PlayerInputs,
@@ -61,6 +62,7 @@ declare global {
         currentLocation: PlayerLocation;
         currentUser: PlayerUser;
         currentCharacter: PlayerCharacter;
+        selectedEntity: Entity;
         currentMs: number;
     }
 }

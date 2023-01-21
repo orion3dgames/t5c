@@ -21,6 +21,7 @@ import { UserInterface } from "../../client/Controllers/UserInterface";
 import { NavMesh } from "../yuka";
 import { AI_STATE } from "./Entity/AIState";
 import Config from "../Config";
+import e from "express";
 
 export class Entity {
     
@@ -44,6 +45,7 @@ export class Entity {
     public mesh: AbstractMesh; //outer collisionbox of player
     public playerMesh: AbstractMesh; //outer collisionbox of player
     public debugMesh: Mesh;
+    public selectedMesh: Mesh;
     public characterChatLabel: Rectangle;
     public characterLabel: Rectangle;
     public sessionId: string;
@@ -104,6 +106,7 @@ export class Entity {
         this.mesh = this.meshController.mesh;
         this.playerMesh = this.meshController.playerMesh;
         this.debugMesh = this.meshController.debugMesh;
+        this.selectedMesh = this.meshController.selectedMesh;
 
         // add mesh to shadow generator
         this._shadow.addShadowCaster(this.meshController.mesh, true);
@@ -119,7 +122,7 @@ export class Entity {
         this.entity.onChange(() => {
 
             // make sure players are always visible
-            this.playerMesh.visibility = 1;
+            this.playerMesh.isVisible = true;
 
             // update player data from server data
             Object.assign(this, this.entity);
@@ -140,6 +143,16 @@ export class Entity {
 
             // animate player continuously
             this.animatorController.animate(this, this.mesh.position, this.moveController.getNextPosition());
+
+            // if entity is selected, show 
+            //console.log(this.debugMesh, global.T5C.selectedEntity);
+            if(this.selectedMesh && this.selectedMesh.visibility){
+                if(global.T5C.selectedEntity && global.T5C.selectedEntity.sessionId === this.sessionId){
+                    this.selectedMesh.isVisible = true;
+                }else{
+                    this.selectedMesh.isVisible = false;
+                }
+            }
 
         });
 

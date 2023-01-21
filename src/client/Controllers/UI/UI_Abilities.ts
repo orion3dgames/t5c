@@ -1,5 +1,5 @@
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
-import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
+import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import Config from "../../../shared/Config";
@@ -7,6 +7,8 @@ import Config from "../../../shared/Config";
 export class UI_Abilities {
 
     private _playerUI;
+    private _tooltip:Rectangle;
+    private _tooltipTxt:TextBlock;
     private abylity_number: number = 10;
 
     constructor(_playerUI) {
@@ -23,10 +25,45 @@ export class UI_Abilities {
 
     _createUI(){
 
+        let width = 360;
+
+        // add tooltip 
+        const toolTipPanel = new Rectangle("toolTipPanel");
+        toolTipPanel.top = "-190px";
+        toolTipPanel.left = 0;
+        toolTipPanel.width = width+"px";
+        toolTipPanel.adaptHeightToChildren = true;
+        toolTipPanel.thickness = 1;
+        toolTipPanel.background = Config.UI_CENTER_PANEL_BG;
+        toolTipPanel.isVisible = false;
+        toolTipPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        toolTipPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        this._playerUI.addControl(toolTipPanel);
+        this._tooltip = toolTipPanel;
+
+        // add tooltip text
+        var toolTipText = new TextBlock("toolTipText");
+        toolTipText.paddingTop = "5px";
+        toolTipText.paddingBottom = "5px";
+        toolTipText.paddingRight = "5px";
+        toolTipText.paddingLeft = "5px";
+        toolTipText.text = "NONE";
+        toolTipText.fontSize = "12px";
+        toolTipText.color = "#FFF";
+        toolTipText.top = "0px";
+        toolTipText.left = "0px";
+        toolTipText.width = 1;
+        toolTipText.textWrapping = TextWrapping.WordWrap;
+        toolTipText.resizeToFit = true;
+        toolTipText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        toolTipText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        toolTipPanel.addControl(toolTipText);
+        this._tooltipTxt = toolTipText;
+
         // add stack panel
         const abilityPanel = new Rectangle("abilityPanel");
         abilityPanel.top = "-150px;"
-        abilityPanel.width = "340px";
+        abilityPanel.width = width+"px";
         abilityPanel.adaptHeightToChildren = true;
         abilityPanel.thickness = 0;
         abilityPanel.background = Config.UI_CENTER_PANEL_BG;
@@ -37,19 +74,16 @@ export class UI_Abilities {
         for (let i = 1; i <= this.abylity_number; i++) {
 
             // calculate responsive width and height 
-            let width = 340;
             let iconWidth = width / this.abylity_number;
             let leftMargin = i > 1 ?  ((i-1)*iconWidth)+"px" : "0px";
-            console.log("LEFT",width, i, iconWidth, leftMargin);
-
+        
             // container
-            var headlineRect = new Rectangle("chatmessage_"+i);
-            headlineRect.top = "3px";
+            var headlineRect = new Rectangle("ability_"+i);
+            headlineRect.top = "0px";
             headlineRect.left = leftMargin;
             headlineRect.width = iconWidth+"px";
             headlineRect.height = iconWidth+"px";
             headlineRect.thickness = 1;
-            headlineRect.paddingBottom = "5px";
             headlineRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             headlineRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             abilityPanel.addControl(headlineRect);
@@ -58,12 +92,28 @@ export class UI_Abilities {
                 var img = new Image("image1", "./icons/ABILITY_fireball.png")
                 img.stretch = Image.STRETCH_FILL;
                 headlineRect.addControl(img);
+
+                headlineRect.onPointerEnterObservable.add(() => { 
+                    this.showTooltip(headlineRect, 'fireball');
+                });
+
+                headlineRect.onPointerOutObservable.add(() => { 
+                    this.hideTooltip();
+                });
             }
 
             if(i === 2){
                 var img = new Image("image2", "./icons/ABILITY_poisonball.png")
                 img.stretch = Image.STRETCH_FILL;
                 headlineRect.addControl(img);
+
+                headlineRect.onPointerEnterObservable.add(() => { 
+                    this.showTooltip(headlineRect, 'poisonball');
+                });
+
+                headlineRect.onPointerOutObservable.add(() => { 
+                    this.hideTooltip();
+                });
             }
 
             var roomTxt = new TextBlock('ability_text_'+i);
@@ -81,6 +131,16 @@ export class UI_Abilities {
 
         }
 
+    }
+
+    showTooltip(ui, key){
+        let ability = Config.abilities[key];
+        this._tooltip.isVisible = true;
+        this._tooltipTxt.text = ability.description;
+    }
+
+    hideTooltip(){
+        this._tooltip.isVisible = false;
     }
 
     _createEvents(){

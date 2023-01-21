@@ -35,7 +35,7 @@ export class UserInterface {
 
     //UI Elements
     private _playerUI;
-    private _chatUI; 
+    private _tooltip; 
     private _debugUI:Rectangle; 
 
     // NewUI
@@ -72,24 +72,20 @@ export class UserInterface {
 
         /////////////////////////////////////
         // create interface
-        let debugTextUI = this.createDebugPanel();
+        //let debugTextUI = this.createDebugPanel();
         this.createMisc();
+        this.createSelectedEntityPanel();
 
         // some ui must be constantly refreshed as things change
         this._scene.registerBeforeRender(() => {
 
-            //
-            //this._UIChat.refresh();
-            //this._UIAbilities.refresh();
-
             // refresh 
-            this._refreshDebugPanel(debugTextUI);
+            //this._refreshDebugPanel(debugTextUI);
             this.refreshEntityUI();
             
         });
         
     }
-
 
     /**
      * Generate a hexadecimal color from a number between 0-100
@@ -123,6 +119,7 @@ export class UserInterface {
         this._currentPlayer = currentPlayer;
         this._UIChat.setCurrentPlayer(currentPlayer);
         this.createCharacterPanel();
+        this.createSelectedEntityPanel();
     }
 
     // create misc stuff
@@ -131,14 +128,14 @@ export class UserInterface {
 
         // add a quit button
         const quitButton = Button.CreateSimpleButton("quit", "Quit");;
-        quitButton.width = "200px;";
+        quitButton.width = "50px;";
         quitButton.height = "30px";
         quitButton.color = "white";
-        quitButton.top = "20px"; 
-        quitButton.left = "20px";
+        quitButton.top = "-15px"; 
+        quitButton.left = "15px";
         quitButton.background = "#000"; 
         quitButton.thickness = 1;
-        quitButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        quitButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         quitButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         this._playerUI.addControl(quitButton);
 
@@ -192,36 +189,56 @@ export class UserInterface {
 
     // character panel
     ////////////////////////////
-    public createCharacterPanel(){
+    public createSelectedEntityPanel(){
 
-        if(!this._currentPlayer) return false
+        const selectedEntityBar = new Rectangle("selectedEntityBar");
+        selectedEntityBar.top = "15px;"
+        selectedEntityBar.left = "-15px;"
+        selectedEntityBar.width = "215px;"
+        selectedEntityBar.height = "55px;";
+        selectedEntityBar.background = Config.UI_CENTER_PANEL_BG;
+        selectedEntityBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        selectedEntityBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        selectedEntityBar.isVisible = false;
+        this._playerUI.addControl(selectedEntityBar);
 
-        // add stack panel
+        const playerNameTxt = new TextBlock("playerNameTxt", "");
+        playerNameTxt.text = "Nothing selected";
+        playerNameTxt.color = "#FFF";
+        playerNameTxt.top = "5px"; 
+        playerNameTxt.left = "-5px";
+        playerNameTxt.fontSize = "16px;";
+        playerNameTxt.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        playerNameTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        playerNameTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        playerNameTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        selectedEntityBar.addControl(playerNameTxt);
+
         const characterPanel = new Rectangle("healthBar");
-        characterPanel.top = "20px;"
-        characterPanel.left = "-20px;"
+        characterPanel.top = "25px;"
+        characterPanel.left = "-5px;"
         characterPanel.width = "200px;"
-        characterPanel.height = "30px;";
+        characterPanel.height = "20px;";
         characterPanel.background = Config.UI_CENTER_PANEL_BG;
         characterPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         characterPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        this._playerUI.addControl(characterPanel);
+        selectedEntityBar.addControl(characterPanel);
         
         const characterPanelInside = new Rectangle("healthBarInside");
         characterPanelInside.top = "0px;"
         characterPanelInside.left = "0px;"
         characterPanelInside.width = "200px;"
         characterPanelInside.thickness = 0;
-        characterPanelInside.height = "30px;";
+        characterPanelInside.height = "20px;";
         characterPanelInside.background = "green";
         characterPanelInside.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         characterPanelInside.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         characterPanel.addControl(characterPanelInside);
         
         const characterText = new TextBlock("healthBarText", "");
-        characterText.text = "Health: "+this._currentPlayer.health;
+        characterText.text = "Health: ";
         characterText.color = "#FFF";
-        characterText.top = "5px"; 
+        characterText.top = "2px"; 
         characterText.left = "-5px";
         characterText.fontSize = "16px;";
         characterText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
@@ -229,6 +246,82 @@ export class UserInterface {
         characterText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         characterText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         characterPanelInside.addControl(characterText);
+
+         // some ui must be constantly refreshed as things change
+         this._scene.registerBeforeRender(() => {
+            selectedEntityBar.isVisible = false;
+            if(global.T5C.selectedEntity){
+                selectedEntityBar.isVisible = true;
+                let entity = global.T5C.selectedEntity;
+                playerNameTxt.text = entity.name;
+                characterText.text = entity.health;
+                characterPanelInside.background = this.healthColor(entity.health);
+                characterPanelInside.width = (entity.health * 2)+"px";
+            }    
+        });
+    }
+
+    // character panel
+    ////////////////////////////
+    public createCharacterPanel(){
+
+        if(!this._currentPlayer) return false
+
+        const selectedEntityBar = new Rectangle("playerCharacterPanel");
+        selectedEntityBar.top = "15px;"
+        selectedEntityBar.left = "15px;"
+        selectedEntityBar.width = "215px;"
+        selectedEntityBar.height = "55px;";
+        selectedEntityBar.background = Config.UI_CENTER_PANEL_BG;
+        selectedEntityBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        selectedEntityBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        this._playerUI.addControl(selectedEntityBar);
+
+        const playerNameTxt = new TextBlock("playerNameTxt", "");
+        playerNameTxt.text = this._currentPlayer.name;
+        playerNameTxt.color = "#FFF";
+        playerNameTxt.top = "5px"; 
+        playerNameTxt.left = "5px";
+        playerNameTxt.fontSize = "16px;";
+        playerNameTxt.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        playerNameTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        playerNameTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        playerNameTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        selectedEntityBar.addControl(playerNameTxt);
+
+        const characterPanel = new Rectangle("healthBar");
+        characterPanel.top = "25px;"
+        characterPanel.left = "5px;"
+        characterPanel.width = "200px;"
+        characterPanel.height = "20px;";
+        characterPanel.background = Config.UI_CENTER_PANEL_BG;
+        characterPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        characterPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        selectedEntityBar.addControl(characterPanel);
+        
+        const characterPanelInside = new Rectangle("healthBarInside");
+        characterPanelInside.top = "0px;"
+        characterPanelInside.left = "0px;"
+        characterPanelInside.width = "200px;"
+        characterPanelInside.thickness = 0;
+        characterPanelInside.height = "20px;";
+        characterPanelInside.background = "green";
+        characterPanelInside.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        characterPanelInside.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        characterPanel.addControl(characterPanelInside);
+        
+        const characterText = new TextBlock("healthBarText", "");
+        characterText.text = "Health: ";
+        characterText.color = "#FFF";
+        characterText.top = "2px"; 
+        characterText.left = "-5px";
+        characterText.fontSize = "16px;";
+        characterText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        characterText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        characterText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        characterText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        characterPanelInside.addControl(characterText);
+
 
          // some ui must be constantly refreshed as things change
          this._scene.registerBeforeRender(() => {
