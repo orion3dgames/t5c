@@ -80,7 +80,7 @@ export class PlayerState extends Schema {
       this.player_interval = setInterval(()=>{
 
         // target loses health
-        target.loseHealth(40);
+        target.loseHealth(10);
 
         // send everyone else the information sender has attacked target
         this._gameroom.broadcast("player_update", {

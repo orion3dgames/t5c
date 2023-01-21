@@ -87,7 +87,6 @@ export class Player extends Entity {
 
                 /////////////////////////////////////////////////////////////////////
                 // display nameplate for a certain time for any entity right clicked
-                console.log('RIGHT CLICK', pointerInfo._pickInfo);
                 if (pointerInfo._pickInfo.pickedMesh && 
                     pointerInfo._pickInfo.pickedMesh.metadata && 
                     pointerInfo._pickInfo.pickedMesh.metadata.sessionId && 
@@ -121,14 +120,7 @@ export class Player extends Entity {
                     senderId: this.sessionId,
                     targetId: entity.sessionId
                 });
-
-                /*
-                // send bullet locally
-                let start = this.mesh.position;
-                let end = global.T5C.selectedEntity;
-                this.actionsController.fire(start, end, this.ui._entities[entity.sessionId].mesh);
-                */
-               
+                
                 this._input.digit1 = false;
 
             }

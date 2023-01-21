@@ -138,7 +138,7 @@ export class GameScene {
         material.alpha = .5;
         material.diffuseColor = new Color3(1.0, 0, 0);
 
-        var texture = new Texture("./textures/decal_target.png");
+        var texture = new Texture("./images/selected_circle_green.png");
         texture.hasAlpha = true;
         var material = new StandardMaterial('entity_selected');
         material.diffuseTexture = texture;

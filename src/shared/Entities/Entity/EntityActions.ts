@@ -22,7 +22,6 @@ export class EntityActions {
 
         // get target mesh 
         let mesh = this._scene.getMeshByName(data.targetId+'_mesh');
-        console.log(data.targetId+'_mesh', mesh, data);
 
         // send bullet locally
         let start = data.fromPos;
@@ -33,14 +32,6 @@ export class EntityActions {
             mesh
         );
 
-        /*
-        ui.addChatMessage({
-            senderID: "SYSTEM",
-            message: data.message,
-            name: "SYSTEM",
-            timestamp: 0,
-            createdAt: ""
-        });*/
     }
 
     public fire(start, end, mesh) {
@@ -93,8 +84,8 @@ export class EntityActions {
             if (i <= 1) {
                 projectile.position = path.getPointAt(i); 
                 i += 0.004;
-            } 
-            if(projectile.intersectsMesh(mesh)){
+            }
+            if(projectile.intersectsMesh(mesh) || i === 1){
                 projectile.dispose(true, true);
                 particleSystem.dispose(true);
                 this._scene.onBeforeRenderObservable.remove(loop);
