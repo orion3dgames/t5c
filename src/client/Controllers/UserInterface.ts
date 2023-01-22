@@ -90,7 +90,7 @@ export class UserInterface {
         this._UIChat.setCurrentPlayer(currentPlayer);
 
         // create abilities ui + events
-        this._UIAbilities = new UI_Abilities(this._playerUI, currentPlayer);
+        this._UIAbilities = new UI_Abilities(this._playerUI, this._gameRoom, currentPlayer);
     }
 
     /**

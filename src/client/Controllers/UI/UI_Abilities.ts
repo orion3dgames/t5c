@@ -9,15 +9,17 @@ import { Player } from "../../../shared/Entities/Player";
 export class UI_Abilities {
 
     private _playerUI;
+    private _gameRoom;
     private _currentPlayer:Player;
     private _tooltip:Rectangle;
     private _tooltipTxt:TextBlock;
     private abylity_number: number = 9;
 
-    constructor(_playerUI, _currentPlayer) {
+    constructor(_playerUI, _gameRoom, _currentPlayer) {
 
         this._playerUI = _playerUI;
         this._currentPlayer = _currentPlayer;
+        this._gameRoom = _gameRoom;
 
         // create ui
         this._createUI();
@@ -113,7 +115,7 @@ export class UI_Abilities {
 
     }
 
-    addAbilityIcon(ability_no, headlineRect){
+    addAbilityIcon(ability_no, headlineRect:Rectangle){
 
         let pAbilities = this._currentPlayer.raceData.abilities ?? false;
 
@@ -127,16 +129,29 @@ export class UI_Abilities {
             headlineRect.addControl(img);
 
             headlineRect.onPointerEnterObservable.add(() => { 
-                this.showTooltip(headlineRect, ability);
+                this.showTooltip(ability);
             });
 
             headlineRect.onPointerOutObservable.add(() => { 
                 this.hideTooltip();
             });
+
+            headlineRect.onPointerClickObservable.add(() => { 
+                let entity = global.T5C.selectedEntity;
+                if(entity){
+                    this._gameRoom.send("entity_ability", {
+                        senderId: this._gameRoom.sessionId,
+                        targetId: entity.sessionId,
+                        digit: ability_no
+                    });
+                }
+            });
+
+            
         }
     }
 
-    showTooltip(ui, ability){
+    showTooltip(ability){
         this._tooltip.isVisible = true;
         this._tooltipTxt.text = ability.description;
     }

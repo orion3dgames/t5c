@@ -92,7 +92,6 @@ export class PlayerInput {
                     targetId: entity.sessionId,
                     digit: this.digit_pressed
                 });
-
                 this.digit_pressed = 0;
             }
 

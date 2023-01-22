@@ -101,7 +101,7 @@ export class UI_Chats {
         // add default chat message
         this.messages.push({
             senderID: "SYSTEM",
-            message: "Welcome to T5C, you can move around by left clicking and dragging the mouse around. Attack by pressing 1 and clicking on any entity.",
+            message: "Welcome to T5C, you can move around by left clicking and dragging the mouse around. Use ability by selecting a target an then typing the appropriate digits on the keyboard.",
             name: "SYSTEM",
             timestamp: 0,
             createdAt: ""
