@@ -24,6 +24,7 @@ import { NavMesh } from "../../shared/yuka";
 import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
 
 import { createConvexRegionHelper, createGraphHelper } from "../../shared/Utils/navMeshHelper";
+import Locations from "../../shared/Data/Locations";
 
 export class GameScene {
 
@@ -70,9 +71,9 @@ export class GameScene {
         ///////////////////// DEBUG CODE /////////////////////////////////
         // if local skip login screen
         if(isLocal()){
-            let tempLocation = "lh_town";
-            //let tempLocation = "lh_dungeon_01";
-            global.T5C.currentLocation = Config.locations[tempLocation];
+            //let tempLocation = "lh_town";
+            let tempLocation = "lh_dungeon_01";
+            global.T5C.currentLocation = Locations[tempLocation];
             let req = await request('get', apiUrl()+'/returnRandomUser');
             let character = JSON.parse(req.data).user;
             global.T5C.currentUser = {
@@ -82,7 +83,7 @@ export class GameScene {
                 token: character.token,
             }
             global.T5C.currentCharacter = character;
-            global.T5C.currentCharacter.tempLocation = tempLocation;
+            global.T5C.currentCharacter.location = tempLocation;
         }
         ///////////////////// END DEBUG CODE /////////////////////////////
         ///////////////////// END DEBUG CODE /////////////////////////////
@@ -210,7 +211,7 @@ export class GameScene {
         await this._scene.whenReadyAsync();
 
         // setup input Controller
-        this._input = new PlayerInput(this._scene);
+        this._input = new PlayerInput(this._scene, this.room);
 
         // setup hud
         this._ui = new UserInterface(this._scene, this._engine, this.room, this.chatRoom, this.entities, this._currentPlayer);

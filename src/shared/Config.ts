@@ -1,4 +1,5 @@
 import State from "../client/Screens/Screens"
+import Locations from "./Data/Locations";
 import { isLocal } from "./Utils";
 
 let Config = {
@@ -38,106 +39,6 @@ let Config = {
 
     // basic locations
     initialLocation: "lh_town",
-    locations: {
-        "lh_town": {
-            title: "Town",
-            key: 'lh_town',
-            mesh: "lh_town.glb",
-            sun: true,
-            sunIntensity: 2,
-            spawnPoint: {
-                x: 7.50,
-                y: 0,
-                z: -14.27,
-                rot: -180
-            },
-        },
-        "lh_dungeon_01": {
-            title: "Dungeon Level 1",
-            key: 'lh_dungeon_01',
-            mesh: "lh_dungeon_01.glb",
-            sun: false,
-            sunIntensity: 0.5,
-            spawnPoint: {
-                x: 11.33,
-                y: 0,
-                z: -2.51,
-                rot: -180
-            },
-        },
-    },
-
-    // entities 
-    entities: {
-        "player_hobbit": {
-            name: "loading...",
-            speed: 0.3,
-            scale: 0.02,
-            animationSpeed: 1.3,
-            animations: {
-                "IDLE": 3,
-                "WALK": 6,
-                "ATTACK": 0,
-                "DEATH": 2,
-                "DAMAGE": 1
-            },
-        },
-        "monster_bear": {
-            name: "Bear",
-            speed: 0.2,
-            scale: 0.02,
-            rotationFix: 3.14,
-            animationSpeed: 1,
-            animations: {
-                "IDLE": 0,
-                "WALK": 3,
-                "ATTACK": 2,
-                "DEATH": 4,
-                "DAMAGE": 5
-            },
-        },
-        "monster_unicorn": {
-            name: "Unicorn",
-            speed: 0.3,
-            scale: 0.0125,
-            rotationFix: 3.14,
-            animationSpeed: 1,
-            animations: {
-                "IDLE": 5,
-                "WALK": 6,
-                "ATTACK": 0,
-                "DEATH": 3,
-                "DAMAGE": 5
-            },
-        },
-    },
-
-    abilities: {
-        "fireball": {
-            name: "Fireball",
-            icon: "./icons/ABILITY_fireball.png",
-            description: "Hurls a massive fiery ball that explodes on contact with target.",
-            value: 40,
-            type: "direct",
-            cooldown: 1, // 1 seconds
-        },  
-        "poisonball": {
-            name: "Poison Cloud",
-            icon: "./icons/ABILITY_poisonball.png",
-            description: "Trow a bottle of viscous poisioneous liquid onto target.",
-            value: 5,
-            type: "dot",
-            cooldown: 5, // 1 seconds
-        },  
-        "healself": {
-            name: "Heal Self",
-            icon: "./icons/ABILITY_healself.png",
-            description: "A spell from ancient that will leave you feeling revigorated.",
-            value: 25,
-            type: "heal",
-            cooldown: 5, // 1 seconds
-        }, 
-    },
 
     // functions
     setDefault(){
@@ -146,7 +47,7 @@ let Config = {
             //nextScene: State.LOGIN,
             currentRoomID: "",
             currentSessionID: "",
-            currentLocation: Config.locations[Config.initialLocation],
+            currentLocation: Locations[Config.initialLocation],
             currentUser: false,
             currentMs: 0
         }

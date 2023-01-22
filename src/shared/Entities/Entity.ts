@@ -21,7 +21,7 @@ import { UserInterface } from "../../client/Controllers/UserInterface";
 import { NavMesh } from "../yuka";
 import { AI_STATE } from "./Entity/AIState";
 import Config from "../Config";
-import e from "express";
+import Races from "../Data/Races";
 
 export class Entity {
     
@@ -67,6 +67,8 @@ export class Entity {
     public state: number = 0;
     public AI_CURRENT_STATE: number = 0;
 
+    public raceData;
+
     // flags
     public blocked: boolean = false; // if true, player will not moved
 
@@ -90,6 +92,7 @@ export class Entity {
         this.sessionId = entity.sessionId; // network id from colyseus
         this.isCurrentPlayer = this._room.sessionId === entity.sessionId;
         this.entity = entity;
+        this.raceData = Races[entity.race];
         
         // update player data from server data
         Object.assign(this, this.entity);

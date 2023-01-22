@@ -3,17 +3,21 @@ import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import Config from "../../../shared/Config";
+import Abilities from "../../../shared/Data/Abilities";
+import { Player } from "../../../shared/Entities/Player";
 
 export class UI_Abilities {
 
     private _playerUI;
+    private _currentPlayer:Player;
     private _tooltip:Rectangle;
     private _tooltipTxt:TextBlock;
-    private abylity_number: number = 10;
+    private abylity_number: number = 9;
 
-    constructor(_playerUI) {
+    constructor(_playerUI, _currentPlayer) {
 
         this._playerUI = _playerUI;
+        this._currentPlayer = _currentPlayer;
 
         // create ui
         this._createUI();
@@ -25,7 +29,7 @@ export class UI_Abilities {
 
     _createUI(){
 
-        let width = 360;
+        let width = 330;
 
         // add tooltip 
         const toolTipPanel = new Rectangle("toolTipPanel");
@@ -88,48 +92,10 @@ export class UI_Abilities {
             headlineRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             abilityPanel.addControl(headlineRect);
 
-            if(i === 1){
-                var img = new Image("image1", "./icons/ABILITY_fireball.png")
-                img.stretch = Image.STRETCH_FILL;
-                headlineRect.addControl(img);
+            // add ability icon and events
+            this.addAbilityIcon(i, headlineRect);
 
-                headlineRect.onPointerEnterObservable.add(() => { 
-                    this.showTooltip(headlineRect, 'fireball');
-                });
-
-                headlineRect.onPointerOutObservable.add(() => { 
-                    this.hideTooltip();
-                });
-            }
-
-            if(i === 2){
-                var img = new Image("image2", "./icons/ABILITY_poisonball.png")
-                img.stretch = Image.STRETCH_FILL;
-                headlineRect.addControl(img);
-
-                headlineRect.onPointerEnterObservable.add(() => { 
-                    this.showTooltip(headlineRect, 'poisonball');
-                });
-
-                headlineRect.onPointerOutObservable.add(() => { 
-                    this.hideTooltip();
-                });
-            }
-
-            if(i === 3){
-                var img = new Image("image2", "./icons/ABILITY_healself.png")
-                img.stretch = Image.STRETCH_FILL;
-                headlineRect.addControl(img);
-
-                headlineRect.onPointerEnterObservable.add(() => { 
-                    this.showTooltip(headlineRect, 'healself');
-                });
-
-                headlineRect.onPointerOutObservable.add(() => { 
-                    this.hideTooltip();
-                });
-            }
-
+            // add ability number
             var roomTxt = new TextBlock('ability_text_'+i);
             roomTxt.paddingLeft = "5px";
             roomTxt.text = ""+i;
@@ -147,14 +113,37 @@ export class UI_Abilities {
 
     }
 
-    showTooltip(ui, key){
-        let ability = Config.abilities[key];
+    addAbilityIcon(ability_no, headlineRect){
+
+        let pAbilities = this._currentPlayer.raceData.abilities ?? false;
+
+        if(pAbilities && pAbilities[ability_no]){
+            let abilityKey = pAbilities[ability_no];
+            let ability = Abilities[abilityKey];
+            console.log(ability_no, abilityKey, ability);
+        
+            var img = new Image("ability_image_"+ability_no, ability.icon)
+            img.stretch = Image.STRETCH_FILL;
+            headlineRect.addControl(img);
+
+            headlineRect.onPointerEnterObservable.add(() => { 
+                this.showTooltip(headlineRect, ability);
+            });
+
+            headlineRect.onPointerOutObservable.add(() => { 
+                this.hideTooltip();
+            });
+        }
+    }
+
+    showTooltip(ui, ability){
         this._tooltip.isVisible = true;
         this._tooltipTxt.text = ability.description;
     }
 
     hideTooltip(){
         this._tooltip.isVisible = false;
+        this._tooltipTxt.text = "";
     }
 
     _createEvents(){

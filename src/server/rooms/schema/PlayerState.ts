@@ -5,6 +5,8 @@ import { PlayerInputs } from "../../../shared/types";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { NavMesh, Vector3 } from "../../../shared/yuka";
 import { GameRoom } from "../GameRoom";
+import Races from "../../../shared/Data/Races";
+import Abilities from "../../../shared/Data/Abilities";
 
 export class PlayerState extends Schema {
 
@@ -43,13 +45,28 @@ export class PlayerState extends Schema {
   public isMoving: boolean = false;
   public player_interval;
   public player_cooldown: number = 1000;
-  public player_in_cooldown: boolean = false;
+  public ability_in_cooldown: boolean[];
   public player_cooldown_timer: number = 0;
 
   constructor(gameroom:GameRoom, ...args: any[]) {
 		super(args);
     this._navMesh = gameroom.navMesh;
     this._gameroom = gameroom;
+    this.raceData = Races[this.race];
+
+    this.ability_in_cooldown = [
+      false, 
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+    ]
 	}
 
   // runs on every server iteration
@@ -64,74 +81,84 @@ export class PlayerState extends Schema {
 
   }
 
-  processAttack(target, data){
+  processAbility(target, data){
 
-    if(this.player_interval){
-      clearInterval(this.player_interval);
+    // get ability 
+    let ability_no = data.digit;
+    let ability_key = (this.raceData.abilities && this.raceData.abilities[ability_no]) ?? false;
+    let ability = Abilities[ability_key] ?? false;
+
+    // if ability not found, cancel everything
+    if(!ability){
+      return false;
     }
 
-    if(this.player_in_cooldown){
+    // if in cooldown
+    if(this.ability_in_cooldown[ability_no]){
       return false;
     }
 
     // if target is not already dead
-    if(target && target.health > 0){
+    if(!target.isDead()){
 
+      // start timer
       this.player_cooldown_timer = this.player_cooldown;
 
       // rotate sender to lookAt target
       this.rot = this.calculateRotation(this.getPosition(), target.getPosition());
 
-      // set attacker as target
-      target.setTarget(this); 
+      // set target as target
+      if(target.type === 'entity'){
+        target.setTarget(this); 
+      }
 
-      //
-      this.player_in_cooldown = true;
+      // start cooldown period
+      this.ability_in_cooldown[ability_no] = true;
       setTimeout(() => {
-        this.player_in_cooldown = false;
-      }, this.player_cooldown);
+        this.ability_in_cooldown[ability_no] = false;
+      }, ability.cooldown);
 
-      // let
-      //this.player_interval = setInterval(()=>{
-
-        // cancel attack
-        if(this.isMoving){
-          clearInterval(this.player_interval);
+      // target loses health
+      if(ability.type === 'direct'){
+        //cannot hurt yourself
+        if(target.sessionId !== this.sessionId){
+          target.loseHealth(ability.value);
+        }else{
+          return false;
         }
+      }
 
-        // target loses health
-        target.loseHealth(40);
+      // target wins health
+      if(ability.type === 'heal'){
+        target.winHealth(ability.value);
+      }
 
-        // send everyone else the information sender has attacked target
-        this._gameroom.broadcast("player_update", {
-            action: 'attack',
-            fromId: this.sessionId,
-            fromPos: this.getPosition(),
-            targetId: target.sessionId,
-            targetPos: {
-                x: target.x,
-                y: target.y,
-                z: target.z,
-            }
-        });
+      // send everyone else the information sender has attacked target
+      this._gameroom.broadcast("ability_update", {
+          key: ability.key,
+          fromId: this.sessionId,
+          fromPos: this.getPosition(),
+          targetId: target.sessionId,
+          targetPos: {
+              x: target.x,
+              y: target.y,
+              z: target.z,
+          }
+      });
 
-          // if target has no more health
-        if(target.health == 0 || target.health < 0){ 
+        // if target has no more health
+      if(target.isDead()){ 
 
-          clearInterval(this.player_interval);
+        // set entity as dead
+        target.setAsDead();
+        Logger.info(`[gameroom][processAbility] Entity is dead`, data);
 
-          // set entity as dead
-          target.setAsDead();
-          Logger.info(`[gameroom][playerAction] Entity is dead`, data);
-
-          // delete so entity can be respawned
-          setTimeout(() => {
-              Logger.info(`[gameroom][playerAction] Deleting entity from server`, data);
-              this._gameroom.state.entities.delete(target.sessionId);
-          }, Config.MONSTER_RESPAWN_RATE);
-        }
-
-      //}, this.player_cooldown);
+        // delete so entity can be respawned
+        setTimeout(() => {
+            Logger.info(`[gameroom][processAbility] Deleting entity from server`, data);
+            this._gameroom.state.entities.delete(target.sessionId);
+        }, Config.MONSTER_RESPAWN_RATE);
+      }
 
     }else{
       
@@ -154,7 +181,7 @@ export class PlayerState extends Schema {
       this.blocked = false;
       this.state = EntityCurrentState.IDLE
       this.setPosition(new Vector3(0, 0 , 0));
-    }, 2000);
+    }, 10000);
   }
 
   resetDestination():void{
@@ -172,8 +199,22 @@ export class PlayerState extends Schema {
     this.z = updatedPos.z;
   }
 
+  isDead(){
+    return this.health <= 0;
+  }
+
   loseHealth(amount:number) {
     this.health -= amount;
+    if(this.health < 0){
+      this.health = 0;
+    }
+  }
+
+  winHealth(amount:number) {
+    this.health += amount;
+    if(this.health > this.raceData.maxHealth){
+      this.health = this.raceData.maxHealth;
+    }
   }
 
   /**

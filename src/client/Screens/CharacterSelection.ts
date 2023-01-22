@@ -17,6 +17,7 @@ import { PlayerCharacter, PlayerUser } from "../../shared/types";
 import Config from "../../shared/Config";
 import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
 import alertMessage from "../../shared/Utils/alertMessage";
+import Locations from "../../shared/Data/Locations";
 
 export class CharacterSelectionScene {
     
@@ -223,7 +224,7 @@ export class CharacterSelectionScene {
     loginAs(character:PlayerCharacter){
         global.T5C.currentCharacter = character;
         global.T5C.currentLocationKey = character.location;
-        global.T5C.currentLocation = Config.locations[character.location];
+        global.T5C.currentLocation = Locations[character.location];
         Config.goToScene(State.GAME);
     }
 

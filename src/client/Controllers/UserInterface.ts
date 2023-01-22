@@ -5,13 +5,9 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
-import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
+import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { Control } from "@babylonjs/gui/2D/controls/control";
-import { InputText } from "@babylonjs/gui/2D/controls/inputText";
-import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
-import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
-import { Image } from "@babylonjs/gui/2D/controls/image";
 
 import { UI_Chats } from "./UI/UI_Chats";
 import { UI_Abilities } from "./UI/UI_Abilities";
@@ -64,12 +60,6 @@ export class UserInterface {
         this._playerUI = playerUI;
         this._playerUI.idealHeight = 720;
 
-        // create chat ui + events
-        this._UIChat = new UI_Chats(playerUI, chatRoom, currentPlayer, entities);
-
-        // create abilities ui + events
-        this._UIAbilities = new UI_Abilities(playerUI);
-
         /////////////////////////////////////
         // create interface
         //let debugTextUI = this.createDebugPanel();
@@ -85,6 +75,22 @@ export class UserInterface {
             
         });
         
+    }
+
+    // set current player
+    ////////////////////////////
+    public setCurrentPlayer(currentPlayer){
+        
+        this._currentPlayer = currentPlayer;
+        this.createCharacterPanel();
+        this.createSelectedEntityPanel();
+
+        // create chat ui + events
+        this._UIChat = new UI_Chats(this._playerUI, this._chatRoom, currentPlayer, this._entities);
+        this._UIChat.setCurrentPlayer(currentPlayer);
+
+        // create abilities ui + events
+        this._UIAbilities = new UI_Abilities(this._playerUI, currentPlayer);
     }
 
     /**
@@ -111,15 +117,6 @@ export class UserInterface {
                 mesh.outlineColor = Color3.FromHexString(this.healthColor(player.health));
             }
         }        
-    }
-
-    // set current player
-    ////////////////////////////
-    public setCurrentPlayer(currentPlayer){
-        this._currentPlayer = currentPlayer;
-        this._UIChat.setCurrentPlayer(currentPlayer);
-        this.createCharacterPanel();
-        this.createSelectedEntityPanel();
     }
 
     // create misc stuff

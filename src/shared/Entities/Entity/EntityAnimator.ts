@@ -1,6 +1,7 @@
 import { AnimationGroup, Vector3 } from "@babylonjs/core";
 import { EntityCurrentState } from "./EntityCurrentState";
 import Config from "../../Config";
+import Races from "../../../shared/Data/Races";
 
 export class EntityAnimator {
 
@@ -28,7 +29,7 @@ export class EntityAnimator {
 
     private _build(): void {
 
-        let raceData = Config.entities[this.entityType];
+        let raceData = Races[this.entityType];
 
         // find animations
         let idleAnimationNumber = raceData.animations['IDLE'];

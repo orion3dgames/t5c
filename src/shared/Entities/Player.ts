@@ -15,6 +15,7 @@ import { PlayerInput } from "../../client/Controllers/PlayerInput";
 import { UserInterface } from "../../client/Controllers/UserInterface";
 import { Room } from "colyseus.js";
 import { NavMesh } from "../yuka";
+import Locations from "../Data/Locations";
 
 export class Player extends Entity {
 
@@ -69,15 +70,16 @@ export class Player extends Entity {
                 if (pointerInfo._pickInfo.pickedMesh && 
                     pointerInfo._pickInfo.pickedMesh.metadata && 
                     pointerInfo._pickInfo.pickedMesh.metadata !== null && 
-                    pointerInfo._pickInfo.pickedMesh.metadata.race && 
-                    pointerInfo._pickInfo.pickedMesh.metadata.race.includes('monster') && 
-                    pointerInfo._pickInfo.pickedMesh.metadata.sessionId !== this.sessionId){
-                        
-                    // get target
-                    let targetSessionId = pointerInfo._pickInfo.pickedMesh.metadata.sessionId;   
-                    
-                    // 
+                    pointerInfo._pickInfo.pickedMesh.metadata.race){
+
+                    let metadata = pointerInfo._pickInfo.pickedMesh.metadata;
+                    let targetSessionId = metadata.sessionId;
                     let target = this.ui._entities[targetSessionId];
+
+                    if(metadata.type === 'player' && targetSessionId === this.sessionId){
+                        target = this.ui._currentPlayer;
+                    }
+        
                     global.T5C.selectedEntity = target;
                 }
             }
@@ -110,20 +112,6 @@ export class Player extends Entity {
 
             // move camera as player moves
             this.cameraController.follow(this.mesh.position);
-            
-            if(this._input.digit1 === true){
-
-                let entity = global.T5C.selectedEntity;
-                        
-                // send to server
-                this._room.send("entity_attack", {
-                    senderId: this.sessionId,
-                    targetId: entity.sessionId
-                });
-                
-                this._input.digit1 = false;
-
-            }
 
         });
       
@@ -142,14 +130,9 @@ export class Player extends Entity {
         });
 
         // on player action
-        this._room.onMessage('player_update', (data) => {
-            console.log('player_update', data);
-            switch(data.action){
-                case 'attack':
-                    this.actionsController.attack(data);
-                    break;
-            }
-            
+        this._room.onMessage('ability_update', (data) => {
+            console.log('ability_update', data);
+            this.actionsController.process(data);
         });
 
     }
@@ -161,7 +144,7 @@ export class Player extends Entity {
 
     public async teleport(location){
         await this._room.leave();
-        global.T5C.currentLocation = Config.locations[location];
+        global.T5C.currentLocation = Locations[location];
         global.T5C.currentLocationKey = location;
         global.T5C.currentCharacter.location = location;
         global.T5C.currentRoomID = "";

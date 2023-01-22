@@ -7,10 +7,10 @@ import { ActionManager } from "@babylonjs/core/Actions/actionManager";
 import { ExecuteCodeAction } from "@babylonjs/core/Actions/directActions";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 
-
 import { Room } from "colyseus.js";
 import { EntityState } from "../../../server/rooms/schema/EntityState";
 import Config from "../../Config";
+import Races from "../../../shared/Data/Races";
 
 export class EntityMesh {
 
@@ -35,7 +35,7 @@ export class EntityMesh {
 
     public async load() {
 
-        let config = Config.entities[this._entity.race];
+        let config = Races[this._entity.race];
 
         // create collision cube
         const box = MeshBuilder.CreateBox("root_"+this._entity.race, {width: 2, height: 4}, this._scene);

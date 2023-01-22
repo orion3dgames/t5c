@@ -5,7 +5,7 @@ import { PlayerInputs } from "../../../shared/types";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 import { NavMesh, Vector3 } from "../../../shared/yuka";
-import { setInterval } from "timers/promises";
+import Races from "../../../shared/Data/Races";
 
 export class EntityState extends Schema {
 
@@ -56,12 +56,13 @@ export class EntityState extends Schema {
   public AI_CLOSEST_TARGET = null;
 
   public AI_ATTACK_INTERVAL:number = 0; 
-  public AI_ATTACK_INTERVAL_RATE: number = 1000;
+  public AI_ATTACK_INTERVAL_RATE: number = 1000; 
 
   constructor(gameroom, ...args: any[]) {
 		super(args);
     this._navMesh = gameroom.navMesh;
     this._gameroom = gameroom;
+    this.raceData = Races[this.race];
 	}
 
   // runs on every server iteration
@@ -178,6 +179,10 @@ export class EntityState extends Schema {
 
   }
 
+  isDead(){
+    return this.health <= 0;
+  }
+
   returnToWandering(){
     this.AI_CURRENT_TARGET = null;
     this.AI_CURRENT_STATE = AI_STATE.WANDER;
@@ -199,6 +204,20 @@ export class EntityState extends Schema {
     this.AI_CURRENT_TARGET = null;
   }
 
+  loseHealth(amount:number) {
+    this.health -= amount;
+    if(this.health < 0){
+      this.health = 0;
+    }
+  }
+
+  winHealth(amount:number) {
+    this.health += amount;
+    if(this.health > this.raceData.maxHealth){
+      this.health = this.raceData.maxHealth;
+    }
+  }
+
 
   /**
    * ATTACK BEHAVIOUR
@@ -213,6 +232,10 @@ export class EntityState extends Schema {
     if(this.AI_ATTACK_INTERVAL === this.AI_ATTACK_INTERVAL_RATE){
       this.AI_ATTACK_INTERVAL = 0;
       this.AI_CURRENT_TARGET.loseHealth(10);
+    }
+
+    if(this.AI_CURRENT_TARGET.health <= 0){
+      this.returnToWandering();
     }
 
   }
@@ -362,10 +385,6 @@ export class EntityState extends Schema {
     this.x = updatedPos.x;
     this.y = updatedPos.y;
     this.z = updatedPos.z;
-  }
-
-  loseHealth(amount:number) {
-    this.health -= amount;
   }
 
   /**

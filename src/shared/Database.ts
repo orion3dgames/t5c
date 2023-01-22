@@ -4,6 +4,7 @@ import { nanoid } from 'nanoid';
 import { PlayerCharacter, PlayerUser } from "./types";
 import { ParsedQs } from "qs";
 import Config from "./Config";
+import Locations from "./Data/Locations";
 
 class Database {
 
@@ -194,7 +195,7 @@ class Database {
 
   async createCharacter(token, name) {
     let user = await this.getUserByToken(token);
-    let defaultLocation = Config.locations[Config.initialLocation];
+    let defaultLocation = Locations[Config.initialLocation];
     const sql = `INSERT INTO characters ("user_id", "name","location","x","y","z","rot","level","experience","health") VALUES (
         "${user.id}",
         "${name}",

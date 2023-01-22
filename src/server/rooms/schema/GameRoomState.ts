@@ -10,6 +10,8 @@ import Config from '../../../shared/Config';
 import Logger from "../../../shared/Logger";
 import { randomNumberInRange } from '../../../shared/Utils';
 import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
+import Locations from '../../../shared/Data/Locations';
+import Races from '../../../shared/Data/Races';
 
 
 export class GameRoomState extends Schema {
@@ -25,10 +27,13 @@ export class GameRoomState extends Schema {
     private timer: number = 0;
     private spawnTimer: number = 0;
 
+    private roomDetails;
+
     constructor(gameroom: GameRoom, _navMesh: NavMesh, ...args: any[]) {
 		super(...args);
 		this._gameroom = gameroom;
 		this.navMesh = _navMesh;
+        this.roomDetails = Locations[this._gameroom.metadata.location];
 	}
 
     public createEntity(delta){
@@ -47,7 +52,7 @@ export class GameRoomState extends Schema {
         let race = monsterTypes[Math.floor(Math.random()*monsterTypes.length)];
 
         // get race data
-        let raceData = Config.entities[race];
+        let raceData = Races[race];
 
         // create entity
         let data = {
@@ -63,8 +68,7 @@ export class GameRoomState extends Schema {
             health: 100,
             level: 1,
             state: EntityCurrentState.IDLE,
-            toRegion: false,
-            raceData: raceData
+            toRegion: false
         };
 
         let entity = new EntityState(this._gameroom).assign(data);
@@ -86,8 +90,8 @@ export class GameRoomState extends Schema {
         let spawnTime = 300;
         if (this.spawnTimer >= spawnTime) {
             this.spawnTimer = 0;
-            let maxEntities = 10; 
-            if(this.entities.size <= maxEntities){
+            let maxEntities = this.roomDetails.monsters; 
+            if(this.entities.size < maxEntities){
                 this.createEntity(this.entities.size);
             }
         }

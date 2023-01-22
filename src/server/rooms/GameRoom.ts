@@ -10,6 +10,7 @@ import { PlayerState } from "./schema/PlayerState";
 import { PlayerInputs } from "../../shared/types";
 import { EntityCurrentState } from "../../shared/Entities/Entity/EntityCurrentState";
 import { NavMesh, Vector3 } from "../../shared/yuka";
+import Locations from "../../shared/Data/Locations";
 
 export class GameRoom extends Room<GameRoomState> {
 
@@ -163,7 +164,7 @@ export class GameRoom extends Room<GameRoomState> {
             if (playerState) {
 
                 // update player location in database
-                let newLocation = Config.locations[location];
+                let newLocation = Locations[location];
                 let updateObj = {
                     location: newLocation.key,
                     x: newLocation.spawnPoint.x,
@@ -190,21 +191,25 @@ export class GameRoom extends Room<GameRoomState> {
 
         /////////////////////////////////////
         // player entity_attack
-        this.onMessage("entity_attack", (client, data: any) => {
+        this.onMessage("entity_ability", (client, data: any) => {
 
             // get players involved
             let sender:PlayerState = this.state.players[client.sessionId];
-            let target:EntityState = this.state.entities[data.targetId];
+            let target = this.state.entities[data.targetId];
+
+            if(!target){
+                target = this.state.players[data.targetId];
+            }
             
             if(sender && target){
-                sender.processAttack(target, data);
+                sender.processAbility(target, data);
             }
 
             Logger.info(`[gameroom][entity_attack] player action processed`, data);
 
         });
 
-        /////////////////////////////////////
+        ///////////////////////////////////// 
         // player move to
         this.onMessage("player_moveTo", (client, data: any) => {
 

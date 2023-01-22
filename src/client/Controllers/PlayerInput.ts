@@ -6,6 +6,7 @@ export class PlayerInput {
 
     public inputMap: {};
     private _scene: Scene;
+    private _gameroom;
 
     //simple movement
     public horizontal: number = 0;
@@ -19,14 +20,15 @@ export class PlayerInput {
     public player_can_move: boolean = false;
 
     // digits
-    public digit1: boolean = false;
+    public digit_pressed: number = 0;
 
     // 
     public activate_spell_1: boolean = false;
 
-    constructor(scene: Scene) {
+    constructor(scene: Scene, gameroom) {
 
         this._scene = scene;
+        this._gameroom = gameroom;
 
         // detect mouse movement
         this._scene.onPointerObservable.add((pointerInfo) => {
@@ -46,7 +48,6 @@ export class PlayerInput {
                     this.inputMap = { rotY: null }
                     this.vertical = 0;
                     this.horizontal = 0;
-                    this.digit1 = false;
                 }
                 if (pointerInfo.event.button == 2) {
                     this.right_click = false
@@ -68,21 +69,33 @@ export class PlayerInput {
         scene.onKeyboardObservable.add((kbInfo) => {
             switch (kbInfo.type) {
               case KeyboardEventTypes.KEYDOWN:
-                if(kbInfo.event.code === 'Digit1'){
-                    this.digit1 = true;
-                }
+                if(kbInfo.event.code === 'Digit1'){ this.digit_pressed = 1;}
+                if(kbInfo.event.code === 'Digit2'){ this.digit_pressed = 2;}
+                if(kbInfo.event.code === 'Digit3'){ this.digit_pressed = 3;}
+                if(kbInfo.event.code === 'Digit4'){ this.digit_pressed = 4;}
+                if(kbInfo.event.code === 'Digit5'){ this.digit_pressed = 5;}
+                if(kbInfo.event.code === 'Digit6'){ this.digit_pressed = 6;}
+                if(kbInfo.event.code === 'Digit7'){ this.digit_pressed = 7;}
+                if(kbInfo.event.code === 'Digit8'){ this.digit_pressed = 8;}
+                if(kbInfo.event.code === 'Digit9'){ this.digit_pressed = 9;}
                 break;
             }
         });
-
+     
         scene.registerAfterRender(() => {
-            /*
-            document.documentElement.style.cursor = "default";
-            scene.hoverCursor = "default";
-            if (this.digit1 === true) {
-                document.documentElement.style.cursor = " url('/images/Magic.cur') 12 12, auto ";
-                scene.hoverCursor = " url('/images/Magic.cur') 12 12, auto ";
-            }*/  
+
+            if(this.digit_pressed > 0 && global.T5C.selectedEntity){
+                // send to server
+                let entity = global.T5C.selectedEntity;
+                this._gameroom.send("entity_ability", {
+                    senderId: this._gameroom.sessionId,
+                    targetId: entity.sessionId,
+                    digit: this.digit_pressed
+                });
+
+                this.digit_pressed = 0;
+            }
+
         }) 
     }
 
