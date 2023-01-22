@@ -6,6 +6,7 @@ let Abilities = {
         description: "Hurls a massive fiery ball that explodes on contact with target.",
         value: 40,
         type: "direct",
+        mana_cost: 20,
         castTime: 1000,
         cooldown: 1000, // 1 seconds
     },  
@@ -26,6 +27,7 @@ let Abilities = {
         description: "A spell from ancient times that will leave target feeling fresh & revigorated.",
         value: 25,
         type: "heal",
+        mana_cost: 40,
         castTime: 1000,
         cooldown: 1000, // 1 seconds
     }, 

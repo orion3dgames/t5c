@@ -143,6 +143,8 @@ export class GameRoomState extends Schema {
      */
     addPlayer(sessionId: string, data: PlayerCharacter):void {
 
+        let raceData = Races['player_hobbit'];
+
         this.players.set(sessionId, new PlayerState(this._gameroom).assign({
             id: data.id,
             sessionId: sessionId,
@@ -154,7 +156,8 @@ export class GameRoomState extends Schema {
             y: data.y,
             z: data.z,
             rot: data.rot,
-            health: data.health,
+            health: raceData.maxHealth,
+            mana: raceData.maxMana,
             level: data.level,
             experience: data.experience,
             state: EntityCurrentState.IDLE

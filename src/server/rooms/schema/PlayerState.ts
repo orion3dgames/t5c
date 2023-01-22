@@ -7,6 +7,7 @@ import { NavMesh, Vector3 } from "../../../shared/yuka";
 import { GameRoom } from "../GameRoom";
 import Races from "../../../shared/Data/Races";
 import Abilities from "../../../shared/Data/Abilities";
+import { roundTo } from "../../../shared/Utils";
 
 export class PlayerState extends Schema {
 
@@ -27,6 +28,7 @@ export class PlayerState extends Schema {
 
   // player details
   @type('number') public health: number = 0;
+  @type('number') public mana: number = 0;
   @type('number') public level: number = 0;
   @type('number') public experience: number = 0;
 
@@ -79,6 +81,12 @@ export class PlayerState extends Schema {
       this.setAsDead();
     }
 
+    if(this.mana < this.raceData.maxMana){
+      this.mana += this.raceData.manaRegen;
+    }
+
+    this.mana = roundTo(this.mana, 0);
+
   }
 
   processAbility(target, data){
@@ -95,6 +103,10 @@ export class PlayerState extends Schema {
 
     // if in cooldown
     if(this.ability_in_cooldown[ability_no]){
+      return false;
+    }
+
+    if(this.mana < ability.mana_cost){
       return false;
     }
 
@@ -131,6 +143,11 @@ export class PlayerState extends Schema {
       // target wins health
       if(ability.type === 'heal'){
         target.winHealth(ability.value);
+      }
+
+      this.mana -= ability.mana_cost;
+      if(this.mana < 0){
+        this.mana = 0;
       }
 
       // send everyone else the information sender has attacked target

@@ -268,7 +268,7 @@ export class UserInterface {
         selectedEntityBar.top = "15px;"
         selectedEntityBar.left = "15px;"
         selectedEntityBar.width = "215px;"
-        selectedEntityBar.height = "55px;";
+        selectedEntityBar.height = "80px;";
         selectedEntityBar.background = Config.UI_CENTER_PANEL_BG;
         selectedEntityBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         selectedEntityBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
@@ -286,6 +286,8 @@ export class UserInterface {
         playerNameTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         selectedEntityBar.addControl(playerNameTxt);
 
+
+        /////////////// health bar
         const characterPanel = new Rectangle("healthBar");
         characterPanel.top = "25px;"
         characterPanel.left = "5px;"
@@ -319,12 +321,49 @@ export class UserInterface {
         characterText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         characterPanelInside.addControl(characterText);
 
+        //////////////////// mana bar
+        const characterManaPanel = new Rectangle("characterManaPanel");
+        characterManaPanel.top = "50px;"
+        characterManaPanel.left = "5px;"
+        characterManaPanel.width = "200px;"
+        characterManaPanel.height = "20px;";
+        characterManaPanel.background = Config.UI_CENTER_PANEL_BG;
+        characterManaPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        characterManaPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        selectedEntityBar.addControl(characterManaPanel);
+        
+        const manaBarInside = new Rectangle("manaBarInside");
+        manaBarInside.top = "0px;"
+        manaBarInside.left = "0px;"
+        manaBarInside.width = "200px;"
+        manaBarInside.thickness = 0;
+        manaBarInside.height = "20px;";
+        manaBarInside.background = "blue";
+        manaBarInside.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        manaBarInside.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        characterManaPanel.addControl(manaBarInside);
+        
+        const manaBarText = new TextBlock("manaBarText", "");
+        manaBarText.text = "Health: ";
+        manaBarText.color = "#FFF";
+        manaBarText.top = "2px"; 
+        manaBarText.left = "-5px";
+        manaBarText.fontSize = "16px;";
+        manaBarText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        manaBarText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        manaBarText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        manaBarText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        characterManaPanel.addControl(manaBarText);
+
 
          // some ui must be constantly refreshed as things change
          this._scene.registerBeforeRender(() => {
             characterText.text = this._currentPlayer.health;
             characterPanelInside.background = this.healthColor(this._currentPlayer.health);
             characterPanelInside.width = (this._currentPlayer.health * 2)+"px";
+
+            manaBarText.text = this._currentPlayer.mana;
+            manaBarInside.width = (this._currentPlayer.mana * 2)+"px";
         });
     }
 
