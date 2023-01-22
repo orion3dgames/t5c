@@ -139,7 +139,7 @@ export class EntityActions {
                 projectile.position = path.getPointAt(i); 
                 i += 5e-3;
             }
-            if(projectile.intersectsMesh(mesh) || i === 1){
+            if(projectile.intersectsMesh(mesh) || i > 1){
                 projectile.dispose(true, true);
                 particleSystem.dispose(true);
                 this._scene.onBeforeRenderObservable.remove(loop);

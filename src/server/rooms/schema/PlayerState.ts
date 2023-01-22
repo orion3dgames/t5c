@@ -85,8 +85,6 @@ export class PlayerState extends Schema {
       this.mana += this.raceData.manaRegen;
     }
 
-    this.mana = roundTo(this.mana, 0);
-
   }
 
   processAbility(target, data){

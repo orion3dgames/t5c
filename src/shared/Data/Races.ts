@@ -13,7 +13,7 @@ let Races = {
         },
         maxHealth: 100,
         maxMana: 100,
-        manaRegen: 0.5, // per second
+        manaRegen: 0.4, // per second
         abilities: {
             1: 'fireball',
             2: 'heal',

@@ -25,11 +25,11 @@ let Abilities = {
         key: "heal",
         icon: "./icons/ABILITY_heal.png",
         description: "A spell from ancient times that will leave target feeling fresh & revigorated.",
-        value: 25,
+        value: 50,
         type: "heal",
         mana_cost: 40,
         castTime: 1000,
-        cooldown: 1000, // 1 seconds
+        cooldown: 3000, // 1 seconds
     }, 
 }
 

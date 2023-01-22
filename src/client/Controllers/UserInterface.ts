@@ -15,7 +15,7 @@ import { UI_Abilities } from "./UI/UI_Abilities";
 import { Room } from "colyseus.js";
 import State from "../Screens/Screens";
 import { Entity } from "../../shared/Entities/Entity";
-import { countPlayers, roundToTwo } from "../../shared/Utils";
+import { countPlayers, roundTo, roundToTwo } from "../../shared/Utils";
 import { PlayerMessage } from "../../shared/types";
 import Config from "../../shared/Config";
 
@@ -362,8 +362,9 @@ export class UserInterface {
             characterPanelInside.background = this.healthColor(this._currentPlayer.health);
             characterPanelInside.width = (this._currentPlayer.health * 2)+"px";
 
-            manaBarText.text = this._currentPlayer.mana;
-            manaBarInside.width = (this._currentPlayer.mana * 2)+"px";
+            let mana = roundTo(this._currentPlayer.mana, 0);
+            manaBarText.text = ""+mana;
+            manaBarInside.width = (mana * 2)+"px";
         });
     }
 
