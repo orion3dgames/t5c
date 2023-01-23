@@ -61,6 +61,7 @@ export class Entity {
     public z: number;
     public rot: number;
     public health: number;
+    public mana: number;
     public level: number;
     public experience: number;
     public location: string = "";

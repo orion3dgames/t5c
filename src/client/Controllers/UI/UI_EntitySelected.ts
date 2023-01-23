@@ -2,7 +2,7 @@ import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import Config from "../../../shared/Config";
-import { getHealthColorFromValue } from "../../../shared/Utils";
+import { getHealthColorFromValue, roundTo } from "../../../shared/Utils";
 
 export class UI_EntitySelected {
 
@@ -39,14 +39,21 @@ export class UI_EntitySelected {
     }
 
     _createUI(){
+
+        //let alignHoriz = this._options.position === 'LEFT' ? Control.HORIZONTAL_ALIGNMENT_LEFT : Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        let alignHoriz = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        let marginLeft = this._options.position === 'LEFT' ? "15px":"-15px;";
+        let marginLeft2 = "5px";
+        let barWidth = 200;
+        let barHeight = 21;
  
         ////////////////////////////////////
         //////////////////// panel
         const selectedEntityBar = new Rectangle("selectedEntityBar");
         selectedEntityBar.top = "15px;"
-        selectedEntityBar.left = "-15px;"
-        selectedEntityBar.width = "215px;"
-        selectedEntityBar.height = "85px;";
+        selectedEntityBar.left = marginLeft;
+        selectedEntityBar.width = "210px;"
+        selectedEntityBar.height = "78px;";
         selectedEntityBar.background = Config.UI_CENTER_PANEL_BG;
         selectedEntityBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         selectedEntityBar.horizontalAlignment = this._options.position === 'LEFT' ? Control.HORIZONTAL_ALIGNMENT_LEFT : Control.HORIZONTAL_ALIGNMENT_RIGHT;
@@ -59,9 +66,9 @@ export class UI_EntitySelected {
         entityNameTxt.text = "Nothing selected";
         entityNameTxt.color = "#FFF";
         entityNameTxt.top = "5px"; 
-        entityNameTxt.left = "-5px";
+        entityNameTxt.left = marginLeft2; 
         entityNameTxt.fontSize = "16px;";
-        entityNameTxt.textHorizontalAlignment = this._options.position === 'LEFT' ? Control.HORIZONTAL_ALIGNMENT_LEFT : Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        entityNameTxt.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         entityNameTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         entityNameTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         selectedEntityBar.addControl(entityNameTxt);
@@ -70,71 +77,71 @@ export class UI_EntitySelected {
         //////////////////// health bar
         const healthBar = new Rectangle("healthBar");
         healthBar.top = "25px;"
-        healthBar.left = "-5px;"
-        healthBar.width = "200px;"
-        healthBar.height = "20px;";
+        healthBar.left = marginLeft2; 
+        healthBar.width = barWidth+"px;"
+        healthBar.height = barHeight+"px";
         healthBar.background = Config.UI_CENTER_PANEL_BG;
         healthBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        healthBar.horizontalAlignment = this._options.position === 'LEFT' ? Control.HORIZONTAL_ALIGNMENT_LEFT : Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        healthBar.horizontalAlignment = alignHoriz;
         selectedEntityBar.addControl(healthBar);
         
         const healthBarInside = new Rectangle("healthBarInside");
         healthBarInside.top = "0px;"
         healthBarInside.left = "0px;"
-        healthBarInside.width = "200px;"
+        healthBarInside.width = (barWidth-2)+"px;"
         healthBarInside.thickness = 0;
-        healthBarInside.height = "20px;";
+        healthBarInside.height = (barHeight-1)+"px";
         healthBarInside.background = "green";
         healthBarInside.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        healthBarInside.horizontalAlignment = this._options.position === 'LEFT' ? Control.HORIZONTAL_ALIGNMENT_LEFT : Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        healthBarInside.horizontalAlignment = alignHoriz;
         healthBar.addControl(healthBarInside);
         
         const healthBarText = new TextBlock("healthBarText", "");
-        healthBarText.text = "Health: ";
+        healthBarText.text = "0";
         healthBarText.color = "#FFF";
         healthBarText.top = "2px"; 
-        healthBarText.left = "-5px";
+        healthBarText.left = "5px"; 
         healthBarText.fontSize = "16px;";
-        healthBarText.textHorizontalAlignment = this._options.position === 'LEFT' ? Control.HORIZONTAL_ALIGNMENT_LEFT : Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        healthBarText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         healthBarText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         healthBarText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        healthBarText.horizontalAlignment = this._options.position === 'LEFT' ? Control.HORIZONTAL_ALIGNMENT_LEFT : Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        healthBar.addControl(healthBarText);
+        healthBarText.horizontalAlignment = alignHoriz;
+        healthBarInside.addControl(healthBarText);
 
         /////////////////////////////////////
         //////////////////// mana bar
         const manaBar = new Rectangle("manaBar");
         manaBar.top = "50px;"
-        manaBar.left = "5px;"
-        manaBar.width = "200px;"
-        manaBar.height = "20px;";
+        manaBar.left = "5px"; 
+        manaBar.width = barWidth+"px;"
+        manaBar.height = barHeight+"px";
         manaBar.background = Config.UI_CENTER_PANEL_BG;
         manaBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        manaBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        manaBar.horizontalAlignment = alignHoriz;
         selectedEntityBar.addControl(manaBar);
         
         const manaBarInside = new Rectangle("manaBarInside");
         manaBarInside.top = "0px;"
         manaBarInside.left = "0px;"
-        manaBarInside.width = "200px;"
+        manaBarInside.width = (barWidth-2)+"px;"
         manaBarInside.thickness = 0;
-        manaBarInside.height = "20px;";
+        manaBarInside.height = (barHeight-1)+"px";
         manaBarInside.background = "blue";
         manaBarInside.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        manaBarInside.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        manaBarInside.horizontalAlignment = alignHoriz;
         manaBar.addControl(manaBarInside);
         
         const manaBarText = new TextBlock("manaBarText");
         manaBarText.text = "0";
         manaBarText.color = "#FFF";
         manaBarText.top = "2px"; 
-        manaBarText.left = "-5px";
+        manaBarText.left = "5px"; 
         manaBarText.fontSize = "16px;";
-        manaBarText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        manaBarText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         manaBarText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         manaBarText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        manaBarText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        manaBar.addControl(manaBarText);
+        manaBarText.horizontalAlignment = alignHoriz;
+        manaBarInside.addControl(manaBarText);
 
 
         /////////////////////////////////////
@@ -154,9 +161,9 @@ export class UI_EntitySelected {
 
         this._selectedEntityBar.isVisible = false;
 
-        let entity = global.T5C.selectedEntity;
-        if(this._options.currentPlayer){
-            entity = this._options.currentPlayer;
+        let entity = global.T5C.selectedEntity ? global.T5C.selectedEntity.entity : false;
+        if(this._options.currentPlayer !== false){
+            entity = this._options.currentPlayer.entity;
         }
 
         if(entity){
@@ -168,13 +175,14 @@ export class UI_EntitySelected {
             this._entityNameTxt.text = entity.name;
             
             // health
-            this._healthBar = entity.health;
-            this._healthBarInside = getHealthColorFromValue(entity.health);
-            this._healthBarText = (entity.health * 2)+"px";
+            this._healthBarInside.width = (entity.health * 2)+"px";
+            this._healthBarInside.background = getHealthColorFromValue(entity.health);
+            this._healthBarText.text = entity.health;
 
             // mana
-            this._manaBar = entity.mana;
-            this._manaBarText.width = (entity.mana * 2)+"px";
+            let mana = roundTo(entity.mana, 0);
+            this._manaBarInside.width = (mana * 2)+"px";
+            this._manaBarText.text = mana;
         }    
     }
 

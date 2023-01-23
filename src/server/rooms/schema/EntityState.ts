@@ -26,6 +26,7 @@ export class EntityState extends Schema {
 
   // player details
   @type('number') public health: number = 0;
+  @type('number') public mana: number = 0;
   @type('number') public level: number = 0;
   @type('number') public experience: number = 0;
 
@@ -161,7 +162,7 @@ export class EntityState extends Schema {
 
       // if entity is dead
       if(this.health < 0 || this.health === 0){
-        this.setAsDead();
+        this.AI_CURRENT_STATE = AI_STATE.IDLE;
       }
 
       // something is wrong

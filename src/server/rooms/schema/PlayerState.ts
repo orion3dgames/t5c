@@ -87,6 +87,10 @@ export class PlayerState extends Schema {
       this.mana += this.raceData.manaRegen;
     }
 
+    if(this.isDead()){
+      this.setAsDead();
+    }
+
   }
 
   processAbility(target, data){
@@ -95,7 +99,7 @@ export class PlayerState extends Schema {
     let ability_no = data.digit;
 
     // if target is not already dead
-    if(!target.isDead()){
+    if(target.isDead()){
       Logger.error(`[gameroom][processAbility] target is dead`, target.health);
       return false;
     }
@@ -171,8 +175,9 @@ export class PlayerState extends Schema {
         }
     });
 
-    // if player has no more health
+    // if target has no more health
     if(target.isDead()){ 
+      console.log('SET AS DEAD');
       // set player as dead
       target.setAsDead();
     }
