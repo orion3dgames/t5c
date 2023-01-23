@@ -4,21 +4,20 @@ import { Engine } from "@babylonjs/core/Engines/engine";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
-import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
-import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 
-import { UI_Chats } from "./UI/UI_Chats";
-import { UI_Abilities } from "./UI/UI_Abilities";
-import { UI_Debug } from "./UI/UI_Debug";
-import { UI_EntitySelected } from "./UI/UI_EntitySelected";
+import { 
+    UI_Chats, 
+    UI_Abilities, 
+    UI_Debug, 
+    UI_EntitySelected 
+} from "./UI";
 
 import { Room } from "colyseus.js";
 import State from "../Screens/Screens";
 import { Entity } from "../../shared/Entities/Entity";
-import { getHealthColorFromValue, roundTo } from "../../shared/Utils";
-import { PlayerMessage } from "../../shared/types";
+import { getHealthColorFromValue } from "../../shared/Utils";
 import Config from "../../shared/Config";
 
 export class UserInterface {
@@ -33,23 +32,11 @@ export class UserInterface {
 
     //UI Elements
     private _playerUI;
-    private _tooltip; 
-    private _debugUI:Rectangle; 
-
-    // NewUI
     private _UIChat:UI_Chats; 
     private _UIAbilities:UI_Abilities; 
     private _UIDebug:UI_Debug;
-
-    private _UI_TargetSelected:UI_EntitySelected; 
-    private _UI_PlayerSelected:UI_EntitySelected; 
-
-    //Chat
-    public messages: PlayerMessage[] = [];
-
-    //
-    public maxWidth = "600px";
-    public uiWidth = "0.5";
+    private _UITargetSelected:UI_EntitySelected; 
+    private _UIPlayerSelected:UI_EntitySelected;
 
     constructor(scene: Scene, engine:Engine, gameRoom:Room, chatRoom:Room, entities:Entity[], currentPlayer) {
 
@@ -75,7 +62,7 @@ export class UserInterface {
 
             // refresh 
             //this._refreshDebugPanel(debugTextUI);
-            this.refreshEntityUI();
+            //this.refreshEntityUI();
             
         });
         
@@ -98,8 +85,8 @@ export class UserInterface {
         //this._UIDebug = new UI_Debug(this._playerUI, this._engine, this._scene, this._gameRoom, this._currentPlayer, this._entities);
 
         // create selected entity panel
-        this._UI_TargetSelected = new UI_EntitySelected(this._playerUI, this._scene, { position: "RIGHT", currentPlayer: false });
-        this._UI_PlayerSelected = new UI_EntitySelected(this._playerUI, this._scene, { position: "LEFT", currentPlayer: currentPlayer });
+        this._UITargetSelected = new UI_EntitySelected(this._playerUI, this._scene, { position: "RIGHT", currentPlayer: false });
+        this._UIPlayerSelected = new UI_EntitySelected(this._playerUI, this._scene, { position: "LEFT", currentPlayer: currentPlayer });
     }
 
     public refreshEntityUI(){
