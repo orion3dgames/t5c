@@ -73,6 +73,21 @@ const clamp = function(value: number, min: number, max: number): number {
 	return Math.min(Math.max(value, min), max);
 }
 
+/**
+ * Generate a hexadecimal color from a number between 0-100
+ * @param value number between 0 - 100
+ * @returns 
+ */
+const getHealthColorFromValue = function(value){
+    let gHex = Math.round(value * 255 / 100) // rule of three to calibrate [0, 100] to [00, FF] (= [0, 255])
+    let rHex = 255 - gHex // just the mirror of gHex
+    let gHexString = gHex.toString(16) // converting to traditional hex representation
+    let rHexString = rHex.toString(16)
+    gHexString = gHexString.length === 1 ? `0${gHex}` : gHexString // compensating missing digit in case of single digit values
+    rHexString = rHexString.length === 1 ? `0${rHex}` : rHexString
+    return `#${rHexString}${gHexString}00` // composing both in a color code
+}
+
 export {
     request,
     generateRandomPlayerName,
@@ -84,4 +99,5 @@ export {
     clamp, 
     randomNumberInRange,
     distanceBetween,
+    getHealthColorFromValue
 }

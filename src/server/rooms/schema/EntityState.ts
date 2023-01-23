@@ -202,6 +202,12 @@ export class EntityState extends Schema {
     this.state = EntityCurrentState.DEAD;
     this.AI_CURRENT_STATE = AI_STATE.IDLE;
     this.AI_CURRENT_TARGET = null;
+
+    // delete so entity can be respawned
+    setTimeout(() => {
+      Logger.info(`[gameroom][processAbility] Deleting entity from server`, this.sessionId);
+      this._gameroom.state.entities.delete(this.sessionId);
+    }, Config.MONSTER_RESPAWN_RATE);
   }
 
   loseHealth(amount:number) {

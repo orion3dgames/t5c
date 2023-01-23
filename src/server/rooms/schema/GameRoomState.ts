@@ -17,7 +17,7 @@ import Races from '../../../shared/Data/Races';
 export class GameRoomState extends Schema {
 
     // networked variables
-    @type({ map: EntityState }) entities = new MapSchema<EntityState>();
+    @type({ map: EntityState }) entities = new MapSchema<any>();
     @type({ map: PlayerState }) players = new MapSchema<PlayerState>();
     @type("number") serverTime: number = 0.0;
     

@@ -7,7 +7,6 @@ import { NavMesh, Vector3 } from "../../../shared/yuka";
 import { GameRoom } from "../GameRoom";
 import Races from "../../../shared/Data/Races";
 import Abilities from "../../../shared/Data/Abilities";
-import { roundTo } from "../../../shared/Utils";
 
 export class PlayerState extends Schema {
 
@@ -32,6 +31,13 @@ export class PlayerState extends Schema {
   @type('number') public level: number = 0;
   @type('number') public experience: number = 0;
 
+  // attributes
+  @type('number') public strength: number = 0;
+  @type('number') public endurance: number = 0;
+  @type('number') public agility: number = 0;
+  @type('number') public intelligence: number = 0;
+  @type('number') public wisdom: number = 0;
+
   // flags
   @type('boolean') public blocked: boolean = false; // if true, used to block player and to prevent movement
   @type('number') public state: EntityCurrentState = EntityCurrentState.IDLE;
@@ -42,7 +48,6 @@ export class PlayerState extends Schema {
   public toRegion;
   public destinationPath;
   public raceData;
-
 
   public isMoving: boolean = false;
   public player_interval;
@@ -74,13 +79,10 @@ export class PlayerState extends Schema {
   // runs on every server iteration
   update(){
 
+    //
     this.isMoving = false;
 
-    // if player is dead
-    if(this.health < 0 || this.health === 0){
-      this.setAsDead();
-    }
-
+    // continuously gain mana
     if(this.mana < this.raceData.maxMana){
       this.mana += this.raceData.manaRegen;
     }
@@ -91,93 +93,88 @@ export class PlayerState extends Schema {
 
     // get ability 
     let ability_no = data.digit;
-    let ability_key = (this.raceData.abilities && this.raceData.abilities[ability_no]) ?? false;
-    let ability = Abilities[ability_key] ?? false;
 
-    // if ability not found, cancel everything
-    if(!ability){
+    // if target is not already dead
+    if(!target.isDead()){
+      Logger.error(`[gameroom][processAbility] target is dead`, target.health);
       return false;
     }
 
     // if in cooldown
     if(this.ability_in_cooldown[ability_no]){
+      Logger.info(`[gameroom][processAbility] ability is in cooldown`, ability_no);
       return false;
     }
 
-    if(this.mana < ability.mana_cost){
+    // get ability
+    let ability_key = (this.raceData.abilities && this.raceData.abilities[ability_no]) ?? false;
+    let ability = Abilities[ability_key] ?? false;
+
+    // if ability not found, cancel everything
+    if(!ability){
+      Logger.error(`[gameroom][processAbility] ability not found`, ability);
       return false;
     }
 
-    // if target is not already dead
-    if(!target.isDead()){
+    // only cast ability if enought mana is available
+    if(this.mana < ability.manaCost){
+      Logger.info(`[gameroom][processAbility] not enough mana available`, this.mana);
+      return false;
+    }
 
-      // start timer
-      this.player_cooldown_timer = this.player_cooldown;
+    // rotate sender to face target
+    this.rot = this.calculateRotation(this.getPosition(), target.getPosition());
 
-      // rotate sender to lookAt target
-      this.rot = this.calculateRotation(this.getPosition(), target.getPosition());
+    // set target as target
+    if(target.type === 'entity'){
+      target.setTarget(this); 
+    }
 
-      // set target as target
-      if(target.type === 'entity'){
-        target.setTarget(this); 
-      }
+    // start cooldown period
+    this.ability_in_cooldown[ability_no] = true;
+    setTimeout(() => {
+      this.ability_in_cooldown[ability_no] = false;
+    }, ability.cooldown);
 
-      // start cooldown period
-      this.ability_in_cooldown[ability_no] = true;
-      setTimeout(() => {
-        this.ability_in_cooldown[ability_no] = false;
-      }, ability.cooldown);
+    // sender cannot hurt himself
+    if(ability.type === 'direct' && target.sessionId === this.sessionId){
+      Logger.info(`[gameroom][processAbility] cannot hurt yourself`, data);
+      return false;
+    }
 
-      // target loses health
-      if(ability.type === 'direct'){
-        //cannot hurt yourself
-        if(target.sessionId !== this.sessionId){
-          target.loseHealth(ability.value);
-        }else{
-          return false;
+    // target lose health
+    if(ability.type === 'direct'){
+      target.loseHealth(ability.value);
+    }
+
+    // target gains health
+    if(ability.type === 'heal'){
+      target.winHealth(ability.value);
+    }
+
+    // sender loses mana
+    this.mana -= ability.manaCost;
+    if(this.mana < 0){
+      this.mana = 0;
+    }
+
+    // send to clients
+    this._gameroom.broadcast("ability_update", {
+        key: ability.key,
+        fromId: this.sessionId,
+        fromPos: this.getPosition(),
+        targetId: target.sessionId,
+        targetPos: {
+            x: target.x,
+            y: target.y,
+            z: target.z,
         }
-      }
+    });
 
-      // target wins health
-      if(ability.type === 'heal'){
-        target.winHealth(ability.value);
-      }
-
-      this.mana -= ability.mana_cost;
-      if(this.mana < 0){
-        this.mana = 0;
-      }
-
-      // send everyone else the information sender has attacked target
-      this._gameroom.broadcast("ability_update", {
-          key: ability.key,
-          fromId: this.sessionId,
-          fromPos: this.getPosition(),
-          targetId: target.sessionId,
-          targetPos: {
-              x: target.x,
-              y: target.y,
-              z: target.z,
-          }
-      });
-
-        // if target has no more health
-      if(target.isDead()){ 
-
-        // set entity as dead
-        target.setAsDead();
-        Logger.info(`[gameroom][processAbility] Entity is dead`, data);
-
-        // delete so entity can be respawned
-        setTimeout(() => {
-            Logger.info(`[gameroom][processAbility] Deleting entity from server`, data);
-            this._gameroom.state.entities.delete(target.sessionId);
-        }, Config.MONSTER_RESPAWN_RATE);
-      }
-
-    }else{
-      
-      Logger.error(`[gameroom][playerAction] target or sender is invalid`, data);
+    // if player has no more health
+    if(target.isDead()){ 
+      // set player as dead
+      target.setAsDead();
     }
 
   }
@@ -187,16 +184,19 @@ export class PlayerState extends Schema {
   }
 
   setAsDead(){
+
+    //
     this.health = 0;
     this.blocked = true;
     this.state = EntityCurrentState.DEAD;
 
+    // revive player after 10 seconds
     setTimeout(()=>{
       this.health = 100;
       this.blocked = false;
       this.state = EntityCurrentState.IDLE
-      this.setPosition(new Vector3(0, 0 , 0));
     }, 10000);
+    
   }
 
   resetDestination():void{
