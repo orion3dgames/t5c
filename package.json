@@ -12,7 +12,8 @@
     "client-build": "webpack --config webpack.prod.js",
     "server-dev": "ts-node-dev --respawn --transpile-only src/server/index.ts",
     "server-start": "ts-node --transpile-only src/server/index.ts",
-    "server-build": "tsc"
+    "server-build": "tsc",
+    "typesafe-i18n": "typesafe-i18n"
   },
   "author": "",
   "license": "ISC",

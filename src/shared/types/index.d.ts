@@ -63,6 +63,7 @@ declare global {
         currentUser: PlayerUser;
         currentCharacter: PlayerCharacter;
         selectedEntity: Entity;
+        locale: 'en',
         currentMs: number;
     }
 }

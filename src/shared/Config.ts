@@ -7,6 +7,7 @@ let Config = {
     // general settings
     title: "T5C",
     version: "Version 0.2.1",
+    lang: 'en',
 
     // server settings
     serverUrlLocal: "ws://localhost:3000",
@@ -50,14 +51,6 @@ let Config = {
             currentLocation: Locations[Config.initialLocation],
             currentUser: false,
             currentMs: 0
-        }
-    },
-
-    checkForSceneChange(){
-        let currentScene = global.T5C.nextScene;
-        if(global.T5C.nextScene != State.NULL){
-            global.T5C.nextScene = State.NULL;
-            return currentScene;  
         }
     },
 

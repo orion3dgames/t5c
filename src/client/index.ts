@@ -72,7 +72,7 @@ class App {
         this._engine.runRenderLoop(() => {
             
             // monitor state
-            this._state = Config.checkForSceneChange();
+            this._state = this.checkForSceneChange();
 
             switch (this._state) {
     
@@ -136,6 +136,14 @@ class App {
             this._engine.resize();
         });
         
+    }
+
+    private checkForSceneChange(){
+        let currentScene = global.T5C.nextScene;
+        if(global.T5C.nextScene != State.NULL){
+            global.T5C.nextScene = State.NULL;
+            return currentScene;  
+        }
     }
 
     private async _process(): Promise<void> {
