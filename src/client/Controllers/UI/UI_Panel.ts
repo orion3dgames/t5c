@@ -1,6 +1,5 @@
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
-import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
-import { Button } from "@babylonjs/gui/2D/controls/Button";
+import { Button } from "@babylonjs/gui/2D/controls/button";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import Config from "../../../shared/Config";
@@ -20,8 +19,8 @@ export class UI_Panel {
         name: "Default Name",
         horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER, 
         vertical_position: Control.VERTICAL_ALIGNMENT_CENTER, 
-        width: .5, // 50% screen width
-        height: .5, // 50% screen height
+        width: 1, // 50% screen width
+        height: 1, // 50% screen height
     }) {
 
         //
@@ -59,6 +58,9 @@ export class UI_Panel {
     // create panel
     private _createUI(){
 
+        // debug only
+        Config.UI_CENTER_PANEL_BG = "rgba(0,0,0,1)";
+
         // main panel
         const mainPanel = new Rectangle("selectedEntityBar");
         mainPanel.top = 0;
@@ -68,32 +70,45 @@ export class UI_Panel {
         mainPanel.background = Config.UI_CENTER_PANEL_BG;
         mainPanel.verticalAlignment = this._options.horizontal_position;
         mainPanel.horizontalAlignment = this._options.vertical_position;
-        mainPanel.isVisible = false;
+        mainPanel.isVisible = true;
         this._playerUI.addControl(mainPanel);
         this.selectedTabUI = mainPanel;
 
         // tabs container
         const tabsPanel = new StackPanel("tabsPanel");
         tabsPanel.width = "100%";
+        tabsPanel.isVertical = false;
         tabsPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         tabsPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        tabsPanel.paddingTop = "5px;"
         mainPanel.addControl(tabsPanel);
 
         for(let tabId in this._tabs){
             let tab = this._tabs[tabId];
 
             const tabButton = Button.CreateSimpleButton("tabButton"+tabId, tab.title);
-            tabButton.width = .8;
+            tabButton.width = .2;
             tabButton.height = "30px";
             tabButton.color = "white";
-            tabButton.top = "-40px";
+            tabButton.top = "0px";
             tabButton.thickness = 1;
             tabButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
             tabButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
             tabsPanel.addControl(tabButton);
 
+            // on click send
+            tabButton.onPointerDownObservable.add(() => { 
+                this.setSelectedTab(tabId);
+            });
+
         }
+
+        // add selected tab
+        
+
+    }
+
+    // open panel
+    public setSelectedTab(key){
 
     }
 

@@ -11,7 +11,8 @@ import {
     UI_Chats, 
     UI_Abilities, 
     UI_Debug, 
-    UI_EntitySelected 
+    UI_EntitySelected, 
+    UI_Panel
 } from "./UI";
 
 import { Room } from "colyseus.js";
@@ -87,6 +88,9 @@ export class UserInterface {
         // create selected entity panel
         this._UITargetSelected = new UI_EntitySelected(this._playerUI, this._scene, { position: "RIGHT", currentPlayer: false });
         this._UIPlayerSelected = new UI_EntitySelected(this._playerUI, this._scene, { position: "LEFT", currentPlayer: currentPlayer });
+
+        // create panel
+        new UI_Panel(this._playerUI, this._scene, currentPlayer);
     }
 
     public refreshEntityUI(){
