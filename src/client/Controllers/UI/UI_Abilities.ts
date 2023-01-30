@@ -122,7 +122,7 @@ export class UI_Abilities {
         if(pAbilities && pAbilities[ability_no]){
             let abilityKey = pAbilities[ability_no];
             let ability = Abilities[abilityKey];
-            console.log(ability_no, abilityKey, ability);
+            //console.log(ability_no, abilityKey, ability);
         
             var img = new Image("ability_image_"+ability_no, ability.icon)
             img.stretch = Image.STRETCH_FILL;

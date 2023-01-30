@@ -162,8 +162,8 @@ export class Entity {
 
         //////////////////////////////////////////////////////////////////////////
         // misc
-        this.characterLabel = this.createLabel(entity.name);
-        this.characterChatLabel = this.createChatLabel(entity.name);
+        this.characterLabel = this.ui.createEntityLabel(this);
+        this.characterChatLabel = this.ui.createEntityChatLabel(this);
       
     }
 
@@ -192,57 +192,6 @@ export class Entity {
         if(distanceFromPlayer < Config.PLAYER_VIEW_DISTANCE){
             this.mesh.setEnabled(true); 
         } 
-    }
-
-    //////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////
-    // to refactor
-
-    public createChatLabel(text) {
-
-        var rect1 = new Rectangle('player_chat_'+this.sessionId);
-        rect1.isVisible = false;
-        rect1.width = "100px";
-        rect1.adaptHeightToChildren = true;
-        rect1.thickness = 1;
-        rect1.cornerRadius = 5;
-        rect1.background = "rgba(0,0,0,.5)";
-        rect1.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        this.ui._playerUI.addControl(rect1);
-        rect1.linkWithMesh(this.mesh);
-        rect1.linkOffsetY = -130;
-
-        var label = new TextBlock('player_chat_label_'+this.sessionId);
-        label.text = text;
-        label.color = "white";
-        label.paddingLeft = '5px;';
-        label.paddingTop = '5px';
-        label.paddingBottom = '5px';
-        label.paddingRight = '5px';
-        label.textWrapping = TextWrapping.WordWrap;
-        label.resizeToFit = true; 
-        rect1.addControl(label);
-
-        return rect1;
-    }
-
-    // obsolete, keeping just in case
-    public createLabel(text) {
-        var rect1 = new Rectangle('player_nameplate_'+this.sessionId);
-        rect1.isVisible = true;
-        rect1.width = "200px";
-        rect1.height = "40px";
-        rect1.thickness = 0;
-        this.ui._playerUI.addControl(rect1);
-        rect1.linkWithMesh(this.mesh);
-        rect1.linkOffsetY = -100;
-        var label = new TextBlock('player_nameplate_text_'+this.sessionId);
-        label.text = text;
-        label.color = "blue";
-        label.fontWeight = "bold";
-        rect1.addControl(label);
-        return rect1;
     }
 
     public position() {
