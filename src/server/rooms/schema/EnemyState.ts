@@ -48,7 +48,10 @@ export class EnemyState extends EntityState {
     this.AI_CLOSEST_TARGET = null;
 
     // make sure this entity knows where the closest player is 
-    this.findClosestPlayer();
+    let target = this.findClosestPlayer();
+
+    // if entity has a target, monitor it's position
+    this.monitorTarget();
 
     //////////////////////////////////////////////////
     // if not dead 
@@ -128,15 +131,29 @@ export class EnemyState extends EntityState {
 
   }
 
+  // if entity has a target, monitor it's position
+  // 
+  monitorTarget(){
+    if(this.AI_CURRENT_TARGET !== null && this.AI_CURRENT_TARGET !== undefined && this.AI_CURRENT_TARGET.sessionId){
+      let targetPos = this.AI_CURRENT_TARGET.getPosition();
+      let entityPos = this.getPosition();
+      let distanceBetween = entityPos.distanceTo(targetPos);
+      this.AI_CURRENT_TARGET_POSITION = targetPos;
+      this.AI_CURRENT_TARGET_DISTANCE = distanceBetween;
+    }else{
+      // else entity has no target
+      this.AI_CURRENT_TARGET = null;
+      this.AI_CURRENT_TARGET_POSITION = null;
+      this.AI_CURRENT_TARGET_DISTANCE = 0;
+    }
+  }
+
   // entity must always know the closest player at all times
   // todo: there must be a better way to do this
   findClosestPlayer(){
-    //
     let closestDistance = 1000000;
     this._gameroom.state.players.forEach(entity => {
-      // only for entity 
       if(this.type === 'entity' && entity.type === 'player' ){
-
         let playerPos = new Vector3(entity.x, entity.y, entity.z);
         let entityPos = new Vector3(this.x, this.y, this.z);
         let distanceBetween = entityPos.distanceTo(playerPos);
@@ -146,22 +163,6 @@ export class EnemyState extends EntityState {
           this.AI_CLOSEST_TARGET_DISTANCE = distanceBetween;
           this.AI_CLOSEST_TARGET = entity;
         }
-
-        // if entity has a target, monitor it's position
-        if(this.AI_CURRENT_TARGET !== null && this.AI_CURRENT_TARGET !== undefined && this.AI_CURRENT_TARGET.sessionId){
-          let targetPos = this.AI_CURRENT_TARGET.getPosition();
-          let entityPos = this.getPosition();
-          let distanceBetween = entityPos.distanceTo(targetPos);
-          this.AI_CURRENT_TARGET_POSITION = targetPos;
-          this.AI_CURRENT_TARGET_DISTANCE = distanceBetween;
-        }else{
-
-          // else entity has no target
-          this.AI_CURRENT_TARGET = null;
-          this.AI_CURRENT_TARGET_POSITION = null;
-          this.AI_CURRENT_TARGET_DISTANCE = distanceBetween;
-        }
-        
       }
     });
   }
