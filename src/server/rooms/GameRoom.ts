@@ -211,6 +211,7 @@ export class GameRoom extends Room<GameRoomState> {
 
         ///////////////////////////////////// 
         // player move to
+        /*
         this.onMessage("player_moveTo", (client, data: any) => {
 
             // get players involved
@@ -224,7 +225,7 @@ export class GameRoom extends Room<GameRoomState> {
             player.toRegion = this.navMesh.getClosestRegion( destination );
             player.destinationPath = this.navMesh.findPath(from, destination);
 
-        });
+        });*/
 
 	}
 

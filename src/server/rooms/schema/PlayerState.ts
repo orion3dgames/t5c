@@ -1,65 +1,31 @@
-import { Schema, type } from "@colyseus/schema";
+import { type } from "@colyseus/schema";
 import Logger from "../../../shared/Logger";
 import Config from "../../../shared/Config";
 import { PlayerInputs } from "../../../shared/types";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
-import { NavMesh, Vector3 } from "../../../shared/yuka";
+import { EntityState } from "../schema/EntityState";
+import { Vector3 } from "../../../shared/yuka";
 import { GameRoom } from "../GameRoom";
-import Races from "../../../shared/Data/Races";
 import Abilities from "../../../shared/Data/Abilities";
 
-export class PlayerState extends Schema {
+export class PlayerState extends EntityState {
 
-  // id and name
-  @type("number") id: number = 0;
-  @type('string') public sessionId: string;
-  @type("string") public name: string = "";
-  @type("string") public type: string = "player";
-  @type("string") public race: string = "player_hobbit";
-
-  // position & rotation
-  @type("string") public location: string = "";
-  @type("number") public sequence: number = 0; // latest input sequence
-  @type('number') public x: number = 0;
-  @type('number') public y: number = 0;
-  @type('number') public z: number = 0;
-  @type('number') public rot: number = 0;
-
-  // player details
-  @type('number') public health: number = 0;
-  @type('number') public mana: number = 0;
-  @type('number') public level: number = 0;
+  // networked player specific
   @type('number') public experience: number = 0;
-
-  // attributes
   @type('number') public strength: number = 0;
   @type('number') public endurance: number = 0;
   @type('number') public agility: number = 0;
   @type('number') public intelligence: number = 0;
   @type('number') public wisdom: number = 0;
 
-  // flags
-  @type('boolean') public blocked: boolean = false; // if true, used to block player and to prevent movement
-  @type('number') public state: EntityCurrentState = EntityCurrentState.IDLE;
-
-  public _navMesh:NavMesh;
-  public _gameroom:GameRoom;
-  public currentRegion;
-  public toRegion;
-  public destinationPath;
-  public raceData;
-
-  public isMoving: boolean = false;
+  // 
   public player_interval;
   public player_cooldown: number = 1000;
   public ability_in_cooldown: boolean[];
   public player_cooldown_timer: number = 0;
 
   constructor(gameroom:GameRoom, ...args: any[]) {
-		super(args);
-    this._navMesh = gameroom.navMesh;
-    this._gameroom = gameroom;
-    this.raceData = Races[this.race];
+		super(gameroom, args);
 
     this.ability_in_cooldown = [
       false, 
@@ -73,7 +39,8 @@ export class PlayerState extends Schema {
       false,
       false,
       false,
-    ]
+    ];
+
 	}
 
   // runs on every server iteration
@@ -82,13 +49,22 @@ export class PlayerState extends Schema {
     //
     this.isMoving = false;
 
-    // continuously gain mana
-    if(this.mana < this.raceData.maxMana){
-      this.mana += this.raceData.manaRegen;
+    if(this.isEntityDead()){
+      this.setAsDead();
     }
 
-    if(this.isDead()){
-      this.setAsDead();
+    // if not dead 
+    if(this.isDead === false){
+
+      // continuously gain mana
+      if(this.mana < this.raceData.maxMana){
+        this.mana += this.raceData.manaRegen;
+      }
+
+      // continuously gain health
+      if(this.health < this.raceData.maxHealth){
+        this.health += this.raceData.healthRegen;
+      }
     }
 
   }
@@ -99,7 +75,7 @@ export class PlayerState extends Schema {
     let ability_no = data.digit;
 
     // if target is not already dead
-    if(target.isDead()){
+    if(target.isEntityDead()){
       Logger.error(`[gameroom][processAbility] target is dead`, target.health);
       return false;
     }
@@ -176,7 +152,7 @@ export class PlayerState extends Schema {
     });
 
     // if target has no more health
-    if(target.isDead()){ 
+    if(target.isEntityDead()){ 
       console.log('SET AS DEAD');
       // set player as dead
       target.setAsDead();
@@ -190,13 +166,14 @@ export class PlayerState extends Schema {
 
   setAsDead(){
 
-    //
+    this.isDead = true;
     this.health = 0;
     this.blocked = true;
     this.state = EntityCurrentState.DEAD;
 
     // revive player after 10 seconds
     setTimeout(()=>{
+      this.isDead = false;
       this.health = 100;
       this.blocked = false;
       this.state = EntityCurrentState.IDLE
@@ -204,9 +181,12 @@ export class PlayerState extends Schema {
     
   }
 
-  resetDestination():void{
-    this.toRegion = false;
-    this.destinationPath = false;
+  /**
+   * is entity dead (isDead is there to prevent setting a player as dead multiple time)
+   * @returns true if health smaller than 0 and not already set as dead. 
+   */
+  isEntityDead(){
+    return this.health <= 0 && this.isDead === false;
   }
 
   setLocation(location:string):void {
@@ -219,9 +199,7 @@ export class PlayerState extends Schema {
     this.z = updatedPos.z;
   }
 
-  isDead(){
-    return this.health <= 0;
-  }
+  
 
   loseHealth(amount:number) {
     this.health -= amount;
@@ -261,8 +239,8 @@ export class PlayerState extends Schema {
       }
 
       // cancel any moveTo event
-      this.toRegion = false;
-      this.destinationPath = [];
+      //this.toRegion = false;
+      //this.destinationPath = [];
 
       // save current position
       let oldX = this.x;

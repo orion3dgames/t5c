@@ -12,12 +12,12 @@ let Races = {
             "DAMAGE": 1
         },
         maxHealth: 100,
+        healthRegen: 0.2,
         maxMana: 100,
         manaRegen: 0.4, // per second
         abilities: {
             1: 'fireball',
-            2: 'heal',
-            //3: 'poisonball',
+            2: 'heal'
         }
     },
     "monster_bear": {
@@ -33,7 +33,7 @@ let Races = {
             "DEATH": 4,
             "DAMAGE": 5
         },
-        maxHealth: 100,
+        maxHealth: 200,
     },
     "monster_unicorn": {
         name: "Unicorn",

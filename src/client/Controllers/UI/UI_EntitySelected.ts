@@ -175,9 +175,10 @@ export class UI_EntitySelected {
             this._entityNameTxt.text = entity.name;
             
             // health
+            let health = roundTo(entity.health, 0);
             this._healthBarInside.width = (entity.health * 2)+"px";
             this._healthBarInside.background = getHealthColorFromValue(entity.health);
-            this._healthBarText.text = entity.health;
+            this._healthBarText.text = health;
 
             // mana
             let mana = roundTo(entity.mana, 0);

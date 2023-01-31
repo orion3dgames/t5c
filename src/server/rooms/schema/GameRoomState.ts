@@ -1,5 +1,5 @@
 import { Schema, type, MapSchema } from '@colyseus/schema';
-import { EntityState } from "./EntityState";
+import { EnemyState } from "./EnemyState";
 import { PlayerState } from './PlayerState';
 import { PlayerCharacter } from '../../../shared/types';
 import { GameRoom } from '../GameRoom';
@@ -17,7 +17,7 @@ import Races from '../../../shared/Data/Races';
 export class GameRoomState extends Schema {
 
     // networked variables
-    @type({ map: EntityState }) entities = new MapSchema<any>();
+    @type({ map: EnemyState }) entities = new MapSchema<EnemyState>();
     @type({ map: PlayerState }) players = new MapSchema<PlayerState>();
     @type("number") serverTime: number = 0.0;
     
@@ -71,7 +71,7 @@ export class GameRoomState extends Schema {
             toRegion: false
         };
 
-        let entity = new EntityState(this._gameroom).assign(data);
+        let entity = new EnemyState(this._gameroom).assign(data);
 
         entity.setRandomDestination(point);
 
@@ -127,8 +127,8 @@ export class GameRoomState extends Schema {
 
             // for each players
             if( this.players.size > 0){
-                this.players.forEach(entity => {
-                    entity.update();
+                this.players.forEach(player => {
+                    player.update();
                 });
             }
 
