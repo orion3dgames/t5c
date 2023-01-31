@@ -168,9 +168,6 @@ export class UI_EntitySelected {
 
         if(entity){
 
-
-            console.log(entity);
-
             // show selected
             this._selectedEntityBar.isVisible = true;
 
