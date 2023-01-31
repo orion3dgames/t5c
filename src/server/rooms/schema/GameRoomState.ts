@@ -65,7 +65,7 @@ export class GameRoomState extends Schema {
             y: 0,
             z: point.z,
             rot: randomNumberInRange(0, Math.PI),  
-            health: 100,
+            health: raceData.maxHealth,
             level: 1,
             state: EntityCurrentState.IDLE,
             toRegion: false

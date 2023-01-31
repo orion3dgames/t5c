@@ -161,12 +161,15 @@ export class UI_EntitySelected {
 
         this._selectedEntityBar.isVisible = false;
 
-        let entity = global.T5C.selectedEntity ? global.T5C.selectedEntity.entity : false;
+        let entity = global.T5C.selectedEntity ? global.T5C.selectedEntity : false;
         if(this._options.currentPlayer !== false){
-            entity = this._options.currentPlayer.entity;
+            entity = this._options.currentPlayer;
         }
 
         if(entity){
+
+
+            console.log(entity);
 
             // show selected
             this._selectedEntityBar.isVisible = true;
@@ -176,13 +179,15 @@ export class UI_EntitySelected {
             
             // health
             let health = roundTo(entity.health, 0);
-            this._healthBarInside.width = (entity.health * 2)+"px";
-            this._healthBarInside.background = getHealthColorFromValue(entity.health);
+            let healthWidth = (entity.health * 100 / entity.raceData.maxHealth) * 2;
+            this._healthBarInside.width = healthWidth+"px";
+            //this._healthBarInside.background = getHealthColorFromValue(entity.health);
             this._healthBarText.text = health;
 
             // mana
             let mana = roundTo(entity.mana, 0);
-            this._manaBarInside.width = (mana * 2)+"px";
+            let manaWidth = (entity.mana * 100 / entity.raceData.maxMana) * 2;
+            this._manaBarInside.width = manaWidth+"px";
             this._manaBarText.text = mana;
         }    
     }

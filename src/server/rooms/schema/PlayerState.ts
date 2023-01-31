@@ -199,22 +199,6 @@ export class PlayerState extends EntityState {
     this.z = updatedPos.z;
   }
 
-  
-
-  loseHealth(amount:number) {
-    this.health -= amount;
-    if(this.health < 0){
-      this.health = 0;
-    }
-  }
-
-  winHealth(amount:number) {
-    this.health += amount;
-    if(this.health > this.raceData.maxHealth){
-      this.health = this.raceData.maxHealth;
-    }
-  }
-
   /**
    * Check if player can move from sourcePos to newPos
    * @param {Vector3} sourcePos source position

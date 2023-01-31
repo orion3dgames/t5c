@@ -43,4 +43,18 @@ export class EntityState extends Schema {
     this.raceData = Races[this.race];
 	}
 
+  loseHealth(amount:number) {
+    this.health -= amount;
+    if(this.health < 0){
+      this.health = 0;
+    }
+  }
+
+  winHealth(amount:number) {
+    this.health += amount;
+    if(this.health > this.raceData.maxHealth){
+      this.health = this.raceData.maxHealth;
+    }
+  }
+
 }

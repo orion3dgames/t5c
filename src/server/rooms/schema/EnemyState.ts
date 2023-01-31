@@ -1,10 +1,9 @@
-import { Schema, type } from "@colyseus/schema";
+import { type } from "@colyseus/schema";
 import Logger from "../../../shared/Logger";
 import Config from "../../../shared/Config";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
-import { NavMesh, Vector3 } from "../../../shared/yuka";
-import Races from "../../../shared/Data/Races";
+import { Vector3 } from "../../../shared/yuka";
 import { EntityState } from "./EntityState";
 import { PlayerState } from "./PlayerState";
 
@@ -41,52 +40,33 @@ export class EnemyState extends EntityState {
   // runs on every server iteration
   update(){
 
-    // 
+    // RESET VALUES
     this.AI_CURRENT_TARGET_POSITION = null;
     this.AI_CURRENT_TARGET_DISTANCE = 0;
     this.AI_CLOSEST_TARGET_POSITION = null;
     this.AI_CLOSEST_TARGET_DISTANCE = 0;
     this.AI_CLOSEST_TARGET = null;
 
-    //
-    let closestDistance = 1000000;
-    this._gameroom.state.players.forEach(entity => {
+    // make sure this entity knows where the closest player is 
+    this.findClosestPlayer();
 
-      // only for entity 
-      if(this.type === 'entity' && entity.type === 'player' ){
+    //////////////////////////////////////////////////
+    // if not dead 
+    if(this.isDead === false){
 
-        // entity must always know the closest player at all times
-        // todo: there must be a better way to do this
-        let playerPos = new Vector3(entity.x, entity.y, entity.z);
-        let entityPos = new Vector3(this.x, this.y, this.z);
-        let distanceBetween = entityPos.distanceTo(playerPos);
-        if(distanceBetween < closestDistance){
-          closestDistance = distanceBetween;
-          this.AI_CLOSEST_TARGET_POSITION = new Vector3(entity.x, entity.y, entity.z);
-          this.AI_CLOSEST_TARGET_DISTANCE = distanceBetween;
-          this.AI_CLOSEST_TARGET = entity;
-        }
-
-        // if entity has a target, monitor it's position
-        if(this.AI_CURRENT_TARGET !== null && this.AI_CURRENT_TARGET !== undefined && this.AI_CURRENT_TARGET.sessionId){
-          let targetPos = this.AI_CURRENT_TARGET.getPosition();
-          let entityPos = this.getPosition();
-          let distanceBetween = entityPos.distanceTo(targetPos);
-          this.AI_CURRENT_TARGET_POSITION = targetPos;
-          this.AI_CURRENT_TARGET_DISTANCE = distanceBetween;
-        }else{
-
-          // else entity has no target
-          this.AI_CURRENT_TARGET = null;
-          this.AI_CURRENT_TARGET_POSITION = null;
-          this.AI_CURRENT_TARGET_DISTANCE = distanceBetween;
-        }
-        
+      // continuously gain mana
+      if(this.mana < this.raceData.maxMana){
+        this.mana += this.raceData.manaRegen;
       }
 
-    });
+      // continuously gain health
+      if(this.health < this.raceData.maxHealth){
+        this.health += this.raceData.healthRegen;
+      }
+    }
 
-
+    ///////////////////////////////////////////////////
+    // AI BRAIN
     if(this.type === 'entity' ){
 
       // default behaviour
@@ -135,7 +115,7 @@ export class EnemyState extends EntityState {
       }
 
       // if entity is dead
-      if(this.health < 0 || this.health === 0){
+      if(this.health < 0 || this.health === 0 || this.isDead){
         this.AI_CURRENT_STATE = AI_STATE.IDLE;
       }
 
@@ -144,15 +124,48 @@ export class EnemyState extends EntityState {
         this.returnToWandering();
       }
 
-      /*
-      console.log(this.sessionId, this.race, AI_STATE[AI_STATE.IDLE], 
-        (this.AI_CURRENT_TARGET ? this.AI_CURRENT_TARGET.name : null),
-         (this.AI_CLOSEST_TARGET ? this.AI_CLOSEST_TARGET.name : null),
-         this.AI_CLOSEST_TARGET_DISTANCE);*/
-
     }
 
   }
+
+  // entity must always know the closest player at all times
+  // todo: there must be a better way to do this
+  findClosestPlayer(){
+    //
+    let closestDistance = 1000000;
+    this._gameroom.state.players.forEach(entity => {
+      // only for entity 
+      if(this.type === 'entity' && entity.type === 'player' ){
+
+        let playerPos = new Vector3(entity.x, entity.y, entity.z);
+        let entityPos = new Vector3(this.x, this.y, this.z);
+        let distanceBetween = entityPos.distanceTo(playerPos);
+        if(distanceBetween < closestDistance){
+          closestDistance = distanceBetween;
+          this.AI_CLOSEST_TARGET_POSITION = new Vector3(entity.x, entity.y, entity.z);
+          this.AI_CLOSEST_TARGET_DISTANCE = distanceBetween;
+          this.AI_CLOSEST_TARGET = entity;
+        }
+
+        // if entity has a target, monitor it's position
+        if(this.AI_CURRENT_TARGET !== null && this.AI_CURRENT_TARGET !== undefined && this.AI_CURRENT_TARGET.sessionId){
+          let targetPos = this.AI_CURRENT_TARGET.getPosition();
+          let entityPos = this.getPosition();
+          let distanceBetween = entityPos.distanceTo(targetPos);
+          this.AI_CURRENT_TARGET_POSITION = targetPos;
+          this.AI_CURRENT_TARGET_DISTANCE = distanceBetween;
+        }else{
+
+          // else entity has no target
+          this.AI_CURRENT_TARGET = null;
+          this.AI_CURRENT_TARGET_POSITION = null;
+          this.AI_CURRENT_TARGET_DISTANCE = distanceBetween;
+        }
+        
+      }
+    });
+  }
+
 
   isEntityDead(){
     return this.health <= 0;
@@ -171,12 +184,13 @@ export class EnemyState extends EntityState {
     this.AI_CURRENT_TARGET = target;
   }
 
-  setAsDead(){
+  setAsDead(){ 
     this.health = 0;
     this.blocked = true;
     this.state = EntityCurrentState.DEAD;
     this.AI_CURRENT_STATE = AI_STATE.IDLE;
     this.AI_CURRENT_TARGET = null;
+    this.isDead = true;
 
     // delete so entity can be respawned
     setTimeout(() => {
@@ -184,21 +198,6 @@ export class EnemyState extends EntityState {
       this._gameroom.state.entities.delete(this.sessionId);
     }, Config.MONSTER_RESPAWN_RATE);
   }
-
-  loseHealth(amount:number) {
-    this.health -= amount;
-    if(this.health < 0){
-      this.health = 0;
-    }
-  }
-
-  winHealth(amount:number) {
-    this.health += amount;
-    if(this.health > this.raceData.maxHealth){
-      this.health = this.raceData.maxHealth;
-    }
-  }
-
 
   /**
    * ATTACK BEHAVIOUR
