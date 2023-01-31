@@ -1,8 +1,31 @@
-let Races = {
+type raceData = {
+    name: string,
+    speed: number,
+    scale: number,
+    rotationFix: number,
+    animationSpeed: number,
+    animations: {
+        [key: string]: number
+    },
+    maxHealth: number,
+    healthRegen: number,
+    maxMana: number,
+    manaRegen: number,
+    abilities: {
+        [key: number]: string
+    }
+};
+
+interface raceDataMap {
+    [key: string]: raceData
+ }
+
+let Races:raceDataMap = {
     "player_hobbit": {
         name: "loading...",
         speed: 0.3,
         scale: 0.02,
+        rotationFix: 0,
         animationSpeed: 1.3,
         animations: {
             "IDLE": 3,
@@ -34,6 +57,10 @@ let Races = {
             "DAMAGE": 5
         },
         maxHealth: 200,
+        healthRegen: 0.2,
+        maxMana: 100,
+        manaRegen: 0.4, // per second
+        abilities: {}
     },
     "monster_unicorn": {
         name: "Unicorn",
@@ -49,7 +76,11 @@ let Races = {
             "DAMAGE": 5
         },
         maxHealth: 100,
+        healthRegen: 0.2,
+        maxMana: 100,
+        manaRegen: 0.4, // per second
+        abilities: {}
     },
-}
+};
 
 export default Races
