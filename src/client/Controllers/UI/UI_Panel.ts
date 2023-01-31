@@ -21,7 +21,7 @@ export class UI_Panel {
         name: "Default Name",
         horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER, 
         vertical_position: Control.VERTICAL_ALIGNMENT_CENTER, 
-        width: 0.5, // 50% screen width
+        width: 0.7, // 50% screen width
         height: 0.5, // 50% screen height
     }) {
 

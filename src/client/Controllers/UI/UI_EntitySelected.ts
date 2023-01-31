@@ -3,6 +3,7 @@ import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import Config from "../../../shared/Config";
 import { getHealthColorFromValue, roundTo } from "../../../shared/Utils";
+import { Leveling } from "../../../shared/Entities/Player/Leveling";
 
 export class UI_EntitySelected {
 
@@ -12,6 +13,7 @@ export class UI_EntitySelected {
 
     private _selectedEntityBar;
     private _entityNameTxt;
+    private _entityLevelTxt;
     
     private _healthBar;
     private _healthBarInside;
@@ -63,7 +65,7 @@ export class UI_EntitySelected {
         ////////////////////////////////////
         //////////////////// entity name
         const entityNameTxt = new TextBlock("entityNameTxt", "");
-        entityNameTxt.text = "Nothing selected";
+        entityNameTxt.text = "XXXXXX";
         entityNameTxt.color = "#FFF";
         entityNameTxt.top = "5px"; 
         entityNameTxt.left = marginLeft2; 
@@ -72,6 +74,19 @@ export class UI_EntitySelected {
         entityNameTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         entityNameTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         selectedEntityBar.addControl(entityNameTxt);
+
+        const entityLevelTxt = new TextBlock("entityLevelTxt", "");
+        entityLevelTxt.text = "XXXXX";
+        entityLevelTxt.color = "#FFF";
+        entityLevelTxt.top = "3px"; 
+        entityLevelTxt.left = "-5px"; 
+        entityLevelTxt.fontSize = "10px;";
+        entityLevelTxt.lineSpacing = "-2px;";
+        entityLevelTxt.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        entityLevelTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        entityLevelTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        entityLevelTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        selectedEntityBar.addControl(entityLevelTxt);
 
         ////////////////////////////////////
         //////////////////// health bar
@@ -147,6 +162,7 @@ export class UI_EntitySelected {
         /////////////////////////////////////
         this._selectedEntityBar = selectedEntityBar;
         this._entityNameTxt = entityNameTxt;
+        this._entityLevelTxt = entityLevelTxt;
         this._healthBar = healthBar;
         this._healthBarInside = healthBarInside;
         this._healthBarText = healthBarText;
@@ -173,6 +189,14 @@ export class UI_EntitySelected {
 
             // update name
             this._entityNameTxt.text = entity.name;
+
+            let level = entity.level;
+            let progress = Leveling.getLevelProgress(entity.experience);
+            if(this._options.currentPlayer){
+                this._entityLevelTxt.text = "Lvl:"+level+" Exp:"+entity.experience+" \n Progress:"+progress+"%";
+            }else{
+                this._entityLevelTxt.text = "Lvl: "+level;
+            }
             
             // health
             let health = roundTo(entity.health, 0);

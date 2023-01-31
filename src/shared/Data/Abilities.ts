@@ -4,7 +4,7 @@ let Abilities = {
         key: "fireball",
         icon: "./icons/ABILITY_fireball.png",
         description: "Hurls a massive fiery ball that explodes on contact with target.",
-        value: 40,
+        value: 100,
         type: "direct",
         manaCost: 20,
         castTime: 0,

@@ -7,6 +7,7 @@ import { EntityState } from "../schema/EntityState";
 import { Vector3 } from "../../../shared/yuka";
 import { GameRoom } from "../GameRoom";
 import Abilities from "../../../shared/Data/Abilities";
+import { Leveling } from "../../../shared/Entities/Player/Leveling";
 
 export class PlayerState extends EntityState {
 
@@ -153,11 +154,20 @@ export class PlayerState extends EntityState {
 
     // if target has no more health
     if(target.isEntityDead()){ 
-      console.log('SET AS DEAD');
+      
+      // 
+      this.addExperience(100);
+
       // set player as dead
       target.setAsDead();
     }
 
+  }
+
+  addExperience(amount){
+    this.experience += amount;
+    this.level = Leveling.getLevel(this.experience);
+    console.log('EXPERIENCE ADD', this.experience, this.level);
   }
 
   getPosition(){
