@@ -97,7 +97,7 @@ let Abilities:abilityMap = {
             color: 'orange'
         },
         casterPropertyAffected: {
-            'mana': -20,
+            'mana': 50,
         },
         targetPropertyAffected: {
             'health': -100,
@@ -123,7 +123,7 @@ let Abilities:abilityMap = {
             color: 'green'
         },
         casterPropertyAffected: {
-            'mana': -40,
+            'mana': 40,
         },
         targetPropertyAffected: {
             'health': 50,
@@ -149,7 +149,7 @@ let Abilities:abilityMap = {
             color: 'white'
         },
         casterPropertyAffected: {
-            'mana': -40,
+            'mana': 40,
         },
         targetPropertyAffected: {
             'health': 50,

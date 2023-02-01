@@ -84,12 +84,12 @@ export class PlayerInput {
      
         scene.registerAfterRender(() => {
 
-            if(this.digit_pressed > 0 && global.T5C.selectedEntity){
+            if(this.digit_pressed > 0){
                 // send to server
                 let entity = global.T5C.selectedEntity;
                 this._gameroom.send("entity_ability", {
                     senderId: this._gameroom.sessionId,
-                    targetId: entity.sessionId,
+                    targetId: entity ? entity.sessionId : false,
                     digit: this.digit_pressed
                 });
                 this.digit_pressed = 0;

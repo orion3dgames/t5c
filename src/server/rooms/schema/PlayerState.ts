@@ -8,6 +8,7 @@ import { Vector3 } from "../../../shared/yuka";
 import { GameRoom } from "../GameRoom";
 import { Abilities, Ability } from "../../../shared/Data/Abilities";
 import { Leveling } from "../../../shared/Entities/Player/Leveling";
+import Races from '../../../shared/Data/Races';
 
 export class PlayerState extends EntityState {
 
@@ -25,8 +26,10 @@ export class PlayerState extends EntityState {
   public ability_in_cooldown: boolean[];
   public player_cooldown_timer: number = 0;
 
-  constructor(gameroom:GameRoom, ...args: any[]) {
-		super(gameroom, args);
+  constructor(gameroom:GameRoom, data, ...args: any[]) {
+		super(gameroom, data, args);
+
+    this.raceData = Races[this.race];
 
     this.ability_in_cooldown = [
       false, 
@@ -71,42 +74,53 @@ export class PlayerState extends EntityState {
 
   }
 
-  canEntityCastAbility(ability_no, target) {
+  canEntityCastAbility(target, ability_no) {
 
     let ability_key = (this.raceData.abilities && this.raceData.abilities[ability_no]) ?? false;
     let ability = Abilities[ability_key] ?? null;
+
+    // if caster is dead, cancel everything
+    if(this.health < 0 || this.health === 0){
+      Logger.error(`[gameroom][processAbility] caster is dead`, ability);
+      return false;
+    }
+    console.log("caster is not dead");
 
     // if ability not found, cancel everything
     if(!ability){
       Logger.error(`[gameroom][processAbility] ability not found`, ability);
       return false;
     }
+    console.log("ability found");
 
     // if target is not already dead
     if(target.isEntityDead()){
       Logger.warning(`[gameroom][processAbility] target is dead`, target.health);
       return false;
     }
+    console.log("target is not dead");
 
     // if in cooldown
     if(this.ability_in_cooldown[ability_no]){
       Logger.warning(`[gameroom][processAbility] ability is in cooldown`, ability_no);
       return false;
     }
+    console.log("ability is not in cooldown");
 
     // only cast ability if enought mana is available
-    let manaNeeded = ability.casterPropertyAffected['mana'] ?? 0;
+    let manaNeeded = ability.casterPropertyAffected['mana'] ? ability.casterPropertyAffected['mana'] : 0;
     if(manaNeeded > 0 && this.mana < manaNeeded){
       Logger.warning(`[gameroom][processAbility] not enough mana available`, this.mana);
       return false;
     }
+    console.log("plenty of mana is available", manaNeeded, this.mana);
 
-    // sender cannot hurt himself
-    let damageDealt = ability.targetPropertyAffected['health'] ?? 0;
-    if(damageDealt > 0 && target.sessionId === this.sessionId){
-      Logger.warning(`[gameroom][processAbility] cannot hurt yourself`);
+    // sender cannot cast on himself
+    if(ability.castSelf === false && target.sessionId === this.sessionId){
+      Logger.warning(`[gameroom][processAbility] cannot cast this ability on yourself`);
       return false;
     }
+    console.log("can cast ability on self");
 
     return ability;
 
@@ -115,7 +129,7 @@ export class PlayerState extends EntityState {
   processAbility(target, data){
 
     // get ability 
-    let ability = this.canEntityCastAbility(data.digit, target);
+    let ability = this.canEntityCastAbility(target, data.digit);
     let ability_no = data.digit;
 
     // if entity can cast
@@ -135,24 +149,21 @@ export class PlayerState extends EntityState {
         this.ability_in_cooldown[ability_no] = false;
       }, ability.cooldown);
 
-      if(ability.type === 'direct'){
-
-        // process self affected properties
-        for(let p in ability.selfPropertyAffected){
-          let property = ability.selfPropertyAffected[p];
-          this[property] += property;
-        }
-
-        // process target affected properties
-        for(let p in ability.targetPropertyAffected){
-          let property = ability.targetPropertyAffected[p];
-          target[property] += property;
-        }
-
-        // make sure no values are out of range.
-        target.normalizeStats();
-
+      // process caster affected properties
+      for(let p in ability.casterPropertyAffected){
+        let property = ability.casterPropertyAffected[p];
+        this[p] -= property;
+        console.log('casterPropertyAffected', this[p], property);
       }
+
+      // process target affected properties
+      for(let p in ability.targetPropertyAffected){
+        let property = ability.targetPropertyAffected[p];
+        target[p] += property;
+      }
+
+      // make sure no values are out of range.
+      target.normalizeStats();
 
       // send to clients
       this._gameroom.broadcast("ability_update", {
@@ -160,18 +171,14 @@ export class PlayerState extends EntityState {
           fromId: this.sessionId,
           fromPos: this.getPosition(),
           targetId: target.sessionId,
-          targetPos: {
-              x: target.x,
-              y: target.y,
-              z: target.z,
-          }
+          targetPos: target.getPosition()
       });
 
       // if target has no more health
       if(target.isEntityDead()){ 
-        
+
         // player gains experience
-        this.addExperience(target.experienceGain);
+        this.addExperience(target.raceData.experienceGain);
 
         // set player as dead
         target.setAsDead();
@@ -184,7 +191,6 @@ export class PlayerState extends EntityState {
   addExperience(amount){
     this.experience += amount;
     this.level = Leveling.getLevel(this.experience);
-    console.log('EXPERIENCE ADD', this.experience, this.level);
   }
 
   getPosition(){
@@ -289,7 +295,7 @@ export class PlayerState extends EntityState {
           this.isMoving = true;
 
           // add player to server
-          Logger.info('Valid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
+          //Logger.info('Valid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
 
       } else {
 
@@ -301,7 +307,7 @@ export class PlayerState extends EntityState {
           this.sequence = playerInput.seq;
           //this.state = EntityCurrentState.IDLE;
 
-          Logger.warning('Invalid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
+          //Logger.warning('Invalid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
       }
       
   }

@@ -36,10 +36,11 @@ export class EntityState extends Schema {
   public isMoving: boolean = false;
   public isDead: boolean = false;
 
-  constructor(gameroom, ...args: any[]) {
+  constructor(gameroom, data, ...args: any[]) {
 		super(args);
     this._navMesh = gameroom.navMesh;
     this._gameroom = gameroom;
+    Object.assign(this, data);
     this.raceData = Races[this.race];
 	}
 

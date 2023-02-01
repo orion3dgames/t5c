@@ -68,10 +68,11 @@ export class GameRoomState extends Schema {
             health: raceData.maxHealth,
             level: 1,
             state: EntityCurrentState.IDLE,
-            toRegion: false
+            toRegion: false,
+            raceData: raceData
         };
 
-        let entity = new EnemyState(this._gameroom).assign(data);
+        let entity = new EnemyState(this._gameroom, data);
 
         entity.setRandomDestination(point);
 
@@ -144,13 +145,12 @@ export class GameRoomState extends Schema {
     addPlayer(sessionId: string, data: PlayerCharacter):void {
 
         let raceData = Races['player_hobbit'];
-
-        this.players.set(sessionId, new PlayerState(this._gameroom).assign({
+        let player = {
             id: data.id,
             sessionId: sessionId,
             type: 'player',
             race: 'player_hobbit',
-            name: data.name,
+            name: data.name, 
             location: data.location,
             x: data.x,
             y: data.y,
@@ -161,7 +161,8 @@ export class GameRoomState extends Schema {
             level: data.level,
             experience: data.experience,
             state: EntityCurrentState.IDLE
-        }));
+        };
+        this.players.set(sessionId, new PlayerState(this._gameroom, player));
 
     }
 

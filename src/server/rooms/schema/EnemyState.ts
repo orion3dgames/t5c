@@ -33,8 +33,8 @@ export class EnemyState extends EntityState {
   public AI_ATTACK_INTERVAL:number = 0; 
   public AI_ATTACK_INTERVAL_RATE: number = 1000; 
 
-  constructor(gameroom, ...args: any[]) {
-		super(gameroom, args);
+  constructor(gameroom, data, ...args: any[]) {
+		super(gameroom, data, args);
 	}
 
   // runs on every server iteration

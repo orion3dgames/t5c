@@ -202,5 +202,6 @@ export class Entity {
        this.characterLabel.dispose();
        this.characterChatLabel.dispose();
        this.mesh.dispose();
+       global.T5C.selectedEntity = false;
     }
 }
