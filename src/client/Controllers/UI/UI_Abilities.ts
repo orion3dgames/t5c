@@ -3,7 +3,7 @@ import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import Config from "../../../shared/Config";
-import Abilities from "../../../shared/Data/Abilities";
+import { Abilities } from "../../../shared/Data/Abilities";
 import { Player } from "../../../shared/Entities/Player";
 
 export class UI_Abilities {

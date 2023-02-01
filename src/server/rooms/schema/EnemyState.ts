@@ -212,7 +212,8 @@ export class EnemyState extends EntityState {
 
     if(this.AI_ATTACK_INTERVAL === this.AI_ATTACK_INTERVAL_RATE){
       this.AI_ATTACK_INTERVAL = 0;
-      this.AI_CURRENT_TARGET.loseHealth(10);
+      this.AI_CURRENT_TARGET.health -= 10;
+      this.AI_CURRENT_TARGET.normalizeStats();
     }
 
     if(this.AI_CURRENT_TARGET.health <= 0){

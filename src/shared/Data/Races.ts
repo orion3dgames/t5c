@@ -11,6 +11,8 @@ type raceData = {
     healthRegen: number,
     maxMana: number,
     manaRegen: number,
+    experienceGain: number,
+    damage_multiplier: number,
     abilities: {
         [key: number]: string
     }
@@ -38,9 +40,12 @@ let Races:raceDataMap = {
         healthRegen: 0.2,
         maxMana: 100,
         manaRegen: 0.4, // per second
+        experienceGain: 0,
+        damage_multiplier: 0,
         abilities: {
-            1: 'fireball',
-            2: 'heal'
+            1: 'base_attack',
+            2: 'fireball',
+            3: 'heal'
         }
     },
     "monster_bear": {
@@ -60,7 +65,11 @@ let Races:raceDataMap = {
         healthRegen: 0.2,
         maxMana: 100,
         manaRegen: 0.4, // per second
-        abilities: {}
+        experienceGain: 250,
+        damage_multiplier: 3,
+        abilities: {
+            1: 'base_attack',
+        }
     },
     "monster_unicorn": {
         name: "Unicorn",
@@ -79,7 +88,12 @@ let Races:raceDataMap = {
         healthRegen: 0.2,
         maxMana: 100,
         manaRegen: 0.4, // per second
-        abilities: {}
+        experienceGain: 100,
+        damage_multiplier: 1.2,
+        abilities: {
+            1: 'base_attack',
+            2: 'fireball',
+        }
     },
 };
 

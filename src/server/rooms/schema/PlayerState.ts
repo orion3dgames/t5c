@@ -6,7 +6,7 @@ import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurren
 import { EntityState } from "../schema/EntityState";
 import { Vector3 } from "../../../shared/yuka";
 import { GameRoom } from "../GameRoom";
-import Abilities from "../../../shared/Data/Abilities";
+import { Abilities, Ability } from "../../../shared/Data/Abilities";
 import { Leveling } from "../../../shared/Entities/Player/Leveling";
 
 export class PlayerState extends EntityState {
@@ -50,6 +50,7 @@ export class PlayerState extends EntityState {
     //
     this.isMoving = false;
 
+    // always check if entity is dead ??
     if(this.isEntityDead()){
       this.setAsDead();
     }
@@ -70,26 +71,10 @@ export class PlayerState extends EntityState {
 
   }
 
-  processAbility(target, data){
+  canEntityCastAbility(ability_no, target) {
 
-    // get ability 
-    let ability_no = data.digit;
-
-    // if target is not already dead
-    if(target.isEntityDead()){
-      Logger.error(`[gameroom][processAbility] target is dead`, target.health);
-      return false;
-    }
-
-    // if in cooldown
-    if(this.ability_in_cooldown[ability_no]){
-      Logger.info(`[gameroom][processAbility] ability is in cooldown`, ability_no);
-      return false;
-    }
-
-    // get ability
     let ability_key = (this.raceData.abilities && this.raceData.abilities[ability_no]) ?? false;
-    let ability = Abilities[ability_key] ?? false;
+    let ability = Abilities[ability_key] ?? null;
 
     // if ability not found, cancel everything
     if(!ability){
@@ -97,69 +82,101 @@ export class PlayerState extends EntityState {
       return false;
     }
 
-    // only cast ability if enought mana is available
-    if(this.mana < ability.manaCost){
-      Logger.info(`[gameroom][processAbility] not enough mana available`, this.mana);
+    // if target is not already dead
+    if(target.isEntityDead()){
+      Logger.warning(`[gameroom][processAbility] target is dead`, target.health);
       return false;
     }
 
-    // rotate sender to face target
-    this.rot = this.calculateRotation(this.getPosition(), target.getPosition());
-
-    // set target as target
-    if(target.type === 'entity'){
-      target.setTarget(this); 
+    // if in cooldown
+    if(this.ability_in_cooldown[ability_no]){
+      Logger.warning(`[gameroom][processAbility] ability is in cooldown`, ability_no);
+      return false;
     }
 
-    // start cooldown period
-    this.ability_in_cooldown[ability_no] = true;
-    setTimeout(() => {
-      this.ability_in_cooldown[ability_no] = false;
-    }, ability.cooldown);
+    // only cast ability if enought mana is available
+    let manaNeeded = ability.selfPropertyAffected['mana'] ?? 0;
+    if(manaNeeded > 0 && this.mana < manaNeeded){
+      Logger.warning(`[gameroom][processAbility] not enough mana available`, this.mana);
+      return false;
+    }
 
     // sender cannot hurt himself
-    if(ability.type === 'direct' && target.sessionId === this.sessionId){
-      Logger.info(`[gameroom][processAbility] cannot hurt yourself`, data);
+    let damageDealt = ability.targetPropertyAffected['health'] ?? 0;
+    if(damageDealt > 0 && target.sessionId === this.sessionId){
+      Logger.warning(`[gameroom][processAbility] cannot hurt yourself`);
       return false;
     }
 
-    // target lose health
-    if(ability.type === 'direct'){
-      target.loseHealth(ability.value);
-    }
+    return ability;
 
-    // target gains health
-    if(ability.type === 'heal'){
-      target.winHealth(ability.value);
-    }
+  }
 
-    // sender loses mana
-    this.mana -= ability.manaCost;
-    if(this.mana < 0){
-      this.mana = 0;
-    }
+  processAbility(target, data){
 
-    // send to clients
-    this._gameroom.broadcast("ability_update", {
-        key: ability.key,
-        fromId: this.sessionId,
-        fromPos: this.getPosition(),
-        targetId: target.sessionId,
-        targetPos: {
-            x: target.x,
-            y: target.y,
-            z: target.z,
+    // get ability 
+    let ability = this.canEntityCastAbility(data.digit, target);
+    let ability_no = data.digit;
+
+    // if entity can cast
+    if(ability !== false){
+
+      // rotate sender to face target
+      this.rot = this.calculateRotation(this.getPosition(), target.getPosition());
+
+      // set target as target
+      if(target.type === 'entity'){
+        target.setTarget(this); 
+      }
+
+      // start cooldown period
+      this.ability_in_cooldown[ability_no] = true;
+      setTimeout(() => {
+        this.ability_in_cooldown[ability_no] = false;
+      }, ability.cooldown);
+
+      if(ability.type === 'direct'){
+
+        // process self affected properties
+        for(let p in ability.selfPropertyAffected){
+          let property = ability.selfPropertyAffected[p];
+          this[property] += property;
         }
-    });
 
-    // if target has no more health
-    if(target.isEntityDead()){ 
-      
-      // 
-      this.addExperience(100);
+        // process target affected properties
+        for(let p in ability.targetPropertyAffected){
+          let property = ability.targetPropertyAffected[p];
+          target[property] += property;
+        }
 
-      // set player as dead
-      target.setAsDead();
+        // make sure no values are out of range.
+        target.normalizeStats();
+
+      }
+
+      // send to clients
+      this._gameroom.broadcast("ability_update", {
+          key: ability.key,
+          fromId: this.sessionId,
+          fromPos: this.getPosition(),
+          targetId: target.sessionId,
+          targetPos: {
+              x: target.x,
+              y: target.y,
+              z: target.z,
+          }
+      });
+
+      // if target has no more health
+      if(target.isEntityDead()){ 
+        
+        // player gains experience
+        this.addExperience(target.experienceGain);
+
+        // set player as dead
+        target.setAsDead();
+      }
+
     }
 
   }

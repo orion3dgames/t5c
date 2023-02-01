@@ -43,18 +43,25 @@ export class EntityState extends Schema {
     this.raceData = Races[this.race];
 	}
 
-  loseHealth(amount:number) {
-    this.health -= amount;
-    if(this.health < 0){
-      this.health = 0;
-    }
-  }
+  // make sure no value are out of range
+  normalizeStats(){
 
-  winHealth(amount:number) {
-    this.health += amount;
+    // health
     if(this.health > this.raceData.maxHealth){
       this.health = this.raceData.maxHealth;
     }
+    if(this.health < 0){
+      this.health = 0;
+    }
+
+    // mana
+    if(this.mana > this.raceData.maxMana){
+      this.mana = this.raceData.maxMana;
+    }
+    if(this.mana < 0){
+      this.mana = 0;
+    }
+
   }
 
 }
