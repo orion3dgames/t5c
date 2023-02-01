@@ -31,15 +31,17 @@ export class EntityActions {
             this.fireball(
                 new Vector3(start.x, start.y, start.z), 
                 new Vector3(end.x, end.y, end.z), 
-                mesh
+                mesh,
+                'orange'
             );
         }
 
         if(data.key === 'poisonball'){
-            this.poisonball(
+            this.fireball(
                 new Vector3(start.x, start.y, start.z), 
                 new Vector3(end.x, end.y, end.z), 
-                mesh
+                mesh,
+                'green'
             );
         }
 
@@ -47,10 +49,6 @@ export class EntityActions {
             this.heal(mesh);
         }
         
-
-    }
-
-    public poisonball(start, end, mesh) {
 
     }
 
@@ -88,14 +86,19 @@ export class EntityActions {
 
     }
 
-    public fireball(start, end, mesh) {
+    public fireball(start, end, mesh, color) {
 
         // calculate angle
         var angle = Math.atan2((start.z - end.z), (start.x - end.x ));
 
+        let colorBall = {
+            'green': Color3.FromInts(64, 141, 33),
+            'orange': Color3.FromInts(249, 115, 0),
+        }
+
         // create material
         var material = new StandardMaterial('player_spell');
-        material.diffuseColor = Color3.FromInts(249, 115, 0);
+        material.diffuseColor = colorBall[color];
 
         // create mesh
         var projectile = MeshBuilder.CreateSphere('Projectile', {segments: 4, diameter: 0.4}, this._scene);
@@ -110,8 +113,7 @@ export class EntityActions {
         particleSystem.particleTexture = new Texture("textures/flare.png", this._scene);
         particleSystem.emitter = projectile; // the starting location
         // Colors of all particles
-        particleSystem.color1 = new Color4(1, 0, 0, 1.0);
-        particleSystem.color2 = new Color4(1, 0.1, 0.1, 1.0);
+        particleSystem.color1 = Color4.FromColor3(colorBall[color]);
         particleSystem.colorDead = new Color4(0, 0, 0.2, 0.0);
         // Size of each particle (random between...
         particleSystem.minSize = 0.6;

@@ -121,16 +121,16 @@ export class UserInterface {
         const panelStack = new StackPanel("panelStack");
         panelStack.left = "15px";
         panelStack.top = "-15px";
-        panelStack.width = "100px";
-        panelStack.height = "200px";
-        panelStack.background = "rgba(0,0,0,.2)";
-        panelStack.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        panelStack.width = "30px";
+        panelStack.height = "60px";
+        //panelStack.background = "rgba(0,0,0,.2)";
+        panelStack.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
         panelStack.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         this._playerUI.addControl(panelStack);
 
   
-        const inventoryButton = Button.CreateSimpleButton("inventoryButton", "Inventory");
-        inventoryButton.width = "100px;";
+        const inventoryButton = Button.CreateSimpleButton("inventoryButton", "I");
+        inventoryButton.width = "30px;";
         inventoryButton.height = "30px";
         inventoryButton.color = "white";
         inventoryButton.background = "#000"; 
@@ -143,8 +143,8 @@ export class UserInterface {
         });
 
         // add a quit button
-        const quitButton = Button.CreateSimpleButton("quitButton", "Quit");;
-        quitButton.width = "100px;";
+        const quitButton = Button.CreateSimpleButton("quitButton", "Q");;
+        quitButton.width = "30px;";
         quitButton.height = "30px";
         quitButton.color = "white";
         quitButton.background = "#000"; 

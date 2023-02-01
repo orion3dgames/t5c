@@ -45,7 +45,8 @@ let Races:raceDataMap = {
         abilities: {
             1: 'base_attack',
             2: 'fireball',
-            3: 'heal'
+            3: 'poisonball',
+            4: 'heal'
         }
     },
     "monster_bear": {
