@@ -37,17 +37,17 @@ type Ability = {
         color?: string // main color of effect
     },
 
-    // what self properties will be affected 
-    selfPropertyAffected: {
+    // what properties will affect caster
+    casterPropertyAffected: {
         [key: string]: number
     },
 
-    // what target properties will be affected
+    // what properties will affect caster
     targetPropertyAffected: {
         [key: string]: number
     },
 
-    // properties a player must have to learn this ability
+    // what properties a player must have to learn this ability
     requiredToLearn: {
         [key: string]: number
     }
@@ -70,11 +70,11 @@ let Abilities:abilityMap = {
         repeatInterval: 0,
         range: 0,
         effect: {
-            type: 'target', // travel or self or target
-            effect: 'damage', // choose from list of effects
-            color: 'white' // choose from list of effects
+            type: 'target',
+            effect: 'damage',
+            color: 'white'
         },
-        selfPropertyAffected: {},
+        casterPropertyAffected: {},
         targetPropertyAffected: {
             'health': -10,
         },
@@ -92,11 +92,11 @@ let Abilities:abilityMap = {
         repeatInterval: 0,
         range: 0,
         effect: {
-            type: 'travel', // travel or self
-            effect: 'fireball', // choose from list of effects
-            color: 'orange' // choose from list of effects
+            type: 'travel',
+            effect: 'fireball',
+            color: 'orange'
         },
-        selfPropertyAffected: {
+        casterPropertyAffected: {
             'mana': -20,
         },
         targetPropertyAffected: {
@@ -113,16 +113,16 @@ let Abilities:abilityMap = {
         description: "Trow a bottle of viscous poisonous liquid onto target that will damage target overtime.",
         castSelf: false,
         castTime: 0,
-        cooldown: 5000, // 1 seconds
+        cooldown: 5000,
         repeat: 10,
         repeatInterval: 1000,
         range: 0,
         effect: {
-            type: 'travel', // travel or self
-            effect: 'fireball', // choose from list of effects
-            color: 'green' // choose from list of effects
+            type: 'travel',
+            effect: 'fireball',
+            color: 'green'
         },
-        selfPropertyAffected: {
+        casterPropertyAffected: {
             'mana': -40,
         },
         targetPropertyAffected: {
@@ -139,16 +139,16 @@ let Abilities:abilityMap = {
         description: "A spell from ancient times that will leave target feeling fresh & revigorated.",
         castSelf: true,
         castTime: 1000,
-        cooldown: 3000, // 1 seconds
+        cooldown: 3000,
         repeat: 0,
         repeatInterval: 0,
 	    range: 0,
         effect: {
-            type: 'self', // travel or self
-            effect: 'fireball', // choose from list of effects
-            color: 'white' // choose from list of effects
+            type: 'self',
+            effect: 'fireball',
+            color: 'white'
         },
-        selfPropertyAffected: {
+        casterPropertyAffected: {
             'mana': -40,
         },
         targetPropertyAffected: {

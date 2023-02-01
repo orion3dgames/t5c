@@ -95,7 +95,7 @@ export class PlayerState extends EntityState {
     }
 
     // only cast ability if enought mana is available
-    let manaNeeded = ability.selfPropertyAffected['mana'] ?? 0;
+    let manaNeeded = ability.casterPropertyAffected['mana'] ?? 0;
     if(manaNeeded > 0 && this.mana < manaNeeded){
       Logger.warning(`[gameroom][processAbility] not enough mana available`, this.mana);
       return false;
