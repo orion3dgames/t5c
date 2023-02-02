@@ -138,7 +138,7 @@ let Abilities:abilityMap = {
         icon: "./icons/ABILITY_heal.png",
         description: "A spell from ancient times that will leave target feeling fresh & revigorated.",
         castSelf: true,
-        castTime: 2000,
+        castTime: 5000,
         cooldown: 3000,
         repeat: 0,
         repeatInterval: 0,

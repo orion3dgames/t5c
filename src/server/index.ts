@@ -15,7 +15,6 @@ import { ChatRoom } from "./rooms/ChatRoom";
 import databaseInstance from "../shared/Database";
 import { PlayerUser } from "../shared/types";
 import Logger from "../shared/Logger";
-import Config from "../shared/Config";
 
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
@@ -58,7 +57,7 @@ gameServer.define("chat_room", ChatRoom);
 // on localhost, simulate bad latency
 if (process.env.NODE_ENV !== "production") {
   Logger.info("[gameserver] Simulating 500ms of latency.")
-  gameServer.simulateLatency(500);
+  gameServer.simulateLatency(100);
 }
 
 // listen

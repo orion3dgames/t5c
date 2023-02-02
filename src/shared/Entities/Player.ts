@@ -4,20 +4,19 @@ import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascaded
 import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 
 import { EntityState } from "../../server/rooms/schema/EntityState";
-
-import Config from "../Config";
 import { EntityCamera } from "./Entity/EntityCamera";
 import { EntityUtils } from "./Entity/EntityUtils";
 import { EntityActions } from "./Entity/EntityActions";
 import { Entity } from "./Entity";
-import State from "../../client/Screens/Screens";
 import { PlayerInput } from "../../client/Controllers/PlayerInput";
 import { UserInterface } from "../../client/Controllers/UserInterface";
 import { Room } from "colyseus.js";
 import { NavMesh } from "../yuka";
 import Locations from "../Data/Locations";
 import { Abilities } from "../Data/Abilities";
-import { setInterval } from "timers/promises";
+import Config from "../Config";
+import State from "../../client/Screens/Screens";
+import { roundTo } from "../Utils";
 
 export class Player extends Entity {
 
@@ -25,6 +24,7 @@ export class Player extends Entity {
     public interval;
 
     public isCasting: boolean = false;
+    public castingDigit: number = 0;
     public castingTimer;
     public castingElapsed: number = 0;
     public castingTarget: number = 0;
@@ -46,7 +46,7 @@ export class Player extends Entity {
         this.spawnPlayer()
     }
 
-    private async spawnPlayer() {
+    private async spawnPlayer() {  
 
         //spawn 
         this.utilsController = new EntityUtils(this._scene, this._room);
@@ -121,59 +121,6 @@ export class Player extends Entity {
             this.cameraController.follow(this.mesh.position);
 
         });
-
-        //////////////////////////////////////////////////////////////////////////
-        // player after render loop
-        /*
-        let isCasting = true;
-        let castingElapsed;
-        let timeThen = Date.now();
-        this._scene.registerAfterRender(() => {
-
-            // every 100ms loop
-            let timeNow = Date.now();
-            let timePassed = (timeNow - timeThen) / 1000;
-            let updateRate = Config.updateRate / 1000; // game is networked update every 100ms
-            if (timePassed >= updateRate) { 
-
-                
-                timeThen = timeNow;
-            }
-
-            // detect input
-            if(this._input.digit_pressed > 0){
-
-                let digit = this._input.digit_pressed;
-                let ability = this.getAbilityFromDigit(digit);
-                let entity = global.T5C.selectedEntity;
-           
-                // check if castime needed
-                if(ability.castTime > 0){
-
-                    let timer = setTimeout(()=>{
-
-                        this._room.send("entity_ability", {
-                            senderId: this._room.sessionId,
-                            targetId: entity ? entity.sessionId : false,
-                            digit: digit
-                        });
-
-                    }, ability.castTime)
-                    
-                }else{
-
-                    this._room.send("entity_ability", {
-                        senderId: this._room.sessionId,
-                        targetId: entity ? entity.sessionId : false,
-                        digit: digit
-                    });
-
-                }
-
-                this._input.digit_pressed = 0;
-            }
-
-        });*/
       
     }
 
@@ -182,32 +129,6 @@ export class Player extends Entity {
         // tween entity
         if(this && this.moveController){
             this.moveController.tween();
-        }
-        
-        // if casting
-        if(this.isCasting){
-            this.castingElapsed += Config.updateRate / 1000;
-            this.ui._UICastingTimer.text = this.castingElapsed;
-            console.log('CASTING.....', this.castingElapsed, this.castingTarget);
-
-            // cast time has elapsed
-            if( this.castingElapsed === this.castingTarget || this.castingElapsed > this.castingTarget ){
-                console.log('CASTING FINISHED');
-
-                let digit = this._input.digit_pressed;
-                let entity = global.T5C.selectedEntity;
-                this._room.send("entity_ability", {
-                    senderId: this._room.sessionId,
-                    targetId: entity ? entity.sessionId : false,
-                    digit: digit
-                });
-
-                this.castingElapsed = 0;
-                this.castingTarget = 0;
-                this.isCasting = false;
-                this.ui._UICastingTimer.isVisible = false;
-                this.ui._UICastingTimer.text = 0;
-            }
         }
 
         // if digit is pressed
@@ -221,18 +142,19 @@ export class Player extends Entity {
 
             console.log('PLAYER PRESSED DIGIT', digit);
 
-            // if user has ability in that digit
+            // if user has ability stored in that digit
             if(ability){
 
-                // if ability must be cast
+                // if ability must be casted
                 if(ability.castTime > 0){
 
                     // player is casting
                     this.isCasting = true;
                     this.castingElapsed = 0;
                     this.castingTarget = ability.castTime;
+                    this.castingDigit = digit;
                     this.ui._UICastingTimer.isVisible = true;
-                    this.ui._UICastingTimer.text = this.castingElapsed;
+                    this.ui._UICastingTimer.text = "Start Casting"
 
                     console.log('START CASTING', 0, this.castingTarget);
                     
@@ -250,9 +172,40 @@ export class Player extends Entity {
                 }
             }
 
-            // in all cases, clear key press after
-            this._input.digit_pressed = 0;
+            console.log('CLEAR DIGIT');
 
+            // in all cases, clear key press after
+            this._input.digit_pressed = false;
+
+        }
+
+        // check if casting
+        if(this.isCasting){
+
+            // increment casting timer
+            this.castingElapsed += Config.updateRate;
+            this.ui._UICastingTimer.text = "Casting: "+roundTo(this.castingElapsed, 0)+"/"+(this.castingTarget);
+            console.log('CASTING.....', this.ui._UICastingTimer.text);
+
+            // cast time has elapsed || cast time bigger than elapsed time
+            if( this.castingElapsed === this.castingTarget || this.castingElapsed > this.castingTarget ){
+                console.log('CASTING FINISHED', this.castingDigit);
+
+                // send ability to server
+                let entity = global.T5C.selectedEntity;
+                this._room.send("entity_ability", {
+                    senderId: this._room.sessionId,
+                    targetId: entity ? entity.sessionId : false,
+                    digit: this.castingDigit
+                });
+
+                // reset ui and timer
+                this.castingElapsed = 0;
+                this.castingTarget = 0;
+                this.isCasting = false;
+                this.ui._UICastingTimer.isVisible = false;
+                this.ui._UICastingTimer.text = 0;
+            }
         }
 
     }
