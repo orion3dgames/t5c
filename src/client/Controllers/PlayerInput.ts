@@ -1,6 +1,7 @@
 import { Scene } from '@babylonjs/core/scene';
 import { PointerEventTypes } from '@babylonjs/core/Events/pointerEvents';
 import { KeyboardEventTypes } from '@babylonjs/core/Events/keyboardEvents';
+import { Room } from 'colyseus.js';
 
 export class PlayerInput {
 
@@ -25,7 +26,7 @@ export class PlayerInput {
     // 
     public activate_spell_1: boolean = false;
 
-    constructor(scene: Scene, gameroom) {
+    constructor(scene: Scene, gameroom: Room) {
 
         this._scene = scene;
         this._gameroom = gameroom;
@@ -81,21 +82,7 @@ export class PlayerInput {
                 break;
             }
         });
-     
-        scene.registerAfterRender(() => {
 
-            if(this.digit_pressed > 0){
-                // send to server
-                let entity = global.T5C.selectedEntity;
-                this._gameroom.send("entity_ability", {
-                    senderId: this._gameroom.sessionId,
-                    targetId: entity ? entity.sessionId : false,
-                    digit: this.digit_pressed
-                });
-                this.digit_pressed = 0;
-            }
-
-        }) 
     }
 
     //handles what is done when mouse is pressed or moved

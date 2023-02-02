@@ -33,7 +33,7 @@ type Ability = {
     // the effect that will happen when the ability is played
     effect: {
         type?: string, // travel or self
-        effect?: string, // choose from list of effects
+        particule?: string, // choose from list of particule effects
         color?: string // main color of effect
     },
 
@@ -71,7 +71,7 @@ let Abilities:abilityMap = {
         range: 0,
         effect: {
             type: 'target',
-            effect: 'damage',
+            particule: 'damage',
             color: 'white'
         },
         casterPropertyAffected: {},
@@ -86,21 +86,21 @@ let Abilities:abilityMap = {
         icon: "./icons/ABILITY_fireball.png",
         description: "Hurls a massive fiery ball that explodes on contact with target.",
         castSelf: false,
-        castTime: 0,
+        castTime: 1000,
         cooldown: 1000,
         repeat: 0,
         repeatInterval: 0,
         range: 0,
         effect: {
             type: 'travel',
-            effect: 'fireball',
+            particule: 'fireball',
             color: 'orange'
         },
         casterPropertyAffected: {
-            'mana': 50,
+            'mana': 10,
         },
         targetPropertyAffected: {
-            'health': -100,
+            'health': -50,
         },
         requiredToLearn: {
             'level': 3,
@@ -114,19 +114,19 @@ let Abilities:abilityMap = {
         castSelf: false,
         castTime: 0,
         cooldown: 5000,
-        repeat: 10,
+        repeat: 5,
         repeatInterval: 1000,
         range: 0,
         effect: {
             type: 'travel',
-            effect: 'fireball',
+            particule: 'fireball',
             color: 'green'
         },
         casterPropertyAffected: {
-            'mana': 40,
+            'mana': 20,
         },
         targetPropertyAffected: {
-            'health': 50,
+            'health': -10,
         },
         requiredToLearn: {
             'level': 5,
@@ -138,18 +138,18 @@ let Abilities:abilityMap = {
         icon: "./icons/ABILITY_heal.png",
         description: "A spell from ancient times that will leave target feeling fresh & revigorated.",
         castSelf: true,
-        castTime: 1000,
+        castTime: 2000,
         cooldown: 3000,
         repeat: 0,
         repeatInterval: 0,
 	    range: 0,
         effect: {
             type: 'self',
-            effect: 'fireball',
+            particule: 'heal',
             color: 'white'
         },
         casterPropertyAffected: {
-            'mana': 40,
+            'mana': 20,
         },
         targetPropertyAffected: {
             'health': 50,

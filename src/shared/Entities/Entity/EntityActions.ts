@@ -9,10 +9,26 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 
 import State from "../../../client/Screens/Screens";
 import Locations from "../../../shared/Data/Locations";
+import { Abilities } from "../../../shared/Data/Abilities";
 
 export class EntityActions {
 
     private _scene: Scene;
+
+    private colors = {
+        'white': [
+            Color3.FromInts(255, 255, 255),
+            Color3.FromInts(240, 240, 240),
+        ],
+        'green': [
+            Color3.FromInts(64, 141, 33),
+            Color3.FromInts(146, 245, 107),
+        ],
+        'orange': [
+            Color3.FromInts(249, 115, 0),
+            Color3.FromInts(222, 93, 54),
+        ],
+    }
 
     constructor(scene) {
         this._scene = scene;
@@ -20,39 +36,47 @@ export class EntityActions {
 
     public process(data) {
 
+        // get ability
+        let ability = Abilities[data.key];
+
         // get target mesh 
         let mesh = this._scene.getMeshByName(data.targetId+'_mesh');
 
-        // send bullet locally
+        // set start and end pos
         let start = data.fromPos;
         let end = data.targetPos;
+        if(ability.effect.type === 'target'){
+            start = data.targetPos;
+        }
+
+        if(ability.effect.type === 'self'){
+            start = data.fromPos;
+            end = data.fromPos;
+        }
     
-        if(data.key === 'fireball'){
-            this.fireball(
+        // set effect
+        if(ability.effect.particule === 'fireball'){
+            this.particule_fireball(
                 new Vector3(start.x, start.y, start.z), 
                 new Vector3(end.x, end.y, end.z), 
                 mesh,
-                'orange'
+                ability.effect.color
             );
         }
 
-        if(data.key === 'poisonball'){
-            this.fireball(
-                new Vector3(start.x, start.y, start.z), 
-                new Vector3(end.x, end.y, end.z), 
+        if(ability.effect.particule === 'heal'){
+            this.particule_heal(
                 mesh,
-                'green'
+                ability.effect.color
             );
         }
 
-        if(data.key === 'heal'){
-            this.heal(mesh);
-        }
+        
         
 
     }
 
-    public heal(mesh) {
+    public particule_heal(mesh, color) {
         
         //////////////////////////////////////////////
         // create a particle system
@@ -60,9 +84,9 @@ export class EntityActions {
         particleSystem.particleTexture = new Texture("textures/flare.png", this._scene);
         particleSystem.emitter = mesh; // the starting location
         // Colors of all particles
-        particleSystem.color1 = new Color4(0, 1, 0, 1.0);
-        particleSystem.color2 = new Color4(0.1, 1, 0.1, 1.0);
-        particleSystem.colorDead = new Color4(0, 0.2, 0, 0.0);
+        particleSystem.color1 = Color4.FromColor3(this.colors[color][0]);
+        particleSystem.color2 = Color4.FromColor3(this.colors[color][1]);
+        particleSystem.colorDead = new Color4(0, 0, 0, 0.0);
         // Size of each particle (random between...
         particleSystem.minSize = 0.6;
         particleSystem.maxSize = 0.8;
@@ -86,19 +110,14 @@ export class EntityActions {
 
     }
 
-    public fireball(start, end, mesh, color) {
+    public particule_fireball(start, end, mesh, color) {
 
         // calculate angle
         var angle = Math.atan2((start.z - end.z), (start.x - end.x ));
 
-        let colorBall = {
-            'green': Color3.FromInts(64, 141, 33),
-            'orange': Color3.FromInts(249, 115, 0),
-        }
-
         // create material
         var material = new StandardMaterial('player_spell');
-        material.diffuseColor = colorBall[color];
+        material.diffuseColor = this.colors[color][0];
 
         // create mesh
         var projectile = MeshBuilder.CreateSphere('Projectile', {segments: 4, diameter: 0.4}, this._scene);
@@ -113,8 +132,9 @@ export class EntityActions {
         particleSystem.particleTexture = new Texture("textures/flare.png", this._scene);
         particleSystem.emitter = projectile; // the starting location
         // Colors of all particles
-        particleSystem.color1 = Color4.FromColor3(colorBall[color]);
-        particleSystem.colorDead = new Color4(0, 0, 0.2, 0.0);
+        particleSystem.color1 = Color4.FromColor3(this.colors[color][0]);
+        particleSystem.color2 = Color4.FromColor3(this.colors[color][1]);
+        particleSystem.colorDead = new Color4(0, 0, 0, 0.0);
         // Size of each particle (random between...
         particleSystem.minSize = 0.6;
         particleSystem.maxSize = 0.8;

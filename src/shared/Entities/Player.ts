@@ -16,11 +16,18 @@ import { UserInterface } from "../../client/Controllers/UserInterface";
 import { Room } from "colyseus.js";
 import { NavMesh } from "../yuka";
 import Locations from "../Data/Locations";
+import { Abilities } from "../Data/Abilities";
+import { setInterval } from "timers/promises";
 
 export class Player extends Entity {
 
     public input;
     public interval;
+
+    public isCasting: boolean = false;
+    public castingTimer;
+    public castingElapsed: number = 0;
+    public castingTarget: number = 0;
 
     constructor(
         entity:EntityState,
@@ -107,14 +114,152 @@ export class Player extends Entity {
         });
 
         //////////////////////////////////////////////////////////////////////////
-        // player render loop
+        // player before render loop
         this._scene.registerBeforeRender(() => {
 
             // move camera as player moves
             this.cameraController.follow(this.mesh.position);
 
         });
+
+        //////////////////////////////////////////////////////////////////////////
+        // player after render loop
+        /*
+        let isCasting = true;
+        let castingElapsed;
+        let timeThen = Date.now();
+        this._scene.registerAfterRender(() => {
+
+            // every 100ms loop
+            let timeNow = Date.now();
+            let timePassed = (timeNow - timeThen) / 1000;
+            let updateRate = Config.updateRate / 1000; // game is networked update every 100ms
+            if (timePassed >= updateRate) { 
+
+                
+                timeThen = timeNow;
+            }
+
+            // detect input
+            if(this._input.digit_pressed > 0){
+
+                let digit = this._input.digit_pressed;
+                let ability = this.getAbilityFromDigit(digit);
+                let entity = global.T5C.selectedEntity;
+           
+                // check if castime needed
+                if(ability.castTime > 0){
+
+                    let timer = setTimeout(()=>{
+
+                        this._room.send("entity_ability", {
+                            senderId: this._room.sessionId,
+                            targetId: entity ? entity.sessionId : false,
+                            digit: digit
+                        });
+
+                    }, ability.castTime)
+                    
+                }else{
+
+                    this._room.send("entity_ability", {
+                        senderId: this._room.sessionId,
+                        targetId: entity ? entity.sessionId : false,
+                        digit: digit
+                    });
+
+                }
+
+                this._input.digit_pressed = 0;
+            }
+
+        });*/
       
+    }
+
+    public update(){
+
+        // tween entity
+        if(this && this.moveController){
+            this.moveController.tween();
+        }
+        
+        // if casting
+        if(this.isCasting){
+            this.castingElapsed += Config.updateRate / 1000;
+            this.ui._UICastingTimer.text = this.castingElapsed;
+            console.log('CASTING.....', this.castingElapsed, this.castingTarget);
+
+            // cast time has elapsed
+            if( this.castingElapsed === this.castingTarget || this.castingElapsed > this.castingTarget ){
+                console.log('CASTING FINISHED');
+
+                let digit = this._input.digit_pressed;
+                let entity = global.T5C.selectedEntity;
+                this._room.send("entity_ability", {
+                    senderId: this._room.sessionId,
+                    targetId: entity ? entity.sessionId : false,
+                    digit: digit
+                });
+
+                this.castingElapsed = 0;
+                this.castingTarget = 0;
+                this.isCasting = false;
+                this.ui._UICastingTimer.isVisible = false;
+                this.ui._UICastingTimer.text = 0;
+            }
+        }
+
+        // if digit is pressed
+        // and not already casting
+        if(this._input.digit_pressed > 0 && !this.isCasting ){
+
+            // get all necessary vars
+            let digit = this._input.digit_pressed;
+            let ability = this.getAbilityFromDigit(digit);
+            let entity = global.T5C.selectedEntity;
+
+            console.log('PLAYER PRESSED DIGIT', digit);
+
+            // if user has ability in that digit
+            if(ability){
+
+                // if ability must be cast
+                if(ability.castTime > 0){
+
+                    // player is casting
+                    this.isCasting = true;
+                    this.castingElapsed = 0;
+                    this.castingTarget = ability.castTime;
+                    this.ui._UICastingTimer.isVisible = true;
+                    this.ui._UICastingTimer.text = this.castingElapsed;
+
+                    console.log('START CASTING', 0, this.castingTarget);
+                    
+                // else send straight to server
+                }else{
+
+                    console.log('CASTING FINISHED');
+
+                    this._room.send("entity_ability", {
+                        senderId: this._room.sessionId,
+                        targetId: entity ? entity.sessionId : false,
+                        digit: digit
+                    });
+
+                }
+            }
+
+            // in all cases, clear key press after
+            this._input.digit_pressed = 0;
+
+        }
+
+    }
+
+    public getAbilityFromDigit(digit){
+        let ability_no = this.raceData.abilities[digit];
+        return Abilities[ability_no];
     }
 
     //////////////////////////////////////////////////////////////////////////

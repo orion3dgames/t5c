@@ -44,6 +44,9 @@ export class UserInterface {
     private _UIPlayerSelected:UI_EntitySelected;
     private _UIPanel:UI_Panel;
 
+    // 
+    public _UICastingTimer;
+
     constructor(scene: Scene, engine:Engine, gameRoom:Room, chatRoom:Room, entities:Entity[], currentPlayer) {
 
         // set var we will be needing
@@ -117,6 +120,20 @@ export class UserInterface {
     // create misc stuff
     ////////////////////////////
     public createMisc(){
+
+        const castingTimer = new TextBlock("castingTimer");
+        castingTimer.text = "0";
+        castingTimer.color = "#FFF";
+        castingTimer.top = 0; 
+        castingTimer.left = 0; 
+        castingTimer.fontSize = "24px;";
+        castingTimer.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        castingTimer.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        castingTimer.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        castingTimer.horizontalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        castingTimer.isVisible = false;
+        this._playerUI.addControl(castingTimer);
+        this._UICastingTimer = castingTimer;
 
         const panelStack = new StackPanel("panelStack");
         panelStack.left = "15px";

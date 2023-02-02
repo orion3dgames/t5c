@@ -38,25 +38,25 @@ export class EntityAnimator {
         let deathAnimationNumber = raceData.animations['DEATH'];
         let takingDamageAnimationNumber = raceData.animations['DAMAGE'];
 
+        // set animations
         this._idle = this._playerAnimations[idleAnimationNumber];
         this._walk = this._playerAnimations[walkAnimationNumber];
         this._attack = this._playerAnimations[attackAnimationNumber];
         this._death = this._playerAnimations[deathAnimationNumber];
         this._damage = this._playerAnimations[takingDamageAnimationNumber];
 
-        // prepare animations
-        //this._scene.stopAllAnimations();
+        // stop all animations
         this._playerAnimations[0].stop();
 
-        //
+        // set if animation is looped
         this._idle.loopAnimation = true;
-
         this._walk.loopAnimation = true;
-        this._walk.speedRatio = raceData.animationSpeed;
-
         this._attack.loopAnimation = true;
         this._death.loopAnimation = false;
         this._damage.loopAnimation = true;
+
+        // set animation speed
+        this._walk.speedRatio = raceData.animationSpeed;
 
         //initialize current and previous
         this._currentAnim = this._idle;
@@ -65,11 +65,8 @@ export class EntityAnimator {
     }
 
     // 
-    private checkIfPlayerIsMoving(currentPos:Vector3, nextPos:Vector3, precision = 5):boolean{
-        return !currentPos.equalsWithEpsilon(nextPos, 0.001);
-        /*
-        return  currentPos.x.toFixed(precision) !== nextPos.x.toFixed(precision) || 
-                currentPos.z.toFixed(precision) !== nextPos.z.toFixed(precision)*/
+    private checkIfPlayerIsMoving(currentPos:Vector3, nextPos:Vector3, epsilon = 0.001):boolean{
+        return !currentPos.equalsWithEpsilon(nextPos, epsilon);
     }
 
     ///////////////////////////
@@ -78,22 +75,18 @@ export class EntityAnimator {
 
         // if position has changed
         if (this.checkIfPlayerIsMoving(currentPos, nextPos)) {
-            //console.log('SAME', player.type, currentPos, nextPos, this.checkIfPlayerIsMoving(currentPos, nextPos));
             this._currentAnim = this._walk;
 
         // if player has died
-        }else if(player.state === EntityCurrentState.DEAD){
-            
+        }else if(player.state === EntityCurrentState.DEAD){  
             this._currentAnim = this._death;
 
         // if player is attacking
-        }else if(player.state === EntityCurrentState.ATTACK){
-                    
+        }else if(player.state === EntityCurrentState.ATTACK){       
             this._currentAnim = this._attack;
 
         // if player is being attacked
-        }else if(player.state === EntityCurrentState.TAKING_DAMAGE){
-                            
+        }else if(player.state === EntityCurrentState.TAKING_DAMAGE){             
             this._currentAnim = this._damage;
 
         // all other cases, should be idle    
@@ -101,7 +94,7 @@ export class EntityAnimator {
             this._currentAnim = this._idle;
         }
 
-        //
+        // play animation and stop previous animation
         if (this._currentAnim != null && this._prevAnim !== this._currentAnim) {
             this._prevAnim.stop();
             this._currentAnim.play(this._currentAnim.loopAnimation);
