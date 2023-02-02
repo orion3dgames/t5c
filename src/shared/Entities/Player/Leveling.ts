@@ -29,6 +29,7 @@ export class Leveling {
         let xpEarned = experience;
         let xpMin = LEVEL_EXPERIENCE[currentLevel-1];
         let xpMax = LEVEL_EXPERIENCE[currentLevel];
+        // daydd a toi de bosser la, il faut retourner le pourcentage pour que je puisse afficher la progression du level
         //console.log((xpEarned/xpMin) - (xpMax-xpMin) * 100);
     }
 
