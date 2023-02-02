@@ -9,6 +9,10 @@ Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 - global chat (works accross zones)
 - server controlled collisions
 - persistence with mysql lite
+- abilities
+- roadming monsters (with basic ai & attacks)
+- selecting characters and monsters
+- and more...
 
 ## Roadmap
 You can follow the progress here: [FORUM POST](https://forum.babylonjs.com/t/multiplayer-top-down-rpg-babylon-js-colyseus/35733/12)
@@ -30,4 +34,4 @@ You can follow the progress here: [FORUM POST](https://forum.babylonjs.com/t/mul
 - Run `yarn server-dev`
 
 The client should be accessible at [`http://localhost:8080`](http://localhost:8080).
-The WebSocket server should be available locally at `ws://localhost:2567`, and [http://localhost:2567](http://localhost:2567) should be accessible.
+The WebSocket server should be available locally at `ws://localhost:3000`, and [http://localhost:3000](http://localhost:3000) should be accessible.

@@ -148,8 +148,7 @@ export class Entity {
             // animate player continuously
             this.animatorController.animate(this, this.mesh.position, this.moveController.getNextPosition());
 
-            // if entity is selected, show 
-            //console.log(this.debugMesh, global.T5C.selectedEntity);
+            // if entity is selected, show
             if(this.selectedMesh && this.selectedMesh.visibility){
                 if(global.T5C.selectedEntity && global.T5C.selectedEntity.sessionId === this.sessionId){
                     this.selectedMesh.isVisible = true;

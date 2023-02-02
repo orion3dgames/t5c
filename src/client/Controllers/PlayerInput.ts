@@ -23,9 +23,6 @@ export class PlayerInput {
     // digits
     public digit_pressed: number = 0;
 
-    // 
-    public activate_spell_1: boolean = false;
-
     constructor(scene: Scene, gameroom: Room) {
 
         this._scene = scene;
