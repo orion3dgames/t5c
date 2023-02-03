@@ -51,3 +51,4 @@ database.db
 database.db-journal
 
 public/models/Spider/*
+*.bkp
