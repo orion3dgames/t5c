@@ -190,7 +190,11 @@ export class PlayerState extends EntityState {
 
   addExperience(amount){
     this.experience += amount;
-    //this.level = Leveling.getLevel(this.experience);
+    this.level = Leveling.convertXpToLevel(this.experience);
+    /*
+    // TODO: if player has levelled up, the notify player somehow
+    if(Leveling.doesPlayerlevelUp(this.level, this.experience, amount)){
+    }*/
   }
 
   getPosition(){

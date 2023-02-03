@@ -1,7 +1,7 @@
 import { Client, Room } from "colyseus.js";
 import { Options } from "@colyseus/loadtest";
 
-import { node_http } from "../../shared/Utils";
+import node_http from "../../shared/Utils/node_http";
 import Config from "../../shared/Config";
 
 function findCurrentRoom(currentRoomKey):Promise<any> {

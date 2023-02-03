@@ -30,6 +30,9 @@ type Ability = {
     // range this ability affects (any entity in this range will be affected the same)
     range: number, 
 
+    // max range this ability affects (if entity is further, prevent casting)
+    maxRange: number,
+
     // the effect that will happen when the ability is played
     effect: {
         type?: string, // travel or self
@@ -69,6 +72,7 @@ let Abilities:abilityMap = {
         repeat: 0,
         repeatInterval: 0,
         range: 0,
+        maxRange: 2,
         effect: {
             type: 'target',
             particule: 'damage',
@@ -91,6 +95,7 @@ let Abilities:abilityMap = {
         repeat: 0,
         repeatInterval: 0,
         range: 0,
+        maxRange: 10,
         effect: {
             type: 'travel',
             particule: 'fireball',
@@ -117,6 +122,7 @@ let Abilities:abilityMap = {
         repeat: 5,
         repeatInterval: 1000,
         range: 0,
+        maxRange: 10,
         effect: {
             type: 'travel',
             particule: 'fireball',
@@ -143,6 +149,7 @@ let Abilities:abilityMap = {
         repeat: 0,
         repeatInterval: 0,
 	    range: 0,
+        maxRange: 10,
         effect: {
             type: 'self',
             particule: 'heal',

@@ -1,5 +1,4 @@
 import request from './requests'
-import node_http from './node_http'
 import Config from "../Config";
 
 const countPlayers = function(object){
@@ -91,7 +90,6 @@ const getHealthColorFromValue = function(value){
 
 export {
     request,
-    node_http,
     generateRandomPlayerName,
     apiUrl,
     roundToTwo,

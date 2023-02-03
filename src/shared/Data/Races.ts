@@ -66,7 +66,7 @@ let Races:raceDataMap = {
         healthRegen: 0.2,
         maxMana: 100,
         manaRegen: 0.4, // per second
-        experienceGain: 250,
+        experienceGain: 500,
         damage_multiplier: 1.3,
         abilities: {
             1: 'base_attack',
@@ -89,7 +89,7 @@ let Races:raceDataMap = {
         healthRegen: 0.2,
         maxMana: 100,
         manaRegen: 0.4, // per second
-        experienceGain: 100,
+        experienceGain: 1000,
         damage_multiplier: 1,
         abilities: {
             1: 'base_attack',
