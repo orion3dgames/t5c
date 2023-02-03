@@ -1,13 +1,12 @@
-import State from "../client/Screens/Screens"
+import State from "../client/Screens/Screens";
 import Locations from "./Data/Locations";
 import { isLocal } from "./Utils";
 
 let Config = {
-    
     // general settings
     title: "T5C",
     version: "Version 0.2.1",
-    lang: 'en',
+    lang: "en",
 
     // server settings
     serverUrlLocal: "ws://localhost:3000",
@@ -15,12 +14,12 @@ let Config = {
     serverUrlProduction: "wss://t5c.onrender.com",
     apiUrlProduction: "https://t5c.onrender.com",
     maxClients: 20, // set maximum clients per room
-    updateRate: 100, // Set frequency the patched state should be sent to all clients, in milliseconds 
+    updateRate: 100, // Set frequency the patched state should be sent to all clients, in milliseconds
     databaseUpdateRate: 1000, // the frequency at which server save players position
     logLevel: "info",
 
     // database settings
-    databaseLocation: './database.db',
+    databaseLocation: "./database.db",
 
     // game settings
     PLAYER_NAMEPLATE_TIMEOUT: 15000, // 15 seconds
@@ -30,7 +29,7 @@ let Config = {
     MONSTER_ATTACK_DISTANCE: 2,
 
     // UI SETTINGS
-    UI_CENTER_PANEL_WIDTH: .6,
+    UI_CENTER_PANEL_WIDTH: 0.6,
     UI_CENTER_PANEL_BG: "rgba(0,0,0,.5)",
 
     // players settings
@@ -42,7 +41,7 @@ let Config = {
     initialLocation: "lh_town",
 
     // functions
-    setDefault(){
+    setDefault() {
         global.T5C = {
             nextScene: isLocal() ? State.GAME : State.LOGIN,
             //nextScene: State.LOGIN,
@@ -50,14 +49,13 @@ let Config = {
             currentSessionID: "",
             currentLocation: Locations[Config.initialLocation],
             currentUser: false,
-            currentMs: 0
-        }
+            currentMs: 0,
+        };
     },
 
-    goToScene(newState: State){
+    goToScene(newState: State) {
         global.T5C.nextScene = newState;
-    }
+    },
+};
 
-}
-
-export default Config
+export default Config;

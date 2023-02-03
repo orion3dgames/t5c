@@ -12,72 +12,53 @@ import Locations from "../../../shared/Data/Locations";
 import { Abilities } from "../../../shared/Data/Abilities";
 
 export class EntityActions {
-
     private _scene: Scene;
 
     private colors = {
-        'white': [
-            Color3.FromInts(255, 255, 255),
-            Color3.FromInts(240, 240, 240),
-        ],
-        'green': [
-            Color3.FromInts(64, 141, 33),
-            Color3.FromInts(146, 245, 107),
-        ],
-        'orange': [
-            Color3.FromInts(249, 115, 0),
-            Color3.FromInts(222, 93, 54),
-        ],
-    }
+        white: [Color3.FromInts(255, 255, 255), Color3.FromInts(240, 240, 240)],
+        green: [Color3.FromInts(64, 141, 33), Color3.FromInts(146, 245, 107)],
+        orange: [Color3.FromInts(249, 115, 0), Color3.FromInts(222, 93, 54)],
+    };
 
     constructor(scene) {
         this._scene = scene;
     }
 
     public process(data) {
-
         // get ability
         let ability = Abilities[data.key];
 
-        // get target mesh 
-        let mesh = this._scene.getMeshByName(data.targetId+'_mesh');
+        // get target mesh
+        let mesh = this._scene.getMeshByName(data.targetId + "_mesh");
 
         // set start and end pos
         let start = data.fromPos;
         let end = data.targetPos;
-        if(ability.effect.type === 'target'){
+        if (ability.effect.type === "target") {
             start = data.targetPos;
         }
 
-        if(ability.effect.type === 'self'){
+        if (ability.effect.type === "self") {
             start = data.fromPos;
             end = data.fromPos;
         }
-    
+
         // set effect
-        if(ability.effect.particule === 'fireball'){
+        if (ability.effect.particule === "fireball") {
             this.particule_fireball(
-                new Vector3(start.x, start.y, start.z), 
-                new Vector3(end.x, end.y, end.z), 
+                new Vector3(start.x, start.y, start.z),
+                new Vector3(end.x, end.y, end.z),
                 mesh,
                 ability.effect.color
             );
         }
 
-        if(ability.effect.particule === 'heal'){
-            this.particule_heal(
-                mesh,
-                ability.effect.color
-            );
+        if (ability.effect.particule === "heal") {
+            this.particule_heal(mesh, ability.effect.color);
         }
-
-        
-        
-
     }
 
     public particule_heal(mesh, color) {
-        
         //////////////////////////////////////////////
         // create a particle system
         var particleSystem = new ParticleSystem("particles", 2000, this._scene);
@@ -104,27 +85,25 @@ export class EntityActions {
         particleSystem.start();
         //////////////////////////////////////////////
 
-        setTimeout(()=>{
+        setTimeout(() => {
             particleSystem.dispose(true);
         }, 1000);
-
     }
 
     public particule_fireball(start, end, mesh, color) {
-
         // calculate angle
-        var angle = Math.atan2((start.z - end.z), (start.x - end.x ));
+        var angle = Math.atan2(start.z - end.z, start.x - end.x);
 
         // create material
-        var material = new StandardMaterial('player_spell');
+        var material = new StandardMaterial("player_spell");
         material.diffuseColor = this.colors[color][0];
 
         // create mesh
-        var projectile = MeshBuilder.CreateSphere('Projectile', {segments: 4, diameter: 0.4}, this._scene);
+        var projectile = MeshBuilder.CreateSphere("Projectile", { segments: 4, diameter: 0.4 }, this._scene);
         projectile.material = material;
         projectile.position = start.clone();
         projectile.position.y = 2;
-        projectile.rotation.y = (Math.PI/2) - angle;
+        projectile.rotation.y = Math.PI / 2 - angle;
 
         //////////////////////////////////////////////
         // create a particle system
@@ -151,25 +130,23 @@ export class EntityActions {
         // Start the particle system
         particleSystem.start();
         //////////////////////////////////////////////
-  
+
         var endVector = projectile.calcMovePOV(0, 0, 72).addInPlace(projectile.position);
         var points = [start, endVector];
         var path = new Path3D(points);
         var i = 0;
-        var loop =  this._scene.onBeforeRenderObservable.add(() => {
+        var loop = this._scene.onBeforeRenderObservable.add(() => {
             if (i < 1) {
-                projectile.position = path.getPointAt(i); 
+                projectile.position = path.getPointAt(i);
                 i += 5e-3;
             }
-            if(projectile.intersectsMesh(mesh) || i > 1){
+            if (projectile.intersectsMesh(mesh) || i > 1) {
                 projectile.dispose(true, true);
                 particleSystem.dispose(true);
                 this._scene.onBeforeRenderObservable.remove(loop);
             }
         });
-
     }
-
 
     public async teleport(room, location) {
         await room.leave();
@@ -177,5 +154,4 @@ export class EntityActions {
         global.T5C.currentCharacter.location = location;
         global.T5C.nextScene = State.GAME;
     }
-
 }

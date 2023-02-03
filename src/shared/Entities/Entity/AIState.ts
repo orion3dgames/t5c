@@ -1,6 +1,6 @@
-export enum AI_STATE { 
-    IDLE = 0, 
+export enum AI_STATE {
+    IDLE = 0,
     WANDER = 1,
     SEEKING = 2,
-    ATTACKING = 3
+    ATTACKING = 3,
 }

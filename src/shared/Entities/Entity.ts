@@ -24,7 +24,6 @@ import Config from "../Config";
 import Races from "../Data/Races";
 
 export class Entity {
-    
     public _scene: Scene;
     public _room;
     public ui;
@@ -40,7 +39,7 @@ export class Entity {
     public utilsController: EntityUtils;
     public actionsController: EntityActions;
     public meshController: EntityMesh;
-    
+
     // entity
     public mesh: AbstractMesh; //outer collisionbox of player
     public playerMesh: AbstractMesh; //outer collisionbox of player
@@ -50,7 +49,7 @@ export class Entity {
     public characterLabel: Rectangle;
     public sessionId: string;
     public entity: EntityState;
-    public isCurrentPlayer:boolean;
+    public isCurrentPlayer: boolean;
 
     // character
     public type: string = "";
@@ -74,15 +73,14 @@ export class Entity {
     public blocked: boolean = false; // if true, player will not moved
 
     constructor(
-        entity:EntityState,
-        room:Room, 
-        scene: Scene, 
-        ui:UserInterface,
-        shadow:CascadedShadowGenerator, 
-        navMesh:NavMesh,
-        assetsContainer:AssetContainer[],
+        entity: EntityState,
+        room: Room,
+        scene: Scene,
+        ui: UserInterface,
+        shadow: CascadedShadowGenerator,
+        navMesh: NavMesh,
+        assetsContainer: AssetContainer[]
     ) {
- 
         // setup class variables
         this._scene = scene;
         this._room = room;
@@ -94,7 +92,7 @@ export class Entity {
         this.isCurrentPlayer = this._room.sessionId === entity.sessionId;
         this.entity = entity;
         this.raceData = Races[entity.race];
-        
+
         // update player data from server data
         Object.assign(this, this.entity);
 
@@ -103,9 +101,14 @@ export class Entity {
     }
 
     public async spawn(entity) {
-
         // load mesh controllers
-        this.meshController = new EntityMesh(this._scene, this.assetsContainer, this.entity, this._room, this.isCurrentPlayer);
+        this.meshController = new EntityMesh(
+            this._scene,
+            this.assetsContainer,
+            this.entity,
+            this._room,
+            this.isCurrentPlayer
+        );
         await this.meshController.load();
         this.mesh = this.meshController.mesh;
         this.playerMesh = this.meshController.playerMesh;
@@ -124,7 +127,6 @@ export class Entity {
         // entity network event
         // colyseus automatically sends entity updates, so let's listen to those changes
         this.entity.onChange(() => {
-
             // make sure players are always visible
             this.playerMesh.isVisible = true;
 
@@ -138,69 +140,64 @@ export class Entity {
             if (this.isCurrentPlayer && !this.blocked) {
                 this.moveController.reconcileMove(this.entity.sequence); // set default entity position
             }
-
         });
 
         //////////////////////////////////////////////////////////////////////////
         // player render loop
         this._scene.registerBeforeRender(() => {
-
             // animate player continuously
             this.animatorController.animate(this, this.mesh.position, this.moveController.getNextPosition());
 
             // if entity is selected, show
-            if(this.selectedMesh && this.selectedMesh.visibility){
-                if(global.T5C.selectedEntity && global.T5C.selectedEntity.sessionId === this.sessionId){
+            if (this.selectedMesh && this.selectedMesh.visibility) {
+                if (global.T5C.selectedEntity && global.T5C.selectedEntity.sessionId === this.sessionId) {
                     this.selectedMesh.isVisible = true;
-                }else{
+                } else {
                     this.selectedMesh.isVisible = false;
                 }
             }
-
         });
 
         //////////////////////////////////////////////////////////////////////////
         // misc
         this.characterLabel = this.ui.createEntityLabel(this);
         this.characterChatLabel = this.ui.createEntityChatLabel(this);
-      
     }
 
-    public update(){
-
-        if(this.AI_CURRENT_STATE === AI_STATE.SEEKING || this.AI_CURRENT_STATE === AI_STATE.ATTACKING){
-            this.debugMesh.material = this._scene.getMaterialByName('debug_entity_active');
+    public update() {
+        if (this.AI_CURRENT_STATE === AI_STATE.SEEKING || this.AI_CURRENT_STATE === AI_STATE.ATTACKING) {
+            this.debugMesh.material = this._scene.getMaterialByName("debug_entity_active");
         }
 
-        if(this.AI_CURRENT_STATE === AI_STATE.WANDER){
-            this.debugMesh.material = this._scene.getMaterialByName('debug_entity_neutral');
+        if (this.AI_CURRENT_STATE === AI_STATE.WANDER) {
+            this.debugMesh.material = this._scene.getMaterialByName("debug_entity_neutral");
         }
 
         // tween entity
-        if(this && this.moveController){
+        if (this && this.moveController) {
             this.moveController.tween();
         }
     }
 
     // basic performance (only enable entities in a range around the player)
-    public lod(_currentPlayer){
-        this.mesh.setEnabled(false); 
+    public lod(_currentPlayer) {
+        this.mesh.setEnabled(false);
         let entityPos = this.position();
         let playerPos = _currentPlayer.position();
         let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
-        if(distanceFromPlayer < Config.PLAYER_VIEW_DISTANCE){
-            this.mesh.setEnabled(true); 
-        } 
+        if (distanceFromPlayer < Config.PLAYER_VIEW_DISTANCE) {
+            this.mesh.setEnabled(true);
+        }
     }
 
     public position() {
         return new Vector3(this.x, this.y, this.z);
-     }
+    }
 
     public remove() {
-       this.characterLabel.dispose();
-       this.characterChatLabel.dispose();
-       this.mesh.dispose();
-       global.T5C.selectedEntity = false;
+        this.characterLabel.dispose();
+        this.characterChatLabel.dispose();
+        this.mesh.dispose();
+        global.T5C.selectedEntity = false;
     }
 }

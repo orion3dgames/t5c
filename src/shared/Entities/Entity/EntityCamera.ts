@@ -14,14 +14,12 @@ export class EntityCamera {
         this._build();
     }
 
-    degrees_to_radians(degrees)
-    {
+    degrees_to_radians(degrees) {
         var pi = Math.PI;
-        return degrees * (pi/180);
+        return degrees * (pi / 180);
     }
 
     private _build() {
-
         // root camera parent that handles positioning of the camera to follow the player
         this._camRoot = new TransformNode("root");
         this._camRoot.position = new Vector3(0, 0, 0); //initialized at (0,0,0)
@@ -33,7 +31,7 @@ export class EntityCamera {
         let yTilt = new TransformNode("ytilt");
 
         // adjustments to camera view to point down at our player
-        yTilt.rotation = new Vector3(0.60, 0, 0);
+        yTilt.rotation = new Vector3(0.6, 0, 0);
         yTilt.parent = this._camRoot;
 
         // our actual camera that's pointing at our root's position
@@ -44,22 +42,22 @@ export class EntityCamera {
 
         // set as active camera
         this._scene.activeCamera = this.camera;
-
     }
 
     public follow(playerPosition): void {
-
-        // camera must follow player 
+        // camera must follow player
         let centerPlayer = playerPosition.y + 2;
-        this._camRoot.position = Vector3.Lerp(this._camRoot.position, new Vector3(playerPosition.x, centerPlayer, playerPosition.z), 0.4);
+        this._camRoot.position = Vector3.Lerp(
+            this._camRoot.position,
+            new Vector3(playerPosition.x, centerPlayer, playerPosition.z),
+            0.4
+        );
 
         // rotate camera around the Y position if right click is true
         if (this._input.right_click) {
-
             // ddaydd to implement
             //let rotationY = this.camera.rotation.y -= this._input.h;
             //this.camera.rotation = new Vector3(0, rotationY, 0);
         }
     }
-
 }

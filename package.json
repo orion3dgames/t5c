@@ -13,7 +13,7 @@
     "server-dev": "ts-node-dev --respawn --transpile-only src/server/index.ts",
     "server-start": "ts-node --transpile-only src/server/index.ts",
     "server-build": "tsc",
-    "loadtest": "npx colyseus-loadtest ./src/server/loadtest/test.ts --room game_room --numClients 1 --endpoint ws://localhost:3000"
+    "loadtest": "npx colyseus-loadtest ./src/server/loadtest/test.ts --room game_room --numClients 10 --endpoint ws://localhost:3000"
   },
   "author": "",
   "license": "ISC",

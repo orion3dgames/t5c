@@ -1,7 +1,6 @@
 import { Scene } from "@babylonjs/core/scene";
 
 export class EntityUtils {
-
     private _scene: Scene;
     private _room;
 
@@ -9,5 +8,4 @@ export class EntityUtils {
         this._scene = scene;
         this._room = room;
     }
-    
 }

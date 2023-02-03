@@ -4,7 +4,6 @@ import Config from "../../Config";
 import Races from "../../../shared/Data/Races";
 
 export class EntityAnimator {
-
     private entityType;
 
     //animations
@@ -20,7 +19,6 @@ export class EntityAnimator {
     private _prevAnim: AnimationGroup;
 
     constructor(player_animations: AnimationGroup[], entityType) {
-
         this._playerAnimations = player_animations;
         this.entityType = entityType;
 
@@ -28,15 +26,14 @@ export class EntityAnimator {
     }
 
     private _build(): void {
-
         let raceData = Races[this.entityType];
 
         // find animations
-        let idleAnimationNumber = raceData.animations['IDLE'];
-        let walkAnimationNumber = raceData.animations['WALK'];
-        let attackAnimationNumber = raceData.animations['ATTACK'];
-        let deathAnimationNumber = raceData.animations['DEATH'];
-        let takingDamageAnimationNumber = raceData.animations['DAMAGE'];
+        let idleAnimationNumber = raceData.animations["IDLE"];
+        let walkAnimationNumber = raceData.animations["WALK"];
+        let attackAnimationNumber = raceData.animations["ATTACK"];
+        let deathAnimationNumber = raceData.animations["DEATH"];
+        let takingDamageAnimationNumber = raceData.animations["DAMAGE"];
 
         // set animations
         this._idle = this._playerAnimations[idleAnimationNumber];
@@ -61,35 +58,33 @@ export class EntityAnimator {
         //initialize current and previous
         this._currentAnim = this._idle;
         this._prevAnim = this._idle;
-
     }
 
-    // 
-    private checkIfPlayerIsMoving(currentPos:Vector3, nextPos:Vector3, epsilon = 0.001):boolean{
+    //
+    private checkIfPlayerIsMoving(currentPos: Vector3, nextPos: Vector3, epsilon = 0.001): boolean {
         return !currentPos.equalsWithEpsilon(nextPos, epsilon);
     }
 
     ///////////////////////////
     // todo: to be improved so we can better control the states... have no idea how yet
     public animate(player, currentPos, nextPos): void {
-
         // if position has changed
         if (this.checkIfPlayerIsMoving(currentPos, nextPos)) {
             this._currentAnim = this._walk;
 
-        // if player has died
-        }else if(player.state === EntityCurrentState.DEAD){  
+            // if player has died
+        } else if (player.state === EntityCurrentState.DEAD) {
             this._currentAnim = this._death;
 
-        // if player is attacking
-        }else if(player.state === EntityCurrentState.ATTACK){       
+            // if player is attacking
+        } else if (player.state === EntityCurrentState.ATTACK) {
             this._currentAnim = this._attack;
 
-        // if player is being attacked
-        }else if(player.state === EntityCurrentState.TAKING_DAMAGE){             
+            // if player is being attacked
+        } else if (player.state === EntityCurrentState.TAKING_DAMAGE) {
             this._currentAnim = this._damage;
 
-        // all other cases, should be idle    
+            // all other cases, should be idle
         } else {
             this._currentAnim = this._idle;
         }
@@ -101,5 +96,4 @@ export class EntityAnimator {
             this._prevAnim = this._currentAnim;
         }
     }
-
 }

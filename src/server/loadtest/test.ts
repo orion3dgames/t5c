@@ -4,12 +4,12 @@ import { Options } from "@colyseus/loadtest";
 import node_http from "../../shared/Utils/node_http";
 import Config from "../../shared/Config";
 
-function findCurrentRoom(currentRoomKey):Promise<any> {
+function findCurrentRoom(currentRoomKey): Promise<any> {
     return new Promise(async (resolve: any, reject: any) => {
         let rooms = await this._client.getAvailableRooms("game_room");
-        if(rooms.length > 0){
+        if (rooms.length > 0) {
             rooms.forEach((room) => {
-                if(room.metadata.location === currentRoomKey){ 
+                if (room.metadata.location === currentRoomKey) {
                     resolve(room);
                 }
             });
@@ -24,29 +24,30 @@ export async function main(options: Options) {
     // get room
     let foundRoom;
     let rooms = await client.getAvailableRooms("game_room");
-    if(rooms.length > 0){
+    if (rooms.length > 0) {
         rooms.forEach((r) => {
-            if(r.metadata.location === 'lh_town'){ 
+            if (r.metadata.location === "lh_town") {
                 foundRoom = r;
             }
         });
     }
 
-    // get random user 
-    let req = await node_http(Config.apiUrlLocal+'/returnRandomUser');
+    // get random user
+    let req = await node_http(Config.apiUrlLocal + "/returnRandomUser");
     let character = req.user;
 
     // join room
-    const room: Room = await client.joinById(foundRoom.roomId, { 
+    const room: Room = await client.joinById(foundRoom.roomId, {
         token: character.token,
-        character_id: character.id
+        character_id: character.id,
     });
 
-    console.log("joined successfully!", options);
+    console.log("joined successfully!");
 
     //
-    room.onMessage("message-type", (payload) => {
+    room.onMessage("*", (payload) => {
         // logic
+        console.log(payload);
     });
 
     //
@@ -56,6 +57,6 @@ export async function main(options: Options) {
 
     //
     room.onLeave((code) => {
-        console.log("left");
+        console.error("left", code);
     });
 }

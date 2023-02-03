@@ -1,5 +1,5 @@
-export enum EntityCurrentState { 
-    IDLE = 0, 
+export enum EntityCurrentState {
+    IDLE = 0,
     WALKING = 1,
     RUNNING = 2,
     ATTACK = 3,
