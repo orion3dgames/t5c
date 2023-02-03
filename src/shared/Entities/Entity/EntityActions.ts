@@ -106,7 +106,7 @@ export class EntityActions {
 
         setTimeout(()=>{
             particleSystem.dispose(true);
-        }, 2000);
+        }, 1000);
 
     }
 

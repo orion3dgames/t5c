@@ -29,6 +29,8 @@ export class Player extends Entity {
     public castingElapsed: number = 0;
     public castingTarget: number = 0;
 
+    public ability_in_cooldown;
+
     constructor(
         entity:EntityState,
         room:Room, 
@@ -42,6 +44,20 @@ export class Player extends Entity {
         super(entity, room, scene, ui, shadow, navMesh, assetsContainer);
 
         this._input = input;
+
+        this.ability_in_cooldown = [
+            false, 
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+        ];
 
         this.spawnPlayer()
     }
@@ -138,7 +154,7 @@ export class Player extends Entity {
             // get all necessary vars
             let digit = this._input.digit_pressed;
             let ability = this.getAbilityFromDigit(digit);
-            let entity = global.T5C.selectedEntity;
+            let target = global.T5C.selectedEntity;
 
             console.log('PLAYER PRESSED DIGIT', digit);
 
@@ -165,7 +181,7 @@ export class Player extends Entity {
 
                     this._room.send("entity_ability", {
                         senderId: this._room.sessionId,
-                        targetId: entity ? entity.sessionId : false,
+                        targetId: target ? target.sessionId : false,
                         digit: digit
                     });
 

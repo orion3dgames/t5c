@@ -86,7 +86,7 @@ let Abilities:abilityMap = {
         icon: "./icons/ABILITY_fireball.png",
         description: "Hurls a massive fiery ball that explodes on contact with target.",
         castSelf: false,
-        castTime: 1000,
+        castTime: 5000,
         cooldown: 1000,
         repeat: 0,
         repeatInterval: 0,
@@ -100,7 +100,7 @@ let Abilities:abilityMap = {
             'mana': 10,
         },
         targetPropertyAffected: {
-            'health': -50,
+            'health': -200,
         },
         requiredToLearn: {
             'level': 3,

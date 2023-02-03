@@ -191,8 +191,8 @@ export class UI_EntitySelected {
             this._entityNameTxt.text = entity.name;
 
             let level = entity.level;
-            let progress = Leveling.getLevelProgress(entity.experience);
             if(this._options.currentPlayer){
+                let progress = Leveling.getLevelProgress(entity.experience);
                 this._entityLevelTxt.text = "Lvl:"+level+" Exp:"+entity.experience+" \n Progress:"+progress+"%";
             }else{
                 this._entityLevelTxt.text = "Lvl: "+level;
