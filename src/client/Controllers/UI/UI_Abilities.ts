@@ -27,15 +27,17 @@ export class UI_Abilities {
         // add ui events
         this._createEvents();
 
+        this._createTooltip();
+
     }
 
-    _createUI(){
+    _createTooltip(){
 
         let width = 330;
 
         // add tooltip 
         const toolTipPanel = new Rectangle("toolTipPanel");
-        toolTipPanel.top = "-190px";
+        toolTipPanel.top = "-200px";
         toolTipPanel.left = 0;
         toolTipPanel.width = width+"px";
         toolTipPanel.adaptHeightToChildren = true;
@@ -65,10 +67,15 @@ export class UI_Abilities {
         toolTipText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         toolTipPanel.addControl(toolTipText);
         this._tooltipTxt = toolTipText;
+    }
+
+    _createUI(){
+
+        let width = 330;
 
         // add stack panel
         const abilityPanel = new Rectangle("abilityPanel");
-        abilityPanel.top = "-150px;"
+        abilityPanel.top = "-13px;"
         abilityPanel.width = width+"px";
         abilityPanel.adaptHeightToChildren = true;
         abilityPanel.thickness = 0;

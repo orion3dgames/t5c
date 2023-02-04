@@ -23,6 +23,7 @@ import State from "../Screens/Screens";
 import { Entity } from "../../shared/Entities/Entity";
 import { getHealthColorFromValue } from "../../shared/Utils";
 import Config from "../../shared/Config";
+import { Leveling } from "../../shared/Entities/Player/Leveling";
 
 export class UserInterface {
     
@@ -37,12 +38,17 @@ export class UserInterface {
     //UI Elements
     private _playerUI;
     private _namesUI;
+    private _centerUI;
     private _UIChat:UI_Chats; 
     private _UIAbilities:UI_Abilities; 
     private _UIDebug:UI_Debug;
     private _UITargetSelected:UI_EntitySelected; 
     private _UIPlayerSelected:UI_EntitySelected;
     private _UIPanel:UI_Panel;
+
+    // experience bar
+    private experienceBarUI;
+    private experienceBarUIText;
 
     // 
     public _UICastingTimer;
@@ -67,16 +73,30 @@ export class UserInterface {
         this._playerUI = playerUI;
         this._playerUI.idealHeight = 720;
 
+        // center panel
+        const centerPanel = new Rectangle("centerPanel");
+        centerPanel.top = "0px;"
+        centerPanel.height = "170px";
+        centerPanel.width = "400px";
+        centerPanel.thickness = 0;
+        centerPanel.background = Config.UI_CENTER_PANEL_BG;
+        centerPanel.alpha = 1;
+        centerPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        centerPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        this._playerUI.addControl(centerPanel);
+        this._centerUI = centerPanel;
+
         /////////////////////////////////////
         // create interface
         this.createMisc();
+        this.experienceBar();
 
         // some ui must be constantly refreshed as things change
         this._scene.registerBeforeRender(() => {
 
             // refresh 
             //this._refreshDebugPanel(debugTextUI);
-            //this.refreshEntityUI();
+            this.refreshEntityUI();
             
         });
         
@@ -89,11 +109,11 @@ export class UserInterface {
         // set current player
         this._currentPlayer = currentPlayer;
 
-        // create chat ui + events
-        this._UIChat = new UI_Chats(this._playerUI, this._chatRoom, currentPlayer, this._entities);
- 
         // create abilities ui + events
-        this._UIAbilities = new UI_Abilities(this._playerUI, this._gameRoom, currentPlayer);
+        this._UIAbilities = new UI_Abilities(this._centerUI, this._gameRoom, currentPlayer);
+
+        // create chat ui + events
+        this._UIChat = new UI_Chats(this._centerUI, this._chatRoom, currentPlayer, this._entities);
 
         // create debug ui + events
         //this._UIDebug = new UI_Debug(this._playerUI, this._engine, this._scene, this._gameRoom, this._currentPlayer, this._entities);
@@ -107,6 +127,15 @@ export class UserInterface {
     }
 
     public refreshEntityUI(){
+
+        if(this._currentPlayer){
+            let progress = Leveling.getLevelProgress(this._currentPlayer.experience);
+            this.experienceBarUI.width = progress / 100;
+            this.experienceBarUIText.text = progress+"%";
+        }
+            
+
+        /*
         for(let sessionId in this._entities){
             let player = this._entities[sessionId];
             // update player color outline
@@ -114,7 +143,51 @@ export class UserInterface {
             if(mesh){
                 mesh.outlineColor = Color3.FromHexString(getHealthColorFromValue(player.health));
             }
-        }        
+        } */   
+    }
+
+
+    public experienceBar(){
+
+        /////////////////////////////////////
+        //////////////////// mana bar
+        const experienceBar = new Rectangle("experienceBar");
+        experienceBar.top = "-2px;"
+        experienceBar.left = "0px"; 
+        experienceBar.width = "400px;"
+        experienceBar.height = "10px";
+        experienceBar.background = Config.UI_CENTER_PANEL_BG;
+        experienceBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        experienceBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        this._playerUI.addControl(experienceBar);
+        
+        const experienceBarInside = new Rectangle("experienceBarInside");
+        experienceBarInside.top = "0px;"
+        experienceBarInside.left = "0px;"
+        experienceBarInside.width = "400px;"
+        experienceBarInside.thickness = 0;
+        experienceBarInside.height = "10px";
+        experienceBarInside.background = "violet";
+        experienceBarInside.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        experienceBarInside.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        experienceBar.addControl(experienceBarInside);
+        this.experienceBarUI = experienceBarInside;
+
+        const experienceBarText = new TextBlock("experienceBarText");
+        experienceBarText.text = "0";
+        experienceBarText.color = "#FFF";
+        experienceBarText.top = "2px"; 
+        experienceBarText.left = "5px"; 
+        experienceBarText.fontSize = "8px;";
+        experienceBarText.lineSpacing = "-1px";
+        experienceBarText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        experienceBarText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        experienceBarText.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        experienceBarText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        experienceBar.addControl(experienceBarText);
+        this.experienceBarUIText = experienceBarText;
+
+
     }
 
     // create misc stuff
@@ -135,40 +208,33 @@ export class UserInterface {
         this._playerUI.addControl(castingTimer);
         this._UICastingTimer = castingTimer;
 
-        const panelStack = new StackPanel("panelStack");
-        panelStack.left = "15px";
-        panelStack.top = "-15px";
-        panelStack.width = "30px";
-        panelStack.height = "60px";
-        //panelStack.background = "rgba(0,0,0,.2)";
-        panelStack.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-        panelStack.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        this._playerUI.addControl(panelStack);
-
-  
         const inventoryButton = Button.CreateSimpleButton("inventoryButton", "I");
+        inventoryButton.top = "-17px;";
+        inventoryButton.left = "-190px;";
         inventoryButton.width = "30px;";
         inventoryButton.height = "30px";
         inventoryButton.color = "white";
         inventoryButton.background = "#000"; 
         inventoryButton.thickness = 1;
         inventoryButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        inventoryButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        panelStack.addControl(inventoryButton);
+        inventoryButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        this._playerUI.addControl(inventoryButton);
         inventoryButton.onPointerDownObservable.add(() => { 
             this._UIPanel.open("inventory");
         });
 
         // add a quit button
-        const quitButton = Button.CreateSimpleButton("quitButton", "Q");;
+        const quitButton = Button.CreateSimpleButton("quitButton", "Q");
+        quitButton.top = "-17px;";
+        quitButton.left = "190px;";
         quitButton.width = "30px;";
         quitButton.height = "30px";
         quitButton.color = "white";
         quitButton.background = "#000"; 
         quitButton.thickness = 1;
         quitButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        quitButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        panelStack.addControl(quitButton);
+        quitButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        this._playerUI.addControl(quitButton);
 
         quitButton.onPointerDownObservable.add(() => { 
             this._gameRoom.leave();

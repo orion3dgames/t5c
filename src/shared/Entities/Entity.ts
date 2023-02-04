@@ -198,6 +198,8 @@ export class Entity {
         this.characterLabel.dispose();
         this.characterChatLabel.dispose();
         this.mesh.dispose();
-        global.T5C.selectedEntity = false;
+        if(global.T5C.selectedEntity && global.T5C.selectedEntity.sessionId === this.sessionId){
+            global.T5C.selectedEntity = false;
+        }
     }
 }

@@ -43,8 +43,8 @@ export class UI_Chats {
         
         // add stack panel
         const chatPanel = new Rectangle("chatPanel");
-        chatPanel.top = "-10px;"
-        chatPanel.height = "131px";
+        chatPanel.top = "-50px;"
+        chatPanel.height = "122px";
         chatPanel.width = "400px";
         chatPanel.thickness = 0;
         chatPanel.background = Config.UI_CENTER_PANEL_BG;
@@ -55,22 +55,24 @@ export class UI_Chats {
 
         // add chat input
         const chatInput = new InputText("chatInput");
-        chatInput.width = .8;
-        chatInput.height = '30px;'
+        chatInput.width = .9;
+        chatInput.height = '22px;'
         chatInput.top = "0px";
         chatInput.color = "#FFF";
+        chatInput.fontSize = "11px";
         chatInput.placeholderText = "Write message here...";
         chatInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         chatInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         chatPanel.addControl(chatInput);
-        this._chatInput = chatInput;
+        this._chatInput = chatInput; 
 
         // add chat send button
         const chatButton = Button.CreateSimpleButton("chatButton", "SEND");
-        chatButton.width = .2;
-        chatButton.height = '30px;'
+        chatButton.width = .1;
+        chatButton.height = '22px;'
         chatButton.top = "0px";
         chatButton.color = "#FFF";
+        chatButton.fontSize = "11px";
         chatButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         chatButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         chatPanel.addControl(chatButton);
@@ -80,7 +82,7 @@ export class UI_Chats {
         const chatScrollViewer = new ScrollViewer("chatScrollViewer");
         chatScrollViewer.width = 1;
         chatScrollViewer.height = "100px";
-        chatScrollViewer.top = "-30px";
+        chatScrollViewer.top = "-22px";
         chatScrollViewer.background = Config.UI_CENTER_PANEL_BG;
         chatScrollViewer.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         chatScrollViewer.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
@@ -193,7 +195,7 @@ export class UI_Chats {
             var headlineRect = new Rectangle("chatMsgRect_"+msg.createdAt);
             headlineRect.width = "100%";
             headlineRect.thickness = 0;
-            headlineRect.paddingBottom = "5px";
+            headlineRect.paddingBottom = "1px";
             headlineRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             headlineRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             headlineRect.adaptHeightToChildren = true;
@@ -206,10 +208,10 @@ export class UI_Chats {
             
             // message
             var roomTxt = new TextBlock("chatMsgTxt_"+msg.createdAt);
-            roomTxt.paddingLeft = "5px";
+            roomTxt.paddingLeft = "5fdsfpx";
             roomTxt.text = prefix+msg.message;
             roomTxt.textHorizontalAlignment = 0;
-            roomTxt.fontSize = "12px";
+            roomTxt.fontSize = "11px";
             roomTxt.color = "#FFF";
             roomTxt.left = "0px";
             roomTxt.textWrapping = TextWrapping.WordWrap;

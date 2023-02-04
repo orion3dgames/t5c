@@ -46,16 +46,16 @@ export class UI_EntitySelected {
         let alignHoriz = Control.HORIZONTAL_ALIGNMENT_LEFT;
         let marginLeft = this._options.position === 'LEFT' ? "15px":"-15px;";
         let marginLeft2 = "5px";
-        let barWidth = 200;
-        let barHeight = 21;
+        let barWidth = 180;
+        let barHeight = 15;
  
         ////////////////////////////////////
         //////////////////// panel
         const selectedEntityBar = new Rectangle("selectedEntityBar");
         selectedEntityBar.top = "15px;"
         selectedEntityBar.left = marginLeft;
-        selectedEntityBar.width = "210px;"
-        selectedEntityBar.height = "78px;";
+        selectedEntityBar.width = (barWidth+10)+"px;"
+        selectedEntityBar.height = "62px;";
         selectedEntityBar.background = Config.UI_CENTER_PANEL_BG;
         selectedEntityBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         selectedEntityBar.horizontalAlignment = this._options.position === 'LEFT' ? Control.HORIZONTAL_ALIGNMENT_LEFT : Control.HORIZONTAL_ALIGNMENT_RIGHT;
@@ -69,7 +69,7 @@ export class UI_EntitySelected {
         entityNameTxt.color = "#FFF";
         entityNameTxt.top = "5px"; 
         entityNameTxt.left = marginLeft2; 
-        entityNameTxt.fontSize = "16px;";
+        entityNameTxt.fontSize = "13px;";
         entityNameTxt.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         entityNameTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         entityNameTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
@@ -116,7 +116,7 @@ export class UI_EntitySelected {
         healthBarText.color = "#FFF";
         healthBarText.top = "2px"; 
         healthBarText.left = "5px"; 
-        healthBarText.fontSize = "16px;";
+        healthBarText.fontSize = "12px;";
         healthBarText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         healthBarText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         healthBarText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
@@ -126,7 +126,7 @@ export class UI_EntitySelected {
         /////////////////////////////////////
         //////////////////// mana bar
         const manaBar = new Rectangle("manaBar");
-        manaBar.top = "50px;"
+        manaBar.top = "43px;"
         manaBar.left = "5px"; 
         manaBar.width = barWidth+"px;"
         manaBar.height = barHeight+"px";
@@ -151,7 +151,7 @@ export class UI_EntitySelected {
         manaBarText.color = "#FFF";
         manaBarText.top = "2px"; 
         manaBarText.left = "5px"; 
-        manaBarText.fontSize = "16px;";
+        manaBarText.fontSize = "12px;";
         manaBarText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         manaBarText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         manaBarText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
@@ -189,14 +189,7 @@ export class UI_EntitySelected {
 
             // update name
             this._entityNameTxt.text = entity.name;
-
-            let level = entity.level;
-            if(this._options.currentPlayer){
-                let progress = Leveling.getLevelProgress(entity.experience);
-                this._entityLevelTxt.text = "Lvl:"+level+" Exp:"+entity.experience+" \n Progress:"+progress+"%";
-            }else{
-                this._entityLevelTxt.text = "Lvl: "+level;
-            }
+            this._entityLevelTxt.text = "Lvl: "+entity.level;
             
             // health
             let health = roundTo(entity.health, 0);
