@@ -146,6 +146,13 @@ export class GameRoom extends Room<GameRoomState> {
 
     private registerMessageHandlers() {
 
+/////////////////////////////////////
+        // on player input
+		this.onMessage('ping', (client, data) => {
+            console.log('ping', data);
+            client.send('pong', data)
+        });
+
         /////////////////////////////////////
         // on player input
 		this.onMessage('playerInput', (client, playerInput: PlayerInputs) => {

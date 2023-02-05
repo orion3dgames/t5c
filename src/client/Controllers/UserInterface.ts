@@ -116,7 +116,7 @@ export class UserInterface {
         this._UIChat = new UI_Chats(this._centerUI, this._chatRoom, currentPlayer, this._entities);
 
         // create debug ui + events
-        //this._UIDebug = new UI_Debug(this._playerUI, this._engine, this._scene, this._gameRoom, this._currentPlayer, this._entities);
+        this._UIDebug = new UI_Debug(this._playerUI, this._engine, this._scene, this._gameRoom, this._currentPlayer, this._entities);
 
         // create selected entity panel
         this._UITargetSelected = new UI_EntitySelected(this._playerUI, this._scene, { position: "RIGHT", currentPlayer: false });
