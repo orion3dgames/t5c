@@ -11,7 +11,7 @@ let Locations = {
             z: 0,
             rot: -180
         },
-        monsters: 100,
+        monsters: 10,
     },
     "lh_dungeon_01": {
         title: "Dungeon Level 1",

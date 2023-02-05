@@ -42,7 +42,11 @@ export async function main(options: Options) {
         character_id: character.id,
     });
 
-    console.log("joined successfully!");
+    let sessionId = room.sessionId;
+    let player = room.state.players.get(sessionId);
+    console.log("joined successfully!", player);
+
+    // fi
 
     //
     room.onMessage("*", (payload) => {
@@ -52,7 +56,7 @@ export async function main(options: Options) {
 
     //
     room.onStateChange((state) => {
-        console.log("state change:", state);
+        //console.log("state change:", state);
     });
 
     //

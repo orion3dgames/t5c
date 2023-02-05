@@ -254,8 +254,13 @@ export class GameScene {
 
         // when a player leaves the room event
         this.room.state.players.onRemove((player, sessionId) => {
-            this.players[sessionId].remove();
-            delete this.players[sessionId];
+            if(this.players[sessionId]){
+                this.players[sessionId].remove();
+                delete this.players[sessionId];
+            }else{
+                this.entities[sessionId].remove();
+                delete this.entities[sessionId];
+            }
         });
         // when a player leaves the room event
         this.room.state.entities.onRemove((player, sessionId) => {
