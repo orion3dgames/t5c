@@ -93,6 +93,10 @@ export class EnemyState extends EntityState {
           this.AI_SEEKING_ELAPSED_TIME += 1;
         }
 
+        if(this.AI_CURRENT_TARGET.isDead){
+          this.returnToWandering();
+        }
+
         // if entity is seeking and target gets away return to wandering
         // - found and attacked player, but player managed to get away
         // - was seeking player for over 50 server iteration but did not manage to catch player
@@ -106,7 +110,7 @@ export class EnemyState extends EntityState {
           this.AI_CURRENT_TARGET_FOUND = false;
           this.AI_SEEKING_ELAPSED_TIME = 0;
         }
-
+        
       }
 
       // if no target, monitor closest player for range distance
@@ -123,7 +127,9 @@ export class EnemyState extends EntityState {
       }
 
       // something is wrong
-      if(this.AI_CURRENT_TARGET && !this._gameroom.state.players.get(this.AI_CURRENT_TARGET.sessionId)){
+      if(
+        this.AI_CURRENT_TARGET && 
+        !this._gameroom.state.players.get(this.AI_CURRENT_TARGET.sessionId)){
         this.returnToWandering();
       }
 
@@ -327,9 +333,9 @@ export class EnemyState extends EntityState {
   setRandomDestination(currentPos:Vector3):void{
     this.toRegion = this._gameroom.navMesh.getRandomRegion();
     this.destinationPath = this._gameroom.navMesh.findPath(
-        currentPos,
-        this.toRegion.centroid
-    );
+      currentPos,
+      this.toRegion.centroid
+  );
     if(this.destinationPath.length === 0){
       this.toRegion = false;
       this.destinationPath = false;
