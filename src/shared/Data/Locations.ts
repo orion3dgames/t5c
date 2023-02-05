@@ -6,9 +6,9 @@ let Locations = {
         sun: true,
         sunIntensity: 2,
         spawnPoint: {
-            x: 7.50,
+            x: 0,
             y: 0,
-            z: -14.27,
+            z: 0,
             rot: -180
         },
         monsters: 100,
