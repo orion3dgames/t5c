@@ -1,6 +1,9 @@
 import { Scene } from "@babylonjs/core/scene";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { WaterMaterial } from "@babylonjs/materials";
 
 export class Environment {
 
@@ -12,7 +15,7 @@ export class Environment {
 
         this._scene = scene;
         this._shadow = shadow;
-
+    
     }
 
     //What we do once the environment assets have been imported

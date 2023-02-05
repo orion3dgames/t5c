@@ -55,7 +55,7 @@ export class UI_EntitySelected {
         selectedEntityBar.top = "15px;"
         selectedEntityBar.left = marginLeft;
         selectedEntityBar.width = (barWidth+10)+"px;"
-        selectedEntityBar.height = "62px;";
+        selectedEntityBar.height = "63px;";
         selectedEntityBar.background = Config.UI_CENTER_PANEL_BG;
         selectedEntityBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         selectedEntityBar.horizontalAlignment = this._options.position === 'LEFT' ? Control.HORIZONTAL_ALIGNMENT_LEFT : Control.HORIZONTAL_ALIGNMENT_RIGHT;
@@ -78,9 +78,10 @@ export class UI_EntitySelected {
         const entityLevelTxt = new TextBlock("entityLevelTxt", "");
         entityLevelTxt.text = "XXXXX";
         entityLevelTxt.color = "#FFF";
-        entityLevelTxt.top = "3px"; 
+        entityLevelTxt.top = "5px"; 
         entityLevelTxt.left = "-5px"; 
-        entityLevelTxt.fontSize = "10px;";
+        entityLevelTxt.fontSize = "14px;";
+        entityLevelTxt.fontWeight = "bold";
         entityLevelTxt.lineSpacing = "-2px;";
         entityLevelTxt.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         entityLevelTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;

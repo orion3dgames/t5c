@@ -76,9 +76,11 @@ export class GameRoom extends Room<GameRoomState> {
                         this.database.updateCharacter(playerClient.auth.id, {
                             location: entity.location,
                             x: entity.x,
-                            y: entity.y,
+                            y: entity.y, 
                             z: entity.z,
                             rot: entity.rot,
+                            level: entity.level,
+                            experience: entity.experience,
                         });
 
                         //Logger.info("[gameroom][onCreate] player "+playerClient.auth.name+" saved to database.");

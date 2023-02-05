@@ -71,8 +71,8 @@ export class GameScene {
         ///////////////////// DEBUG CODE /////////////////////////////////
         // if local skip login screen
         if(isLocal()){
+            //let tempLocation = "lh_town";
             let tempLocation = "lh_town";
-            //let tempLocation = "lh_dungeon_01";
             global.T5C.currentLocation = Locations[tempLocation];
             let req = await request('get', apiUrl()+'/returnRandomUser');
             let character = JSON.parse(req.data).user;
