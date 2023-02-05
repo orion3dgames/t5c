@@ -32,7 +32,9 @@ export class Environment {
             // default values
             m.checkCollisions = false;
             m.isPickable = true;
-   
+
+            this._shadow.addShadowCaster(m);      
+
             if (m.getClassName() !== 'InstancedMesh') {
                 m.receiveShadows = true;
             }

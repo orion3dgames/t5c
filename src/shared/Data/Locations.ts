@@ -4,7 +4,7 @@ let Locations = {
         key: 'lh_town',
         mesh: "lh_town.glb",
         sun: true,
-        sunIntensity: 2,
+        sunIntensity: 2.5,
         spawnPoint: {
             x: 0,
             y: 0,
