@@ -192,6 +192,8 @@ export class Player extends Entity {
 
         // server confirms ability can be cast
         this._room.onMessage("entity_ability_cast", (data) => {
+            console.log("CASTING ABILITY ON CLIENT", this.isCasting, data);
+
             // remove any casting timers
             this.castingElapsed = 0;
             this.castingTarget = 0;

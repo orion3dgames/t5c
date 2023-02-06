@@ -153,7 +153,9 @@ export class PlayerState extends EntityState {
         }
         console.log("can cast ability on self");
 
-        return false;
+        //
+        console.log("can cast ability confirmed");
+        return true;
     }
 
     /**
@@ -167,7 +169,7 @@ export class PlayerState extends EntityState {
         // rotate sender to face target
         this.rot = this.calculateRotation(this.getPosition(), target.getPosition());
 
-        // set target as target
+        // set sender as enemy target
         if (target.type === "entity") {
             target.setTarget(this);
         }
@@ -179,6 +181,7 @@ export class PlayerState extends EntityState {
         }, ability.cooldown);
 
         // process caster affected properties
+        // TODO: improve this
         for (let p in ability.casterPropertyAffected) {
             let property = ability.casterPropertyAffected[p];
             this[p] -= property;
@@ -186,6 +189,7 @@ export class PlayerState extends EntityState {
         }
 
         // process target affected properties
+        // TODO: improve this
         for (let p in ability.targetPropertyAffected) {
             let property = ability.targetPropertyAffected[p];
             target[p] += property;
