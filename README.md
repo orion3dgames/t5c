@@ -15,10 +15,10 @@ Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 - and more...
 
 ## Roadmap
-You can follow the progress here: [FORUM POST](https://forum.babylonjs.com/t/multiplayer-top-down-rpg-babylon-js-colyseus/35733/12)
+You can follow the progress here: [FORUM POST](https://forum.babylonjs.com/t/multiplayer-top-down-rpg-babylon-js-colyseus/35733)
 
 ## Requirements
-- Download and install [Node.js LTS](https://nodejs.org/en/download/) ( Version 14.20.1 tested )
+- Download and install [Node.js LTS](https://nodejs.org/en/download/)
 - Clone or download this repository.
 - Run `yarn install`
 
