@@ -35,3 +35,7 @@ You can follow the progress here: [FORUM POST](https://forum.babylonjs.com/t/mul
 
 The client should be accessible at [`http://localhost:8080`](http://localhost:8080).
 The WebSocket server should be available locally at `ws://localhost:3000`, and [http://localhost:3000](http://localhost:3000) should be accessible.
+
+## License
+Everything under ./src is licensed under the GNU license except for the yuka library who is MIT license.
+All models under the ./public/models folder does not fall under the GNU license and cannot be used commercially.
