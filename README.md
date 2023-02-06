@@ -1,5 +1,3 @@
-![image](https://user-images.githubusercontent.com/5079492/216863254-7f305256-7e48-4266-9d67-5f5167ade1bc.png)
-
 # T5C
 Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 
