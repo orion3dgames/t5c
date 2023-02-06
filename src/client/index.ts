@@ -1,6 +1,6 @@
 import { isLocal } from "../shared/Utils";
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
     import("@babylonjs/core/Debug/debugLayer");
     import("@babylonjs/inspector");
 }
@@ -14,21 +14,21 @@ import "@babylonjs/loaders/glTF/2.0/Extensions/KHR_materials_pbrSpecularGlossine
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { Scene } from "@babylonjs/core/scene";
- 
+
 // IMPORT SCREEN
-import State from "./Screens/Screens"; 
+import State from "./Screens/Screens";
 import { GameScene } from "./Screens/GameScene";
 import { LoginScene } from "./Screens/LoginScene";
 import { CharacterSelectionScene } from "./Screens/CharacterSelection";
 import Config from "../shared/Config";
 import { Network } from "./Controllers/Network";
+import { Loading } from "./Controllers/Loading";
 
 // App class is our entire game application
-class App { 
-
+class App {
     // General Entire Application
     private _scene: Scene;
-    private _canvas: HTMLCanvasElement;
+    private _canvas;
     private _engine: Engine;
 
     //Game State Related
@@ -39,9 +39,8 @@ class App {
     private _currentScene;
 
     constructor() {
-
         // create canvas
-        this._canvas = this._createCanvas();
+        this._canvas = document.getElementById("renderCanvas");
 
         // initialize babylon scene and engine
         this._init();
@@ -51,31 +50,30 @@ class App {
     }
 
     private async _init(): Promise<void> {
-
         // create engine
-        this._engine = await EngineFactory.CreateAsync(this._canvas, {
-            antialiasing: true
-        }) as Engine;
- 
+        this._engine = (await EngineFactory.CreateAsync(this._canvas, {
+            antialiasing: true,
+        })) as Engine;
+
+        // loading
+        var loadingScreen = new Loading("I'm loading!!");
+        this._engine.loadingScreen = loadingScreen;
+
         // create colyseus client
         // this should use environement values
         this._client = new Network(this._scene);
 
         //MAIN render loop & state machine
         await this._render();
-
     }
 
     private async _render(): Promise<void> {
-
         // render loop
         this._engine.runRenderLoop(() => {
-            
             // monitor state
             this._state = this.checkForSceneChange();
 
             switch (this._state) {
-    
                 ///////////////////////////////////////
                 ///////////////////////////////////////
                 ///////////////////////////////////////
@@ -108,13 +106,13 @@ class App {
                     this._scene = this._currentScene._scene;
                     this._state = State.NULL;
                     break;
-    
-                default: break;
-            } 
-            
+
+                default:
+                    break;
+            }
+
             // render when scene is ready
             this._process();
-
         });
 
         if (isLocal()) {
@@ -132,52 +130,48 @@ class App {
         }
 
         //resize if the screen is resized/rotated
-        window.addEventListener('resize', () => {
+        window.addEventListener("resize", () => {
             this._engine.resize();
         });
-        
     }
 
-    private checkForSceneChange(){
+    private checkForSceneChange() {
         let currentScene = global.T5C.nextScene;
-        if(global.T5C.nextScene != State.NULL){
+        if (global.T5C.nextScene != State.NULL) {
             global.T5C.nextScene = State.NULL;
-            return currentScene;  
+            return currentScene;
         }
     }
 
     private async _process(): Promise<void> {
-        
         // make sure scene and camera is initialized
-        if(this._scene && this._scene.activeCamera){
-
+        if (this._scene && this._scene.activeCamera) {
             //when the scene is ready, hide loading
-            this._engine.hideLoadingUI(); 
+            this._engine.hideLoadingUI();
 
             // render scene
             this._scene.render();
-        }  
+        }
     }
 
     private clearScene() {
-        if(this._scene){
+        if (this._scene) {
             this._engine.displayLoadingUI();
             this._scene.detachControl();
             this._scene.dispose();
             this._currentScene = null;
         }
     }
- 
+
     //set up the canvas
     private _createCanvas(): HTMLCanvasElement {
-
         document.documentElement.style["overflow"] = "hidden";
         document.documentElement.style.overflow = "hidden";
         document.documentElement.style.width = "100%";
         document.documentElement.style.height = "100%";
         document.documentElement.style.margin = "0";
         document.documentElement.style.padding = "0";
-        
+
         document.body.style.overflow = "hidden";
         document.body.style.width = "100%";
         document.body.style.height = "100%";
@@ -193,6 +187,5 @@ class App {
 
         return this._canvas;
     }
-
 }
 new App();
