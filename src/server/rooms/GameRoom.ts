@@ -1,8 +1,8 @@
 import http from "http";
 import { Room, Client, Delayed } from "@colyseus/core";
-import { GameRoomState } from './schema/GameRoomState';
+import { GameRoomState } from "./schema/GameRoomState";
 import databaseInstance from "../../shared/Database";
-import Config from '../../shared/Config';
+import Config from "../../shared/Config";
 import Logger from "../../shared/Logger";
 import loadNavMeshFromFile from "../../shared/Utils/loadNavMeshFromFile";
 import { EntityState } from "./schema/EntityState";
@@ -13,10 +13,9 @@ import { NavMesh, Vector3 } from "../../shared/yuka";
 import Locations from "../../shared/Data/Locations";
 
 export class GameRoom extends Room<GameRoomState> {
-
     public maxClients = 64;
     public autoDispose = false;
-    public database: any; 
+    public database: any;
     public delayedInterval!: Delayed;
     public navMesh: NavMesh;
 
@@ -25,16 +24,15 @@ export class GameRoom extends Room<GameRoomState> {
     //////////////////////////////////////////////////////////////////////////
     // on create room event
     async onCreate(options: any) {
+        Logger.info("[gameroom][onCreate] game room created: " + this.roomId, options);
 
-        Logger.info("[gameroom][onCreate] game room created: "+this.roomId, options)
- 
         this.setMetadata(options);
 
         // initialize navmesh
-        const navMesh = await loadNavMeshFromFile(options.location)
+        const navMesh = await loadNavMeshFromFile(options.location);
         this.navMesh = navMesh;
-        Logger.info("[gameroom][onCreate] navmesh "+options.location+" initialized.");
-   
+        Logger.info("[gameroom][onCreate] navmesh " + options.location + " initialized.");
+
         // Set initial state
         this.setState(new GameRoomState(this, this.navMesh, options));
 
@@ -47,10 +45,10 @@ export class GameRoom extends Room<GameRoomState> {
 
         // Set the simulation interval callback
         // use to check stuff on the server at regular interval
-        this.setSimulationInterval(dt => { 
-            this.state.serverTime += dt; 
+        this.setSimulationInterval((dt) => {
+            this.state.serverTime += dt;
             this.state.update(dt);
-        });  
+        });
 
         // set max clients
         this.maxClients = Config.maxClients;
@@ -61,22 +59,18 @@ export class GameRoom extends Room<GameRoomState> {
         ///////////////////////////////////////////////////////////////////////////
         // if players are in a room, make sure we save any changes to the database.
         this.delayedInterval = this.clock.setInterval(() => {
-
             // only save if there is any players
-            if(this.state.players.size > 0){
-
+            if (this.state.players.size > 0) {
                 //Logger.info("[gameroom][onCreate] Saving data for room "+options.location+" with "+this.state.players.size+" players");
-                this.state.players.forEach(entity => {
-
+                this.state.players.forEach((entity) => {
                     // do not save if players is blocked
-                    if(entity.blocked){
-
+                    if (entity.blocked) {
                         // update player
                         let playerClient = this.clients.hashedArray[entity.sessionId];
                         this.database.updateCharacter(playerClient.auth.id, {
                             location: entity.location,
                             x: entity.x,
-                            y: entity.y, 
+                            y: entity.y,
                             z: entity.z,
                             rot: entity.rot,
                             level: entity.level,
@@ -85,11 +79,8 @@ export class GameRoom extends Room<GameRoomState> {
 
                         //Logger.info("[gameroom][onCreate] player "+playerClient.auth.name+" saved to database.");
                     }
-                    
                 });
-                
             }
-           
         }, Config.databaseUpdateRate);
     }
 
@@ -97,23 +88,20 @@ export class GameRoom extends Room<GameRoomState> {
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     // authorize client based on provided options before WebSocket handshake is complete
-    async onAuth (client: Client, data: any, request: http.IncomingMessage) { 
-        
+    async onAuth(client: Client, data: any, request: http.IncomingMessage) {
         // try to find char
         const character = await this.database.getCharacter(data.character_id);
-        
+
         // if no character found, then refuse auth
         if (!character) {
             Logger.error("[gameroom][onAuth] client could not authentified, joining failed.", data.character_id);
-            return false
+            return false;
         }
 
-        
-
         // character found, check if already logged in
-        if(character.online > 0){
+        if (character.online > 0) {
             Logger.error("[gameroom][onAuth] client already connected. ", character);
-            return false
+            return false;
         }
 
         // all checks are good, proceed
@@ -126,7 +114,6 @@ export class GameRoom extends Room<GameRoomState> {
     //////////////////////////////////////////////////////////////////////////
     // on client join
     async onJoin(client: Client, options: any) {
-
         // add player to server
         Logger.info(`[gameroom][onJoin] player ${client.sessionId} joined room ${this.roomId}.`, options);
 
@@ -136,7 +123,6 @@ export class GameRoom extends Room<GameRoomState> {
         Logger.info(`[gameroom][onJoin] player added `);
 
         //client.send('sdfsdfsd', element)
-        
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -145,17 +131,15 @@ export class GameRoom extends Room<GameRoomState> {
     // client message handler
 
     private registerMessageHandlers() {
-
-/////////////////////////////////////
+        /////////////////////////////////////
         // on player input
-		this.onMessage('ping', (client, data) => {
-            console.log('ping', data);
-            client.send('pong', data)
+        this.onMessage("ping", (client, data) => {
+            client.send("pong", data);
         });
 
         /////////////////////////////////////
         // on player input
-		this.onMessage('playerInput', (client, playerInput: PlayerInputs) => {
+        this.onMessage("playerInput", (client, playerInput: PlayerInputs) => {
             const playerState: PlayerState = this.state.players.get(client.sessionId);
             if (playerState) {
                 playerState.processPlayerInput(playerInput);
@@ -167,11 +151,9 @@ export class GameRoom extends Room<GameRoomState> {
         /////////////////////////////////////
         // on player teleport
         this.onMessage("playerTeleport", (client, location) => {
-
             const playerState: PlayerState = this.state.players.get(client.sessionId);
 
             if (playerState) {
-
                 // update player location in database
                 let newLocation = Locations[location];
                 let updateObj = {
@@ -182,43 +164,39 @@ export class GameRoom extends Room<GameRoomState> {
                     rot: 0,
                 };
                 this.database.updateCharacter(client.auth.id, updateObj);
-                
+
                 // update player state on server
                 playerState.setLocation(location);
 
                 // inform client he cand now teleport to new zone
-                client.send('playerTeleportConfirm', location)
+                client.send("playerTeleportConfirm", location);
 
                 // log
                 Logger.info(`[gameroom][playerTeleport] player teleported to ${location}`);
-
-
-            }else{
+            } else {
                 Logger.error(`[gameroom][playerTeleport] failed to teleported to ${location}`);
             }
         });
 
         /////////////////////////////////////
         // player entity_attack
-        this.onMessage("entity_ability", (client, data: any) => {
-
+        this.onMessage("entity_ability_key", (client, data: any) => {
             // get players involved
-            let sender:PlayerState = this.state.players[client.sessionId];
+            let sender: PlayerState = this.state.players[client.sessionId];
             let target = this.state.entities[data.targetId];
 
-            if(!target){
+            if (!target) {
                 target = this.state.players[data.targetId];
             }
-            
-            if(sender && target){
-                sender.processAbility(target, data);
+
+            if (sender && target) {
+                sender.processAbility(client, target, data);
             }
 
-            Logger.info(`[gameroom][entity_attack] player action processed`, data);
-
+            Logger.info(`[gameroom][entity_ability_key] player action processed`, data);
         });
 
-        ///////////////////////////////////// 
+        /////////////////////////////////////
         // player move to
         /*
         this.onMessage("player_moveTo", (client, data: any) => {
@@ -235,8 +213,7 @@ export class GameRoom extends Room<GameRoomState> {
             player.destinationPath = this.navMesh.findPath(from, destination);
 
         });*/
-
-	}
+    }
 
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
@@ -267,18 +244,14 @@ export class GameRoom extends Room<GameRoomState> {
 
         this.state.players.delete(client.sessionId);
         this.database.toggleOnlineStatus(client.auth.id, 0);
-	}
+    }
 
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     // cleanup callback, called after there are no more clients in the room. (see `autoDispose`)
     onDispose() {
-
         //log
         Logger.warning(`[onDispose] game room removed. `);
-
     }
-
-
 }
