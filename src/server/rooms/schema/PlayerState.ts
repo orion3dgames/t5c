@@ -24,6 +24,7 @@ export class PlayerState extends EntityState {
     public player_cooldown: number = 1000;
     public ability_in_cooldown: boolean[];
     public player_cooldown_timer: number = 0;
+    public player_casting_timer;
 
     constructor(gameroom: GameRoom, data, ...args: any[]) {
         super(gameroom, data, args);
@@ -61,6 +62,13 @@ export class PlayerState extends EntityState {
         let ability_key = (this.raceData.abilities && this.raceData.abilities[ability_no]) ?? false;
         let ability = Abilities[ability_key] ?? null;
 
+        // if already casting
+        if (ability.castTime > 0 && this.player_casting_timer) {
+            Logger.error(`[gameroom][processAbility] player is already casting an ability`, ability);
+            return false;
+        }
+        console.log("caster is not casting");
+
         // if caster is dead, cancel everything
         if (this.health < 0 || this.health === 0) {
             Logger.error(`[gameroom][processAbility] caster is dead`, ability);
@@ -73,7 +81,7 @@ export class PlayerState extends EntityState {
             Logger.error(`[gameroom][processAbility] ability not found`, ability);
             return false;
         }
-        console.log("ability found");
+        console.log("ability is found");
 
         // if target is not already dead
         if (target.isEntityDead()) {
@@ -104,71 +112,87 @@ export class PlayerState extends EntityState {
         }
         console.log("can cast ability on self");
 
-        return ability;
+        return false;
+    }
+
+    castAbility(target, ability, digit) {
+        // rotate sender to face target
+        this.rot = this.calculateRotation(this.getPosition(), target.getPosition());
+
+        // set target as target
+        if (target.type === "entity") {
+            target.setTarget(this);
+        }
+
+        // start cooldown period
+        this.ability_in_cooldown[digit] = true;
+        setTimeout(() => {
+            this.ability_in_cooldown[digit] = false;
+        }, ability.cooldown);
+
+        // process caster affected properties
+        for (let p in ability.casterPropertyAffected) {
+            let property = ability.casterPropertyAffected[p];
+            this[p] -= property;
+            console.log("casterPropertyAffected", this[p], property);
+        }
+
+        // process target affected properties
+        for (let p in ability.targetPropertyAffected) {
+            let property = ability.targetPropertyAffected[p];
+            target[p] += property;
+        }
+
+        // make sure no values are out of range.
+        target.normalizeStats();
+
+        // send to clients
+        this._gameroom.broadcast("entity_ability_cast", {
+            key: ability.key,
+            fromId: this.sessionId,
+            fromPos: this.getPosition(),
+            targetId: target.sessionId,
+            targetPos: target.getPosition(),
+        });
+
+        // if target has no more health
+        if (target.isEntityDead()) {
+            // player gains experience
+            this.addExperience(target.raceData.experienceGain);
+
+            // set player as dead
+            target.setAsDead();
+        }
     }
 
     processAbility(client, target, data) {
-        // get ability
-        let ability = this.canEntityCastAbility(target, data.digit);
-        let ability_no = data.digit;
+        let digit = data.digit;
+        let ability_key = (this.raceData.abilities && this.raceData.abilities[digit]) ?? false;
+        let ability = Abilities[ability_key] ?? null;
 
-        // if entity can cast
-        if (ability !== false) {
-            // if ability can be casted
-            if (ability.castTime > 0) {
-                // inform player he can start casting
-                client.send("ability_start_casting", {
-                    digit: data.digit,
-                });
-            }
+        // make sure player can cast this ability
+        if (!this.canEntityCastAbility(target, data.digit)) {
+            return false;
+        }
 
-            // rotate sender to face target
-            this.rot = this.calculateRotation(this.getPosition(), target.getPosition());
-
-            // set target as target
-            if (target.type === "entity") {
-                target.setTarget(this);
-            }
-
-            // start cooldown period
-            this.ability_in_cooldown[ability_no] = true;
-            setTimeout(() => {
-                this.ability_in_cooldown[ability_no] = false;
-            }, ability.cooldown);
-
-            // process caster affected properties
-            for (let p in ability.casterPropertyAffected) {
-                let property = ability.casterPropertyAffected[p];
-                this[p] -= property;
-                console.log("casterPropertyAffected", this[p], property);
-            }
-
-            // process target affected properties
-            for (let p in ability.targetPropertyAffected) {
-                let property = ability.targetPropertyAffected[p];
-                target[p] += property;
-            }
-
-            // make sure no values are out of range.
-            target.normalizeStats();
-
-            // send to clients
-            this._gameroom.broadcast("entity_ability_cast", {
-                key: ability.key,
-                fromId: this.sessionId,
-                fromPos: this.getPosition(),
-                targetId: target.sessionId,
-                targetPos: target.getPosition(),
+        // if ability can be casted
+        if (ability.castTime > 0) {
+            // inform player he can start casting
+            client.send("ability_start_casting", {
+                digit: data.digit,
             });
 
-            // if target has no more health
-            if (target.isEntityDead()) {
-                // player gains experience
-                this.addExperience(target.raceData.experienceGain);
+            // start a timer
+            this.player_casting_timer = setTimeout(() => {
+                // process ability straight away
+                this.castAbility(target, ability, digit);
 
-                // set player as dead
-                target.setAsDead();
-            }
+                // remove timer
+                clearTimeout(this.player_casting_timer);
+            }, ability.castTime);
+        } else {
+            // process ability straight away
+            this.castAbility(target, ability, digit);
         }
     }
 
@@ -176,9 +200,9 @@ export class PlayerState extends EntityState {
         this.experience += amount;
         this.level = Leveling.convertXpToLevel(this.experience);
         /*
-    // TODO: if player has levelled up, the notify player somehow
-    if(Leveling.doesPlayerlevelUp(this.level, this.experience, amount)){
-    }*/
+        // TODO: if player has levelled up, the notify player somehow
+        if(Leveling.doesPlayerlevelUp(this.level, this.experience, amount)){
+        }*/
     }
 
     getPosition() {

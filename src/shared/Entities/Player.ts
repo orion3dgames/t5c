@@ -143,9 +143,12 @@ export class Player extends Entity {
             this._input.digit_pressed = false;
         }
 
+        console.log("IS CASTING", this.isCasting);
+
         // check if casting
-        if (this.isCasting) {
+        if (this.isCasting === true) {
             // increment casting timer
+            this.ui._UICastingTimer.isVisible = true;
             this.castingElapsed += Config.updateRate;
             this.ui._UICastingTimer.text = "Casting: " + roundTo(this.castingElapsed, 0) + "/" + this.castingTarget;
             console.log("CASTING.....", this.ui._UICastingTimer.text);
@@ -158,8 +161,6 @@ export class Player extends Entity {
     }
 
     public startCasting(data) {
-        console.log("SERVER CONFIRM PLAYER CAN START CASTING", data);
-
         let digit = data.digit;
         let ability = this.getAbilityFromDigit(digit);
 
@@ -170,6 +171,7 @@ export class Player extends Entity {
         this.castingDigit = digit;
         this.ui._UICastingTimer.isVisible = true;
         this.ui._UICastingTimer.text = "Start Casting";
+        console.log("SERVER CONFIRM PLAYER CAN START CASTING", this.isCasting, data);
     }
 
     //////////////////////////////////////////////////////////////////////////
