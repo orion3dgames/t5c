@@ -309,23 +309,34 @@ export class GameScene {
                 }
             }*/
 
-            // continuously move entities at 60fps
+            let delta = this._engine.getFps();
+
+            // entities update
             for (let sessionId in this.entities) {
                 const entity = this.entities[sessionId];
-                entity.update();
+                entity.update(delta);
                 entity.lod(this._currentPlayer);
             }
 
+            // player update
             for (let sessionId in this.players) {
                 const entity = this.players[sessionId];
-                entity.update();
+                entity.update(delta);
             }
 
+            /////////////////
+            // server update rate
             // every 100ms loop
             let timeNow = Date.now();
             let timePassed = (timeNow - timeThen) / 1000;
             let updateRate = Config.updateRate / 1000; // game is networked update every 100ms
             if (timePassed >= updateRate) {
+                // player uppdate at server rate
+                for (let sessionId in this.players) {
+                    const entity = this.players[sessionId];
+                    entity.updateServerRate(Config.updateRate);
+                }
+
                 // detect movement
                 if (this._input.player_can_move && !this._currentPlayer.blocked) {
                     // increment seq

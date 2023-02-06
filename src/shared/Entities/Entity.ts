@@ -164,7 +164,7 @@ export class Entity {
         this.characterChatLabel = this.ui.createEntityChatLabel(this);
     }
 
-    public update() {
+    public update(delta) {
         if (this.AI_CURRENT_STATE === AI_STATE.SEEKING || this.AI_CURRENT_STATE === AI_STATE.ATTACKING) {
             this.debugMesh.material = this._scene.getMaterialByName("debug_entity_active");
         }
@@ -182,10 +182,12 @@ export class Entity {
     // basic performance (only enable entities in a range around the player)
     public lod(_currentPlayer) {
         this.mesh.setEnabled(false);
+        this.mesh.freezeWorldMatrix();
         let entityPos = this.position();
         let playerPos = _currentPlayer.position();
         let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
         if (distanceFromPlayer < Config.PLAYER_VIEW_DISTANCE) {
+            this.mesh.unfreezeWorldMatrix();
             this.mesh.setEnabled(true);
         }
     }
@@ -198,7 +200,7 @@ export class Entity {
         this.characterLabel.dispose();
         this.characterChatLabel.dispose();
         this.mesh.dispose();
-        if(global.T5C.selectedEntity && global.T5C.selectedEntity.sessionId === this.sessionId){
+        if (global.T5C.selectedEntity && global.T5C.selectedEntity.sessionId === this.sessionId) {
             global.T5C.selectedEntity = false;
         }
     }
