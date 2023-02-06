@@ -120,7 +120,7 @@ export class Player extends Entity {
         });
     }
 
-    public update() {
+    public update(delta) {
         // tween entity
         if (this && this.moveController) {
             this.moveController.tween();
@@ -143,16 +143,15 @@ export class Player extends Entity {
             this._input.digit_pressed = false;
         }
 
-        console.log("IS CASTING", this.isCasting);
-
         // check if casting
         if (this.isCasting === true) {
             // increment casting timer
             this.ui._UICastingTimer.isVisible = true;
-            this.castingElapsed += Config.updateRate;
+            this.castingElapsed += delta;
             this.ui._UICastingTimer.text = "Casting: " + roundTo(this.castingElapsed, 0) + "/" + this.castingTarget;
             console.log("CASTING.....", this.ui._UICastingTimer.text);
         }
+
     }
 
     public getAbilityFromDigit(digit) {
@@ -200,6 +199,17 @@ export class Player extends Entity {
             this.isCasting = false;
             this.ui._UICastingTimer.isVisible = false;
             this.ui._UICastingTimer.text = 0;
+
+            // 
+            let digit = data.digit;
+            let ability = Abilities[data.key];
+            let cooldownUI = this.ui._playerUI.getControlByName('ability_'+digit+'_cooldown');
+            cooldownUI.isVisible = true;
+            console.log('STARTING COOLDOWN', cooldownUI, ability.cooldown);
+            setTimeout(() => {
+                cooldownUI.isVisible = false;
+                console.log('FINISH COOLDOWN', cooldownUI, ability.cooldown);
+            }, ability.cooldown);
 
             // action ability
             this.actionsController.process(data);

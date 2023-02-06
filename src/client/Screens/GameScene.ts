@@ -290,16 +290,18 @@ export class GameScene {
                 }
             }*/
 
+            let delta = this._engine.getFps();
+
             // continuously move entities at 60fps
             for (let sessionId in this.entities) {
                 const entity = this.entities[sessionId];
-                entity.update();
+                entity.update(delta);
                 entity.lod(this._currentPlayer);
             }
 
             for (let sessionId in this.players) {
                 const entity = this.players[sessionId];
-                entity.update();
+                entity.update(delta);
             }
 
             // every 100ms loop

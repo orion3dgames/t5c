@@ -118,6 +118,20 @@ export class UI_Abilities {
             roomTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             headlineRect.addControl(roomTxt);
 
+            // add cooldown 
+            // container
+            var abilityCooldown = new Rectangle("ability_"+i+"_cooldown");
+            abilityCooldown.top = 0;
+            abilityCooldown.left = 0;
+            abilityCooldown.width = iconWidth+"px";
+            abilityCooldown.height = iconWidth+"px";
+            abilityCooldown.thickness = 0;
+            abilityCooldown.isVisible = false;
+            abilityCooldown.background = "rgba(0,0,0,.7)";
+            abilityCooldown.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            abilityCooldown.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            headlineRect.addControl(abilityCooldown);
+
         }
 
     }
@@ -145,8 +159,8 @@ export class UI_Abilities {
 
             headlineRect.onPointerClickObservable.add(() => { 
                 let entity = global.T5C.selectedEntity;
-                if(entity){
-                    this._gameRoom.send("entity_ability", {
+                if(entity && !this._currentPlayer.isCasting){
+                    this._gameRoom.send("entity_ability_key", {
                         senderId: this._gameRoom.sessionId,
                         targetId: entity.sessionId,
                         digit: ability_no

@@ -164,7 +164,7 @@ export class Entity {
         this.characterChatLabel = this.ui.createEntityChatLabel(this);
     }
 
-    public update() {
+    public update(delta) {
         if (this.AI_CURRENT_STATE === AI_STATE.SEEKING || this.AI_CURRENT_STATE === AI_STATE.ATTACKING) {
             this.debugMesh.material = this._scene.getMaterialByName("debug_entity_active");
         }

@@ -24,7 +24,7 @@ export class PlayerState extends EntityState {
     public player_cooldown: number = 1000;
     public ability_in_cooldown: boolean[];
     public player_cooldown_timer: number = 0;
-    public player_casting_timer;
+    public player_casting_timer:any = false;
 
     constructor(gameroom: GameRoom, data, ...args: any[]) {
         super(gameroom, data, args);
@@ -82,13 +82,13 @@ export class PlayerState extends EntityState {
                 digit: data.digit,
             });
 
+            console.log('START TIMER', ability.castTime);
             // start a timer
             this.player_casting_timer = setTimeout(() => {
+                console.log('END TIMER', ability.castTime);
                 // process ability straight away
                 this.castAbility(target, ability, digit);
 
-                // remove timer
-                clearTimeout(this.player_casting_timer);
             }, ability.castTime);
         } else {
             // process ability straight away
@@ -104,7 +104,7 @@ export class PlayerState extends EntityState {
      */
     canEntityCastAbility(target, ability, digit) {
         // if already casting
-        if (ability.castTime > 0 && this.player_casting_timer) {
+        if (ability.castTime > 0 && this.player_casting_timer !== false) {
             Logger.error(`[gameroom][processAbility] player is already casting an ability`, ability);
             return false;
         }
@@ -201,11 +201,17 @@ export class PlayerState extends EntityState {
         // send to clients
         this._gameroom.broadcast("entity_ability_cast", {
             key: ability.key,
+            digit: digit,
             fromId: this.sessionId,
             fromPos: this.getPosition(),
             targetId: target.sessionId,
             targetPos: target.getPosition(),
         });
+
+        if(this.player_casting_timer){
+            console.log('REMOVE CASTING TIMER');
+            this.player_casting_timer = false;
+        }
 
         // if target has no more health
         if (target.isEntityDead()) {
