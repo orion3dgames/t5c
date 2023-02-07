@@ -46,9 +46,8 @@ export class GameRoom extends Room<GameRoomState> {
         // Set the simulation interval callback
         // use to check stuff on the server at regular interval
         this.setSimulationInterval((dt) => {
-            this.state.serverTime += dt;
             this.state.update(dt);
-        });
+        }, Config.updateRate);
 
         // set max clients
         this.maxClients = Config.maxClients;
@@ -82,6 +81,10 @@ export class GameRoom extends Room<GameRoomState> {
                 });
             }
         }, Config.databaseUpdateRate);
+    }
+
+    public onBeforePatch(state){
+        
     }
 
     //////////////////////////////////////////////////////////////////////////

@@ -81,6 +81,7 @@ export class GameRoomState extends Schema {
     }
 
     public update(deltaTime: number) {
+        
         //////////////////////////////////////////////
         // entity spawning script (span a monster every .5 second)
         this.spawnTimer += deltaTime;

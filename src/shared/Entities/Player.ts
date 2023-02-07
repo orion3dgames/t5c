@@ -190,18 +190,22 @@ export class Player extends Entity {
             let digit = data.digit;
             let ability = Abilities.getByDigit(this, digit);
             if (ability) {
-                // cancel casting
-                this.castingElapsed = 0;
-                this.castingTarget = 0;
-                this.isCasting = false;
-                this.ui._UICastingTimer.isVisible = false;
-                this.ui._UICastingTimerText.text = "";
+                
+                // if you are sender, cancel casting and strat cooldown on client
+                if(data.fromId === this.sessionId){
+                    // cancel casting
+                    this.castingElapsed = 0;
+                    this.castingTarget = 0;
+                    this.isCasting = false;
+                    this.ui._UICastingTimer.isVisible = false;
+                    this.ui._UICastingTimerText.text = "";
 
-                let cooldownUI = this.ui._playerUI.getControlByName("ability_" + digit + "_cooldown");
-                cooldownUI.isVisible = true;
-                setTimeout(() => {
-                    cooldownUI.isVisible = false;
-                }, ability.cooldown);
+                    let cooldownUI = this.ui._playerUI.getControlByName("ability_" + digit + "_cooldown");
+                    cooldownUI.isVisible = true;
+                    setTimeout(() => {
+                        cooldownUI.isVisible = false;
+                    }, ability.cooldown);
+                }
 
                 // action ability
                 this.actionsController.process(data, ability);
