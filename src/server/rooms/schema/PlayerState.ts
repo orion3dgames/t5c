@@ -77,6 +77,11 @@ export class PlayerState extends EntityState {
         let ability_key = (this.raceData.abilities && this.raceData.abilities[digit]) ?? false;
         let ability = Abilities[ability_key] ?? null;
 
+        // make sure ability exists
+        if (!ability) {
+            return false;
+        }
+
         // make sure player can cast this ability
         if (!this.canEntityCastAbility(target, ability, digit)) {
             return false;
