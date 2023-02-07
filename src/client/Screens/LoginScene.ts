@@ -78,7 +78,7 @@ export class LoginScene {
         welcomeText.width = 0.8;
         welcomeText.height = "40px";
         welcomeText.color = "white";
-        welcomeText.top = "100px";
+        welcomeText.top = "120px";
         welcomeText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         welcomeText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         columnRect.addControl(welcomeText);
