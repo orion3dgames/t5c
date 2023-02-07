@@ -56,7 +56,7 @@ class App {
         })) as Engine;
 
         // loading
-        var loadingScreen = new Loading("I'm loading!!");
+        var loadingScreen = new Loading("Loading Assets...");
         this._engine.loadingScreen = loadingScreen;
 
         // create colyseus client

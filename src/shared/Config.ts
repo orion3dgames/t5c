@@ -43,8 +43,8 @@ let Config = {
     // functions
     setDefault() {
         global.T5C = {
-            nextScene: isLocal() ? State.GAME : State.LOGIN,
-            //nextScene: State.LOGIN,
+            //nextScene: isLocal() ? State.GAME : State.LOGIN,
+            nextScene: State.LOGIN,
             currentRoomID: "",
             currentSessionID: "",
             currentLocation: Locations[Config.initialLocation],

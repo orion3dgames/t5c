@@ -20,7 +20,6 @@ import alertMessage from "../../shared/Utils/alertMessage";
 import Locations from "../../shared/Data/Locations";
 
 export class CharacterSelectionScene {
-    
     public _scene: Scene;
     private _gui: AdvancedDynamicTexture;
     public _button: Button;
@@ -28,7 +27,6 @@ export class CharacterSelectionScene {
     private leftColumnRect;
 
     public async createScene(engine) {
-
         // create scene
         let scene = new Scene(engine);
 
@@ -40,7 +38,7 @@ export class CharacterSelectionScene {
         camera.setTarget(Vector3.Zero()); //targets the camera to scene origin
 
         // set up ui
-        const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI"); 
+        const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
         guiMenu.idealHeight = 720;
 
         // add main ui container
@@ -52,12 +50,12 @@ export class CharacterSelectionScene {
         guiMenu.addControl(imageRect);
 
         // add image
-        var img = new Image("image", "./images/background_mainmenu_1.jpg")
+        var img = new Image("image", "./images/background_mainmenu_1.jpg");
         img.stretch = Image.STRETCH_FILL;
         imageRect.addControl(img);
 
         //////////////////////////////////////////////////////////////
- 
+
         // left columm
         const leftColumnRect = new Rectangle("columnLeft");
         leftColumnRect.top = 0;
@@ -70,10 +68,9 @@ export class CharacterSelectionScene {
         leftColumnRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         imageRect.addControl(leftColumnRect);
 
-
         const leftColumnRectPad = new Rectangle("leftColumnRectPad");
         leftColumnRectPad.top = 0;
-        leftColumnRectPad.width = .9;
+        leftColumnRectPad.width = 0.9;
         leftColumnRectPad.height = 1;
         leftColumnRectPad.thickness = 0;
         leftColumnRectPad.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
@@ -81,31 +78,30 @@ export class CharacterSelectionScene {
         leftColumnRect.addControl(leftColumnRectPad);
         this.leftColumnRect = leftColumnRectPad;
 
-       // logo
-       const title = new TextBlock("title", Config.title);
-       title.top = "30px";
-       title.fontSize = "40px";
-       title.color = "white";
-       title.width = 0.8;
-       title.height = "40px";
-       title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-       leftColumnRect.addControl(title);
+        // logo
+        var imgLogo = new Image("imgLogo", "./images/logo.png");
+        imgLogo.stretch = Image.STRETCH_UNIFORM;
+        imgLogo.top = "30px";
+        imgLogo.width = 1;
+        imgLogo.height = "65px;";
+        imgLogo.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        leftColumnRect.addControl(imgLogo);
 
-       // welcome text
-       const welcomeText = new TextBlock("infotext", "Welcome "+global.T5C.currentUser.username);
-       welcomeText.width = 0.8
-       welcomeText.height = "40px";
-       welcomeText.color = "white";
-       welcomeText.top = "80px";
-       welcomeText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-       welcomeText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-       leftColumnRect.addControl(welcomeText);
+        // welcome text
+        const welcomeText = new TextBlock("infotext", "Welcome " + global.T5C.currentUser.username);
+        welcomeText.width = 0.8;
+        welcomeText.height = "40px";
+        welcomeText.color = "white";
+        welcomeText.top = "100px";
+        welcomeText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        welcomeText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        leftColumnRect.addControl(welcomeText);
 
         // add scrollable container
         var scrollViewerBloc = new ScrollViewer("chat-scroll-viewer");
         scrollViewerBloc.width = 1;
-        scrollViewerBloc.height = .4;
-        scrollViewerBloc.left = '0px';
+        scrollViewerBloc.height = 0.4;
+        scrollViewerBloc.left = "0px";
         scrollViewerBloc.top = "160px";
         scrollViewerBloc.background = "#222222";
         scrollViewerBloc.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
@@ -123,7 +119,7 @@ export class CharacterSelectionScene {
         logoutBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         this.leftColumnRect.addControl(logoutBtn);
 
-        logoutBtn.onPointerDownObservable.add(() => { 
+        logoutBtn.onPointerDownObservable.add(() => {
             this.logout();
         });
 
@@ -133,31 +129,30 @@ export class CharacterSelectionScene {
         await this._scene.whenReadyAsync();
 
         // check if user token is valid
-        let user:PlayerUser = await this.checkLogin();
-        if(!user){
+        let user: PlayerUser = await this.checkLogin();
+        if (!user) {
             // if token not valid, send back to login screen
             Config.goToScene(State.LOGIN);
         }
 
         // SHOW AVAILABLE CHARACTERS GUI
         await this.displayCharactersGUI(user.characters as PlayerCharacter[], scrollViewerBloc);
-        
+
         // SHOW NEW PLAYER GUI
         await this.displayCreateNewCharacterGUI();
     }
 
-    async displayCreateNewCharacterGUI(){
-
+    async displayCreateNewCharacterGUI() {
         const usernameInput = new InputText("newCharacterInput");
         usernameInput.top = "-130px;";
         usernameInput.width = 1;
-        usernameInput.height = '30px;'
+        usernameInput.height = "30px;";
         usernameInput.color = "#FFF";
         usernameInput.text = generateRandomPlayerName();
         usernameInput.placeholderText = "Enter username";
         usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         usernameInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        this.leftColumnRect.addControl(usernameInput); 
+        this.leftColumnRect.addControl(usernameInput);
 
         const createBtn = Button.CreateSimpleButton("newCharacterBtn", "Create New Character");
         createBtn.top = "-100px";
@@ -169,29 +164,23 @@ export class CharacterSelectionScene {
         createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         this.leftColumnRect.addControl(createBtn);
 
-        createBtn.onPointerDownObservable.add(() => { 
-            
-            // create new character via database 
-            this.createCharacter(usernameInput.text).then((char)=>{
-
+        createBtn.onPointerDownObservable.add(() => {
+            // create new character via database
+            this.createCharacter(usernameInput.text).then((char) => {
                 // login as this character
                 this.loginAs(char);
 
                 // reset text
                 usernameInput.text = "";
             });
-
         });
-
     }
 
-    async displayCharactersGUI(characters:PlayerCharacter[], scrollViewerBloc){
-
+    async displayCharactersGUI(characters: PlayerCharacter[], scrollViewerBloc) {
         let top = 0;
-        characters.forEach(char => {
-
-            const createBtn = Button.CreateSimpleButton("characterBtn-"+char.id, "Play as: "+char.name);
-            createBtn.top = top+"px";
+        characters.forEach((char) => {
+            const createBtn = Button.CreateSimpleButton("characterBtn-" + char.id, "Play as: " + char.name);
+            createBtn.top = top + "px";
             createBtn.width = 1;
             createBtn.height = "30px";
             createBtn.background = "#000000";
@@ -201,72 +190,64 @@ export class CharacterSelectionScene {
             createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             scrollViewerBloc.addControl(createBtn);
 
-            createBtn.onPointerDownObservable.add(() => { 
+            createBtn.onPointerDownObservable.add(() => {
                 this.loginAs(char);
             });
 
             top += 35;
         });
-
     }
 
     // login as this character
-    loginAs(character:PlayerCharacter){
+    loginAs(character: PlayerCharacter) {
         global.T5C.currentCharacter = character;
         global.T5C.currentLocationKey = character.location;
         global.T5C.currentLocation = Locations[character.location];
         Config.goToScene(State.GAME);
     }
 
-     // logout
-     logout(){
+    // logout
+    logout() {
         global.T5C.currentCharacter = null;
         global.T5C.currentLocationKey = null;
         global.T5C.currentLocation = null;
         Config.goToScene(State.LOGIN);
     }
 
-
     // check login details
-    async checkLogin(){
-
+    async checkLogin() {
         // check user exists else send back to login
-        let req = await request('post', apiUrl()+'/check', {
+        let req = await request("post", apiUrl() + "/check", {
             token: global.T5C.currentUser.token,
         });
 
         // check req status
-        if(req.status === 200){
+        if (req.status === 200) {
             return JSON.parse(req.data).user;
-        }else{
+        } else {
             // something went wrong
             alertMessage(this._gui, "Something went wrong.");
         }
- 
     }
 
     // create character
-    async createCharacter(name){
-
+    async createCharacter(name) {
         // make sure both the username and password is entered.
-        if(!name){
+        if (!name) {
             return false;
         }
 
         // check user exists else send back to login
-        let req = await request('post', apiUrl()+'/create_character', {
+        let req = await request("post", apiUrl() + "/create_character", {
             token: global.T5C.currentUser.token,
-            name: name
+            name: name,
         });
 
         // check req status
-        if(req.status === 200){
+        if (req.status === 200) {
             return JSON.parse(req.data).character;
-        }else{
+        } else {
             return false;
         }
-
     }
-
-
 }
