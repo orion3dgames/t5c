@@ -95,39 +95,34 @@ export class GameRoomState extends Schema {
         }
 
         //////////////////////////////////////////////
-        // entity moving script
-        this.timer += deltaTime;
-        let refreshRate = 100;
-        if (this.timer >= refreshRate) {
-            this.timer = 0;
+        // for each entity
+        if (this.entities.size > 0) {
+            this.entities.forEach((entity) => {
+                
+                // entity update
+                entity.update();
 
-            // for each entity
-            if (this.entities.size > 0) {
-                this.entities.forEach((entity) => {
-                    // entity update
-                    entity.update();
-
-                    // only move non playing entities
-                    if (entity.type === "entity") {
-                        if (entity.AI_CURRENT_STATE === AI_STATE.IDLE) {
-                        } else if (entity.AI_CURRENT_STATE === AI_STATE.SEEKING) {
-                            entity.seek();
-                        } else if (entity.AI_CURRENT_STATE === AI_STATE.WANDER) {
-                            entity.wander();
-                        } else if (entity.AI_CURRENT_STATE === AI_STATE.ATTACKING) {
-                            entity.attack();
-                        }
+                // only move non playing entities
+                if (entity.type === "entity") {
+                    if (entity.AI_CURRENT_STATE === AI_STATE.IDLE) {
+                    } else if (entity.AI_CURRENT_STATE === AI_STATE.SEEKING) {
+                        entity.seek();
+                    } else if (entity.AI_CURRENT_STATE === AI_STATE.WANDER) {
+                        entity.wander();
+                    } else if (entity.AI_CURRENT_STATE === AI_STATE.ATTACKING) {
+                        entity.attack();
                     }
-                });
-            }
-
-            // for each players
-            if (this.players.size > 0) {
-                this.players.forEach((player) => {
-                    player.update();
-                });
-            }
+                }
+            });
         }
+
+        // for each players
+        if (this.players.size > 0) {
+            this.players.forEach((player) => {
+                player.update();
+            });
+        }
+        
     }
 
     /**
