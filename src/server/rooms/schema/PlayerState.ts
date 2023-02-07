@@ -6,9 +6,9 @@ import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurren
 import { EntityState } from "../schema/EntityState";
 import { Vector3 } from "../../../shared/yuka";
 import { GameRoom } from "../GameRoom";
-import { Abilities, Ability } from "../../../shared/Data/Abilities";
+import { Abilities } from "../../../shared/Entities/Common/Abilities";
 import { Leveling } from "../../../shared/Entities/Player/Leveling";
-import Races from "../../../shared/Data/Races";
+import { Races } from "../../../shared/Entities/Common/Races";
 
 export class PlayerState extends EntityState {
     // networked player specific
@@ -31,8 +31,7 @@ export class PlayerState extends EntityState {
     constructor(gameroom: GameRoom, data, ...args: any[]) {
         super(gameroom, data, args);
 
-        this.raceData = Races[this.race];
-
+        this.raceData = Races.get(this.race);
         this.ability_in_cooldown = [false, false, false, false, false, false, false, false, false, false, false];
 
         // add a 5 second grace period where the player can not be targeted by the ennemies
@@ -53,6 +52,12 @@ export class PlayerState extends EntityState {
 
         // if not dead
         if (this.isDead === false) {
+            // level boost
+            if (this.level > 1) {
+                //this.raceData.maxMana = this.raceData.maxMana * this.level;
+                //this.raceData.maxHealth = this.raceData.maxMana * this.level;
+            }
+
             // continuously gain mana
             if (this.mana < this.raceData.maxMana) {
                 this.mana += this.raceData.manaRegen;
@@ -74,13 +79,14 @@ export class PlayerState extends EntityState {
      */
     processAbility(client, target, data) {
         let digit = data.digit;
-        let ability_key = (this.raceData.abilities && this.raceData.abilities[digit]) ?? false;
-        let ability = Abilities[ability_key] ?? null;
+        let ability = Abilities.getByDigit(this, digit);
 
         // make sure ability exists
         if (!ability) {
             return false;
         }
+
+        let ability_key = ability.key;
 
         // make sure player can cast this ability
         if (!this.canEntityCastAbility(target, ability, digit)) {
@@ -94,10 +100,8 @@ export class PlayerState extends EntityState {
                 digit: data.digit,
             });
 
-            console.log("START TIMER", ability.castTime);
             // start a timer
             this.player_casting_timer = setTimeout(() => {
-                console.log("END TIMER", ability.castTime);
                 // process ability straight away
                 this.castAbility(target, ability, digit);
             }, ability.castTime);
@@ -116,56 +120,49 @@ export class PlayerState extends EntityState {
     canEntityCastAbility(target, ability, digit) {
         // if already casting
         if (ability.castTime > 0 && this.player_casting_timer !== false) {
-            Logger.error(`[gameroom][processAbility] player is already casting an ability`, ability);
+            Logger.warning(`[canEntityCastAbility] player is already casting an ability`, ability);
             return false;
         }
-        console.log("caster is not casting");
 
         // if caster is dead, cancel everything
         if (this.health < 0 || this.health === 0) {
-            Logger.error(`[gameroom][processAbility] caster is dead`, ability);
+            Logger.warning(`[canEntityCastAbility] caster is dead`, ability);
             return false;
         }
-        console.log("caster is not dead");
 
         // if ability not found, cancel everything
         if (!ability) {
-            Logger.error(`[gameroom][processAbility] ability not found`, ability);
+            Logger.error(`[canEntityCastAbility] ability not found`, ability);
             return false;
         }
-        console.log("ability is found");
 
         // if target is not already dead
         if (target.isEntityDead()) {
-            Logger.warning(`[gameroom][processAbility] target is dead`, target.health);
+            Logger.warning(`[canEntityCastAbility] target is dead`, target.health);
             return false;
         }
-        console.log("target is not dead");
 
         // if in cooldown
         if (this.ability_in_cooldown[digit]) {
-            Logger.warning(`[gameroom][processAbility] ability is in cooldown`, digit);
+            Logger.warning(`[canEntityCastAbility] ability is in cooldown`, digit);
             return false;
         }
-        console.log("ability is not in cooldown");
 
         // only cast ability if enought mana is available
         let manaNeeded = ability.casterPropertyAffected["mana"] ? ability.casterPropertyAffected["mana"] : 0;
         if (manaNeeded > 0 && this.mana < manaNeeded) {
-            Logger.warning(`[gameroom][processAbility] not enough mana available`, this.mana);
+            Logger.warning(`[canEntityCastAbility] not enough mana available`, this.mana);
             return false;
         }
-        console.log("plenty of mana is available", manaNeeded, this.mana);
 
         // sender cannot cast on himself
         if (ability.castSelf === false && target.sessionId === this.sessionId) {
-            Logger.warning(`[gameroom][processAbility] cannot cast this ability on yourself`);
+            Logger.warning(`[canEntityCastAbility] cannot cast this ability on yourself`);
             return false;
         }
-        console.log("can cast ability on self");
 
-        //
-        console.log("can cast ability confirmed");
+        Logger.info(`[canEntityCastAbility] player can cast ability`, ability.key);
+
         return true;
     }
 
@@ -196,7 +193,6 @@ export class PlayerState extends EntityState {
         for (let p in ability.casterPropertyAffected) {
             let property = ability.casterPropertyAffected[p];
             this[p] -= property;
-            console.log("casterPropertyAffected", this[p], property);
         }
 
         // process target affected properties
@@ -219,8 +215,8 @@ export class PlayerState extends EntityState {
             targetPos: target.getPosition(),
         });
 
+        // removing any casting timers
         if (this.player_casting_timer) {
-            console.log("REMOVE CASTING TIMER");
             this.player_casting_timer = false;
         }
 
@@ -305,10 +301,6 @@ export class PlayerState extends EntityState {
             return false;
         }
 
-        // cancel any moveTo event
-        //this.toRegion = false;
-        //this.destinationPath = [];
-
         // save current position
         let oldX = this.x;
         let oldY = this.y;
@@ -327,11 +319,11 @@ export class PlayerState extends EntityState {
         const foundPath: any = this._navMesh.checkPath(sourcePos, destinationPos);
         if (foundPath) {
             /*
-          // adjust height of the entity according to the ground
-          let currentRegion = this._navMesh.getClosestRegion( destinationPos );
-          const distance = currentRegion.plane.distanceToPoint( sourcePos );
-          let newY = distance * 0.2; // smooth transition
-          */
+            // adjust height of the entity according to the ground
+            let currentRegion = this._navMesh.getClosestRegion( destinationPos );
+            const distance = currentRegion.plane.distanceToPoint( sourcePos );
+            let newY = distance * 0.2; // smooth transition
+            */
 
             // next position validated, update player
             this.x = newX;
@@ -343,7 +335,6 @@ export class PlayerState extends EntityState {
 
             this.isMoving = true;
 
-            // add player to server
             //Logger.info('Valid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
         } else {
             // collision detected, return player old position

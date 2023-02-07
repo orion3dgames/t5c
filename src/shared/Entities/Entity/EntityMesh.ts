@@ -10,7 +10,7 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Room } from "colyseus.js";
 import { EntityState } from "../../../server/rooms/schema/EntityState";
 import Config from "../../Config";
-import Races from "../../../shared/Data/Races";
+import { Races, Race } from "../../Entities/Common/Races";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 
 export class EntityMesh {
@@ -18,6 +18,7 @@ export class EntityMesh {
     private assetsContainer: AssetContainer;
     private _entity: EntityState;
     private _room: Room;
+    private _raceData: Race;
     private _animationGroups: AnimationGroup[];
     public mesh: Mesh;
     public playerMesh;
@@ -25,17 +26,23 @@ export class EntityMesh {
     public debugMesh: Mesh;
     public selectedMesh: Mesh;
 
-    constructor(scene: Scene, assetsContainer, entity: EntityState, room: Room, isCurrentPlayer: boolean) {
+    constructor(
+        scene: Scene,
+        assetsContainer,
+        entity: EntityState,
+        room: Room,
+        isCurrentPlayer: boolean,
+        raceData: Race
+    ) {
         this._scene = scene;
         this.assetsContainer = assetsContainer;
         this._entity = entity;
         this._room = room;
         this.isCurrentPlayer = isCurrentPlayer;
+        this._raceData = raceData;
     }
 
     public async load() {
-        let config = Races[this._entity.race];
-
         // create collision cube
         const box = MeshBuilder.CreateBox("root_" + this._entity.race, { width: 2, height: 4 }, this._scene);
         box.visibility = 0;
@@ -94,10 +101,10 @@ export class EntityMesh {
         playerMesh.name = this._entity.sessionId + "_mesh";
         playerMesh.parent = box;
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
-        if (config.rotationFix) {
-            playerMesh.rotation.set(0, config.rotationFix, 0);
+        if (this._raceData.rotationFix) {
+            playerMesh.rotation.set(0, this._raceData.rotationFix, 0);
         }
-        playerMesh.scaling.set(config.scale, config.scale, config.scale);
+        playerMesh.scaling.set(this._raceData.scale, this._raceData.scale, this._raceData.scale);
         playerMesh.isVisible = false;
         this.playerMesh = playerMesh;
 

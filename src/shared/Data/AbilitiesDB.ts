@@ -1,67 +1,66 @@
 type Ability = {
-
-    // unique key 
-    key: string, 
+    // unique key
+    key: string;
 
     // relative link to icon
-    icon: string, 
-    
+    icon: string;
+
     // ability title
-    name: string, 
+    name: string;
 
     // ability description
-    description: string,
+    description: string;
 
     // can ability be cast on self ? true or false
-    castSelf: boolean,
+    castSelf: boolean;
 
     // cast time in milliseconds
-    castTime: number, 
+    castTime: number;
 
     // cooldown period in milliseconds
-    cooldown: number, 
-    
+    cooldown: number;
+
     // number of time this ability should repeat
-    repeat: number, 
+    repeat: number;
 
     // interval this ability should repeat in milliseconds
-    repeatInterval: number, 
+    repeatInterval: number;
 
     // range this ability affects (any entity in this range will be affected the same)
-    range: number, 
+    range: number;
 
     // max range this ability affects (if entity is further, prevent casting)
-    maxRange: number,
+    maxRange: number;
 
     // the effect that will happen when the ability is played
     effect: {
-        type?: string, // travel or self
-        particule?: string, // choose from list of particule effects
-        color?: string // main color of effect
-    },
+        type?: string; // travel or self
+        particule?: string; // choose from list of particule effects
+        color?: string; // main color of effect
+    };
 
     // what properties will affect caster
     casterPropertyAffected: {
-        [key: string]: number
-    },
+        [key: string]: number;
+    };
 
     // what properties will affect caster
     targetPropertyAffected: {
-        [key: string]: number
-    },
+        [key: string]: number;
+    };
 
     // what properties a player must have to learn this ability
     requiredToLearn: {
-        [key: string]: number
-    }
+        [key: string]: number;
+    };
 };
 
 interface abilityMap {
-    [key: string]: Ability
- }
+    [key: string]: Ability;
+}
 
-let Abilities:abilityMap = {
-    "base_attack": {
+let AbilitiesDB: abilityMap = {
+    base_attack: {
         name: "Attack",
         key: "base_attack",
         icon: "./icons/ABILITY_base_attack.png",
@@ -74,17 +73,17 @@ let Abilities:abilityMap = {
         range: 0,
         maxRange: 2,
         effect: {
-            type: 'target',
-            particule: 'damage',
-            color: 'white'
+            type: "target",
+            particule: "damage",
+            color: "white",
         },
         casterPropertyAffected: {},
         targetPropertyAffected: {
-            'health': -10,
+            health: -10,
         },
         requiredToLearn: {},
-    },  
-    "fireball": {
+    },
+    fireball: {
         name: "Fireball",
         key: "fireball",
         icon: "./icons/ABILITY_fireball.png",
@@ -97,21 +96,21 @@ let Abilities:abilityMap = {
         range: 0,
         maxRange: 10,
         effect: {
-            type: 'travel',
-            particule: 'fireball',
-            color: 'orange'
+            type: "travel",
+            particule: "fireball",
+            color: "orange",
         },
         casterPropertyAffected: {
-            'mana': 10,
+            mana: 10,
         },
         targetPropertyAffected: {
-            'health': -50,
+            health: -50,
         },
         requiredToLearn: {
-            'level': 3,
+            level: 3,
         },
-    },  
-    "poisonball": {
+    },
+    poisonball: {
         name: "Poison Cloud",
         key: "poisonball",
         icon: "./icons/ABILITY_poisonball.png",
@@ -124,21 +123,21 @@ let Abilities:abilityMap = {
         range: 0,
         maxRange: 10,
         effect: {
-            type: 'travel',
-            particule: 'fireball',
-            color: 'green'
+            type: "travel",
+            particule: "fireball",
+            color: "green",
         },
         casterPropertyAffected: {
-            'mana': 20,
+            mana: 20,
         },
         targetPropertyAffected: {
-            'health': -10,
+            health: -10,
         },
         requiredToLearn: {
-            'level': 5,
+            level: 5,
         },
-    },  
-    "heal": {
+    },
+    heal: {
         name: "Heal",
         key: "heal",
         icon: "./icons/ABILITY_heal.png",
@@ -148,28 +147,25 @@ let Abilities:abilityMap = {
         cooldown: 3000,
         repeat: 0,
         repeatInterval: 0,
-	    range: 0,
+        range: 0,
         maxRange: 10,
         effect: {
-            type: 'self',
-            particule: 'heal',
-            color: 'white'
+            type: "self",
+            particule: "heal",
+            color: "white",
         },
         casterPropertyAffected: {
-            'mana': 20,
+            mana: 20,
         },
         targetPropertyAffected: {
-            'health': 50,
+            health: 50,
         },
         requiredToLearn: {
-            'level': 4,
-            'intelligence': 18,
-            'wisdom': 24,
+            level: 4,
+            intelligence: 18,
+            wisdom: 24,
         },
-    }, 
-}
+    },
+};
 
-export {
-    Abilities,
-    Ability
-}
+export { AbilitiesDB, Ability };

@@ -13,10 +13,9 @@ import { UserInterface } from "../../client/Controllers/UserInterface";
 import { Room } from "colyseus.js";
 import { NavMesh } from "../yuka";
 import Locations from "../Data/Locations";
-import { Abilities } from "../Data/Abilities";
+import { Abilities } from "./Common/Abilities";
 import Config from "../Config";
 import State from "../../client/Screens/Screens";
-import { roundTo } from "../Utils";
 
 export class Player extends Entity {
     public input;
@@ -69,8 +68,6 @@ export class Player extends Entity {
         this._scene.onPointerObservable.add((pointerInfo: any) => {
             // on left mouse click
             if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 0) {
-                //console.log(pointerInfo._pickInfo);
-
                 /////////////////////////////////////////////////////////////////////
                 // if click on entity
                 if (
@@ -150,30 +147,26 @@ export class Player extends Entity {
         // check if casting
         if (this.isCasting === true) {
             // increment casting timer
-            this.ui._UICastingTimer.isVisible = true;
-            this.castingElapsed += delta;
-            this.ui._UICastingTimer.text = "Casting: " + roundTo(this.castingElapsed, 0) + "/" + this.castingTarget;
-            console.log("CASTING.....", this.ui._UICastingTimer.text);
+            this.ui._UICastingTimer.isVisible = true; // show timer
+            this.castingElapsed += delta; // increment casting timer by server delta
+            let widthInPercentage = ((this.castingElapsed / this.castingTarget) * 100) / 100; // percentage between 0 and 1
+            this.ui._UICastingTimerText.text = this.castingElapsed + "/" + this.castingTarget;
+            this.ui._UICastingTimerInside.width = widthInPercentage;
         }
     }
 
-    public getAbilityFromDigit(digit) {
-        let ability_no = this.raceData.abilities[digit];
-        return Abilities[ability_no];
-    }
-
+    // player is casting
     public startCasting(data) {
         let digit = data.digit;
-        let ability = this.getAbilityFromDigit(digit);
-
-        // player is casting
-        this.isCasting = true;
-        this.castingElapsed = 0;
-        this.castingTarget = ability.castTime;
-        this.castingDigit = digit;
-        this.ui._UICastingTimer.isVisible = true;
-        this.ui._UICastingTimer.text = "Start Casting";
-        console.log("SERVER CONFIRM PLAYER CAN START CASTING", this.isCasting, data);
+        let ability = Abilities.getByDigit(this, digit);
+        if (ability) {
+            this.isCasting = true;
+            this.castingElapsed = 0;
+            this.castingTarget = ability.castTime;
+            this.castingDigit = digit;
+            this.ui._UICastingTimer.isVisible = true;
+            this.ui._UICastingTimerText.text = "Start Casting";
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -194,28 +187,25 @@ export class Player extends Entity {
 
         // server confirms ability can be cast
         this._room.onMessage("entity_ability_cast", (data) => {
-            console.log("CASTING ABILITY ON CLIENT", this.isCasting, data);
-
-            // remove any casting timers
-            this.castingElapsed = 0;
-            this.castingTarget = 0;
-            this.isCasting = false;
-            this.ui._UICastingTimer.isVisible = false;
-            this.ui._UICastingTimer.text = 0;
-
-            //
             let digit = data.digit;
-            let ability = Abilities[data.key];
-            let cooldownUI = this.ui._playerUI.getControlByName("ability_" + digit + "_cooldown");
-            cooldownUI.isVisible = true;
-            console.log("STARTING COOLDOWN", cooldownUI, ability.cooldown);
-            setTimeout(() => {
-                cooldownUI.isVisible = false;
-                console.log("FINISH COOLDOWN", cooldownUI, ability.cooldown);
-            }, ability.cooldown);
+            let ability = Abilities.getByDigit(this, digit);
+            if (ability) {
+                // cancel casting
+                this.castingElapsed = 0;
+                this.castingTarget = 0;
+                this.isCasting = false;
+                this.ui._UICastingTimer.isVisible = false;
+                this.ui._UICastingTimerText.text = "";
 
-            // action ability
-            this.actionsController.process(data);
+                let cooldownUI = this.ui._playerUI.getControlByName("ability_" + digit + "_cooldown");
+                cooldownUI.isVisible = true;
+                setTimeout(() => {
+                    cooldownUI.isVisible = false;
+                }, ability.cooldown);
+
+                // action ability
+                this.actionsController.process(data, ability);
+            }
         });
     }
 

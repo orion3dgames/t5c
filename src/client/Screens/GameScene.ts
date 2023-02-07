@@ -25,6 +25,7 @@ import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
 
 import { createConvexRegionHelper, createGraphHelper } from "../../shared/Utils/navMeshHelper";
 import Locations from "../../shared/Data/Locations";
+import { SceneController } from "../Controllers/Scene";
 
 export class GameScene {
     private _scene: Scene;
@@ -178,7 +179,7 @@ export class GameScene {
             console.error("FAILED TO CONNECT/CREATE ROOM", e);
             alert("Failed to connect.");
 
-            Config.goToScene(State.CHARACTER_SELECTION);
+            SceneController.goToScene(State.CHARACTER_SELECTION);
         }
     }
 

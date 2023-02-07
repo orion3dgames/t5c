@@ -17,6 +17,7 @@ import Config from "../../shared/Config";
 import State from "./Screens";
 import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
 import alertMessage from "../../shared/Utils/alertMessage";
+import { SceneController } from "../Controllers/Scene";
 
 export class LoginScene {
     private _engine: Engine;
@@ -168,7 +169,7 @@ export class LoginScene {
             global.T5C.currentUser = JSON.parse(req.data).user;
 
             // go to character selection page
-            Config.goToScene(State.CHARACTER_SELECTION);
+            SceneController.goToScene(State.CHARACTER_SELECTION);
         } else {
             // something went wrong
             alertMessage(this._ui, "Something went wrong.");

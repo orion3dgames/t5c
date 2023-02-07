@@ -1,10 +1,8 @@
 import { AnimationGroup, Vector3 } from "@babylonjs/core";
 import { EntityCurrentState } from "./EntityCurrentState";
-import Config from "../../Config";
-import Races from "../../../shared/Data/Races";
 
 export class EntityAnimator {
-    private entityType;
+    private raceData;
 
     //animations
     private _playerAnimations: AnimationGroup[];
@@ -18,22 +16,20 @@ export class EntityAnimator {
     private _currentAnim: AnimationGroup = null;
     private _prevAnim: AnimationGroup;
 
-    constructor(player_animations: AnimationGroup[], entityType) {
+    constructor(player_animations: AnimationGroup[], raceData) {
         this._playerAnimations = player_animations;
-        this.entityType = entityType;
+        this.raceData = raceData;
 
         this._build();
     }
 
     private _build(): void {
-        let raceData = Races[this.entityType];
-
         // find animations
-        let idleAnimationNumber = raceData.animations["IDLE"];
-        let walkAnimationNumber = raceData.animations["WALK"];
-        let attackAnimationNumber = raceData.animations["ATTACK"];
-        let deathAnimationNumber = raceData.animations["DEATH"];
-        let takingDamageAnimationNumber = raceData.animations["DAMAGE"];
+        let idleAnimationNumber = this.raceData.animations["IDLE"];
+        let walkAnimationNumber = this.raceData.animations["WALK"];
+        let attackAnimationNumber = this.raceData.animations["ATTACK"];
+        let deathAnimationNumber = this.raceData.animations["DEATH"];
+        let takingDamageAnimationNumber = this.raceData.animations["DAMAGE"];
 
         // set animations
         this._idle = this._playerAnimations[idleAnimationNumber];
@@ -53,7 +49,7 @@ export class EntityAnimator {
         this._damage.loopAnimation = true;
 
         // set animation speed
-        this._walk.speedRatio = raceData.animationSpeed;
+        this._walk.speedRatio = this.raceData.animationSpeed;
 
         //initialize current and previous
         this._currentAnim = this._idle;

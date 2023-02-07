@@ -9,7 +9,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 
 import State from "../../../client/Screens/Screens";
 import Locations from "../../../shared/Data/Locations";
-import { Abilities } from "../../../shared/Data/Abilities";
+import { Abilities } from "../Common/Abilities";
 
 export class EntityActions {
     private _scene: Scene;
@@ -24,10 +24,7 @@ export class EntityActions {
         this._scene = scene;
     }
 
-    public process(data) {
-        // get ability
-        let ability = Abilities[data.key];
-
+    public process(data, ability) {
         // get target mesh
         let mesh = this._scene.getMeshByName(data.targetId + "_mesh");
 

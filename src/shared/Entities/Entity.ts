@@ -4,9 +4,6 @@ import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascaded
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-
-import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
-import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 
 import { EntityState } from "../../server/rooms/schema/EntityState";
@@ -20,8 +17,8 @@ import { Room } from "colyseus.js";
 import { UserInterface } from "../../client/Controllers/UserInterface";
 import { NavMesh } from "../yuka";
 import { AI_STATE } from "./Entity/AIState";
+import { Races, Race } from "../Entities/Common/Races";
 import Config from "../Config";
-import Races from "../Data/Races";
 
 export class Entity {
     public _scene: Scene;
@@ -67,7 +64,7 @@ export class Entity {
     public state: number = 0;
     public AI_CURRENT_STATE: number = 0;
 
-    public raceData;
+    public raceData: Race;
 
     // flags
     public blocked: boolean = false; // if true, player will not moved
@@ -91,7 +88,7 @@ export class Entity {
         this.sessionId = entity.sessionId; // network id from colyseus
         this.isCurrentPlayer = this._room.sessionId === entity.sessionId;
         this.entity = entity;
-        this.raceData = Races[entity.race];
+        this.raceData = Races.get(entity.race);
 
         // update player data from server data
         Object.assign(this, this.entity);
@@ -107,7 +104,8 @@ export class Entity {
             this.assetsContainer,
             this.entity,
             this._room,
-            this.isCurrentPlayer
+            this.isCurrentPlayer,
+            this.raceData
         );
         await this.meshController.load();
         this.mesh = this.meshController.mesh;
@@ -119,7 +117,7 @@ export class Entity {
         this._shadow.addShadowCaster(this.meshController.mesh, true);
 
         // add all entity related stuff
-        this.animatorController = new EntityAnimator(this.meshController.getAnimation(), this.entity.race);
+        this.animatorController = new EntityAnimator(this.meshController.getAnimation(), this.raceData);
         this.moveController = new EntityMove(this.mesh, this._navMesh, this.isCurrentPlayer);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
 

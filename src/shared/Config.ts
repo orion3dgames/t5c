@@ -1,7 +1,3 @@
-import State from "../client/Screens/Screens";
-import Locations from "./Data/Locations";
-import { isLocal } from "./Utils";
-
 let Config = {
     // general settings
     title: "T5C",
@@ -39,23 +35,6 @@ let Config = {
 
     // basic locations
     initialLocation: "lh_town",
-
-    // functions
-    setDefault() {
-        global.T5C = {
-            //nextScene: isLocal() ? State.GAME : State.LOGIN,
-            nextScene: State.LOGIN,
-            currentRoomID: "",
-            currentSessionID: "",
-            currentLocation: Locations[Config.initialLocation],
-            currentUser: false,
-            currentMs: 0,
-        };
-    },
-
-    goToScene(newState: State) {
-        global.T5C.nextScene = newState;
-    },
 };
 
 export default Config;

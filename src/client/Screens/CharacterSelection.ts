@@ -18,6 +18,7 @@ import Config from "../../shared/Config";
 import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
 import alertMessage from "../../shared/Utils/alertMessage";
 import Locations from "../../shared/Data/Locations";
+import { SceneController } from "../Controllers/Scene";
 
 export class CharacterSelectionScene {
     public _scene: Scene;
@@ -132,7 +133,7 @@ export class CharacterSelectionScene {
         let user: PlayerUser = await this.checkLogin();
         if (!user) {
             // if token not valid, send back to login screen
-            Config.goToScene(State.LOGIN);
+            SceneController.goToScene(State.LOGIN);
         }
 
         // SHOW AVAILABLE CHARACTERS GUI
@@ -203,7 +204,7 @@ export class CharacterSelectionScene {
         global.T5C.currentCharacter = character;
         global.T5C.currentLocationKey = character.location;
         global.T5C.currentLocation = Locations[character.location];
-        Config.goToScene(State.GAME);
+        SceneController.goToScene(State.GAME);
     }
 
     // logout
@@ -211,7 +212,7 @@ export class CharacterSelectionScene {
         global.T5C.currentCharacter = null;
         global.T5C.currentLocationKey = null;
         global.T5C.currentLocation = null;
-        Config.goToScene(State.LOGIN);
+        SceneController.goToScene(State.LOGIN);
     }
 
     // check login details

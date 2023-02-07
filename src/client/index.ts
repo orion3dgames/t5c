@@ -23,6 +23,7 @@ import { CharacterSelectionScene } from "./Screens/CharacterSelection";
 import Config from "../shared/Config";
 import { Network } from "./Controllers/Network";
 import { Loading } from "./Controllers/Loading";
+import Locations from "./../shared/Data/Locations";
 
 // App class is our entire game application
 class App {
@@ -46,7 +47,7 @@ class App {
         this._init();
 
         // setup default values
-        Config.setDefault();
+        this.setDefault();
     }
 
     private async _init(): Promise<void> {
@@ -61,7 +62,7 @@ class App {
 
         // create colyseus client
         // this should use environement values
-        this._client = new Network(this._scene);
+        this._client = new Network();
 
         //MAIN render loop & state machine
         await this._render();
@@ -133,6 +134,19 @@ class App {
         window.addEventListener("resize", () => {
             this._engine.resize();
         });
+    }
+
+    // functions
+    setDefault() {
+        global.T5C = {
+            //nextScene: isLocal() ? State.GAME : State.LOGIN,
+            nextScene: State.LOGIN,
+            currentRoomID: "",
+            currentSessionID: "",
+            currentLocation: Locations[Config.initialLocation],
+            currentUser: false,
+            currentMs: 0,
+        };
     }
 
     private checkForSceneChange() {

@@ -1,4 +1,3 @@
-
 import { Scene } from "@babylonjs/core/scene";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
@@ -8,53 +7,46 @@ import { Button } from "@babylonjs/gui/2D/controls/button";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
-import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 
-import { 
-    UI_Chats, 
-    UI_Abilities, 
-    UI_Debug, 
-    UI_EntitySelected, 
-    UI_Panel
-} from "./UI";
+import { UI_Chats, UI_Abilities, UI_Debug, UI_EntitySelected, UI_Panel } from "./UI";
 
 import { Room } from "colyseus.js";
 import State from "../Screens/Screens";
+import { SceneController } from "../Controllers/Scene";
 import { Entity } from "../../shared/Entities/Entity";
-import { getHealthColorFromValue } from "../../shared/Utils";
 import Config from "../../shared/Config";
 import { Leveling } from "../../shared/Entities/Player/Leveling";
 
 export class UserInterface {
-    
     private _scene: Scene;
     private _engine: Engine;
 
     private _gameRoom: Room;
     private _chatRoom: Room;
-    public _entities:Entity[];
+    public _entities: Entity[];
     private _currentPlayer;
 
     //UI Elements
     private _playerUI;
     private _namesUI;
     private _centerUI;
-    private _UIChat:UI_Chats; 
-    private _UIAbilities:UI_Abilities; 
-    private _UIDebug:UI_Debug;
-    private _UITargetSelected:UI_EntitySelected; 
-    private _UIPlayerSelected:UI_EntitySelected;
-    private _UIPanel:UI_Panel;
+    private _UIChat: UI_Chats;
+    private _UIAbilities: UI_Abilities;
+    private _UIDebug: UI_Debug;
+    private _UITargetSelected: UI_EntitySelected;
+    private _UIPlayerSelected: UI_EntitySelected;
+    private _UIPanel: UI_Panel;
 
     // experience bar
     private experienceBarUI;
     private experienceBarUIText;
 
-    // 
+    // casting bar
     public _UICastingTimer;
+    public _UICastingTimerInside;
+    public _UICastingTimerText;
 
-    constructor(scene: Scene, engine:Engine, gameRoom:Room, chatRoom:Room, entities:Entity[], currentPlayer) {
-
+    constructor(scene: Scene, engine: Engine, gameRoom: Room, chatRoom: Room, entities: Entity[], currentPlayer) {
         // set var we will be needing
         this._scene = scene;
         this._engine = engine;
@@ -62,7 +54,7 @@ export class UserInterface {
         this._chatRoom = chatRoom;
         this._entities = entities;
         this._currentPlayer = currentPlayer;
- 
+
         // create ui
         const _namesUI = AdvancedDynamicTexture.CreateFullscreenUI("UI", true, this._scene);
         this._namesUI = _namesUI;
@@ -75,7 +67,7 @@ export class UserInterface {
 
         // center panel
         const centerPanel = new Rectangle("centerPanel");
-        centerPanel.top = "0px;"
+        centerPanel.top = "0px;";
         centerPanel.height = "170px";
         centerPanel.width = "400px";
         centerPanel.thickness = 0;
@@ -90,22 +82,19 @@ export class UserInterface {
         // create interface
         this.createMisc();
         this.experienceBar();
+        this.castingBar();
 
         // some ui must be constantly refreshed as things change
         this._scene.registerBeforeRender(() => {
-
-            // refresh 
+            // refresh
             //this._refreshDebugPanel(debugTextUI);
             this.refreshEntityUI();
-            
         });
-        
     }
 
     // set current player
     ////////////////////////////
-    public setCurrentPlayer(currentPlayer){
-        
+    public setCurrentPlayer(currentPlayer) {
         // set current player
         this._currentPlayer = currentPlayer;
 
@@ -116,24 +105,35 @@ export class UserInterface {
         this._UIChat = new UI_Chats(this._centerUI, this._chatRoom, currentPlayer, this._entities);
 
         // create debug ui + events
-        this._UIDebug = new UI_Debug(this._playerUI, this._engine, this._scene, this._gameRoom, this._currentPlayer, this._entities);
+        this._UIDebug = new UI_Debug(
+            this._playerUI,
+            this._engine,
+            this._scene,
+            this._gameRoom,
+            this._currentPlayer,
+            this._entities
+        );
 
         // create selected entity panel
-        this._UITargetSelected = new UI_EntitySelected(this._playerUI, this._scene, { position: "RIGHT", currentPlayer: false });
-        this._UIPlayerSelected = new UI_EntitySelected(this._playerUI, this._scene, { position: "LEFT", currentPlayer: currentPlayer });
+        this._UITargetSelected = new UI_EntitySelected(this._playerUI, this._scene, {
+            position: "RIGHT",
+            currentPlayer: false,
+        });
+        this._UIPlayerSelected = new UI_EntitySelected(this._playerUI, this._scene, {
+            position: "LEFT",
+            currentPlayer: currentPlayer,
+        });
 
         // create panel
         this._UIPanel = new UI_Panel(this._playerUI, this._scene, currentPlayer);
     }
 
-    public refreshEntityUI(){
-
-        if(this._currentPlayer){
+    public refreshEntityUI() {
+        if (this._currentPlayer) {
             let progress = Leveling.getLevelProgress(this._currentPlayer.experience);
             this.experienceBarUI.width = progress / 100;
-            this.experienceBarUIText.text = progress+"%";
+            this.experienceBarUIText.text = progress + "%";
         }
-            
 
         /*
         for(let sessionId in this._entities){
@@ -143,28 +143,26 @@ export class UserInterface {
             if(mesh){
                 mesh.outlineColor = Color3.FromHexString(getHealthColorFromValue(player.health));
             }
-        } */   
+        } */
     }
 
-
-    public experienceBar(){
-
+    public experienceBar() {
         /////////////////////////////////////
         //////////////////// mana bar
         const experienceBar = new Rectangle("experienceBar");
-        experienceBar.top = "-2px;"
-        experienceBar.left = "0px"; 
-        experienceBar.width = "400px;"
+        experienceBar.top = "-2px;";
+        experienceBar.left = "0px";
+        experienceBar.width = "400px;";
         experienceBar.height = "10px";
         experienceBar.background = Config.UI_CENTER_PANEL_BG;
         experienceBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         experienceBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         this._playerUI.addControl(experienceBar);
-        
+
         const experienceBarInside = new Rectangle("experienceBarInside");
-        experienceBarInside.top = "0px;"
-        experienceBarInside.left = "0px;"
-        experienceBarInside.width = "400px;"
+        experienceBarInside.top = "0px;";
+        experienceBarInside.left = "0px;";
+        experienceBarInside.width = "400px;";
         experienceBarInside.thickness = 0;
         experienceBarInside.height = "10px";
         experienceBarInside.background = "violet";
@@ -176,8 +174,8 @@ export class UserInterface {
         const experienceBarText = new TextBlock("experienceBarText");
         experienceBarText.text = "0";
         experienceBarText.color = "#FFF";
-        experienceBarText.top = "2px"; 
-        experienceBarText.left = "5px"; 
+        experienceBarText.top = "2px";
+        experienceBarText.left = "5px";
         experienceBarText.fontSize = "8px;";
         experienceBarText.lineSpacing = "-1px";
         experienceBarText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
@@ -186,40 +184,62 @@ export class UserInterface {
         experienceBarText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         experienceBar.addControl(experienceBarText);
         this.experienceBarUIText = experienceBarText;
-
-
     }
 
-    // create misc stuff
-    ////////////////////////////
-    public createMisc(){
+    public castingBar() {
+        // add tooltip
+        const castingBar = new Rectangle("castingBar");
+        castingBar.top = "0px";
+        castingBar.width = "200px";
+        castingBar.height = "20px";
+        castingBar.thickness = 1;
+        castingBar.background = "black";
+        castingBar.isVisible = false;
+        castingBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        castingBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        this._playerUI.addControl(castingBar);
+        this._UICastingTimer = castingBar;
+
+        const castingBarInside = new Rectangle("castingBarInside");
+        castingBarInside.top = "0px";
+        castingBarInside.width = 1;
+        castingBarInside.height = 1;
+        castingBarInside.background = "white";
+        castingBarInside.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        castingBarInside.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        castingBar.addControl(castingBarInside);
+        this._UICastingTimerInside = castingBarInside;
 
         const castingTimer = new TextBlock("castingTimer");
         castingTimer.text = "0";
         castingTimer.color = "#FFF";
-        castingTimer.top = 0; 
-        castingTimer.left = 0; 
-        castingTimer.fontSize = "24px;";
+        castingTimer.top = 0;
+        castingTimer.left = 0;
+        castingTimer.fontSize = "12px;";
+        castingTimer.color = "black;";
         castingTimer.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         castingTimer.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
         castingTimer.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
         castingTimer.horizontalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-        castingTimer.isVisible = false;
-        this._playerUI.addControl(castingTimer);
-        this._UICastingTimer = castingTimer;
+        castingBar.addControl(castingTimer);
+        this._UICastingTimerText = castingTimer;
+    }
 
+    // create misc stuff
+    ////////////////////////////
+    public createMisc() {
         const inventoryButton = Button.CreateSimpleButton("inventoryButton", "I");
         inventoryButton.top = "-17px;";
         inventoryButton.left = "-190px;";
         inventoryButton.width = "30px;";
         inventoryButton.height = "30px";
         inventoryButton.color = "white";
-        inventoryButton.background = "#000"; 
+        inventoryButton.background = "#000";
         inventoryButton.thickness = 1;
         inventoryButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         inventoryButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         this._playerUI.addControl(inventoryButton);
-        inventoryButton.onPointerDownObservable.add(() => { 
+        inventoryButton.onPointerDownObservable.add(() => {
             this._UIPanel.open("inventory");
         });
 
@@ -230,22 +250,20 @@ export class UserInterface {
         quitButton.width = "30px;";
         quitButton.height = "30px";
         quitButton.color = "white";
-        quitButton.background = "#000"; 
+        quitButton.background = "#000";
         quitButton.thickness = 1;
         quitButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         quitButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         this._playerUI.addControl(quitButton);
 
-        quitButton.onPointerDownObservable.add(() => { 
+        quitButton.onPointerDownObservable.add(() => {
             this._gameRoom.leave();
-            Config.goToScene(State.CHARACTER_SELECTION);
+            SceneController.goToScene(State.CHARACTER_SELECTION);
         });
-
     }
 
     public createEntityChatLabel(entity) {
-
-        var rect1 = new Rectangle('player_chat_'+entity.sessionId);
+        var rect1 = new Rectangle("player_chat_" + entity.sessionId);
         rect1.isVisible = false;
         rect1.width = "100px";
         rect1.adaptHeightToChildren = true;
@@ -257,15 +275,15 @@ export class UserInterface {
         rect1.linkWithMesh(entity.mesh);
         rect1.linkOffsetY = -130;
 
-        var label = new TextBlock('player_chat_label_'+entity.sessionId);
+        var label = new TextBlock("player_chat_label_" + entity.sessionId);
         label.text = entity.name;
         label.color = "white";
-        label.paddingLeft = '5px;';
-        label.paddingTop = '5px';
-        label.paddingBottom = '5px';
-        label.paddingRight = '5px';
+        label.paddingLeft = "5px;";
+        label.paddingTop = "5px";
+        label.paddingBottom = "5px";
+        label.paddingRight = "5px";
         label.textWrapping = TextWrapping.WordWrap;
-        label.resizeToFit = true; 
+        label.resizeToFit = true;
         rect1.addControl(label);
 
         return rect1;
@@ -273,21 +291,19 @@ export class UserInterface {
 
     // obsolete, keeping just in case
     public createEntityLabel(entity) {
-        var rect1 = new Rectangle('player_nameplate_'+entity.sessionId);
+        var rect1 = new Rectangle("player_nameplate_" + entity.sessionId);
         rect1.isVisible = true;
         rect1.width = "200px";
         rect1.height = "40px";
         rect1.thickness = 0;
-        rect1.zIndex = 
-        this._namesUI.addControl(rect1);
+        rect1.zIndex = this._namesUI.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
         rect1.linkOffsetY = -100;
-        var label = new TextBlock('player_nameplate_text_'+entity.sessionId);
+        var label = new TextBlock("player_nameplate_text_" + entity.sessionId);
         label.text = entity.name;
         label.color = "blue";
         label.fontWeight = "bold";
         rect1.addControl(label);
         return rect1;
     }
-
 }

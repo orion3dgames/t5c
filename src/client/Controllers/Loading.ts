@@ -16,16 +16,13 @@ class Loading implements ILoadingScreen {
     constructor(public loadingUIText: string) {
         this.loadingScreenDiv = window.document.getElementById("loadingScreen");
         this.loadingScreenTxt = window.document.getElementById("loadingText");
-        console.log(this.loadingScreenDiv);
     }
     public displayLoadingUI() {
-        console.log("displayLoadingUI");
         this.loadingScreenDiv.style.display = "block";
         this.loadingScreenTxt.innerHTML = "Loading Assets...";
     }
 
     public hideLoadingUI() {
-        console.log("hideLoadingUI");
         this.loadingScreenDiv.style.display = "none";
     }
 }
