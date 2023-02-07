@@ -28,9 +28,8 @@ import Locations from "../../shared/Data/Locations";
 import { SceneController } from "../Controllers/Scene";
 
 export class GameScene {
+    private _app;
     private _scene: Scene;
-    private _client;
-    private _engine: Engine;
     private _assetsContainer: AssetContainer[] = [];
     private _input: PlayerInput;
     private _ui;
@@ -50,15 +49,14 @@ export class GameScene {
 
     constructor() {}
 
-    async createScene(engine, client): Promise<void> {
-        this._client = client;
-        this._engine = engine;
+    async createScene(app): Promise<void> {
+        this._app = app;
 
         // show loading screen
-        this._engine.displayLoadingUI();
+        this._app.engine.displayLoadingUI();
 
         // create scene
-        let scene = new Scene(engine);
+        let scene = new Scene(app.engine);
 
         // set scene
         this._scene = scene;
@@ -157,14 +155,14 @@ export class GameScene {
             let user = global.T5C.currentUser;
             let character = global.T5C.currentCharacter;
             let currentLocationKey = character.location;
-            let room = await this._client.findCurrentRoom(currentLocationKey);
+            let room = await this._app.client.findCurrentRoom(currentLocationKey);
 
             if (room) {
                 // join game room
-                this.room = await this._client.joinRoom(room.roomId, user.token, character.id);
+                this.room = await this._app.client.joinRoom(room.roomId, user.token, character.id);
 
                 // join global chat room (match sessionId to gameRoom)
-                this.chatRoom = await this._client.joinChatRoom({ sessionId: this.room.sessionId });
+                this.chatRoom = await this._app.client.joinChatRoom({ sessionId: this.room.sessionId });
 
                 // set global vars
                 this._roomId = this.room.roomId;
@@ -209,7 +207,7 @@ export class GameScene {
         // setup hud
         this._ui = new UserInterface(
             this._scene,
-            this._engine,
+            this._app.engine,
             this.room,
             this.chatRoom,
             this.entities,
@@ -310,7 +308,7 @@ export class GameScene {
                 }
             }*/
 
-            let delta = this._engine.getFps();
+            let delta = this._app.engine.getFps();
 
             // entities update
             for (let sessionId in this.entities) {

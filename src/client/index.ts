@@ -27,21 +27,28 @@ import Locations from "./../shared/Data/Locations";
 
 // App class is our entire game application
 class App {
-    // General Entire Application
-    private _scene: Scene;
-    private _canvas;
-    private _engine: Engine;
+    // babylon
+    public canvas;
+    public engine: Engine;
+    public client: Network;
+    public scene: Scene;
 
-    //Game State Related
-    private _client;
+    // scene management
+    public state: number = 0;
+    public currentScene;
+    public nextScene;
 
-    //Scene - related
-    private _state: number = 0;
-    private _currentScene;
+    // custom data
+    public currentUser;
+    public currentPlayer;
+    public currentRoomID;
+    public currentSessionID;
+    public currentLocation;
+    public metaData: any;
 
     constructor() {
         // create canvas
-        this._canvas = document.getElementById("renderCanvas");
+        this.canvas = document.getElementById("renderCanvas");
 
         // initialize babylon scene and engine
         this._init();
@@ -52,60 +59,57 @@ class App {
 
     private async _init(): Promise<void> {
         // create engine
-        this._engine = (await EngineFactory.CreateAsync(this._canvas, {
+        this.engine = (await EngineFactory.CreateAsync(this.canvas, {
             antialiasing: true,
         })) as Engine;
 
         // loading
         var loadingScreen = new Loading("Loading Assets...");
-        this._engine.loadingScreen = loadingScreen;
+        this.engine.loadingScreen = loadingScreen;
 
         // create colyseus client
         // this should use environement values
-        this._client = new Network();
+        this.client = new Network();
 
-        //MAIN render loop & state machine
+        // main render loop & state machine
         await this._render();
     }
 
     private async _render(): Promise<void> {
         // render loop
-        this._engine.runRenderLoop(() => {
+        this.engine.runRenderLoop(() => {
             // monitor state
-            this._state = this.checkForSceneChange();
+            this.state = this.checkForSceneChange();
 
-            switch (this._state) {
+            switch (this.state) {
                 ///////////////////////////////////////
-                ///////////////////////////////////////
-                ///////////////////////////////////////
+                // LOGIN SCENE
                 case State.LOGIN:
                     this.clearScene();
-                    this._currentScene = new LoginScene();
-                    this._currentScene.createScene(this._engine, this._client);
-                    this._scene = this._currentScene._scene;
-                    this._state = State.NULL;
+                    this.currentScene = new LoginScene();
+                    this.currentScene.createScene(this);
+                    this.scene = this.currentScene._scene;
+                    this.state = State.NULL;
                     break;
 
                 ///////////////////////////////////////
-                ///////////////////////////////////////
-                ///////////////////////////////////////
+                // CHARACTER SELECTION SCENE
                 case State.CHARACTER_SELECTION:
                     this.clearScene();
-                    this._currentScene = new CharacterSelectionScene();
-                    this._currentScene.createScene(this._engine, this._client);
-                    this._scene = this._currentScene._scene;
-                    this._state = State.NULL;
+                    this.currentScene = new CharacterSelectionScene();
+                    this.currentScene.createScene(this);
+                    this.scene = this.currentScene._scene;
+                    this.state = State.NULL;
                     break;
 
                 ///////////////////////////////////////
-                ///////////////////////////////////////
-                ///////////////////////////////////////
+                // GAME SCENE
                 case State.GAME:
                     this.clearScene();
-                    this._currentScene = new GameScene();
-                    this._currentScene.createScene(this._engine, this._client);
-                    this._scene = this._currentScene._scene;
-                    this._state = State.NULL;
+                    this.currentScene = new GameScene();
+                    this.currentScene.createScene(this);
+                    this.scene = this.currentScene._scene;
+                    this.state = State.NULL;
                     break;
 
                 default:
@@ -121,10 +125,10 @@ class App {
             window.addEventListener("keydown", (ev) => {
                 //Shift+Ctrl+Alt+I
                 if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.keyCode === 73) {
-                    if (this._scene.debugLayer.isVisible()) {
-                        this._scene.debugLayer.hide();
+                    if (this.scene.debugLayer.isVisible()) {
+                        this.scene.debugLayer.hide();
                     } else {
-                        this._scene.debugLayer.show();
+                        this.scene.debugLayer.show();
                     }
                 }
             });
@@ -132,7 +136,7 @@ class App {
 
         //resize if the screen is resized/rotated
         window.addEventListener("resize", () => {
-            this._engine.resize();
+            this.engine.resize();
         });
     }
 
@@ -159,47 +163,22 @@ class App {
 
     private async _process(): Promise<void> {
         // make sure scene and camera is initialized
-        if (this._scene && this._scene.activeCamera) {
+        if (this.scene && this.scene.activeCamera) {
             //when the scene is ready, hide loading
-            this._engine.hideLoadingUI();
+            this.engine.hideLoadingUI();
 
             // render scene
-            this._scene.render();
+            this.scene.render();
         }
     }
 
     private clearScene() {
-        if (this._scene) {
-            this._engine.displayLoadingUI();
-            this._scene.detachControl();
-            this._scene.dispose();
-            this._currentScene = null;
+        if (this.scene) {
+            this.engine.displayLoadingUI();
+            this.scene.detachControl();
+            this.scene.dispose();
+            this.currentScene = null;
         }
-    }
-
-    //set up the canvas
-    private _createCanvas(): HTMLCanvasElement {
-        document.documentElement.style["overflow"] = "hidden";
-        document.documentElement.style.overflow = "hidden";
-        document.documentElement.style.width = "100%";
-        document.documentElement.style.height = "100%";
-        document.documentElement.style.margin = "0";
-        document.documentElement.style.padding = "0";
-
-        document.body.style.overflow = "hidden";
-        document.body.style.width = "100%";
-        document.body.style.height = "100%";
-        document.body.style.margin = "0";
-        document.body.style.padding = "0";
-
-        //create the canvas html element and attach it to the webpage
-        this._canvas = document.createElement("canvas");
-        this._canvas.style.width = "100%";
-        this._canvas.style.height = "100%";
-        this._canvas.id = "gameCanvas";
-        document.body.appendChild(this._canvas);
-
-        return this._canvas;
     }
 }
 new App();

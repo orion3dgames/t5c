@@ -14,7 +14,6 @@ import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollVie
 
 import State from "./Screens";
 import { PlayerCharacter, PlayerUser } from "../../shared/types";
-import Config from "../../shared/Config";
 import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
 import alertMessage from "../../shared/Utils/alertMessage";
 import Locations from "../../shared/Data/Locations";
@@ -27,9 +26,9 @@ export class CharacterSelectionScene {
 
     private leftColumnRect;
 
-    public async createScene(engine) {
+    public async createScene(app) {
         // create scene
-        let scene = new Scene(engine);
+        let scene = new Scene(app.engine);
 
         // set color
         scene.clearColor = new Color4(0, 0, 0, 1);

@@ -1,4 +1,3 @@
-import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
@@ -20,7 +19,6 @@ import alertMessage from "../../shared/Utils/alertMessage";
 import { SceneController } from "../Controllers/Scene";
 
 export class LoginScene {
-    private _engine: Engine;
     public _scene: Scene;
     public _newState: State;
     public _button: Button;
@@ -30,10 +28,8 @@ export class LoginScene {
         this._newState = State.NULL;
     }
 
-    public async createScene(engine, client) {
-        this._engine = engine;
-
-        let scene = new Scene(engine);
+    public async createScene(app) {
+        let scene = new Scene(app.engine);
         scene.clearColor = new Color4(0, 0, 0, 1);
 
         //creates and positions a free camera
