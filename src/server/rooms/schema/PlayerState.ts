@@ -24,7 +24,9 @@ export class PlayerState extends EntityState {
     public player_cooldown: number = 1000;
     public ability_in_cooldown: boolean[];
     public player_cooldown_timer: number = 0;
-    public player_casting_timer:any = false;
+    public player_casting_timer: any = false;
+
+    public gracePeriod: boolean = true;
 
     constructor(gameroom: GameRoom, data, ...args: any[]) {
         super(gameroom, data, args);
@@ -32,6 +34,11 @@ export class PlayerState extends EntityState {
         this.raceData = Races[this.race];
 
         this.ability_in_cooldown = [false, false, false, false, false, false, false, false, false, false, false];
+
+        // add a 5 second grace period where the player can not be targeted by the ennemies
+        setTimeout(() => {
+            this.gracePeriod = false;
+        }, 5000);
     }
 
     // runs on every server iteration
@@ -82,13 +89,12 @@ export class PlayerState extends EntityState {
                 digit: data.digit,
             });
 
-            console.log('START TIMER', ability.castTime);
+            console.log("START TIMER", ability.castTime);
             // start a timer
             this.player_casting_timer = setTimeout(() => {
-                console.log('END TIMER', ability.castTime);
+                console.log("END TIMER", ability.castTime);
                 // process ability straight away
                 this.castAbility(target, ability, digit);
-
             }, ability.castTime);
         } else {
             // process ability straight away
@@ -208,8 +214,8 @@ export class PlayerState extends EntityState {
             targetPos: target.getPosition(),
         });
 
-        if(this.player_casting_timer){
-            console.log('REMOVE CASTING TIMER');
+        if (this.player_casting_timer) {
+            console.log("REMOVE CASTING TIMER");
             this.player_casting_timer = false;
         }
 
