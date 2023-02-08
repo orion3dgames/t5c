@@ -13,6 +13,7 @@ import { Abilities } from "../Common/Abilities";
 
 export class EntityActions {
     private _scene: Scene;
+    private particleTxt_01: Texture;
 
     private colors = {
         white: [Color3.FromInts(255, 255, 255), Color3.FromInts(240, 240, 240)],
@@ -22,6 +23,8 @@ export class EntityActions {
 
     constructor(scene) {
         this._scene = scene;
+
+        this.particleTxt_01 = new Texture("textures/particle_01.png", this._scene);
     }
 
     public process(data, ability) {
@@ -59,15 +62,15 @@ export class EntityActions {
         //////////////////////////////////////////////
         // create a particle system
         var particleSystem = new ParticleSystem("particles", 2000, this._scene);
-        particleSystem.particleTexture = new Texture("textures/flare.png", this._scene);
+        particleSystem.particleTexture = this.particleTxt_01.clone();
         particleSystem.emitter = mesh; // the starting location
         // Colors of all particles
         particleSystem.color1 = Color4.FromColor3(this.colors[color][0]);
         particleSystem.color2 = Color4.FromColor3(this.colors[color][1]);
         particleSystem.colorDead = new Color4(0, 0, 0, 0.0);
         // Size of each particle (random between...
-        particleSystem.minSize = 0.6;
-        particleSystem.maxSize = 0.8;
+        particleSystem.minSize = 0.2;
+        particleSystem.maxSize = 0.4;
         // Life time of each particle (random between...
         particleSystem.minLifeTime = 5;
         particleSystem.maxLifeTime = 10;
@@ -84,7 +87,7 @@ export class EntityActions {
 
         setTimeout(() => {
             particleSystem.dispose(true);
-        }, 1000);
+        }, 750);
     }
 
     public particule_fireball(start, end, mesh, color) {
@@ -105,15 +108,15 @@ export class EntityActions {
         //////////////////////////////////////////////
         // create a particle system
         var particleSystem = new ParticleSystem("particles", 2000, this._scene);
-        particleSystem.particleTexture = new Texture("textures/flare.png", this._scene);
+        particleSystem.particleTexture = this.particleTxt_01.clone();
         particleSystem.emitter = projectile; // the starting location
         // Colors of all particles
         particleSystem.color1 = Color4.FromColor3(this.colors[color][0]);
         particleSystem.color2 = Color4.FromColor3(this.colors[color][1]);
         particleSystem.colorDead = new Color4(0, 0, 0, 0.0);
         // Size of each particle (random between...
-        particleSystem.minSize = 0.6;
-        particleSystem.maxSize = 0.8;
+        particleSystem.minSize = 0.2;
+        particleSystem.maxSize = 0.4;
         // Life time of each particle (random between...
         particleSystem.minLifeTime = 0.05;
         particleSystem.maxLifeTime = 0.3;
