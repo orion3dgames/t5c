@@ -35,7 +35,8 @@ export class Environment {
     }
 
     public async loadAssets() {
-        // load all models
+
+        // load all models that could be reused
         let modelsToLoad = ["player_hobbit", "monster_unicorn", "monster_bear"];
         for (const model of modelsToLoad) {
             this._assetsContainer[model] = await SceneLoader.LoadAssetContainerAsync(
@@ -48,6 +49,7 @@ export class Environment {
             );
         }
 
+        // load envionment model (doesnt need to be reused later)
         let environmentModel = [global.T5C.currentLocation.mesh];
         for (const model of environmentModel) {
             this._assetsContainer[model] = await SceneLoader.ImportMeshAsync(
@@ -61,6 +63,7 @@ export class Environment {
             );
         }
 
+        // loading materials
         this.showLoadingMessage("materials: loaded");
 
         // debug circle inaactive
@@ -97,12 +100,17 @@ export class Environment {
             // default values
             m.checkCollisions = false;
             m.isPickable = false;
+            
 
             if (m.getClassName() !== "InstancedMesh") {
             }
 
             if (m.name.includes("Preview")) {
                 m.dispose();
+            }
+
+            if (m.name.includes("New Terrain 1")) {
+                m.receiveShadows = true;
             }
 
             //trigger meshes

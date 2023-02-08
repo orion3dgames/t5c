@@ -111,8 +111,8 @@ export class UI_EntitySelected {
         const healthBarText = new TextBlock("healthBarText", "");
         healthBarText.text = "0";
         healthBarText.color = "#FFF";
-        healthBarText.top = "2px";
-        healthBarText.left = "5px";
+        healthBarText.top = "1px";
+        healthBarText.left = "3px";
         healthBarText.fontSize = "12px;";
         healthBarText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         healthBarText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
@@ -146,8 +146,8 @@ export class UI_EntitySelected {
         const manaBarText = new TextBlock("manaBarText");
         manaBarText.text = "0";
         manaBarText.color = "#FFF";
-        manaBarText.top = "2px";
-        manaBarText.left = "5px";
+        manaBarText.top = "1px";
+        manaBarText.left = "3px";
         manaBarText.fontSize = "12px;";
         manaBarText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         manaBarText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
