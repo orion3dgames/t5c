@@ -19,7 +19,7 @@ import { Entity } from "../../shared/Entities/Entity";
 import Config from "../../shared/Config";
 import { Room } from "colyseus.js";
 import { PlayerInputs } from "../../shared/types";
-import { apiUrl, isLocal, request } from "../../shared/Utils";
+import { apiUrl, bytesToSize, isLocal, request } from "../../shared/Utils";
 import { NavMesh } from "../../shared/yuka";
 import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
 
@@ -60,9 +60,6 @@ export class GameScene {
 
         // set scene
         this._scene = scene;
-
-        // load assets and remove them all from scene
-        await this._loadAssets();
 
         ///////////////////// END DEBUG CODE /////////////////////////////
         ///////////////////// DEBUG CODE /////////////////////////////////
@@ -114,41 +111,16 @@ export class GameScene {
         this._shadow.autoCalcDepthBounds = true;
         this._shadow.shadowMaxZ = 95;
 
+        // load assets and remove them all from scene
+        this._environment = new Environment(this._scene, this._shadow, this._assetsContainer);
+        await this._environment.loadNavMesh();
+        await this._environment.loadAssets();
+        await this._environment.prepareAssets();
+
         await this._initNetwork();
     }
 
-    private async _loadAssets() {
-        this._assetsContainer["player_hobbit"] = await SceneLoader.LoadAssetContainerAsync(
-            "./models/",
-            "player_hobbit.glb",
-            this._scene
-        );
-        this._assetsContainer["monster_unicorn"] = await SceneLoader.LoadAssetContainerAsync(
-            "./models/",
-            "monster_unicorn.glb",
-            this._scene
-        );
-        this._assetsContainer["monster_bear"] = await SceneLoader.LoadAssetContainerAsync(
-            "./models/",
-            "monster_bear.glb",
-            this._scene
-        );
-
-        // create materials
-        var material = new StandardMaterial("debug_entity_neutral");
-        material.alpha = 0.5;
-        material.diffuseColor = new Color3(1.0, 1.0, 1.0);
-
-        var material = new StandardMaterial("debug_entity_active");
-        material.alpha = 0.5;
-        material.diffuseColor = new Color3(1.0, 0, 0);
-
-        var texture = new Texture("./images/selected_circle_green.png");
-        texture.hasAlpha = true;
-        var material = new StandardMaterial("entity_selected");
-        material.diffuseTexture = texture;
-        material.useAlphaFromDiffuseTexture = true;
-    }
+    private async _loadAssets() {}
 
     private async _initNetwork(): Promise<void> {
         try {
@@ -182,11 +154,6 @@ export class GameScene {
     }
 
     private async _loadEnvironment(): Promise<void> {
-        // load environment
-        const environment = new Environment(this._scene, this._shadow);
-        this._environment = environment;
-        await this._environment.load(this._loadedAssets); //environment
-
         // load navmesh
         this._navMesh = await loadNavMeshFromString(global.T5C.currentLocation.key);
         console.log("NAVMESH LOADED", this._navMesh);
