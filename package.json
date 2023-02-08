@@ -5,7 +5,7 @@
     "url": "git+https://github.com/oriongunning/t5c.git"
   },
   "description": "Babylon.js Colyseus demo",
-  "main": "index.js",
+  "main": "./dist/client/index.html",
   "scripts": {
     "client-dev": "webpack serve --open --config webpack.dev.js",
     "client-start": "webpack serve --open --config webpack.dev.js",
