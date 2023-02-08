@@ -97,6 +97,12 @@ export class GameScene {
             ambientLight.specular = Color3.Black();
         }
 
+        // fox
+        scene.fogMode = Scene.FOGMODE_LINEAR ;
+        scene.fogStart = 60.0;
+        scene.fogEnd = 120.0;
+        scene.fogColor = new Color3(0.9, 0.9, 0.85);
+
         // shadow light
         var light = new DirectionalLight("DirectionalLight", new Vector3(-1, -2, -1), scene);
         light.position = new Vector3(100, 100, 100);
@@ -105,15 +111,16 @@ export class GameScene {
         light.autoCalcShadowZBounds = true;
 
         // shadow generator
-        this._shadow = new CascadedShadowGenerator(2048, light);
-        this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_MEDIUM;
+        this._shadow = new CascadedShadowGenerator(1024, light);
+        this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_LOW;
+        this._shadow.lambda = 0.94;
         this._shadow.bias = 0.018;
         this._shadow.autoCalcDepthBounds = true;
-        this._shadow.shadowMaxZ = 95;
+        this._shadow.shadowMaxZ = 1000;
 
         // load assets and remove them all from scene
         this._environment = new Environment(this._scene, this._shadow, this._assetsContainer);
-        await this._environment.loadNavMesh();
+        this._navMesh = await this._environment.loadNavMesh();
         await this._environment.loadAssets();
         await this._environment.prepareAssets();
 
@@ -141,7 +148,8 @@ export class GameScene {
                 global.T5C.currentRoomID = this._roomId;
                 global.T5C.currentSessionID = this.room.sessionId;
 
-                await this._loadEnvironment();
+                await this._initEvents();
+
             } else {
                 console.error("FAILED TO CONNECT/CREATE ROOM");
             }
@@ -153,17 +161,6 @@ export class GameScene {
         }
     }
 
-    private async _loadEnvironment(): Promise<void> {
-        // load navmesh
-        this._navMesh = await loadNavMeshFromString(global.T5C.currentLocation.key);
-        console.log("NAVMESH LOADED", this._navMesh);
-
-        // visualize navmesh
-        //let navMeshGroup = createConvexRegionHelper(this._navMesh, this._scene)
-        //let graphHelper = createGraphHelper(this._scene, this._navMesh.graph, 0.2)
-
-        await this._initEvents();
-    }
 
     private async _initEvents() {
         await this._scene.whenReadyAsync();

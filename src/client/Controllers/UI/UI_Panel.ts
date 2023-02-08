@@ -1,4 +1,5 @@
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
+import { Image } from "@babylonjs/gui/2D/controls/image";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
@@ -25,7 +26,7 @@ export class UI_Panel {
             horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
             vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
             width: 0.7, // 50% screen width
-            height: 0.5, // 50% screen height
+            height: 0.6, // 50% screen height
         }
     ) {
         //
@@ -69,19 +70,27 @@ export class UI_Panel {
         mainPanel.left = 0;
         mainPanel.width = this._options.width;
         mainPanel.height = this._options.height;
-        mainPanel.background = Config.UI_CENTER_PANEL_BG;
         mainPanel.verticalAlignment = this._options.horizontal_position;
         mainPanel.horizontalAlignment = this._options.vertical_position;
         mainPanel.isVisible = false;
+        mainPanel.thickness = 0;
         this._playerUI.addControl(mainPanel);
         this.selectedTabUI = mainPanel;
+
+        var image = new Image("but", "/ui/panel_blue2x.9.png");
+        image.width = 1;
+        image.height = 1;
+        image.populateNinePatchSlicesFromImage = true;
+        image.stretch = Image.STRETCH_NINE_PATCH;
+        mainPanel.addControl(image);
 
         // close button
         const mainPanelClose = Button.CreateSimpleButton("mainPanelClose", "X");
         mainPanelClose.width = "30px";
         mainPanelClose.height = "30px";
         mainPanelClose.color = "white";
-        mainPanelClose.top = "0px";
+        mainPanelClose.top = "15px";
+        mainPanelClose.left = "-15px";
         mainPanelClose.thickness = 1;
         mainPanelClose.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         mainPanelClose.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
@@ -95,6 +104,9 @@ export class UI_Panel {
         // tabs button container
         const tabsPanel = new StackPanel("tabsPanel");
         tabsPanel.width = 0.9;
+        tabsPanel.spacing = 2;
+        tabsPanel.paddingTop = "15px";
+        tabsPanel.paddingLeft = "15px";
         tabsPanel.isVertical = false;
         tabsPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         tabsPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
@@ -114,7 +126,7 @@ export class UI_Panel {
             tabButton.height = "30px";
             tabButton.color = "white";
             tabButton.top = "0px";
-            tabButton.thickness = 1;
+            tabButton.thickness = 0;
             tabButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             tabButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             tabsPanel.addControl(tabButton);
@@ -131,8 +143,12 @@ export class UI_Panel {
             tabContent.left = 0;
             tabContent.width = 1;
             tabContent.height = 0.917;
-            tabContent.thickness = 1;
-            tabContent.background = "rgba(255,255,255, 0.1)";
+            tabContent.thickness = 0;
+            tabContent.paddingBottom = "15px;";
+            tabContent.paddingLeft = "15px;";
+            tabContent.paddingRight = "15px;";
+            tabContent.paddingTop = "15px;";
+            //tabContent.background = "rgba(255,255,255, 0.1)";
             tabContent.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
             tabContent.horizontalAlignment = this._options.vertical_position;
             tabContent.isVisible = this.selectedTab === tabId ? true : false;
