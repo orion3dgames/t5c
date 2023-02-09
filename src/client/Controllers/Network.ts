@@ -8,12 +8,11 @@ export class Network {
 
     constructor() {
         // create colyseus client
-        // this should use environement values
+        let url = "wss://" + window.location.hostname;
         if (isLocal()) {
-            this._client = new Client(Config.serverUrlLocal); // local
-        } else {
-            this._client = new Client(Config.serverUrlProduction); // online
+            url = "ws://localhost:" + Config.port;
         }
+        this._client = new Client(url);
     }
 
     public async joinRoom(roomId, token, character_id): Promise<any> {

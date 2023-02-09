@@ -1,3 +1,6 @@
+import State from "../client/Screens/Screens";
+import { isLocal } from "./Utils";
+
 let Config = {
     // general settings
     title: "T5C",
@@ -5,10 +8,7 @@ let Config = {
     lang: "en",
 
     // server settings
-    serverUrlLocal: "ws://localhost:3000",
-    apiUrlLocal: "http://localhost:3000",
-    serverUrlProduction: "wss://t5c.onrender.com",
-    apiUrlProduction: "https://t5c.onrender.com",
+    port: 3000,
     maxClients: 20, // set maximum clients per room
     updateRate: 100, // Set frequency the patched state should be sent to all clients, in milliseconds
     databaseUpdateRate: 1000, // the frequency at which server save players position
@@ -35,6 +35,10 @@ let Config = {
 
     // basic locations
     initialLocation: "lh_town",
+
+    // default scene
+    //defaultScene: isLocal() ? State.GAME : State.LOGIN,
+    defaultScene: State.LOGIN,
 };
 
 export default Config;

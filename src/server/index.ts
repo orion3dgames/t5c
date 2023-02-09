@@ -14,6 +14,7 @@ import { ChatRoom } from "./rooms/ChatRoom";
 import databaseInstance from "../shared/Database";
 import { PlayerUser } from "../shared/types";
 import Logger from "../shared/Logger";
+import Config from "../shared/Config";
 
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
@@ -36,7 +37,7 @@ let database = new databaseInstance();
 ///////////// COLYSEUS GAME SERVER ///////////////
 //////////////////////////////////////////////////
 
-const port = Number(process.env.port) || 3000;
+const port = Config.port;
 const app = express();
 app.use(cors());
 app.use(express.json());

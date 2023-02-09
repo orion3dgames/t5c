@@ -25,9 +25,9 @@ const roundTo = function (num: number, decimal: number = 2) {
 };
 
 const apiUrl = function () {
-    let url = Config.apiUrlProduction;
-    if (window.location.host === "localhost:8080") {
-        url = Config.apiUrlLocal;
+    let url = "https://" + window.location.hostname;
+    if (isLocal()) {
+        url = "http://localhost:" + Config.port;
     }
     return url;
 };

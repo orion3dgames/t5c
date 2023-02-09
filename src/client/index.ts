@@ -143,8 +143,7 @@ class App {
     // functions
     setDefault() {
         global.T5C = {
-            nextScene: isLocal() ? State.GAME : State.LOGIN,
-            //nextScene: State.LOGIN,
+            nextScene: Config.defaultScene,
             currentRoomID: "",
             currentSessionID: "",
             currentLocation: Locations[Config.initialLocation],
