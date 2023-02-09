@@ -98,7 +98,7 @@ export class GameScene {
         }
 
         // fox
-        scene.fogMode = Scene.FOGMODE_LINEAR ;
+        scene.fogMode = Scene.FOGMODE_LINEAR;
         scene.fogStart = 60.0;
         scene.fogEnd = 120.0;
         scene.fogColor = new Color3(0.9, 0.9, 0.85);
@@ -123,11 +123,8 @@ export class GameScene {
         this._navMesh = await this._environment.loadNavMesh();
         await this._environment.loadAssets();
         await this._environment.prepareAssets();
-
         await this._initNetwork();
     }
-
-    private async _loadAssets() {}
 
     private async _initNetwork(): Promise<void> {
         try {
@@ -149,18 +146,13 @@ export class GameScene {
                 global.T5C.currentSessionID = this.room.sessionId;
 
                 await this._initEvents();
-
             } else {
-                console.error("FAILED TO CONNECT/CREATE ROOM");
             }
         } catch (e) {
-            console.error("FAILED TO CONNECT/CREATE ROOM", e);
             alert("Failed to connect.");
-
             SceneController.goToScene(State.CHARACTER_SELECTION);
         }
     }
-
 
     private async _initEvents() {
         await this._scene.whenReadyAsync();

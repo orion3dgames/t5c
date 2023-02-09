@@ -81,6 +81,7 @@ export class Player extends Entity {
                     let target = this.ui._entities[targetSessionId];
 
                     if (metadata.type === "player" && targetSessionId === this.sessionId) {
+                        console.log("PLAYER");
                         target = this.ui._currentPlayer;
                     }
 
@@ -190,9 +191,8 @@ export class Player extends Entity {
             let digit = data.digit;
             let ability = Abilities.getByDigit(this, digit);
             if (ability) {
-                
                 // if you are sender, cancel casting and strat cooldown on client
-                if(data.fromId === this.sessionId){
+                if (data.fromId === this.sessionId) {
                     // cancel casting
                     this.castingElapsed = 0;
                     this.castingTarget = 0;

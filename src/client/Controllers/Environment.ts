@@ -6,6 +6,8 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class Environment {
     private _scene: Scene;
@@ -35,6 +37,15 @@ export class Environment {
     }
 
     public async loadAssets() {
+        /*
+        // add plane
+        var texture = new Texture("./textures/0088-green-grass-texture-seamless-hr.jpg");
+        var grassMaterial = new StandardMaterial("grassMaterial");
+        grassMaterial.diffuseTexture = texture;
+        const sphere = MeshBuilder.CreateCylinder("entity_selected", { diameter: 100, height: 0.01 }, this._scene);
+        sphere.position = new Vector3(0, -0.01, 0);
+        sphere.material = grassMaterial;
+        sphere.receiveShadows = true;*/
 
         // load all models that could be reused
         let modelsToLoad = ["player_hobbit", "monster_unicorn", "monster_bear"];
@@ -49,7 +60,7 @@ export class Environment {
             );
         }
 
-        // load envionment model (doesnt need to be reused later)
+        // load environment model (doesnt need to be reused later, so let's import it directly)
         let environmentModel = [global.T5C.currentLocation.mesh];
         for (const model of environmentModel) {
             this._assetsContainer[model] = await SceneLoader.ImportMeshAsync(
@@ -100,7 +111,6 @@ export class Environment {
             // default values
             m.checkCollisions = false;
             m.isPickable = false;
-            
 
             if (m.getClassName() !== "InstancedMesh") {
             }

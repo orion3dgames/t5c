@@ -72,18 +72,16 @@ export class EntityMesh {
         }
 
         // add selected image
-        if (this._entity.type === "entity") {
-            var material = this._scene.getMaterialByName("entity_selected");
-            const sphere = MeshBuilder.CreateCylinder(
-                "entity_selected_" + this._entity.race,
-                { diameter: 2, height: 0.01 },
-                this._scene
-            );
-            sphere.isVisible = true;
-            sphere.parent = box;
-            sphere.material = material;
-            this.selectedMesh = sphere;
-        }
+        var material = this._scene.getMaterialByName("entity_selected");
+        const sphere = MeshBuilder.CreateCylinder(
+            "entity_selected_" + this._entity.race,
+            { diameter: 2, height: 0.01 },
+            this._scene
+        );
+        sphere.isVisible = true;
+        sphere.parent = box;
+        sphere.material = material;
+        this.selectedMesh = sphere;
 
         // load player mesh
         const result = this.assetsContainer[this._entity.race].instantiateModelsToScene(

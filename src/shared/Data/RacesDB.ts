@@ -25,7 +25,7 @@ interface raceDataMap {
 let RacesDB: raceDataMap = {
     player_hobbit: {
         name: "loading...",
-        speed: 0.3,
+        speed: 0.6,
         scale: 0.02,
         rotationFix: 0,
         animationSpeed: 1.3,
