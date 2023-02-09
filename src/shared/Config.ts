@@ -1,5 +1,4 @@
 import State from "../client/Screens/Screens";
-import { isLocal } from "./Utils";
 
 let Config = {
     // general settings
@@ -20,18 +19,13 @@ let Config = {
     // game settings
     PLAYER_NAMEPLATE_TIMEOUT: 15000, // 15 seconds
     PLAYER_VIEW_DISTANCE: 25,
-    MONSTER_RESPAWN_RATE: 10000,
-    MONSTER_AGGRO_DISTANCE: 5,
+    MONSTER_RESPAWN_RATE: 20000,
+    MONSTER_AGGRO_DISTANCE: 6,
     MONSTER_ATTACK_DISTANCE: 2,
 
     // UI SETTINGS
     UI_CENTER_PANEL_WIDTH: 0.6,
     UI_CENTER_PANEL_BG: "rgba(0,0,0,.5)",
-
-    // players settings
-    PLAYER_SPEED: 0.55,
-    PLAYER_START_HEALTH: 100,
-    PLAYER_START_LEVEL: 1,
 
     // basic locations
     initialLocation: "lh_town",

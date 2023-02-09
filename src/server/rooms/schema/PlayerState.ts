@@ -301,6 +301,8 @@ export class PlayerState extends EntityState {
             return false;
         }
 
+        let speed = this.raceData.speed;
+
         // save current position
         let oldX = this.x;
         let oldY = this.y;
@@ -308,9 +310,9 @@ export class PlayerState extends EntityState {
         let oldRot = this.rot;
 
         // calculate new position
-        let newX = this.x - playerInput.h * Config.PLAYER_SPEED;
+        let newX = this.x - playerInput.h * speed;
         let newY = this.y;
-        let newZ = this.z - playerInput.v * Config.PLAYER_SPEED;
+        let newZ = this.z - playerInput.v * speed;
         let newRot = Math.atan2(playerInput.h, playerInput.v);
 
         // check if destination is in navmesh
