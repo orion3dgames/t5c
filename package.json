@@ -4,7 +4,7 @@
   "repository": {
     "url": "git+https://github.com/oriongunning/t5c.git"
   },
-  "description": "Babylon.js Colyseus demo",
+  "description": "Building a basic multiplayer 3d top down rpg using babylon.js and colyseus",
   "main": "./dist/client/index.html",
   "scripts": {
     "client-dev": "webpack serve --open --config webpack.dev.js",
@@ -15,8 +15,8 @@
     "server-build": "tsc",
     "loadtest": "npx colyseus-loadtest ./src/server/loadtest/test.ts --room game_room --numClients 10 --endpoint ws://localhost:3000"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Orion",
+  "license": "GPL-3.0",
   "devDependencies": {
     "@babylonjs/gui-editor": "5.42.1",
     "@babylonjs/inspector": "5.42.1",
