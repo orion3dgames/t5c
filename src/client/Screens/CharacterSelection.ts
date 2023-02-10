@@ -212,6 +212,8 @@ export class CharacterSelectionScene {
         global.T5C.currentLocationKey = null;
         global.T5C.currentLocation = null;
         SceneController.goToScene(State.LOGIN);
+        // clear local storage
+        localStorage.removeItem("t5c_token");
     }
 
     // check login details

@@ -90,6 +90,31 @@ export class LoginScene {
         columnRect.addControl(formContainer);
 
         ///////////////////////////////////////////
+        // user token
+        const token = localStorage.getItem("t5c_token");
+        if (token) {
+            // send login data
+            let req = await request("get", apiUrl() + "/loginWithToken", {
+                token: token,
+            });
+
+            // check req status
+            if (req.status === 200) {
+                // user was found or created
+                global.T5C.currentUser = JSON.parse(req.data).user;
+
+                // save token to local storage
+                localStorage.setItem("t5c_token", JSON.parse(req.data).user.token);
+
+                // go to character selection page
+                SceneController.goToScene(State.CHARACTER_SELECTION);
+            } else {
+                // something went wrong
+                alertMessage(this._ui, "Something went wrong.");
+            }
+        }
+
+        ///////////////////////////////////////////
         // username input
         const usernameInput = new InputText("usernameInput");
         usernameInput.top = "-140px";
@@ -188,6 +213,9 @@ export class LoginScene {
         if (req.status === 200) {
             // user was found or created
             global.T5C.currentUser = JSON.parse(req.data).user;
+
+            // save token to local storage
+            localStorage.setItem("t5c_token", JSON.parse(req.data).user.token);
 
             // go to character selection page
             SceneController.goToScene(State.CHARACTER_SELECTION);

@@ -133,6 +133,13 @@ class Database {
         return await this.get(sql, [username, password]);
     }
 
+    async getUserWithToken(
+        token: string | string[] | ParsedQs | ParsedQs[],
+    ) {
+        const sql = `SELECT * FROM users WHERE token=?;`;
+        return await this.get(sql, [token]);
+    }
+
     async getUserById(user_id: number): Promise<PlayerUser> {
         const sql = `SELECT * FROM users WHERE id=?;`;
         let user = await (<any>this.get(sql, [user_id]));

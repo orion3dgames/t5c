@@ -123,6 +123,30 @@ app.get("/login", function (req, res) {
     }
 });
 
+app.get("/loginWithToken", function (req, res) {
+    const token: string = (req.query.token as string) ?? "";
+    if (token) {
+        Logger.info("[api][/login] checking password.");
+        database
+            .getUserWithToken(token)
+            .then((user: PlayerUser) => {
+                if (!user) {
+                    Logger.info("[api][/login] invalid token.");
+                }
+
+                Logger.info("[api][/login] valid token, refreshing login token.");
+                return database.refreshToken(user.id);
+            })
+            .then((user) => {
+                Logger.info("[api][/login] login succesful.");
+                return res.send({
+                    message: "Login Successful",
+                    user: user,
+                });
+            });
+    }
+});
+
 app.post("/check", function (req, res) {
     const token: string = (req.query.token as string) ?? "";
     if (token !== "") {
@@ -168,7 +192,7 @@ app.post("/create_character", function (req, res) {
     }
 });
 
-app.get("/register", function (req, res) {});
+app.get("/register", function (req, res) { });
 
 app.get("/returnRandomUser", function (req, res) {
     database.returnRandomUserAndChar().then((user) => {
