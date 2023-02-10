@@ -154,6 +154,19 @@ export class Player extends Entity {
             this.ui._UICastingTimerText.text = this.castingElapsed + "/" + this.castingTarget;
             this.ui._UICastingTimerInside.width = widthInPercentage;
         }
+
+        // check for cooldowns  (estethic only as server really controls cooldowns)
+        this.ability_in_cooldown.forEach((cooldown, digit) => {
+            if (cooldown > 0) {
+                let cooldownUI = this.ui._playerUI.getControlByName("ability_" + digit + "_cooldown");
+                let ability = Abilities.getByDigit(this, digit);
+                if (ability) {
+                    this.ability_in_cooldown[digit] -= delta;
+                    let percentage = ((this.ability_in_cooldown[digit] / ability.cooldown) * 100) / 100;
+                    cooldownUI.height = percentage;
+                }
+            }
+        });
     }
 
     // player is casting
@@ -199,12 +212,7 @@ export class Player extends Entity {
                     this.isCasting = false;
                     this.ui._UICastingTimer.isVisible = false;
                     this.ui._UICastingTimerText.text = "";
-
-                    let cooldownUI = this.ui._playerUI.getControlByName("ability_" + digit + "_cooldown");
-                    cooldownUI.isVisible = true;
-                    setTimeout(() => {
-                        cooldownUI.isVisible = false;
-                    }, ability.cooldown);
+                    this.ability_in_cooldown[digit] = ability.cooldown; // set cooldown
                 }
 
                 // action ability

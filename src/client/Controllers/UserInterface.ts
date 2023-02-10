@@ -189,11 +189,11 @@ export class UserInterface {
     public castingBar() {
         // add tooltip
         const castingBar = new Rectangle("castingBar");
-        castingBar.top = "0px";
-        castingBar.width = "200px";
-        castingBar.height = "20px";
+        castingBar.top = "-75px";
+        castingBar.width = "150px";
+        castingBar.height = "17px";
         castingBar.thickness = 1;
-        castingBar.background = "black";
+        castingBar.background = Config.UI_CENTER_PANEL_BG;
         castingBar.isVisible = false;
         castingBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
         castingBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
@@ -204,7 +204,7 @@ export class UserInterface {
         castingBarInside.top = "0px";
         castingBarInside.width = 1;
         castingBarInside.height = 1;
-        castingBarInside.background = "white";
+        castingBarInside.background = "rgba(255,255,255,0.5)";
         castingBarInside.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
         castingBarInside.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         castingBar.addControl(castingBarInside);
@@ -215,7 +215,7 @@ export class UserInterface {
         castingTimer.color = "#FFF";
         castingTimer.top = 0;
         castingTimer.left = 0;
-        castingTimer.fontSize = "12px;";
+        castingTimer.fontSize = "11px;";
         castingTimer.color = "black;";
         castingTimer.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         castingTimer.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;

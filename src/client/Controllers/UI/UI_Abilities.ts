@@ -118,9 +118,9 @@ export class UI_Abilities {
             abilityCooldown.top = 0;
             abilityCooldown.left = 0;
             abilityCooldown.width = iconWidth + "px";
-            abilityCooldown.height = iconWidth + "px";
+            abilityCooldown.height = 0;
             abilityCooldown.thickness = 0;
-            abilityCooldown.isVisible = false;
+            abilityCooldown.isVisible = true;
             abilityCooldown.background = "rgba(0,0,0,.7)";
             abilityCooldown.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             abilityCooldown.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
