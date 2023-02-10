@@ -71,7 +71,11 @@ export class EntityMove {
 
     public tween() {
         this._mesh.position = Vector3.Lerp(this._mesh.position, this.nextPosition, 0.2);
-        this._mesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.8);
+        const gap = Math.abs(this._mesh.rotation.y - this.nextRotation.y);
+        if (gap > Math.PI)
+            this._mesh.rotation.y = this.nextRotation.y;
+        else
+            this._mesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.2);
     }
 
     public move(input: PlayerInputs): void {
