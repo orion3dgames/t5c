@@ -49,6 +49,7 @@ export class EntityMesh {
 
         // set collision mesh
         this.mesh = box;
+        this.mesh.isPickable = true;
         this.mesh.position = new Vector3(this._entity.x, this._entity.y, this._entity.z);
         this.mesh.metadata = {
             sessionId: this._entity.sessionId,
@@ -104,6 +105,7 @@ export class EntityMesh {
         }
         playerMesh.scaling.set(this._raceData.scale, this._raceData.scale, this._raceData.scale);
         playerMesh.isVisible = false;
+        playerMesh.isPickable = false;
         this.playerMesh = playerMesh;
 
         // start action manager

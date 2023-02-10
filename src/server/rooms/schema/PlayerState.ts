@@ -166,6 +166,31 @@ export class PlayerState extends EntityState {
         return true;
     }
 
+    // process caster affected properties
+    affectCaster(ability) {
+        for (let p in ability.casterPropertyAffected) {
+            let property = ability.casterPropertyAffected[p];
+            this[p] -= property;
+        }
+    }
+
+    // process target affected properties
+    affectTarget(target, ability) {
+        for (let p in ability.targetPropertyAffected) {
+            let property = ability.targetPropertyAffected[p];
+            target[p] += property;
+        }
+    }
+
+    // start cooldown
+    startCooldown(digit, ability) {
+        // start cooldown period
+        this.ability_in_cooldown[digit] = true;
+        setTimeout(() => {
+            this.ability_in_cooldown[digit] = false;
+        }, ability.cooldown);
+    }
+
     /**
      * cast an ability onto target
      * does not do any check, use canEntityCastAbility() to check.
@@ -182,24 +207,25 @@ export class PlayerState extends EntityState {
             target.setTarget(this);
         }
 
-        // start cooldown period
-        this.ability_in_cooldown[digit] = true;
-        setTimeout(() => {
-            this.ability_in_cooldown[digit] = false;
-        }, ability.cooldown);
+        this.affectCaster(ability);
 
-        // process caster affected properties
-        // TODO: improve this
-        for (let p in ability.casterPropertyAffected) {
-            let property = ability.casterPropertyAffected[p];
-            this[p] -= property;
-        }
-
-        // process target affected properties
-        // TODO: improve this
-        for (let p in ability.targetPropertyAffected) {
-            let property = ability.targetPropertyAffected[p];
-            target[p] += property;
+        if (ability.repeat > 0) {
+            let repeat = 1;
+            let timer = setInterval(() => {
+                this.affectTarget(target, ability);
+                if (target.isEntityDead()) {
+                    this.processDeath(target);
+                    clearInterval(timer);
+                }
+                if (repeat >= ability.repeat) {
+                    this.startCooldown(digit, ability);
+                    clearInterval(timer);
+                }
+                repeat += 1;
+            }, ability.repeatInterval);
+        } else {
+            this.affectTarget(target, ability);
+            this.startCooldown(digit, ability);
         }
 
         // make sure no values are out of range.
@@ -220,14 +246,17 @@ export class PlayerState extends EntityState {
             this.player_casting_timer = false;
         }
 
-        // if target has no more health
         if (target.isEntityDead()) {
-            // set target as dead
-            target.setAsDead();
-
-            // player gains experience
-            this.addExperience(target.raceData.experienceGain);
+            this.processDeath(target);
         }
+    }
+
+    processDeath(target) {
+        // set target as dead
+        target.setAsDead();
+
+        // player gains experience
+        this.addExperience(target.raceData.experienceGain);
     }
 
     addExperience(amount) {
