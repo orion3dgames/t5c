@@ -60,32 +60,33 @@ export class GameRoom extends Room<GameRoomState> {
         this.delayedInterval = this.clock.setInterval(() => {
             // only save if there is any players
             if (this.state.players.size > 0) {
-                //Logger.info("[gameroom][onCreate] Saving data for room "+options.location+" with "+this.state.players.size+" players");
+                Logger.info(
+                    "[gameroom][onCreate] Saving data for room " +
+                        options.location +
+                        " with " +
+                        this.state.players.size +
+                        " players"
+                );
                 this.state.players.forEach((entity) => {
-                    // do not save if players is blocked
-                    if (entity.blocked) {
-                        // update player
-                        let playerClient = this.clients.hashedArray[entity.sessionId];
-                        this.database.updateCharacter(playerClient.auth.id, {
-                            location: entity.location,
-                            x: entity.x,
-                            y: entity.y,
-                            z: entity.z,
-                            rot: entity.rot,
-                            level: entity.level,
-                            experience: entity.experience,
-                        });
+                    // update player
+                    let playerClient = this.clients.hashedArray[entity.sessionId];
+                    this.database.updateCharacter(playerClient.auth.id, {
+                        location: entity.location,
+                        x: entity.x,
+                        y: entity.y,
+                        z: entity.z,
+                        rot: entity.rot,
+                        level: entity.level,
+                        experience: entity.experience,
+                    });
 
-                        //Logger.info("[gameroom][onCreate] player "+playerClient.auth.name+" saved to database.");
-                    }
+                    Logger.info("[gameroom][onCreate] player " + playerClient.auth.name + " saved to database.");
                 });
             }
         }, Config.databaseUpdateRate);
     }
 
-    public onBeforePatch(state){
-        
-    }
+    public onBeforePatch(state) {}
 
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////

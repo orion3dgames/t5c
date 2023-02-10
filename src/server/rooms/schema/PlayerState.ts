@@ -12,7 +12,6 @@ import { Races } from "../../../shared/Entities/Common/Races";
 
 export class PlayerState extends EntityState {
     // networked player specific
-    @type("number") public experience: number = 0;
     @type("number") public strength: number = 0;
     @type("number") public endurance: number = 0;
     @type("number") public agility: number = 0;
@@ -218,15 +217,15 @@ export class PlayerState extends EntityState {
                     clearInterval(timer);
                 }
                 if (repeat >= ability.repeat) {
-                    this.startCooldown(digit, ability);
                     clearInterval(timer);
                 }
                 repeat += 1;
             }, ability.repeatInterval);
         } else {
             this.affectTarget(target, ability);
-            this.startCooldown(digit, ability);
         }
+
+        this.startCooldown(digit, ability);
 
         // make sure no values are out of range.
         target.normalizeStats();
@@ -252,11 +251,21 @@ export class PlayerState extends EntityState {
     }
 
     processDeath(target) {
+        if (target.isDead) {
+            return false;
+        }
+
         // set target as dead
         target.setAsDead();
 
         // player gains experience
-        this.addExperience(target.raceData.experienceGain);
+        let exp = target.raceData.experienceGain;
+        this.addExperience(exp);
+
+        let caster = this._gameroom.clients.get(this.sessionId);
+        if (caster) {
+            caster.send("event", { message: "You've killed " + target.name + " and gained " + exp + " experience." });
+        }
     }
 
     addExperience(amount) {
@@ -287,6 +296,12 @@ export class PlayerState extends EntityState {
             this.health = 100;
             this.blocked = false;
             this.state = EntityCurrentState.IDLE;
+            this.gracePeriod = true;
+
+            // add a 5 second grace period where the player can not be targeted by the ennemies
+            setTimeout(() => {
+                this.gracePeriod = false;
+            }, 5000);
         }, 10000);
     }
 

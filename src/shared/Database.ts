@@ -211,9 +211,21 @@ class Database {
         return await this.getCharacter(c.id);
     }
 
-    async updateCharacter(character_id: number, data: { location: any; x: any; y: any; z: any; rot: any }) {
-        const sql = `UPDATE characters SET location=?, x=?, y=?, z=?, rot=? WHERE id=? ;`;
-        return this.run(sql, [data.location, data.x, data.y, data.z, data.rot, character_id]);
+    async updateCharacter(
+        character_id: number,
+        data: { location: any; x: any; y: any; z: any; rot: any; level: any; experience: any }
+    ) {
+        const sql = `UPDATE characters SET location=?, x=?, y=?, z=?, rot=?, level=?, experience=? WHERE id=? ;`;
+        return this.run(sql, [
+            data.location,
+            data.x,
+            data.y,
+            data.z,
+            data.rot,
+            data.level,
+            data.experience,
+            character_id,
+        ]);
     }
 
     async toggleOnlineStatus(character_id: number, online: number) {

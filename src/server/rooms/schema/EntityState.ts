@@ -23,6 +23,7 @@ export class EntityState extends Schema {
     @type("number") public health: number = 0;
     @type("number") public mana: number = 0;
     @type("number") public level: number = 0;
+    @type("number") public experience: number = 0;
 
     // flags
     @type("boolean") public blocked: boolean = false; // if true, used to block player and to prevent movement

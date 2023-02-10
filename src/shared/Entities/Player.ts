@@ -189,6 +189,17 @@ export class Player extends Entity {
     // server message handler
 
     public registerServerMessages() {
+        this._room.onMessage("event", (data) => {
+            this.ui._UIChat.processSystemMessage({
+                type: "kill",
+                senderID: "SYSTEM",
+                message: data.message,
+                name: "SYSTEM",
+                timestamp: 0,
+                createdAt: "",
+            });
+        });
+
         // on teleport confirmation
         this._room.onMessage("playerTeleportConfirm", (location) => {
             this.actionsController.teleport(this._room, location);
