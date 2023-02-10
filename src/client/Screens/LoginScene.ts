@@ -80,19 +80,28 @@ export class LoginScene {
         welcomeText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         columnRect.addControl(welcomeText);
 
+        // FORM CONTAINER columm
+        const formContainer = new Rectangle("formContainer");
+        formContainer.width = 1;
+        formContainer.height = "300px";
+        formContainer.thickness = 0;
+        formContainer.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        formContainer.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        columnRect.addControl(formContainer);
+
         ///////////////////////////////////////////
         // username input
         const usernameInput = new InputText("usernameInput");
-        usernameInput.top = "-120px";
+        usernameInput.top = "-140px";
         usernameInput.width = 0.8;
         usernameInput.height = "30px;";
         usernameInput.color = "#FFF";
-        usernameInput.text = generateRandomPlayerName();
+        usernameInput.text = "";
         //usernameInput.text = "test";
         usernameInput.placeholderText = "Enter username";
         usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         usernameInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        columnRect.addControl(usernameInput);
+        formContainer.addControl(usernameInput);
 
         usernameInput.onKeyboardEventProcessedObservable.add((ev) => {
             if (ev.key === "Tab") {
@@ -107,12 +116,12 @@ export class LoginScene {
         passwordInput.width = 0.8;
         passwordInput.height = "30px;";
         passwordInput.color = "#FFF";
-        passwordInput.top = "-80px";
-        passwordInput.text = "test";
+        passwordInput.top = "-110px";
+        passwordInput.text = "";
         passwordInput.placeholderText = "Enter password";
         passwordInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         passwordInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        columnRect.addControl(passwordInput);
+        formContainer.addControl(passwordInput);
 
         passwordInput.onKeyboardEventProcessedObservable.add((ev) => {
             if (ev.key === "Enter") {
@@ -128,16 +137,32 @@ export class LoginScene {
         joinBtn.width = 0.8;
         joinBtn.height = "30px";
         joinBtn.color = "white";
-        joinBtn.top = "-40px";
+        joinBtn.top = "-80px";
         joinBtn.thickness = 1;
         joinBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         joinBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        columnRect.addControl(joinBtn);
+        formContainer.addControl(joinBtn);
 
         joinBtn.onPointerDownObservable.add(() => {
             this.connect(usernameInput.text, passwordInput.text);
             usernameInput.text = "";
             passwordInput.text = "";
+        });
+
+        ///////////////////////////////////////////
+        // guest button
+        const joinGuestBtn = Button.CreateSimpleButton("joinGuestBtn", "Guest Login");
+        joinGuestBtn.width = 0.8;
+        joinGuestBtn.height = "30px";
+        joinGuestBtn.color = "white";
+        joinGuestBtn.top = "-30px";
+        joinGuestBtn.thickness = 1;
+        joinGuestBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        joinGuestBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        formContainer.addControl(joinGuestBtn);
+
+        joinGuestBtn.onPointerDownObservable.add(() => {
+            this.connect(generateRandomPlayerName(), generateRandomPlayerName());
         });
 
         // load scene
