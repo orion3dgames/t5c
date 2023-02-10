@@ -1,0 +1,1 @@
+global.camY = 0;

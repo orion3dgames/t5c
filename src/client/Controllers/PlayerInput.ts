@@ -66,17 +66,17 @@ export class PlayerInput {
 
         scene.onKeyboardObservable.add((kbInfo) => {
             switch (kbInfo.type) {
-              case KeyboardEventTypes.KEYDOWN:
-                if(kbInfo.event.code === 'Digit1'){ this.digit_pressed = 1;}
-                if(kbInfo.event.code === 'Digit2'){ this.digit_pressed = 2;}
-                if(kbInfo.event.code === 'Digit3'){ this.digit_pressed = 3;}
-                if(kbInfo.event.code === 'Digit4'){ this.digit_pressed = 4;}
-                if(kbInfo.event.code === 'Digit5'){ this.digit_pressed = 5;}
-                if(kbInfo.event.code === 'Digit6'){ this.digit_pressed = 6;}
-                if(kbInfo.event.code === 'Digit7'){ this.digit_pressed = 7;}
-                if(kbInfo.event.code === 'Digit8'){ this.digit_pressed = 8;}
-                if(kbInfo.event.code === 'Digit9'){ this.digit_pressed = 9;}
-                break;
+                case KeyboardEventTypes.KEYDOWN:
+                    if (kbInfo.event.code === 'Digit1') { this.digit_pressed = 1; }
+                    if (kbInfo.event.code === 'Digit2') { this.digit_pressed = 2; }
+                    if (kbInfo.event.code === 'Digit3') { this.digit_pressed = 3; }
+                    if (kbInfo.event.code === 'Digit4') { this.digit_pressed = 4; }
+                    if (kbInfo.event.code === 'Digit5') { this.digit_pressed = 5; }
+                    if (kbInfo.event.code === 'Digit6') { this.digit_pressed = 6; }
+                    if (kbInfo.event.code === 'Digit7') { this.digit_pressed = 7; }
+                    if (kbInfo.event.code === 'Digit8') { this.digit_pressed = 8; }
+                    if (kbInfo.event.code === 'Digit9') { this.digit_pressed = 9; }
+                    break;
             }
         });
 
@@ -97,8 +97,8 @@ export class PlayerInput {
 
         //forward - backwards movement
         if (this.inputMap["rotY"] !== null) {
-            this.vertical = -Math.cos(this.inputMap["rotY"] + Math.PI / 4);
-            this.horizontal = Math.sin(this.inputMap["rotY"] + Math.PI / 4);
+            this.vertical = -Math.cos(this.inputMap["rotY"] + Math.PI - global.camY);
+            this.horizontal = Math.sin(this.inputMap["rotY"] + Math.PI - global.camY);
         }
     }
 }

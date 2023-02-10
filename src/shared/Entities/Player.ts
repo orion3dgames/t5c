@@ -122,6 +122,7 @@ export class Player extends Entity {
     public update(delta) {
         // tween entity
         if (this && this.moveController) {
+            global.camY = this.cameraController._camRoot.rotation.y;
             this.moveController.tween();
         }
     }

@@ -72,6 +72,7 @@ export class EntityMove {
     public tween() {
         this._mesh.position = Vector3.Lerp(this._mesh.position, this.nextPosition, 0.2);
         const gap = Math.abs(this._mesh.rotation.y - this.nextRotation.y);
+        // TODO DAYD : make it better
         if (gap > Math.PI)
             this._mesh.rotation.y = this.nextRotation.y;
         else
@@ -90,8 +91,7 @@ export class EntityMove {
         let newX = oldX - input.h * speed;
         let newY = oldY;
         let newZ = oldZ - input.v * speed;
-        let newRot = Math.atan2(input.h, input.v);
-
+        const newRotY = Math.atan2(input.h, input.v)
         // check it fits in navmesh
         if (this.isCurrentPlayer) {
             let sourcePos = new Vector3(oldX, oldY, oldZ); // new pos
@@ -101,7 +101,7 @@ export class EntityMove {
                 this.nextPosition.x = newX;
                 this.nextPosition.y = newY;
                 this.nextPosition.z = newZ;
-                this.nextRotation.y = this.nextRotation.y + (newRot - this.nextRotation.y);
+                this.nextRotation.y = this.nextRotation.y + (newRotY - this.nextRotation.y);
 
                 //console.log('VALID position for', new Vector3Y( oldX, oldY, oldZ), new Vector3Y(newX, newY, newZ), foundPath);
             } else {
@@ -112,7 +112,7 @@ export class EntityMove {
             this.nextPosition.x = newX;
             this.nextPosition.y = newY;
             this.nextPosition.z = newZ;
-            this.nextRotation.y = this.nextRotation.y + (newRot - this.nextRotation.y);
+            this.nextRotation.y = this.nextRotation.y + (newRotY - this.nextRotation.y);
 
             //console.log('entity move');
         }

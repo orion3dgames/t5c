@@ -7,7 +7,7 @@ export class EntityCamera {
     public camera;
     private _scene: Scene;
     private _input;
-    private _camRoot;
+    public _camRoot;
     constructor(scene: Scene, input) {
         this._scene = scene;
         this._input = input;
@@ -15,8 +15,7 @@ export class EntityCamera {
     }
 
     degrees_to_radians(degrees) {
-        var pi = Math.PI;
-        return degrees * (pi / 180);
+        return degrees * (Math.PI / 180);
     }
 
     private _build() {
@@ -25,10 +24,10 @@ export class EntityCamera {
         this._camRoot.position = new Vector3(0, 0, 0); //initialized at (0,0,0)
 
         // to face the player from behind (180 degrees)
-        this._camRoot.rotation = new Vector3(0, this.degrees_to_radians(145), 0);
+        this._camRoot.rotation = new Vector3(0, 3 / 4 * Math.PI, 0);
 
         // rotations along the x-axis (up/down tilting)
-        let yTilt = new TransformNode("ytilt");
+        const yTilt = new TransformNode("ytilt");
 
         // adjustments to camera view to point down at our player
         yTilt.rotation = new Vector3(0.6, 0, 0);
@@ -56,8 +55,8 @@ export class EntityCamera {
         // rotate camera around the Y position if right click is true
         if (this._input.right_click) {
             // ddaydd to implement
-            //let rotationY = this.camera.rotation.y -= this._input.h;
-            //this.camera.rotation = new Vector3(0, rotationY, 0);
+            const rotationY = this._camRoot.rotation.y + 0.1;
+            this._camRoot.rotation = new Vector3(0, rotationY, 0);
         }
     }
 }
