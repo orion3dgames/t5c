@@ -25,10 +25,6 @@ import { Network } from "./Controllers/Network";
 import { Loading } from "./Controllers/Loading";
 import Locations from "./../shared/Data/Locations";
 
-// temp dayd
-
-import './helpers.js';
-
 // App class is our entire game application
 class App {
     // babylon
@@ -154,6 +150,7 @@ class App {
             currentUser: false,
             currentMs: 0,
         };
+        global.camY = 0;
     }
 
     private checkForSceneChange() {
