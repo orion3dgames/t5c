@@ -5,6 +5,9 @@ type Ability = {
     // relative link to icon
     icon: string;
 
+    // sound effect
+    sound: string,
+
     // ability title
     name: string;
 
@@ -64,6 +67,7 @@ let AbilitiesDB: abilityMap = {
         name: "Attack",
         key: "base_attack",
         icon: "./icons/ABILITY_base_attack.png",
+        sound: "enemy_attack_1",
         description: "A unimpressive attack that deals very little damage.",
         castSelf: false,
         castTime: 0,
@@ -87,6 +91,7 @@ let AbilitiesDB: abilityMap = {
         name: "Fireball",
         key: "fireball",
         icon: "./icons/ABILITY_fireball.png",
+        sound: "fire_attack_2",
         description: "Hurls a massive fiery ball that explodes on contact with target.",
         castSelf: false,
         castTime: 1000,
@@ -114,6 +119,7 @@ let AbilitiesDB: abilityMap = {
         name: "Poison Cloud",
         key: "poisonball",
         icon: "./icons/ABILITY_poisonball.png",
+        sound: "fire_attack_2",
         description: "Trow a bottle of viscous poisonous liquid onto target that will damage target overtime.",
         castSelf: false,
         castTime: 0,
@@ -141,6 +147,7 @@ let AbilitiesDB: abilityMap = {
         name: "Heal",
         key: "heal",
         icon: "./icons/ABILITY_heal.png",
+        sound: "heal_1",
         description: "A spell from ancient times that will leave target feeling fresh & revigorated.",
         castSelf: true,
         castTime: 3000,

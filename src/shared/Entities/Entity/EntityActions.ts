@@ -10,9 +10,11 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import State from "../../../client/Screens/Screens";
 import Locations from "../../../shared/Data/Locations";
 import { Abilities } from "../Common/Abilities";
+import { Sound } from "@babylonjs/core/Audio/sound";
 
 export class EntityActions {
     private _scene: Scene;
+    private _assetsContainer: Scene;
     private particleTxt_01: Texture;
 
     private colors = {
@@ -21,15 +23,33 @@ export class EntityActions {
         orange: [Color3.FromInts(249, 115, 0), Color3.FromInts(222, 93, 54)],
     };
 
-    constructor(scene) {
+    constructor(scene, assetsContainer) {
         this._scene = scene;
-
+        this._assetsContainer = assetsContainer;
+        console.log(assetsContainer);
         this.particleTxt_01 = new Texture("textures/particle_01.png", this._scene);
     }
 
+    public playSound(){
+
+    }
+
     public process(data, ability) {
+
+        /*
+        let soundToPlay = this._scene.getSoundByName("sound_"+ability.key);
+        if(!soundToPlay){
+            // play sound
+            let soundData = this._assetsContainer[ability.sound];
+            let sound = new Sound("sound_"+ability.key, soundData, this._scene, function(){}, {
+                volume: 0.3
+            });
+        }
+        soundToPlay.play();*/
+        
+    
         // get target mesh
-        let mesh = this._scene.getMeshByName(data.targetId + "_mesh");
+        let mesh = this._scene.getMeshByName(data.targetId);
 
         // set start and end pos
         let start = data.fromPos;
@@ -69,28 +89,29 @@ export class EntityActions {
         particleSystem.color2 = Color4.FromColor3(this.colors[color][1]);
         particleSystem.colorDead = new Color4(0, 0, 0, 0.0);
         // Size of each particle (random between...
-        particleSystem.minSize = 0.2;
-        particleSystem.maxSize = 0.4;
+        particleSystem.minSize = 0.5;
+        particleSystem.maxSize = 0.9;
         // Life time of each particle (random between...
-        particleSystem.minLifeTime = 5;
-        particleSystem.maxLifeTime = 10;
+        particleSystem.minLifeTime = 0.2;
+        particleSystem.maxLifeTime = 0.6;
         // Emission rate
-        particleSystem.emitRate = 1000;
+        particleSystem.emitRate = 100;
         particleSystem.createSphereEmitter(1);
         // Speed
-        particleSystem.minEmitPower = 5;
-        particleSystem.maxEmitPower = 10;
-        particleSystem.updateSpeed = 0.5;
+        particleSystem.minEmitPower = 2;
+        particleSystem.maxEmitPower = 5;
+        particleSystem.updateSpeed = 0.1;
         // Start the particle system
         particleSystem.start();
         //////////////////////////////////////////////
 
         setTimeout(() => {
             particleSystem.dispose(true);
-        }, 750);
+        }, 500);
     }
 
     public particule_fireball(start, end, mesh, color) {
+
         // calculate angle
         var angle = Math.atan2(start.z - end.z, start.x - end.x);
 
@@ -141,6 +162,7 @@ export class EntityActions {
                 i += 5e-3;
             }
             if (projectile.intersectsMesh(mesh) || i > 1) {
+                this.particule_heal(mesh, color);
                 projectile.dispose(true, true);
                 particleSystem.dispose(true);
                 this._scene.onBeforeRenderObservable.remove(loop);

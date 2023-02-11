@@ -52,7 +52,7 @@ export class Player extends Entity {
         //spawn
         this.utilsController = new EntityUtils(this._scene, this._room);
         this.cameraController = new EntityCamera(this._scene, this._input);
-        this.actionsController = new EntityActions(this._scene);
+        this.actionsController = new EntityActions(this._scene, this.assetsContainer);
 
         ///////////////////////////////////////////////////////////
         // entity network event
