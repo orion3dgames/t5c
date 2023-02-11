@@ -50,6 +50,7 @@ export class EntityMesh {
         // set collision mesh
         this.mesh = box;
         this.mesh.isPickable = true;
+        this.mesh.checkCollisions = true;
         this.mesh.position = new Vector3(this._entity.x, this._entity.y, this._entity.z);
         this.mesh.metadata = {
             sessionId: this._entity.sessionId,

@@ -7,7 +7,11 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector2, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { CreateGround } from "@babylonjs/core/Meshes/Builders/groundBuilder";
+import { WaterMaterial } from "@babylonjs/materials/water";
+import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
+import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 
 export class Environment {
     private _scene: Scene;
@@ -101,6 +105,36 @@ export class Environment {
     //What we do once the environment assets have been imported
     //handles setting the necessary flags for collision and trigger meshes,
     public async prepareAssets() {
+
+        /*
+        var skybox = CreateBox("skyBox", {width: 1000, height: 1000, depth: 1000});
+        var skyboxMaterial = new StandardMaterial("skyBox");
+        skyboxMaterial.backFaceCulling = false;
+        skyboxMaterial.reflectionTexture = new CubeTexture("textures/skybox", this._scene);
+        skyboxMaterial.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
+        skyboxMaterial.diffuseColor = new Color3(0, 0, 0);
+        skyboxMaterial.specularColor = new Color3(0, 0, 0);
+        skyboxMaterial.disableLighting = true;
+        skybox.material = skyboxMaterial;*/
+
+        // Water
+        var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 32 }, this._scene);
+        waterMesh.position = new Vector3(0, -2, 0);
+        
+        var water = new WaterMaterial("water", this._scene);
+        water.bumpTexture = new Texture("textures/waterbump.jpg", this._scene);
+        
+        // Water properties
+        water.backFaceCulling = true;
+        water.windForce = -5;
+        water.waveHeight = 0.2;
+        water.bumpHeight = 0.05;
+        water.waterColor = Color3.FromInts(0, 157, 255);
+        water.colorBlendFactor = 0.5;
+        waterMesh.material = water;
+
+        //water.addToRenderList(skybox);
+
         // instantiate the scene
         let key = global.T5C.currentLocation.mesh;
         let env = this._assetsContainer[key].meshes[0];
@@ -121,6 +155,9 @@ export class Environment {
 
             if (m.name.includes("New Terrain 1")) {
                 m.receiveShadows = true;
+
+                // Add skybox and ground to the reflection and refraction
+                water.addToRenderList(m);
             }
 
             //trigger meshes
