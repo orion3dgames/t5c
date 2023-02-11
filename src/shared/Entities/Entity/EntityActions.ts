@@ -9,12 +9,12 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 
 import State from "../../../client/Screens/Screens";
 import Locations from "../../../shared/Data/Locations";
-import { Abilities } from "../Common/Abilities";
 import { Sound } from "@babylonjs/core/Audio/sound";
+
 
 export class EntityActions {
     private _scene: Scene;
-    private _assetsContainer: Scene;
+    private _loadedAssets: any[];
     private particleTxt_01: Texture;
 
     private colors = {
@@ -23,11 +23,10 @@ export class EntityActions {
         orange: [Color3.FromInts(249, 115, 0), Color3.FromInts(222, 93, 54)],
     };
 
-    constructor(scene, assetsContainer) {
+    constructor(scene, _loadedAssets) {
         this._scene = scene;
-        this._assetsContainer = assetsContainer;
-        console.log(assetsContainer);
-        this.particleTxt_01 = new Texture("textures/particle_01.png", this._scene);
+        this._loadedAssets = _loadedAssets;
+        this.particleTxt_01 = this._loadedAssets['particle_01'];
     }
 
     public playSound(){
@@ -40,14 +39,12 @@ export class EntityActions {
         let soundToPlay = this._scene.getSoundByName("sound_"+ability.key);
         if(!soundToPlay){
             // play sound
-            let soundData = this._assetsContainer[ability.sound];
-            let sound = new Sound("sound_"+ability.key, soundData, this._scene, function(){}, {
+            let soundData = this._loadedAssets[ability.sound];
+            let sound = new Sound("sound_"+ability.key, soundData, this._scene, function(){ sound.play(); }, {
                 volume: 0.3
             });
-        }
-        soundToPlay.play();*/
+        }*/
         
-    
         // get target mesh
         let mesh = this._scene.getMeshByName(data.targetId);
 

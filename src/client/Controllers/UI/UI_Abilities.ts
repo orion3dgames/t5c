@@ -9,15 +9,17 @@ import { Player } from "../../../shared/Entities/Player";
 export class UI_Abilities {
     private _playerUI;
     private _gameRoom;
+    private _loadedAssets;
     private _currentPlayer: Player;
     private _tooltip: Rectangle;
     private _tooltipTxt: TextBlock;
     private abylity_number: number = 9;
 
-    constructor(_playerUI, _gameRoom, _currentPlayer) {
+    constructor(_playerUI, _gameRoom, _currentPlayer, _loadedAssets) {
         this._playerUI = _playerUI;
         this._currentPlayer = _currentPlayer;
         this._gameRoom = _gameRoom;
+        this._loadedAssets = _loadedAssets;
 
         // create ui
         this._createUI();
@@ -131,7 +133,8 @@ export class UI_Abilities {
     addAbilityIcon(digit, headlineRect: Rectangle) {
         let ability = Abilities.getByDigit(this._currentPlayer, digit);
         if (ability) {
-            var img = new Image("ability_image_" + digit, ability.icon);
+            var imageData = this._loadedAssets[ability.icon];
+            var img = new Image("ability_image_" + digit, imageData);
             img.stretch = Image.STRETCH_FILL;
             headlineRect.addControl(img);
 

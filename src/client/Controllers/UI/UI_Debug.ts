@@ -41,7 +41,6 @@ export class UI_Debug {
         }, 10000)
 
         // on teleport confirmation
-        
         this._gameRoom.onMessage('pong', (data) => {
             let dateNow = Date.now();
             this.ping = dateNow - data.date;

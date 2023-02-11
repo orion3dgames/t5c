@@ -115,7 +115,7 @@ export class UI_Chats {
         };
 
         // intial refresh chatbox
-        this._refreshChatBox();
+        this._refreshChatBox(); 
     }
 
     _createEvents() {
@@ -197,6 +197,9 @@ export class UI_Chats {
         elements.forEach((element) => {
             element.dispose();
         });
+
+        console.log(this.messages);
+
 
         this.messages
             .slice()

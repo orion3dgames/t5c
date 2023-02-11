@@ -1,5 +1,4 @@
 import { Scene } from "@babylonjs/core/scene";
-import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -10,12 +9,12 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Room } from "colyseus.js";
 import { EntityState } from "../../../server/rooms/schema/EntityState";
 import Config from "../../Config";
-import { Races, Race } from "../../Entities/Common/Races";
+import { Race } from "../../Entities/Common/Races";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 
 export class EntityMesh {
     private _scene: Scene;
-    private assetsContainer: AssetContainer;
+    private _loadedAssets;
     private _entity: EntityState;
     private _room: Room;
     private _raceData: Race;
@@ -28,14 +27,14 @@ export class EntityMesh {
 
     constructor(
         scene: Scene,
-        assetsContainer,
+        _loadedAssets,
         entity: EntityState,
         room: Room,
         isCurrentPlayer: boolean,
         raceData: Race
     ) {
         this._scene = scene;
-        this.assetsContainer = assetsContainer;
+        this._loadedAssets = _loadedAssets;
         this._entity = entity;
         this._room = room;
         this.isCurrentPlayer = isCurrentPlayer;
@@ -86,7 +85,7 @@ export class EntityMesh {
         this.selectedMesh = sphere;
 
         // load player mesh
-        const result = this.assetsContainer[this._entity.race].instantiateModelsToScene();
+        const result = this._loadedAssets[this._entity.race].instantiateModelsToScene();
         const playerMesh = result.rootNodes[0];
         this._animationGroups = result.animationGroups;
         //console.log('LOADED ENTITY MESH', this._entity.race, result);

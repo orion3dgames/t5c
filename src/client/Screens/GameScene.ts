@@ -1,14 +1,10 @@
-import { Engine } from "@babylonjs/core/Engines/engine";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { Scene } from "@babylonjs/core/scene";
-import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 
 import State from "./Screens";
 import { PlayerInput } from "../Controllers/PlayerInput";
@@ -19,10 +15,9 @@ import { Entity } from "../../shared/Entities/Entity";
 import Config from "../../shared/Config";
 import { Room } from "colyseus.js";
 import { PlayerInputs } from "../../shared/types";
-import { apiUrl, bytesToSize, isLocal, request } from "../../shared/Utils";
+import { apiUrl, isLocal, request } from "../../shared/Utils";
 import { NavMesh } from "../../shared/yuka";
 import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
-
 import { createConvexRegionHelper, createGraphHelper } from "../../shared/Utils/navMeshHelper";
 import Locations from "../../shared/Data/Locations";
 import { SceneController } from "../Controllers/Scene";
@@ -30,7 +25,6 @@ import { SceneController } from "../Controllers/Scene";
 export class GameScene {
     private _app;
     private _scene: Scene;
-    private _assetsContainer: AssetContainer[] = [];
     private _input: PlayerInput;
     private _ui;
     private _shadow: CascadedShadowGenerator;
@@ -41,7 +35,7 @@ export class GameScene {
     private room: Room<any>;
     private chatRoom: Room<any>;
     private _currentPlayer: Player;
-    private _loadedAssets;
+    private _loadedAssets: AssetContainer[] = [];
 
     // networked entities
     private entities: Entity[] = [];
@@ -84,7 +78,6 @@ export class GameScene {
 
         //
         let location = global.T5C.currentLocation;
-        console.log(location);
 
         // black background
         scene.clearColor = new Color4(0, 0, 0, 1);
@@ -119,11 +112,16 @@ export class GameScene {
         this._shadow.shadowMaxZ = 1000;
 
         // load assets and remove them all from scene
-        this._environment = new Environment(this._scene, this._shadow, this._assetsContainer);
+        this._environment = new Environment(this._scene, this._shadow, this._loadedAssets);
         this._navMesh = await this._environment.loadNavMesh();
         await this._environment.loadAssets();
+
+        // load the rest
+        this._app.engine.displayLoadingUI();
         await this._environment.prepareAssets();
-        await this._initNetwork();
+        await this._initNetwork();   
+
+        
     }
 
     private async _initNetwork(): Promise<void> {
@@ -155,7 +153,6 @@ export class GameScene {
     }
 
     private async _initEvents() {
-        await this._scene.whenReadyAsync();
 
         // setup input Controller
         this._input = new PlayerInput(this._scene, this.room);
@@ -167,7 +164,8 @@ export class GameScene {
             this.room,
             this.chatRoom,
             this.entities,
-            this._currentPlayer
+            this._currentPlayer,
+            this._loadedAssets
         );
 
         ////////////////////////////////////////////////////
@@ -186,7 +184,7 @@ export class GameScene {
                     this._ui,
                     this._shadow,
                     this._navMesh,
-                    this._assetsContainer,
+                    this._loadedAssets,
                     this._input
                 );
 
@@ -199,6 +197,9 @@ export class GameScene {
                 // add to entities
                 this.players[sessionId] = _player;
 
+                // player is load, let's hide the loading gui
+                this._app.engine.hideLoadingUI();
+
                 //////////////////
                 // else if entity or another player
             } else {
@@ -210,7 +211,7 @@ export class GameScene {
                     this._ui,
                     this._shadow,
                     this._navMesh,
-                    this._assetsContainer
+                    this._loadedAssets
                 );
             }
         });
@@ -223,7 +224,7 @@ export class GameScene {
                 this._ui,
                 this._shadow,
                 this._navMesh,
-                this._assetsContainer
+                this._loadedAssets
             );
         });
 

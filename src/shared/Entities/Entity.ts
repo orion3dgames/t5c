@@ -27,7 +27,7 @@ export class Entity {
     public _input;
     public _shadow;
     public _navMesh;
-    public assetsContainer;
+    public _loadedAssets;
 
     // controllers
     public cameraController: EntityCamera;
@@ -76,13 +76,13 @@ export class Entity {
         ui: UserInterface,
         shadow: CascadedShadowGenerator,
         navMesh: NavMesh,
-        assetsContainer: AssetContainer[]
+        _loadedAssets: AssetContainer[]
     ) {
         // setup class variables
         this._scene = scene;
         this._room = room;
         this._navMesh = navMesh;
-        this.assetsContainer = assetsContainer;
+        this._loadedAssets = _loadedAssets;
         this.ui = ui;
         this._shadow = shadow;
         this.sessionId = entity.sessionId; // network id from colyseus
@@ -101,7 +101,7 @@ export class Entity {
         // load mesh controllers
         this.meshController = new EntityMesh(
             this._scene,
-            this.assetsContainer,
+            this._loadedAssets,
             this.entity,
             this._room,
             this.isCurrentPlayer,

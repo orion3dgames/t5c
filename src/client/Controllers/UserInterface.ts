@@ -20,11 +20,11 @@ import { Leveling } from "../../shared/Entities/Player/Leveling";
 export class UserInterface {
     private _scene: Scene;
     private _engine: Engine;
-
     private _gameRoom: Room;
     private _chatRoom: Room;
     public _entities: Entity[];
     private _currentPlayer;
+    private _loadedAssets;
 
     //UI Elements
     private _playerUI;
@@ -46,7 +46,7 @@ export class UserInterface {
     public _UICastingTimerInside;
     public _UICastingTimerText;
 
-    constructor(scene: Scene, engine: Engine, gameRoom: Room, chatRoom: Room, entities: Entity[], currentPlayer) {
+    constructor(scene: Scene, engine: Engine, gameRoom: Room, chatRoom: Room, entities: Entity[], currentPlayer, _loadedAssets) {
         // set var we will be needing
         this._scene = scene;
         this._engine = engine;
@@ -54,6 +54,7 @@ export class UserInterface {
         this._chatRoom = chatRoom;
         this._entities = entities;
         this._currentPlayer = currentPlayer;
+        this._loadedAssets = _loadedAssets;
 
         // create ui
         const _namesUI = AdvancedDynamicTexture.CreateFullscreenUI("UI", true, this._scene);
@@ -99,7 +100,7 @@ export class UserInterface {
         this._currentPlayer = currentPlayer;
 
         // create abilities ui + events
-        this._UIAbilities = new UI_Abilities(this._centerUI, this._gameRoom, currentPlayer);
+        this._UIAbilities = new UI_Abilities(this._centerUI, this._gameRoom, currentPlayer, this._loadedAssets);
 
         // create chat ui + events
         this._UIChat = new UI_Chats(this._centerUI, this._chatRoom, currentPlayer, this._entities);

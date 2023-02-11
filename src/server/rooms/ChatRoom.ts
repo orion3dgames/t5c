@@ -24,14 +24,7 @@ export class ChatRoom extends Room {
 
         Logger.info("[chat_room][message] client joined " + client.sessionId, options);
 
-        // sent initial help message
-        client.send(
-            "messages",
-            this.generateMessage(
-                client.sessionId,
-                "Welcome to T5C, you can move around by left clicking and dragging the mouse around."
-            )
-        );
+        this.broadcast("messages", this.generateMessage(client.sessionId, client.sessionId+" has joined the room."));
     }
 
     // When a client leaves the room

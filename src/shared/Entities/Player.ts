@@ -36,10 +36,10 @@ export class Player extends Entity {
         ui: UserInterface,
         shadow: CascadedShadowGenerator,
         navMesh: NavMesh,
-        assetsContainer: AssetContainer[],
+        _loadedAssets:any[],
         input: PlayerInput
     ) {
-        super(entity, room, scene, ui, shadow, navMesh, assetsContainer);
+        super(entity, room, scene, ui, shadow, navMesh, _loadedAssets);
 
         this._input = input;
 
@@ -52,7 +52,7 @@ export class Player extends Entity {
         //spawn
         this.utilsController = new EntityUtils(this._scene, this._room);
         this.cameraController = new EntityCamera(this._scene, this._input);
-        this.actionsController = new EntityActions(this._scene, this.assetsContainer);
+        this.actionsController = new EntityActions(this._scene, this._loadedAssets);
 
         ///////////////////////////////////////////////////////////
         // entity network event

@@ -1,32 +1,27 @@
 import { Scene } from "@babylonjs/core/scene";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
-import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
-import { bytesToSize } from "../../shared/Utils";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Vector2, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CreateGround } from "@babylonjs/core/Meshes/Builders/groundBuilder";
 import { WaterMaterial } from "@babylonjs/materials/water";
-import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
-import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { Sound } from "@babylonjs/core/Audio/sound";
-import { AssetsManager, BinaryFileAssetTask, ContainerAssetTask, CubeTextureAssetTask, HDRCubeTextureAssetTask, MeshAssetTask, TextFileAssetTask, TextureAssetTask } from "@babylonjs/core/Misc/assetsManager";
+import { AssetsManager, BinaryFileAssetTask, ContainerAssetTask, CubeTextureAssetTask, HDRCubeTextureAssetTask, ImageAssetTask, MeshAssetTask, TextFileAssetTask, TextureAssetTask } from "@babylonjs/core/Misc/assetsManager";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class Environment {
     private _scene: Scene;
     private _shadow: CascadedShadowGenerator;
     private _assetsManager:AssetsManager;
-    private _assetsContainer;
+    private _loadedAssets;
     public allMeshes;
     private _loadingTxt;
 
-    constructor(scene: Scene, shadow: CascadedShadowGenerator, _assetsContainer) {
+    constructor(scene: Scene, shadow: CascadedShadowGenerator, _loadedAssets) {
         this._scene = scene;
         this._shadow = shadow;
-        this._assetsContainer = _assetsContainer;
+        this._loadedAssets = _loadedAssets;
         this._loadingTxt = window.document.getElementById("loadingTextDetails");
 
         // Assets manager
@@ -62,18 +57,24 @@ export class Environment {
             { name: "player_walking", filename: "player_walking.wav", extension: "wav" }, 
 
             // models
-            { name: "player_hobbit", filename: "player_hobbit.glb", extension: "glb", container: true }, 
-            { name: "monster_unicorn", filename: "monster_unicorn.glb", extension: "glb", container: true  }, 
-            { name: "monster_bear", filename: "monster_bear.glb", extension: "glb", container: true }, 
+            { name: "player_hobbit", filename: "player_hobbit.glb", extension: "glb", instantiate: true }, 
+            { name: "monster_unicorn", filename: "monster_unicorn.glb", extension: "glb", instantiate: true  }, 
+            { name: "monster_bear", filename: "monster_bear.glb", extension: "glb", instantiate: true }, 
+
+            // image
+            { name: "ABILITY_base_attack", filename: "icons/ABILITY_base_attack.png", extension: "png", type: "image" },
+            { name: "ABILITY_fireball", filename: "icons/ABILITY_fireball.png", extension: "png", type: "image" },
+            { name: "ABILITY_poisonball", filename: "icons/ABILITY_poisonball.png", extension: "png", type: "image"},
+            { name: "ABILITY_heal", filename: "icons/ABILITY_heal.png", extension: "png", type: "image"},
 
             // textures
-            { name: "selected_circle_green", filename: "selected_circle_green.png", extension: "png" },
+            { name: "selected_circle_green", filename: "selected_circle_green.png", extension: "png", type: "texture" },
+            { name: "particle_01", filename: "particle_01.png", extension: "png", type: "texture" },
 
             // environment
-            { name: environmentModel, filename: environmentModel+".glb", extension: "glb", container: false }, 
+            { name: environmentModel, filename: environmentModel+".glb", extension: "glb", instantiate: false }, 
         ];
 
-        let assets: string[] = [];
         assetsToLoad.forEach((obj) => {
             let assetTask;
             switch(obj.extension) {
@@ -81,34 +82,44 @@ export class Environment {
                 case "jpg":
                 case "jpeg":
                 case "gif":
-                    assetTask = this._assetsManager.addTextureTask(obj.name, './images/' + obj.filename);
+                    if(obj.type === "texture"){
+                        assetTask = this._assetsManager.addTextureTask(obj.name, './textures/' + obj.filename);
+                    }else if(obj.type === "image"){
+                        assetTask = this._assetsManager.addImageTask(obj.name, './images/' + obj.filename);
+                    }
                     break;
+
                 case "dds":
                     assetTask = this._assetsManager.addCubeTextureTask(obj.name, './images/' + obj.filename);
                     break;
+
                 case "hdr":
                     assetTask = this._assetsManager.addHDRCubeTextureTask(obj.name, './images/' + obj.filename, 512);
                     break;
+
                 case "mp3":
                 case "wav":
                     assetTask = this._assetsManager.addBinaryFileTask(obj.name, './sounds/' + obj.filename);
                     break;
+
                 case "babylon":
                 case "gltf":
                 case "glb":
                 case "obj":
-                    if(obj.container){
+                    if(obj.instantiate){
                         assetTask = this._assetsManager.addContainerTask(obj.name, "", "", './models/' + obj.filename)
                     }else{
                         assetTask = this._assetsManager.addMeshTask(obj.name, "", "", './models/' + obj.filename)
                     }
                     break;
+
                 case "json":
                 case "txt":
                     assetTask = this._assetsManager.addTextFileTask(obj.name, './data/' + obj.filename);
                     break;
+
                 default:
-                    console.log('Error loading asset "' + obj.name + '". Unrecognized file extension "' + obj.extension + '"');
+                    console.error('Error loading asset "' + obj.name + '". Unrecognized file extension "' + obj.extension + '"');
                     break;
             }
 
@@ -117,23 +128,25 @@ export class Environment {
                     case TextureAssetTask:
                     case CubeTextureAssetTask:
                     case HDRCubeTextureAssetTask:
-                        this._assetsContainer[task.name] = task.texture;
+                        this._loadedAssets[task.name] = task.texture;
+                        break;
+                    case ImageAssetTask:
+                        this._loadedAssets[task.name] = task.url;
                         break;
                     case BinaryFileAssetTask:
-                        this._assetsContainer[task.name] = task.data;
+                        this._loadedAssets[task.name] = task.data;
                         break;
                     case ContainerAssetTask:
-                        this._assetsContainer[task.name] = task.loadedContainer;
+                        this._loadedAssets[task.name] = task.loadedContainer;
                         break;
                     case MeshAssetTask:
-                        console.log(task);
-                        this._assetsContainer[task.name] = task;
+                        this._loadedAssets[task.name] = task;
                         break;
                     case TextFileAssetTask:
-                        this._assetsContainer[task.name] = task.text;
+                        this._loadedAssets[task.name] = task.text;
                         break;
                     default:
-                        console.log('Error loading asset "' + task.name + '". Unrecognized AssetManager task type.');
+                        console.error('Error loading asset "' + task.name + '". Unrecognized AssetManager task type.');
                         break;
                 }
             };
@@ -149,13 +162,11 @@ export class Environment {
         };
 
         this._assetsManager.onFinish = () => {
+            console.log('loading complete', this._loadedAssets);
             this.showLoadingMessage("loading complete");
         };
 
         await this._assetsManager.loadAsync();
-
-        // loading materials
-        this.showLoadingMessage("materials: loaded");
 
         // debug circle inaactive
         var material = new StandardMaterial("debug_entity_neutral");
@@ -168,14 +179,12 @@ export class Environment {
         material.diffuseColor = new Color3(1.0, 0, 0);
 
         // entity selected circle
-        var texture = new Texture("./images/selected_circle_green.png");
+        var texture = this._loadedAssets['selected_circle_green'];
         texture.hasAlpha = true;
         var material = new StandardMaterial("entity_selected");
         material.diffuseTexture = texture;
         material.useAlphaFromDiffuseTexture = true;
 
-        // particle 01 texture
-        let particle_01Txt = new Texture("textures/particle_01.png", this._scene);
     }
 
     //What we do once the environment assets have been imported
@@ -199,14 +208,15 @@ export class Environment {
         waterMesh.material = water;
 
         // start  music
-        let soundData = this._assetsContainer['music'];
+        /*
+        let soundData = this._loadedAssets['music'];
         let sound = new Sound("music", soundData, this._scene, function(){ sound.play() }, {
             volume: 0.3
-        });
+        });*/
 
         // instantiate the scene
         let key = global.T5C.currentLocation.mesh;
-        this.allMeshes = this._assetsContainer[key].loadedMeshes;
+        this.allMeshes = this._loadedAssets[key].loadedMeshes;
 
         //Loop through all environment meshes that were imported
         this.allMeshes.forEach((m) => {
