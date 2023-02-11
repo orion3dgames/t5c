@@ -142,6 +142,15 @@ export class GameRoom extends Room<GameRoomState> {
         });
 
         /////////////////////////////////////
+        // on player reset position
+        this.onMessage("reset_position", (client, data) => {
+            const playerState: PlayerState = this.state.players.get(client.sessionId);
+            if (playerState) {
+                playerState.resetPosition();
+            }
+        });
+
+        /////////////////////////////////////
         // on player input
         this.onMessage("playerInput", (client, playerInput: PlayerInputs) => {
             const playerState: PlayerState = this.state.players.get(client.sessionId);

@@ -176,6 +176,7 @@ export class GameScene {
             //////////////////
             // if player type
             if (entity.type === "player" && isCurrentPlayer) {
+
                 // create player entity
                 let _player = new Player(
                     entity,
@@ -216,6 +217,7 @@ export class GameScene {
             }
         });
 
+        // add non player entities
         this.room.state.entities.onAdd((entity, sessionId) => {
             this.entities[sessionId] = new Entity(
                 entity,

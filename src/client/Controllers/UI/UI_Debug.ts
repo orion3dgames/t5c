@@ -4,6 +4,7 @@ import { Control } from "@babylonjs/gui/2D/controls/control";
 import { countPlayers, roundTo } from "../../../shared/Utils";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
+import { Button } from "@babylonjs/gui/2D/controls/button";
 
 export class UI_Debug {
 
@@ -73,8 +74,23 @@ export class UI_Debug {
         debugText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         debugText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         debugPanel.addControl(debugText);
-
         this._debugTextUI = debugText;
+
+        //reset position button
+        const resetButton = Button.CreateSimpleButton("resetButton", "Reset Position");
+        resetButton.top = "160px;";
+        resetButton.left = "15px;";
+        resetButton.width = "190px;";
+        resetButton.height = "30px";
+        resetButton.color = "white";
+        resetButton.background = "#000";
+        resetButton.thickness = 1;
+        resetButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        resetButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        this._playerUI.addControl(resetButton);
+        resetButton.onPointerDownObservable.add(() => {
+            this._gameRoom.send("reset_position");
+        });
 
     }
 

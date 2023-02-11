@@ -198,9 +198,6 @@ export class UI_Chats {
             element.dispose();
         });
 
-        console.log(this.messages);
-
-
         this.messages
             .slice()
             .reverse()

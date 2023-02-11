@@ -69,6 +69,12 @@ export class PlayerState extends EntityState {
         }
     }
 
+    resetPosition(){
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+    }
+
     /**
      * process a player ability
      * @param client
