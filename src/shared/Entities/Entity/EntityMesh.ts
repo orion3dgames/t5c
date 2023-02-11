@@ -44,7 +44,7 @@ export class EntityMesh {
 
     public async load() {
         // create collision cube
-        const box = MeshBuilder.CreateBox("root_" + this._entity.race, { width: 2, height: 4 }, this._scene);
+        const box = MeshBuilder.CreateBox(this._entity.sessionId, { width: 2, height: 4, depth: 3 }, this._scene);
         box.visibility = 0;
 
         // set collision mesh
@@ -86,13 +86,7 @@ export class EntityMesh {
         this.selectedMesh = sphere;
 
         // load player mesh
-        const result = this.assetsContainer[this._entity.race].instantiateModelsToScene(
-            (name) => this._entity.sessionId,
-            false,
-            {
-                doNotInstantiate: false,
-            }
-        );
+        const result = this.assetsContainer[this._entity.race].instantiateModelsToScene();
         const playerMesh = result.rootNodes[0];
         this._animationGroups = result.animationGroups;
         //console.log('LOADED ENTITY MESH', this._entity.race, result);

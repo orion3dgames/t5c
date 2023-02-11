@@ -12,10 +12,13 @@ import { CreateGround } from "@babylonjs/core/Meshes/Builders/groundBuilder";
 import { WaterMaterial } from "@babylonjs/materials/water";
 import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
+import { Sound } from "@babylonjs/core/Audio/sound";
+import { AssetsManager, BinaryFileAssetTask, ContainerAssetTask, CubeTextureAssetTask, HDRCubeTextureAssetTask, MeshAssetTask, TextFileAssetTask, TextureAssetTask } from "@babylonjs/core/Misc/assetsManager";
 
 export class Environment {
     private _scene: Scene;
     private _shadow: CascadedShadowGenerator;
+    private _assetsManager:AssetsManager;
     private _assetsContainer;
     public allMeshes;
     private _loadingTxt;
@@ -25,6 +28,9 @@ export class Environment {
         this._shadow = shadow;
         this._assetsContainer = _assetsContainer;
         this._loadingTxt = window.document.getElementById("loadingTextDetails");
+
+        // Assets manager
+	    this._assetsManager = new AssetsManager(scene);
     }
 
     private showLoadingMessage(msg) {
@@ -41,42 +47,112 @@ export class Environment {
     }
 
     public async loadAssets() {
-        /*
-        // add plane
-        var texture = new Texture("./textures/0088-green-grass-texture-seamless-hr.jpg");
-        var grassMaterial = new StandardMaterial("grassMaterial");
-        grassMaterial.diffuseTexture = texture;
-        const sphere = MeshBuilder.CreateCylinder("entity_selected", { diameter: 100, height: 0.01 }, this._scene);
-        sphere.position = new Vector3(0, -0.01, 0);
-        sphere.material = grassMaterial;
-        sphere.receiveShadows = true;*/
 
-        // load all models that could be reused
-        let modelsToLoad = ["player_hobbit", "monster_unicorn", "monster_bear"];
-        for (const model of modelsToLoad) {
-            this._assetsContainer[model] = await SceneLoader.LoadAssetContainerAsync(
-                "./models/",
-                model + ".glb",
-                this._scene,
-                (progress) => {
-                    this.showLoadingMessage(model + ": " + bytesToSize(progress.loaded));
-                }
-            );
-        }
+        let environmentModel = global.T5C.currentLocation.mesh;
 
-        // load environment model (doesnt need to be reused later, so let's import it directly)
-        let environmentModel = [global.T5C.currentLocation.mesh];
-        for (const model of environmentModel) {
-            this._assetsContainer[model] = await SceneLoader.ImportMeshAsync(
-                null,
-                "./models/",
-                model + ".glb",
-                this._scene,
-                (progress) => {
-                    this.showLoadingMessage(model + ": " + bytesToSize(progress.loaded));
+        let assetsToLoad = [
+
+            // sounds
+            { name: "enemy_attack_1", filename: "enemy_attack_1.wav", extension: "wav" }, 
+            { name: "enemy_attack_2", filename: "enemy_attack_2.wav", extension: "wav" }, 
+            { name: "fire_attack_1", filename: "fire_attack_1.wav", extension: "wav" }, 
+            { name: "fire_attack_2", filename: "fire_attack_2.wav", extension: "wav" }, 
+            { name: "heal_1", filename: "heal_1.wav", extension: "wav" }, 
+            { name: "music", filename: "music.mp3", extension: "mp3" }, 
+            { name: "player_walking", filename: "player_walking.wav", extension: "wav" }, 
+
+            // models
+            { name: "player_hobbit", filename: "player_hobbit.glb", extension: "glb", container: true }, 
+            { name: "monster_unicorn", filename: "monster_unicorn.glb", extension: "glb", container: true  }, 
+            { name: "monster_bear", filename: "monster_bear.glb", extension: "glb", container: true }, 
+
+            // textures
+            { name: "selected_circle_green", filename: "selected_circle_green.png", extension: "png" },
+
+            // environment
+            { name: environmentModel, filename: environmentModel+".glb", extension: "glb", container: false }, 
+        ];
+
+        let assets: string[] = [];
+        assetsToLoad.forEach((obj) => {
+            let assetTask;
+            switch(obj.extension) {
+                case "png":
+                case "jpg":
+                case "jpeg":
+                case "gif":
+                    assetTask = this._assetsManager.addTextureTask(obj.name, './images/' + obj.filename);
+                    break;
+                case "dds":
+                    assetTask = this._assetsManager.addCubeTextureTask(obj.name, './images/' + obj.filename);
+                    break;
+                case "hdr":
+                    assetTask = this._assetsManager.addHDRCubeTextureTask(obj.name, './images/' + obj.filename, 512);
+                    break;
+                case "mp3":
+                case "wav":
+                    assetTask = this._assetsManager.addBinaryFileTask(obj.name, './sounds/' + obj.filename);
+                    break;
+                case "babylon":
+                case "gltf":
+                case "glb":
+                case "obj":
+                    if(obj.container){
+                        assetTask = this._assetsManager.addContainerTask(obj.name, "", "", './models/' + obj.filename)
+                    }else{
+                        assetTask = this._assetsManager.addMeshTask(obj.name, "", "", './models/' + obj.filename)
+                    }
+                    break;
+                case "json":
+                case "txt":
+                    assetTask = this._assetsManager.addTextFileTask(obj.name, './data/' + obj.filename);
+                    break;
+                default:
+                    console.log('Error loading asset "' + obj.name + '". Unrecognized file extension "' + obj.extension + '"');
+                    break;
+            }
+
+            assetTask.onSuccess = (task) => {
+                switch(task.constructor) {
+                    case TextureAssetTask:
+                    case CubeTextureAssetTask:
+                    case HDRCubeTextureAssetTask:
+                        this._assetsContainer[task.name] = task.texture;
+                        break;
+                    case BinaryFileAssetTask:
+                        this._assetsContainer[task.name] = task.data;
+                        break;
+                    case ContainerAssetTask:
+                        this._assetsContainer[task.name] = task.loadedContainer;
+                        break;
+                    case MeshAssetTask:
+                        console.log(task);
+                        this._assetsContainer[task.name] = task;
+                        break;
+                    case TextFileAssetTask:
+                        this._assetsContainer[task.name] = task.text;
+                        break;
+                    default:
+                        console.log('Error loading asset "' + task.name + '". Unrecognized AssetManager task type.');
+                        break;
                 }
-            );
-        }
+            };
+
+            assetTask.onError = (task, message, exception) => {
+                console.log(message, exception);
+            };
+
+        });
+
+        this._assetsManager.onProgress = (remainingCount, totalCount, lastFinishedTask) => {
+            this.showLoadingMessage(lastFinishedTask.name + ": "+remainingCount+"/"+totalCount);
+        };
+
+        this._assetsManager.onFinish = () => {
+            this.showLoadingMessage("loading complete");
+        };
+
+        await this._assetsManager.loadAsync();
 
         // loading materials
         this.showLoadingMessage("materials: loaded");
@@ -106,17 +182,6 @@ export class Environment {
     //handles setting the necessary flags for collision and trigger meshes,
     public async prepareAssets() {
 
-        /*
-        var skybox = CreateBox("skyBox", {width: 1000, height: 1000, depth: 1000});
-        var skyboxMaterial = new StandardMaterial("skyBox");
-        skyboxMaterial.backFaceCulling = false;
-        skyboxMaterial.reflectionTexture = new CubeTexture("textures/skybox", this._scene);
-        skyboxMaterial.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
-        skyboxMaterial.diffuseColor = new Color3(0, 0, 0);
-        skyboxMaterial.specularColor = new Color3(0, 0, 0);
-        skyboxMaterial.disableLighting = true;
-        skybox.material = skyboxMaterial;*/
-
         // Water
         var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 32 }, this._scene);
         waterMesh.position = new Vector3(0, -2, 0);
@@ -133,12 +198,15 @@ export class Environment {
         water.colorBlendFactor = 0.5;
         waterMesh.material = water;
 
-        //water.addToRenderList(skybox);
+        // start  music
+        let soundData = this._assetsContainer['music'];
+        let sound = new Sound("music", soundData, this._scene, function(){ sound.play() }, {
+            volume: 0.3
+        });
 
         // instantiate the scene
         let key = global.T5C.currentLocation.mesh;
-        let env = this._assetsContainer[key].meshes[0];
-        this.allMeshes = env.getChildMeshes();
+        this.allMeshes = this._assetsContainer[key].loadedMeshes;
 
         //Loop through all environment meshes that were imported
         this.allMeshes.forEach((m) => {
