@@ -295,20 +295,14 @@ export class PlayerState extends EntityState {
         this.health = 0;
         this.blocked = true;
         this.state = EntityCurrentState.DEAD;
+    }
 
-        // revive player after 10 seconds
-        setTimeout(() => {
-            this.isDead = false;
-            this.health = 100;
-            this.blocked = false;
-            this.state = EntityCurrentState.IDLE;
-            this.gracePeriod = true;
-
-            // add a 5 second grace period where the player can not be targeted by the ennemies
-            setTimeout(() => {
-                this.gracePeriod = false;
-            }, 5000);
-        }, 10000);
+    ressurect(){
+        this.isDead = false;
+        this.health = 100;
+        this.blocked = false;
+        this.state = EntityCurrentState.IDLE;
+        this.gracePeriod = true;
     }
 
     /**

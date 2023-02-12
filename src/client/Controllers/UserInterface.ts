@@ -46,6 +46,9 @@ export class UserInterface {
     public _UICastingTimerInside;
     public _UICastingTimerText;
 
+    // revive panel
+    public revivePanel;
+
     constructor(scene: Scene, engine: Engine, gameRoom: Room, chatRoom: Room, entities: Entity[], currentPlayer, _loadedAssets) {
         // set var we will be needing
         this._scene = scene;
@@ -84,6 +87,7 @@ export class UserInterface {
         this.createMisc();
         this.experienceBar();
         this.castingBar();
+        this.createRevivePanel() 
 
         // some ui must be constantly refreshed as things change
         this._scene.registerBeforeRender(() => {
@@ -224,6 +228,51 @@ export class UserInterface {
         castingTimer.horizontalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
         castingBar.addControl(castingTimer);
         this._UICastingTimerText = castingTimer;
+    }
+
+    public createRevivePanel() {
+
+        // add tooltip
+        const revivePanel = new Rectangle("revivePanel");
+        revivePanel.top = "0px";
+        revivePanel.width = "200px";
+        revivePanel.height = "90px;";
+        revivePanel.thickness = 1;
+        revivePanel.background = Config.UI_CENTER_PANEL_BG;
+        revivePanel.isVisible = false;
+        revivePanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        revivePanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        this._playerUI.addControl(revivePanel);
+        this.revivePanel = revivePanel;
+
+        const revivePanelText = new TextBlock("revivePanelText");
+        revivePanelText.height = "30px;";
+        revivePanelText.text = "You have died.";
+        revivePanelText.top = "10px;";
+        revivePanelText.left = 0;
+        revivePanelText.fontSize = "24px;";
+        revivePanelText.color = "white";
+        revivePanelText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        revivePanelText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        revivePanelText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        revivePanelText.horizontalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        revivePanel.addControl(revivePanelText);
+
+        const reviveButton = Button.CreateSimpleButton("reviveButton", "RESSURECT");
+        reviveButton.top = "-10px;";
+        reviveButton.left = "0px;";
+        reviveButton.width = "180px;";
+        reviveButton.height = "30px";
+        reviveButton.color = "white";
+        reviveButton.background = "#000";
+        reviveButton.thickness = 1;
+        reviveButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        reviveButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        revivePanel.addControl(reviveButton);
+
+        reviveButton.onPointerDownObservable.add(() => {
+            this._gameRoom.send("revive_pressed");
+        });
     }
 
     // create misc stuff

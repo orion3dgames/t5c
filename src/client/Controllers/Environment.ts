@@ -158,7 +158,7 @@ export class Environment {
         });
 
         this._assetsManager.onProgress = (remainingCount, totalCount, lastFinishedTask) => {
-            this.showLoadingMessage(lastFinishedTask.name + ": "+remainingCount+"/"+totalCount);
+            this.showLoadingMessage("loading: "+lastFinishedTask.name);
         };
 
         this._assetsManager.onFinish = () => {

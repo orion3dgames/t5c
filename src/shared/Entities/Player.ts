@@ -16,6 +16,7 @@ import Locations from "../Data/Locations";
 import { Abilities } from "./Common/Abilities";
 import Config from "../Config";
 import State from "../../client/Screens/Screens";
+import { EntityCurrentState } from "./Entity/EntityCurrentState";
 
 export class Player extends Entity {
     public input;
@@ -168,6 +169,12 @@ export class Player extends Entity {
                 }
             }
         });
+
+        if(this.state === EntityCurrentState.DEAD){
+            this.ui.revivePanel.isVisible = true;
+        }else{
+            this.ui.revivePanel.isVisible = false;
+        }
     }
 
     // player is casting

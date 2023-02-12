@@ -150,6 +150,13 @@ export class GameRoom extends Room<GameRoomState> {
             }
         });
 
+        this.onMessage("revive_pressed", (client, data) => {
+            const playerState: PlayerState = this.state.players.get(client.sessionId);
+            if (playerState) {
+                playerState.ressurect();
+            }
+        });
+
         /////////////////////////////////////
         // on player input
         this.onMessage("playerInput", (client, playerInput: PlayerInputs) => {
