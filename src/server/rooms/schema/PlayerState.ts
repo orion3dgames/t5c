@@ -9,6 +9,7 @@ import { GameRoom } from "../GameRoom";
 import { Abilities } from "../../../shared/Entities/Common/Abilities";
 import { Leveling } from "../../../shared/Entities/Player/Leveling";
 import { Races } from "../../../shared/Entities/Common/Races";
+import { randomNumberInRange } from "src/shared/Utils";
 
 export class PlayerState extends EntityState {
     // networked player specific
@@ -30,7 +31,6 @@ export class PlayerState extends EntityState {
     constructor(gameroom: GameRoom, data, ...args: any[]) {
         super(gameroom, data, args);
 
-        this.raceData = Races.get(this.race);
         this.ability_in_cooldown = [false, false, false, false, false, false, false, false, false, false, false];
 
         // add a 5 second grace period where the player can not be targeted by the ennemies
@@ -51,20 +51,15 @@ export class PlayerState extends EntityState {
 
         // if not dead
         if (this.isDead === false) {
-            // level boost
-            if (this.level > 1) {
-                //this.raceData.maxMana = this.raceData.maxMana * this.level;
-                //this.raceData.maxHealth = this.raceData.maxMana * this.level;
-            }
-
+            
             // continuously gain mana
-            if (this.mana < this.raceData.maxMana) {
-                this.mana += this.raceData.manaRegen;
+            if (this.mana < this.maxMana) {
+                this.mana += this.manaRegen;
             }
 
             // continuously gain health
-            if (this.health < this.raceData.maxHealth) {
-                this.health += this.raceData.healthRegen;
+            if (this.health < this.maxHealth) {
+                this.health += this.healthRegen;
             }
         }
     }
@@ -182,7 +177,7 @@ export class PlayerState extends EntityState {
     // process target affected properties
     affectTarget(target, ability) {
         for (let p in ability.targetPropertyAffected) {
-            let property = ability.targetPropertyAffected[p];
+            let property = ability.targetPropertyAffected[p] + ( ability.targetPropertyAffected[p] * this.level / (Math.random() * (100 - 0) + 0));
             target[p] += property;
         }
     }
@@ -265,7 +260,7 @@ export class PlayerState extends EntityState {
         target.setAsDead();
 
         // player gains experience
-        let exp = target.raceData.experienceGain;
+        let exp = target.experienceGain;
         this.addExperience(exp);
 
         let caster = this._gameroom.clients.get(this.sessionId);
@@ -275,15 +270,21 @@ export class PlayerState extends EntityState {
     }
 
     addExperience(amount) {
-        // add experience to player
-        this.experience += amount;
-        this.level = Leveling.convertXpToLevel(this.experience);
-        Logger.info(`[gameroom][addExperience] player has gained ${amount} experience`);
 
         // does player level up?
         if (Leveling.doesPlayerlevelUp(this.level, this.experience, amount)) {
             Logger.info(`[gameroom][addExperience] player has gained a level and is now level ${this.level}`);
+
+            this.maxMana = this.maxMana + 50;
+            this.maxHealth = this.maxHealth + 50;
+            this.health = this.maxHealth;
+            this.mana = this.maxMana;
         }
+
+        // add experience to player
+        this.experience += amount;
+        this.level = Leveling.convertXpToLevel(this.experience);
+        Logger.info(`[gameroom][addExperience] player has gained ${amount} experience`);
     }
 
     getPosition() {
@@ -345,7 +346,7 @@ export class PlayerState extends EntityState {
             return false;
         }
 
-        let speed = this.raceData.speed;
+        let speed = this.speed;
 
         // save current position
         let oldX = this.x;

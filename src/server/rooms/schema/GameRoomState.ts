@@ -63,10 +63,10 @@ export class GameRoomState extends Schema {
             z: point.z,
             rot: randomNumberInRange(0, Math.PI),
             health: raceData.maxHealth,
+            mana: raceData.maxMana,
             level: 1,
             state: EntityCurrentState.IDLE,
-            toRegion: false,
-            raceData: raceData,
+            toRegion: false
         };
 
         let entity = new EnemyState(this._gameroom, data);

@@ -52,6 +52,7 @@ export class Entity {
     public type: string = "";
     public race: string = "";
     public name: string = "";
+    public speed: string = "";
     public x: number;
     public y: number;
     public z: number;
@@ -63,6 +64,11 @@ export class Entity {
     public location: string = "";
     public state: number = 0;
     public AI_CURRENT_STATE: number = 0;
+
+    // raceData
+    public rotationFix;
+    public scale;
+    public animationSpeed;
 
     public raceData: Race;
 
@@ -88,7 +94,9 @@ export class Entity {
         this.sessionId = entity.sessionId; // network id from colyseus
         this.isCurrentPlayer = this._room.sessionId === entity.sessionId;
         this.entity = entity;
-        this.raceData = Races.get(entity.race);
+
+        // update player data from server data
+        Object.assign(this, Races.get(entity.race));
 
         // update player data from server data
         Object.assign(this, this.entity);
@@ -99,14 +107,7 @@ export class Entity {
 
     public async spawn(entity) {
         // load mesh controllers
-        this.meshController = new EntityMesh(
-            this._scene,
-            this._loadedAssets,
-            this.entity,
-            this._room,
-            this.isCurrentPlayer,
-            this.raceData
-        );
+        this.meshController = new EntityMesh(this);
         await this.meshController.load();
         this.mesh = this.meshController.mesh;
         this.playerMesh = this.meshController.playerMesh;
@@ -117,8 +118,8 @@ export class Entity {
         this._shadow.addShadowCaster(this.meshController.mesh, true);
 
         // add all entity related stuff
-        this.animatorController = new EntityAnimator(this.meshController.getAnimation(), this.raceData);
-        this.moveController = new EntityMove(this.mesh, this._navMesh, this.isCurrentPlayer, this.raceData);
+        this.animatorController = new EntityAnimator(this.meshController.getAnimation(), this);
+        this.moveController = new EntityMove(this.mesh, this._navMesh, this.isCurrentPlayer, this.speed);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
 
         ///////////////////////////////////////////////////////////
@@ -150,6 +151,7 @@ export class Entity {
             if (this.selectedMesh && this.selectedMesh.visibility) {
                 if (global.T5C.selectedEntity && global.T5C.selectedEntity.sessionId === this.sessionId) {
                     this.selectedMesh.isVisible = true;
+                    this.selectedMesh.rotate(new Vector3(0, 0.1, 0), 0.01);
                 } else {
                     this.selectedMesh.isVisible = false;
                 }

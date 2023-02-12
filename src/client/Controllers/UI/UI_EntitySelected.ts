@@ -186,13 +186,13 @@ export class UI_EntitySelected {
 
             // health
             let health = roundTo(entity.health, 0);
-            let healthWidth = entity.health / entity.raceData.maxHealth;
+            let healthWidth = entity.health / entity.maxHealth;
             this._healthBarInside.width = healthWidth;
             this._healthBarText.text = health;
 
             // mana
             let mana = roundTo(entity.mana, 0);
-            let manaWidth = entity.mana / entity.raceData.maxMana;
+            let manaWidth = entity.mana / entity.maxMana;
             this._manaBarInside.width = manaWidth;
             this._manaBarText.text = mana;
         }

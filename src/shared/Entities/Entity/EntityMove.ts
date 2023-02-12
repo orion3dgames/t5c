@@ -6,7 +6,7 @@ import { NavMesh, Vector3 as Vector3Y } from "../../yuka";
 
 export class EntityMove {
     private _mesh;
-    private _raceData;
+    private speed;
     private _navMesh: NavMesh;
     public playerInputs = [];
     private playerLatestSequence: number;
@@ -16,10 +16,10 @@ export class EntityMove {
 
     private isCurrentPlayer: boolean;
 
-    constructor(mesh, navMesh: NavMesh, isCurrentPlayer, raceData) {
+    constructor(mesh, navMesh: NavMesh, isCurrentPlayer, speed) {
         this._mesh = mesh;
         this._navMesh = navMesh;
-        this._raceData = raceData;
+        this.speed = speed;
         this.isCurrentPlayer = isCurrentPlayer;
     }
 
@@ -80,7 +80,7 @@ export class EntityMove {
     }
 
     public move(input: PlayerInputs): void {
-        let speed = this._raceData.speed;
+        let speed = this.speed;
 
         // save current position
         let oldX = this.nextPosition.x;

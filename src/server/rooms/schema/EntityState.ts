@@ -21,9 +21,16 @@ export class EntityState extends Schema {
 
     // player details
     @type("number") public health: number = 0;
+    @type("number") public maxHealth: number = 0;
     @type("number") public mana: number = 0;
+    @type("number") public maxMana: number = 0;
     @type("number") public level: number = 0;
     @type("number") public experience: number = 0;
+
+    public manaRegen: number = 0;
+    public healthRegen: number = 0;
+    public speed: number = 0;
+    public experienceGain: number = 0;
 
     // flags
     @type("boolean") public blocked: boolean = false; // if true, used to block player and to prevent movement
@@ -41,22 +48,22 @@ export class EntityState extends Schema {
         this._navMesh = gameroom.navMesh;
         this._gameroom = gameroom;
         Object.assign(this, data);
-        this.raceData = Races.get(this.race);
+        Object.assign(this, Races.get(this.race));
     }
 
     // make sure no value are out of range
     normalizeStats() {
         // health
-        if (this.health > this.raceData.maxHealth) {
-            this.health = this.raceData.maxHealth;
+        if (this.health > this.maxHealth) {
+            this.health = this.maxHealth;
         }
         if (this.health < 0) {
             this.health = 0;
         }
 
         // mana
-        if (this.mana > this.raceData.maxMana) {
-            this.mana = this.raceData.maxMana;
+        if (this.mana > this.maxMana) {
+            this.mana = this.maxMana;
         }
         if (this.mana < 0) {
             this.mana = 0;

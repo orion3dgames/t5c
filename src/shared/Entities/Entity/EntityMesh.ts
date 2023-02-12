@@ -11,13 +11,13 @@ import { EntityState } from "../../../server/rooms/schema/EntityState";
 import Config from "../../Config";
 import { Race } from "../../Entities/Common/Races";
 import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Entity } from "../Entity";
 
 export class EntityMesh {
+    private _entity: Entity;
     private _scene: Scene;
     private _loadedAssets;
-    private _entity: EntityState;
-    private _room: Room;
-    private _raceData: Race;
+    private _room;
     private _animationGroups: AnimationGroup[];
     public mesh: Mesh;
     public playerMesh;
@@ -25,20 +25,11 @@ export class EntityMesh {
     public debugMesh: Mesh;
     public selectedMesh: Mesh;
 
-    constructor(
-        scene: Scene,
-        _loadedAssets,
-        entity: EntityState,
-        room: Room,
-        isCurrentPlayer: boolean,
-        raceData: Race
-    ) {
-        this._scene = scene;
-        this._loadedAssets = _loadedAssets;
+    constructor(entity: Entity,) {
         this._entity = entity;
-        this._room = room;
-        this.isCurrentPlayer = isCurrentPlayer;
-        this._raceData = raceData;
+        this._scene = entity._scene;
+        this._loadedAssets = entity._loadedAssets;
+        this._room = entity._room;
     }
 
     public async load() {
@@ -94,10 +85,10 @@ export class EntityMesh {
         playerMesh.name = this._entity.sessionId + "_mesh";
         playerMesh.parent = box;
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
-        if (this._raceData.rotationFix) {
-            playerMesh.rotation.set(0, this._raceData.rotationFix, 0);
+        if (this._entity.rotationFix) {
+            playerMesh.rotation.set(0, this._entity.rotationFix, 0);
         }
-        playerMesh.scaling.set(this._raceData.scale, this._raceData.scale, this._raceData.scale);
+        playerMesh.scaling.set(this._entity.scale, this._entity.scale, this._entity.scale);
         playerMesh.isVisible = false;
         playerMesh.isPickable = false;
         this.playerMesh = playerMesh;

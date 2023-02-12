@@ -8,7 +8,7 @@ export class Abilities {
         return false;
     }
     public static getByDigit(player, digit) {
-        let key = player.raceData.abilities[digit];
+        let key = player.abilities[digit];
         if (AbilitiesDB[key]) {
             return AbilitiesDB[key];
         }

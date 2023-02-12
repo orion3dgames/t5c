@@ -46,7 +46,7 @@ export class EnemyState extends EntityState {
         this.AI_CLOSEST_TARGET = null;
 
         // make sure this entity knows where the closest player is
-        let target = this.findClosestPlayer();
+        this.findClosestPlayer();
 
         // if entity has a target, monitor it's position
         this.monitorTarget();
@@ -54,14 +54,15 @@ export class EnemyState extends EntityState {
         //////////////////////////////////////////////////
         // if not dead
         if (this.isDead === false) {
+
             // continuously gain mana
-            if (this.mana < this.raceData.maxMana) {
-                this.mana += this.raceData.manaRegen;
+            if (this.mana < this.maxMana) {
+                this.mana += this.manaRegen;
             }
 
             // continuously gain health
-            if (this.health < this.raceData.maxHealth) {
-                this.health += this.raceData.healthRegen;
+            if (this.health < this.maxHealth) {
+                this.health += this.healthRegen;
             }
         }
 
@@ -228,7 +229,7 @@ export class EnemyState extends EntityState {
         let currentPos = this.getPosition();
 
         // calculate next position towards destination
-        let updatedPos = this.moveTo(currentPos, this.AI_CURRENT_TARGET_POSITION, this.raceData.speed);
+        let updatedPos = this.moveTo(currentPos, this.AI_CURRENT_TARGET_POSITION, this.speed);
         this.setPosition(updatedPos);
 
         // calculate rotation
@@ -254,7 +255,7 @@ export class EnemyState extends EntityState {
             destinationOnPath.y = 0;
 
             // calculate next position towards destination
-            let updatedPos = this.moveTo(currentPos, destinationOnPath, this.raceData.speed);
+            let updatedPos = this.moveTo(currentPos, destinationOnPath, this.speed);
             this.setPosition(updatedPos);
 
             // calculate rotation
@@ -281,7 +282,7 @@ export class EnemyState extends EntityState {
             destinationOnPath.y = 0;
 
             // calculate next position towards destination
-            let updatedPos = this.moveTo(currentPos, destinationOnPath, this.raceData.speed);
+            let updatedPos = this.moveTo(currentPos, destinationOnPath, this.speed);
             this.setPosition(updatedPos);
 
             // calculate rotation
