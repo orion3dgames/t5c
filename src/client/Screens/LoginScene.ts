@@ -91,6 +91,7 @@ export class LoginScene {
 
         ///////////////////////////////////////////
         // user token
+        /*
         const token = localStorage.getItem("t5c_token");
         if (token) {
             // send login data
@@ -112,7 +113,7 @@ export class LoginScene {
                 // something went wrong
                 alertMessage(this._ui, "Something went wrong.");
             }
-        }
+        }*/
 
         ///////////////////////////////////////////
         // username input

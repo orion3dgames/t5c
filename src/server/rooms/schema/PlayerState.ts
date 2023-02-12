@@ -66,6 +66,8 @@ export class PlayerState extends EntityState {
         }
 
         // if player has a target, start heading towards it.
+        // once you get to it start auto attacking 
+        // autoattack stop if casting, moving, dying
         if(this.AI_CURRENT_TARGET){
             let start = this.getPosition();
             let end = this.AI_CURRENT_TARGET.getPosition();
@@ -77,7 +79,6 @@ export class PlayerState extends EntityState {
                 this.attackTimer = setInterval(()=>{
                     this.state = EntityCurrentState.ATTACK;
                     this.castAbility(target, ability, 1);
-                    
                 }, 1000);
                 this.AI_CURRENT_TARGET = null;
                 this.AI_CURRENT_ABILITY = null;
@@ -86,8 +87,6 @@ export class PlayerState extends EntityState {
                 this.setPosition(this.moveTo(start, end, this.speed));
             }
         }
-
-        console.log(EntityCurrentState[this.state]);
     }
 
     resetPosition(){
