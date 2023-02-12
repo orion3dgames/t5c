@@ -1,5 +1,5 @@
 type Race = {
-    name: string;
+    title: string;
     speed: number;
     scale: number;
     rotationFix: number;
@@ -24,7 +24,7 @@ interface raceDataMap {
 
 let RacesDB: raceDataMap = {
     player_hobbit: {
-        name: "loading...",
+        title: 'Hobbit',
         speed: 0.6,
         scale: 0.02,
         rotationFix: 0,
@@ -50,7 +50,7 @@ let RacesDB: raceDataMap = {
         },
     },
     monster_bear: {
-        name: "Bear",
+        title: "Bear",
         speed: 0.2,
         scale: 0.02,
         rotationFix: 3.14,
@@ -73,7 +73,7 @@ let RacesDB: raceDataMap = {
         },
     },
     monster_unicorn: {
-        name: "Unicorn",
+        title: "Unicorn",
         speed: 0.3,
         scale: 0.0125,
         rotationFix: 3.14,

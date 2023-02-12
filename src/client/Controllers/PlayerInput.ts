@@ -23,6 +23,8 @@ export class PlayerInput {
     // digits
     public digit_pressed: number = 0;
 
+    public movementX:number = 0;
+
     constructor(scene: Scene, gameroom: Room) {
 
         this._scene = scene;
@@ -60,6 +62,9 @@ export class PlayerInput {
                     const y = (pointerInfo.event.clientY / pointerInfo.event.target.height) * 2 - 1;
                     this.inputMap = { rotY: Math.atan2(x, y) }
                     this._updateFromMouse(pointerInfo);
+                }
+                if (this.right_click) {
+                    this.movementX = (pointerInfo.event.movementX / 100);
                 }
             }
         });

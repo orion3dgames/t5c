@@ -41,7 +41,7 @@ export class PlayerState extends EntityState {
 
     // runs on every server iteration
     update() {
-        //
+
         this.isMoving = false;
 
         // always check if entity is dead ??
@@ -77,7 +77,7 @@ export class PlayerState extends EntityState {
      * @param data
      * @returns void
      */
-    processAbility(client, target, data) {
+    async processAbility(client, target, data) {
         let digit = data.digit;
         let ability = Abilities.getByDigit(this, digit);
 
@@ -90,6 +90,11 @@ export class PlayerState extends EntityState {
 
         // make sure player can cast this ability
         if (!this.canEntityCastAbility(target, ability, digit)) {
+            return false;
+        }
+
+         // make sure player is in range else bring in in range
+        if(!this.targetIsInRange(target, ability)){
             return false;
         }
 
@@ -109,6 +114,17 @@ export class PlayerState extends EntityState {
             // process ability straight away
             this.castAbility(target, ability, digit);
         }
+    }
+
+    targetIsInRange(target, ability):boolean {
+        let start = this.getPosition();
+        let end = target.getPosition();
+        let distance = start.distanceTo(end);
+        if(distance > ability.maxRange){
+            Logger.warning(`[canEntityCastAbility] player is out of range ${distance} to ${ability.range} `, ability.range);
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -161,7 +177,7 @@ export class PlayerState extends EntityState {
             return false;
         }
 
-        Logger.info(`[canEntityCastAbility] player can cast ability`, ability.key);
+        //Logger.info(`[canEntityCastAbility] player can cast ability`, ability.key);
 
         return true;
     }
@@ -255,36 +271,44 @@ export class PlayerState extends EntityState {
         if (target.isDead) {
             return false;
         }
-
+            
         // set target as dead
         target.setAsDead();
 
-        // player gains experience
-        let exp = target.experienceGain;
-        this.addExperience(exp);
-
+        // update caster
         let caster = this._gameroom.clients.get(this.sessionId);
         if (caster) {
-            caster.send("event", { message: "You've killed " + target.name + " and gained " + exp + " experience." });
+
+            // player gains experience
+            let exp = target.experienceGain;
+            this.addExperience(exp, caster);
+
+            // inform player
+            caster.send("event", { type: "experience_gain",  message: "You've killed " + target.name + " and gained " + exp + " experience." });
         }
     }
 
-    addExperience(amount) {
+    addExperience(amount, caster) {
 
         // does player level up?
+        let doesLevelUp = false;
         if (Leveling.doesPlayerlevelUp(this.level, this.experience, amount)) {
-            Logger.info(`[gameroom][addExperience] player has gained a level and is now level ${this.level}`);
-
-            this.maxMana = this.maxMana + 50;
-            this.maxHealth = this.maxHealth + 50;
-            this.health = this.maxHealth;
-            this.mana = this.maxMana;
+            doesLevelUp = true;
         }
 
         // add experience to player
         this.experience += amount;
         this.level = Leveling.convertXpToLevel(this.experience);
         Logger.info(`[gameroom][addExperience] player has gained ${amount} experience`);
+
+        if (doesLevelUp) {
+            Logger.info(`[gameroom][addExperience] player has gained a level and is now level ${this.level}`);
+            this.maxMana = this.maxMana + 50;
+            this.maxHealth = this.maxHealth + 50;
+            this.health = this.maxHealth;
+            this.mana = this.maxMana;
+            caster.send("event", { type: "level_up", message: "You've gained knowledge and are now level "+this.level+"." });
+        }
     }
 
     getPosition() {
@@ -378,8 +402,6 @@ export class PlayerState extends EntityState {
             this.z = newZ;
             this.rot = newRot;
             this.sequence = playerInput.seq;
-            //this.state = EntityCurrentState.WALKING;
-
             this.isMoving = true;
 
             //Logger.info('Valid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);

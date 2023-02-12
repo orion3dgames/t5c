@@ -98,8 +98,8 @@ let AbilitiesDB: abilityMap = {
         cooldown: 2000,
         repeat: 0,
         repeatInterval: 0,
-        range: 0,
-        maxRange: 10,
+        range: 2,
+        maxRange: 20,
         effect: {
             type: "travel",
             particule: "fireball",
@@ -127,7 +127,7 @@ let AbilitiesDB: abilityMap = {
         repeat: 5,
         repeatInterval: 1000,
         range: 0,
-        maxRange: 10,
+        maxRange: 20,
         effect: {
             type: "travel",
             particule: "fireball",

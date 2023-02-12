@@ -56,7 +56,7 @@ export class GameRoomState extends Schema {
             sessionId: sessionId,
             type: "entity",
             race: race,
-            name: raceData.name + " #" + delta,
+            name: raceData.title + " #" + delta,
             location: this._gameroom.metadata.location,
             x: point.x,
             y: 0,
