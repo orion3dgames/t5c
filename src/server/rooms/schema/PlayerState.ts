@@ -25,8 +25,9 @@ export class PlayerState extends EntityState {
     public ability_in_cooldown: boolean[];
     public player_cooldown_timer: number = 0;
     public player_casting_timer: any = false;
-
     public gracePeriod: boolean = true;
+
+    public attackTimer;
 
     constructor(gameroom: GameRoom, data, ...args: any[]) {
         super(gameroom, data, args);
@@ -46,6 +47,7 @@ export class PlayerState extends EntityState {
 
         // always check if entity is dead ??
         if (this.isEntityDead()) {
+            this.cancelAutoAttack();
             this.setAsDead();
         }
 
@@ -62,6 +64,30 @@ export class PlayerState extends EntityState {
                 this.health += this.healthRegen;
             }
         }
+
+        // if player has a target, start heading towards it.
+        if(this.AI_CURRENT_TARGET){
+            let start = this.getPosition();
+            let end = this.AI_CURRENT_TARGET.getPosition();
+            this.AI_CURRENT_TARGET_POSITION = end;
+            this.AI_CURRENT_TARGET_DISTANCE = start.distanceTo(end);
+            if(this.AI_CURRENT_TARGET_DISTANCE < 4){
+                let ability = this.AI_CURRENT_ABILITY;
+                let target = this.AI_CURRENT_TARGET;
+                this.attackTimer = setInterval(()=>{
+                    this.state = EntityCurrentState.ATTACK;
+                    this.castAbility(target, ability, 1);
+                    
+                }, 1000);
+                this.AI_CURRENT_TARGET = null;
+                this.AI_CURRENT_ABILITY = null;
+            }else{
+                this.rot = this.calculateRotation(start, this.AI_CURRENT_TARGET.getPosition());
+                this.setPosition(this.moveTo(start, end, this.speed));
+            }
+        }
+
+        console.log(EntityCurrentState[this.state]);
     }
 
     resetPosition(){
@@ -86,6 +112,8 @@ export class PlayerState extends EntityState {
             return false;
         }
 
+        this.cancelAutoAttack();
+
         let ability_key = ability.key;
 
         // make sure player can cast this ability
@@ -93,9 +121,11 @@ export class PlayerState extends EntityState {
             return false;
         }
 
-         // make sure player is in range else bring in in range
-        if(!this.targetIsInRange(target, ability)){
-            return false;
+        // if there is a minRange, set target as target
+        if(ability.minRange > 0){
+            this.AI_CURRENT_TARGET = target;
+            this.AI_CURRENT_ABILITY = ability; // store ability to use once user gets close enough
+            return false;  
         }
 
         // if ability can be casted
@@ -120,7 +150,7 @@ export class PlayerState extends EntityState {
         let start = this.getPosition();
         let end = target.getPosition();
         let distance = start.distanceTo(end);
-        if(distance > ability.maxRange){
+        if(distance > ability.minRange){
             Logger.warning(`[canEntityCastAbility] player is out of range ${distance} to ${ability.range} `, ability.range);
             return false;
         }
@@ -271,6 +301,8 @@ export class PlayerState extends EntityState {
         if (target.isDead) {
             return false;
         }
+
+        this.cancelAutoAttack();
             
         // set target as dead
         target.setAsDead();
@@ -316,6 +348,7 @@ export class PlayerState extends EntityState {
     }
 
     setAsDead() {
+        console.log("setAsDead");
         this.isDead = true;
         this.health = 0;
         this.blocked = true;
@@ -358,6 +391,13 @@ export class PlayerState extends EntityState {
         return this._navMesh.checkPath(sourcePos, newPos);
     }
 
+    cancelAutoAttack(){
+        this.AI_CURRENT_TARGET = null;
+        this.AI_CURRENT_ABILITY = null;
+        this.state = EntityCurrentState.IDLE;
+        clearInterval(this.attackTimer);
+    }
+
     /**
      * Calculate next forward position on the navmesh based on playerInput forces
      * @param {PlayerInputs} playerInput
@@ -369,6 +409,8 @@ export class PlayerState extends EntityState {
             Logger.warning("Player " + this.name + " is blocked, no movement will be processed");
             return false;
         }
+
+        this.cancelAutoAttack();
 
         let speed = this.speed;
 
