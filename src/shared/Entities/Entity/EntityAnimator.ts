@@ -17,7 +17,7 @@ export class EntityAnimator {
     private _currentAnim: AnimationGroup = null;
     private _prevAnim: AnimationGroup;
 
-    constructor(player_animations, entity:Entity) {
+    constructor(player_animations, entity: Entity) {
         this._playerAnimations = player_animations;
         this._entity = entity;
 
@@ -58,7 +58,7 @@ export class EntityAnimator {
     }
 
     //
-    private checkIfPlayerIsMoving(currentPos: Vector3, nextPos: Vector3, epsilon = 0.001): boolean {
+    private checkIfPlayerIsMoving(currentPos: Vector3, nextPos: Vector3, epsilon = 0.05): boolean {
         return !currentPos.equalsWithEpsilon(nextPos, epsilon);
     }
 
@@ -67,6 +67,7 @@ export class EntityAnimator {
     public animate(player, currentPos, nextPos): void {
         // if position has changed
         if (this.checkIfPlayerIsMoving(currentPos, nextPos)) {
+            //if (player.state === EntityCurrentState.WALKING) {
             this._currentAnim = this._walk;
 
             // if player has died

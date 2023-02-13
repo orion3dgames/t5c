@@ -37,7 +37,7 @@ export class Player extends Entity {
         ui: UserInterface,
         shadow: CascadedShadowGenerator,
         navMesh: NavMesh,
-        _loadedAssets:any[],
+        _loadedAssets: any[],
         input: PlayerInput
     ) {
         super(entity, room, scene, ui, shadow, navMesh, _loadedAssets);
@@ -80,12 +80,9 @@ export class Player extends Entity {
                     let metadata = pointerInfo._pickInfo.pickedMesh.metadata;
                     let targetSessionId = metadata.sessionId;
                     let target = this.ui._entities[targetSessionId];
-
                     if (metadata.type === "player" && targetSessionId === this.sessionId) {
-                        console.log("PLAYER");
                         target = this.ui._currentPlayer;
                     }
-
                     global.T5C.selectedEntity = target;
                 }
             }
@@ -121,9 +118,11 @@ export class Player extends Entity {
 
     // update at engine rate
     public update(delta) {
-        // tween entity
         if (this && this.moveController) {
+            // global camera rotation
             global.camY = this.cameraController._camRoot.rotation.y;
+
+            // tween entity
             this.moveController.tween();
         }
     }
@@ -170,9 +169,9 @@ export class Player extends Entity {
             }
         });
 
-        if(this.state === EntityCurrentState.DEAD){
+        if (this.state === EntityCurrentState.DEAD) {
             this.ui.revivePanel.isVisible = true;
-        }else{
+        } else {
             this.ui.revivePanel.isVisible = false;
         }
     }

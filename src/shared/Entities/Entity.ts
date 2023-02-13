@@ -19,6 +19,7 @@ import { NavMesh } from "../yuka";
 import { AI_STATE } from "./Entity/AIState";
 import { Races, Race } from "../Entities/Common/Races";
 import Config from "../Config";
+import { EntityCurrentState } from "./Entity/EntityCurrentState";
 
 export class Entity {
     public _scene: Scene;
@@ -62,7 +63,7 @@ export class Entity {
     public level: number;
     public experience: number;
     public location: string = "";
-    public state: number = 0;
+    public state: number = EntityCurrentState.IDLE;
     public AI_CURRENT_STATE: number = 0;
 
     // raceData

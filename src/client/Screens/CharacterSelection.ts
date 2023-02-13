@@ -21,7 +21,7 @@ import { SceneController } from "../Controllers/Scene";
 
 export class CharacterSelectionScene {
     public _scene: Scene;
-    private _gui: AdvancedDynamicTexture;
+    private _ui: AdvancedDynamicTexture;
     public _button: Button;
 
     private leftColumnRect;
@@ -40,6 +40,7 @@ export class CharacterSelectionScene {
         // set up ui
         const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
         guiMenu.idealHeight = 720;
+        this._ui = guiMenu;
 
         // add main ui container
         const imageRect = new Rectangle("background");
@@ -125,7 +126,6 @@ export class CharacterSelectionScene {
 
         // load scene
         this._scene = scene;
-        this._gui = guiMenu;
         await this._scene.whenReadyAsync();
 
         // check if user token is valid
@@ -228,7 +228,7 @@ export class CharacterSelectionScene {
             return JSON.parse(req.data).user;
         } else {
             // something went wrong
-            alertMessage(this._gui, "Something went wrong.");
+            alertMessage(this._ui, "Something went wrong.");
         }
     }
 

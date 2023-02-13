@@ -7,13 +7,23 @@ import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
 import { CreateGround } from "@babylonjs/core/Meshes/Builders/groundBuilder";
 import { WaterMaterial } from "@babylonjs/materials/water";
 import { Sound } from "@babylonjs/core/Audio/sound";
-import { AssetsManager, BinaryFileAssetTask, ContainerAssetTask, CubeTextureAssetTask, HDRCubeTextureAssetTask, ImageAssetTask, MeshAssetTask, TextFileAssetTask, TextureAssetTask } from "@babylonjs/core/Misc/assetsManager";
+import {
+    AssetsManager,
+    BinaryFileAssetTask,
+    ContainerAssetTask,
+    CubeTextureAssetTask,
+    HDRCubeTextureAssetTask,
+    ImageAssetTask,
+    MeshAssetTask,
+    TextFileAssetTask,
+    TextureAssetTask,
+} from "@babylonjs/core/Misc/assetsManager";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class Environment {
     private _scene: Scene;
     private _shadow: CascadedShadowGenerator;
-    private _assetsManager:AssetsManager;
+    private _assetsManager: AssetsManager;
     private _loadedAssets;
     public allMeshes;
     private _loadingTxt;
@@ -25,7 +35,7 @@ export class Environment {
         this._loadingTxt = window.document.getElementById("loadingTextDetails");
 
         // Assets manager
-	    this._assetsManager = new AssetsManager(scene);
+        this._assetsManager = new AssetsManager(scene);
     }
 
     private showLoadingMessage(msg) {
@@ -42,89 +52,94 @@ export class Environment {
     }
 
     public async loadAssets() {
-
         let environmentModel = global.T5C.currentLocation.mesh;
 
         let assetsToLoad = [
-
             // sounds
-            { name: "enemy_attack_1", filename: "enemy_attack_1.wav", extension: "wav" }, 
-            { name: "enemy_attack_2", filename: "enemy_attack_2.wav", extension: "wav" }, 
-            { name: "fire_attack_1", filename: "fire_attack_1.wav", extension: "wav" }, 
-            { name: "fire_attack_2", filename: "fire_attack_2.wav", extension: "wav" }, 
-            { name: "heal_1", filename: "heal_1.wav", extension: "wav" }, 
-            { name: "music", filename: "music.mp3", extension: "mp3" }, 
-            { name: "player_walking", filename: "player_walking.wav", extension: "wav" }, 
+            { name: "enemy_attack_1", filename: "enemy_attack_1.wav", extension: "wav" },
+            { name: "enemy_attack_2", filename: "enemy_attack_2.wav", extension: "wav" },
+            { name: "fire_attack_1", filename: "fire_attack_1.wav", extension: "wav" },
+            { name: "fire_attack_2", filename: "fire_attack_2.wav", extension: "wav" },
+            { name: "heal_1", filename: "heal_1.wav", extension: "wav" },
+            { name: "music", filename: "music.mp3", extension: "mp3" },
+            { name: "player_walking", filename: "player_walking.wav", extension: "wav" },
 
             // models
-            { name: "player_hobbit", filename: "player_hobbit.glb", extension: "glb", instantiate: true }, 
-            { name: "monster_unicorn", filename: "monster_unicorn.glb", extension: "glb", instantiate: true  }, 
-            { name: "monster_bear", filename: "monster_bear.glb", extension: "glb", instantiate: true }, 
+            { name: "player_hobbit", filename: "player_hobbit.glb", extension: "glb", instantiate: true },
+            { name: "monster_unicorn", filename: "monster_unicorn.glb", extension: "glb", instantiate: true },
+            { name: "monster_bear", filename: "monster_bear.glb", extension: "glb", instantiate: true },
 
             // image
             { name: "ABILITY_base_attack", filename: "icons/ABILITY_base_attack.png", extension: "png", type: "image" },
             { name: "ABILITY_fireball", filename: "icons/ABILITY_fireball.png", extension: "png", type: "image" },
-            { name: "ABILITY_poisonball", filename: "icons/ABILITY_poisonball.png", extension: "png", type: "image"},
-            { name: "ABILITY_heal", filename: "icons/ABILITY_heal.png", extension: "png", type: "image"},
+            { name: "ABILITY_poisonball", filename: "icons/ABILITY_poisonball.png", extension: "png", type: "image" },
+            { name: "ABILITY_heal", filename: "icons/ABILITY_heal.png", extension: "png", type: "image" },
 
             // textures
             { name: "selected_circle_green", filename: "selected_circle_green.png", extension: "png", type: "texture" },
             { name: "particle_01", filename: "particle_01.png", extension: "png", type: "texture" },
 
             // environment
-            { name: environmentModel, filename: environmentModel+".glb", extension: "glb", instantiate: false }, 
+            {
+                name: global.T5C.currentLocation.key,
+                filename: environmentModel + ".glb",
+                extension: "glb",
+                instantiate: false,
+            },
         ];
 
         assetsToLoad.forEach((obj) => {
             let assetTask;
-            switch(obj.extension) {
+            switch (obj.extension) {
                 case "png":
                 case "jpg":
                 case "jpeg":
                 case "gif":
-                    if(obj.type === "texture"){
-                        assetTask = this._assetsManager.addTextureTask(obj.name, './textures/' + obj.filename);
-                    }else if(obj.type === "image"){
-                        assetTask = this._assetsManager.addImageTask(obj.name, './images/' + obj.filename);
+                    if (obj.type === "texture") {
+                        assetTask = this._assetsManager.addTextureTask(obj.name, "./textures/" + obj.filename);
+                    } else if (obj.type === "image") {
+                        assetTask = this._assetsManager.addImageTask(obj.name, "./images/" + obj.filename);
                     }
                     break;
 
                 case "dds":
-                    assetTask = this._assetsManager.addCubeTextureTask(obj.name, './images/' + obj.filename);
+                    assetTask = this._assetsManager.addCubeTextureTask(obj.name, "./images/" + obj.filename);
                     break;
 
                 case "hdr":
-                    assetTask = this._assetsManager.addHDRCubeTextureTask(obj.name, './images/' + obj.filename, 512);
+                    assetTask = this._assetsManager.addHDRCubeTextureTask(obj.name, "./images/" + obj.filename, 512);
                     break;
 
                 case "mp3":
                 case "wav":
-                    assetTask = this._assetsManager.addBinaryFileTask(obj.name, './sounds/' + obj.filename);
+                    assetTask = this._assetsManager.addBinaryFileTask(obj.name, "./sounds/" + obj.filename);
                     break;
 
                 case "babylon":
                 case "gltf":
                 case "glb":
                 case "obj":
-                    if(obj.instantiate){
-                        assetTask = this._assetsManager.addContainerTask(obj.name, "", "", './models/' + obj.filename)
-                    }else{
-                        assetTask = this._assetsManager.addMeshTask(obj.name, "", "", './models/' + obj.filename)
+                    if (obj.instantiate) {
+                        assetTask = this._assetsManager.addContainerTask(obj.name, "", "", "./models/" + obj.filename);
+                    } else {
+                        assetTask = this._assetsManager.addMeshTask(obj.name, "", "", "./models/" + obj.filename);
                     }
                     break;
 
                 case "json":
                 case "txt":
-                    assetTask = this._assetsManager.addTextFileTask(obj.name, './data/' + obj.filename);
+                    assetTask = this._assetsManager.addTextFileTask(obj.name, "./data/" + obj.filename);
                     break;
 
                 default:
-                    console.error('Error loading asset "' + obj.name + '". Unrecognized file extension "' + obj.extension + '"');
+                    console.error(
+                        'Error loading asset "' + obj.name + '". Unrecognized file extension "' + obj.extension + '"'
+                    );
                     break;
             }
 
             assetTask.onSuccess = (task) => {
-                switch(task.constructor) {
+                switch (task.constructor) {
                     case TextureAssetTask:
                     case CubeTextureAssetTask:
                     case HDRCubeTextureAssetTask:
@@ -154,15 +169,14 @@ export class Environment {
             assetTask.onError = (task, message, exception) => {
                 console.log(message, exception);
             };
-
         });
 
         this._assetsManager.onProgress = (remainingCount, totalCount, lastFinishedTask) => {
-            this.showLoadingMessage("loading: "+lastFinishedTask.name);
+            this.showLoadingMessage("loading: " + lastFinishedTask.name);
         };
 
         this._assetsManager.onFinish = () => {
-            console.log('loading complete', this._loadedAssets);
+            console.log("loading complete", this._loadedAssets);
             this.showLoadingMessage("loading complete");
         };
 
@@ -179,25 +193,23 @@ export class Environment {
         material.diffuseColor = new Color3(1.0, 0, 0);
 
         // entity selected circle
-        var texture = this._loadedAssets['selected_circle_green'];
+        var texture = this._loadedAssets["selected_circle_green"];
         texture.hasAlpha = true;
         var material = new StandardMaterial("entity_selected");
         material.diffuseTexture = texture;
         material.useAlphaFromDiffuseTexture = true;
-
     }
 
     //What we do once the environment assets have been imported
     //handles setting the necessary flags for collision and trigger meshes,
     public async prepareAssets() {
-
         // Water
         var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 32 }, this._scene);
         waterMesh.position = new Vector3(0, -2, 0);
-        
+
         var water = new WaterMaterial("water", this._scene);
         water.bumpTexture = new Texture("textures/waterbump.jpg", this._scene);
-        
+
         // Water properties
         water.backFaceCulling = true;
         water.windForce = -5;

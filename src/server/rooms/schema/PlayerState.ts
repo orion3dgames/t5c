@@ -42,7 +42,6 @@ export class PlayerState extends EntityState {
 
     // runs on every server iteration
     update() {
-
         this.isMoving = false;
 
         // always check if entity is dead ??
@@ -53,7 +52,6 @@ export class PlayerState extends EntityState {
 
         // if not dead
         if (this.isDead === false) {
-            
             // continuously gain mana
             if (this.mana < this.maxMana) {
                 this.mana += this.manaRegen;
@@ -66,30 +64,42 @@ export class PlayerState extends EntityState {
         }
 
         // if player has a target, start heading towards it.
-        // once you get to it start auto attacking 
+        // once you get to it start auto attacking
         // autoattack stop if casting, moving, dying
-        if(this.AI_CURRENT_TARGET){
+        if (this.AI_CURRENT_TARGET) {
             let start = this.getPosition();
             let end = this.AI_CURRENT_TARGET.getPosition();
             this.AI_CURRENT_TARGET_POSITION = end;
             this.AI_CURRENT_TARGET_DISTANCE = start.distanceTo(end);
-            if(this.AI_CURRENT_TARGET_DISTANCE < 4){
+            if (this.AI_CURRENT_TARGET_DISTANCE < 4) {
                 let ability = this.AI_CURRENT_ABILITY;
                 let target = this.AI_CURRENT_TARGET;
-                this.attackTimer = setInterval(()=>{
-                    this.state = EntityCurrentState.ATTACK;
-                    this.castAbility(target, ability, 1);
-                }, 1000);
+                this.doAutoAttack(target, ability);
+                this.attackTimer = setInterval(() => {
+                    this.doAutoAttack(target, ability);
+                }, 900);
                 this.AI_CURRENT_TARGET = null;
                 this.AI_CURRENT_ABILITY = null;
-            }else{
+            } else {
                 this.rot = this.calculateRotation(start, this.AI_CURRENT_TARGET.getPosition());
                 this.setPosition(this.moveTo(start, end, this.speed));
             }
         }
     }
 
-    resetPosition(){
+    doAutoAttack(target, ability) {
+        this.state = EntityCurrentState.ATTACK;
+        this.castAbility(target, ability, 1);
+    }
+
+    cancelAutoAttack() {
+        this.AI_CURRENT_TARGET = null;
+        this.AI_CURRENT_ABILITY = null;
+        this.state = EntityCurrentState.IDLE;
+        clearInterval(this.attackTimer);
+    }
+
+    resetPosition() {
         this.x = 0;
         this.y = 0;
         this.z = 0;
@@ -121,10 +131,10 @@ export class PlayerState extends EntityState {
         }
 
         // if there is a minRange, set target as target
-        if(ability.minRange > 0){
+        if (ability.minRange > 0) {
             this.AI_CURRENT_TARGET = target;
             this.AI_CURRENT_ABILITY = ability; // store ability to use once user gets close enough
-            return false;  
+            return false;
         }
 
         // if ability can be casted
@@ -145,12 +155,15 @@ export class PlayerState extends EntityState {
         }
     }
 
-    targetIsInRange(target, ability):boolean {
+    targetIsInRange(target, ability): boolean {
         let start = this.getPosition();
         let end = target.getPosition();
         let distance = start.distanceTo(end);
-        if(distance > ability.minRange){
-            Logger.warning(`[canEntityCastAbility] player is out of range ${distance} to ${ability.range} `, ability.range);
+        if (distance > ability.minRange) {
+            Logger.warning(
+                `[canEntityCastAbility] player is out of range ${distance} to ${ability.range} `,
+                ability.range
+            );
             return false;
         }
         return true;
@@ -222,7 +235,9 @@ export class PlayerState extends EntityState {
     // process target affected properties
     affectTarget(target, ability) {
         for (let p in ability.targetPropertyAffected) {
-            let property = ability.targetPropertyAffected[p] + ( ability.targetPropertyAffected[p] * this.level / (Math.random() * (100 - 0) + 0));
+            let property =
+                ability.targetPropertyAffected[p] +
+                (ability.targetPropertyAffected[p] * this.level) / (Math.random() * (100 - 0) + 0);
             target[p] += property;
         }
     }
@@ -302,25 +317,26 @@ export class PlayerState extends EntityState {
         }
 
         this.cancelAutoAttack();
-            
+
         // set target as dead
         target.setAsDead();
 
         // update caster
         let caster = this._gameroom.clients.get(this.sessionId);
         if (caster) {
-
             // player gains experience
             let exp = target.experienceGain;
             this.addExperience(exp, caster);
 
             // inform player
-            caster.send("event", { type: "experience_gain",  message: "You've killed " + target.name + " and gained " + exp + " experience." });
+            caster.send("event", {
+                type: "experience_gain",
+                message: "You've killed " + target.name + " and gained " + exp + " experience.",
+            });
         }
     }
 
     addExperience(amount, caster) {
-
         // does player level up?
         let doesLevelUp = false;
         if (Leveling.doesPlayerlevelUp(this.level, this.experience, amount)) {
@@ -338,7 +354,10 @@ export class PlayerState extends EntityState {
             this.maxHealth = this.maxHealth + 50;
             this.health = this.maxHealth;
             this.mana = this.maxMana;
-            caster.send("event", { type: "level_up", message: "You've gained knowledge and are now level "+this.level+"." });
+            caster.send("event", {
+                type: "level_up",
+                message: "You've gained knowledge and are now level " + this.level + ".",
+            });
         }
     }
 
@@ -354,7 +373,7 @@ export class PlayerState extends EntityState {
         this.state = EntityCurrentState.DEAD;
     }
 
-    ressurect(){
+    ressurect() {
         this.isDead = false;
         this.health = 100;
         this.blocked = false;
@@ -388,13 +407,6 @@ export class PlayerState extends EntityState {
      */
     canMoveTo(sourcePos: Vector3, newPos: Vector3): boolean {
         return this._navMesh.checkPath(sourcePos, newPos);
-    }
-
-    cancelAutoAttack(){
-        this.AI_CURRENT_TARGET = null;
-        this.AI_CURRENT_ABILITY = null;
-        this.state = EntityCurrentState.IDLE;
-        clearInterval(this.attackTimer);
     }
 
     /**
@@ -444,6 +456,7 @@ export class PlayerState extends EntityState {
             this.rot = newRot;
             this.sequence = playerInput.seq;
             this.isMoving = true;
+            this.state = EntityCurrentState.WALKING;
 
             //Logger.info('Valid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
         } else {
@@ -453,7 +466,7 @@ export class PlayerState extends EntityState {
             this.z = oldZ;
             this.rot = oldRot;
             this.sequence = playerInput.seq;
-            //this.state = EntityCurrentState.IDLE;
+            this.state = EntityCurrentState.IDLE;
 
             //Logger.warning('Invalid position for '+this.name+': ( x: '+this.x+', y: '+this.y+', z: '+this.z+', rot: '+this.rot);
         }
