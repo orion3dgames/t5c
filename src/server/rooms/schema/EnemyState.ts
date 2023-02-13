@@ -46,7 +46,6 @@ export class EnemyState extends EntityState {
         //////////////////////////////////////////////////
         // if not dead
         if (this.isDead === false) {
-
             // continuously gain mana
             if (this.mana < this.maxMana) {
                 this.mana += this.manaRegen;
@@ -68,6 +67,12 @@ export class EnemyState extends EntityState {
             if (this.AI_CURRENT_TARGET != null) {
                 // start chasing player
                 this.AI_CURRENT_STATE = AI_STATE.SEEKING;
+
+                // if entity does not have a destination, find one
+                if (!this.toRegion) {
+                    this.setDestination(this.AI_CURRENT_TARGET_POSITION);
+                    console.log("SET SEEK DESTINATION");
+                }
 
                 // if entity is close enough to player, start attacking it
                 if (this.AI_CURRENT_TARGET_DISTANCE < Config.MONSTER_ATTACK_DISTANCE) {
@@ -118,27 +123,6 @@ export class EnemyState extends EntityState {
         }
     }
 
-    // if entity has a target, monitor it's position
-    //
-    monitorTarget() {
-        if (
-            this.AI_CURRENT_TARGET !== null &&
-            this.AI_CURRENT_TARGET !== undefined &&
-            this.AI_CURRENT_TARGET.sessionId
-        ) {
-            let targetPos = this.AI_CURRENT_TARGET.getPosition();
-            let entityPos = this.getPosition();
-            let distanceBetween = entityPos.distanceTo(targetPos);
-            this.AI_CURRENT_TARGET_POSITION = targetPos;
-            this.AI_CURRENT_TARGET_DISTANCE = distanceBetween;
-        } else {
-            // else entity has no target
-            this.AI_CURRENT_TARGET = null;
-            this.AI_CURRENT_TARGET_POSITION = null;
-            this.AI_CURRENT_TARGET_DISTANCE = 0;
-        }
-    }
-
     // entity must always know the closest player at all times
     // todo: there must be a better way to do this
     findClosestPlayer() {
@@ -165,14 +149,6 @@ export class EnemyState extends EntityState {
     returnToWandering() {
         this.AI_CURRENT_TARGET = null;
         this.AI_CURRENT_STATE = AI_STATE.WANDER;
-    }
-
-    getPosition() {
-        return new Vector3(this.x, this.y, this.z);
-    }
-
-    setTarget(target) {
-        this.AI_CURRENT_TARGET = target;
     }
 
     setAsDead() {
@@ -226,6 +202,42 @@ export class EnemyState extends EntityState {
 
         // calculate rotation
         this.rot = this.calculateRotation(currentPos, updatedPos);
+
+        /*
+        if(this.toRegion.)
+
+        // save current position
+        let currentPos = this.getPosition();
+
+        // move entity
+        if (this.destinationPath.length > 0) {
+            // get next waypoint
+            let destinationOnPath = this.destinationPath[0];
+            destinationOnPath.y = 0;
+
+            // calculate next position towards destination
+            let updatedPos = this.moveTo(currentPos, destinationOnPath, this.speed);
+            this.setPosition(updatedPos);
+
+            // calculate rotation
+            this.rot = this.calculateRotation(currentPos, updatedPos);
+
+            console.log("GOING TO WAYPOINT");
+
+            // check if arrived at waypoint
+            if (destinationOnPath.equals(updatedPos)) {
+                console.log("ARRIVED AT WAYPOINT");
+                this.destinationPath.shift();
+            }
+        } else if (this.destinationPath.length === 1) {
+            let updatedPos = this.moveTo(currentPos, this.AI_CURRENT_TARGET_POSITION, this.speed);
+            this.setPosition(updatedPos);
+            this.rot = this.calculateRotation(currentPos, updatedPos);
+            console.log("LAST WAYPOINT, MOVE TO");
+        } else {
+            // something is wrong, let's look for a new destination
+            this.resetDestination();
+        }*/
     }
 
     /**
@@ -317,6 +329,13 @@ export class EnemyState extends EntityState {
         }
     }
 
+    calculatePathDistance() {
+        if (this.destinationPath.length > 0) {
+            this.destinationPath.forEach((element) => {});
+        }
+        return 0;
+    }
+
     resetDestination(): void {
         this.toRegion = false;
         this.destinationPath = false;
@@ -351,5 +370,4 @@ export class EnemyState extends EntityState {
     calculateRotation(v1: Vector3, v2: Vector3): number {
         return Math.atan2(v1.x - v2.x, v1.z - v2.z);
     }
-
 }

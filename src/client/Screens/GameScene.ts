@@ -58,7 +58,6 @@ export class GameScene {
         ///////////////////// END DEBUG CODE /////////////////////////////
         ///////////////////// DEBUG CODE /////////////////////////////////
         // if local skip login screen
-        /*
         if (isLocal()) {
             //let tempLocation = "lh_town";
             let tempLocation = "lh_town";
@@ -73,7 +72,7 @@ export class GameScene {
             };
             global.T5C.currentCharacter = character;
             global.T5C.currentCharacter.location = tempLocation;
-        }*/
+        }
         ///////////////////// END DEBUG CODE /////////////////////////////
         ///////////////////// END DEBUG CODE /////////////////////////////
 
@@ -120,9 +119,7 @@ export class GameScene {
         // load the rest
         this._app.engine.displayLoadingUI();
         await this._environment.prepareAssets();
-        await this._initNetwork();   
-
-        
+        await this._initNetwork();
     }
 
     private async _initNetwork(): Promise<void> {
@@ -154,7 +151,6 @@ export class GameScene {
     }
 
     private async _initEvents() {
-
         // setup input Controller
         this._input = new PlayerInput(this._scene, this.room);
 
@@ -177,7 +173,6 @@ export class GameScene {
             //////////////////
             // if player type
             if (entity.type === "player" && isCurrentPlayer) {
-
                 // create player entity
                 let _player = new Player(
                     entity,

@@ -50,7 +50,7 @@ export class EntityState extends Schema {
     public AI_CURRENT_TARGET;
     public AI_CURRENT_TARGET_FOUND = false;
     public AI_CURRENT_ABILITY;
-    
+
     constructor(gameroom, data, ...args: any[]) {
         super(args);
         this._navMesh = gameroom.navMesh;
@@ -75,6 +75,40 @@ export class EntityState extends Schema {
         }
         if (this.mana < 0) {
             this.mana = 0;
+        }
+    }
+
+    getPosition() {
+        return new Vector3(this.x, this.y, this.z);
+    }
+
+    setTarget(target) {
+        this.AI_CURRENT_TARGET = target;
+    }
+
+    hasTarget() {
+        return this.AI_CURRENT_TARGET ?? false;
+    }
+
+    /**
+     * monitor a target
+     */
+    monitorTarget() {
+        if (
+            this.AI_CURRENT_TARGET !== null &&
+            this.AI_CURRENT_TARGET !== undefined &&
+            this.AI_CURRENT_TARGET.sessionId
+        ) {
+            let targetPos = this.AI_CURRENT_TARGET.getPosition();
+            let entityPos = this.getPosition();
+            let distanceBetween = entityPos.distanceTo(targetPos);
+            this.AI_CURRENT_TARGET_POSITION = targetPos;
+            this.AI_CURRENT_TARGET_DISTANCE = distanceBetween;
+        } else {
+            // else entity has no target
+            this.AI_CURRENT_TARGET = null;
+            this.AI_CURRENT_TARGET_POSITION = null;
+            this.AI_CURRENT_TARGET_DISTANCE = 0;
         }
     }
 

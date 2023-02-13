@@ -50,6 +50,10 @@ export class PlayerState extends EntityState {
             this.setAsDead();
         }
 
+        if (this.health < 0 || this.health === 0) {
+            this.isDead = true;
+        }
+
         // if not dead
         if (this.isDead === false) {
             // continuously gain mana
@@ -63,15 +67,17 @@ export class PlayerState extends EntityState {
             }
         }
 
+        // if player has a target, monitor it's position.
+        this.monitorTarget();
+
         // if player has a target, start heading towards it.
         // once you get to it start auto attacking
         // autoattack stop if casting, moving, dying
-        if (this.AI_CURRENT_TARGET) {
+        if (this.hasTarget()) {
             let start = this.getPosition();
-            let end = this.AI_CURRENT_TARGET.getPosition();
-            this.AI_CURRENT_TARGET_POSITION = end;
-            this.AI_CURRENT_TARGET_DISTANCE = start.distanceTo(end);
-            if (this.AI_CURRENT_TARGET_DISTANCE < 4) {
+            let destination = this.AI_CURRENT_TARGET_POSITION;
+            let distance = this.AI_CURRENT_TARGET_DISTANCE;
+            if (distance < 4) {
                 let ability = this.AI_CURRENT_ABILITY;
                 let target = this.AI_CURRENT_TARGET;
                 this.doAutoAttack(target, ability);
@@ -81,8 +87,8 @@ export class PlayerState extends EntityState {
                 this.AI_CURRENT_TARGET = null;
                 this.AI_CURRENT_ABILITY = null;
             } else {
-                this.rot = this.calculateRotation(start, this.AI_CURRENT_TARGET.getPosition());
-                this.setPosition(this.moveTo(start, end, this.speed));
+                this.rot = this.calculateRotation(start, destination);
+                this.setPosition(this.moveTo(start, destination, this.speed));
             }
         }
     }
@@ -359,10 +365,6 @@ export class PlayerState extends EntityState {
                 message: "You've gained knowledge and are now level " + this.level + ".",
             });
         }
-    }
-
-    getPosition() {
-        return new Vector3(this.x, this.y, this.z);
     }
 
     setAsDead() {
