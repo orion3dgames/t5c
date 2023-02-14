@@ -71,8 +71,6 @@ export class GameRoomState extends Schema {
 
         let entity = new EnemyState(this._gameroom, data);
 
-        entity.setRandomDestination(point);
-
         // add to colyseus state
         this.entities.set(sessionId, entity);
 

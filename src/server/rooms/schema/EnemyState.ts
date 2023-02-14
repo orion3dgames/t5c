@@ -13,7 +13,8 @@ export class EnemyState extends EntityState {
 
     // public vars
     public currentRegion;
-    public toRegion;
+    public wanderRegion;
+    public targetRegion;
     public destinationPath;
 
     public AI_STATE_REMAINING_DURATION: number = 0;
@@ -68,12 +69,6 @@ export class EnemyState extends EntityState {
                 // start chasing player
                 this.AI_CURRENT_STATE = AI_STATE.SEEKING;
 
-                // if entity does not have a destination, find one
-                if (!this.toRegion) {
-                    this.setDestination(this.AI_CURRENT_TARGET_POSITION);
-                    console.log("SET SEEK DESTINATION");
-                }
-
                 // if entity is close enough to player, start attacking it
                 if (this.AI_CURRENT_TARGET_DISTANCE < Config.MONSTER_ATTACK_DISTANCE) {
                     // set ai state to attack
@@ -100,6 +95,8 @@ export class EnemyState extends EntityState {
                     this.AI_CURRENT_TARGET_DISTANCE = 0;
                     this.AI_CURRENT_TARGET_FOUND = false;
                     this.AI_SEEKING_ELAPSED_TIME = 0;
+                    this.resetDestination();
+                    this.targetRegion = null;
                 }
             }
 
@@ -190,21 +187,10 @@ export class EnemyState extends EntityState {
      * SEEK BEHAVIOUR
      */
     seek() {
-        // reset any previous path
-        this.resetDestination();
-
-        // save current position
-        let currentPos = this.getPosition();
-
-        // calculate next position towards destination
-        let updatedPos = this.moveTo(currentPos, this.AI_CURRENT_TARGET_POSITION, this.speed);
-        this.setPosition(updatedPos);
-
-        // calculate rotation
-        this.rot = this.calculateRotation(currentPos, updatedPos);
-
-        /*
-        if(this.toRegion.)
+        // if entity does not have a destination, find one
+        if (!this.targetRegion) {
+            this.setDestination(this.AI_CURRENT_TARGET_POSITION);
+        }
 
         // save current position
         let currentPos = this.getPosition();
@@ -222,22 +208,18 @@ export class EnemyState extends EntityState {
             // calculate rotation
             this.rot = this.calculateRotation(currentPos, updatedPos);
 
-            console.log("GOING TO WAYPOINT");
-
             // check if arrived at waypoint
             if (destinationOnPath.equals(updatedPos)) {
-                console.log("ARRIVED AT WAYPOINT");
                 this.destinationPath.shift();
             }
         } else if (this.destinationPath.length === 1) {
+            // move straight to player
             let updatedPos = this.moveTo(currentPos, this.AI_CURRENT_TARGET_POSITION, this.speed);
             this.setPosition(updatedPos);
             this.rot = this.calculateRotation(currentPos, updatedPos);
-            console.log("LAST WAYPOINT, MOVE TO");
         } else {
-            // something is wrong, let's look for a new destination
             this.resetDestination();
-        }*/
+        }
     }
 
     /**
@@ -248,8 +230,8 @@ export class EnemyState extends EntityState {
         let currentPos = this.getPosition();
 
         // if entity does not have a destination, find one
-        if (!this.toRegion) {
-            this.setRandomDestination(currentPos);
+        if (!this.wanderRegion) {
+            this.setWanderDestination(currentPos);
         }
 
         // move entity
@@ -306,11 +288,11 @@ export class EnemyState extends EntityState {
      * Finds a new random valid position on navmesh and sets is as the new destination for this entity
      * @param {Vector3} currentPos
      */
-    setRandomDestination(currentPos: Vector3): void {
-        this.toRegion = this._gameroom.navMesh.getRandomRegion();
-        this.destinationPath = this._gameroom.navMesh.findPath(currentPos, this.toRegion.centroid);
+    setWanderDestination(currentPos: Vector3): void {
+        this.wanderRegion = this._gameroom.navMesh.getRandomRegion();
+        this.destinationPath = this._gameroom.navMesh.findPath(currentPos, this.wanderRegion.centroid);
         if (this.destinationPath.length === 0) {
-            this.toRegion = false;
+            this.wanderRegion = false;
             this.destinationPath = false;
         }
     }
@@ -321,12 +303,18 @@ export class EnemyState extends EntityState {
      */
     setDestination(targetPos: Vector3): void {
         let currentPos = new Vector3(this.x, this.y, this.z);
-        this.toRegion = this._gameroom.navMesh.getClosestRegion(targetPos);
+        this.targetRegion = this._gameroom.navMesh.getClosestRegion(targetPos);
         this.destinationPath = this._gameroom.navMesh.findPath(currentPos, targetPos);
         if (this.destinationPath.length === 0) {
-            this.toRegion = false;
+            this.targetRegion = false;
             this.destinationPath = false;
         }
+    }
+
+    resetDestination(): void {
+        this.wanderRegion = false;
+        this.targetRegion = false;
+        this.destinationPath = false;
     }
 
     calculatePathDistance() {
@@ -334,11 +322,6 @@ export class EnemyState extends EntityState {
             this.destinationPath.forEach((element) => {});
         }
         return 0;
-    }
-
-    resetDestination(): void {
-        this.toRegion = false;
-        this.destinationPath = false;
     }
 
     setLocation(location: string): void {
