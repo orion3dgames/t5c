@@ -1,9 +1,9 @@
 import { isLocal } from "../shared/Utils";
 
-//if (process.env.NODE_ENV !== "production") {
-import("@babylonjs/core/Debug/debugLayer");
-import("@babylonjs/inspector");
-//}
+if (process.env.NODE_ENV !== "production") {
+    import("@babylonjs/core/Debug/debugLayer");
+    import("@babylonjs/inspector");
+}
 
 import "@babylonjs/core/Animations/animatable";
 import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
@@ -122,6 +122,7 @@ class App {
 
         //if (isLocal()) {
         //**for development: make inspector visible/invisible
+        /*
         window.addEventListener("keydown", (ev) => {
             //Shift+Ctrl+Alt+I
             if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.keyCode === 73) {
@@ -131,7 +132,7 @@ class App {
                     this.scene.debugLayer.show();
                 }
             }
-        });
+        });*/
         //}
 
         //resize if the screen is resized/rotated
