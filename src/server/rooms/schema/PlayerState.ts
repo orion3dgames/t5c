@@ -37,21 +37,19 @@ export class PlayerState extends EntityState {
         // add a 5 second grace period where the player can not be targeted by the ennemies
         setTimeout(() => {
             this.gracePeriod = false;
-        }, 5000);
+        }, Config.PLAYER_GRACE_PERIOD);
     }
 
     // runs on every server iteration
     update() {
         this.isMoving = false;
 
-        // always check if entity is dead ??
+        // always check if player is dead ??
         if (this.isEntityDead()) {
             this.cancelAutoAttack();
             this.setAsDead();
-        }
-
-        if (this.health < 0 || this.health === 0) {
-            this.isDead = true;
+        } else if (this.isDead) {
+            this.setAsDead();
         }
 
         // if not dead
@@ -103,12 +101,6 @@ export class PlayerState extends EntityState {
         this.AI_CURRENT_ABILITY = null;
         this.state = EntityCurrentState.IDLE;
         clearInterval(this.attackTimer);
-    }
-
-    resetPosition() {
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
     }
 
     /**
@@ -368,11 +360,17 @@ export class PlayerState extends EntityState {
     }
 
     setAsDead() {
-        console.log("setAsDead");
         this.isDead = true;
         this.health = 0;
         this.blocked = true;
         this.state = EntityCurrentState.DEAD;
+    }
+
+    resetPosition() {
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.ressurect();
     }
 
     ressurect() {
@@ -381,6 +379,9 @@ export class PlayerState extends EntityState {
         this.blocked = false;
         this.state = EntityCurrentState.IDLE;
         this.gracePeriod = true;
+        setTimeout(() => {
+            this.gracePeriod = false;
+        }, Config.PLAYER_GRACE_PERIOD);
     }
 
     /**
@@ -417,7 +418,7 @@ export class PlayerState extends EntityState {
      * @returns
      */
     processPlayerInput(playerInput: PlayerInputs) {
-        if (this.blocked) {
+        if (this.blocked && !this.isDead) {
             this.state = EntityCurrentState.IDLE;
             Logger.warning("Player " + this.name + " is blocked, no movement will be processed");
             return false;
