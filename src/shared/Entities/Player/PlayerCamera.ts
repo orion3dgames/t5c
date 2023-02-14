@@ -3,7 +3,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { UniversalCamera } from "@babylonjs/core/Cameras/universalCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-export class EntityCamera {
+export class PlayerCamera {
     public camera;
     private _scene: Scene;
     private _input;
@@ -24,7 +24,7 @@ export class EntityCamera {
         this._camRoot.position = new Vector3(0, 0, 0); //initialized at (0,0,0)
 
         // to face the player from behind (180 degrees)
-        this._camRoot.rotation = new Vector3(0, 3 / 4 * Math.PI, 0);
+        this._camRoot.rotation = new Vector3(0, (3 / 4) * Math.PI, 0);
 
         // rotations along the x-axis (up/down tilting)
         const yTilt = new TransformNode("ytilt");

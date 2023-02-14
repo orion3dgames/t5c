@@ -25,10 +25,11 @@ export class EntityMesh {
     public debugMesh: Mesh;
     public selectedMesh: Mesh;
 
-    constructor(entity: Entity,) {
+    constructor(entity: Entity) {
         this._entity = entity;
         this._scene = entity._scene;
         this._loadedAssets = entity._loadedAssets;
+        this.isCurrentPlayer = entity.isCurrentPlayer;
         this._room = entity._room;
     }
 
@@ -40,7 +41,9 @@ export class EntityMesh {
         // set collision mesh
         this.mesh = box;
         this.mesh.isPickable = true;
+        this.mesh.isVisible = false;
         this.mesh.checkCollisions = true;
+        this.mesh.showBoundingBox = true;
         this.mesh.position = new Vector3(this._entity.x, this._entity.y, this._entity.z);
         this.mesh.metadata = {
             sessionId: this._entity.sessionId,
@@ -65,21 +68,22 @@ export class EntityMesh {
 
         // add selected image
         var material = this._scene.getMaterialByName("entity_selected");
-        const sphere = MeshBuilder.CreateCylinder(
+        const selectedMesh = MeshBuilder.CreateCylinder(
             "entity_selected_" + this._entity.race,
-            { diameter: 2, height: 0.01 },
+            { diameter: 2, height: 0.01, tessellation: 10 },
             this._scene
         );
-        sphere.isVisible = true;
-        sphere.parent = box;
-        sphere.material = material;
-        this.selectedMesh = sphere;
+        selectedMesh.parent = box;
+        selectedMesh.material = material;
+        selectedMesh.isVisible = false;
+        selectedMesh.isPickable = false;
+        selectedMesh.checkCollisions = false;
+        this.selectedMesh = selectedMesh;
 
         // load player mesh
         const result = this._loadedAssets[this._entity.race].instantiateModelsToScene();
         const playerMesh = result.rootNodes[0];
         this._animationGroups = result.animationGroups;
-        //console.log('LOADED ENTITY MESH', this._entity.race, result);
 
         // set initial player scale & rotation
         playerMesh.name = this._entity.sessionId + "_mesh";
@@ -89,8 +93,8 @@ export class EntityMesh {
             playerMesh.rotation.set(0, this._entity.rotationFix, 0);
         }
         playerMesh.scaling.set(this._entity.scale, this._entity.scale, this._entity.scale);
-        playerMesh.isVisible = false;
         playerMesh.isPickable = false;
+        playerMesh.checkCollisions = false;
         this.playerMesh = playerMesh;
 
         // start action manager
@@ -100,17 +104,21 @@ export class EntityMesh {
         if (this.isCurrentPlayer) {
             // teleport collision
             // terrible stuff here, I need to improve to be more dynamic
-            let targetMesh = this._scene.getMeshByName("teleport");
+            let targetMesh = this._scene.getMeshesByTags("teleport");
             this.mesh.actionManager.registerAction(
                 new ExecuteCodeAction(
                     {
                         trigger: ActionManager.OnIntersectionEnterTrigger,
                         parameter: targetMesh,
                     },
-                    () => {
+                    (test) => {
+                        if (this.isCurrentPlayer) {
+                            console.log("player collided with mesh: ", test);
+                        }
+                        /*
                         if (this.mesh.metadata.sessionId === this._entity.sessionId) {
                             this._room.send("playerTeleport", targetMesh.metadata.location);
-                        }
+                        }*/
                     }
                 )
             );
@@ -124,7 +132,6 @@ export class EntityMesh {
                 mesh.outlineColor = new Color3(0, 1, 0);
                 mesh.outlineWidth = 3;
                 mesh.renderOutline = true;
-                //this.characterLabel.isVisible = true;
             })
         );
 
@@ -134,7 +141,6 @@ export class EntityMesh {
                 let meshes = ev.meshUnderPointer.getChildMeshes();
                 let mesh = meshes.length === 2 ? meshes[1] : meshes[2];
                 mesh.renderOutline = false;
-                //this.characterLabel.isVisible = false;
             })
         );
     }

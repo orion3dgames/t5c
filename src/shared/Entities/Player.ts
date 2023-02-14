@@ -1,17 +1,16 @@
 import { Scene } from "@babylonjs/core/scene";
-import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
+import { NavMesh } from "../yuka";
+import { Room } from "colyseus.js";
 
 import { EntityState } from "../../server/rooms/schema/EntityState";
-import { EntityCamera } from "./Entity/EntityCamera";
+import { PlayerCamera } from "./Player/PlayerCamera";
 import { EntityUtils } from "./Entity/EntityUtils";
 import { EntityActions } from "./Entity/EntityActions";
 import { Entity } from "./Entity";
 import { PlayerInput } from "../../client/Controllers/PlayerInput";
 import { UserInterface } from "../../client/Controllers/UserInterface";
-import { Room } from "colyseus.js";
-import { NavMesh } from "../yuka";
 import Locations from "../Data/Locations";
 import { Abilities } from "./Common/Abilities";
 import Config from "../Config";
@@ -52,7 +51,7 @@ export class Player extends Entity {
     private async spawnPlayer() {
         //spawn
         this.utilsController = new EntityUtils(this._scene, this._room);
-        this.cameraController = new EntityCamera(this._scene, this._input);
+        this.cameraController = new PlayerCamera(this._scene, this._input);
         this.actionsController = new EntityActions(this._scene, this._loadedAssets);
 
         ///////////////////////////////////////////////////////////
@@ -81,7 +80,7 @@ export class Player extends Entity {
                     let targetSessionId = metadata.sessionId;
                     let target = this.ui._entities[targetSessionId];
                     if (metadata.type === "player" && targetSessionId === this.sessionId) {
-                        target = this.ui._currentPlayer;
+                        target = this;
                     }
                     global.T5C.selectedEntity = target;
                 }
@@ -143,7 +142,7 @@ export class Player extends Entity {
             });
 
             // clear digit
-            this._input.digit_pressed = false;
+            this._input.digit_pressed = 0;
         }
 
         // check if casting

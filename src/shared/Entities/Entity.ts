@@ -5,33 +5,34 @@ import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
+import { Room } from "colyseus.js";
 
 import { EntityState } from "../../server/rooms/schema/EntityState";
-import { EntityCamera } from "./Entity/EntityCamera";
+import { PlayerCamera } from "./Player/PlayerCamera";
 import { EntityAnimator } from "./Entity/EntityAnimator";
 import { EntityMove } from "./Entity/EntityMove";
 import { EntityUtils } from "./Entity/EntityUtils";
 import { EntityActions } from "./Entity/EntityActions";
 import { EntityMesh } from "./Entity/EntityMesh";
-import { Room } from "colyseus.js";
 import { UserInterface } from "../../client/Controllers/UserInterface";
 import { NavMesh } from "../yuka";
 import { AI_STATE } from "./Entity/AIState";
 import { Races, Race } from "../Entities/Common/Races";
 import Config from "../Config";
 import { EntityCurrentState } from "./Entity/EntityCurrentState";
+import { PlayerInput } from "../../client/Controllers/PlayerInput";
 
 export class Entity {
     public _scene: Scene;
-    public _room;
-    public ui;
-    public _input;
+    public _room: Room;
+    public ui: UserInterface;
+    public _input: PlayerInput;
     public _shadow;
     public _navMesh;
     public _loadedAssets;
 
     // controllers
-    public cameraController: EntityCamera;
+    public cameraController: PlayerCamera;
     public animatorController: EntityAnimator;
     public moveController: EntityMove;
     public utilsController: EntityUtils;
@@ -128,7 +129,7 @@ export class Entity {
         // colyseus automatically sends entity updates, so let's listen to those changes
         this.entity.onChange(() => {
             // make sure players are always visible
-            this.playerMesh.isVisible = true;
+            this.mesh.isVisible = true;
 
             // update player data from server data
             Object.assign(this, this.entity);

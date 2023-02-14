@@ -19,6 +19,7 @@ import {
     TextureAssetTask,
 } from "@babylonjs/core/Misc/assetsManager";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Tags } from "@babylonjs/core/Misc/tags";
 
 export class Environment {
     private _scene: Scene;
@@ -250,22 +251,28 @@ export class Environment {
                 water.addToRenderList(m);
             }
 
-            //trigger meshes
+            // trigger meshes
+            // trigger event (must have a unique key)
             if (m.name.includes("trigger")) {
                 m.isVisible = false;
                 m.isPickable = false;
-                m.checkCollisions = false;
                 m.receiveShadows = false;
 
-                if (m.name.includes("teleport_lh_town")) {
+                Tags.EnableFor(m);
+
+                if (m.name === "trigger_teleport_lh_town") {
+                    m.checkCollisions = true;
+                    m.metadata.action = "teleport";
                     m.metadata.location = "lh_town";
+                    m.addTags("teleport");
                 }
 
-                if (m.name.includes("teleport_lh_dungeon_01")) {
+                if (m.name === "trigger_teleport_lh_dungeon_01") {
+                    m.checkCollisions = true;
+                    m.metadata.action = "teleport";
                     m.metadata.location = "lh_dungeon_01";
+                    m.addTags("teleport");
                 }
-
-                m.name = "teleport";
             }
         });
     }

@@ -27,10 +27,10 @@ export class UserInterface {
     private _loadedAssets;
 
     //UI Elements
-    private _playerUI;
+    public _playerUI;
     private _namesUI;
     private _centerUI;
-    private _UIChat: UI_Chats;
+    public _UIChat: UI_Chats;
     private _UIAbilities: UI_Abilities;
     private _UIDebug: UI_Debug;
     private _UITargetSelected: UI_EntitySelected;
@@ -49,7 +49,15 @@ export class UserInterface {
     // revive panel
     public revivePanel;
 
-    constructor(scene: Scene, engine: Engine, gameRoom: Room, chatRoom: Room, entities: Entity[], currentPlayer, _loadedAssets) {
+    constructor(
+        scene: Scene,
+        engine: Engine,
+        gameRoom: Room,
+        chatRoom: Room,
+        entities: Entity[],
+        currentPlayer,
+        _loadedAssets
+    ) {
         // set var we will be needing
         this._scene = scene;
         this._engine = engine;
@@ -87,7 +95,7 @@ export class UserInterface {
         this.createMisc();
         this.experienceBar();
         this.castingBar();
-        this.createRevivePanel() 
+        this.createRevivePanel();
 
         // some ui must be constantly refreshed as things change
         this._scene.registerBeforeRender(() => {
@@ -231,7 +239,6 @@ export class UserInterface {
     }
 
     public createRevivePanel() {
-
         // add tooltip
         const revivePanel = new Rectangle("revivePanel");
         revivePanel.top = "0px";
