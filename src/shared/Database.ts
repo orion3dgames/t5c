@@ -21,31 +21,48 @@ class Database {
         Logger.info("[database] Creating database.");
 
         const usersSql = `CREATE TABLE IF NOT EXISTS "users" (
-      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-      "username" TEXT NOT NULL UNIQUE,
-      "password" TEXT,
-      "token" TEXT
-    );`;
+            "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+            "username" TEXT NOT NULL UNIQUE,
+            "password" TEXT,
+            "token" TEXT
+        );`;
 
         const playersSql = `CREATE TABLE IF NOT EXISTS "characters" (
-      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-      "user_id" INTEGER,
-      "name" TEXT,
-      "location" TEXT,
-      "level" int,
-      "experience" int,
-      "health" int,
-      "x" REAL DEFAULT 0.0,
-      "y"	REAL DEFAULT 0.0,
-      "z"	REAL DEFAULT 0.0, 
-      "rot" REAL DEFAULT 0.0,
-      "online" INTEGER
-    );`;
+            "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+            "user_id" INTEGER,
+            "name" TEXT,
+            "location" TEXT,
+            "level" int,
+            "experience" int,
+            "health" int,
+            "x" REAL DEFAULT 0.0,
+            "y"	REAL DEFAULT 0.0,
+            "z"	REAL DEFAULT 0.0, 
+            "rot" REAL DEFAULT 0.0,
+            "gold" INTEGER,
+            "online" INTEGER
+        );`;
+
+        const playerInventorySql = `CREATE TABLE IF NOT EXISTS "character_inventory" (
+            "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+            "owner_id" INTEGER,
+            "item_id" INTEGER,
+            "qty" INTEGER
+        )`;
+
+        const itemsSql = `CREATE TABLE IF NOT EXISTS "items" (
+            "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+            "key" TEXT NOT NULL UNIQUE,
+            "label" TEXT NOT NULL UNIQUE,
+            "description" TEXT NOT NULL UNIQUE
+        )`;
 
         this.db.serialize(() => {
             Logger.info("[database] Creating default database structure.");
             this.run(usersSql);
             this.run(playersSql);
+            this.run(playerInventorySql);
+            this.run(itemsSql);
 
             Logger.info("[database] Reset all characters to offline. ");
             this.run(`UPDATE characters SET online=0 ;`);
@@ -133,9 +150,7 @@ class Database {
         return await this.get(sql, [username, password]);
     }
 
-    async getUserWithToken(
-        token: string | string[] | ParsedQs | ParsedQs[],
-    ) {
+    async getUserWithToken(token: string | string[] | ParsedQs | ParsedQs[]) {
         const sql = `SELECT * FROM users WHERE token=?;`;
         return await this.get(sql, [token]);
     }

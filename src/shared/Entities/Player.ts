@@ -195,15 +195,8 @@ export class Player extends Entity {
     // server message handler
 
     public registerServerMessages() {
-        this._room.onMessage("event", (data) => {
-            this.ui._UIChat.processSystemMessage({
-                type: "kill",
-                senderID: "SYSTEM",
-                message: data.message,
-                name: "SYSTEM",
-                timestamp: 0,
-                createdAt: "",
-            });
+        this._room.onMessage("notification", (data) => {
+            this.ui._UIChat.addNotificationMessage(data.type, data.message, data.message);
         });
 
         // on teleport confirmation

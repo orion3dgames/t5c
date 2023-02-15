@@ -1,3 +1,9 @@
+type Drops = {
+    min: number;
+    max: number;
+    change: number;
+};
+
 type Race = {
     title: string;
     speed: number;
@@ -12,9 +18,13 @@ type Race = {
     maxMana: number;
     manaRegen: number;
     experienceGain: number;
+    goldGain: {};
     damage_multiplier: number;
     abilities: {
         [key: number]: string;
+    };
+    drops?: {
+        [key: string]: any;
     };
 };
 
@@ -24,7 +34,7 @@ interface raceDataMap {
 
 let RacesDB: raceDataMap = {
     player_hobbit: {
-        title: 'Hobbit',
+        title: "Hobbit",
         speed: 0.6,
         scale: 0.02,
         rotationFix: 0,
@@ -41,6 +51,7 @@ let RacesDB: raceDataMap = {
         maxMana: 100,
         manaRegen: 0.4, // per second
         experienceGain: 0,
+        goldGain: {},
         damage_multiplier: 0,
         abilities: {
             1: "base_attack",
@@ -48,6 +59,7 @@ let RacesDB: raceDataMap = {
             3: "poisonball",
             4: "heal",
         },
+        drops: {},
     },
     monster_bear: {
         title: "Bear",
@@ -66,10 +78,15 @@ let RacesDB: raceDataMap = {
         healthRegen: 0.2,
         maxMana: 100,
         manaRegen: 0.4, // per second
-        experienceGain: 500,
+        experienceGain: 2000,
+        goldGain: { min: 120, max: 250 },
         damage_multiplier: 1.3,
         abilities: {
             1: "base_attack",
+        },
+        drops: {
+            apples: { min: 1, max: 1, chance: 0.2 },
+            pears: { min: 1, max: 10, chance: 0.1 },
         },
     },
     monster_unicorn: {
@@ -90,10 +107,15 @@ let RacesDB: raceDataMap = {
         maxMana: 100,
         manaRegen: 0.4, // per second
         experienceGain: 1000,
+        goldGain: { min: 45, max: 75 },
         damage_multiplier: 1,
         abilities: {
             1: "base_attack",
             2: "fireball",
+        },
+        drops: {
+            apples: { min: 1, max: 1, chance: 0.2 },
+            pears: { min: 1, max: 10, chance: 0.1 },
         },
     },
 };

@@ -27,6 +27,12 @@ export class UI_Chats {
         this._currentPlayer = _currentPlayer;
         this._entities = _entities;
 
+        this._colors = {
+            event: "orange",
+            system: "darkgray",
+            chat: "white",
+        };
+
         // create ui
         this._createUI();
 
@@ -98,24 +104,15 @@ export class UI_Chats {
         chatInput.focus();
 
         // add default chat message
-        this.messages.push({
-            type: "system",
-            senderID: "SYSTEM",
-            message:
-                "Welcome to T5C, you can move around by left clicking and dragging the mouse around. Use ability by selecting a target an then typing the appropriate digits on the keyboard.",
-            name: "SYSTEM",
-            timestamp: 0,
-            createdAt: "",
-        });
-
-        this._colors = {
-            kill: "orange",
-            system: "darkgray",
-            chat: "white",
-        };
+        this.addNotificationMessage(
+            "system",
+            "Welcome to T5C, you can move around by left clicking and dragging the mouse" +
+                +"around. Use ability by selecting a target an then typing the appropriate digits on the keyboard.",
+            new Date()
+        );
 
         // intial refresh chatbox
-        this._refreshChatBox(); 
+        this._refreshChatBox();
     }
 
     _createEvents() {
@@ -134,6 +131,7 @@ export class UI_Chats {
         // receive message event
         this._chatRoom.onMessage("messages", (message: PlayerMessage) => {
             message.type = "chat";
+            message.color = this._colors["chat"];
             this.processMessage(message);
         });
     }
@@ -151,7 +149,20 @@ export class UI_Chats {
     }
 
     // process incoming messages
-    public processSystemMessage(message) {
+    public addNotificationMessage(type, message, date) {
+        this.processNotificationMessage({
+            type: type,
+            senderID: "SYSTEM",
+            message: message,
+            name: "SYSTEM",
+            timestamp: 0,
+            createdAt: date,
+            color: this._colors[type],
+        });
+    }
+
+    // process incoming messages
+    public processNotificationMessage(message) {
         this.messages.push(message);
         this._refreshChatBox();
     }
@@ -224,7 +235,7 @@ export class UI_Chats {
                 roomTxt.text = prefix + msg.message;
                 roomTxt.textHorizontalAlignment = 0;
                 roomTxt.fontSize = "11px";
-                roomTxt.color = this._colors[msg.type];
+                roomTxt.color = msg.color;
                 roomTxt.left = "0px";
                 roomTxt.textWrapping = TextWrapping.WordWrap;
                 roomTxt.resizeToFit = true;

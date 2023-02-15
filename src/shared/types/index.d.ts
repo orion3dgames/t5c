@@ -24,6 +24,7 @@ type PlayerMessage = {
     message: string;
     timestamp: number;
     createdAt: string;
+    color: string;
 };
 
 type PlayerUser = {

@@ -173,9 +173,19 @@ export class EnemyState extends EntityState {
         this.AI_ATTACK_INTERVAL += 100;
 
         if (this.AI_ATTACK_INTERVAL === this.AI_ATTACK_INTERVAL_RATE) {
+            let damage = 10;
             this.AI_ATTACK_INTERVAL = 0;
-            this.AI_CURRENT_TARGET.health -= 10;
+            this.AI_CURRENT_TARGET.health -= damage;
             this.AI_CURRENT_TARGET.normalizeStats();
+
+            /*
+            // inform player
+            let caster = this._gameroom.clients.get(this.AI_CURRENT_TARGET.sessionId);
+            caster.send("notification", {
+                type: "event",
+                message: this.name + " attacked you, and you lost " + damage + " health.",
+                date: new Date(),
+            });*/
         }
 
         if (this.AI_CURRENT_TARGET.health <= 0) {

@@ -58,7 +58,6 @@ export class GameScene {
         ///////////////////// END DEBUG CODE /////////////////////////////
         ///////////////////// DEBUG CODE /////////////////////////////////
         // if local skip login screen
-        /*
         if (isLocal()) {
             //let tempLocation = "lh_town";
             let tempLocation = "lh_town";
@@ -73,7 +72,7 @@ export class GameScene {
             };
             global.T5C.currentCharacter = character;
             global.T5C.currentCharacter.location = tempLocation;
-        }*/
+        }
         ///////////////////// END DEBUG CODE /////////////////////////////
         ///////////////////// END DEBUG CODE /////////////////////////////
 

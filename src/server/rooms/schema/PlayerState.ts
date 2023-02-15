@@ -8,8 +8,6 @@ import { Vector3 } from "../../../shared/yuka";
 import { GameRoom } from "../GameRoom";
 import { Abilities } from "../../../shared/Entities/Common/Abilities";
 import { Leveling } from "../../../shared/Entities/Player/Leveling";
-import { Races } from "../../../shared/Entities/Common/Races";
-import { randomNumberInRange } from "src/shared/Utils";
 
 export class PlayerState extends EntityState {
     // networked player specific
@@ -324,12 +322,21 @@ export class PlayerState extends EntityState {
         if (caster) {
             // player gains experience
             let exp = target.experienceGain;
+            let gold = target.goldGain;
             this.addExperience(exp, caster);
 
             // inform player
-            caster.send("event", {
-                type: "experience_gain",
+            caster.send("notification", {
+                type: "event",
                 message: "You've killed " + target.name + " and gained " + exp + " experience.",
+                date: new Date(),
+            });
+
+            // inform player
+            caster.send("notification", {
+                type: "event",
+                message: "You've gained " + gold + " gold.",
+                date: new Date(),
             });
         }
     }
@@ -352,9 +359,12 @@ export class PlayerState extends EntityState {
             this.maxHealth = this.maxHealth + 50;
             this.health = this.maxHealth;
             this.mana = this.maxMana;
-            caster.send("event", {
-                type: "level_up",
+
+            // inform player
+            caster.send("notification", {
+                type: "event",
                 message: "You've gained knowledge and are now level " + this.level + ".",
+                date: new Date(),
             });
         }
     }
