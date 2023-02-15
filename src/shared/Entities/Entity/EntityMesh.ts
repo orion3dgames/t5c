@@ -102,26 +102,24 @@ export class EntityMesh {
 
         // setup collisions for current player
         if (this.isCurrentPlayer) {
-            // teleport collision
-            // terrible stuff here, I need to improve to be more dynamic
-            let targetMesh = this._scene.getMeshesByTags("teleport");
-            this.mesh.actionManager.registerAction(
-                new ExecuteCodeAction(
-                    {
-                        trigger: ActionManager.OnIntersectionEnterTrigger,
-                        parameter: targetMesh,
-                    },
-                    (test) => {
-                        if (this.isCurrentPlayer) {
-                            console.log("player collided with mesh: ", test);
+            // teleport trigger
+            let targetMeshes = this._scene.getMeshesByTags("teleport");
+            targetMeshes.forEach((mesh) => {
+                console.log(mesh);
+                this.mesh.actionManager.registerAction(
+                    new ExecuteCodeAction(
+                        {
+                            trigger: ActionManager.OnIntersectionEnterTrigger,
+                            parameter: mesh,
+                        },
+                        () => {
+                            if (this.isCurrentPlayer) {
+                                this._room.send("playerTeleport", mesh.metadata.location);
+                            }
                         }
-                        /*
-                        if (this.mesh.metadata.sessionId === this._entity.sessionId) {
-                            this._room.send("playerTeleport", targetMesh.metadata.location);
-                        }*/
-                    }
-                )
-            );
+                    )
+                );
+            });
         }
 
         // register hover over player

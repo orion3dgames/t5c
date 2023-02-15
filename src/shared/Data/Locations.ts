@@ -12,6 +12,7 @@ let Locations = {
             rot: -180,
         },
         monsters: 10,
+        waterPlane: true,
     },
     lh_dungeon_01: {
         title: "Dungeon Level 1",
@@ -26,6 +27,7 @@ let Locations = {
             rot: -180,
         },
         monsters: 2,
+        waterPlane: false,
     },
 };
 

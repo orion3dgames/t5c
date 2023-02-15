@@ -204,21 +204,23 @@ export class Environment {
     //What we do once the environment assets have been imported
     //handles setting the necessary flags for collision and trigger meshes,
     public async prepareAssets() {
-        // Water
-        var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 32 }, this._scene);
-        waterMesh.position = new Vector3(0, -2, 0);
+        if (global.T5C.currentLocation.waterPlane) {
+            // Water
+            var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 32 }, this._scene);
+            waterMesh.position = new Vector3(0, -2, 0);
 
-        var water = new WaterMaterial("water", this._scene);
-        water.bumpTexture = new Texture("textures/waterbump.jpg", this._scene);
+            var water = new WaterMaterial("water", this._scene);
+            water.bumpTexture = new Texture("textures/waterbump.jpg", this._scene);
 
-        // Water properties
-        water.backFaceCulling = true;
-        water.windForce = -5;
-        water.waveHeight = 0.2;
-        water.bumpHeight = 0.05;
-        water.waterColor = Color3.FromInts(0, 157, 255);
-        water.colorBlendFactor = 0.5;
-        waterMesh.material = water;
+            // Water properties
+            water.backFaceCulling = true;
+            water.windForce = -5;
+            water.waveHeight = 0.2;
+            water.bumpHeight = 0.05;
+            water.waterColor = Color3.FromInts(0, 157, 255);
+            water.colorBlendFactor = 0.5;
+            waterMesh.material = water;
+        }
 
         // start  music
         /*
@@ -260,17 +262,17 @@ export class Environment {
 
                 Tags.EnableFor(m);
 
-                if (m.name === "trigger_teleport_lh_town") {
-                    m.checkCollisions = true;
-                    m.metadata.action = "teleport";
-                    m.metadata.location = "lh_town";
-                    m.addTags("teleport");
-                }
-
-                if (m.name === "trigger_teleport_lh_dungeon_01") {
+                if (m.name === "teleport_lh_dungeon_01 trigger") {
                     m.checkCollisions = true;
                     m.metadata.action = "teleport";
                     m.metadata.location = "lh_dungeon_01";
+                    m.addTags("teleport");
+                }
+
+                if (m.name === "teleport_lh_town trigger") {
+                    m.checkCollisions = true;
+                    m.metadata.action = "teleport";
+                    m.metadata.location = "lh_town";
                     m.addTags("teleport");
                 }
             }
