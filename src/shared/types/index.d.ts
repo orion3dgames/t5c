@@ -46,6 +46,7 @@ type PlayerCharacter = {
     rot: number;
     online: number;
     health: number;
+    mana: number;
     level: number;
     experience: number;
 };

@@ -219,7 +219,7 @@ class Database {
         let raceData = Races.get("player_hobbit");
         let user = await this.getUserByToken(token);
         let defaultLocation = Locations[Config.initialLocation];
-        const sql = `INSERT INTO characters ("user_id", "name","location","x","y","z","rot","level","experience","health") VALUES (
+        const sql = `INSERT INTO characters ("user_id", "name","location","x","y","z","rot","level","experience","health", "mana") VALUES (
         "${user.id}",
         "${name}",
         "${defaultLocation.key}",
@@ -229,7 +229,8 @@ class Database {
         "${defaultLocation.spawnPoint.rot}",
         "1",
         "0",
-        "${raceData.maxHealth}"
+        "${raceData.baseHealth}",
+        "${raceData.baseMana}",
       );`;
         let c = await (<any>this.run(sql));
         return await this.getCharacter(c.id);

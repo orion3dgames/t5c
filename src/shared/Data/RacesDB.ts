@@ -13,9 +13,9 @@ type Race = {
     animations: {
         [key: string]: number;
     };
-    maxHealth: number;
+    baseHealth: number;
+    baseMana: number;
     healthRegen: number;
-    maxMana: number;
     manaRegen: number;
     experienceGain: number;
     goldGain: {};
@@ -46,9 +46,9 @@ let RacesDB: raceDataMap = {
             DEATH: 2,
             DAMAGE: 1,
         },
-        maxHealth: 100,
+        baseHealth: 100,
+        baseMana: 100,
         healthRegen: 0.2,
-        maxMana: 100,
         manaRegen: 0.4, // per second
         experienceGain: 0,
         goldGain: {},
@@ -74,9 +74,9 @@ let RacesDB: raceDataMap = {
             DEATH: 4,
             DAMAGE: 5,
         },
-        maxHealth: 200,
+        baseHealth: 200,
+        baseMana: 100,
         healthRegen: 0.2,
-        maxMana: 100,
         manaRegen: 0.4, // per second
         experienceGain: 2000,
         goldGain: { min: 120, max: 250 },
@@ -102,9 +102,9 @@ let RacesDB: raceDataMap = {
             DEATH: 3,
             DAMAGE: 5,
         },
-        maxHealth: 100,
+        baseHealth: 100,
+        baseMana: 100,
         healthRegen: 0.2,
-        maxMana: 100,
         manaRegen: 0.4, // per second
         experienceGain: 1000,
         goldGain: { min: 45, max: 75 },

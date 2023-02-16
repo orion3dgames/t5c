@@ -62,11 +62,13 @@ export class GameRoomState extends Schema {
             y: 0,
             z: point.z,
             rot: randomNumberInRange(0, Math.PI),
-            health: raceData.maxHealth,
-            mana: raceData.maxMana,
+            health: raceData.baseHealth,
+            mana: raceData.baseMana,
+            maxHealth: raceData.baseHealth,
+            maxMana: raceData.baseMana,
             level: 1,
             state: EntityCurrentState.IDLE,
-            toRegion: false
+            toRegion: false,
         };
 
         let entity = new EnemyState(this._gameroom, data);
@@ -79,7 +81,6 @@ export class GameRoomState extends Schema {
     }
 
     public update(deltaTime: number) {
-        
         //////////////////////////////////////////////
         // entity spawning script (span a monster every .5 second)
         this.spawnTimer += deltaTime;
@@ -96,7 +97,6 @@ export class GameRoomState extends Schema {
         // for each entity
         if (this.entities.size > 0) {
             this.entities.forEach((entity) => {
-                
                 // entity update
                 entity.update();
 
@@ -120,7 +120,6 @@ export class GameRoomState extends Schema {
                 player.update();
             });
         }
-        
     }
 
     /**
@@ -130,7 +129,6 @@ export class GameRoomState extends Schema {
      */
     addPlayer(sessionId: string, data: PlayerCharacter): void {
         let race = "player_hobbit";
-        let raceData = Races.get(race);
         let player = {
             id: data.id,
             sessionId: sessionId,
@@ -142,12 +140,15 @@ export class GameRoomState extends Schema {
             y: data.y,
             z: data.z,
             rot: data.rot,
-            health: raceData.maxHealth,
-            mana: raceData.maxMana,
+            health: data.health,
+            mana: data.mana,
+            maxHealth: data.health,
+            maxMana: data.mana,
             level: data.level,
             experience: data.experience,
             state: EntityCurrentState.IDLE,
         };
+        console.log(player);
         this.players.set(sessionId, new PlayerState(this._gameroom, player));
     }
 
