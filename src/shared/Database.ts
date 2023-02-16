@@ -5,6 +5,7 @@ import { PlayerCharacter, PlayerUser } from "./types";
 import { ParsedQs } from "qs";
 import Config from "./Config";
 import Locations from "./Data/Locations";
+import { AbilitiesDB } from "./Data/AbilitiesDB";
 import { Races } from "./Entities/Common/Races";
 
 class Database {
@@ -59,6 +60,26 @@ class Database {
             "key" TEXT
         )`;
 
+        const abilitiesSql = `CREATE TABLE IF NOT EXISTS "abilities" (
+            "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+            "key" TEXT NOT NULL UNIQUE,
+            "label" TEXT NOT NULL,
+            "description" TEXT NOT NULL,
+            "icon" TEXT NOT NULL,
+            "sound" TEXT NOT NULL,
+            "castSelf" numeric DEFAULT 0,
+            "castTime" numeric DEFAULT 0,
+            "cooldown" numeric DEFAULT 0,
+            "repeat" numeric DEFAULT 0,
+            "repeatInterval" numeric DEFAULT 0,
+            "range" numeric DEFAULT 0,
+            "minRange" numeric DEFAULT 0,
+            "effect" TEXT DEFAULT '{}',
+            "casterPropertyAffected" TEXT DEFAULT '{}',
+            "targetPropertyAffected" TEXT DEFAULT '{}',
+            "requiredToLearn" TEXT DEFAULT '{}'
+        )`;
+
         const itemsSql = `CREATE TABLE IF NOT EXISTS "items" (
             "id" INTEGER PRIMARY KEY AUTOINCREMENT,
             "key" TEXT NOT NULL UNIQUE,
@@ -73,10 +94,28 @@ class Database {
             this.run(playerInventorySql);
             this.run(itemsSql);
             this.run(playerAbilitySql);
+            this.run(abilitiesSql);
 
             this.run(`DELETE FROM "items" where id > 0`);
             this.run(`INSERT INTO items ("key","label","description") VALUES ("pear","Pear","A delicious golden fruit.")`);
             this.run(`INSERT INTO items ("key","label","description") VALUES ("apple","Apple","One of the juciest fruit in the 5th continent.")`);
+
+            //this.run(`DELETE FROM "abilities" where id > 0`);
+            for (let i in AbilitiesDB) {
+                let ability = AbilitiesDB[i];
+                let sql = "INSERT INTO abilities SET ";
+
+                for (let a in ability) {
+                    let el = ability[a];
+                    if (typeof el === "object") {
+                        el = JSON.stringify(el);
+                    }
+                    sql += "`" + a + "`=`" + el + "`,";
+                }
+                sql = sql.slice(0, -1);
+                this.run(sql);
+                console.log(sql);
+            }
 
             Logger.info("[database] Reset all characters to offline. ");
             this.run(`UPDATE characters SET online=0 ;`);
