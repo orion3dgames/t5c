@@ -41,6 +41,7 @@ export class EntityState extends Schema {
     public _navMesh: NavMesh;
     public _gameroom;
     public raceData;
+    public client;
 
     public isMoving: boolean = false;
     public isDead: boolean = false;
@@ -55,8 +56,13 @@ export class EntityState extends Schema {
         super(args);
         this._navMesh = gameroom.navMesh;
         this._gameroom = gameroom;
+        this.client = this.getClient();
         Object.assign(this, data);
         Object.assign(this, Races.get(this.race));
+    }
+
+    public getClient() {
+        return this._gameroom.clients.get(this.sessionId);
     }
 
     // make sure no value are out of range
@@ -94,11 +100,7 @@ export class EntityState extends Schema {
      * monitor a target
      */
     monitorTarget() {
-        if (
-            this.AI_CURRENT_TARGET !== null &&
-            this.AI_CURRENT_TARGET !== undefined &&
-            this.AI_CURRENT_TARGET.sessionId
-        ) {
+        if (this.AI_CURRENT_TARGET !== null && this.AI_CURRENT_TARGET !== undefined && this.AI_CURRENT_TARGET.sessionId) {
             let targetPos = this.AI_CURRENT_TARGET.getPosition();
             let entityPos = this.getPosition();
             let distanceBetween = entityPos.distanceTo(targetPos);

@@ -1,8 +1,10 @@
 import { Schema, type } from "@colyseus/schema";
 
-export class ChatSchema extends Schema {
+export class ItemSchema extends Schema {
     // networked player specific
-    @type("number") public value: number = 0;
+    @type("number") public key: string = "";
+    @type("number") public label: string = "";
+    @type("number") public description: string = "";
 
     constructor() {}
 }

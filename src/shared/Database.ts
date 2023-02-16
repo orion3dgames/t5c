@@ -35,6 +35,7 @@ class Database {
             "level" int,
             "experience" int,
             "health" int,
+            "mana" int,
             "x" REAL DEFAULT 0.0,
             "y"	REAL DEFAULT 0.0,
             "z"	REAL DEFAULT 0.0, 
@@ -50,11 +51,19 @@ class Database {
             "qty" INTEGER
         )`;
 
+        const playerAbilitySql = `CREATE TABLE IF NOT EXISTS "character_abilities" (
+            "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+            "owner_id" INTEGER,
+            "ability_id" INTEGER,
+            "digit" INTEGER,
+            "key" TEXT
+        )`;
+
         const itemsSql = `CREATE TABLE IF NOT EXISTS "items" (
             "id" INTEGER PRIMARY KEY AUTOINCREMENT,
             "key" TEXT NOT NULL UNIQUE,
-            "label" TEXT NOT NULL UNIQUE,
-            "description" TEXT NOT NULL UNIQUE
+            "label" TEXT NOT NULL,
+            "description" TEXT NOT NULL
         )`;
 
         this.db.serialize(() => {
@@ -63,16 +72,14 @@ class Database {
             this.run(playersSql);
             this.run(playerInventorySql);
             this.run(itemsSql);
+            this.run(playerAbilitySql);
+
+            this.run(`DELETE FROM "items" where id > 0`);
+            this.run(`INSERT INTO items ("key","label","description") VALUES ("pear","Pear","A delicious golden fruit.")`);
+            this.run(`INSERT INTO items ("key","label","description") VALUES ("apple","Apple","One of the juciest fruit in the 5th continent.")`);
 
             Logger.info("[database] Reset all characters to offline. ");
             this.run(`UPDATE characters SET online=0 ;`);
-
-            /*
-      let req = this.run(`INSERT INTO users SET username=?, password=?, token=?`, ['test', 'test', 'test']);
-      console.log(req);
-      this.run(`INSERT INTO characters SET name=?, location=?, x=?, y=?, z=?, rot=?, level=?, experience=?, health=?`, 
-        ['Orion', 'lh_town', 0,0,0,0,1,0,100]);
-      */
         });
     }
 
@@ -129,9 +136,7 @@ class Database {
                     console.log(err);
                     reject(err);
                 } else {
-                    if (this.debug) {
-                        console.log("sql: " + sql, params);
-                    }
+                    //console.log("sql: " + sql, params, data, err);
                     resolve({ id: this.lastID });
                 }
             });
@@ -142,10 +147,7 @@ class Database {
     ///////////////////////////////////////
     ///////////////////////////////////////
 
-    async getUser(
-        username: string | string[] | ParsedQs | ParsedQs[],
-        password: string | string[] | ParsedQs | ParsedQs[]
-    ) {
+    async getUser(username: string | string[] | ParsedQs | ParsedQs[], password: string | string[] | ParsedQs | ParsedQs[]) {
         const sql = `SELECT * FROM users WHERE username=? AND password=?;`;
         return await this.get(sql, [username, password]);
     }
@@ -233,21 +235,28 @@ class Database {
         return await this.getCharacter(c.id);
     }
 
-    async updateCharacter(
-        character_id: number,
-        data: { location: any; x: any; y: any; z: any; rot: any; level: any; experience: any }
-    ) {
-        const sql = `UPDATE characters SET location=?, x=?, y=?, z=?, rot=?, level=?, experience=? WHERE id=? ;`;
-        return this.run(sql, [
-            data.location,
-            data.x,
-            data.y,
-            data.z,
-            data.rot,
-            data.level,
-            data.experience,
-            character_id,
-        ]);
+    async updateCharacter(character_id: number, data) {
+        let p = [];
+        p["location"] = data.location;
+        p["x"] = data.x;
+        p["y"] = data.y;
+        p["z"] = data.z;
+        p["rot"] = data.rot;
+        p["level"] = data.level;
+        p["experience"] = data.experience;
+        p["health"] = data.maxHealth;
+        p["mana"] = data.maxMana;
+        p["gold"] = 0;
+
+        let sql = "UPDATE characters SET ";
+
+        for (let i in p) {
+            const el = p[i];
+            sql += i + "='" + el + "',";
+        }
+        sql = sql.slice(0, -1);
+        sql += " WHERE id= " + character_id;
+        return this.run(sql, []);
     }
 
     async toggleOnlineStatus(character_id: number, online: number) {

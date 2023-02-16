@@ -14,6 +14,7 @@ import { EntityMove } from "./Entity/EntityMove";
 import { EntityUtils } from "./Entity/EntityUtils";
 import { EntityActions } from "./Entity/EntityActions";
 import { EntityMesh } from "./Entity/EntityMesh";
+
 import { UserInterface } from "../../client/Controllers/UserInterface";
 import { NavMesh } from "../yuka";
 import { AI_STATE } from "./Entity/AIState";
@@ -77,15 +78,7 @@ export class Entity {
     // flags
     public blocked: boolean = false; // if true, player will not moved
 
-    constructor(
-        entity: EntityState,
-        room: Room,
-        scene: Scene,
-        ui: UserInterface,
-        shadow: CascadedShadowGenerator,
-        navMesh: NavMesh,
-        _loadedAssets: AssetContainer[]
-    ) {
+    constructor(entity: EntityState, room: Room, scene: Scene, ui: UserInterface, shadow: CascadedShadowGenerator, navMesh: NavMesh, _loadedAssets: AssetContainer[]) {
         // setup class variables
         this._scene = scene;
         this._room = room;

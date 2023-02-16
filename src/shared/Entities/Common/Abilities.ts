@@ -14,4 +14,7 @@ export class Abilities {
         }
         return false;
     }
+    public static loadAll() {
+        return AbilitiesDB;
+    }
 }

@@ -72,15 +72,7 @@ export class GameRoom extends Room<GameRoomState> {
                 this.state.players.forEach((entity) => {
                     // update player
                     let playerClient = this.clients.hashedArray[entity.sessionId];
-                    this.database.updateCharacter(playerClient.auth.id, {
-                        location: entity.location,
-                        x: entity.x,
-                        y: entity.y,
-                        z: entity.z,
-                        rot: entity.rot,
-                        level: entity.level,
-                        experience: entity.experience,
-                    });
+                    this.database.updateCharacter(playerClient.auth.id, entity);
 
                     //Logger.info("[gameroom][onCreate] player " + playerClient.auth.name + " saved to database.");
                 });
@@ -164,7 +156,7 @@ export class GameRoom extends Room<GameRoomState> {
         this.onMessage("playerInput", (client, playerInput: PlayerInputs) => {
             const playerState: PlayerState = this.state.players.get(client.sessionId);
             if (playerState) {
-                playerState.processPlayerInput(playerInput);
+                playerState.moveCTRL.processPlayerInput(playerInput);
             } else {
                 console.error(`Failed to retrieve Player State for ${client.sessionId}`);
             }
@@ -212,7 +204,7 @@ export class GameRoom extends Room<GameRoomState> {
             }
 
             if (sender && target) {
-                sender.processAbility(client, target, data);
+                sender.abilitiesCTRL.processAbility(sender, target, data);
             }
 
             Logger.info(`[gameroom][entity_ability_key] player action processed`, data);

@@ -29,16 +29,7 @@ export class Player extends Entity {
 
     public ability_in_cooldown;
 
-    constructor(
-        entity: EntityState,
-        room: Room,
-        scene: Scene,
-        ui: UserInterface,
-        shadow: CascadedShadowGenerator,
-        navMesh: NavMesh,
-        _loadedAssets: any[],
-        input: PlayerInput
-    ) {
+    constructor(entity: EntityState, room: Room, scene: Scene, ui: UserInterface, shadow: CascadedShadowGenerator, navMesh: NavMesh, _loadedAssets: any[], input: PlayerInput) {
         super(entity, room, scene, ui, shadow, navMesh, _loadedAssets);
 
         this._input = input;
@@ -70,12 +61,7 @@ export class Player extends Entity {
             if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 0) {
                 /////////////////////////////////////////////////////////////////////
                 // if click on entity
-                if (
-                    pointerInfo._pickInfo.pickedMesh &&
-                    pointerInfo._pickInfo.pickedMesh.metadata &&
-                    pointerInfo._pickInfo.pickedMesh.metadata !== null &&
-                    pointerInfo._pickInfo.pickedMesh.metadata.race
-                ) {
+                if (pointerInfo._pickInfo.pickedMesh && pointerInfo._pickInfo.pickedMesh.metadata && pointerInfo._pickInfo.pickedMesh.metadata !== null && pointerInfo._pickInfo.pickedMesh.metadata.race) {
                     let metadata = pointerInfo._pickInfo.pickedMesh.metadata;
                     let targetSessionId = metadata.sessionId;
                     let target = this.ui._entities[targetSessionId];
@@ -90,12 +76,7 @@ export class Player extends Entity {
             if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 2) {
                 /////////////////////////////////////////////////////////////////////
                 // display nameplate for a certain time for any entity right clicked
-                if (
-                    pointerInfo._pickInfo.pickedMesh &&
-                    pointerInfo._pickInfo.pickedMesh.metadata &&
-                    pointerInfo._pickInfo.pickedMesh.metadata.sessionId &&
-                    pointerInfo._pickInfo.pickedMesh.metadata.sessionId != this._room.sessionId
-                ) {
+                if (pointerInfo._pickInfo.pickedMesh && pointerInfo._pickInfo.pickedMesh.metadata && pointerInfo._pickInfo.pickedMesh.metadata.sessionId && pointerInfo._pickInfo.pickedMesh.metadata.sessionId != this._room.sessionId) {
                     let targetMesh = pointerInfo._pickInfo.pickedMesh;
                     let targetData = targetMesh.metadata;
                     let target = this.ui._entities[targetData.sessionId];
