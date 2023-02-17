@@ -5,7 +5,8 @@ import cors from "cors";
 import path from "path";
 import fs from "fs";
 
-import { Server, matchMaker, LobbyRoom } from "@colyseus/core";
+import { Server, matchMaker } from "@colyseus/core";
+import { monitor } from "@colyseus/monitor";
 
 import { WebSocketTransport } from "@colyseus/ws-transport";
 import { GameRoom } from "./rooms/GameRoom";
@@ -59,7 +60,6 @@ class GameServer {
         });
 
         // define all rooms
-        gameServer.define("lobby", LobbyRoom);
         gameServer.define("game_room", GameRoom);
         gameServer.define("chat_room", ChatRoom);
 
@@ -79,9 +79,10 @@ class GameServer {
 
             // create island room
             matchMaker.createRoom("game_room", { location: "lh_dungeon_01" });
-        });
 
-        //app.use("/colyseus", monitor());
+            // start monitor
+            app.use("/colyseus", monitor());
+        });
 
         //////////////////////////////////////////////////
         //// SERVING CLIENT DIST FOLDER TO EXPRESS ///////

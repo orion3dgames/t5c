@@ -61,21 +61,12 @@ export class GameRoom extends Room<GameRoomState> {
         this.delayedInterval = this.clock.setInterval(() => {
             // only save if there is any players
             if (this.state.players.size > 0) {
-                /*
-                Logger.info(
-                    "[gameroom][onCreate] Saving data for room " +
-                        options.location +
-                        " with " +
-                        this.state.players.size +
-                        " players"
-                );
-                */
+                Logger.info("[gameroom][onCreate] Saving data for room " + options.location + " with " + this.state.players.size + " players");
                 this.state.players.forEach((entity) => {
                     // update player
                     let playerClient = this.clients.hashedArray[entity.sessionId];
                     this.database.updateCharacter(playerClient.auth.id, entity);
-
-                    //Logger.info("[gameroom][onCreate] player " + playerClient.auth.name + " saved to database.");
+                    Logger.info("[gameroom][onCreate] player " + playerClient.auth.name + " saved to database.");
                 });
             }
         }, Config.databaseUpdateRate);
@@ -257,6 +248,7 @@ export class GameRoom extends Room<GameRoomState> {
 
         Logger.info(`[onLeave] player ${client.auth.name} left`);
 
+        client.leave();
         this.state.players.delete(client.sessionId);
         this.database.toggleOnlineStatus(client.auth.id, 0);
     }

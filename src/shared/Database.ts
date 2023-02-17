@@ -11,7 +11,6 @@ import { Races } from "./Entities/Common/Races";
 class Database {
     private db;
     private debug: boolean = true;
-    private test;
 
     constructor() {}
 
