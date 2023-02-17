@@ -21,6 +21,7 @@
     "@babylonjs/gui-editor": "5.42.1",
     "@babylonjs/inspector": "5.42.1",
     "@babylonjs/materials": "5.42.1",
+    "colyseus": "0.15.0-preview.4",
     "@colyseus/loadtest": "0.15.0-preview.0",
     "@colyseus/monitor": "^0.15.0-preview.2",
     "@types/node": "^17.0.12",

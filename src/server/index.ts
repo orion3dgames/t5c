@@ -81,7 +81,7 @@ class GameServer {
             matchMaker.createRoom("game_room", { location: "lh_dungeon_01" });
 
             // start monitor
-            //app.use("/colyseus", monitor());
+            app.use("/colyseus", monitor());
         });
 
         //////////////////////////////////////////////////
@@ -97,6 +97,10 @@ class GameServer {
         let indexFile = path.resolve(indexPath + clientFile);
         app.get("/", function (req, res) {
             res.sendFile(indexFile);
+        });
+
+        app.get("/monitor", function (req, res) {
+            monitor();
         });
 
         //////////////////////////////////////////////////
