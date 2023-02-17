@@ -120,20 +120,19 @@ class App {
             this._process();
         });
 
-        //if (isLocal()) {
-        //**for development: make inspector visible/invisible
-        /*
-        window.addEventListener("keydown", (ev) => {
-            //Shift+Ctrl+Alt+I
-            if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.keyCode === 73) {
-                if (this.scene.debugLayer.isVisible()) {
-                    this.scene.debugLayer.hide();
-                } else {
-                    this.scene.debugLayer.show();
+        if (isLocal()) {
+            //**for development: make inspector visible/invisible
+            window.addEventListener("keydown", (ev) => {
+                //Shift+Ctrl+Alt+I
+                if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.keyCode === 73) {
+                    if (this.scene.debugLayer.isVisible()) {
+                        this.scene.debugLayer.hide();
+                    } else {
+                        this.scene.debugLayer.show();
+                    }
                 }
-            }
-        });*/
-        //}
+            });
+        }
 
         //resize if the screen is resized/rotated
         window.addEventListener("resize", () => {

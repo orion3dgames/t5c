@@ -5,6 +5,7 @@ import { Button } from "@babylonjs/gui/2D/controls/button";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import Config from "../../../shared/Config";
+import { Grid } from "@babylonjs/gui/2D/controls/grid";
 
 export class UI_Panel {
     private _playerUI;
@@ -25,8 +26,8 @@ export class UI_Panel {
             name: "Default Name",
             horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
             vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
-            width: 0.7, // 50% screen width
-            height: 0.6, // 50% screen height
+            width: "500px", // 50% screen width
+            height: "390px", // 50% screen height
         }
     ) {
         //
@@ -72,7 +73,7 @@ export class UI_Panel {
         mainPanel.height = this._options.height;
         mainPanel.verticalAlignment = this._options.horizontal_position;
         mainPanel.horizontalAlignment = this._options.vertical_position;
-        mainPanel.isVisible = false;
+        mainPanel.isVisible = true;
         mainPanel.thickness = 0;
         this._playerUI.addControl(mainPanel);
         this.selectedTabUI = mainPanel;
@@ -208,25 +209,82 @@ export class UI_Panel {
     ///////////////////////////////////////
     // CHARACTER PANEL
     public character(panel, tab) {
-        const entityNameTxt = new TextBlock("entityNameTxt");
-        entityNameTxt.text = tab.title;
-        entityNameTxt.color = "#FFF";
-        entityNameTxt.top = "5px";
-        entityNameTxt.left = "0";
-        entityNameTxt.fontSize = "16px;";
-        entityNameTxt.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        entityNameTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        entityNameTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        panel.addControl(entityNameTxt);
+        console.log("character", panel, tab);
     }
 
     ///////////////////////////////////////
     ///////////////////////////////////////
     // INVENTORY PANEL
-    public inventory() {}
+    public inventory(panel, tab) {
+        console.log("inventory", panel, tab);
+
+        const leftPanel = new Rectangle("inventoryLeftPanel");
+        leftPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        leftPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        leftPanel.top = "5px";
+        leftPanel.left = 0;
+        leftPanel.width = 0.5;
+        leftPanel.height = 1;
+        leftPanel.background = "#222";
+        leftPanel.thickness = 0;
+        panel.addControl(leftPanel);
+
+        const rightPanel = new Rectangle("inventoryRightPanel");
+        rightPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        rightPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        rightPanel.top = "5px";
+        rightPanel.width = 0.5;
+        rightPanel.height = 1;
+        rightPanel.background = "";
+        rightPanel.thickness = 0;
+        panel.addControl(rightPanel);
+
+        var grid = new Grid();
+        grid.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        grid.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        grid.left = "5px;";
+        grid.background = "";
+        grid.width = 1;
+        grid.height = 1;
+        rightPanel.addControl(grid);
+
+        let inventorySpace = 35;
+        let inventorySpaceW = 5;
+        let size = 46;
+        let inventorySpaceCols = inventorySpaceW;
+        let inventorySpaceRows = inventorySpace / inventorySpaceW;
+
+        console.log(size, inventorySpaceCols, inventorySpaceRows);
+
+        for (let i = 0; i <= inventorySpaceW; i++) {
+            grid.addColumnDefinition(size, true);
+        }
+
+        for (let i = 0; i <= inventorySpaceRows; i++) {
+            grid.addRowDefinition(size, true);
+        }
+
+        for (let r = 0; r < inventorySpaceRows; r++) {
+            for (let col = 0; col < inventorySpaceCols; col++) {
+                const inventorySpace = new Rectangle("inventorySpace_" + r + col);
+                inventorySpace.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+                inventorySpace.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+                inventorySpace.top = 0.1;
+                inventorySpace.left = 0.1;
+                inventorySpace.width = 0.9;
+                inventorySpace.height = 0.9;
+                inventorySpace.background = "gray";
+                inventorySpace.thickness = 0;
+                inventorySpace.cornerRadius = 4;
+                grid.addControl(inventorySpace, r, col);
+            }
+        }
+    }
 
     ///////////////////////////////////////
     ///////////////////////////////////////
     // SKILLS PANEL
-    public skills() {}
+    public skills(panel, tab) {
+        console.log("skills", panel, tab);
+    }
 }
