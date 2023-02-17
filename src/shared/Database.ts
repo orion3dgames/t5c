@@ -11,14 +11,15 @@ import { Races } from "./Entities/Common/Races";
 class Database {
     private db;
     private debug: boolean = true;
+    private test;
 
-    constructor() {
-        this.getDatabase();
+    constructor() {}
+
+    async initDatabase() {
+        this.db = await this.connectDatabase();
     }
 
-    async getDatabase() {
-        this.db = await this.connectDatabase();
-
+    async createDatabase() {
         Logger.info("[database] Creating database.");
 
         const usersSql = `CREATE TABLE IF NOT EXISTS "users" (
@@ -68,11 +69,11 @@ class Database {
             "icon" TEXT NOT NULL,
             "sound" TEXT NOT NULL,
             "castSelf" numeric DEFAULT 0,
-            "castTime" numeric DEFAULT 0,
+            "castTime" numeric DEFAULT 0, 
             "cooldown" numeric DEFAULT 0,
             "repeat" numeric DEFAULT 0,
             "repeatInterval" numeric DEFAULT 0,
-            "range" numeric DEFAULT 0,
+            "range" numeric DEFAULT 0, 
             "minRange" numeric DEFAULT 0,
             "effect" TEXT DEFAULT '{}',
             "casterPropertyAffected" TEXT DEFAULT '{}',
@@ -96,25 +97,31 @@ class Database {
             this.run(playerAbilitySql);
             this.run(abilitiesSql);
 
+            // insert some items
             this.run(`DELETE FROM "items" where id > 0`);
             this.run(`INSERT INTO items ("key","label","description") VALUES ("pear","Pear","A delicious golden fruit.")`);
             this.run(`INSERT INTO items ("key","label","description") VALUES ("apple","Apple","One of the juciest fruit in the 5th continent.")`);
 
-            //this.run(`DELETE FROM "abilities" where id > 0`);
+            // insert some abilities
+            this.run(`DELETE FROM "abilities" where id > 0`);
             for (let i in AbilitiesDB) {
                 let ability = AbilitiesDB[i];
-                let sql = "INSERT INTO abilities SET ";
-
+                let sql = `INSERT INTO abilities (`;
+                for (let a in ability) {
+                    sql += `"${a}",`;
+                }
+                sql = sql.slice(0, -1);
+                sql += `) VALUES (`;
                 for (let a in ability) {
                     let el = ability[a];
                     if (typeof el === "object") {
-                        el = JSON.stringify(el);
+                        el = encodeURI(JSON.stringify(el));
                     }
-                    sql += "`" + a + "`=`" + el + "`,";
+                    sql += `"${el}",`;
                 }
                 sql = sql.slice(0, -1);
+                sql += `)`;
                 this.run(sql);
-                console.log(sql);
             }
 
             Logger.info("[database] Reset all characters to offline. ");
@@ -269,7 +276,7 @@ class Database {
         "1",
         "0",
         "${raceData.baseHealth}",
-        "${raceData.baseMana}",
+        "${raceData.baseMana}"
       );`;
         let c = await (<any>this.run(sql));
         return await this.getCharacter(c.id);

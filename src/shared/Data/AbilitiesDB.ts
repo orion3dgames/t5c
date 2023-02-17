@@ -6,10 +6,10 @@ type Ability = {
     icon: string;
 
     // sound effect
-    sound: string,
+    sound: string;
 
     // ability title
-    name: string;
+    label: string;
 
     // ability description
     description: string;
@@ -64,7 +64,7 @@ interface abilityMap {
 
 let AbilitiesDB: abilityMap = {
     base_attack: {
-        name: "Attack",
+        label: "Attack",
         key: "base_attack",
         icon: "ABILITY_base_attack",
         sound: "enemy_attack_1",
@@ -88,7 +88,7 @@ let AbilitiesDB: abilityMap = {
         requiredToLearn: {},
     },
     fireball: {
-        name: "Fireball",
+        label: "Fireball",
         key: "fireball",
         icon: "ABILITY_fireball",
         sound: "fire_attack_2",
@@ -116,7 +116,7 @@ let AbilitiesDB: abilityMap = {
         },
     },
     poisonball: {
-        name: "Poison Cloud",
+        label: "Poison Cloud",
         key: "poisonball",
         icon: "ABILITY_poisonball",
         sound: "fire_attack_2",
@@ -144,7 +144,7 @@ let AbilitiesDB: abilityMap = {
         },
     },
     heal: {
-        name: "Heal",
+        label: "Heal",
         key: "heal",
         icon: "ABILITY_heal",
         sound: "heal_1",

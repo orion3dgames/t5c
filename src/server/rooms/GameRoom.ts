@@ -54,6 +54,7 @@ export class GameRoom extends Room<GameRoomState> {
 
         // initialize database
         this.database = new databaseInstance();
+        await this.database.initDatabase();
 
         ///////////////////////////////////////////////////////////////////////////
         // if players are in a room, make sure we save any changes to the database.
