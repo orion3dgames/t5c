@@ -23,7 +23,8 @@ export class PlayerInput {
     // digits
     public digit_pressed: number = 0;
 
-    public movementX:number = 0;
+    public movementX: number = 0;
+    public movementY: number = 0;
 
     constructor(scene: Scene, gameroom: Room) {
 
@@ -65,6 +66,7 @@ export class PlayerInput {
                 }
                 if (this.right_click) {
                     this.movementX = (pointerInfo.event.movementX / 100);
+                    this.movementY = (pointerInfo.event.movementY / 100);
                 }
             }
         });

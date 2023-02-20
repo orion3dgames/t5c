@@ -55,8 +55,9 @@ export class PlayerCamera {
         // rotate camera around the Y position if right click is true
         if (this._input.right_click) {
             // ddaydd to implement
+            const rotationX = this._camRoot.rotation.x + this._input.movementY;
             const rotationY = this._camRoot.rotation.y + this._input.movementX;
-            this._camRoot.rotation = new Vector3(0, rotationY, 0);
+            this._camRoot.rotation = new Vector3(rotationX, rotationY, 0);
         }
     }
 }
