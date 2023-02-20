@@ -4,6 +4,9 @@ import { AbilitiesDB } from "../../../shared/Data/AbilitiesDB";
 import { Ability } from "../../../shared/Entities/Common/Ability";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { Leveling } from "../../../shared/Entities/Player/Leveling";
+import { nanoid } from "nanoid";
+import { ItemState } from "../schema/ItemState";
+import { randomNumberInRange } from "../../../shared/Utils";
 
 export class abilitiesCTRL {
     private _owner;
@@ -278,6 +281,7 @@ export class abilitiesCTRL {
             let gold = target.goldGain;
             this.addExperience(owner, client, exp);
 
+            
             // inform player
             client.send("notification", {
                 type: "event",

@@ -1,6 +1,7 @@
 import { Schema, type, MapSchema } from "@colyseus/schema";
 import { EnemyState } from "./EnemyState";
 import { PlayerState } from "./PlayerState";
+import { ItemState } from "./ItemState";
 import { PlayerCharacter } from "../../../shared/types";
 import { GameRoom } from "../GameRoom";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
@@ -17,6 +18,7 @@ export class GameRoomState extends Schema {
     // networked variables
     @type({ map: EnemyState }) entities = new MapSchema<EnemyState>();
     @type({ map: PlayerState }) players = new MapSchema<PlayerState>();
+    @type({ map: ItemState }) items = new MapSchema<ItemState>();
     @type("number") serverTime: number = 0.0;
 
     // not networked variables

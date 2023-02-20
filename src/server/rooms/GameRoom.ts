@@ -11,6 +11,9 @@ import { PlayerInputs } from "../../shared/types";
 import { EntityCurrentState } from "../../shared/Entities/Entity/EntityCurrentState";
 import { NavMesh, Vector3 } from "../../shared/yuka";
 import Locations from "../../shared/Data/Locations";
+import { nanoid } from "nanoid";
+import { randomNumberInRange } from "../../shared/Utils";
+import { ItemState } from "./schema/ItemState";
 
 export class GameRoom extends Room<GameRoomState> {
     public maxClients = 64;
@@ -61,12 +64,12 @@ export class GameRoom extends Room<GameRoomState> {
         this.delayedInterval = this.clock.setInterval(() => {
             // only save if there is any players
             if (this.state.players.size > 0) {
-                Logger.info("[gameroom][onCreate] Saving data for room " + options.location + " with " + this.state.players.size + " players");
+                //Logger.info("[gameroom][onCreate] Saving data for room " + options.location + " with " + this.state.players.size + " players");
                 this.state.players.forEach((entity) => {
                     // update player
                     let playerClient = this.clients.hashedArray[entity.sessionId];
                     this.database.updateCharacter(playerClient.auth.id, entity);
-                    Logger.info("[gameroom][onCreate] player " + playerClient.auth.name + " saved to database.");
+                    //Logger.info("[gameroom][onCreate] player " + playerClient.auth.name + " saved to database.");
                 });
             }
         }, Config.databaseUpdateRate);
@@ -195,6 +198,24 @@ export class GameRoom extends Room<GameRoomState> {
                 target = this.state.players[data.targetId];
             }
 
+            if(data.digit === 5){
+                // create drops
+                let sessionId = nanoid();
+                let currentPosition = sender.getPosition();
+                currentPosition.x += randomNumberInRange(0.1,1.5);
+                currentPosition.z += randomNumberInRange(0.1,1.5);
+                let data = {
+                    key: 'apple',
+                    name: "Apple",
+                    sessionId: sessionId, 
+                    x: currentPosition.x,
+                    y: 0.25,
+                    z: currentPosition.z,
+                }
+                let entity = new ItemState(this, data);
+                this.state.items.set(sessionId, entity);
+            }
+
             if (sender && target) {
                 sender.abilitiesCTRL.processAbility(sender, target, data);
             }
@@ -248,8 +269,8 @@ export class GameRoom extends Room<GameRoomState> {
 
         Logger.info(`[onLeave] player ${client.auth.name} left`);
 
-        client.leave();
         this.state.players.delete(client.sessionId);
+        client.leave();
         this.database.toggleOnlineStatus(client.auth.id, 0);
     }
 
