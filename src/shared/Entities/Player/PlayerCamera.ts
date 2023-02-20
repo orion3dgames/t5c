@@ -45,7 +45,7 @@ export class PlayerCamera {
 
     public follow(playerPosition): void {
         // camera must follow player
-        let centerPlayer = playerPosition.y + 2;
+        let centerPlayer = playerPosition.y;
         this._camRoot.position = Vector3.Lerp(
             this._camRoot.position,
             new Vector3(playerPosition.x, centerPlayer, playerPosition.z),
@@ -59,5 +59,13 @@ export class PlayerCamera {
             const rotationY = this._camRoot.rotation.y + this._input.movementX;
             this._camRoot.rotation = new Vector3(rotationX, rotationY, 0);
         }
+    }
+
+    public zoom(deltaY): void {
+        // zoom in/out
+        if (deltaY > 0 && this.camera.position.z > -50)
+            this.camera.position.z -= 1;
+        if (deltaY < 0 && this.camera.position.z < -20)
+            this.camera.position.z += 1;
     }
 }
