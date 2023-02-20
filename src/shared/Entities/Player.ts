@@ -100,7 +100,7 @@ export class Player extends Entity {
         // player before render loop
         this._scene.registerBeforeRender(() => {
             // move camera as player moves
-            this.cameraController.follow(this.mesh.position);
+            this.cameraController.follow(this.mesh.position, this.mesh.rotation.y);
         });
     }
 

@@ -43,7 +43,7 @@ export class PlayerCamera {
         this._scene.activeCamera = this.camera;
     }
 
-    public follow(playerPosition): void {
+    public follow(playerPosition, rotationY): void {
         // camera must follow player
         let centerPlayer = playerPosition.y;
         this._camRoot.position = Vector3.Lerp(
@@ -51,6 +51,9 @@ export class PlayerCamera {
             new Vector3(playerPosition.x, centerPlayer, playerPosition.z),
             0.4
         );
+
+        // to implement when the direction of the player depends on the mouse position clicked on the terrain and not on the screen
+        // this._camRoot.rotation = new Vector3(this._camRoot.rotation.x, rotationY, 0);
 
         // rotate camera around the Y position if right click is true
         if (this._input.right_click) {
