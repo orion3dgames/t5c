@@ -86,13 +86,21 @@ export class Player extends Entity {
                     }, Config.PLAYER_NAMEPLATE_TIMEOUT);
                 }
             }
+
+            // on wheel mouse
+            if (pointerInfo.type === PointerEventTypes.POINTERWHEEL) {
+                /////////////////////////////////////////////////////////////////////
+                // camera zoom on mouse wheel
+                this.cameraController.zoom(pointerInfo.event.deltaY);
+            }
+
         });
 
         //////////////////////////////////////////////////////////////////////////
         // player before render loop
         this._scene.registerBeforeRender(() => {
             // move camera as player moves
-            this.cameraController.follow(this.mesh.position);
+            this.cameraController.follow(this.mesh.position, this.mesh.rotation.y);
         });
     }
 

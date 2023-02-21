@@ -12,6 +12,7 @@ import { Environment } from "../Controllers/Environment";
 import { UserInterface } from "../Controllers/UserInterface";
 import { Player } from "../../shared/Entities/Player";
 import { Entity } from "../../shared/Entities/Entity";
+import { Item } from "../../shared/Entities/Item";
 import Config from "../../shared/Config";
 import { Room } from "colyseus.js";
 import { PlayerInputs } from "../../shared/types";
@@ -40,6 +41,7 @@ export class GameScene {
     // networked entities
     private entities: Entity[] = [];
     private players: Player[] = [];
+    private items: Item[] = [];
 
     constructor() {}
 
@@ -222,6 +224,18 @@ export class GameScene {
                 this._ui,
                 this._shadow,
                 this._navMesh,
+                this._loadedAssets
+            );
+        });
+
+        // add non player entities
+        this.room.state.items.onAdd((entity, sessionId) => {
+            this.items[sessionId] = new Item(
+                entity,
+                this.room, 
+                this._scene,
+                this._ui,
+                this._shadow,
                 this._loadedAssets
             );
         });

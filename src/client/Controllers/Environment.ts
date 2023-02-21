@@ -69,6 +69,7 @@ export class Environment {
             { name: "player_hobbit", filename: "player_hobbit.glb", extension: "glb", instantiate: true },
             { name: "monster_unicorn", filename: "monster_unicorn.glb", extension: "glb", instantiate: true },
             { name: "monster_bear", filename: "monster_bear.glb", extension: "glb", instantiate: true },
+            { name: "apple", filename: "apple.glb", extension: "glb", instantiate: true },
 
             // image
             { name: "ABILITY_base_attack", filename: "icons/ABILITY_base_attack.png", extension: "png", type: "image" },
