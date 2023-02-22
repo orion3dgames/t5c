@@ -7,6 +7,7 @@ import { Leveling } from "../../../shared/Entities/Player/Leveling";
 import { nanoid } from "nanoid";
 import { ItemState } from "../schema/ItemState";
 import { randomNumberInRange } from "../../../shared/Utils";
+import { dropCTRL } from "./dropCTRL";
 
 export class abilitiesCTRL {
     private _owner;
@@ -273,29 +274,25 @@ export class abilitiesCTRL {
         // set target as dead
         target.setAsDead();
 
-        // update caster
+        // inform player
         let client = owner.getClient();
+        client.send("notification", {
+            type: "event",
+            message: "You've killed " + target.name + ".",
+            date: new Date(),
+        });
+
+        // update caster rewards
         if (client) {
-            // player gains experience
-            let exp = target.experienceGain;
-            let gold = target.goldGain;
-            this.addExperience(owner, client, exp);
+            let drop = new dropCTRL(owner, client);
 
-            
-            // inform player
-            client.send("notification", {
-                type: "event",
-                message: "You've killed " + target.name + " and gained " + exp + " experience.",
-                date: new Date(),
-            });
+            drop.addExperience(target);
 
-            // inform player
-            client.send("notification", {
-                type: "event",
-                message: "You've gained " + gold + " gold.",
-                date: new Date(),
-            });
+            drop.addGold(target);
+
+            drop.calculateDrops(target);
         }
+        
     }
 
     addExperience(owner, client, amount) {
