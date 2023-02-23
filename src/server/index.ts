@@ -22,12 +22,12 @@ import Config from "../shared/Config";
 //////////////////////////////////////////////////
 
 if (fs.existsSync(Config.databaseLocation)) {
-  fs.unlink(Config.databaseLocation, (err) => {
-    if (err) {
-      Logger.error("Could not delete the file: "+Config.databaseLocation, err);
-    }
-    Logger.info("File is deleted: "+Config.databaseLocation);
-  });
+    fs.unlink(Config.databaseLocation, (err) => {
+        if (err) {
+            Logger.error("Could not delete the file: " + Config.databaseLocation, err);
+        }
+        Logger.info("File is deleted: " + Config.databaseLocation);
+    });
 }
 
 class GameServer {
@@ -49,7 +49,7 @@ class GameServer {
         const port = Config.port;
         const app = express();
         app.use(cors());
-        app.use(express.json());
+        //app.use(express.json());
 
         // create colyseus server
         const gameServer = new Server({
@@ -78,10 +78,10 @@ class GameServer {
 
             // create island room
             matchMaker.createRoom("game_room", { location: "lh_dungeon_01" });
-
-            // start monitor
-            //app.use("/colyseus", monitor());
         });
+
+        // start monitor
+        app.use("/colyseus", monitor());
 
         //////////////////////////////////////////////////
         //// SERVING CLIENT DIST FOLDER TO EXPRESS ///////
@@ -96,10 +96,6 @@ class GameServer {
         let indexFile = path.resolve(indexPath + clientFile);
         app.get("/", function (req, res) {
             res.sendFile(indexFile);
-        });
-
-        app.get("/monitor", function (req, res) {
-            monitor();
         });
 
         //////////////////////////////////////////////////

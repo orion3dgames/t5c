@@ -2,21 +2,6 @@ import { Client, Room } from "colyseus.js";
 import { Options } from "@colyseus/loadtest";
 
 import node_http from "../../shared/Utils/node_http";
-import Config from "../../shared/Config";
-
-function findCurrentRoom(currentRoomKey): Promise<any> {
-    return new Promise(async (resolve: any, reject: any) => {
-        let rooms = await this._client.getAvailableRooms("game_room");
-        if (rooms.length > 0) {
-            rooms.forEach((room) => {
-                if (room.metadata.location === currentRoomKey) {
-                    resolve(room);
-                }
-            });
-        }
-        resolve(false);
-    });
-}
 
 export async function main(options: Options) {
     const client = new Client(options.endpoint);
@@ -32,8 +17,10 @@ export async function main(options: Options) {
         });
     }
 
+    console.log(foundRoom);
+
     // get random user
-    let req = await node_http(Config.apiUrlLocal + "/returnRandomUser");
+    let req = await node_http("http://localhost:8080/returnRandomUser");
     let character = req.user;
 
     // join room
@@ -45,8 +32,6 @@ export async function main(options: Options) {
     let sessionId = room.sessionId;
     let player = room.state.players.get(sessionId);
     console.log("joined successfully!", player);
-
-    // fi
 
     //
     room.onMessage("*", (payload) => {

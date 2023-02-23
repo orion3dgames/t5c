@@ -73,7 +73,7 @@ export class UI_Panel {
         mainPanel.height = this._options.height;
         mainPanel.verticalAlignment = this._options.horizontal_position;
         mainPanel.horizontalAlignment = this._options.vertical_position;
-        mainPanel.isVisible = true;
+        mainPanel.isVisible = false;
         mainPanel.thickness = 0;
         this._playerUI.addControl(mainPanel);
         this.selectedTabUI = mainPanel;
