@@ -142,13 +142,23 @@ export class GameRoomState extends Schema {
             y: data.y,
             z: data.z,
             rot: data.rot,
+            state: EntityCurrentState.IDLE,
+
             health: data.health,
             mana: data.mana,
             maxHealth: data.health,
             maxMana: data.mana,
+
             level: data.level,
             experience: data.experience,
-            state: EntityCurrentState.IDLE,
+
+            gold: 0,
+
+            strength: 15,
+            endurance: 16,
+            agility: 15,
+            intelligence: 20,
+            wisdom: 20,
         };
         console.log(player);
         this.players.set(sessionId, new PlayerState(this._gameroom, player));

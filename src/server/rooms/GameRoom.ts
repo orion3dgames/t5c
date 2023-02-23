@@ -198,20 +198,20 @@ export class GameRoom extends Room<GameRoomState> {
                 target = this.state.players[data.targetId];
             }
 
-            if(data.digit === 5){
+            if (data.digit === 5) {
                 // create drops
                 let sessionId = nanoid();
                 let currentPosition = sender.getPosition();
-                currentPosition.x += randomNumberInRange(0.1,1.5);
-                currentPosition.z += randomNumberInRange(0.1,1.5);
+                currentPosition.x += randomNumberInRange(0.1, 1.5);
+                currentPosition.z += randomNumberInRange(0.1, 1.5);
                 let data = {
-                    key: 'apple',
+                    key: "apple",
                     name: "Apple",
-                    sessionId: sessionId, 
+                    sessionId: sessionId,
                     x: currentPosition.x,
                     y: 0.25,
                     z: currentPosition.z,
-                }
+                };
                 let entity = new ItemState(this, data);
                 this.state.items.set(sessionId, entity);
             }

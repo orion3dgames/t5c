@@ -288,11 +288,21 @@ class Database {
         p["y"] = data.y;
         p["z"] = data.z;
         p["rot"] = data.rot;
-        if(data.level){p["level"] = data.level;}
-        if(data.experience){p["experience"] = data.experience;}
-        if(data.health){p["health"] = data.health;}
-        if(data.mana){p["mana"] = data.mana;}
-        if(data.gold){p["gold"] = data.gold;}
+        if (data.level) {
+            p["level"] = data.level;
+        }
+        if (data.experience) {
+            p["experience"] = data.experience;
+        }
+        if (data.health) {
+            p["health"] = data.health;
+        }
+        if (data.mana) {
+            p["mana"] = data.mana;
+        }
+        if (data.gold) {
+            p["gold"] = data.gold;
+        }
 
         let sql = "UPDATE characters SET ";
 

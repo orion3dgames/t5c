@@ -222,11 +222,7 @@ var nameList = [
 ];
 
 const generateRandomPlayerName = function () {
-    return (
-        nameList[Math.floor(Math.random() * nameList.length)] +
-        "_" +
-        nameList[Math.floor(Math.random() * nameList.length)]
-    );
+    return nameList[Math.floor(Math.random() * nameList.length)] + "_" + nameList[Math.floor(Math.random() * nameList.length)];
 };
 
 const distanceBetween = function (a, b): number {
@@ -252,17 +248,4 @@ const getHealthColorFromValue = function (value) {
     return `#${rHexString}${gHexString}00`; // composing both in a color code
 };
 
-export {
-    request,
-    generateRandomPlayerName,
-    apiUrl,
-    roundToTwo,
-    roundTo,
-    countPlayers,
-    isLocal,
-    clamp,
-    randomNumberInRange,
-    distanceBetween,
-    getHealthColorFromValue,
-    bytesToSize,
-};
+export { request, generateRandomPlayerName, apiUrl, roundToTwo, roundTo, countPlayers, isLocal, clamp, randomNumberInRange, distanceBetween, getHealthColorFromValue, bytesToSize };

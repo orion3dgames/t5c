@@ -82,7 +82,7 @@ export class Item {
         this._loadedAssets = _loadedAssets;
         this.ui = ui;
         this._shadow = shadow;
-        this.sessionId = entity.sessionId; 
+        this.sessionId = entity.sessionId;
         this.entity = entity;
 
         // update player data from server data
@@ -93,23 +93,22 @@ export class Item {
     }
 
     public async spawn(entity) {
-        
         // load player mesh
         const result = await this._loadedAssets[entity.key].instantiateModelsToScene();
         const playerMesh = result.rootNodes[0];
-    
+
         // set initial player scale & rotation
         playerMesh.name = entity.sessionId + "_apple";
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
         if (entity.rotationFix) {
             playerMesh.rotation.set(0, entity.rotationFix, 0);
         }
-        playerMesh.scaling = new Vector3(0.25,0.25,0.25);
+        playerMesh.scaling = new Vector3(0.25, 0.25, 0.25);
         playerMesh.isPickable = true;
         playerMesh.checkCollisions = false;
         playerMesh.parent = this.mesh;
         this.mesh = playerMesh;
-        
+
         // add mesh to shadow generator
         //this._shadow.addShadowCaster(this.mesh, true);
 
@@ -130,7 +129,7 @@ export class Item {
         ///
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);
-        
+
         // register hover over player
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
@@ -144,7 +143,7 @@ export class Item {
         // register hover out player
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
-                let mesh = ev.meshUnderPointer
+                let mesh = ev.meshUnderPointer;
                 mesh.renderOutline = false;
             })
         );
@@ -154,9 +153,7 @@ export class Item {
         //this.characterLabel = this.ui.createEntityLabel(this);
     }
 
-    public update(delta) {
-
-    }
+    public update(delta) {}
 
     // basic performance (only enable entities in a range around the player)
     public lod(_currentPlayer) {
@@ -183,8 +180,5 @@ export class Item {
         this.characterLabel.dispose();
         this.characterChatLabel.dispose();
         this.mesh.dispose();
-        if (global.T5C.selectedEntity && global.T5C.selectedEntity.sessionId === this.sessionId) {
-            global.T5C.selectedEntity = false;
-        }
     }
 }

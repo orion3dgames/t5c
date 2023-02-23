@@ -285,41 +285,9 @@ export class abilitiesCTRL {
         // update caster rewards
         if (client) {
             let drop = new dropCTRL(owner, client);
-
             drop.addExperience(target);
-
             drop.addGold(target);
-
-            drop.calculateDrops(target);
-        }
-        
-    }
-
-    addExperience(owner, client, amount) {
-        // does player level up?
-        let doesLevelUp = false;
-        if (Leveling.doesPlayerlevelUp(owner.level, owner.experience, amount)) {
-            doesLevelUp = true;
-        }
-
-        // add experience to player
-        owner.experience += amount;
-        owner.level = Leveling.convertXpToLevel(owner.experience);
-        Logger.info(`[gameroom][addExperience] player has gained ${amount} experience`);
-
-        if (doesLevelUp) {
-            Logger.info(`[gameroom][addExperience] player has gained a level and is now level ${owner.level}`);
-            owner.maxMana = owner.maxMana + 50;
-            owner.maxHealth = owner.maxHealth + 50;
-            owner.health = owner.maxHealth;
-            owner.mana = owner.maxMana;
-
-            // inform player
-            client.send("notification", {
-                type: "event",
-                message: "You've gained knowledge and are now level " + owner.level + ".",
-                date: new Date(),
-            });
+            drop.dropItems(target);
         }
     }
 }

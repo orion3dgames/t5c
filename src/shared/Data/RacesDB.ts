@@ -1,3 +1,5 @@
+import { ILootTableEntry, LootTableEntry } from "../Entities/Player/LootTable";
+
 type Drops = {
     min: number;
     max: number;
@@ -17,15 +19,13 @@ type Race = {
     baseMana: number;
     healthRegen: number;
     manaRegen: number;
-    experienceGain: number;
+    experienceGain: {};
     goldGain: {};
     damage_multiplier: number;
     abilities: {
         [key: number]: string;
     };
-    drops?: {
-        [key: string]: any;
-    };
+    drops?: ILootTableEntry[];
 };
 
 interface raceDataMap {
@@ -50,7 +50,7 @@ let RacesDB: raceDataMap = {
         baseMana: 100,
         healthRegen: 0.2,
         manaRegen: 0.4, // per second
-        experienceGain: 0,
+        experienceGain: {},
         goldGain: {},
         damage_multiplier: 0,
         abilities: {
@@ -59,7 +59,7 @@ let RacesDB: raceDataMap = {
             3: "poisonball",
             4: "heal",
         },
-        drops: {},
+        drops: [],
     },
     monster_bear: {
         title: "Bear",
@@ -78,16 +78,13 @@ let RacesDB: raceDataMap = {
         baseMana: 100,
         healthRegen: 0.2,
         manaRegen: 0.4, // per second
-        experienceGain: 4000,
+        experienceGain: { min: 2000, max: 4000 },
         goldGain: { min: 120, max: 250 },
         damage_multiplier: 1.3,
         abilities: {
             1: "base_attack",
         },
-        drops: {
-            apples: { min: 1, max: 1, chance: 0.2 },
-            pears: { min: 1, max: 10, chance: 0.1 },
-        },
+        drops: [LootTableEntry("apple", 50, 1, 1, 1, 2), LootTableEntry("pear", 5, 1, 10, 1, 2)],
     },
     monster_unicorn: {
         title: "Unicorn",
@@ -106,17 +103,14 @@ let RacesDB: raceDataMap = {
         baseMana: 100,
         healthRegen: 0.2,
         manaRegen: 0.4, // per second
-        experienceGain: 10000,
+        experienceGain: { min: 300, max: 600 },
         goldGain: { min: 45, max: 75 },
         damage_multiplier: 1,
         abilities: {
             1: "base_attack",
             2: "fireball",
         },
-        drops: {
-            apples: { min: 1, max: 1, chance: 0.2 },
-            pears: { min: 1, max: 10, chance: 0.1 },
-        },
+        drops: [LootTableEntry("apple", 50, 1, 1, 1, 2), LootTableEntry("pear", 5, 1, 10, 1, 2)],
     },
 };
 

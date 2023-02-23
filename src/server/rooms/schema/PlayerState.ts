@@ -8,6 +8,7 @@ import { moveCTRL } from "../ctrl/moveCTRL";
 
 export class PlayerState extends EntityState {
     // networked player specific
+    @type("number") public gold: number = 0;
     @type("number") public strength: number = 0;
     @type("number") public endurance: number = 0;
     @type("number") public agility: number = 0;
