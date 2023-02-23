@@ -78,7 +78,7 @@ let RacesDB: raceDataMap = {
         baseMana: 100,
         healthRegen: 0.2,
         manaRegen: 0.4, // per second
-        experienceGain: 2000,
+        experienceGain: 4000,
         goldGain: { min: 120, max: 250 },
         damage_multiplier: 1.3,
         abilities: {
@@ -106,7 +106,7 @@ let RacesDB: raceDataMap = {
         baseMana: 100,
         healthRegen: 0.2,
         manaRegen: 0.4, // per second
-        experienceGain: 1000,
+        experienceGain: 10000,
         goldGain: { min: 45, max: 75 },
         damage_multiplier: 1,
         abilities: {
