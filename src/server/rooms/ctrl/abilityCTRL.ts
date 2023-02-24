@@ -1,13 +1,8 @@
 import Logger from "../../../shared/Logger";
-
-import { AbilitiesDB } from "../../../shared/Data/AbilitiesDB";
 import { Ability } from "../../../shared/Entities/Common/Ability";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
-import { Leveling } from "../../../shared/Entities/Player/Leveling";
-import { nanoid } from "nanoid";
-import { ItemState } from "../schema/ItemState";
-import { randomNumberInRange } from "../../../shared/Utils";
 import { dropCTRL } from "./dropCTRL";
+import { dataDB } from "../../../shared/Data/dataDB";
 
 export class abilitiesCTRL {
     private _owner;
@@ -26,7 +21,7 @@ export class abilitiesCTRL {
     constructor(owner) {
         this._owner = owner;
         this.abilitiesOwned = this._owner.abilities;
-        this.abilitiesDB = AbilitiesDB;
+        this.abilitiesDB = dataDB.load("abilities");
         this.create();
     }
 

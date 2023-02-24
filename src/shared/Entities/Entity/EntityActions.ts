@@ -8,9 +8,8 @@ import { ParticleSystem } from "@babylonjs/core/Particles/particleSystem";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 
 import State from "../../../client/Screens/Screens";
-import Locations from "../../../shared/Data/Locations";
+import LocationsDB from "../../Data/LocationsDB";
 import { Sound } from "@babylonjs/core/Audio/sound";
-
 
 export class EntityActions {
     private _scene: Scene;
@@ -26,15 +25,12 @@ export class EntityActions {
     constructor(scene, _loadedAssets) {
         this._scene = scene;
         this._loadedAssets = _loadedAssets;
-        this.particleTxt_01 = this._loadedAssets['particle_01'];
+        this.particleTxt_01 = this._loadedAssets["particle_01"];
     }
 
-    public playSound(){
-
-    }
+    public playSound() {}
 
     public process(data, ability) {
-
         /*
         let soundToPlay = this._scene.getSoundByName("sound_"+ability.key);
         if(!soundToPlay){
@@ -44,7 +40,7 @@ export class EntityActions {
                 volume: 0.3
             });
         }*/
-        
+
         // get target mesh
         let mesh = this._scene.getMeshByName(data.targetId);
 
@@ -62,12 +58,7 @@ export class EntityActions {
 
         // set effect
         if (ability.effect.particule === "fireball") {
-            this.particule_fireball(
-                new Vector3(start.x, start.y, start.z),
-                new Vector3(end.x, end.y, end.z),
-                mesh,
-                ability.effect.color
-            );
+            this.particule_fireball(new Vector3(start.x, start.y, start.z), new Vector3(end.x, end.y, end.z), mesh, ability.effect.color);
         }
 
         if (ability.effect.particule === "heal") {
@@ -108,7 +99,6 @@ export class EntityActions {
     }
 
     public particule_fireball(start, end, mesh, color) {
-
         // calculate angle
         var angle = Math.atan2(start.z - end.z, start.x - end.x);
 

@@ -16,7 +16,7 @@ import State from "./Screens";
 import { PlayerCharacter, PlayerUser } from "../../shared/types";
 import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
 import alertMessage from "../../shared/Utils/alertMessage";
-import Locations from "../../shared/Data/Locations";
+import { dataDB } from "../../shared/Data/dataDB";
 import { SceneController } from "../Controllers/Scene";
 
 export class CharacterSelectionScene {
@@ -202,7 +202,7 @@ export class CharacterSelectionScene {
     loginAs(character: PlayerCharacter) {
         global.T5C.currentCharacter = character;
         global.T5C.currentLocationKey = character.location;
-        global.T5C.currentLocation = Locations[character.location];
+        global.T5C.currentLocation = dataDB.get("location", character.location);
         SceneController.goToScene(State.GAME);
     }
 

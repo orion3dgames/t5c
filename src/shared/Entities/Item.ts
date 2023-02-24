@@ -2,26 +2,18 @@ import { Scene } from "@babylonjs/core/scene";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { ActionManager } from "@babylonjs/core/Actions/actionManager";
+import { ExecuteCodeAction } from "@babylonjs/core/Actions/directActions";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { Room } from "colyseus.js";
 
 import { EntityState } from "../../server/rooms/schema/EntityState";
-import { PlayerCamera } from "./Player/PlayerCamera";
-import { EntityAnimator } from "./Entity/EntityAnimator";
-import { EntityUtils } from "./Entity/EntityUtils";
-import { EntityActions } from "./Entity/EntityActions";
-import { EntityMesh } from "./Entity/EntityMesh";
-
 import { UserInterface } from "../../client/Controllers/UserInterface";
-import Config from "../Config";
-import { EntityCurrentState } from "./Entity/EntityCurrentState";
 import { PlayerInput } from "../../client/Controllers/PlayerInput";
-import { ActionManager } from "@babylonjs/core/Actions/actionManager";
-import { ExecuteCodeAction } from "@babylonjs/core/Actions/directActions";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+
+import Config from "../Config";
 
 export class Item {
     public _scene: Scene;
@@ -31,46 +23,21 @@ export class Item {
     public _shadow;
     public _loadedAssets;
 
-    // controllers
-    public cameraController: PlayerCamera;
-    public animatorController: EntityAnimator;
-    public utilsController: EntityUtils;
-    public actionsController: EntityActions;
-    public meshController: EntityMesh;
-    public actionManager: ActionManager;
-
     // entity
-    public mesh: AbstractMesh; //outer collisionbox of player
-    public playerMesh: AbstractMesh; //outer collisionbox of player
-    public debugMesh: Mesh;
-    public selectedMesh: Mesh;
-    public characterChatLabel: Rectangle;
+    public entity;
+    public sessionId;
+    public mesh: AbstractMesh;
     public characterLabel: Rectangle;
-    public sessionId: string;
-    public entity: EntityState;
-    public isCurrentPlayer: boolean;
 
-    // character
-    public type: string = "";
-    public race: string = "";
     public name: string = "";
-    public speed: string = "";
     public x: number;
     public y: number;
     public z: number;
     public rot: number;
-    public health: number;
-    public mana: number;
-    public level: number;
-    public experience: number;
-    public location: string = "";
-    public state: number = EntityCurrentState.IDLE;
-    public AI_CURRENT_STATE: number = 0;
 
     // raceData
     public rotationFix;
     public scale: number = 1;
-    public animationSpeed;
 
     // flags
     public blocked: boolean = false; // if true, player will not moved
@@ -111,7 +78,6 @@ export class Item {
 
         // add mesh to shadow generator
         //this._shadow.addShadowCaster(this.mesh, true);
-
         this.setPosition();
 
         //////////////////////////////////////////////
@@ -178,7 +144,6 @@ export class Item {
 
     public remove() {
         this.characterLabel.dispose();
-        this.characterChatLabel.dispose();
         this.mesh.dispose();
     }
 }

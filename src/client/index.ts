@@ -23,7 +23,7 @@ import { CharacterSelectionScene } from "./Screens/CharacterSelection";
 import Config from "../shared/Config";
 import { Network } from "./Controllers/Network";
 import { Loading } from "./Controllers/Loading";
-import Locations from "./../shared/Data/Locations";
+import { dataDB } from "./../shared/Data/dataDB";
 
 // App class is our entire game application
 class App {
@@ -146,7 +146,7 @@ class App {
             nextScene: Config.defaultScene,
             currentRoomID: "",
             currentSessionID: "",
-            currentLocation: Locations[Config.initialLocation],
+            currentLocation: dataDB.get("location", Config.initialLocation),
             currentUser: false,
             currentMs: 0,
         };

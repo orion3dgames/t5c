@@ -8,12 +8,12 @@ import { moveCTRL } from "../ctrl/moveCTRL";
 
 export class PlayerState extends EntityState {
     // networked player specific
-    @type("number") public gold: number = 0;
-    @type("number") public strength: number = 0;
-    @type("number") public endurance: number = 0;
-    @type("number") public agility: number = 0;
-    @type("number") public intelligence: number = 0;
-    @type("number") public wisdom: number = 0;
+    @type("uint8") public gold: number = 0;
+    @type("uint8") public strength: number = 0;
+    @type("uint8") public endurance: number = 0;
+    @type("uint8") public agility: number = 0;
+    @type("uint8") public intelligence: number = 0;
+    @type("uint8") public wisdom: number = 0;
 
     //
     public gracePeriod: boolean = true;
@@ -25,8 +25,6 @@ export class PlayerState extends EntityState {
 
     constructor(gameroom: GameRoom, data, ...args: any[]) {
         super(gameroom, data, args);
-
-        //
         this.abilitiesCTRL = new abilitiesCTRL(this);
         this.moveCTRL = new moveCTRL(this);
 

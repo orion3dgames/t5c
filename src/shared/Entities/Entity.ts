@@ -18,10 +18,10 @@ import { EntityMesh } from "./Entity/EntityMesh";
 import { UserInterface } from "../../client/Controllers/UserInterface";
 import { NavMesh } from "../yuka";
 import { AI_STATE } from "./Entity/AIState";
-import { Races, Race } from "../Entities/Common/Races";
 import Config from "../Config";
 import { EntityCurrentState } from "./Entity/EntityCurrentState";
 import { PlayerInput } from "../../client/Controllers/PlayerInput";
+import { dataDB } from "../Data/dataDB";
 
 export class Entity {
     public _scene: Scene;
@@ -73,7 +73,7 @@ export class Entity {
     public scale;
     public animationSpeed;
 
-    public raceData: Race;
+    public raceData;
 
     // flags
     public blocked: boolean = false; // if true, player will not moved
@@ -91,7 +91,7 @@ export class Entity {
         this.entity = entity;
 
         // update player data from server data
-        Object.assign(this, Races.get(entity.race));
+        Object.assign(this, dataDB.get("race", entity.race));
 
         // update player data from server data
         Object.assign(this, this.entity);

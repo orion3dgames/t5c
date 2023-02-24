@@ -5,12 +5,10 @@ import databaseInstance from "../../shared/Database";
 import Config from "../../shared/Config";
 import Logger from "../../shared/Logger";
 import loadNavMeshFromFile from "../../shared/Utils/loadNavMeshFromFile";
-import { EntityState } from "./schema/EntityState";
 import { PlayerState } from "./schema/PlayerState";
 import { PlayerInputs } from "../../shared/types";
-import { EntityCurrentState } from "../../shared/Entities/Entity/EntityCurrentState";
-import { NavMesh, Vector3 } from "../../shared/yuka";
-import Locations from "../../shared/Data/Locations";
+import { NavMesh } from "../../shared/yuka";
+import LocationsDB from "../../shared/Data/LocationsDB";
 import { nanoid } from "nanoid";
 import { randomNumberInRange } from "../../shared/Utils";
 import { ItemState } from "./schema/ItemState";
@@ -114,8 +112,6 @@ export class GameRoom extends Room<GameRoomState> {
         this.state.addPlayer(client.sessionId, client.auth);
         this.database.toggleOnlineStatus(client.auth.id, 1);
         Logger.info(`[gameroom][onJoin] player added `);
-
-        //client.send('sdfsdfsd', element)
     }
 
     //////////////////////////////////////////////////////////////////////////

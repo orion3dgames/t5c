@@ -11,8 +11,6 @@ import { EntityActions } from "./Entity/EntityActions";
 import { Entity } from "./Entity";
 import { PlayerInput } from "../../client/Controllers/PlayerInput";
 import { UserInterface } from "../../client/Controllers/UserInterface";
-import Locations from "../Data/Locations";
-import { Abilities } from "./Common/Abilities";
 import Config from "../Config";
 import State from "../../client/Screens/Screens";
 import { EntityCurrentState } from "./Entity/EntityCurrentState";
@@ -93,7 +91,6 @@ export class Player extends Entity {
                 // camera zoom on mouse wheel
                 this.cameraController.zoom(pointerInfo.event.deltaY);
             }
-
         });
 
         //////////////////////////////////////////////////////////////////////////

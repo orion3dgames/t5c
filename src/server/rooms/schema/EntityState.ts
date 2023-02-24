@@ -1,7 +1,7 @@
 import { Schema, type } from "@colyseus/schema";
+import { dataDB } from "../../../shared/Data/dataDB";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { NavMesh } from "../../../shared/yuka";
-import { Races } from "../../../shared/Entities/Common/Races";
 import { Vector3 } from "../../../shared/yuka";
 import { PlayerState } from "./PlayerState";
 
@@ -19,15 +19,15 @@ export class EntityState extends Schema {
     @type("number") public x: number = 0;
     @type("number") public y: number = 0;
     @type("number") public z: number = 0;
-    @type("number") public rot: number = 0;
+    @type("int16") public rot: number = 0;
 
     // player details
-    @type("number") public health: number = 0;
-    @type("number") public maxHealth: number = 0;
-    @type("number") public mana: number = 0;
-    @type("number") public maxMana: number = 0;
-    @type("number") public level: number = 0;
-    @type("number") public experience: number = 0;
+    @type("int16") public health: number = 0;
+    @type("int16") public maxHealth: number = 0;
+    @type("int16") public mana: number = 0;
+    @type("int16") public maxMana: number = 0;
+    @type("uint8") public level: number = 0;
+    @type("uint32") public experience: number = 0;
 
     public manaRegen: number = 0;
     public healthRegen: number = 0;
@@ -36,7 +36,7 @@ export class EntityState extends Schema {
 
     // flags
     @type("boolean") public blocked: boolean = false; // if true, used to block player and to prevent movement
-    @type("number") public state: EntityCurrentState = EntityCurrentState.IDLE;
+    @type("int8") public state: EntityCurrentState = EntityCurrentState.IDLE;
 
     public _navMesh: NavMesh;
     public _gameroom;
@@ -57,8 +57,9 @@ export class EntityState extends Schema {
         this._navMesh = gameroom.navMesh;
         this._gameroom = gameroom;
         this.client = this.getClient();
+
         Object.assign(this, data);
-        Object.assign(this, Races.get(this.race));
+        Object.assign(this, dataDB.get("race", this.race));
     }
 
     public getClient() {

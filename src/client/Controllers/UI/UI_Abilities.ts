@@ -3,7 +3,7 @@ import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import Config from "../../../shared/Config";
-import { Abilities } from "../../../shared/Entities/Common/Abilities";
+import { dataDB } from "../../../shared/Data/dataDB";
 import { Player } from "../../../shared/Entities/Player";
 
 export class UI_Abilities {
@@ -13,6 +13,7 @@ export class UI_Abilities {
     private _currentPlayer: Player;
     private _tooltip: Rectangle;
     private _tooltipTxt: TextBlock;
+    private abilities;
     private abylity_number: number = 9;
 
     constructor(_playerUI, _gameRoom, _currentPlayer, _loadedAssets) {
@@ -20,6 +21,7 @@ export class UI_Abilities {
         this._currentPlayer = _currentPlayer;
         this._gameRoom = _gameRoom;
         this._loadedAssets = _loadedAssets;
+        this.abilities = dataDB.load("abilities");
 
         // create ui
         this._createUI();

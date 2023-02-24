@@ -2,17 +2,14 @@ import { Schema, type, MapSchema } from "@colyseus/schema";
 import { EnemyState } from "./EnemyState";
 import { PlayerState } from "./PlayerState";
 import { ItemState } from "./ItemState";
-import { PlayerCharacter } from "../../../shared/types";
 import { GameRoom } from "../GameRoom";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { NavMesh } from "../../../shared/yuka";
 import { nanoid } from "nanoid";
-import Config from "../../../shared/Config";
 import Logger from "../../../shared/Logger";
 import { randomNumberInRange } from "../../../shared/Utils";
 import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
-import Locations from "../../../shared/Data/Locations";
-import { Races, Race } from "../../../shared/Entities/Common/Races";
+import { dataDB } from "../../../shared/Data/dataDB";
 
 export class GameRoomState extends Schema {
     // networked variables
@@ -33,7 +30,7 @@ export class GameRoomState extends Schema {
         super(...args);
         this._gameroom = gameroom;
         this.navMesh = _navMesh;
-        this.roomDetails = Locations[this._gameroom.metadata.location];
+        this.roomDetails = dataDB.get("location", this._gameroom.metadata.location);
     }
 
     public createEntity(delta) {
@@ -51,7 +48,7 @@ export class GameRoomState extends Schema {
         let race = monsterTypes[Math.floor(Math.random() * monsterTypes.length)];
 
         // get race data
-        let raceData: Race = Races.get(race);
+        let raceData = dataDB.get("race", race);
 
         // create entity
         let data = {
@@ -129,13 +126,12 @@ export class GameRoomState extends Schema {
      * @param sessionId
      * @param data
      */
-    addPlayer(sessionId: string, data: PlayerCharacter): void {
-        let race = "player_hobbit";
+    addPlayer(sessionId: string, data): void {
         let player = {
             id: data.id,
             sessionId: sessionId,
             type: "player",
-            race: race,
+            race: "player_hobbit",
             name: data.name,
             location: data.location,
             x: data.x,
@@ -151,7 +147,6 @@ export class GameRoomState extends Schema {
 
             level: data.level,
             experience: data.experience,
-
             gold: 0,
 
             strength: 15,
@@ -159,8 +154,10 @@ export class GameRoomState extends Schema {
             agility: 15,
             intelligence: 20,
             wisdom: 20,
+
+            abilities: data.abilities,
+            inventory: data.inventory,
         };
-        console.log(player);
         this.players.set(sessionId, new PlayerState(this._gameroom, player));
     }
 

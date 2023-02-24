@@ -4,9 +4,7 @@ import { nanoid } from "nanoid";
 import { PlayerCharacter, PlayerUser } from "./types";
 import { ParsedQs } from "qs";
 import Config from "./Config";
-import Locations from "./Data/Locations";
-import { AbilitiesDB } from "./Data/AbilitiesDB";
-import { Races } from "./Entities/Common/Races";
+import { dataDB } from "./Data/dataDB";
 
 class Database {
     private db;
@@ -48,8 +46,8 @@ class Database {
         const playerInventorySql = `CREATE TABLE IF NOT EXISTS "character_inventory" (
             "id" INTEGER PRIMARY KEY AUTOINCREMENT,
             "owner_id" INTEGER,
-            "item_id" INTEGER,
-            "qty" INTEGER
+            "qty" INTEGER,
+            "key" TEXT
         )`;
 
         const playerAbilitySql = `CREATE TABLE IF NOT EXISTS "character_abilities" (
@@ -60,6 +58,7 @@ class Database {
             "key" TEXT
         )`;
 
+        /*
         const abilitiesSql = `CREATE TABLE IF NOT EXISTS "abilities" (
             "id" INTEGER PRIMARY KEY AUTOINCREMENT,
             "key" TEXT NOT NULL UNIQUE,
@@ -85,17 +84,16 @@ class Database {
             "key" TEXT NOT NULL UNIQUE,
             "label" TEXT NOT NULL,
             "description" TEXT NOT NULL
-        )`;
+        )`;*/
 
         this.db.serialize(() => {
             Logger.info("[database] Creating default database structure.");
             this.run(usersSql);
             this.run(playersSql);
             this.run(playerInventorySql);
-            this.run(itemsSql);
             this.run(playerAbilitySql);
-            this.run(abilitiesSql);
 
+            /*
             // insert some items
             this.run(`DELETE FROM "items" where id > 0`);
             this.run(`INSERT INTO items ("key","label","description") VALUES ("pear","Pear","A delicious golden fruit.")`);
@@ -121,7 +119,7 @@ class Database {
                 sql = sql.slice(0, -1);
                 sql += `)`;
                 this.run(sql);
-            }
+            }*/
 
             Logger.info("[database] Reset all characters to offline. ");
             this.run(`UPDATE characters SET online=0 ;`);
@@ -139,9 +137,9 @@ class Database {
         });
     }
 
-    get(sql: string, params = []) {
+    get(sql: string, params = []): Promise<any> {
         return new Promise((resolve, reject) => {
-            this.db.get(sql, params, (err: any, result: unknown) => {
+            this.db.get(sql, params, (err: any, result: []) => {
                 if (err) {
                     console.log("Error running sql: " + sql);
                     console.log(err);
@@ -156,9 +154,9 @@ class Database {
         });
     }
 
-    all(sql: string, params = []) {
+    all(sql: string, params = []): Promise<any[]> {
         return new Promise((resolve, reject) => {
-            this.db.all(sql, params, (err: any, rows: unknown) => {
+            this.db.all(sql, params, (err: any, rows: []) => {
                 if (err) {
                     console.log("Error running sql: " + sql);
                     console.log(err);
@@ -256,28 +254,44 @@ class Database {
     ///////////////////////////////////////
 
     async getCharacter(id: number) {
-        const sql = `SELECT * FROM characters WHERE id=?;`;
-        return await this.get(sql, [id]);
+        let character = await this.get(`SELECT * FROM characters WHERE id=?;`, [id]);
+        character.abilities = await this.all(`SELECT CA.* FROM character_abilities CA WHERE CA.owner_id=? ORDER BY CA.digit ASC;`, [id]);
+        character.inventory = await this.all(`SELECT CI.* FROM character_inventory CI WHERE CI.owner_id=?;`, [id]);
+        return character;
     }
 
     async createCharacter(token, name) {
-        let raceData = Races.get("player_hobbit");
+        // create a character
+        let raceData = dataDB.get("race", "player_hobbit");
         let user = await this.getUserByToken(token);
-        let defaultLocation = Locations[Config.initialLocation];
+        let defaultLocation = dataDB.get("location", Config.initialLocation);
         const sql = `INSERT INTO characters ("user_id", "name","location","x","y","z","rot","level","experience","health", "mana") VALUES (
-        "${user.id}",
-        "${name}",
-        "${defaultLocation.key}",
-        "${defaultLocation.spawnPoint.x}",
-        "${defaultLocation.spawnPoint.y}",
-        "${defaultLocation.spawnPoint.z}",
-        "${defaultLocation.spawnPoint.rot}",
-        "1",
-        "0",
-        "${raceData.baseHealth}",
-        "${raceData.baseMana}"
-      );`;
+            "${user.id}",
+            "${name}",
+            "${defaultLocation.key}",
+            "${defaultLocation.spawnPoint.x}",
+            "${defaultLocation.spawnPoint.y}",
+            "${defaultLocation.spawnPoint.z}",
+            "${defaultLocation.spawnPoint.rot}",
+            "1",
+            "0",
+            "${raceData.baseHealth}",
+            "${raceData.baseMana}"
+        );`;
         let c = await (<any>this.run(sql));
+
+        // add default abilities
+        let abilities = [
+            { digit: 1, key: "basic_attack" },
+            { digit: 2, key: "fireball" },
+            { digit: 3, key: "poisonball" },
+            { digit: 4, key: "heal" },
+        ];
+        abilities.forEach((ability) => {
+            const sql_abilities = `INSERT INTO character_abilities ("owner_id", "digit", "key") VALUES ("${c.id}", "${ability.digit}", "${ability.key}")`;
+            this.run(sql_abilities);
+        });
+
         return await this.getCharacter(c.id);
     }
 

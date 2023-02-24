@@ -1,4 +1,4 @@
-let Locations = {
+let LocationsDB = {
     lh_town: {
         title: "Town",
         key: "lh_town",
@@ -31,4 +31,4 @@ let Locations = {
     },
 };
 
-export default Locations;
+export { LocationsDB };

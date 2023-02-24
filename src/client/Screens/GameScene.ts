@@ -62,6 +62,7 @@ export class GameScene {
         // if local skip login screen
         if (isLocal()) {
             //let tempLocation = "lh_town";
+            /*
             let tempLocation = "lh_town";
             global.T5C.currentLocation = Locations[tempLocation];
             let req = await request("get", apiUrl() + "/returnRandomUser");
@@ -74,6 +75,7 @@ export class GameScene {
             };
             global.T5C.currentCharacter = character;
             global.T5C.currentCharacter.location = tempLocation;
+            */
         }
         ///////////////////// END DEBUG CODE /////////////////////////////
         ///////////////////// END DEBUG CODE /////////////////////////////
@@ -157,15 +159,7 @@ export class GameScene {
         this._input = new PlayerInput(this._scene, this.room);
 
         // setup hud
-        this._ui = new UserInterface(
-            this._scene,
-            this._app.engine,
-            this.room,
-            this.chatRoom,
-            this.entities,
-            this._currentPlayer,
-            this._loadedAssets
-        );
+        this._ui = new UserInterface(this._scene, this._app.engine, this.room, this.chatRoom, this.entities, this._currentPlayer, this._loadedAssets);
 
         ////////////////////////////////////////////////////
         //  when a entity joins the room event
@@ -176,16 +170,7 @@ export class GameScene {
             // if player type
             if (entity.type === "player" && isCurrentPlayer) {
                 // create player entity
-                let _player = new Player(
-                    entity,
-                    this.room,
-                    this._scene,
-                    this._ui,
-                    this._shadow,
-                    this._navMesh,
-                    this._loadedAssets,
-                    this._input
-                );
+                let _player = new Player(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._loadedAssets, this._input);
 
                 // set currentPlayer
                 this._currentPlayer = _player;
@@ -203,41 +188,18 @@ export class GameScene {
                 // else if entity or another player
             } else {
                 // save entity
-                this.entities[sessionId] = new Entity(
-                    entity,
-                    this.room,
-                    this._scene,
-                    this._ui,
-                    this._shadow,
-                    this._navMesh,
-                    this._loadedAssets
-                );
+                this.entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._loadedAssets);
             }
         });
 
         // add non player entities
         this.room.state.entities.onAdd((entity, sessionId) => {
-            this.entities[sessionId] = new Entity(
-                entity,
-                this.room,
-                this._scene,
-                this._ui,
-                this._shadow,
-                this._navMesh,
-                this._loadedAssets
-            );
+            this.entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._loadedAssets);
         });
 
         // add non player entities
         this.room.state.items.onAdd((entity, sessionId) => {
-            this.items[sessionId] = new Item(
-                entity,
-                this.room, 
-                this._scene,
-                this._ui,
-                this._shadow,
-                this._loadedAssets
-            );
+            this.items[sessionId] = new Item(entity, this.room, this._scene, this._ui, this._shadow, this._loadedAssets);
         });
 
         // when a player leaves the room event

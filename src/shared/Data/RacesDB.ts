@@ -1,11 +1,5 @@
 import { ILootTableEntry, LootTableEntry } from "../Entities/Player/LootTable";
 
-type Drops = {
-    min: number;
-    max: number;
-    change: number;
-};
-
 type Race = {
     title: string;
     speed: number;
@@ -22,9 +16,6 @@ type Race = {
     experienceGain: {};
     goldGain: {};
     damage_multiplier: number;
-    abilities: {
-        [key: number]: string;
-    };
     drops?: ILootTableEntry[];
 };
 
@@ -53,12 +44,6 @@ let RacesDB: raceDataMap = {
         experienceGain: {},
         goldGain: {},
         damage_multiplier: 0,
-        abilities: {
-            1: "base_attack",
-            2: "fireball",
-            3: "poisonball",
-            4: "heal",
-        },
         drops: [],
     },
     monster_bear: {
@@ -81,9 +66,6 @@ let RacesDB: raceDataMap = {
         experienceGain: { min: 2000, max: 4000 },
         goldGain: { min: 120, max: 250 },
         damage_multiplier: 1.3,
-        abilities: {
-            1: "base_attack",
-        },
         drops: [LootTableEntry("apple", 50, 1, 1, 1, 2), LootTableEntry("pear", 5, 1, 10, 1, 2)],
     },
     monster_unicorn: {
@@ -106,10 +88,6 @@ let RacesDB: raceDataMap = {
         experienceGain: { min: 300, max: 600 },
         goldGain: { min: 45, max: 75 },
         damage_multiplier: 1,
-        abilities: {
-            1: "base_attack",
-            2: "fireball",
-        },
         drops: [LootTableEntry("apple", 50, 1, 1, 1, 2), LootTableEntry("pear", 5, 1, 10, 1, 2)],
     },
 };
