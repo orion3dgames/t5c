@@ -83,7 +83,7 @@ export class GameScene {
         let location = global.T5C.currentLocation;
 
         // black background
-        scene.clearColor = new Color4(255, 255, 255, 1);
+        scene.clearColor = new Color4(location.skyColor, location.skyColor, location.skyColor, 1);
 
         if (location.sun) {
             // ambient light
@@ -233,19 +233,6 @@ export class GameScene {
         let sequence = 0;
         let latestInput: PlayerInputs;
         this._scene.registerBeforeRender(() => {
-            /*
-            if(this._environment.allMeshes){
-                for(let meshId in this._environment.allMeshes){
-                    const mesh = this._environment.allMeshes[meshId];
-                    mesh.setEnabled(false); 
-                    let entityPos = mesh.position;
-                    let playerPos = this._currentPlayer.position();
-                    let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
-                    if(distanceFromPlayer < Config.PLAYER_VIEW_DISTANCE){
-                        mesh.setEnabled(true); 
-                    }
-                }
-            }*/
 
             let delta = this._app.engine.getFps();
 

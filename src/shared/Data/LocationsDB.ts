@@ -13,13 +13,14 @@ let LocationsDB = {
         },
         monsters: 1,
         waterPlane: true,
+        skyColor: 255,
     },
     lh_dungeon_01: {
         title: "Dungeon Level 1",
         key: "lh_dungeon_01",
         mesh: "lh_dungeon_01",
         sun: false,
-        sunIntensity: 0.5,
+        sunIntensity: 1,
         spawnPoint: {
             x: 11.33,
             y: 0,
@@ -28,6 +29,7 @@ let LocationsDB = {
         },
         monsters: 2,
         waterPlane: false,
+        skyColor: 0,
     },
 };
 
