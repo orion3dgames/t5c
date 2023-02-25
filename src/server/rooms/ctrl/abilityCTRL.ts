@@ -27,10 +27,11 @@ export class abilitiesCTRL {
 
     public create() {
         for (let index in this.abilitiesOwned) {
-            const key = this.abilitiesOwned[index];
-            const skill = this.abilitiesDB[key];
+            const link = this.abilitiesOwned[index];
+            const skill = this.abilitiesDB[link.key];
             this.abilities.push(new Ability(skill));
         }
+        console.log(this.abilities);
     }
 
     public update() {}

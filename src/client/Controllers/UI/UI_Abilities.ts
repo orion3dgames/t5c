@@ -133,7 +133,7 @@ export class UI_Abilities {
     }
 
     addAbilityIcon(digit, headlineRect: Rectangle) {
-        let ability = Abilities.getByDigit(this._currentPlayer, digit);
+        let ability = this._currentPlayer.getAbilityByDigit(digit);
         if (ability) {
             var imageData = this._loadedAssets[ability.icon];
             var img = new Image("ability_image_" + digit, imageData);

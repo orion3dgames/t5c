@@ -20,7 +20,6 @@ import { apiUrl, isLocal, request } from "../../shared/Utils";
 import { NavMesh } from "../../shared/yuka";
 import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
 import { createConvexRegionHelper, createGraphHelper } from "../../shared/Utils/navMeshHelper";
-import Locations from "../../shared/Data/Locations";
 import { SceneController } from "../Controllers/Scene";
 
 export class GameScene {
@@ -84,7 +83,7 @@ export class GameScene {
         let location = global.T5C.currentLocation;
 
         // black background
-        scene.clearColor = new Color4(0, 0, 0, 1);
+        scene.clearColor = new Color4(255, 255, 255, 1);
 
         if (location.sun) {
             // ambient light
@@ -161,6 +160,10 @@ export class GameScene {
         // setup hud
         this._ui = new UserInterface(this._scene, this._app.engine, this.room, this.chatRoom, this.entities, this._currentPlayer, this._loadedAssets);
 
+        // get character
+        let req = await request("get", apiUrl() + "/get_character", { character_id: global.T5C.currentCharacter.id });
+        let character = JSON.parse(req.data).character;
+
         ////////////////////////////////////////////////////
         //  when a entity joins the room event
         this.room.state.players.onAdd((entity, sessionId) => {
@@ -169,6 +172,11 @@ export class GameScene {
             //////////////////
             // if player type
             if (entity.type === "player" && isCurrentPlayer) {
+
+                // terrible way... i'm just not sure what is the best way yet...
+                entity.abilities = character.abilities;
+                entity.inventory = character.inventory;
+                
                 // create player entity
                 let _player = new Player(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._loadedAssets, this._input);
 

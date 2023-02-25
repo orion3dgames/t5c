@@ -8,10 +8,10 @@ import loadNavMeshFromFile from "../../shared/Utils/loadNavMeshFromFile";
 import { PlayerState } from "./schema/PlayerState";
 import { PlayerInputs } from "../../shared/types";
 import { NavMesh } from "../../shared/yuka";
-import LocationsDB from "../../shared/Data/LocationsDB";
 import { nanoid } from "nanoid";
 import { randomNumberInRange } from "../../shared/Utils";
 import { ItemState } from "./schema/ItemState";
+import { dataDB } from "../../shared/Data/dataDB";
 
 export class GameRoom extends Room<GameRoomState> {
     public maxClients = 64;
@@ -160,7 +160,7 @@ export class GameRoom extends Room<GameRoomState> {
 
             if (playerState) {
                 // update player location in database
-                let newLocation = Locations[location];
+                let newLocation = dataDB.get('location', location);
                 let updateObj = {
                     location: newLocation.key,
                     x: newLocation.spawnPoint.x,

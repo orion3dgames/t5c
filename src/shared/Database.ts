@@ -282,7 +282,7 @@ class Database {
 
         // add default abilities
         let abilities = [
-            { digit: 1, key: "basic_attack" },
+            { digit: 1, key: "base_attack" },
             { digit: 2, key: "fireball" },
             { digit: 3, key: "poisonball" },
             { digit: 4, key: "heal" },

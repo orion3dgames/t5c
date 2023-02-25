@@ -202,6 +202,22 @@ class GameServer {
             }
         });
 
+        app.get("/get_character", function (req, res) {
+            const character_id: string = (req.query.character_id as string) ?? '';
+            database.getCharacter(parseInt(character_id)).then((character) => {
+                if (!character) {
+                    return res.status(400).send({
+                        message: "Get Character Failed",
+                    });
+                } else {
+                    return res.send({
+                        message: "Get Character Successful",
+                        character: character,
+                    });
+                }
+            });
+        });
+
         app.get("/register", function (req, res) {});
 
         app.get("/returnRandomUser", function (req, res) {

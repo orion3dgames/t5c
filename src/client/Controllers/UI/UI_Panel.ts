@@ -209,14 +209,14 @@ export class UI_Panel {
     ///////////////////////////////////////
     // CHARACTER PANEL
     public character(panel, tab) {
-        console.log("character", panel, tab);
+        //console.log("character", panel, tab);
     }
 
     ///////////////////////////////////////
     ///////////////////////////////////////
     // INVENTORY PANEL
     public inventory(panel, tab) {
-        console.log("inventory", panel, tab);
+        //console.log("inventory", panel, tab);
 
         const leftPanel = new Rectangle("inventoryLeftPanel");
         leftPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
@@ -254,7 +254,7 @@ export class UI_Panel {
         let inventorySpaceCols = inventorySpaceW;
         let inventorySpaceRows = inventorySpace / inventorySpaceW;
 
-        console.log(size, inventorySpaceCols, inventorySpaceRows);
+        //console.log(size, inventorySpaceCols, inventorySpaceRows);
 
         for (let i = 0; i <= inventorySpaceW; i++) {
             grid.addColumnDefinition(size, true);
@@ -285,6 +285,6 @@ export class UI_Panel {
     ///////////////////////////////////////
     // SKILLS PANEL
     public skills(panel, tab) {
-        console.log("skills", panel, tab);
+        //console.log("skills", panel, tab);
     }
 }

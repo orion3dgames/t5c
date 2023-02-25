@@ -14,6 +14,7 @@ import { UserInterface } from "../../client/Controllers/UserInterface";
 import Config from "../Config";
 import State from "../../client/Screens/Screens";
 import { EntityCurrentState } from "./Entity/EntityCurrentState";
+import { dataDB } from "../Data/dataDB";
 
 export class Player extends Entity {
     public input;
@@ -24,8 +25,10 @@ export class Player extends Entity {
     public castingTimer;
     public castingElapsed: number = 0;
     public castingTarget: number = 0;
-
     public ability_in_cooldown;
+
+    public abilities;
+    public inventory;
 
     constructor(entity: EntityState, room: Room, scene: Scene, ui: UserInterface, shadow: CascadedShadowGenerator, navMesh: NavMesh, _loadedAssets: any[], input: PlayerInput) {
         super(entity, room, scene, ui, shadow, navMesh, _loadedAssets);
@@ -145,7 +148,7 @@ export class Player extends Entity {
         this.ability_in_cooldown.forEach((cooldown, digit) => {
             if (cooldown > 0) {
                 let cooldownUI = this.ui._playerUI.getControlByName("ability_" + digit + "_cooldown");
-                let ability = Abilities.getByDigit(this, digit);
+                let ability = this.getAbilityByDigit(digit);
                 if (ability) {
                     this.ability_in_cooldown[digit] -= delta;
                     let percentage = ((this.ability_in_cooldown[digit] / ability.cooldown) * 100) / 100;
@@ -161,10 +164,18 @@ export class Player extends Entity {
         }
     }
 
+    public getAbilityByDigit(digit){
+        let link = this.abilities[(digit-1)];
+        if(link){
+            return dataDB.get('ability', link.key);
+        }
+        return false;
+    }
+
     // player is casting
     public startCasting(data) {
         let digit = data.digit;
-        let ability = Abilities.getByDigit(this, digit);
+        let ability = this.getAbilityByDigit(digit);
         if (ability) {
             this.isCasting = true;
             this.castingElapsed = 0;
@@ -198,7 +209,7 @@ export class Player extends Entity {
         // server confirms ability can be cast
         this._room.onMessage("entity_ability_cast", (data) => {
             let digit = data.digit;
-            let ability = Abilities.getByDigit(this, digit);
+            let ability = this.getAbilityByDigit(digit);
             if (ability) {
                 // if you are sender, cancel casting and strat cooldown on client
                 if (data.fromId === this.sessionId) {
@@ -224,12 +235,12 @@ export class Player extends Entity {
 
     public async teleport(location) {
         await this._room.leave();
-        global.T5C.currentLocation = Locations[location];
+        global.T5C.currentLocation = dataDB.get('location', location);
         global.T5C.currentLocationKey = location;
         global.T5C.currentCharacter.location = location;
         global.T5C.currentRoomID = "";
         global.T5C.nextScene = State.GAME;
-    }
+    } 
 
     public remove() {
         this.characterLabel.dispose();

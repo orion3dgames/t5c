@@ -5,11 +5,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { ActionManager } from "@babylonjs/core/Actions/actionManager";
 import { ExecuteCodeAction } from "@babylonjs/core/Actions/directActions";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-
-import { Room } from "colyseus.js";
-import { EntityState } from "../../../server/rooms/schema/EntityState";
 import Config from "../../Config";
-import { Race } from "../../Entities/Common/Races";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { Entity } from "../Entity";
 
@@ -86,10 +82,12 @@ export class EntityMesh {
         this._animationGroups = result.animationGroups;
 
         // set initial player scale & rotation
+        
         playerMesh.name = this._entity.sessionId + "_mesh";
         playerMesh.parent = box;
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
         if (this._entity.rotationFix) {
+            console.log(this._entity.rotationFix);
             playerMesh.rotation.set(0, this._entity.rotationFix, 0);
         }
         playerMesh.scaling.set(this._entity.scale, this._entity.scale, this._entity.scale);
@@ -105,7 +103,6 @@ export class EntityMesh {
             // teleport trigger
             let targetMeshes = this._scene.getMeshesByTags("teleport");
             targetMeshes.forEach((mesh) => {
-                console.log(mesh);
                 this.mesh.actionManager.registerAction(
                     new ExecuteCodeAction(
                         {

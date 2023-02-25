@@ -11,7 +11,7 @@ let LocationsDB = {
             z: 0,
             rot: -180,
         },
-        monsters: 10,
+        monsters: 1,
         waterPlane: true,
     },
     lh_dungeon_01: {

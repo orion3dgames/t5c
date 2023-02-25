@@ -8,8 +8,8 @@ import { ParticleSystem } from "@babylonjs/core/Particles/particleSystem";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 
 import State from "../../../client/Screens/Screens";
-import LocationsDB from "../../Data/LocationsDB";
 import { Sound } from "@babylonjs/core/Audio/sound";
+import { dataDB } from "../../Data/dataDB";
 
 export class EntityActions {
     private _scene: Scene;
@@ -159,7 +159,7 @@ export class EntityActions {
 
     public async teleport(room, location) {
         await room.leave();
-        global.T5C.currentLocation = Locations[location];
+        global.T5C.currentLocation = dataDB.get('location', location);
         global.T5C.currentCharacter.location = location;
         global.T5C.nextScene = State.GAME;
     }
