@@ -224,11 +224,10 @@ export class Environment {
         }
 
         // start  music
-        /*
         let soundData = this._loadedAssets['music'];
         let sound = new Sound("music", soundData, this._scene, function(){ sound.play() }, {
             volume: 0.3
-        });*/
+        });
 
         // instantiate the scene
         let key = global.T5C.currentLocation.mesh;
