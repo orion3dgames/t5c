@@ -75,7 +75,7 @@ export class EntityMove {
         // TODO DAYD : make it better
         // maybe look into Scalar.LerpAngle ??? https://doc.babylonjs.com/typedoc/classes/BABYLON.Scalar#LerpAngle
         if (gap > Math.PI) this._mesh.rotation.y = this.nextRotation.y;
-        else this._mesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.2);
+        else this._mesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.8);
     }
 
     public move(input: PlayerInputs): void {
@@ -91,6 +91,7 @@ export class EntityMove {
         let newY = oldY;
         let newZ = oldZ - input.v * speed;
         const newRotY = Math.atan2(input.h, input.v);
+
         // check it fits in navmesh
         if (this.isCurrentPlayer) {
             let sourcePos = new Vector3(oldX, oldY, oldZ); // new pos

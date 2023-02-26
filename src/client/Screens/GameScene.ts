@@ -21,6 +21,7 @@ import { NavMesh } from "../../shared/yuka";
 import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
 import { createConvexRegionHelper, createGraphHelper } from "../../shared/Utils/navMeshHelper";
 import { SceneController } from "../Controllers/Scene";
+import { dataDB } from "../../shared/Data/dataDB";
 
 export class GameScene {
     private _app;
@@ -61,9 +62,9 @@ export class GameScene {
         // if local skip login screen
         if (isLocal()) {
             //let tempLocation = "lh_town";
-            /*
+            
             let tempLocation = "lh_town";
-            global.T5C.currentLocation = Locations[tempLocation];
+            global.T5C.currentLocation = dataDB.get('location', tempLocation);
             let req = await request("get", apiUrl() + "/returnRandomUser");
             let character = JSON.parse(req.data).user;
             global.T5C.currentUser = {
@@ -74,7 +75,7 @@ export class GameScene {
             };
             global.T5C.currentCharacter = character;
             global.T5C.currentCharacter.location = tempLocation;
-            */
+            
         }
         ///////////////////// END DEBUG CODE /////////////////////////////
         ///////////////////// END DEBUG CODE /////////////////////////////

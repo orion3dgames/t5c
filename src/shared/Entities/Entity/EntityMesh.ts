@@ -6,7 +6,7 @@ import { ActionManager } from "@babylonjs/core/Actions/actionManager";
 import { ExecuteCodeAction } from "@babylonjs/core/Actions/directActions";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import Config from "../../Config";
-import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math";
 import { Entity } from "../Entity";
 
 export class EntityMesh {
@@ -31,16 +31,18 @@ export class EntityMesh {
 
     public async load() {
         // create collision cube
-        const box = MeshBuilder.CreateBox(this._entity.sessionId, { width: 2, height: 4, depth: 3 }, this._scene);
+        const box = MeshBuilder.CreateBox(this._entity.sessionId, { width: 2, height: 2, depth: 2 }, this._scene);
         box.visibility = 0;
+        box.setPivotMatrix(Matrix.Translation(0, 1, 0), false);
 
         // set collision mesh
         this.mesh = box;
         this.mesh.isPickable = true;
-        this.mesh.isVisible = false;
+        this.mesh.isVisible = true;
         this.mesh.checkCollisions = true;
         this.mesh.showBoundingBox = true;
         this.mesh.position = new Vector3(this._entity.x, this._entity.y, this._entity.z);
+
         this.mesh.metadata = {
             sessionId: this._entity.sessionId,
             type: this._entity.type,
@@ -74,6 +76,7 @@ export class EntityMesh {
         selectedMesh.isVisible = false;
         selectedMesh.isPickable = false;
         selectedMesh.checkCollisions = false;
+        selectedMesh.position = new Vector3(0,-1,0);
         this.selectedMesh = selectedMesh;
 
         // load player mesh
@@ -87,12 +90,12 @@ export class EntityMesh {
         playerMesh.parent = box;
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
         if (this._entity.rotationFix) {
-            console.log(this._entity.rotationFix);
             playerMesh.rotation.set(0, this._entity.rotationFix, 0);
         }
         playerMesh.scaling.set(this._entity.scale, this._entity.scale, this._entity.scale);
         playerMesh.isPickable = false;
         playerMesh.checkCollisions = false;
+        playerMesh.position = new Vector3(0,-1,0);
         this.playerMesh = playerMesh;
 
         // start action manager
@@ -123,7 +126,7 @@ export class EntityMesh {
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
                 let meshes = ev.meshUnderPointer.getChildMeshes();
-                let mesh = meshes.length === 2 ? meshes[1] : meshes[2];
+                let mesh =  meshes[this._entity.meshIndex];
                 mesh.outlineColor = new Color3(0, 1, 0);
                 mesh.outlineWidth = 3;
                 mesh.renderOutline = true;
@@ -134,7 +137,7 @@ export class EntityMesh {
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
                 let meshes = ev.meshUnderPointer.getChildMeshes();
-                let mesh = meshes.length === 2 ? meshes[1] : meshes[2];
+                let mesh =  meshes[this._entity.meshIndex];
                 mesh.renderOutline = false;
             })
         );

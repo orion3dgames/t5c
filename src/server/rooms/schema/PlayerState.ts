@@ -8,7 +8,7 @@ import { moveCTRL } from "../ctrl/moveCTRL";
 
 export class PlayerState extends EntityState {
     // networked player specific
-    @type("uint8") public gold: number = 0;
+    
     @type("uint8") public strength: number = 0;
     @type("uint8") public endurance: number = 0;
     @type("uint8") public agility: number = 0;
@@ -79,7 +79,8 @@ export class PlayerState extends EntityState {
 
     ressurect() {
         this.isDead = false;
-        this.health = 100;
+        this.health = this.maxHealth;
+        this.mana = this.maxMana;
         this.blocked = false;
         this.state = EntityCurrentState.IDLE;
         this.gracePeriod = true;

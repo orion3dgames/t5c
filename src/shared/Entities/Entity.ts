@@ -70,6 +70,7 @@ export class Entity {
 
     // raceData
     public rotationFix;
+    public meshIndex;
     public scale;
     public animationSpeed;
 

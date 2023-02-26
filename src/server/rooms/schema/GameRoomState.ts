@@ -147,7 +147,7 @@ export class GameRoomState extends Schema {
 
             level: data.level,
             experience: data.experience,
-            gold: 0,
+            gold: data.gold,
 
             strength: 15,
             endurance: 16,

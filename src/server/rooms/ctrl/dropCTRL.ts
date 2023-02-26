@@ -52,7 +52,7 @@ export class dropCTRL {
             let gold = Math.floor(randomNumberInRange(goldGains.min, goldGains.max));
             this._owner.gold += gold;
 
-            Logger.info(`[gameroom][addExperience] player has gained ${gold} gold`);
+            Logger.info(`[gameroom][addGold] player has gained ${gold} gold, total: ${this._owner.gold}`);
 
             // inform player
             this._client.send("notification", {

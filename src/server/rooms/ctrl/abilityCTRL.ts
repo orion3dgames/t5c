@@ -31,7 +31,6 @@ export class abilitiesCTRL {
             const skill = this.abilitiesDB[link.key];
             this.abilities.push(new Ability(skill));
         }
-        console.log(this.abilities);
     }
 
     public update() {}
@@ -176,10 +175,10 @@ export class abilitiesCTRL {
     }
 
     // process caster affected properties
-    affectCaster(ability) {
+    affectCaster(owner, ability) {
         for (let p in ability.casterPropertyAffected) {
             let property = ability.casterPropertyAffected[p];
-            this[p] -= property;
+            owner[p] -= property;
         }
     }
 
@@ -216,7 +215,7 @@ export class abilitiesCTRL {
             target.setTarget(owner);
         }
 
-        this.affectCaster(ability);
+        this.affectCaster(owner, ability);
 
         if (ability.repeat > 0) {
             let repeat = 1;

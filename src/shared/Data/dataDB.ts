@@ -1,6 +1,7 @@
 import { AbilitiesDB } from "./AbilitiesDB";
 import { RacesDB } from "./RacesDB";
 import { LocationsDB } from "./LocationsDB";
+import { ItemsDB } from "./ItemDB";
 
 export class dataDB {
     public static get(type, key) {
@@ -14,6 +15,9 @@ export class dataDB {
                 break;
             case "location":
                 returnData = LocationsDB[key] ?? false;
+                break;
+            case "item":
+                returnData = ItemsDB[key] ?? false;
                 break;
             case "":
                 returnData = false;
@@ -34,6 +38,8 @@ export class dataDB {
             case "locations":
                 returnData = LocationsDB ?? false;
                 break;
+            case "item":
+                returnData = ItemsDB ?? false;
             case "":
                 returnData = false;
                 break;

@@ -6,6 +6,7 @@ type Race = {
     scale: number;
     rotationFix: number;
     animationSpeed: number;
+    meshIndex: number;
     animations: {
         [key: string]: number;
     };
@@ -30,6 +31,7 @@ let RacesDB: raceDataMap = {
         scale: 0.02,
         rotationFix: 0,
         animationSpeed: 1.3,
+        meshIndex: 2,
         animations: {
             IDLE: 3,
             WALK: 6,
@@ -52,6 +54,7 @@ let RacesDB: raceDataMap = {
         scale: 0.02,
         rotationFix: 3.14,
         animationSpeed: 1,
+        meshIndex: 3,
         animations: {
             IDLE: 0,
             WALK: 3,
@@ -74,6 +77,7 @@ let RacesDB: raceDataMap = {
         scale: 0.0125,
         rotationFix: 3.14,
         animationSpeed: 1,
+        meshIndex: 3,
         animations: {
             IDLE: 5,
             WALK: 6,

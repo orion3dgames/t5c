@@ -308,11 +308,11 @@ class Database {
         if (data.experience) {
             p["experience"] = data.experience;
         }
-        if (data.health) {
-            p["health"] = data.health;
+        if (data.maxHealth) {
+            p["health"] = data.maxHealth;
         }
-        if (data.mana) {
-            p["mana"] = data.mana;
+        if (data.maxMana) {
+            p["mana"] = data.maxMana;
         }
         if (data.gold) {
             p["gold"] = data.gold;

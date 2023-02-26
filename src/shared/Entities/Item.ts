@@ -14,6 +14,7 @@ import { UserInterface } from "../../client/Controllers/UserInterface";
 import { PlayerInput } from "../../client/Controllers/PlayerInput";
 
 import Config from "../Config";
+import { dataDB } from "../Data/dataDB";
 
 export class Item {
     public _scene: Scene;
@@ -30,6 +31,7 @@ export class Item {
     public characterLabel: Rectangle;
 
     public name: string = "";
+    public key: string;
     public x: number;
     public y: number;
     public z: number;
@@ -42,7 +44,7 @@ export class Item {
     // flags
     public blocked: boolean = false; // if true, player will not moved
 
-    constructor(entity: EntityState, room: Room, scene: Scene, ui: UserInterface, shadow: CascadedShadowGenerator, _loadedAssets: AssetContainer[]) {
+    constructor(entity, room: Room, scene: Scene, ui: UserInterface, shadow: CascadedShadowGenerator, _loadedAssets: AssetContainer[]) {
         // setup class variables
         this._scene = scene;
         this._room = room;
@@ -51,6 +53,9 @@ export class Item {
         this._shadow = shadow;
         this.sessionId = entity.sessionId;
         this.entity = entity;
+
+        // update player data from server data
+        Object.assign(this, dataDB.get("item", entity.key));
 
         // update player data from server data
         Object.assign(this, this.entity);
@@ -99,24 +104,26 @@ export class Item {
         // register hover over player
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
-                let mesh = ev.meshUnderPointer;
-                mesh.renderOutline = true;
+                let meshes = ev.meshUnderPointer.getChildMeshes();
+                let mesh =  meshes[this.entity.meshIndex];
                 mesh.outlineColor = new Color3(0, 1, 0);
                 mesh.outlineWidth = 3;
+                mesh.renderOutline = true;
             })
         );
 
         // register hover out player
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
-                let mesh = ev.meshUnderPointer;
+                let meshes = ev.meshUnderPointer.getChildMeshes();
+                let mesh =  meshes[this.entity.meshIndex];
                 mesh.renderOutline = false;
             })
         );
 
         //////////////////////////////////////////////////////////////////////////
         // misc
-        //this.characterLabel = this.ui.createEntityLabel(this);
+        this.characterLabel = this.ui.createEntityLabel(this);
     }
 
     public update(delta) {}

@@ -101,6 +101,7 @@ export class UI_Debug {
         locationText += "Total Entities: "+(countPlayers(this._entities) + 1)+" \n";
         locationText += "FPS: "+roundTo(this._engine.getFps(), 0)+" \n";
         locationText += "Ping: "+this.ping+"ms\n";
+        locationText += "Gold: "+this._currentPlayer.gold+"\n";
         this._debugTextUI.text = locationText;
     }
 

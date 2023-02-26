@@ -19,7 +19,7 @@ export class EntityState extends Schema {
     @type("number") public x: number = 0;
     @type("number") public y: number = 0;
     @type("number") public z: number = 0;
-    @type("int16") public rot: number = 0;
+    @type("number") public rot: number = 0;
 
     // player details
     @type("int16") public health: number = 0;
@@ -28,6 +28,7 @@ export class EntityState extends Schema {
     @type("int16") public maxMana: number = 0;
     @type("uint8") public level: number = 0;
     @type("uint32") public experience: number = 0;
+    @type("uint32") public gold: number = 0;
 
     public manaRegen: number = 0;
     public healthRegen: number = 0;
