@@ -38,7 +38,7 @@ export class GameRoomState extends Schema {
         let monsterTypes = ["monster_unicorn", "monster_bear"];
 
         // random id
-        let sessionId = nanoid();
+        let sessionId = nanoid(10);
 
         // get starting starting position
         let randomRegion = this.navMesh.getRandomRegion();

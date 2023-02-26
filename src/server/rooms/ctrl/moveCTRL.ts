@@ -4,6 +4,8 @@ import { Vector3 } from "../../../shared/yuka";
 
 import { PlayerInputs } from "../../../shared/types";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
+import { EnemyState } from "../schema/EnemyState";
+import { ItemState } from "../schema/ItemState";
 
 export class moveCTRL {
     private _owner;
@@ -23,10 +25,15 @@ export class moveCTRL {
             let start = this._owner.getPosition();
             let destination = this._owner.AI_CURRENT_TARGET_POSITION;
             let distance = this._owner.AI_CURRENT_TARGET_DISTANCE;
-            if (distance < 4) {
+            if (distance < 3) {
                 let ability = this._owner.AI_CURRENT_ABILITY;
                 let target = this._owner.AI_CURRENT_TARGET;
-                this._owner.abilitiesCTRL.startAutoAttack(this._owner, target, ability);
+                if(target instanceof EnemyState){
+                    this._owner.abilitiesCTRL.startAutoAttack(this._owner, target, ability);
+                }
+                if(target instanceof ItemState){
+                    this._owner._gameroom.state.items.delete(target.sessionId);
+                }
                 this._owner.AI_CURRENT_TARGET = null;
                 this._owner.AI_CURRENT_ABILITY = null;
             } else {

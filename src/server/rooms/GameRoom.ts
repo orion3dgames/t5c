@@ -142,6 +142,15 @@ export class GameRoom extends Room<GameRoomState> {
             }
         });
 
+        this.onMessage("pickup_item", (client, data) => {
+            const playerState: PlayerState = this.state.players.get(client.sessionId);
+            const itemState = this.state.items.get(data.sessionId);
+            if (playerState && itemState) {
+                playerState.setTarget(itemState);
+                //this.state.items.delete(data.sessionId);
+            }
+        });
+
         /////////////////////////////////////
         // on player input
         this.onMessage("playerInput", (client, playerInput: PlayerInputs) => {
@@ -196,13 +205,12 @@ export class GameRoom extends Room<GameRoomState> {
 
             if (data.digit === 5) {
                 // create drops
-                let sessionId = nanoid();
+                let sessionId = nanoid(10);
                 let currentPosition = sender.getPosition();
                 currentPosition.x += randomNumberInRange(0.1, 1.5);
                 currentPosition.z += randomNumberInRange(0.1, 1.5);
                 let data = {
                     key: "apple",
-                    name: "Apple",
                     sessionId: sessionId,
                     x: currentPosition.x,
                     y: 0.25,

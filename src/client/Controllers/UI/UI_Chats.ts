@@ -10,7 +10,8 @@ import Config from "../../../shared/Config";
 
 export class UI_Chats {
     private _playerUI;
-    private _chatUI;
+    private _chatUI:StackPanel;
+    private _chatUIScroll:ScrollViewer;
     private _chatRoom;
     private _currentPlayer;
     private _entities;
@@ -90,6 +91,7 @@ export class UI_Chats {
         chatScrollViewer.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         chatScrollViewer.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         chatPanel.addControl(chatScrollViewer);
+        this._chatUIScroll = chatScrollViewer;
 
         // add stack panel
         const chatStackPanel = new StackPanel("chatStackPanel");
@@ -209,9 +211,10 @@ export class UI_Chats {
             element.dispose();
         });
 
+        this._chatUIScroll.verticalBar.value = 1;
+
         this.messages
             .slice()
-            .reverse()
             .forEach((msg: PlayerMessage) => {
                 // container
                 var headlineRect = new Rectangle("chatMsgRect_" + msg.createdAt);
@@ -244,4 +247,6 @@ export class UI_Chats {
                 headlineRect.addControl(roomTxt);
             });
     }
+
+    
 }

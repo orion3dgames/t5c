@@ -210,6 +210,10 @@ export class GameScene {
         this.room.state.items.onAdd((entity, sessionId) => {
             this.items[sessionId] = new Item(entity, this.room, this._scene, this._ui, this._shadow, this._loadedAssets);
         });
+        this.room.state.items.onRemove((player, sessionId) => {
+            this.items[sessionId].remove();
+            delete this.items[sessionId];
+        });
 
         // when a player leaves the room event
         this.room.state.players.onRemove((player, sessionId) => {

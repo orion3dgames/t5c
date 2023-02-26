@@ -67,7 +67,7 @@ export class dropCTRL {
         let loot = GetLoot(target.drops);
         loot.forEach((drop) => {
             // drop item on the ground
-            let sessionId = nanoid();
+            let sessionId = nanoid(10);
             let currentPosition = target.getPosition();
             currentPosition.x += randomNumberInRange(0.1, 1.5);
             currentPosition.z += randomNumberInRange(0.1, 1.5);

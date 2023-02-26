@@ -5,10 +5,11 @@ import { EntityState } from "../schema/EntityState";
 import { GameRoom } from "../GameRoom";
 import { abilitiesCTRL } from "../ctrl/abilityCTRL";
 import { moveCTRL } from "../ctrl/moveCTRL";
+import { dataDB } from "../../../shared/Data/dataDB";
 
 export class PlayerState extends EntityState {
     // networked player specific
-    
+    @type("uint32") public gold: number = 0;
     @type("uint8") public strength: number = 0;
     @type("uint8") public endurance: number = 0;
     @type("uint8") public agility: number = 0;
@@ -25,6 +26,10 @@ export class PlayerState extends EntityState {
 
     constructor(gameroom: GameRoom, data, ...args: any[]) {
         super(gameroom, data, args);
+
+        Object.assign(this, data);
+        Object.assign(this, dataDB.get("race", this.race));
+
         this.abilitiesCTRL = new abilitiesCTRL(this);
         this.moveCTRL = new moveCTRL(this);
 

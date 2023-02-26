@@ -15,6 +15,8 @@ import { PlayerInput } from "../../client/Controllers/PlayerInput";
 
 import Config from "../Config";
 import { dataDB } from "../Data/dataDB";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 
 export class Item {
     public _scene: Scene;
@@ -40,6 +42,7 @@ export class Item {
     // raceData
     public rotationFix;
     public scale: number = 1;
+    public meshIndex: number = 0;
 
     // flags
     public blocked: boolean = false; // if true, player will not moved
@@ -65,6 +68,25 @@ export class Item {
     }
 
     public async spawn(entity) {
+
+        const box = MeshBuilder.CreateBox(this.entity.sessionId, { width: 1, height: 1, depth: 1 }, this._scene);
+        box.visibility = 0.5;
+
+        // set collision mesh
+        this.mesh = box;
+        this.mesh.isPickable = true;
+        this.mesh.isVisible = true;
+        this.mesh.checkCollisions = true;
+        this.mesh.showBoundingBox = true;
+        this.mesh.position = new Vector3(this.entity.x, this.entity.y, this.entity.z);
+
+        this.mesh.metadata = {
+            sessionId: this.entity.sessionId,
+            type: 'item',
+            key: this.key,
+            name: this.entity.name,
+        };
+
         // load player mesh
         const result = await this._loadedAssets[entity.key].instantiateModelsToScene();
         const playerMesh = result.rootNodes[0];
@@ -79,7 +101,6 @@ export class Item {
         playerMesh.isPickable = true;
         playerMesh.checkCollisions = false;
         playerMesh.parent = this.mesh;
-        this.mesh = playerMesh;
 
         // add mesh to shadow generator
         //this._shadow.addShadowCaster(this.mesh, true);
@@ -102,10 +123,11 @@ export class Item {
         this.mesh.actionManager = new ActionManager(this._scene);
 
         // register hover over player
+        console.log(this.meshIndex);
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
                 let meshes = ev.meshUnderPointer.getChildMeshes();
-                let mesh =  meshes[this.entity.meshIndex];
+                let mesh =  meshes[this.meshIndex];
                 mesh.outlineColor = new Color3(0, 1, 0);
                 mesh.outlineWidth = 3;
                 mesh.renderOutline = true;
@@ -116,8 +138,18 @@ export class Item {
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
                 let meshes = ev.meshUnderPointer.getChildMeshes();
-                let mesh =  meshes[this.entity.meshIndex];
+                let mesh =  meshes[this.meshIndex];
                 mesh.renderOutline = false;
+            })
+        );
+
+         // register hover out player
+         this.mesh.actionManager.registerAction(
+            new ExecuteCodeAction(ActionManager.OnLeftPickTrigger, (ev) => {
+                let item = ev.meshUnderPointer.metadata;
+                this._room.send("pickup_item", {  
+                    sessionId: item.sessionId
+                });
             })
         );
 

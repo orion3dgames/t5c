@@ -28,7 +28,6 @@ export class EntityState extends Schema {
     @type("int16") public maxMana: number = 0;
     @type("uint8") public level: number = 0;
     @type("uint32") public experience: number = 0;
-    @type("uint32") public gold: number = 0;
 
     public manaRegen: number = 0;
     public healthRegen: number = 0;
