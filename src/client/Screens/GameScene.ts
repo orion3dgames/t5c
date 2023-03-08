@@ -62,9 +62,8 @@ export class GameScene {
         // if local skip login screen
         if (isLocal()) {
             //let tempLocation = "lh_town";
-            
             let tempLocation = "lh_town";
-            global.T5C.currentLocation = dataDB.get('location', tempLocation);
+            global.T5C.currentLocation = dataDB.get("location", tempLocation);
             let req = await request("get", apiUrl() + "/returnRandomUser");
             let character = JSON.parse(req.data).user;
             global.T5C.currentUser = {
@@ -75,7 +74,6 @@ export class GameScene {
             };
             global.T5C.currentCharacter = character;
             global.T5C.currentCharacter.location = tempLocation;
-            
         }
         ///////////////////// END DEBUG CODE /////////////////////////////
         ///////////////////// END DEBUG CODE /////////////////////////////
@@ -173,11 +171,10 @@ export class GameScene {
             //////////////////
             // if player type
             if (entity.type === "player" && isCurrentPlayer) {
-
                 // terrible way... i'm just not sure what is the best way yet...
                 entity.abilities = character.abilities;
                 entity.inventory = character.inventory;
-                
+
                 // create player entity
                 let _player = new Player(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._loadedAssets, this._input);
 
@@ -238,7 +235,6 @@ export class GameScene {
         let sequence = 0;
         let latestInput: PlayerInputs;
         this._scene.registerBeforeRender(() => {
-
             let delta = this._app.engine.getFps();
 
             // entities update
