@@ -1,4 +1,4 @@
-import { type } from "@colyseus/schema";
+import { Schema, ArraySchema, type } from "@colyseus/schema";
 import Config from "../../../shared/Config";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { EntityState } from "../schema/EntityState";
@@ -6,6 +6,11 @@ import { GameRoom } from "../GameRoom";
 import { abilitiesCTRL } from "../ctrl/abilityCTRL";
 import { moveCTRL } from "../ctrl/moveCTRL";
 import { dataDB } from "../../../shared/Data/dataDB";
+
+class Item extends Schema {
+    @type("number") key: string = "";
+    @type("uint16") qty: number = 0;
+}
 
 export class PlayerState extends EntityState {
     // networked player specific
@@ -15,6 +20,7 @@ export class PlayerState extends EntityState {
     @type("uint8") public agility: number = 0;
     @type("uint8") public intelligence: number = 0;
     @type("uint8") public wisdom: number = 0;
+    @type([Item]) public inventory = new ArraySchema<Item>();
 
     //
     public gracePeriod: boolean = true;

@@ -3,7 +3,6 @@ import { dataDB } from "../../../shared/Data/dataDB";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { NavMesh } from "../../../shared/yuka";
 import { Vector3 } from "../../../shared/yuka";
-import { PlayerState } from "./PlayerState";
 
 export class EntityState extends Schema {
     // id and name
