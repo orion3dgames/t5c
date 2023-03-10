@@ -62,5 +62,6 @@ declare global {
         selectedEntity: Entity;
         locale: "en";
         currentMs: number;
+        camY: number;
     }
 }

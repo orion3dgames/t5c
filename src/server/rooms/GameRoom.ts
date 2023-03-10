@@ -13,12 +13,18 @@ import { randomNumberInRange } from "../../shared/Utils";
 import { ItemState } from "./schema/ItemState";
 import { dataDB } from "../../shared/Data/dataDB";
 
+import { Dispatcher } from "@colyseus/command";
+
+import { OnPlayerAuthCommand, OnPlayerJoinCommand } from "./commands";
+
 export class GameRoom extends Room<GameRoomState> {
     public maxClients = 64;
     public autoDispose = false;
     public database: any;
     public delayedInterval!: Delayed;
     public navMesh: NavMesh;
+
+    dispatcher = new Dispatcher(this);
 
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
@@ -73,46 +79,22 @@ export class GameRoom extends Room<GameRoomState> {
         }, Config.databaseUpdateRate);
     }
 
-    public onBeforePatch(state) {}
-
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     // authorize client based on provided options before WebSocket handshake is complete
-    async onAuth(client: Client, data: any, request: http.IncomingMessage) {
-        // try to find char
-        const character = await this.database.getCharacter(data.character_id);
-
-        // if no character found, then refuse auth
-        if (!character) {
-            Logger.error("[gameroom][onAuth] client could not authentified, joining failed.", data.character_id);
-            return false;
-        }
-
-        // character found, check if already logged in
-        if (character.online > 0) {
-            Logger.error("[gameroom][onAuth] client already connected. ", character);
-            return false;
-        }
-
-        // all checks are good, proceed
-        Logger.info("[gameroom][onAuth] client authentified.", character);
-        return character;
+    async onAuth(client: Client, authData: any, request: http.IncomingMessage) {
+        const character = await this.database.getCharacter(authData.character_id);
+        const auth = this.dispatcher.dispatch(new OnPlayerAuthCommand(), character);
+        console.log(auth);
+        return auth;
     }
 
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     // on client join
-    async onJoin(client: Client, options: any) {
-        // add player to server
-        Logger.info(`[gameroom][onJoin] player ${client.sessionId} joined room ${this.roomId}.`, options);
-
-        // add player using auth data
-        this.state.addPlayer(client.sessionId, client.auth);
-        this.database.toggleOnlineStatus(client.auth.id, 1);
-        Logger.info(`[gameroom][onJoin] player added `);
-    }
+    async onJoin(client: Client, options: any) {}
 
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
@@ -169,7 +151,7 @@ export class GameRoom extends Room<GameRoomState> {
 
             if (playerState) {
                 // update player location in database
-                let newLocation = dataDB.get('location', location);
+                let newLocation = dataDB.get("location", location);
                 let updateObj = {
                     location: newLocation.key,
                     x: newLocation.spawnPoint.x,
@@ -283,6 +265,9 @@ export class GameRoom extends Room<GameRoomState> {
     //////////////////////////////////////////////////////////////////////////
     // cleanup callback, called after there are no more clients in the room. (see `autoDispose`)
     onDispose() {
+        // stop dispatcher
+        this.dispatcher.stop();
+
         //log
         Logger.warning(`[onDispose] game room removed. `);
     }

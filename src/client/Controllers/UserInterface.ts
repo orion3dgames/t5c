@@ -49,15 +49,7 @@ export class UserInterface {
     // revive panel
     public revivePanel;
 
-    constructor(
-        scene: Scene,
-        engine: Engine,
-        gameRoom: Room,
-        chatRoom: Room,
-        entities: Entity[],
-        currentPlayer,
-        _loadedAssets
-    ) {
+    constructor(scene: Scene, engine: Engine, gameRoom: Room, chatRoom: Room, entities: Entity[], currentPlayer, _loadedAssets) {
         // set var we will be needing
         this._scene = scene;
         this._engine = engine;
@@ -85,6 +77,7 @@ export class UserInterface {
         centerPanel.thickness = 0;
         centerPanel.background = Config.UI_CENTER_PANEL_BG;
         centerPanel.alpha = 1;
+        centerPanel.isPointerBlocker = true;
         centerPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         centerPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         this._playerUI.addControl(centerPanel);
@@ -118,14 +111,7 @@ export class UserInterface {
         this._UIChat = new UI_Chats(this._centerUI, this._chatRoom, currentPlayer, this._entities);
 
         // create debug ui + events
-        this._UIDebug = new UI_Debug(
-            this._playerUI,
-            this._engine,
-            this._scene,
-            this._gameRoom,
-            this._currentPlayer,
-            this._entities
-        );
+        this._UIDebug = new UI_Debug(this._playerUI, this._engine, this._scene, this._gameRoom, this._currentPlayer, this._entities);
 
         // create selected entity panel
         this._UITargetSelected = new UI_EntitySelected(this._playerUI, this._scene, {
@@ -247,6 +233,7 @@ export class UserInterface {
         revivePanel.thickness = 1;
         revivePanel.background = Config.UI_CENTER_PANEL_BG;
         revivePanel.isVisible = false;
+        revivePanel.isPointerBlocker = true;
         revivePanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
         revivePanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         this._playerUI.addControl(revivePanel);

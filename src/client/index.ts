@@ -24,6 +24,8 @@ import Config from "../shared/Config";
 import { Network } from "./Controllers/Network";
 import { Loading } from "./Controllers/Loading";
 import { dataDB } from "./../shared/Data/dataDB";
+import { PlayerLocation, PlayerUser, PlayerCharacter } from "../shared/types";
+import { Entity } from "../shared/Entities/Entity";
 
 // App class is our entire game application
 class App {
@@ -39,12 +41,18 @@ class App {
     public nextScene;
 
     // custom data
-    public currentUser;
-    public currentPlayer;
-    public currentRoomID;
-    public currentSessionID;
-    public currentLocation;
-    public metaData: any;
+    public metaData: {
+        nextScene: State;
+        currentRoomID: string;
+        currentSessionID: string;
+        currentLocation: PlayerLocation;
+        currentUser: PlayerUser;
+        currentCharacter: PlayerCharacter;
+        selectedEntity: Entity;
+        locale: "en";
+        currentMs: number;
+        camY: number;
+    };
 
     constructor() {
         // create canvas
@@ -149,8 +157,8 @@ class App {
             currentLocation: dataDB.get("location", Config.initialLocation),
             currentUser: false,
             currentMs: 0,
+            camY: 0,
         };
-        global.camY = 0;
     }
 
     private checkForSceneChange() {

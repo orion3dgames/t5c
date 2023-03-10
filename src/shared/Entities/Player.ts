@@ -108,7 +108,7 @@ export class Player extends Entity {
     public update(delta) {
         if (this && this.moveController) {
             // global camera rotation
-            global.camY = this.cameraController._camRoot.rotation.y;
+            global.T5C.camY = this.cameraController._camRoot.rotation.y;
 
             // tween entity
             this.moveController.tween();
@@ -164,10 +164,10 @@ export class Player extends Entity {
         }
     }
 
-    public getAbilityByDigit(digit){
-        let link = this.abilities[(digit-1)];
-        if(link){
-            return dataDB.get('ability', link.key);
+    public getAbilityByDigit(digit) {
+        let link = this.abilities[digit - 1];
+        if (link) {
+            return dataDB.get("ability", link.key);
         }
         return false;
     }
@@ -235,12 +235,12 @@ export class Player extends Entity {
 
     public async teleport(location) {
         await this._room.leave();
-        global.T5C.currentLocation = dataDB.get('location', location);
+        global.T5C.currentLocation = dataDB.get("location", location);
         global.T5C.currentLocationKey = location;
         global.T5C.currentCharacter.location = location;
         global.T5C.currentRoomID = "";
         global.T5C.nextScene = State.GAME;
-    } 
+    }
 
     public remove() {
         this.characterLabel.dispose();
