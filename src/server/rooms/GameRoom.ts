@@ -15,7 +15,7 @@ import { dataDB } from "../../shared/Data/dataDB";
 
 import { Dispatcher } from "@colyseus/command";
 
-import { OnPlayerAuthCommand, OnPlayerJoinCommand } from "./commands";
+import { OnPlayerJoinCommand, Auth } from "./commands";
 
 export class GameRoom extends Room<GameRoomState> {
     public maxClients = 64;
@@ -84,9 +84,7 @@ export class GameRoom extends Room<GameRoomState> {
     //////////////////////////////////////////////////////////////////////////
     // authorize client based on provided options before WebSocket handshake is complete
     async onAuth(client: Client, authData: any, request: http.IncomingMessage) {
-        const character = await this.database.getCharacter(authData.character_id);
-        //const auth = this.dispatcher.dispatch(new OnPlayerAuthCommand(), character);
-        return character;
+        return await Auth.check(this.database, authData);
     }
 
     //////////////////////////////////////////////////////////////////////////

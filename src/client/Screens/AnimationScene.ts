@@ -132,7 +132,7 @@ export class AnimationScene {
         // load scene
         this._scene = scene;
 
-        let result = await SceneLoader.ImportMeshAsync("", "./models/", "NPC_AllModels_Prefab.glb", scene);
+        let result = await SceneLoader.ImportMeshAsync("", "./models/", "player.glb", scene);
         console.log(result);
 
         result.geometries.forEach(element => {

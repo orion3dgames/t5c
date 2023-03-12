@@ -1,9 +1,11 @@
 import { Command } from "@colyseus/command";
-import { GameRoom } from "../../GameRoom";
-import Logger from "../../../../shared/Logger";
+import { GameRoom } from "../GameRoom";
+import Logger from "../../../shared/Logger";
 
-class OnPlayerAuthCommand extends Command<GameRoom, { character: any }> {
-    execute(character) {
+class Auth{
+    static async check(db, authData) {
+
+        const character = await db.getCharacter(authData.character_id);
 
         if (!character) {
             Logger.error("[gameroom][onAuth] client could not authentified, joining failed.", character.character_id);
@@ -22,4 +24,4 @@ class OnPlayerAuthCommand extends Command<GameRoom, { character: any }> {
     }
 }
 
-export { OnPlayerAuthCommand };
+export { Auth };

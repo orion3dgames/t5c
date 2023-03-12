@@ -1,5 +1,5 @@
 import { OnPlayerJoinCommand } from "./players/OnPlayerJoinCommand";
-import { OnPlayerAuthCommand } from "./players/OnPlayerAuthCommand";
+import { Auth } from "./Auth";
 import { CreateRandomEnemy } from "./entity/CreateRandomEnemy";
 
-export { OnPlayerJoinCommand, OnPlayerAuthCommand, CreateRandomEnemy };
+export { OnPlayerJoinCommand, Auth, CreateRandomEnemy };
