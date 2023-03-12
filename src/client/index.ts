@@ -20,6 +20,7 @@ import State from "./Screens/Screens";
 import { GameScene } from "./Screens/GameScene";
 import { LoginScene } from "./Screens/LoginScene";
 import { CharacterSelectionScene } from "./Screens/CharacterSelection";
+import { AnimationScene } from "./Screens/AnimationScene";
 import Config from "../shared/Config";
 import { Network } from "./Controllers/Network";
 import { Loading } from "./Controllers/Loading";
@@ -115,6 +116,17 @@ class App {
                 case State.GAME:
                     this.clearScene();
                     this.currentScene = new GameScene();
+                    this.currentScene.createScene(this);
+                    this.scene = this.currentScene._scene;
+                    this.state = State.NULL;
+                    break;
+
+                    
+                ///////////////////////////////////////
+                // ANIMATION SCENE
+                case State.ANIMATION:
+                    this.clearScene();
+                    this.currentScene = new AnimationScene();
                     this.currentScene.createScene(this);
                     this.scene = this.currentScene._scene;
                     this.state = State.NULL;

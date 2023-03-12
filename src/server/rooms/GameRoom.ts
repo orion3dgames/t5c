@@ -85,16 +85,17 @@ export class GameRoom extends Room<GameRoomState> {
     // authorize client based on provided options before WebSocket handshake is complete
     async onAuth(client: Client, authData: any, request: http.IncomingMessage) {
         const character = await this.database.getCharacter(authData.character_id);
-        const auth = this.dispatcher.dispatch(new OnPlayerAuthCommand(), character);
-        console.log(auth);
-        return auth;
+        //const auth = this.dispatcher.dispatch(new OnPlayerAuthCommand(), character);
+        return character;
     }
 
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     // on client join
-    async onJoin(client: Client, options: any) {}
+    async onJoin(client: Client, options: any) {
+        this.dispatcher.dispatch(new OnPlayerJoinCommand(), { client: client});
+    }
 
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
@@ -209,23 +210,6 @@ export class GameRoom extends Room<GameRoomState> {
             Logger.info(`[gameroom][entity_ability_key] player action processed`, data);
         });
 
-        /////////////////////////////////////
-        // player move to
-        /*
-        this.onMessage("player_moveTo", (client, data: any) => {
-
-            // get players involved
-            let player:PlayerState = this.state.players[client.sessionId];
-           
-            if(!player) throw new Error('sender does not exists!');
-
-            // set destination
-            let from = new Vector3(player.x, player.y, player.z);
-            let destination = new Vector3(data.to._x, data.to._y, data.to._z);
-            player.toRegion = this.navMesh.getClosestRegion( destination );
-            player.destinationPath = this.navMesh.findPath(from, destination);
-
-        });*/
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -233,31 +217,18 @@ export class GameRoom extends Room<GameRoomState> {
     //////////////////////////////////////////////////////////////////////////
     // when a client leaves the room
     async onLeave(client: Client, consented: boolean) {
-        /*
-		try {
-			if (consented) {
-				throw new Error('consented leave!');
-			}
 
-			//throw new Error('DEBUG force no reconnection check');
-
-			console.log("let's wait for reconnection for client: " + client.sessionId);
-			const newClient: Client = await this.allowReconnection(client, 3);
-			console.log('reconnected! client: ' + newClient.sessionId);
-
-		} catch (e) {
-			Logger.info(`[onLeave] player ${client.auth.name} left`);
-
-			this.state.players.delete(client.sessionId);
-            this.database.toggleOnlineStatus(client.auth.id, 0);
-		}
-        */
-
-        Logger.info(`[onLeave] player ${client.auth.name} left`);
-
+        // remove from state
         this.state.players.delete(client.sessionId);
+        
+        // colyseus client leave
         client.leave();
+
+        // set character as not online
         this.database.toggleOnlineStatus(client.auth.id, 0);
+
+        // log
+        Logger.info(`[onLeave] player ${client.auth.name} left`);
     }
 
     //////////////////////////////////////////////////////////////////////////

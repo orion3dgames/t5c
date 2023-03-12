@@ -1,22 +1,18 @@
 import { Command } from "@colyseus/command";
+import { Client } from "@colyseus/core";
 import { GameRoom } from "../../GameRoom";
 import Logger from "../../../../shared/Logger";
 import { PlayerState } from "../../schema/PlayerState";
 import { EntityCurrentState } from "../../../../shared/Entities/Entity/EntityCurrentState";
 
-class OnPlayerJoinCommand extends Command<
-    GameRoom,
-    {
-        sessionId: string;
-    }
-> {
-    execute({ sessionId, client }) {
+class OnPlayerJoinCommand extends Command<GameRoom,{client: Client}> {
+    execute({ client }) {
         this.payload;
         // prepare player data
         let data = client.auth;
         let player = {
             id: data.id,
-            sessionId: sessionId,
+            sessionId: client.sessionId,
             type: "player",
             race: "player_hobbit",
             name: data.name,
@@ -45,7 +41,7 @@ class OnPlayerJoinCommand extends Command<
             abilities: data.abilities,
             inventory: data.inventory,
         };
-        this.state.players.set(sessionId, new PlayerState(this.room, player));
+        this.state.players.set(client.sessionId, new PlayerState(this.room, player));
 
         // set player as online
         //database.toggleOnlineStatus(client.auth.id, 1);

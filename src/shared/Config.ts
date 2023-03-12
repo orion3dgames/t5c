@@ -33,7 +33,7 @@ let Config = {
 
     // default scene
     //defaultScene: isLocal() ? State.GAME : State.LOGIN,
-    defaultScene: State.GAME,
+    defaultScene: State.ANIMATION,
 };
 
 export default Config;
