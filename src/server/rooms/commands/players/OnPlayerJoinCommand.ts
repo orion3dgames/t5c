@@ -5,7 +5,7 @@ import Logger from "../../../../shared/Logger";
 import { PlayerState } from "../../schema/PlayerState";
 import { EntityCurrentState } from "../../../../shared/Entities/Entity/EntityCurrentState";
 
-class OnPlayerJoinCommand extends Command<GameRoom,{client: Client}> {
+class OnPlayerJoinCommand extends Command<GameRoom, { client: Client }> {
     execute({ client }) {
         this.payload;
         // prepare player data
