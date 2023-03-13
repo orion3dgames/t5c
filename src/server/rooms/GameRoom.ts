@@ -14,7 +14,6 @@ import { ItemState } from "./schema/ItemState";
 import { dataDB } from "../../shared/Data/dataDB";
 
 import { Dispatcher } from "@colyseus/command";
-
 import { OnPlayerJoinCommand, Auth } from "./commands";
 
 export class GameRoom extends Room<GameRoomState> {
@@ -92,7 +91,7 @@ export class GameRoom extends Room<GameRoomState> {
     //////////////////////////////////////////////////////////////////////////
     // on client join
     async onJoin(client: Client, options: any) {
-        this.dispatcher.dispatch(new OnPlayerJoinCommand(), { client: client});
+        this.dispatcher.dispatch(new OnPlayerJoinCommand(), { client: client });
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -207,7 +206,6 @@ export class GameRoom extends Room<GameRoomState> {
 
             Logger.info(`[gameroom][entity_ability_key] player action processed`, data);
         });
-
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -215,10 +213,9 @@ export class GameRoom extends Room<GameRoomState> {
     //////////////////////////////////////////////////////////////////////////
     // when a client leaves the room
     async onLeave(client: Client, consented: boolean) {
-
         // remove from state
         this.state.players.delete(client.sessionId);
-        
+
         // colyseus client leave
         client.leave();
 
