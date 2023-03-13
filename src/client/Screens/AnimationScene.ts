@@ -21,6 +21,8 @@ import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
+import { CheckboxGroup, RadioGroup, SelectionPanel, SliderGroup } from "@babylonjs/gui/2D/controls/selector";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 
 export class AnimationScene {
     public _scene: Scene;
@@ -67,17 +69,17 @@ export class AnimationScene {
         Wood_001
         */
 
+        let CHARACTER_SIZE = {
+            LIGHT: ["NPC_Man_Skinny_primitive0", "NPC_Man_Skinny_primitive1"],
+            NORMAL: ["NPC_Man_Normal_primitive0", "NPC_Man_Normal_primitive1"],
+            HEAVY: ["NPC_Man_Fat_primitive0", "NPC_Man_Fat_primitive1"],
+        };
+
         let CHARACTER_DATA = {
-            GENDER: {},
-            BODY: {
-                SKINNY: ["NPC_Man_Skinny_primitive0", "NPC_Man_Skinny_primitive1"],
-                NORMAL: ["NPC_Man_Normal_primitive0", "NPC_Man_Normal_primitive1"],
-                FAT: ["NPC_Man_Fat_primitive0", "NPC_Man_Fat_primitive1"],
-            },
-            BEARD: ["NPC_Beard_001", "NPC_Beard_002", "NPC_Beard_003", "NPC_Beard_004", "NPC_Beard_005", "NPC_Beard_006", "NPC_Beard_007"],
-            HAIR: ["NPC_Hair_001", "NPC_Hair_002", "NPC_Hair_003", "NPC_Hair_004", "NPC_Hair_005", "NPC_Hair_006", "NPC_Hair_007", "NPC_Hair_008"],
-            HAT: ["NPC_Hat_001", "NPC_Hat_002", "NPC_Hat_003", "NPC_Hat_004", "NPC_Hat_005", "NPC_Hat_006"],
-            WEAPON: ["NPC_Tools_Axe_001", "NPC_Tools_Axe_002", "NPC_Tools_Axe_003", "NPC_Tools_Hammer_01", "NPC_Tools_Pick_01", "NPC_Tools_Saw_001", "NPC_Tools_Shovel_001"],
+            BEARD: ["None", "NPC_Beard_001", "NPC_Beard_002", "NPC_Beard_003", "NPC_Beard_004", "NPC_Beard_005", "NPC_Beard_006", "NPC_Beard_007"],
+            HAIR: ["None", "NPC_Hair_001", "NPC_Hair_002", "NPC_Hair_003", "NPC_Hair_004", "NPC_Hair_005", "NPC_Hair_006", "NPC_Hair_007", "NPC_Hair_008"],
+            HAT: ["None", "NPC_Hat_001", "NPC_Hat_002", "NPC_Hat_003", "NPC_Hat_004", "NPC_Hat_005", "NPC_Hat_006"],
+            WEAPON: ["None", "NPC_Tools_Axe_001", "NPC_Tools_Axe_002", "NPC_Tools_Axe_003", "NPC_Tools_Hammer_01", "NPC_Tools_Pick_01", "NPC_Tools_Saw_001", "NPC_Tools_Shovel_001"],
         };
 
         /*
@@ -108,10 +110,13 @@ export class AnimationScene {
         light.intensity = 0.6;
         light.specular = Color3.Black();
 
+        // Built-in 'ground' shape.
+        const ground = MeshBuilder.CreateGround("ground", {width: 6, height: 6}, scene);
+
         // load scene
         this._scene = scene;
 
-        let result = await SceneLoader.ImportMeshAsync("", "./models/", "NPC_AllModels_Prefab.glb", scene);
+        let result = await SceneLoader.ImportMeshAsync("", "./models/", "player.glb", scene);
         this.results = result;
         console.log(result);
 
@@ -126,20 +131,19 @@ export class AnimationScene {
             }
         });
 
-        let beard = scene.getMeshByName("NPC_Beard_001");
-        if (beard) {
-            beard.isVisible = true;
-        }
+        ///////////////////////////////////////////////
+        let animations = result.animationGroups;
+        animations[0].stop();
 
-        let hair = scene.getMeshByName("NPC_Hair_001");
-        if (hair) {
-            hair.isVisible = true;
-        }
+        let ANIM_IDLE = animations[5];
+        let ANIM_WALK = animations[1];
+        let ANIM_DEATH = animations[19];
 
-        let sword = scene.getMeshByName("NPC_Tools_Axe_001");
-        if (sword) {
-            sword.isVisible = true;
-        }
+        let CHARACTER_ANIMATION = [
+            ANIM_IDLE,
+            ANIM_WALK,
+            ANIM_DEATH
+        ]
 
         ///////////////////////////////////////////////
 
@@ -148,67 +152,57 @@ export class AnimationScene {
         guiMenu.idealHeight = 720;
         this._ui = guiMenu;
 
-        // add main ui container
-        const sidebarRect = new Rectangle("background");
-        sidebarRect.left = 0;
-        sidebarRect.width = 0.4;
-        sidebarRect.height = 1;
-        sidebarRect.thickness = 0;
-        sidebarRect.paddingLeft = "15px";
-        sidebarRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        guiMenu.addControl(sidebarRect);
-
-        // main sidebar
-        const sidebarStackPanel = new StackPanel("sidebarSctackPanel");
-        sidebarStackPanel.width = "100%";
-        sidebarStackPanel.adaptHeightToChildren = true;
-        sidebarStackPanel.spacing = 5;
-        sidebarStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        sidebarStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        sidebarStackPanel.paddingTop = "5px;";
-        sidebarStackPanel.isVertical = true;
-        sidebarRect.addControl(sidebarStackPanel);
-
-        //
-        // SIZE CHARACTER
-        const genderPanel = this.createStackPanel("char_gender", sidebarStackPanel, false);
-        this.createButton("Male", genderPanel, function (btn: Button) {
-            console.log(btn.name);
-        });
-        this.createButton("Female", genderPanel, function (btn: Button) {
-            console.log(btn.name);
-        });
-
-        //
-        // SIZE CHARACTER
-        const sizePanel = this.createStackPanel("char_size", sidebarStackPanel, false);
-        this.createButton("Skinny", sizePanel, (btn: Button) => {
-            this.showMeshes(["NPC_Man_Skinny_primitive0", "NPC_Man_Skinny_primitive1"]);
-        });
-        this.createButton("Normal", sizePanel, (btn: Button) => {
-            this.showMeshes(["NPC_Man_Normal_primitive0", "NPC_Man_Normal_primitive1"]);
-        });
-        this.createButton("Fat", sizePanel, (btn: Button) => {
-            this.showMeshes(["NPC_Man_Fat_primitive0", "NPC_Man_Fat_primitive1"]);
-        });
-
-        //
-        // char beards
-        const beardPanel = this.createStackPanel("beardPanel", sidebarStackPanel, false);
-        CHARACTER_DATA.BEARD.forEach((element) => {
-            this.createButton(element, beardPanel, (btn: Button) => {
-                CHARACTER_DATA.BEARD.forEach((b) => {
-                    let beard = scene.getMeshByName(b);
-                    if (beard) {
-                        beard.isVisible = false;
-                    }
+        var animationsOptions = new RadioGroup("Animation");
+        CHARACTER_ANIMATION.forEach(anim => {
+            animationsOptions.addRadio(anim.name, ()=>{
+                CHARACTER_ANIMATION.forEach(element => {
+                    element.stop();;
                 });
-                let beard = scene.getMeshByName(element);
-                if (beard) {
-                    beard.isVisible = true;
-                }
+                anim.start(true, 1.0, anim.from, anim.to, false);
             });
         });
+        
+        var sizeOptions = new RadioGroup("Body Size");
+        for(let key in CHARACTER_SIZE){
+            let data = CHARACTER_SIZE[key];
+            sizeOptions.addRadio(key, ()=>{
+                data.forEach((b) => {
+                    this.showMesh(key, true);
+                });
+            });
+        }
+        
+        var rotateGroup = new SliderGroup("Body Options");
+        for(let key in CHARACTER_DATA){
+            let data = CHARACTER_DATA[key];
+            rotateGroup.addSlider(key, (v)=>{
+                let index = v.toFixed(0);
+                let value = data[index];
+                data.forEach((b) => {
+                    this.showMesh(b, false);
+                });
+                this.showMesh(value, true);
+            }, key, 0, (data.length - 1), 0) 
+        }
+        
+
+        var selectBox = new SelectionPanel("sp", [sizeOptions, rotateGroup, animationsOptions]);
+        selectBox.background = "rgba(255, 255, 255, .7)";
+        selectBox.top = "15px;";
+        selectBox.left = "15px;";
+        selectBox.width = 0.25;
+        selectBox.height = .9;
+        selectBox.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        selectBox.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        guiMenu.addControl(selectBox);
+
+    }
+
+    showMesh(name: string, show = false) {
+        let el = this._scene.getMeshByName(name);
+        if (el) {
+            el.isVisible = show;
+        }
     }
 
     showMeshes(stringArray: string[] = []) {
