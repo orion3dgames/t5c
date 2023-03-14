@@ -1,5 +1,5 @@
 import { Scene } from "@babylonjs/core/scene";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 
@@ -23,8 +23,13 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { CheckboxGroup, RadioGroup, SelectionPanel, SliderGroup } from "@babylonjs/gui/2D/controls/selector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { BakedVertexAnimationManager } from "@babylonjs/core/BakedVertexAnimation/bakedVertexAnimationManager";
+import { VertexAnimationBaker } from "@babylonjs/core/BakedVertexAnimation/vertexAnimationBaker";
+import { Engine } from "@babylonjs/core/Engines/engine";
 
 export class AnimationScene {
+    public _engine: Engine;
     public _scene: Scene;
     public _newState: State;
     public _button: Button;
@@ -37,64 +42,7 @@ export class AnimationScene {
     }
 
     public async createScene(app) {
-        /*
-        NPC_Hat_002
-        NPC_Hat_003
-        NPC_Hat_004
-        NPC_Hat_005
-        NPC_Hat_006
-        NPC_Tools_Axe_001
-        NPC_Tools_Axe_002
-        NPC_Tools_Axe_003
-        NPC_Tools_Hammer_01
-        NPC_Tools_Pick_01
-        NPC_Tools_Saw_001
-        NPC_Tools_Shovel_001
-        Fish_001
-        Fruits_001
-        Fruits_002
-        NPC_Backet_001
-        NPC_Backet_002
-        NPC_Backet_003
-        NPC_Backet_004
-        NPC_Backet_005
-        NPC_Backet_Empty
-        NPC_Man_Fat_primitive0
-        NPC_Man_Fat_primitive1
-        NPC_Man_Normal_primitive0
-        NPC_Man_Normal_primitive1
-        NPC_Man_Skinny_primitive0
-        NPC_Man_Skinny_primitive1
-        Stone_001
-        Wood_001
-        */
-
-        let CHARACTER_SIZE = {
-            LIGHT: ["NPC_Man_Skinny_primitive0", "NPC_Man_Skinny_primitive1"],
-            NORMAL: ["NPC_Man_Normal_primitive0", "NPC_Man_Normal_primitive1"],
-            HEAVY: ["NPC_Man_Fat_primitive0", "NPC_Man_Fat_primitive1"],
-        };
-
-        let CHARACTER_DATA = {
-            BEARD: ["None", "NPC_Beard_001", "NPC_Beard_002", "NPC_Beard_003", "NPC_Beard_004", "NPC_Beard_005", "NPC_Beard_006", "NPC_Beard_007"],
-            HAIR: ["None", "NPC_Hair_001", "NPC_Hair_002", "NPC_Hair_003", "NPC_Hair_004", "NPC_Hair_005", "NPC_Hair_006", "NPC_Hair_007", "NPC_Hair_008"],
-            HAT: ["None", "NPC_Hat_001", "NPC_Hat_002", "NPC_Hat_003", "NPC_Hat_004", "NPC_Hat_005", "NPC_Hat_006"],
-            WEAPON: ["None", "NPC_Tools_Axe_001", "NPC_Tools_Axe_002", "NPC_Tools_Axe_003", "NPC_Tools_Hammer_01", "NPC_Tools_Pick_01", "NPC_Tools_Saw_001", "NPC_Tools_Shovel_001"],
-        };
-
-        /*
-        Fish_001
-        Fruits_001
-        Fruits_002
-        NPC_Backet_001
-        NPC_Backet_002
-        NPC_Backet_003
-        NPC_Backet_004
-        NPC_Backet_005
-        NPC_Backet_Empty
-        Stone_001
-        Wood_001
-        */
+        this._engine = app.engine;
 
         let scene = new Scene(app.engine);
         scene.clearColor = new Color4(0, 0, 0, 1);
@@ -111,136 +59,146 @@ export class AnimationScene {
         light.specular = Color3.Black();
 
         // Built-in 'ground' shape.
-        const ground = MeshBuilder.CreateGround("ground", {width: 6, height: 6}, scene);
+        const ground = MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, scene);
 
         // load scene
         this._scene = scene;
 
-        let result = await SceneLoader.ImportMeshAsync("", "./models/", "player.glb", scene);
-        this.results = result;
-        console.log(result);
+        //////////////////////////////////////////////////////////
+        const PLANE_SIZE = 20;
+        const INST_COUNT = 1;
+        const PICKED_ANIMS = ["Walk", "Run", "Idle", "Wave", "Roll"];
+        const URL_MESH = "Adventurer.gltf";
+        const { meshes, animationGroups, skeletons } = await SceneLoader.ImportMeshAsync("", "./models/", URL_MESH, scene);
 
-        result.geometries.forEach((element) => {
-            console.log(element.id);
-        });
+        const selectedAnimationGroups = animationGroups.filter((ag) => PICKED_ANIMS.includes(ag.name));
+        const skeleton = skeletons[0];
+        const root = meshes[0];
 
-        result.meshes.forEach((element) => {
-            element.isVisible = false;
-            if (element.name === "NPC_Man_Normal_primitive0" || element.name === "NPC_Man_Skinny_primitive1") {
-                element.isVisible = true;
+        root.position.setAll(0);
+        root.scaling.setAll(1);
+        root.rotationQuaternion = null;
+        root.rotation.setAll(0);
+
+        const merged = this.merge(root, skeleton);
+
+        root.setEnabled(false);
+
+        if (merged) {
+            merged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
+            merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+
+            const ranges = this.calculateRanges(selectedAnimationGroups);
+
+            const setAnimationParameters = (vec, animIndex = Math.floor(Math.random() * selectedAnimationGroups.length)) => {
+                const anim = ranges[animIndex];
+                const from = Math.floor(anim.from);
+                const to = Math.floor(anim.to);
+                const ofst = Math.floor(Math.random() * (to - from - 1));
+                vec.set(from, to - 1, ofst, 60);
+            };
+
+            const b = new VertexAnimationBaker(scene, merged);
+            const manager = new BakedVertexAnimationManager(scene);
+            merged.bakedVertexAnimationManager = manager;
+            merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+            setAnimationParameters(merged.instancedBuffers.bakedVertexAnimationSettingsInstanced, 0);
+
+            const bufferFromMesh = await this.bakeVertexData(merged, selectedAnimationGroups);
+            let vertexDataJson = b.serializeBakedVertexDataToJSON(bufferFromMesh);
+            console.log(vertexDataJson);
+
+            const buffer = bufferFromMesh;
+
+            manager.texture = b.textureFromBakedVertexData(buffer);
+
+            const createInst = (id) => {
+                const instance = merged.createInstance("instance_" + id);
+                instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+                setAnimationParameters(instance.instancedBuffers.bakedVertexAnimationSettingsInstanced);
+                instance.position.x = 0;
+                instance.position.z = 0;
+                instance.rotation.y = 0;
+                return instance;
+            };
+
+            for (let i = 0; i < INST_COUNT; i++) {
+                createInst(i + "");
             }
-        });
 
-        ///////////////////////////////////////////////
-        let animations = result.animationGroups;
-        animations[0].stop();
-
-        let ANIM_IDLE = animations[5];
-        let ANIM_WALK = animations[1];
-        let ANIM_DEATH = animations[19];
-
-        let CHARACTER_ANIMATION = [
-            ANIM_IDLE,
-            ANIM_WALK,
-            ANIM_DEATH
-        ]
-
-        ///////////////////////////////////////////////
-
-        // set up ui
-        const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-        guiMenu.idealHeight = 720;
-        this._ui = guiMenu;
-
-        var animationsOptions = new RadioGroup("Animation");
-        CHARACTER_ANIMATION.forEach(anim => {
-            animationsOptions.addRadio(anim.name, ()=>{
-                CHARACTER_ANIMATION.forEach(element => {
-                    element.stop();;
-                });
-                anim.start(true, 1.0, anim.from, anim.to, false);
+            scene.registerBeforeRender(() => {
+                manager.time += scene.getEngine().getDeltaTime() / 1000.0;
             });
-        });
-        
-        var sizeOptions = new RadioGroup("Body Size");
-        for(let key in CHARACTER_SIZE){
-            let data = CHARACTER_SIZE[key];
-            sizeOptions.addRadio(key, ()=>{
-                data.forEach((b) => {
-                    this.showMesh(key, true);
-                });
-            });
-        }
-        
-        var rotateGroup = new SliderGroup("Body Options");
-        for(let key in CHARACTER_DATA){
-            let data = CHARACTER_DATA[key];
-            rotateGroup.addSlider(key, (v)=>{
-                let index = v.toFixed(0);
-                let value = data[index];
-                data.forEach((b) => {
-                    this.showMesh(b, false);
-                });
-                this.showMesh(value, true);
-            }, key, 0, (data.length - 1), 0) 
-        }
-        
 
-        var selectBox = new SelectionPanel("sp", [sizeOptions, rotateGroup, animationsOptions]);
-        selectBox.background = "rgba(255, 255, 255, .7)";
-        selectBox.top = "15px;";
-        selectBox.left = "15px;";
-        selectBox.width = 0.25;
-        selectBox.height = .9;
-        selectBox.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        selectBox.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        guiMenu.addControl(selectBox);
-
-    }
-
-    showMesh(name: string, show = false) {
-        let el = this._scene.getMeshByName(name);
-        if (el) {
-            el.isVisible = show;
+            //dispose resources
+            meshes.forEach((m) => m.dispose(false, true));
+            animationGroups.forEach((ag) => ag.dispose());
+            skeletons.forEach((s) => s.dispose());
         }
     }
 
-    showMeshes(stringArray: string[] = []) {
-        this.results.meshes.forEach((element) => {
-            element.isVisible = false;
-            if (stringArray.length > 0) {
-                if (stringArray.includes(element.name)) {
-                    element.isVisible = true;
-                }
+    merge(mesh, skeleton) {
+        // pick what you want to merge
+        const allChildMeshes = mesh.getChildTransformNodes(true)[0].getChildMeshes(false);
+
+        // Ignore Backpack because pf different attributes
+        // https://forum.babylonjs.com/t/error-during-merging-meshes-from-imported-glb/23483
+        const childMeshes = allChildMeshes.filter((m) => !m.name.includes("Backpack"));
+
+        // multiMaterial = true
+        const merged = Mesh.MergeMeshes(childMeshes, false, true, undefined, undefined, true);
+        if (merged) {
+            merged.name = "_MergedModel";
+            merged.skeleton = skeleton;
+        }
+        return merged;
+    }
+
+    calculateRanges(animationGroups) {
+        return animationGroups.reduce((acc, ag, index) => {
+            if (index === 0) {
+                acc.push({ from: Math.floor(ag.from), to: Math.floor(ag.to) });
+            } else {
+                const prev = acc[index - 1];
+                acc.push({ from: prev.to + 1, to: prev.to + 1 + Math.floor(ag.to) });
             }
-        });
+            return acc;
+        }, []);
     }
 
-    createStackPanel($name: string, ui, vertical = true) {
-        const chatStackPanel = new StackPanel($name + "StackPanel");
-        chatStackPanel.width = "100%";
-        chatStackPanel.spacing = 5;
-        chatStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        chatStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        chatStackPanel.adaptHeightToChildren = true;
-        chatStackPanel.setPaddingInPixels(5, 0, 5, 0);
-        chatStackPanel.isVertical = vertical;
-        ui.addControl(chatStackPanel);
-        return chatStackPanel;
-    }
+    async bakeVertexData(mesh, ags) {
+        const s = mesh.skeleton;
+        const boneCount = s.bones.length;
+        /** total number of frames in our animations */
+        const frameCount = ags.reduce((acc, ag) => acc + (Math.floor(ag.to) - Math.floor(ag.from)) + 1, 0);
 
-    createButton($name: string, ui, callback: any) {
-        const btn = Button.CreateSimpleButton($name + "Btn", $name);
-        btn.width = "100px;";
-        btn.height = "22px";
-        btn.color = "white";
-        btn.background = "#222222";
-        btn.thickness = 1;
-        btn.fontSize = "12px";
-        btn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        ui.addControl(btn);
-        btn.onPointerDownObservable.add(() => {
-            callback(btn);
-        });
+        // reset our loop data
+        let textureIndex = 0;
+        const textureSize = (boneCount + 1) * 4 * 4 * frameCount;
+        const vertexData = new Float32Array(textureSize);
+
+        function* captureFrame() {
+            const skeletonMatrices = s.getTransformMatrices(mesh);
+            vertexData.set(skeletonMatrices, textureIndex * skeletonMatrices.length);
+        }
+
+        let ii = 0;
+        for (const ag of ags) {
+            ag.reset();
+            const from = Math.floor(ag.from);
+            const to = Math.floor(ag.to);
+            for (let frameIndex = from; frameIndex <= to; frameIndex++) {
+                if (ii++ === 0) continue;
+                // start anim for one frame
+                ag.start(false, 1, frameIndex, frameIndex, false);
+                // wait for finishing
+                await ag.onAnimationEndObservable.runCoroutineAsync(captureFrame());
+                textureIndex++;
+                // stop anim
+                ag.stop();
+            }
+        }
+
+        return vertexData;
     }
 }

@@ -119,9 +119,21 @@ export class CharacterSelectionScene {
         logoutBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         logoutBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         this.leftColumnRect.addControl(logoutBtn);
-
         logoutBtn.onPointerDownObservable.add(() => {
             this.logout();
+        });
+
+        const characterEditorBtn = Button.CreateSimpleButton("characterEditorBtn", "Character Editor");
+        characterEditorBtn.top = "-70px";
+        characterEditorBtn.width = 1;
+        characterEditorBtn.height = "30px";
+        characterEditorBtn.color = "white";
+        characterEditorBtn.thickness = 1;
+        characterEditorBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        characterEditorBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        this.leftColumnRect.addControl(characterEditorBtn);
+        characterEditorBtn.onPointerDownObservable.add(() => {
+            SceneController.goToScene(State.ANIMATION);
         });
 
         // load scene
