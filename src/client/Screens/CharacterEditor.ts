@@ -38,36 +38,151 @@ export class CharacterEditor {
 
     public async createScene(app) {
         /*
-        NPC_Hat_002
-        NPC_Hat_003
-        NPC_Hat_004
-        NPC_Hat_005
-        NPC_Hat_006
-        NPC_Tools_Axe_001
-        NPC_Tools_Axe_002
-        NPC_Tools_Axe_003
-        NPC_Tools_Hammer_01
-        NPC_Tools_Pick_01
-        NPC_Tools_Saw_001
-        NPC_Tools_Shovel_001
-        Fish_001
-        Fruits_001
-        Fruits_002
-        NPC_Backet_001
-        NPC_Backet_002
-        NPC_Backet_003
-        NPC_Backet_004
-        NPC_Backet_005
-        NPC_Backet_Empty
-        NPC_Man_Fat_primitive0
-        NPC_Man_Fat_primitive1
-        NPC_Man_Normal_primitive0
-        NPC_Man_Normal_primitive1
-        NPC_Man_Skinny_primitive0
-        NPC_Man_Skinny_primitive1
-        Stone_001
-        Wood_001
+        Adventurer_Body_primitive0
+        Adventurer_Body_primitive1
+        Adventurer_Body_primitive2
+        Adventurer_Feet_primitive0
+        Adventurer_Feet_primitive1
+        Adventurer_Head_primitive0
+        Adventurer_Head_primitive1
+        Adventurer_Head_primitive2
+        Adventurer_Head_primitive3
+        Adventurer_Legs_primitive0
+        Adventurer_Legs_primitive1
+        Backpack_primitive0
+        Backpack_primitive1
+        Backpack_primitive2
+        Backpack_primitive3
+        Beach_Body_primitive0
+        Beach_Body_primitive1
+        Beach_Feet_primitive0
+        Beach_Feet_primitive1
+        Beach_Head_primitive0
+        Beach_Head_primitive1
+        Beach_Head_primitive2
+        Beach_Head_primitive3
+        Beach_Head_primitive4
+        Beach_Legs_primitive0
+        Beach_Legs_primitive1
+        Beach_Legs_primitive2
+        Casual2_Body_primitive0
+        Casual2_Body_primitive1
+        Casual2_Feet_primitive0
+        Casual2_Feet_primitive1
+        Casual2_Head_primitive0
+        Casual2_Head_primitive1
+        Casual2_Head_primitive2
+        Casual2_Head_primitive3
+        Casual2_Head_primitive4
+        Casual2_Legs
+        Casual_Body_primitive0
+        Casual_Body_primitive1
+        Casual_Feet_primitive0
+        Casual_Feet_primitive1
+        Casual_Head_primitive0
+        Casual_Head_primitive1
+        Casual_Head_primitive2
+        Casual_Head_primitive3
+        Casual_Legs_primitive0
+        Casual_Legs_primitive1
+        Farmer_Body_primitive0
+        Farmer_Body_primitive1
+        Farmer_Body_primitive2
+        Farmer_Body_primitive3
+        Farmer_Feet_primitive0
+        Farmer_Feet_primitive1
+        Farmer_Head_primitive0
+        Farmer_Head_primitive1
+        Farmer_Head_primitive2
+        Farmer_Head_primitive3
+        Farmer_Head_primitive4
+        Farmer_Pants
+        Horse_Head_primitive0
+        Horse_Head_primitive1
+        Horse_Head_primitive2
+        Horse_Head_primitive3
+        Horse_Head_primitive4
+        Horse_Head_primitive5
+        King_Body_primitive0
+        King_Body_primitive1
+        King_Body_primitive2
+        King_Body_primitive3
+        King_Body_primitive4
+        King_Feet
+        King_Head_primitive0
+        King_Head_primitive1
+        King_Head_primitive2
+        King_Head_primitive3
+        King_Legs_primitive0
+        King_Legs_primitive1
+        King_Legs_primitive2
+        
+        Pistol_primitive1
+        Pistol_primitive2
+        Punk_Body_primitive0
+        Punk_Body_primitive1
+        Punk_Body_primitive2
+        Punk_Feet_primitive0
+        Punk_Feet_primitive1
+        Punk_Head_primitive0
+        Punk_Head_primitive1
+        Punk_Head_primitive2
+        Punk_Head_primitive3
+        Punk_Head_primitive4
+        Punk_Head_primitive5
+        Punk_Legs_primitive0
+        Punk_Legs_primitive1
+        SpaceSuit_Body_primitive0
+        SpaceSuit_Body_primitive1
+        SpaceSuit_Body_primitive2
+        SpaceSuit_Body_primitive3
+        SpaceSuit_Feet_primitive0
+        SpaceSuit_Feet_primitive1
+        SpaceSuit_Head_primitive0
+        SpaceSuit_Head_primitive1
+        SpaceSuit_Head_primitive2
+        SpaceSuit_Legs_primitive0
+        SpaceSuit_Legs_primitive1
+        SpaceSuit_Legs_primitive2
+        SpaceSuit_Legs_primitive3
+        Suit_Body_primitive0
+        Suit_Body_primitive1
+        Suit_Body_primitive2
+        Suit_Body_primitive3
+        Suit_Feet
+        Suit_Head_primitive0
+        Suit_Head_primitive1
+        Suit_Head_primitive2
+        Suit_Head_primitive3
+        Suit_Legs
+        Swat_Body_primitive0
+        Swat_Body_primitive1
+        Swat_Body_primitive2
+        Swat_Feet
+        Swat_Head_primitive0
+        Swat_Head_primitive1
+        Swat_Head_primitive2
+        Swat_Legs_primitive0
+        Swat_Legs_primitive1
+        Worker_Body_primitive0
+        Worker_Body_primitive1
+        Worker_Body_primitive2
+        Worker_Body_primitive3
+        Worker_Feet_primitive0
+        Worker_Feet_primitive1
+        Worker_Head_primitive0
+        Worker_Head_primitive1
+        Worker_Head_primitive2
+        Worker_Head_primitive3
+        Worker_Head_primitive4
+        Worker_Legs_primitive0
+        Worker_Legs_primitive1
         */
+
+        let CHARACTER_GENDER = {
+            MALE: ["Casual2_Body_primitive0", "Casual2_Body_primitive1", "Casual2_Feet_primitive0", "Casual2_Feet_primitive1", "Casual2_Head_primitive0", "Casual2_Head_primitive1", "Casual2_Head_primitive2", "Casual2_Head_primitive3", "Casual2_Head_primitive4", "Casual2_Legs"],
+            FEMALE: ["Casual_Body_primitive0", "Casual_Body_primitive1", "Casual_Feet_primitive0", "Casual_Feet_primitive1", "Casual_Head_primitive0", "Casual_Head_primitive1", "Casual_Head_primitive2", "Casual_Head_primitive3", "Casual_Head_primitive4", "Casual_Legs"],
+        };
 
         let CHARACTER_SIZE = {
             LIGHT: ["NPC_Man_Skinny_primitive0", "NPC_Man_Skinny_primitive1"],
@@ -76,25 +191,8 @@ export class CharacterEditor {
         };
 
         let CHARACTER_DATA = {
-            BEARD: ["None", "NPC_Beard_001", "NPC_Beard_002", "NPC_Beard_003", "NPC_Beard_004", "NPC_Beard_005", "NPC_Beard_006", "NPC_Beard_007"],
-            HAIR: ["None", "NPC_Hair_001", "NPC_Hair_002", "NPC_Hair_003", "NPC_Hair_004", "NPC_Hair_005", "NPC_Hair_006", "NPC_Hair_007", "NPC_Hair_008"],
-            HAT: ["None", "NPC_Hat_001", "NPC_Hat_002", "NPC_Hat_003", "NPC_Hat_004", "NPC_Hat_005", "NPC_Hat_006"],
-            WEAPON: ["None", "NPC_Tools_Axe_001", "NPC_Tools_Axe_002", "NPC_Tools_Axe_003", "NPC_Tools_Hammer_01", "NPC_Tools_Pick_01", "NPC_Tools_Saw_001", "NPC_Tools_Shovel_001"],
+            WEAPON: ["None", "Sword_primitive0", "Sword_primitive1", "Sword_primitive2", "Pistol_primitive0"],
         };
-
-        /*
-        Fish_001
-        Fruits_001
-        Fruits_002
-        NPC_Backet_001
-        NPC_Backet_002
-        NPC_Backet_003
-        NPC_Backet_004
-        NPC_Backet_005
-        NPC_Backet_Empty
-        Stone_001
-        Wood_001
-        */
 
         let scene = new Scene(app.engine);
         scene.clearColor = new Color4(0, 0, 0, 1);
@@ -116,28 +214,25 @@ export class CharacterEditor {
         // load scene
         this._scene = scene;
 
-        let result = await SceneLoader.ImportMeshAsync("", "./models/", "player.glb", scene);
+        // import
+        let result = await SceneLoader.ImportMeshAsync("", "./models/", "male_all.glb", scene);
         this.results = result;
         console.log(result);
 
-        result.geometries.forEach((element) => {
-            console.log(element.id);
-        });
-
         result.meshes.forEach((element) => {
+            console.log(element.name);
             element.isVisible = false;
-            if (element.name === "NPC_Man_Normal_primitive0" || element.name === "NPC_Man_Skinny_primitive1") {
-                element.isVisible = true;
-            }
         });
 
         ///////////////////////////////////////////////
         let animations = result.animationGroups;
         animations[0].stop();
 
-        let ANIM_IDLE = animations[5];
-        let ANIM_WALK = animations[1];
-        let ANIM_DEATH = animations[19];
+        let ANIM_IDLE = animations[4];
+        let ANIM_WALK = animations[22];
+        let ANIM_DEATH = animations[0];
+
+        ANIM_IDLE.play(true);
 
         let CHARACTER_ANIMATION = [ANIM_IDLE, ANIM_WALK, ANIM_DEATH];
 
@@ -158,12 +253,12 @@ export class CharacterEditor {
             });
         });
 
-        var sizeOptions = new RadioGroup("Body Size");
-        for (let key in CHARACTER_SIZE) {
-            let data = CHARACTER_SIZE[key];
+        var sizeOptions = new RadioGroup("Gender");
+        for (let key in CHARACTER_GENDER) {
+            let data = CHARACTER_GENDER[key];
             sizeOptions.addRadio(key, () => {
                 data.forEach((b) => {
-                    this.showMesh(key, true);
+                    this.showMesh(b, true);
                 });
             });
         }
@@ -206,7 +301,7 @@ export class CharacterEditor {
         }
     }
 
-    showMeshes(stringArray: string[] = []) {
+    showMeshes(stringArray: string[] = [], show = true) {
         this.results.meshes.forEach((element) => {
             element.isVisible = false;
             if (stringArray.length > 0) {
