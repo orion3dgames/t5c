@@ -24,7 +24,7 @@ import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { CheckboxGroup, RadioGroup, SelectionPanel, SliderGroup } from "@babylonjs/gui/2D/controls/selector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 
-export class _AnimationScene {
+export class CharacterEditor {
     public _scene: Scene;
     public _newState: State;
     public _button: Button;

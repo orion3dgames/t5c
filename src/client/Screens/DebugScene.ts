@@ -28,7 +28,27 @@ import { BakedVertexAnimationManager } from "@babylonjs/core/BakedVertexAnimatio
 import { VertexAnimationBaker } from "@babylonjs/core/BakedVertexAnimation/vertexAnimationBaker";
 import { Engine } from "@babylonjs/core/Engines/engine";
 
-export class AnimationScene {
+class JavascriptDataDownloader {
+    private data;
+    constructor(data = {}) {
+        this.data = data;
+    }
+    download(type_of = "text/plain", filename = "data.txt") {
+        let body = document.body;
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(
+            new Blob([JSON.stringify(this.data, null, 2)], {
+                type: type_of,
+            })
+        );
+        a.setAttribute("download", filename);
+        body.appendChild(a);
+        a.click();
+        body.removeChild(a);
+    }
+}
+
+export class DebugScene {
     public _engine: Engine;
     public _scene: Scene;
     public _newState: State;
@@ -66,9 +86,9 @@ export class AnimationScene {
 
         //////////////////////////////////////////////////////////
         const PLANE_SIZE = 20;
-        const INST_COUNT = 1;
+        const INST_COUNT = 200;
         const PICKED_ANIMS = ["Walk", "Run", "Idle", "Wave", "Roll"];
-        const URL_MESH = "Adventurer.gltf";
+        const URL_MESH = "male.gltf";
         const { meshes, animationGroups, skeletons } = await SceneLoader.ImportMeshAsync("", "./models/", URL_MESH, scene);
 
         const selectedAnimationGroups = animationGroups.filter((ag) => PICKED_ANIMS.includes(ag.name));
@@ -85,6 +105,8 @@ export class AnimationScene {
         root.setEnabled(false);
 
         if (merged) {
+            merged.visibility = 1;
+
             merged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
             merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
 
@@ -95,7 +117,7 @@ export class AnimationScene {
                 const from = Math.floor(anim.from);
                 const to = Math.floor(anim.to);
                 const ofst = Math.floor(Math.random() * (to - from - 1));
-                vec.set(from, to - 1, ofst, 60);
+                vec.set(from, to - 1, ofst, 60); // skip one frame to avoid weird artifacts
             };
 
             const b = new VertexAnimationBaker(scene, merged);
@@ -104,9 +126,15 @@ export class AnimationScene {
             merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
             setAnimationParameters(merged.instancedBuffers.bakedVertexAnimationSettingsInstanced, 0);
 
-            const bufferFromMesh = await this.bakeVertexData(merged, selectedAnimationGroups);
-            let vertexDataJson = b.serializeBakedVertexDataToJSON(bufferFromMesh);
-            console.log(vertexDataJson);
+            //const bufferFromMesh = await this.bakeVertexData(merged, selectedAnimationGroups);
+            //let vertexDataJson = b.serializeBakedVertexDataToJSON(bufferFromMesh);
+            //new JavascriptDataDownloader(vertexDataJson).download();
+
+            // load prebaked vat animations
+            // 2 mo for the baked animation, not sure if it is worth it for the moment to work on that
+
+            let req = await request("get", "./models/male_baked_animation.json", {}, false, { headers: { "Content-Type": "application/json" } });
+            let bufferFromMesh = b.loadBakedVertexDataFromJSON(JSON.parse(req.data));
 
             const buffer = bufferFromMesh;
 
@@ -116,8 +144,8 @@ export class AnimationScene {
                 const instance = merged.createInstance("instance_" + id);
                 instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
                 setAnimationParameters(instance.instancedBuffers.bakedVertexAnimationSettingsInstanced);
-                instance.position.x = 0;
-                instance.position.z = 0;
+                instance.position.x = Math.random() * PLANE_SIZE - PLANE_SIZE / 2;
+                instance.position.z = Math.random() * PLANE_SIZE - PLANE_SIZE / 2;
                 instance.rotation.y = 0;
                 return instance;
             };

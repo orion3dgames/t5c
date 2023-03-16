@@ -20,7 +20,9 @@ import State from "./Screens/Screens";
 import { GameScene } from "./Screens/GameScene";
 import { LoginScene } from "./Screens/LoginScene";
 import { CharacterSelectionScene } from "./Screens/CharacterSelection";
-import { AnimationScene } from "./Screens/AnimationScene";
+import { CharacterEditor } from "./Screens/CharacterEditor";
+import { DebugScene } from "./Screens/DebugScene";
+
 import Config from "../shared/Config";
 import { Network } from "./Controllers/Network";
 import { Loading } from "./Controllers/Loading";
@@ -112,6 +114,16 @@ class App {
                     break;
 
                 ///////////////////////////////////////
+                // CHARACTER EDITOR SCENE
+                case State.CHARACTER_EDITOR:
+                    this.clearScene();
+                    this.currentScene = new CharacterEditor();
+                    this.currentScene.createScene(this);
+                    this.scene = this.currentScene._scene;
+                    this.state = State.NULL;
+                    break;
+
+                ///////////////////////////////////////
                 // GAME SCENE
                 case State.GAME:
                     this.clearScene();
@@ -121,12 +133,11 @@ class App {
                     this.state = State.NULL;
                     break;
 
-                    
                 ///////////////////////////////////////
-                // ANIMATION SCENE
-                case State.ANIMATION:
+                // DEBUG SCENE
+                case State.DEBUG_SCENE:
                     this.clearScene();
-                    this.currentScene = new AnimationScene();
+                    this.currentScene = new DebugScene();
                     this.currentScene.createScene(this);
                     this.scene = this.currentScene._scene;
                     this.state = State.NULL;

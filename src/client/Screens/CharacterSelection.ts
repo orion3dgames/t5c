@@ -133,7 +133,7 @@ export class CharacterSelectionScene {
         characterEditorBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         this.leftColumnRect.addControl(characterEditorBtn);
         characterEditorBtn.onPointerDownObservable.add(() => {
-            SceneController.goToScene(State.ANIMATION);
+            SceneController.goToScene(State.CHARACTER_EDITOR);
         });
 
         // load scene
