@@ -1,28 +1,18 @@
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
-
-import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
-import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
-import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
-import { Control } from "@babylonjs/gui/2D/controls/control";
-import { Button } from "@babylonjs/gui/2D/controls/button";
-import { InputText } from "@babylonjs/gui/2D/controls/inputText";
-import { InputPassword } from "@babylonjs/gui/2D/controls/inputPassword";
-import { Image } from "@babylonjs/gui/2D/controls/image";
-
-import Config from "../../shared/Config";
-import State from "./Screens";
-import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
-import alertMessage from "../../shared/Utils/alertMessage";
-import { SceneController } from "../Controllers/Scene";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
-import { CheckboxGroup, RadioGroup, SelectionPanel, SliderGroup } from "@babylonjs/gui/2D/controls/selector";
+import { RadioGroup, SelectionPanel, SliderGroup } from "@babylonjs/gui/2D/controls/selector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+
+import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
+import { Control } from "@babylonjs/gui/2D/controls/control";
+import { Button } from "@babylonjs/gui/2D/controls/button";
+import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
+
+import State from "./Screens";
 
 export class CharacterEditor {
     public _scene: Scene;
@@ -257,6 +247,7 @@ export class CharacterEditor {
         for (let key in CHARACTER_GENDER) {
             let data = CHARACTER_GENDER[key];
             sizeOptions.addRadio(key, () => {
+                this.hideAll(CHARACTER_GENDER);
                 data.forEach((b) => {
                     this.showMesh(b, true);
                 });
@@ -292,6 +283,15 @@ export class CharacterEditor {
         selectBox.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         selectBox.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         guiMenu.addControl(selectBox);
+    }
+
+    hideAll(arr) {
+        for (let key in arr) {
+            let data = arr[key];
+            data.forEach((b) => {
+                this.showMesh(b, true);
+            });
+        }
     }
 
     showMesh(name: string, show = false) {

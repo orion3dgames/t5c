@@ -10,6 +10,7 @@ import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
 import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/loaders/glTF/2.0/glTFLoader";
 import "@babylonjs/loaders/glTF/2.0/Extensions/KHR_materials_pbrSpecularGlossiness";
+import "@babylonjs/loaders/glTF/2.0/Extensions/KHR_draco_mesh_compression";
 
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
