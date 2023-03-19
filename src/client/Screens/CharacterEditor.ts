@@ -246,7 +246,7 @@ export class CharacterEditor {
         playBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         guiMenu.addControl(playBtn);
         playBtn.onPointerDownObservable.add(() => {
-            SceneController.goToScene(State.GAME);
+            //SceneController.goToScene(State.GAME);
         });
 
         // BACK BUTTON
