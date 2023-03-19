@@ -20,8 +20,6 @@ import Config from "../shared/Config";
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
-
-/*
 if (fs.existsSync(Config.databaseLocation)) {
     fs.unlink(Config.databaseLocation, (err) => {
         if (err) {
@@ -29,7 +27,7 @@ if (fs.existsSync(Config.databaseLocation)) {
         }
         Logger.info("File is deleted: " + Config.databaseLocation);
     });
-}*/
+}
 
 class GameServer {
     constructor() {
@@ -203,7 +201,7 @@ class GameServer {
         });
 
         app.get("/get_character", function (req, res) {
-            const character_id: string = (req.query.character_id as string) ?? '';
+            const character_id: string = (req.query.character_id as string) ?? "";
             database.getCharacter(parseInt(character_id)).then((character) => {
                 if (!character) {
                     return res.status(400).send({

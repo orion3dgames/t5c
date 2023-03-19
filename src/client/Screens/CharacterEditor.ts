@@ -12,6 +12,7 @@ import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 
+import { SceneController } from "../Controllers/Scene";
 import State from "./Screens";
 
 export class CharacterEditor {
@@ -233,6 +234,37 @@ export class CharacterEditor {
         guiMenu.idealHeight = 720;
         this._ui = guiMenu;
 
+        // PLAY BUTTON
+        const playBtn = Button.CreateSimpleButton("playBtn", "PLAY");
+        playBtn.top = "-70px";
+        playBtn.width = 1;
+        playBtn.height = "30px";
+        playBtn.color = "white";
+        playBtn.background = "orange";
+        playBtn.thickness = 1;
+        playBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        playBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        guiMenu.addControl(playBtn);
+        playBtn.onPointerDownObservable.add(() => {
+            SceneController.goToScene(State.GAME);
+        });
+
+        // BACK BUTTON
+        const backBtn = Button.CreateSimpleButton("backBtn", "BACK");
+        backBtn.top = "-30px";
+        backBtn.width = 1;
+        backBtn.height = "30px";
+        backBtn.color = "white";
+        backBtn.background = "gray";
+        backBtn.thickness = 1;
+        backBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        backBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        guiMenu.addControl(backBtn);
+        backBtn.onPointerDownObservable.add(() => {
+            SceneController.goToScene(State.CHARACTER_SELECTION);
+        });
+
+        // EDITOR OPTIONS
         var animationsOptions = new RadioGroup("Animation");
         CHARACTER_ANIMATION.forEach((anim) => {
             animationsOptions.addRadio(anim.name, () => {
