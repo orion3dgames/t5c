@@ -123,7 +123,7 @@ export class CharacterSelectionScene {
             this.logout();
         });
 
-        const characterEditorBtn = Button.CreateSimpleButton("characterEditorBtn", "Character Editor");
+        const characterEditorBtn = Button.CreateSimpleButton("characterEditorBtn", "New Character");
         characterEditorBtn.top = "-70px";
         characterEditorBtn.width = 1;
         characterEditorBtn.height = "30px";
@@ -149,43 +149,6 @@ export class CharacterSelectionScene {
 
         // SHOW AVAILABLE CHARACTERS GUI
         await this.displayCharactersGUI(user.characters as PlayerCharacter[], scrollViewerBloc);
-
-        // SHOW NEW PLAYER GUI
-        await this.displayCreateNewCharacterGUI();
-    }
-
-    async displayCreateNewCharacterGUI() {
-        const usernameInput = new InputText("newCharacterInput");
-        usernameInput.top = "-130px;";
-        usernameInput.width = 1;
-        usernameInput.height = "30px;";
-        usernameInput.color = "#FFF";
-        usernameInput.text = generateRandomPlayerName();
-        usernameInput.placeholderText = "Enter username";
-        usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        usernameInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        this.leftColumnRect.addControl(usernameInput);
-
-        const createBtn = Button.CreateSimpleButton("newCharacterBtn", "Create New Character");
-        createBtn.top = "-100px";
-        createBtn.width = 1;
-        createBtn.height = "30px";
-        createBtn.color = "white";
-        createBtn.thickness = 1;
-        createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        this.leftColumnRect.addControl(createBtn);
-
-        createBtn.onPointerDownObservable.add(() => {
-            // create new character via database
-            this.createCharacter(usernameInput.text).then((char) => {
-                // login as this character
-                this.loginAs(char);
-
-                // reset text
-                usernameInput.text = "";
-            });
-        });
     }
 
     async displayCharactersGUI(characters: PlayerCharacter[], scrollViewerBloc) {
@@ -201,7 +164,6 @@ export class CharacterSelectionScene {
             createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
             createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             scrollViewerBloc.addControl(createBtn);
-
             createBtn.onPointerDownObservable.add(() => {
                 this.loginAs(char);
             });

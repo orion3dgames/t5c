@@ -7,6 +7,7 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { RadioGroup, SelectionPanel, SliderGroup } from "@babylonjs/gui/2D/controls/selector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 
+import { InputText } from "@babylonjs/gui/2D/controls/inputText";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Button } from "@babylonjs/gui/2D/controls/button";
@@ -14,6 +15,10 @@ import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 
 import { SceneController } from "../Controllers/Scene";
 import State from "./Screens";
+
+import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
+import { PlayerCharacter, PlayerUser } from "../../shared/types";
+import { dataDB } from "../../shared/Data/dataDB";
 
 export class CharacterEditor {
     public _scene: Scene;
@@ -205,6 +210,13 @@ export class CharacterEditor {
         // load scene
         this._scene = scene;
 
+        // check if user token is valid
+        let user: PlayerUser = await this.checkLogin();
+        if (!user) {
+            // if token not valid, send back to login screen
+            SceneController.goToScene(State.LOGIN);
+        }
+
         // import
         let result = await SceneLoader.ImportMeshAsync("", "./models/", "male_all.glb", scene);
         this.results = result;
@@ -234,6 +246,17 @@ export class CharacterEditor {
         guiMenu.idealHeight = 720;
         this._ui = guiMenu;
 
+        const usernameInput = new InputText("newCharacterInput");
+        usernameInput.top = "-110px;";
+        usernameInput.width = 1;
+        usernameInput.height = "30px;";
+        usernameInput.color = "#FFF";
+        usernameInput.text = generateRandomPlayerName();
+        usernameInput.placeholderText = "Enter username";
+        usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        usernameInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        guiMenu.addControl(usernameInput);
+
         // PLAY BUTTON
         const playBtn = Button.CreateSimpleButton("playBtn", "PLAY");
         playBtn.top = "-70px";
@@ -246,7 +269,13 @@ export class CharacterEditor {
         playBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         guiMenu.addControl(playBtn);
         playBtn.onPointerDownObservable.add(() => {
-            //SceneController.goToScene(State.GAME);
+            // create new character via database
+            this.createCharacter(usernameInput.text).then((char) => {
+                // login as this character
+                this.loginAs(char);
+                // reset text
+                usernameInput.text = "";
+            });
         });
 
         // BACK BUTTON
@@ -370,5 +399,55 @@ export class CharacterEditor {
         btn.onPointerDownObservable.add(() => {
             callback(btn);
         });
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////
+
+    // check login details
+    async checkLogin() {
+        // check user exists else send back to login
+        let req = await request("post", apiUrl() + "/check", {
+            token: global.T5C.currentUser.token,
+        });
+
+        // check req status
+        if (req.status === 200) {
+            return JSON.parse(req.data).user;
+        } else {
+            // something went wrong
+            //alertMessage(this._ui, "Something went wrong.");
+        }
+    }
+
+    // login as this character
+    loginAs(character: PlayerCharacter) {
+        global.T5C.currentCharacter = character;
+        global.T5C.currentLocationKey = character.location;
+        global.T5C.currentLocation = dataDB.get("location", character.location);
+        SceneController.goToScene(State.GAME);
+    }
+
+    // create character
+    async createCharacter(name) {
+        // make sure both the username and password is entered.
+        if (!name) {
+            return false;
+        }
+
+        // check user exists else send back to login
+        let req = await request("post", apiUrl() + "/create_character", {
+            token: global.T5C.currentUser.token,
+            name: name,
+        });
+
+        // check req status
+        if (req.status === 200) {
+            return JSON.parse(req.data).character;
+        } else {
+            return false;
+        }
     }
 }

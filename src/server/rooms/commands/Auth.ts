@@ -2,9 +2,8 @@ import { Command } from "@colyseus/command";
 import { GameRoom } from "../GameRoom";
 import Logger from "../../../shared/Logger";
 
-class Auth{
+class Auth {
     static async check(db, authData) {
-
         const character = await db.getCharacter(authData.character_id);
 
         if (!character) {
@@ -20,7 +19,7 @@ class Auth{
 
         // all checks are good, proceed
         Logger.info("[gameroom][onAuth] client authentified.", character);
-        return true;
+        return character;
     }
 }
 
