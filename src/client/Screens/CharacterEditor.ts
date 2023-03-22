@@ -6,6 +6,7 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { RadioGroup, SelectionPanel, SliderGroup } from "@babylonjs/gui/2D/controls/selector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { AssetContainer } from "@babylonjs/core/assetContainer";
 
 import { InputText } from "@babylonjs/gui/2D/controls/inputText";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
@@ -14,25 +15,81 @@ import { Button } from "@babylonjs/gui/2D/controls/button";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 
 import { SceneController } from "../Controllers/Scene";
+import { AuthController } from "../Controllers/AuthController";
 import State from "./Screens";
-
 import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
-import { PlayerCharacter, PlayerUser } from "../../shared/types";
-import { dataDB } from "../../shared/Data/dataDB";
+import { Environment } from "../Controllers/Environment";
+import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
+import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 
 export class CharacterEditor {
     public _scene: Scene;
+    private _auth: AuthController;
+    public _environment;
     public _newState: State;
     public _button: Button;
     public _ui;
-
+    public _shadow;
+    private _loadedAssets: AssetContainer[] = [];
     public results;
+    public selection;
+    public CHARACTER;
 
     constructor() {
         this._newState = State.NULL;
     }
 
     public async createScene(app) {
+        // auth controller
+        this._auth = AuthController.getInstance();
+
+        let scene = new Scene(app.engine);
+        scene.clearColor = new Color4(0, 0, 0, 1);
+
+        // camera
+        var camera = new ArcRotateCamera("camera1", Math.PI / 2, Math.PI / 4, 3, new Vector3(0, 0.5, 0), scene);
+        camera.attachControl(app.canvas, true);
+        camera.lowerRadiusLimit = 2;
+        camera.upperRadiusLimit = 10;
+        camera.wheelDeltaPercentage = 0.01;
+
+        // scene light
+        var sun = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
+        sun.intensity = 0.6;
+        sun.specular = Color3.Black();
+
+        // shadow light
+        var light = new DirectionalLight("DirectionalLight", new Vector3(-1, -2, -1), scene);
+        light.position = new Vector3(100, 100, 100);
+        light.radius = 0.27;
+        light.intensity = 2;
+        light.autoCalcShadowZBounds = true;
+
+        // shadow generator
+        this._shadow = new CascadedShadowGenerator(1024, light);
+        this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_LOW;
+        this._shadow.lambda = 0.94;
+        this._shadow.bias = 0.018;
+        this._shadow.autoCalcDepthBounds = true;
+        this._shadow.shadowMaxZ = 1000;
+
+        // Built-in 'ground' shape.
+        const ground = MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, scene);
+
+        // load scene
+        this._scene = scene;
+
+        // check if user token is valid
+        let user = await this._auth.loggedIn();
+        if (!user) {
+            // if token not valid, send back to login screen
+            SceneController.goToScene(State.LOGIN);
+        }
+
+        /////////////////////////////////////////////////////////
+        //////////////////////// MESHES
+        /////////////////////////////////////////////////////////
+
         /*
         Adventurer_Body_primitive0
         Adventurer_Body_primitive1
@@ -175,48 +232,51 @@ export class CharacterEditor {
         Worker_Legs_primitive1
         */
 
-        let CHARACTER_GENDER = {
-            MALE: ["Casual2_Body_primitive0", "Casual2_Body_primitive1", "Casual2_Feet_primitive0", "Casual2_Feet_primitive1", "Casual2_Head_primitive0", "Casual2_Head_primitive1", "Casual2_Head_primitive2", "Casual2_Head_primitive3", "Casual2_Head_primitive4", "Casual2_Legs"],
-            FEMALE: ["Casual_Body_primitive0", "Casual_Body_primitive1", "Casual_Feet_primitive0", "Casual_Feet_primitive1", "Casual_Head_primitive0", "Casual_Head_primitive1", "Casual_Head_primitive2", "Casual_Head_primitive3", "Casual_Head_primitive4", "Casual_Legs"],
-        };
-
-        let CHARACTER_SIZE = {
-            LIGHT: ["NPC_Man_Skinny_primitive0", "NPC_Man_Skinny_primitive1"],
-            NORMAL: ["NPC_Man_Normal_primitive0", "NPC_Man_Normal_primitive1"],
-            HEAVY: ["NPC_Man_Fat_primitive0", "NPC_Man_Fat_primitive1"],
-        };
-
         let CHARACTER_DATA = {
             WEAPON: ["None", "Sword_primitive0", "Sword_primitive1", "Sword_primitive2", "Pistol_primitive0"],
         };
 
-        let scene = new Scene(app.engine);
-        scene.clearColor = new Color4(0, 0, 0, 1);
+        let CHARACTER = {
+            player_male: {
+                MAIN_MESH: ["Casual2_Body_primitive0", "Casual2_Body_primitive1", "Casual2_Feet_primitive0", "Casual2_Feet_primitive1", "Casual2_Head_primitive0", "Casual2_Head_primitive1", "Casual2_Head_primitive2", "Casual2_Head_primitive3", "Casual2_Head_primitive4", "Casual2_Legs"],
+                OPTIONS: CHARACTER_DATA,
+                SCALE: 1,
+                ANIMATIONS: {
+                    IDLE: 4,
+                    WALK: 22,
+                    DEATH: 1,
+                },
+            },
+            player_female: {
+                MAIN_MESH: ["Casual_Body_primitive0", "Casual_Body_primitive1", "Casual_Feet_primitive0", "Casual_Feet_primitive1", "Casual_Head_primitive0", "Casual_Head_primitive1", "Casual_Head_primitive2", "Casual_Head_primitive3", "Casual_Head_primitive4", "Casual_Legs"],
+                OPTIONS: CHARACTER_DATA,
+                SCALE: 0.02,
+                ANIMATIONS: {
+                    IDLE: 4,
+                    WALK: 22,
+                    DEATH: 1,
+                },
+            },
+        };
 
-        var camera = new ArcRotateCamera("camera1", Math.PI / 2, Math.PI / 4, 3, new Vector3(0, 0.5, 0), scene);
-        camera.attachControl(app.canvas, true);
+        this.CHARACTER = CHARACTER;
 
-        camera.lowerRadiusLimit = 2;
-        camera.upperRadiusLimit = 10;
-        camera.wheelDeltaPercentage = 0.01;
+        // load assets and remove them all from scene
+        this._environment = new Environment(this._scene, this._shadow, this._loadedAssets);
+        await this._environment.loadCharacterEditor();
 
-        var light = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
-        light.intensity = 0.6;
-        light.specular = Color3.Black();
+        // load the rest
+        app.engine.displayLoadingUI();
 
-        // Built-in 'ground' shape.
-        const ground = MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, scene);
+        //
+        this.selection = {
+            GENDER: "player_male",
+            ANIMATION: "IDLE",
+        };
 
-        // load scene
-        this._scene = scene;
+        this.loadMainMesh(this.selection);
 
-        // check if user token is valid
-        let user: PlayerUser = await this.checkLogin();
-        if (!user) {
-            // if token not valid, send back to login screen
-            SceneController.goToScene(State.LOGIN);
-        }
-
+        /*
         // import
         let result = await SceneLoader.ImportMeshAsync("", "./models/", "male_all.glb", scene);
         this.results = result;
@@ -238,8 +298,11 @@ export class CharacterEditor {
         ANIM_IDLE.play(true);
 
         let CHARACTER_ANIMATION = [ANIM_IDLE, ANIM_WALK, ANIM_DEATH];
+        */
 
-        ///////////////////////////////////////////////
+        /////////////////////////////////////////////////////////
+        //////////////////////// UI
+        /////////////////////////////////////////////////////////
 
         // set up ui
         const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
@@ -248,19 +311,19 @@ export class CharacterEditor {
 
         const usernameInput = new InputText("newCharacterInput");
         usernameInput.top = "-110px;";
-        usernameInput.width = 1;
+        usernameInput.width = "200px";
         usernameInput.height = "30px;";
         usernameInput.color = "#FFF";
         usernameInput.text = generateRandomPlayerName();
         usernameInput.placeholderText = "Enter username";
-        usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         usernameInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         guiMenu.addControl(usernameInput);
 
         // PLAY BUTTON
         const playBtn = Button.CreateSimpleButton("playBtn", "PLAY");
         playBtn.top = "-70px";
-        playBtn.width = 1;
+        playBtn.width = "200px";
         playBtn.height = "30px";
         playBtn.color = "white";
         playBtn.background = "orange";
@@ -270,9 +333,9 @@ export class CharacterEditor {
         guiMenu.addControl(playBtn);
         playBtn.onPointerDownObservable.add(() => {
             // create new character via database
-            this.createCharacter(usernameInput.text).then((char) => {
+            this.createCharacter(this._auth.currentUser.token, usernameInput.text).then((char) => {
                 // login as this character
-                this.loginAs(char);
+                this._auth.setCharacter(char);
                 // reset text
                 usernameInput.text = "";
             });
@@ -281,7 +344,7 @@ export class CharacterEditor {
         // BACK BUTTON
         const backBtn = Button.CreateSimpleButton("backBtn", "BACK");
         backBtn.top = "-30px";
-        backBtn.width = 1;
+        backBtn.width = "200px";
         backBtn.height = "30px";
         backBtn.color = "white";
         backBtn.background = "gray";
@@ -293,6 +356,7 @@ export class CharacterEditor {
             SceneController.goToScene(State.CHARACTER_SELECTION);
         });
 
+        /*
         // EDITOR OPTIONS
         var animationsOptions = new RadioGroup("Animation");
         CHARACTER_ANIMATION.forEach((anim) => {
@@ -303,18 +367,24 @@ export class CharacterEditor {
                 anim.start(true, 1.0, anim.from, anim.to, false);
             });
         });
+        */
 
         var sizeOptions = new RadioGroup("Gender");
-        for (let key in CHARACTER_GENDER) {
-            let data = CHARACTER_GENDER[key];
+        for (let key in CHARACTER) {
             sizeOptions.addRadio(key, () => {
-                this.hideAll(CHARACTER_GENDER);
-                data.forEach((b) => {
-                    this.showMesh(b, true);
-                });
+                // hide current mesh
+                let existingMesh = this._scene.getMeshByName(this.selection.GENDER);
+                if (existingMesh) {
+                    existingMesh.isVisible = false;
+                }
+
+                // show mesh
+                this.selection.GENDER = key;
+                this.loadMainMesh(this.selection);
             });
         }
 
+        /*
         var rotateGroup = new SliderGroup("Body Options");
         for (let key in CHARACTER_DATA) {
             let data = CHARACTER_DATA[key];
@@ -333,17 +403,37 @@ export class CharacterEditor {
                 data.length - 1,
                 0
             );
-        }
+        }*/
 
-        var selectBox = new SelectionPanel("sp", [sizeOptions, rotateGroup, animationsOptions]);
+        var selectBox = new SelectionPanel("sp", [sizeOptions]);
         selectBox.background = "rgba(255, 255, 255, .7)";
         selectBox.top = "15px;";
         selectBox.left = "15px;";
         selectBox.width = 0.25;
-        selectBox.height = 0.9;
+        selectBox.height = 0.7;
         selectBox.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         selectBox.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         guiMenu.addControl(selectBox);
+    }
+
+    loadMainMesh(selection) {
+        let CHARACTER = this.CHARACTER[selection.GENDER];
+
+        let existingMesh = this._scene.getMeshByName(selection.GENDER);
+        if (existingMesh) {
+            existingMesh.isVisible = true;
+        } else {
+            // load player mesh
+            const result = this._loadedAssets[selection.GENDER].instantiateModelsToScene((el) => {
+                if (el === "__root__") return selection.GENDER;
+                return el;
+            });
+            const playerMesh = result.rootNodes[0];
+            const animationGroups = result.animationGroups;
+
+            // scale model
+            playerMesh.scaling = new Vector3(CHARACTER.SCALE, CHARACTER.SCALE, CHARACTER.SCALE);
+        }
     }
 
     hideAll(arr) {
@@ -406,32 +496,8 @@ export class CharacterEditor {
     ///////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////
 
-    // check login details
-    async checkLogin() {
-        // check user exists else send back to login
-        let req = await request("post", apiUrl() + "/check", {
-            token: global.T5C.currentUser.token,
-        });
-
-        // check req status
-        if (req.status === 200) {
-            return JSON.parse(req.data).user;
-        } else {
-            // something went wrong
-            //alertMessage(this._ui, "Something went wrong.");
-        }
-    }
-
-    // login as this character
-    loginAs(character: PlayerCharacter) {
-        global.T5C.currentCharacter = character;
-        global.T5C.currentLocationKey = character.location;
-        global.T5C.currentLocation = dataDB.get("location", character.location);
-        SceneController.goToScene(State.GAME);
-    }
-
     // create character
-    async createCharacter(name) {
+    async createCharacter(token, name) {
         // make sure both the username and password is entered.
         if (!name) {
             return false;
@@ -439,7 +505,7 @@ export class CharacterEditor {
 
         // check user exists else send back to login
         let req = await request("post", apiUrl() + "/create_character", {
-            token: global.T5C.currentUser.token,
+            token: token,
             name: name,
         });
 

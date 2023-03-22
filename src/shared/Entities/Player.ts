@@ -1,6 +1,7 @@
 import { Scene } from "@babylonjs/core/scene";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
+
 import { NavMesh } from "../yuka";
 import { Room } from "colyseus.js";
 
@@ -14,11 +15,14 @@ import { UserInterface } from "../../client/Controllers/UserInterface";
 import Config from "../Config";
 import State from "../../client/Screens/Screens";
 import { EntityCurrentState } from "./Entity/EntityCurrentState";
+import { AuthController } from "../../client/Controllers/AuthController";
 import { dataDB } from "../Data/dataDB";
+import { SceneController } from "../../client/Controllers/Scene";
 
 export class Player extends Entity {
     public input;
     public interval;
+    private _auth: AuthController;
 
     public isCasting: boolean = false;
     public castingDigit: number = 0;
@@ -36,6 +40,8 @@ export class Player extends Entity {
         this._input = input;
 
         this.ability_in_cooldown = [false, false, false, false, false, false, false, false, false, false, false];
+
+        this._auth = AuthController.getInstance();
 
         this.spawnPlayer();
     }
@@ -198,7 +204,7 @@ export class Player extends Entity {
 
         // on teleport confirmation
         this._room.onMessage("playerTeleportConfirm", (location) => {
-            this.actionsController.teleport(this._room, location);
+            this.teleport(location);
         });
 
         // server confirm player can start casting
@@ -234,12 +240,17 @@ export class Player extends Entity {
     // to refactor
 
     public async teleport(location) {
+        // leave colyseus room
         await this._room.leave();
-        global.T5C.currentLocation = dataDB.get("location", location);
-        global.T5C.currentLocationKey = location;
-        global.T5C.currentCharacter.location = location;
-        global.T5C.currentRoomID = "";
-        global.T5C.nextScene = State.GAME;
+
+        // update auth data
+        let character = this._auth.currentCharacter;
+        character.location = location;
+        this._auth.setCharacter(character);
+        this._auth.setLocation(location);
+
+        // switch scene
+        SceneController.goToScene(State.GAME);
     }
 
     public remove() {

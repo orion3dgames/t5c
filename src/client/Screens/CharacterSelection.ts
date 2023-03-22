@@ -18,15 +18,19 @@ import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
 import alertMessage from "../../shared/Utils/alertMessage";
 import { dataDB } from "../../shared/Data/dataDB";
 import { SceneController } from "../Controllers/Scene";
+import { AuthController } from "../Controllers/AuthController";
 
 export class CharacterSelectionScene {
     public _scene: Scene;
     private _ui: AdvancedDynamicTexture;
+    private _auth: AuthController;
     public _button: Button;
-
     private leftColumnRect;
 
     public async createScene(app) {
+        // auth controller
+        this._auth = AuthController.getInstance();
+
         // create scene
         let scene = new Scene(app.engine);
 
@@ -89,7 +93,7 @@ export class CharacterSelectionScene {
         leftColumnRect.addControl(imgLogo);
 
         // welcome text
-        const welcomeText = new TextBlock("infotext", "Welcome " + global.T5C.currentUser.username);
+        const welcomeText = new TextBlock("infotext", "Welcome " + this._auth.currentUser.username);
         welcomeText.width = 0.8;
         welcomeText.height = "40px";
         welcomeText.color = "white";
@@ -120,7 +124,7 @@ export class CharacterSelectionScene {
         logoutBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         this.leftColumnRect.addControl(logoutBtn);
         logoutBtn.onPointerDownObservable.add(() => {
-            this.logout();
+            this._auth.logout();
         });
 
         const characterEditorBtn = Button.CreateSimpleButton("characterEditorBtn", "New Character");
@@ -141,17 +145,20 @@ export class CharacterSelectionScene {
         await this._scene.whenReadyAsync();
 
         // check if user token is valid
-        let user: PlayerUser = await this.checkLogin();
+        let user = await this._auth.loggedIn();
         if (!user) {
             // if token not valid, send back to login screen
             SceneController.goToScene(State.LOGIN);
         }
 
         // SHOW AVAILABLE CHARACTERS GUI
-        await this.displayCharactersGUI(user.characters as PlayerCharacter[], scrollViewerBloc);
+        if (user.characters.length > 0) {
+            await this.displayCharactersGUI(user.characters as PlayerCharacter[], scrollViewerBloc);
+        }
     }
 
     async displayCharactersGUI(characters: PlayerCharacter[], scrollViewerBloc) {
+        const Auth = AuthController.getInstance();
         let top = 0;
         characters.forEach((char) => {
             const createBtn = Button.CreateSimpleButton("characterBtn-" + char.id, "Play as: " + char.name);
@@ -165,65 +172,10 @@ export class CharacterSelectionScene {
             createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             scrollViewerBloc.addControl(createBtn);
             createBtn.onPointerDownObservable.add(() => {
-                this.loginAs(char);
+                Auth.setCharacter(char);
             });
 
             top += 35;
         });
-    }
-
-    // login as this character
-    loginAs(character: PlayerCharacter) {
-        global.T5C.currentCharacter = character;
-        global.T5C.currentLocationKey = character.location;
-        global.T5C.currentLocation = dataDB.get("location", character.location);
-        SceneController.goToScene(State.GAME);
-    }
-
-    // logout
-    logout() {
-        global.T5C.currentCharacter = null;
-        global.T5C.currentLocationKey = null;
-        global.T5C.currentLocation = null;
-        SceneController.goToScene(State.LOGIN);
-        // clear local storage
-        localStorage.removeItem("t5c_token");
-    }
-
-    // check login details
-    async checkLogin() {
-        // check user exists else send back to login
-        let req = await request("post", apiUrl() + "/check", {
-            token: global.T5C.currentUser.token,
-        });
-
-        // check req status
-        if (req.status === 200) {
-            return JSON.parse(req.data).user;
-        } else {
-            // something went wrong
-            alertMessage(this._ui, "Something went wrong.");
-        }
-    }
-
-    // create character
-    async createCharacter(name) {
-        // make sure both the username and password is entered.
-        if (!name) {
-            return false;
-        }
-
-        // check user exists else send back to login
-        let req = await request("post", apiUrl() + "/create_character", {
-            token: global.T5C.currentUser.token,
-            name: name,
-        });
-
-        // check req status
-        if (req.status === 200) {
-            return JSON.parse(req.data).character;
-        } else {
-            return false;
-        }
     }
 }

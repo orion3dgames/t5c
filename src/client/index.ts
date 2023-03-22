@@ -176,10 +176,6 @@ class App {
     setDefault() {
         global.T5C = {
             nextScene: Config.defaultScene,
-            currentRoomID: "",
-            currentSessionID: "",
-            currentLocation: dataDB.get("location", Config.initialLocation),
-            currentUser: false,
             currentMs: 0,
             camY: 0,
         };

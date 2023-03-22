@@ -17,6 +17,7 @@ import State from "./Screens";
 import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
 import alertMessage from "../../shared/Utils/alertMessage";
 import { SceneController } from "../Controllers/Scene";
+import { AuthController } from "../Controllers/AuthController";
 
 export class LoginScene {
     public _scene: Scene;
@@ -90,32 +91,6 @@ export class LoginScene {
         columnRect.addControl(formContainer);
 
         ///////////////////////////////////////////
-        // user token
-        /*
-        const token = localStorage.getItem("t5c_token");
-        if (token) {
-            // send login data
-            let req = await request("get", apiUrl() + "/loginWithToken", {
-                token: token,
-            });
-
-            // check req status
-            if (req.status === 200) {
-                // user was found or created
-                global.T5C.currentUser = JSON.parse(req.data).user;
-
-                // save token to local storage
-                localStorage.setItem("t5c_token", JSON.parse(req.data).user.token);
-
-                // go to character selection page
-                SceneController.goToScene(State.CHARACTER_SELECTION);
-            } else {
-                // something went wrong
-                alertMessage(this._ui, "Something went wrong.");
-            }
-        }*/
-
-        ///////////////////////////////////////////
         // username input
         const usernameInput = new InputText("usernameInput");
         usernameInput.top = "-140px";
@@ -151,7 +126,7 @@ export class LoginScene {
 
         passwordInput.onKeyboardEventProcessedObservable.add((ev) => {
             if (ev.key === "Enter") {
-                this.connect(usernameInput.text, passwordInput.text);
+                this.login(usernameInput.text, passwordInput.text);
                 usernameInput.text = "";
                 passwordInput.text = "";
             }
@@ -169,8 +144,9 @@ export class LoginScene {
         joinBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         formContainer.addControl(joinBtn);
 
-        joinBtn.onPointerDownObservable.add(() => {
-            this.connect(usernameInput.text, passwordInput.text);
+        joinBtn.onPointerDownObservable.add(async () => {
+            await this.login(usernameInput.text, passwordInput.text);
+            // reset input
             usernameInput.text = "";
             passwordInput.text = "";
         });
@@ -187,8 +163,8 @@ export class LoginScene {
         joinGuestBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         formContainer.addControl(joinGuestBtn);
 
-        joinGuestBtn.onPointerDownObservable.add(() => {
-            this.connect(generateRandomPlayerName(), generateRandomPlayerName());
+        joinGuestBtn.onPointerDownObservable.add(async () => {
+            await this.login(generateRandomPlayerName(), generateRandomPlayerName());
         });
 
         // load scene
@@ -197,32 +173,11 @@ export class LoginScene {
         await this._scene.whenReadyAsync();
     }
 
-    async connect(username: string, password: string) {
-        // make sure both the username and password is entered.
-        if (!username || !password) {
-            alertMessage(this._ui, "Please enter both the username and the password.");
-            return false;
-        }
-
-        // send login data
-        let req = await request("get", apiUrl() + "/login", {
-            username: username,
-            password: password,
-        });
-
-        // check req status
-        if (req.status === 200) {
-            // user was found or created
-            global.T5C.currentUser = JSON.parse(req.data).user;
-
-            // save token to local storage
-            localStorage.setItem("t5c_token", JSON.parse(req.data).user.token);
-
-            // go to character selection page
+    async login(username, password) {
+        const Auth = AuthController.getInstance();
+        let loginResult = await Auth.login(username, password);
+        if (loginResult) {
             SceneController.goToScene(State.CHARACTER_SELECTION);
-        } else {
-            // something went wrong
-            alertMessage(this._ui, "Something went wrong.");
         }
     }
 }

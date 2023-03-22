@@ -156,11 +156,4 @@ export class EntityActions {
             }
         });
     }
-
-    public async teleport(room, location) {
-        await room.leave();
-        global.T5C.currentLocation = dataDB.get('location', location);
-        global.T5C.currentCharacter.location = location;
-        global.T5C.nextScene = State.GAME;
-    }
 }

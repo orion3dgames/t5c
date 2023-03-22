@@ -7,19 +7,10 @@ import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
 import { CreateGround } from "@babylonjs/core/Meshes/Builders/groundBuilder";
 import { WaterMaterial } from "@babylonjs/materials/water";
 import { Sound } from "@babylonjs/core/Audio/sound";
-import {
-    AssetsManager,
-    BinaryFileAssetTask,
-    ContainerAssetTask,
-    CubeTextureAssetTask,
-    HDRCubeTextureAssetTask,
-    ImageAssetTask,
-    MeshAssetTask,
-    TextFileAssetTask,
-    TextureAssetTask,
-} from "@babylonjs/core/Misc/assetsManager";
+import { AssetsManager, BinaryFileAssetTask, ContainerAssetTask, CubeTextureAssetTask, HDRCubeTextureAssetTask, ImageAssetTask, MeshAssetTask, TextFileAssetTask, TextureAssetTask } from "@babylonjs/core/Misc/assetsManager";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Tags } from "@babylonjs/core/Misc/tags";
+import { AuthController } from "./AuthController";
 
 export class Environment {
     private _scene: Scene;
@@ -28,12 +19,14 @@ export class Environment {
     private _loadedAssets;
     public allMeshes;
     private _loadingTxt;
+    private _auth;
 
     constructor(scene: Scene, shadow: CascadedShadowGenerator, _loadedAssets) {
         this._scene = scene;
         this._shadow = shadow;
         this._loadedAssets = _loadedAssets;
         this._loadingTxt = window.document.getElementById("loadingTextDetails");
+        this._auth = AuthController.getInstance();
 
         // Assets manager
         this._assetsManager = new AssetsManager(scene);
@@ -47,13 +40,14 @@ export class Environment {
 
     public async loadNavMesh() {
         this.showLoadingMessage("navmesh: loading");
-        let navmesh = await loadNavMeshFromString(global.T5C.currentLocation.key);
+        let navmesh = await loadNavMeshFromString(this._auth.currentLocation.key);
         this.showLoadingMessage("navmesh: loaded");
         return navmesh;
     }
 
     public async loadAssets() {
-        let environmentModel = global.T5C.currentLocation.mesh;
+        let environmentName = this._auth.currentLocation.key;
+        let environmentModel = this._auth.currentLocation.mesh;
 
         let assetsToLoad = [
             // sounds
@@ -84,7 +78,7 @@ export class Environment {
 
             // environment
             {
-                name: global.T5C.currentLocation.key,
+                name: environmentName,
                 filename: environmentModel + ".glb",
                 extension: "glb",
                 instantiate: false,
@@ -135,9 +129,7 @@ export class Environment {
                     break;
 
                 default:
-                    console.error(
-                        'Error loading asset "' + obj.name + '". Unrecognized file extension "' + obj.extension + '"'
-                    );
+                    console.error('Error loading asset "' + obj.name + '". Unrecognized file extension "' + obj.extension + '"');
                     break;
             }
 
@@ -203,10 +195,56 @@ export class Environment {
         material.useAlphaFromDiffuseTexture = true;
     }
 
+    public async loadCharacterEditor() {
+        let assetsToLoad = [
+            // models
+            { name: "player_male", filename: "male_all.glb", extension: "glb", instantiate: true },
+            { name: "player_female", filename: "player_hobbit.glb", extension: "glb", instantiate: true },
+        ];
+
+        assetsToLoad.forEach((obj) => {
+            let assetTask;
+            switch (obj.extension) {
+                case "glb":
+                    assetTask = this._assetsManager.addContainerTask(obj.name, "", "", "./models/" + obj.filename);
+                    break;
+                default:
+                    console.error('Error loading asset "' + obj.name + '". Unrecognized file extension "' + obj.extension + '"');
+                    break;
+            }
+
+            assetTask.onSuccess = (task) => {
+                switch (task.constructor) {
+                    case ContainerAssetTask:
+                        this._loadedAssets[task.name] = task.loadedContainer;
+                        break;
+                    default:
+                        console.error('Error loading asset "' + task.name + '". Unrecognized AssetManager task type.');
+                        break;
+                }
+            };
+
+            assetTask.onError = (task, message, exception) => {
+                console.log(message, exception);
+            };
+        });
+
+        this._assetsManager.onProgress = (remainingCount, totalCount, lastFinishedTask) => {
+            this.showLoadingMessage("loading: " + lastFinishedTask.name);
+        };
+
+        this._assetsManager.onFinish = () => {
+            console.log("loading complete", this._loadedAssets);
+            this.showLoadingMessage("loading complete");
+        };
+
+        await this._assetsManager.loadAsync();
+    }
+
     //What we do once the environment assets have been imported
     //handles setting the necessary flags for collision and trigger meshes,
     public async prepareAssets() {
-        if (global.T5C.currentLocation.waterPlane) {
+        if (this._auth.currentLocation.waterPlane) {
             // Water
             var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 32 }, this._scene);
             waterMesh.position = new Vector3(0, -2, 0);
@@ -232,7 +270,7 @@ export class Environment {
         });*/
 
         // instantiate the scene
-        let key = global.T5C.currentLocation.mesh;
+        let key = this._auth.currentLocation.mesh;
         this.allMeshes = this._loadedAssets[key].loadedMeshes;
 
         //Loop through all environment meshes that were imported

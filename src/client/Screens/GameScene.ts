@@ -22,9 +22,11 @@ import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
 import { createConvexRegionHelper, createGraphHelper } from "../../shared/Utils/navMeshHelper";
 import { SceneController } from "../Controllers/Scene";
 import { dataDB } from "../../shared/Data/dataDB";
+import { AuthController } from "../Controllers/AuthController";
 
 export class GameScene {
     private _app;
+    private _auth: AuthController;
     private _scene: Scene;
     private _input: PlayerInput;
     private _ui;
@@ -46,7 +48,11 @@ export class GameScene {
     constructor() {}
 
     async createScene(app): Promise<void> {
+        // app
         this._app = app;
+
+        // auth controller
+        this._auth = AuthController.getInstance();
 
         // show loading screen
         this._app.engine.displayLoadingUI();
@@ -61,25 +67,41 @@ export class GameScene {
         ///////////////////// DEBUG CODE /////////////////////////////////
         // if local skip login screen
         if (isLocal()) {
+            /*
+            // set location
             //let tempLocation = "lh_town";
             let tempLocation = "lh_town";
-            global.T5C.currentLocation = dataDB.get("location", tempLocation);
+            this._auth.setLocation(tempLocation);
+
+            // get random user
             let req = await request("get", apiUrl() + "/returnRandomUser");
             let character = JSON.parse(req.data).user;
-            global.T5C.currentUser = {
+            character.location = tempLocation;
+
+            // set user
+            this._auth.setUser({
                 id: character.user_id,
                 username: character.username,
                 password: character.password,
                 token: character.token,
-            };
-            global.T5C.currentCharacter = character;
-            global.T5C.currentCharacter.location = tempLocation;
+            });
+
+            //set character
+            this._auth.setCharacter(character);
+            */
         }
         ///////////////////// END DEBUG CODE /////////////////////////////
         ///////////////////// END DEBUG CODE /////////////////////////////
 
+        // check if user token is valid
+        let user = await this._auth.loggedIn();
+        if (!user) {
+            // if token not valid, send back to login screen
+            SceneController.goToScene(State.LOGIN);
+        }
+
         //
-        let location = global.T5C.currentLocation;
+        let location = this._auth.currentLocation;
 
         // black background
         scene.clearColor = new Color4(location.skyColor, location.skyColor, location.skyColor, 1);
@@ -126,22 +148,19 @@ export class GameScene {
 
     private async _initNetwork(): Promise<void> {
         try {
-            let user = global.T5C.currentUser;
-            let character = global.T5C.currentCharacter;
+            let character = this._auth.currentCharacter;
             let currentLocationKey = character.location;
             let room = await this._app.client.findCurrentRoom(currentLocationKey);
 
             if (room) {
                 // join game room
-                this.room = await this._app.client.joinRoom(room.roomId, user.token, character.id);
+                this.room = await this._app.client.joinRoom(room.roomId, this._auth.currentUser.token, character.id);
 
                 // join global chat room (match sessionId to gameRoom)
                 this.chatRoom = await this._app.client.joinChatRoom({ sessionId: this.room.sessionId });
 
                 // set global vars
                 this._roomId = this.room.roomId;
-                global.T5C.currentRoomID = this._roomId;
-                global.T5C.currentSessionID = this.room.sessionId;
 
                 await this._initEvents();
             } else {
@@ -160,7 +179,7 @@ export class GameScene {
         this._ui = new UserInterface(this._scene, this._app.engine, this.room, this.chatRoom, this.entities, this._currentPlayer, this._loadedAssets);
 
         // get character
-        let req = await request("get", apiUrl() + "/get_character", { character_id: global.T5C.currentCharacter.id });
+        let req = await request("get", apiUrl() + "/get_character", { character_id: this._auth.currentCharacter.id });
         let character = JSON.parse(req.data).character;
 
         ////////////////////////////////////////////////////

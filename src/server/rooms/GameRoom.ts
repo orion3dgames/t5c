@@ -91,7 +91,6 @@ export class GameRoom extends Room<GameRoomState> {
     //////////////////////////////////////////////////////////////////////////
     // on client join
     async onJoin(client: Client, options: any) {
-        console.log(client);
         this.dispatcher.dispatch(new OnPlayerJoinCommand(), { client: client });
     }
 
