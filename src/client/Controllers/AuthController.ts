@@ -103,7 +103,6 @@ class AuthController {
         this._currentCharacter = character;
         this._currentLocationKey = character.location;
         this._currentLocation = dataDB.get("location", character.location);
-        SceneController.goToScene(State.GAME);
     }
 
     // set location

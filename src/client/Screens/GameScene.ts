@@ -67,7 +67,6 @@ export class GameScene {
         ///////////////////// DEBUG CODE /////////////////////////////////
         // if local skip login screen
         if (isLocal()) {
-            /*
             // set location
             //let tempLocation = "lh_town";
             let tempLocation = "lh_town";
@@ -88,17 +87,9 @@ export class GameScene {
 
             //set character
             this._auth.setCharacter(character);
-            */
         }
         ///////////////////// END DEBUG CODE /////////////////////////////
         ///////////////////// END DEBUG CODE /////////////////////////////
-
-        // check if user token is valid
-        let user = await this._auth.loggedIn();
-        if (!user) {
-            // if token not valid, send back to login screen
-            SceneController.goToScene(State.LOGIN);
-        }
 
         //
         let location = this._auth.currentLocation;
@@ -167,7 +158,7 @@ export class GameScene {
             }
         } catch (e) {
             alert("Failed to connect.");
-            SceneController.goToScene(State.CHARACTER_SELECTION);
+            //SceneController.goToScene(State.CHARACTER_SELECTION);
         }
     }
 

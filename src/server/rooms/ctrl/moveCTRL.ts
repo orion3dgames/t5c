@@ -6,6 +6,7 @@ import { PlayerInputs } from "../../../shared/types";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { EnemyState } from "../schema/EnemyState";
 import { ItemState } from "../schema/ItemState";
+import { nanoid } from "nanoid";
 
 export class moveCTRL {
     private _owner;
@@ -28,11 +29,12 @@ export class moveCTRL {
             if (distance < 3) {
                 let ability = this._owner.AI_CURRENT_ABILITY;
                 let target = this._owner.AI_CURRENT_TARGET;
-                if(target instanceof EnemyState){
+                if (target instanceof EnemyState) {
                     this._owner.abilitiesCTRL.startAutoAttack(this._owner, target, ability);
                 }
-                if(target instanceof ItemState){
-                    this._owner._gameroom.state.items.delete(target.sessionId);
+                if (target instanceof ItemState) {
+                    this._owner.addItemToInventory(target.key);
+                    //this._owner._gameroom.state.items.delete(target.sessionId);
                 }
                 this._owner.AI_CURRENT_TARGET = null;
                 this._owner.AI_CURRENT_ABILITY = null;

@@ -173,6 +173,7 @@ export class CharacterSelectionScene {
             scrollViewerBloc.addControl(createBtn);
             createBtn.onPointerDownObservable.add(() => {
                 Auth.setCharacter(char);
+                SceneController.goToScene(State.GAME);
             });
 
             top += 35;

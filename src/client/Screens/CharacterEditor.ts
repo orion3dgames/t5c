@@ -128,6 +128,7 @@ export class CharacterEditor {
             this.createCharacter(this._auth.currentUser.token, usernameInput.text).then((char) => {
                 // login as this character
                 this._auth.setCharacter(char);
+                SceneController.goToScene(State.GAME);
                 // reset text
                 usernameInput.text = "";
             });
@@ -398,11 +399,9 @@ export class CharacterEditor {
             });
         }
 
-        // ANIMATION OPTIONS
-        let animationOptions = this.CHARACTER[this.selection.GENDER].ANIMATIONS;
+        // ANIMATION OPTIONSd
         var radioGroupAnim = new RadioGroup("Animation");
         this._playerAnimations.forEach((anim) => {
-            console.log(anim);
             radioGroupAnim.addRadio(anim.name, () => {
                 this._playerAnimations.forEach((element) => {
                     element.stop();

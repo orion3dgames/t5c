@@ -6,9 +6,11 @@ import { GameRoom } from "../GameRoom";
 import { abilitiesCTRL } from "../ctrl/abilityCTRL";
 import { moveCTRL } from "../ctrl/moveCTRL";
 import { dataDB } from "../../../shared/Data/dataDB";
+import { nanoid } from "nanoid";
 
-class Item extends Schema {
-    @type("number") key: string = "";
+class InventoryItem extends Schema {
+    @type("string") sessionId: string = "";
+    @type("string") key: string = "";
     @type("uint16") qty: number = 0;
 }
 
@@ -20,7 +22,7 @@ export class PlayerState extends EntityState {
     @type("uint8") public agility: number = 0;
     @type("uint8") public intelligence: number = 0;
     @type("uint8") public wisdom: number = 0;
-    @type([Item]) public inventory = new ArraySchema<Item>();
+    @type([InventoryItem]) public inventory = new ArraySchema<InventoryItem>();
 
     //
     public gracePeriod: boolean = true;
@@ -71,6 +73,21 @@ export class PlayerState extends EntityState {
 
         //
         this.moveCTRL.update();
+    }
+
+    addItemToInventory(key) {
+        /*
+        // drop item on the ground
+        let sessionId = nanoid(10);
+        let data = {
+            sessionId: sessionId,
+            key: key,
+            qty: 1,
+        };
+        this.inventory.push(data);
+
+        console.log(this.inventory);
+        */
     }
 
     setAsDead() {

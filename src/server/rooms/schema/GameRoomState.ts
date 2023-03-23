@@ -79,6 +79,25 @@ export class GameRoomState extends Schema {
         Logger.info("[gameroom][state][createEntity] created new entity " + race + ": " + sessionId);
     }
 
+    public createItem() {
+        // get starting starting position
+        let randomRegion = this.navMesh.getRandomRegion();
+        let point = randomRegion.centroid;
+
+        // drop item on the ground
+        let sessionId = nanoid(10);
+        let data = {
+            key: "apple",
+            name: "Apple",
+            sessionId: sessionId,
+            x: point.x,
+            y: 0.25,
+            z: point.z,
+        };
+        let entity = new ItemState(this, data);
+        this.items.set(sessionId, entity);
+    }
+
     public update(deltaTime: number) {
         //////////////////////////////////////////////
         // entity spawning script (span a monster every .5 second)
@@ -89,6 +108,9 @@ export class GameRoomState extends Schema {
             let maxEntities = this.roomDetails.monsters;
             if (this.entities.size < maxEntities) {
                 this.createEntity(this.entities.size);
+            }
+            if (this.items.size < 20) {
+                this.createItem();
             }
         }
 
