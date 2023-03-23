@@ -21,6 +21,7 @@ import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
 import { Environment } from "../Controllers/Environment";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
+import { MeshAssetTask } from "@babylonjs/core/Misc/assetsManager";
 
 export class CharacterEditor {
     public _scene: Scene;
@@ -28,12 +29,17 @@ export class CharacterEditor {
     public _environment;
     public _newState: State;
     public _button: Button;
-    public _ui;
     public _shadow;
-    private _loadedAssets: AssetContainer[] = [];
+    private _loadedAssets: MeshAssetTask[] = [];
     public results;
     public selection;
     public CHARACTER;
+
+    public _ui;
+    public _uiRadioOptions;
+
+    private _playerMesh;
+    private _playerAnimations;
 
     constructor() {
         this._newState = State.NULL;
@@ -85,6 +91,62 @@ export class CharacterEditor {
             // if token not valid, send back to login screen
             SceneController.goToScene(State.LOGIN);
         }
+
+        /////////////////////////////////////////////////////////
+        //////////////////////// UI
+        /////////////////////////////////////////////////////////
+
+        // set up ui
+        const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        guiMenu.idealHeight = 720;
+        this._ui = guiMenu;
+
+        const usernameInput = new InputText("newCharacterInput");
+        usernameInput.top = "-110px;";
+        usernameInput.width = "200px";
+        usernameInput.height = "30px;";
+        usernameInput.color = "#FFF";
+        usernameInput.text = generateRandomPlayerName();
+        usernameInput.placeholderText = "Enter username";
+        usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        usernameInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        guiMenu.addControl(usernameInput);
+
+        // PLAY BUTTON
+        const playBtn = Button.CreateSimpleButton("playBtn", "PLAY");
+        playBtn.top = "-70px";
+        playBtn.width = "200px";
+        playBtn.height = "30px";
+        playBtn.color = "white";
+        playBtn.background = "orange";
+        playBtn.thickness = 1;
+        playBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        playBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        guiMenu.addControl(playBtn);
+        playBtn.onPointerDownObservable.add(() => {
+            // create new character via database
+            this.createCharacter(this._auth.currentUser.token, usernameInput.text).then((char) => {
+                // login as this character
+                this._auth.setCharacter(char);
+                // reset text
+                usernameInput.text = "";
+            });
+        });
+
+        // BACK BUTTON
+        const backBtn = Button.CreateSimpleButton("backBtn", "BACK");
+        backBtn.top = "-30px";
+        backBtn.width = "200px";
+        backBtn.height = "30px";
+        backBtn.color = "white";
+        backBtn.background = "gray";
+        backBtn.thickness = 1;
+        backBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        backBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        guiMenu.addControl(backBtn);
+        backBtn.onPointerDownObservable.add(() => {
+            SceneController.goToScene(State.CHARACTER_SELECTION);
+        });
 
         /////////////////////////////////////////////////////////
         //////////////////////// MESHES
@@ -250,7 +312,7 @@ export class CharacterEditor {
             player_female: {
                 MAIN_MESH: ["Casual_Body_primitive0", "Casual_Body_primitive1", "Casual_Feet_primitive0", "Casual_Feet_primitive1", "Casual_Head_primitive0", "Casual_Head_primitive1", "Casual_Head_primitive2", "Casual_Head_primitive3", "Casual_Head_primitive4", "Casual_Legs"],
                 OPTIONS: CHARACTER_DATA,
-                SCALE: 0.02,
+                SCALE: 1,
                 ANIMATIONS: {
                     IDLE: 4,
                     WALK: 22,
@@ -265,8 +327,13 @@ export class CharacterEditor {
         this._environment = new Environment(this._scene, this._shadow, this._loadedAssets);
         await this._environment.loadCharacterEditor();
 
-        // load the rest
-        app.engine.displayLoadingUI();
+        // hide all meshes
+        for (let i in this._loadedAssets) {
+            const result = this._loadedAssets[i];
+            result.loadedMeshes.forEach((element) => {
+                element.isVisible = false;
+            });
+        }
 
         //
         this.selection = {
@@ -274,109 +341,56 @@ export class CharacterEditor {
             ANIMATION: "IDLE",
         };
 
+        // load the rest
+        app.engine.displayLoadingUI();
+
         this.loadMainMesh(this.selection);
+    }
 
-        /*
-        // import
-        let result = await SceneLoader.ImportMeshAsync("", "./models/", "male_all.glb", scene);
-        this.results = result;
-        console.log(result);
+    loadMainMesh(selection) {
+        let CHARACTER = this.CHARACTER[selection.GENDER];
+        const result = this._loadedAssets[selection.GENDER];
 
-        result.meshes.forEach((element) => {
-            console.log(element.name);
-            element.isVisible = false;
+        // load player mesh
+        const playerMesh = result.loadedMeshes[0];
+        result.loadedMeshes.forEach((m) => {
+            m.isVisible = true;
         });
 
-        ///////////////////////////////////////////////
-        let animations = result.animationGroups;
-        animations[0].stop();
+        // get animations
+        const animationGroups = result.loadedAnimationGroups;
+        animationGroups[0].stop();
+        animationGroups[CHARACTER.ANIMATIONS.IDLE].play(true);
 
-        let ANIM_IDLE = animations[4];
-        let ANIM_WALK = animations[22];
-        let ANIM_DEATH = animations[0];
+        // scale model
+        playerMesh.scaling = new Vector3(CHARACTER.SCALE, CHARACTER.SCALE, CHARACTER.SCALE);
 
-        ANIM_IDLE.play(true);
+        // get select animations
+        let meshAnimations = CHARACTER.ANIMATIONS;
+        const selectedAnimationGroups = [animationGroups[meshAnimations.IDLE], animationGroups[meshAnimations.WALK], animationGroups[meshAnimations.DEATH]];
 
-        let CHARACTER_ANIMATION = [ANIM_IDLE, ANIM_WALK, ANIM_DEATH];
-        */
+        //
+        this._playerMesh = playerMesh;
+        this._playerAnimations = selectedAnimationGroups;
 
-        /////////////////////////////////////////////////////////
-        //////////////////////// UI
-        /////////////////////////////////////////////////////////
+        this.loadSelectionUI();
+    }
 
-        // set up ui
-        const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-        guiMenu.idealHeight = 720;
-        this._ui = guiMenu;
+    loadSelectionUI() {
+        if (this._uiRadioOptions) {
+            this._uiRadioOptions.dispose();
+        }
 
-        const usernameInput = new InputText("newCharacterInput");
-        usernameInput.top = "-110px;";
-        usernameInput.width = "200px";
-        usernameInput.height = "30px;";
-        usernameInput.color = "#FFF";
-        usernameInput.text = generateRandomPlayerName();
-        usernameInput.placeholderText = "Enter username";
-        usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        usernameInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        guiMenu.addControl(usernameInput);
-
-        // PLAY BUTTON
-        const playBtn = Button.CreateSimpleButton("playBtn", "PLAY");
-        playBtn.top = "-70px";
-        playBtn.width = "200px";
-        playBtn.height = "30px";
-        playBtn.color = "white";
-        playBtn.background = "orange";
-        playBtn.thickness = 1;
-        playBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        playBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        guiMenu.addControl(playBtn);
-        playBtn.onPointerDownObservable.add(() => {
-            // create new character via database
-            this.createCharacter(this._auth.currentUser.token, usernameInput.text).then((char) => {
-                // login as this character
-                this._auth.setCharacter(char);
-                // reset text
-                usernameInput.text = "";
-            });
-        });
-
-        // BACK BUTTON
-        const backBtn = Button.CreateSimpleButton("backBtn", "BACK");
-        backBtn.top = "-30px";
-        backBtn.width = "200px";
-        backBtn.height = "30px";
-        backBtn.color = "white";
-        backBtn.background = "gray";
-        backBtn.thickness = 1;
-        backBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        backBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        guiMenu.addControl(backBtn);
-        backBtn.onPointerDownObservable.add(() => {
-            SceneController.goToScene(State.CHARACTER_SELECTION);
-        });
-
-        /*
-        // EDITOR OPTIONS
-        var animationsOptions = new RadioGroup("Animation");
-        CHARACTER_ANIMATION.forEach((anim) => {
-            animationsOptions.addRadio(anim.name, () => {
-                CHARACTER_ANIMATION.forEach((element) => {
-                    element.stop();
-                });
-                anim.start(true, 1.0, anim.from, anim.to, false);
-            });
-        });
-        */
-
+        // GENDER OPTIONS
         var sizeOptions = new RadioGroup("Gender");
-        for (let key in CHARACTER) {
+        for (let key in this.CHARACTER) {
             sizeOptions.addRadio(key, () => {
                 // hide current mesh
-                let existingMesh = this._scene.getMeshByName(this.selection.GENDER);
-                if (existingMesh) {
-                    existingMesh.isVisible = false;
-                }
+                const result = this._loadedAssets[this.selection.GENDER];
+                const playerMesh = result.loadedMeshes[0];
+                result.loadedMeshes.forEach((m) => {
+                    m.isVisible = false;
+                });
 
                 // show mesh
                 this.selection.GENDER = key;
@@ -384,28 +398,20 @@ export class CharacterEditor {
             });
         }
 
-        /*
-        var rotateGroup = new SliderGroup("Body Options");
-        for (let key in CHARACTER_DATA) {
-            let data = CHARACTER_DATA[key];
-            rotateGroup.addSlider(
-                key,
-                (v) => {
-                    let index = v.toFixed(0);
-                    let value = data[index];
-                    data.forEach((b) => {
-                        this.showMesh(b, false);
-                    });
-                    this.showMesh(value, true);
-                },
-                key,
-                0,
-                data.length - 1,
-                0
-            );
-        }*/
+        // ANIMATION OPTIONS
+        let animationOptions = this.CHARACTER[this.selection.GENDER].ANIMATIONS;
+        var radioGroupAnim = new RadioGroup("Animation");
+        this._playerAnimations.forEach((anim) => {
+            console.log(anim);
+            radioGroupAnim.addRadio(anim.name, () => {
+                this._playerAnimations.forEach((element) => {
+                    element.stop();
+                });
+                anim.start(true, 1.0, anim.from, anim.to, false);
+            });
+        });
 
-        var selectBox = new SelectionPanel("sp", [sizeOptions]);
+        var selectBox = new SelectionPanel("sp", [sizeOptions, radioGroupAnim]);
         selectBox.background = "rgba(255, 255, 255, .7)";
         selectBox.top = "15px;";
         selectBox.left = "15px;";
@@ -413,27 +419,9 @@ export class CharacterEditor {
         selectBox.height = 0.7;
         selectBox.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         selectBox.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        guiMenu.addControl(selectBox);
-    }
+        this._ui.addControl(selectBox);
 
-    loadMainMesh(selection) {
-        let CHARACTER = this.CHARACTER[selection.GENDER];
-
-        let existingMesh = this._scene.getMeshByName(selection.GENDER);
-        if (existingMesh) {
-            existingMesh.isVisible = true;
-        } else {
-            // load player mesh
-            const result = this._loadedAssets[selection.GENDER].instantiateModelsToScene((el) => {
-                if (el === "__root__") return selection.GENDER;
-                return el;
-            });
-            const playerMesh = result.rootNodes[0];
-            const animationGroups = result.animationGroups;
-
-            // scale model
-            playerMesh.scaling = new Vector3(CHARACTER.SCALE, CHARACTER.SCALE, CHARACTER.SCALE);
-        }
+        this._uiRadioOptions = selectBox;
     }
 
     hideAll(arr) {
