@@ -1,18 +1,13 @@
-import { Schema, ArraySchema, type } from "@colyseus/schema";
+import { Schema, MapSchema, type } from "@colyseus/schema";
 import Config from "../../../shared/Config";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { EntityState } from "../schema/EntityState";
+import { InventoryItem } from "../schema/InventoryItem";
 import { GameRoom } from "../GameRoom";
 import { abilitiesCTRL } from "../ctrl/abilityCTRL";
 import { moveCTRL } from "../ctrl/moveCTRL";
 import { dataDB } from "../../../shared/Data/dataDB";
-import { nanoid } from "nanoid";
-
-class InventoryItem extends Schema {
-    @type("string") sessionId: string = "";
-    @type("string") key: string = "";
-    @type("uint16") qty: number = 0;
-}
+import { Item } from "src/shared/Entities/Item";
 
 export class PlayerState extends EntityState {
     // networked player specific
@@ -22,7 +17,7 @@ export class PlayerState extends EntityState {
     @type("uint8") public agility: number = 0;
     @type("uint8") public intelligence: number = 0;
     @type("uint8") public wisdom: number = 0;
-    @type([InventoryItem]) public inventory = new ArraySchema<InventoryItem>();
+    @type({ map: InventoryItem }) inventory = new MapSchema<InventoryItem>();
 
     //
     public gracePeriod: boolean = true;
@@ -75,19 +70,21 @@ export class PlayerState extends EntityState {
         this.moveCTRL.update();
     }
 
-    addItemToInventory(key) {
-        /*
+    addItemToInventory(item: Item) {
+        console.log("Pick up item", item.key);
+
         // drop item on the ground
-        let sessionId = nanoid(10);
         let data = {
-            sessionId: sessionId,
-            key: key,
+            key: item.key,
             qty: 1,
         };
-        this.inventory.push(data);
 
-        console.log(this.inventory);
-        */
+        let inventoryItem = this.inventory.get(data.key);
+        if (inventoryItem) {
+            inventoryItem.qty += 1;
+        } else {
+            this.inventory.set(item.key, new InventoryItem(data));
+        }
     }
 
     setAsDead() {

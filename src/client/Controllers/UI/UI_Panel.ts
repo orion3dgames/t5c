@@ -216,7 +216,7 @@ export class UI_Panel {
     ///////////////////////////////////////
     // INVENTORY PANEL
     public inventory(panel, tab) {
-        //console.log("inventory", panel, tab);
+        console.log("inventory", this._currentPlayer.inventory);
 
         const leftPanel = new Rectangle("inventoryLeftPanel");
         leftPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
@@ -275,7 +275,7 @@ export class UI_Panel {
                 inventorySpace.height = 0.9;
                 inventorySpace.background = "gray";
                 inventorySpace.thickness = 0;
-                inventorySpace.cornerRadius = 4;
+                inventorySpace.cornerRadius = 0;
                 grid.addControl(inventorySpace, r, col);
             }
         }
