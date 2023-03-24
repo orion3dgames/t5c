@@ -13,7 +13,7 @@ export class UI_Panel {
     private _currentPlayer;
     private _options;
     private _tabs;
-    private tabContent = [];
+    private tabContent: Rectangle[] = [];
     private tabButtons = [];
     private selectedTab;
     private selectedTabUI;
@@ -26,8 +26,8 @@ export class UI_Panel {
             name: "Default Name",
             horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
             vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
-            width: "500px", // 50% screen width
-            height: "390px", // 50% screen height
+            width: 1, // 50% screen width
+            height: 0.8, // 50% screen height
         }
     ) {
         //
@@ -67,13 +67,13 @@ export class UI_Panel {
 
         // main panel
         const mainPanel = new Rectangle("mainPanel");
-        mainPanel.top = "-50px;";
+        mainPanel.top = 0;
         mainPanel.left = 0;
         mainPanel.width = this._options.width;
         mainPanel.height = this._options.height;
         mainPanel.verticalAlignment = this._options.horizontal_position;
         mainPanel.horizontalAlignment = this._options.vertical_position;
-        mainPanel.isVisible = false;
+        mainPanel.isVisible = true;
         mainPanel.thickness = 0;
         this._playerUI.addControl(mainPanel);
         this.selectedTabUI = mainPanel;
@@ -149,10 +149,9 @@ export class UI_Panel {
             tabContent.paddingLeft = "15px;";
             tabContent.paddingRight = "15px;";
             tabContent.paddingTop = "15px;";
-            //tabContent.background = "rgba(255,255,255, 0.1)";
             tabContent.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
             tabContent.horizontalAlignment = this._options.vertical_position;
-            tabContent.isVisible = this.selectedTab === tabId ? true : false;
+            tabContent.isVisible = false;
             mainPanel.addControl(tabContent);
 
             const entityNameTxt = new TextBlock("entityNameTxt");
@@ -167,19 +166,29 @@ export class UI_Panel {
             tabContent.addControl(entityNameTxt);
 
             this.tabContent[tabId] = tabContent;
-            this[tabId](tabContent, tab);
         }
 
         // add selected tab
+        this.setSelectedTab("character");
     }
 
     // open panel
     public setSelectedTab(key) {
+        // hide all tabs buttons
         for (let tabId in this._tabs) {
             this.tabContent[tabId].isVisible = false;
             this.tabButtons[tabId].background = "#000";
         }
 
+        // remove children
+        this.tabContent[key].children.forEach((element) => {
+            element.dispose();
+        });
+
+        // refresh tab content
+        this[key](this.tabContent[key], key);
+
+        // show
         this.selectedTabUI.isVisible = true;
         this.tabContent[key].isVisible = true;
         this.tabButtons[key].background = "green";
@@ -209,7 +218,14 @@ export class UI_Panel {
     ///////////////////////////////////////
     // CHARACTER PANEL
     public character(panel, tab) {
-        //console.log("character", panel, tab);
+        console.log("character", panel, tab);
+    }
+
+    ///////////////////////////////////////
+    ///////////////////////////////////////
+    // SKILLS PANEL
+    public skills(panel, tab) {
+        console.log("skills", panel, tab);
     }
 
     ///////////////////////////////////////
@@ -279,12 +295,5 @@ export class UI_Panel {
                 grid.addControl(inventorySpace, r, col);
             }
         }
-    }
-
-    ///////////////////////////////////////
-    ///////////////////////////////////////
-    // SKILLS PANEL
-    public skills(panel, tab) {
-        //console.log("skills", panel, tab);
     }
 }
