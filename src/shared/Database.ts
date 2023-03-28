@@ -46,6 +46,7 @@ class Database {
         const playerInventorySql = `CREATE TABLE IF NOT EXISTS "character_inventory" (
             "id" INTEGER PRIMARY KEY AUTOINCREMENT,
             "owner_id" INTEGER,
+            "order" INTEGER,
             "qty" INTEGER,
             "key" TEXT
         )`;

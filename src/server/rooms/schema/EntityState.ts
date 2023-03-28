@@ -1,8 +1,10 @@
-import { Schema, type } from "@colyseus/schema";
+import { Schema, type, filter, MapSchema } from "@colyseus/schema";
 import { dataDB } from "../../../shared/Data/dataDB";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { NavMesh } from "../../../shared/yuka";
 import { Vector3 } from "../../../shared/yuka";
+
+import { InventoryItem } from "../schema/InventoryItem";
 
 export class EntityState extends Schema {
     // id and name
@@ -50,6 +52,8 @@ export class EntityState extends Schema {
     public AI_CURRENT_TARGET;
     public AI_CURRENT_TARGET_FOUND = false;
     public AI_CURRENT_ABILITY;
+
+    @type({ map: InventoryItem }) inventory = new MapSchema<InventoryItem>();
 
     constructor(gameroom, data, ...args: any[]) {
         super(args);

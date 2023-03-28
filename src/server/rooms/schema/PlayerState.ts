@@ -1,8 +1,7 @@
-import { Schema, MapSchema, type } from "@colyseus/schema";
+import { Schema, MapSchema, type, filter } from "@colyseus/schema";
 import Config from "../../../shared/Config";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { EntityState } from "../schema/EntityState";
-import { InventoryItem } from "../schema/InventoryItem";
 import { GameRoom } from "../GameRoom";
 import { abilitiesCTRL } from "../ctrl/abilityCTRL";
 import { moveCTRL } from "../ctrl/moveCTRL";
@@ -17,14 +16,16 @@ export class PlayerState extends EntityState {
     @type("uint8") public agility: number = 0;
     @type("uint8") public intelligence: number = 0;
     @type("uint8") public wisdom: number = 0;
-    @type({ map: InventoryItem }) inventory = new MapSchema<InventoryItem>();
+
+    //
+    // inventory item should only be sent to corresponding player
 
     //
     public gracePeriod: boolean = true;
     public attackTimer;
     public abilitiesCTRL: abilitiesCTRL;
+    public abilities;
     public moveCTRL: moveCTRL;
-
     public events = [];
 
     constructor(gameroom: GameRoom, data, ...args: any[]) {
@@ -71,19 +72,18 @@ export class PlayerState extends EntityState {
     }
 
     addItemToInventory(item: Item) {
-        console.log("Pick up item", item.key);
+        console.log("Pick up item", item.key, item.quantity);
 
-        // drop item on the ground
         let data = {
             key: item.key,
-            qty: 1,
+            qty: item.quantity,
         };
 
         let inventoryItem = this.inventory.get(data.key);
         if (inventoryItem) {
-            inventoryItem.qty += 1;
+            inventoryItem.qty += data.qty;
         } else {
-            this.inventory.set(item.key, new InventoryItem(data));
+            //this.inventory.set(data.key, new InventoryItem(data));
         }
     }
 

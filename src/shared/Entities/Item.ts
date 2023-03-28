@@ -38,6 +38,7 @@ export class Item {
     public y: number;
     public z: number;
     public rot: number;
+    public quantity: number;
 
     // raceData
     public rotationFix;
@@ -68,7 +69,6 @@ export class Item {
     }
 
     public async spawn(entity) {
-
         const box = MeshBuilder.CreateBox(this.entity.sessionId, { width: 1, height: 1, depth: 1 }, this._scene);
         box.visibility = 0.5;
 
@@ -82,7 +82,7 @@ export class Item {
 
         this.mesh.metadata = {
             sessionId: this.entity.sessionId,
-            type: 'item',
+            type: "item",
             key: this.key,
             name: this.entity.name,
         };
@@ -127,7 +127,7 @@ export class Item {
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
                 let meshes = ev.meshUnderPointer.getChildMeshes();
-                let mesh =  meshes[this.meshIndex];
+                let mesh = meshes[this.meshIndex];
                 mesh.outlineColor = new Color3(0, 1, 0);
                 mesh.outlineWidth = 3;
                 mesh.renderOutline = true;
@@ -138,17 +138,17 @@ export class Item {
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
                 let meshes = ev.meshUnderPointer.getChildMeshes();
-                let mesh =  meshes[this.meshIndex];
+                let mesh = meshes[this.meshIndex];
                 mesh.renderOutline = false;
             })
         );
 
-         // register hover out player
-         this.mesh.actionManager.registerAction(
+        // register hover out player
+        this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnLeftPickTrigger, (ev) => {
                 let item = ev.meshUnderPointer.metadata;
-                this._room.send("pickup_item", {  
-                    sessionId: item.sessionId
+                this._room.send("pickup_item", {
+                    sessionId: item.sessionId,
                 });
             })
         );

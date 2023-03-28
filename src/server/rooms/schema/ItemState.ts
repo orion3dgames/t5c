@@ -9,6 +9,7 @@ export class ItemState extends Schema {
     @type("int16") public y: number = 0;
     @type("int16") public z: number = 0;
     @type("int16") public rot: number = 0;
+    @type("int16") public quantity: number = 0;
 
     public label;
     public description;
@@ -21,5 +22,4 @@ export class ItemState extends Schema {
     getPosition() {
         return new Vector3(this.x, this.y, this.z);
     }
-
 }

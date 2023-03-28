@@ -27,7 +27,7 @@ export class UI_Panel {
             horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
             vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
             width: 1, // 50% screen width
-            height: 0.8, // 50% screen height
+            height: 1, // 50% screen height
         }
     ) {
         //
@@ -218,32 +218,44 @@ export class UI_Panel {
     ///////////////////////////////////////
     // CHARACTER PANEL
     public character(panel, tab) {
-        console.log("character", panel, tab);
+        console.log(tab, panel, tab);
     }
 
     ///////////////////////////////////////
     ///////////////////////////////////////
     // SKILLS PANEL
     public skills(panel, tab) {
-        console.log("skills", panel, tab);
+        console.log(tab, panel, tab);
     }
 
     ///////////////////////////////////////
     ///////////////////////////////////////
     // INVENTORY PANEL
     public inventory(panel, tab) {
-        console.log("inventory", this._currentPlayer.inventory);
+        console.log(tab, this._currentPlayer);
 
         const leftPanel = new Rectangle("inventoryLeftPanel");
         leftPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         leftPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         leftPanel.top = "5px";
         leftPanel.left = 0;
-        leftPanel.width = 0.5;
+        leftPanel.width = 0.45;
         leftPanel.height = 1;
         leftPanel.background = "#222";
-        leftPanel.thickness = 0;
+        leftPanel.thickness = 1;
+        leftPanel.setPaddingInPixels(5, 5, 5, 5);
         panel.addControl(leftPanel);
+
+        const leftPanelTxt = new TextBlock("leftPanelTxt");
+        leftPanelTxt.text = "3d character to be displayed here...";
+        leftPanelTxt.color = "#FFF";
+        leftPanelTxt.top = "5px";
+        leftPanelTxt.left = "0";
+        leftPanelTxt.fontSize = "16px;";
+        leftPanelTxt.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        leftPanelTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        leftPanelTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        leftPanel.addControl(leftPanelTxt);
 
         const rightPanel = new Rectangle("inventoryRightPanel");
         rightPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;

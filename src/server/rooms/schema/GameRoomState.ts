@@ -93,6 +93,7 @@ export class GameRoomState extends Schema {
             x: point.x,
             y: 0.25,
             z: point.z,
+            quantity: 1,
         };
         let entity = new ItemState(this, data);
         this.items.set(sessionId, entity);

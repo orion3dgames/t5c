@@ -72,6 +72,17 @@ export class GameRoom extends Room<GameRoomState> {
                     // update player
                     let playerClient = this.clients.hashedArray[entity.sessionId];
                     this.database.updateCharacter(playerClient.auth.id, entity);
+
+                    // update player items
+                    if (entity.inventory && entity.inventory.size > 0) {
+                        //this.database.saveItems(entity.inventory);
+                    }
+
+                    // update player abilities
+                    if (entity.abilities && entity.abilities.size > 0) {
+                        //this.database.saveAbilities(entity.abilities);
+                    }
+
                     //Logger.info("[gameroom][onCreate] player " + playerClient.auth.name + " saved to database.");
                 });
             }
