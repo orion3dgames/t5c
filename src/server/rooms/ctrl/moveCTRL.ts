@@ -1,12 +1,9 @@
 import Logger from "../../../shared/Logger";
-
 import { Vector3 } from "../../../shared/yuka";
-
 import { PlayerInputs } from "../../../shared/types";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { EnemyState } from "../schema/EnemyState";
-import { ItemState } from "../schema/ItemState";
-import { nanoid } from "nanoid";
+import { LootState } from "../schema/LootState";
 
 export class moveCTRL {
     private _owner;
@@ -32,7 +29,7 @@ export class moveCTRL {
                 if (target instanceof EnemyState) {
                     this._owner.abilitiesCTRL.startAutoAttack(this._owner, target, ability);
                 }
-                if (target instanceof ItemState) {
+                if (target instanceof LootState) {
                     this._owner.addItemToInventory(target);
                     //this._owner._gameroom.state.items.delete(target.sessionId);
                 }
@@ -132,5 +129,50 @@ export class moveCTRL {
 
             Logger.warning("Invalid position for " + this._owner.name + ": ( x: " + this._owner.x + ", y: " + this._owner.y + ", z: " + this._owner.z + ", rot: " + this._owner.rot);
         }
+    }
+
+    /**
+     * Move entity toward a Vector3 position
+     * @param {Vector3} source
+     * @param {Vector3} destination
+     * @param {number} speed movement speed
+     * @returns {Vector3} new position
+     */
+    moveTo(source: Vector3, destination: Vector3, speed: number): Vector3 {
+        let currentX = source.x;
+        let currentZ = source.z;
+        let targetX = destination.x;
+        let targetZ = destination.z;
+        let newPos = new Vector3(source.x, source.y, source.z);
+
+        if (targetX < currentX) {
+            newPos.x -= speed;
+            if (newPos.x < targetX) {
+                newPos.x = targetX;
+            }
+        }
+
+        if (targetX > currentX) {
+            newPos.x += speed;
+            if (newPos.x > targetX) {
+                newPos.x = targetX;
+            }
+        }
+
+        if (targetZ < currentZ) {
+            newPos.z -= speed;
+            if (newPos.z < targetZ) {
+                newPos.z = targetZ;
+            }
+        }
+
+        if (targetZ > currentZ) {
+            newPos.z += speed;
+            if (newPos.z > targetZ) {
+                newPos.z = targetZ;
+            }
+        }
+
+        return newPos;
     }
 }

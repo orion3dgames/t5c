@@ -18,7 +18,7 @@ class Auth {
         }
 
         // all checks are good, proceed
-        Logger.info("[gameroom][onAuth] client authentified.", character);
+        Logger.info("[gameroom][onAuth] client authentified.");
         return character;
     }
 }

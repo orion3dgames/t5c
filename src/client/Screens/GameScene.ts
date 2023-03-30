@@ -169,22 +169,24 @@ export class GameScene {
         // setup hud
         this._ui = new UserInterface(this._scene, this._app.engine, this.room, this.chatRoom, this.entities, this._currentPlayer, this._loadedAssets);
 
-        // get character
-        let req = await request("get", apiUrl() + "/get_character", { character_id: this._auth.currentCharacter.id });
-        let character = JSON.parse(req.data).character;
-
         ////////////////////////////////////////////////////
         //  when a entity joins the room event
         this.room.state.players.onAdd((entity, sessionId) => {
             var isCurrentPlayer = sessionId === this.room.sessionId;
 
+            console.log("ADDING PLAYER", entity);
+
+            entity.abilities.forEach((element) => {
+                console.log("ABILITY", element);
+            });
+
+            entity.inventory.forEach((element) => {
+                console.log("INVENTORY", element);
+            });
+
             //////////////////
             // if player type
             if (entity.type === "player" && isCurrentPlayer) {
-                // terrible way... i'm just not sure what is the best way yet...
-                entity.abilities = character.abilities;
-                entity.inventory = character.inventory;
-
                 // create player entity
                 let _player = new Player(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._loadedAssets, this._input);
 

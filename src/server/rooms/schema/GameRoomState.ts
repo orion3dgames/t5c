@@ -1,7 +1,7 @@
 import { Schema, type, MapSchema } from "@colyseus/schema";
 import { EnemyState } from "./EnemyState";
-import { PlayerState } from "./PlayerState";
-import { ItemState } from "./ItemState";
+import { PlayerData, PlayerState } from "./PlayerState";
+import { LootState } from "./LootState";
 import { GameRoom } from "../GameRoom";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { NavMesh } from "../../../shared/yuka";
@@ -10,12 +10,13 @@ import Logger from "../../../shared/Logger";
 import { randomNumberInRange } from "../../../shared/Utils";
 import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 import { dataDB } from "../../../shared/Data/dataDB";
+import { Client } from "colyseus";
 
 export class GameRoomState extends Schema {
     // networked variables
     @type({ map: EnemyState }) entities = new MapSchema<EnemyState>();
     @type({ map: PlayerState }) players = new MapSchema<PlayerState>();
-    @type({ map: ItemState }) items = new MapSchema<ItemState>();
+    @type({ map: LootState }) items = new MapSchema<LootState>();
     @type("number") serverTime: number = 0.0;
 
     // not networked variables
@@ -34,9 +35,6 @@ export class GameRoomState extends Schema {
     }
 
     public createEntity(delta) {
-        // monster pool to chose from
-        let monsterTypes = ["monster_unicorn", "monster_bear"];
-
         // random id
         let sessionId = nanoid(10);
 
@@ -44,27 +42,26 @@ export class GameRoomState extends Schema {
         let randomRegion = this.navMesh.getRandomRegion();
         let point = randomRegion.centroid;
 
-        // random mesh
-        let race = monsterTypes[Math.floor(Math.random() * monsterTypes.length)];
-
-        // get race data
-        let raceData = dataDB.get("race", race);
+        // monster pool to chose from
+        let randTypes = ["monster_unicorn", "monster_bear"];
+        let randResult = randTypes[Math.floor(Math.random() * randTypes.length)];
+        let randData = dataDB.get("race", randResult);
 
         // create entity
         let data = {
             sessionId: sessionId,
             type: "entity",
-            race: race,
-            name: raceData.title + " #" + delta,
+            race: randData.key,
+            name: randData.title + " #" + delta,
             location: this._gameroom.metadata.location,
             x: point.x,
             y: 0,
             z: point.z,
             rot: randomNumberInRange(0, Math.PI),
-            health: raceData.baseHealth,
-            mana: raceData.baseMana,
-            maxHealth: raceData.baseHealth,
-            maxMana: raceData.baseMana,
+            health: randData.baseHealth,
+            mana: randData.baseMana,
+            maxHealth: randData.baseHealth,
+            maxMana: randData.baseMana,
             level: 1,
             state: EntityCurrentState.IDLE,
             toRegion: false,
@@ -76,7 +73,7 @@ export class GameRoomState extends Schema {
         this.entities.set(sessionId, entity);
 
         // log
-        Logger.info("[gameroom][state][createEntity] created new entity " + race + ": " + sessionId);
+        Logger.info("[gameroom][state][createEntity] created new entity " + randData.key + ": " + sessionId);
     }
 
     public createItem() {
@@ -84,18 +81,23 @@ export class GameRoomState extends Schema {
         let randomRegion = this.navMesh.getRandomRegion();
         let point = randomRegion.centroid;
 
+        // item pool to chose from
+        let randTypes = ["apple", "pear"];
+        let randResult = randTypes[Math.floor(Math.random() * randTypes.length)];
+        let randData = dataDB.get("item", randResult);
+
         // drop item on the ground
         let sessionId = nanoid(10);
         let data = {
-            key: "apple",
-            name: "Apple",
+            key: randData.key,
+            name: randData.name,
             sessionId: sessionId,
             x: point.x,
             y: 0.25,
             z: point.z,
             quantity: 1,
         };
-        let entity = new ItemState(this, data);
+        let entity = new LootState(this, data);
         this.items.set(sessionId, entity);
     }
 
@@ -119,6 +121,7 @@ export class GameRoomState extends Schema {
         // for each entity
         if (this.entities.size > 0) {
             this.entities.forEach((entity) => {
+                /*
                 // entity update
                 entity.update();
 
@@ -132,14 +135,14 @@ export class GameRoomState extends Schema {
                     } else if (entity.AI_CURRENT_STATE === AI_STATE.ATTACKING) {
                         entity.attack();
                     }
-                }
+                }*/
             });
         }
 
         // for each players
         if (this.players.size > 0) {
             this.players.forEach((player) => {
-                player.update();
+                //player.update();
             });
         }
     }
@@ -149,39 +152,52 @@ export class GameRoomState extends Schema {
      * @param sessionId
      * @param data
      */
-    addPlayer(sessionId: string, data): void {
+    addPlayer(client: Client): void {
+        // prepare player data
+        let data = client.auth;
         let player = {
             id: data.id,
-            sessionId: sessionId,
-            type: "player",
-            race: "player_hobbit",
-            name: data.name,
-            location: data.location,
+
             x: data.x,
             y: data.y,
             z: data.z,
             rot: data.rot,
-            state: EntityCurrentState.IDLE,
 
             health: data.health,
-            mana: data.mana,
             maxHealth: data.health,
+            mana: data.mana,
             maxMana: data.mana,
-
             level: data.level,
-            experience: data.experience,
-            gold: data.gold,
 
+            sessionId: client.sessionId,
+            name: data.name,
+            type: "player",
+            race: "player_hobbit",
+
+            location: data.location,
+            sequence: 0,
+            blocked: false,
+            state: EntityCurrentState.IDLE,
+
+            gold: data.gold ?? 0,
             strength: 15,
             endurance: 16,
             agility: 15,
             intelligence: 20,
             wisdom: 20,
+            experience: data.experience ?? 0,
 
-            abilities: data.abilities,
-            inventory: data.inventory,
+            temp_abilities: data.abilities ?? [],
+            temp_inventory: data.inventory ?? [],
         };
-        this.players.set(sessionId, new PlayerState(this._gameroom, player));
+
+        this._gameroom.state.players.set(client.sessionId, new PlayerState(this._gameroom, player));
+
+        // set player as online
+        this._gameroom.database.toggleOnlineStatus(client.auth.id, 1);
+
+        // log
+        Logger.info(`[gameroom][onJoin] player ${client.sessionId} joined room ${this._gameroom.roomId}.`);
     }
 
     removePlayer(sessionId: string) {

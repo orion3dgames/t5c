@@ -1,15 +1,48 @@
-import { type } from "@colyseus/schema";
+import { Schema, type } from "@colyseus/schema";
 import Logger from "../../../shared/Logger";
 import Config from "../../../shared/Config";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
-import { Vector3 } from "../../../shared/yuka";
-import { EntityState } from "./EntityState";
-import { PlayerState } from "./PlayerState";
+import { Vector3, NavMesh } from "../../../shared/yuka";
+import { dataDB } from "../../../shared/Data/dataDB";
 
-export class EnemyState extends EntityState {
-    // networked vars
+export class EnemyState extends Schema {
+    /////////////////////////////////////////////////////////////
+    // the below will be synced to all the players
+    @type("number") public id: number = 0;
+    @type("number") public x: number = 0;
+    @type("number") public y: number = 0;
+    @type("number") public z: number = 0;
+    @type("number") public rot: number = 0;
+
+    @type("int16") public health: number = 0;
+    @type("int16") public maxHealth: number = 0;
+    @type("int16") public mana: number = 0;
+    @type("int16") public maxMana: number = 0;
+    @type("uint8") public level: number = 0;
+
+    @type("string") public sessionId: string;
+    @type("string") public name: string = "";
+    @type("string") public type: string = "player";
+    @type("string") public race: string = "player_hobbit";
+
+    @type("string") public location: string = "";
+    @type("number") public sequence: number = 0; // latest input sequence
+    @type("boolean") public blocked: boolean = false; // if true, used to block player and to prevent movement
+    @type("int8") public anim_state: EntityCurrentState = EntityCurrentState.IDLE;
     @type("number") public AI_CURRENT_STATE: AI_STATE = 0;
+
+    public manaRegen: number = 0;
+    public healthRegen: number = 0;
+    public speed: number = 0;
+    public experienceGain: number = 0;
+    public isMoving: boolean = false;
+    public isDead: boolean = false;
+
+    public _navMesh: NavMesh;
+    public _gameroom;
+    public raceData;
+    public client;
 
     // public vars
     public currentRegion;
@@ -17,6 +50,11 @@ export class EnemyState extends EntityState {
     public targetRegion;
     public destinationPath;
 
+    public AI_CURRENT_TARGET_POSITION = null;
+    public AI_CURRENT_TARGET_DISTANCE = 0;
+    public AI_CURRENT_TARGET;
+    public AI_CURRENT_TARGET_FOUND = false;
+    public AI_CURRENT_ABILITY;
     public AI_STATE_REMAINING_DURATION: number = 0;
     public AI_SEEKING_ELAPSED_TIME: number = 0;
     public AI_CLOSEST_TARGET_POSITION = null;
@@ -27,6 +65,13 @@ export class EnemyState extends EntityState {
 
     constructor(gameroom, data, ...args: any[]) {
         super(gameroom, data, args);
+
+        this._navMesh = gameroom.navMesh;
+        this._gameroom = gameroom;
+        this.client = this.getClient();
+
+        Object.assign(this, data);
+        Object.assign(this, dataDB.get("race", this.race));
     }
 
     // runs on every server iteration
@@ -86,10 +131,7 @@ export class EnemyState extends EntityState {
                 // if entity is seeking and target gets away return to wandering
                 // - found and attacked player, but player managed to get away
                 // - was seeking player for over 50 server iteration but did not manage to catch player
-                if (
-                    (this.AI_CURRENT_TARGET_FOUND && this.AI_CURRENT_TARGET_DISTANCE > Config.MONSTER_AGGRO_DISTANCE) ||
-                    this.AI_SEEKING_ELAPSED_TIME > 50
-                ) {
+                if ((this.AI_CURRENT_TARGET_FOUND && this.AI_CURRENT_TARGET_DISTANCE > Config.MONSTER_AGGRO_DISTANCE) || this.AI_SEEKING_ELAPSED_TIME > 50) {
                     this.AI_CURRENT_STATE = AI_STATE.WANDER;
                     this.AI_CURRENT_TARGET = null;
                     this.AI_CURRENT_TARGET_DISTANCE = 0;
@@ -118,6 +160,32 @@ export class EnemyState extends EntityState {
                 this.returnToWandering();
             }
         }
+    }
+
+    public getClient() {
+        return this._gameroom.clients.get(this.sessionId);
+    }
+
+    /**
+     * monitor a target
+     */
+    monitorTarget() {
+        if (this.AI_CURRENT_TARGET !== null && this.AI_CURRENT_TARGET !== undefined && this.AI_CURRENT_TARGET.sessionId) {
+            let targetPos = this.AI_CURRENT_TARGET.getPosition();
+            let entityPos = this.getPosition();
+            let distanceBetween = entityPos.distanceTo(targetPos);
+            this.AI_CURRENT_TARGET_POSITION = targetPos;
+            this.AI_CURRENT_TARGET_DISTANCE = distanceBetween;
+        } else {
+            // else entity has no target
+            this.AI_CURRENT_TARGET = null;
+            this.AI_CURRENT_TARGET_POSITION = null;
+            this.AI_CURRENT_TARGET_DISTANCE = 0;
+        }
+    }
+
+    getPosition() {
+        return new Vector3(this.x, this.y, this.z);
     }
 
     // entity must always know the closest player at all times
@@ -151,7 +219,7 @@ export class EnemyState extends EntityState {
     setAsDead() {
         this.health = 0;
         this.blocked = true;
-        this.state = EntityCurrentState.DEAD;
+        this.anim_state = EntityCurrentState.DEAD;
         this.AI_CURRENT_STATE = AI_STATE.IDLE;
         this.AI_CURRENT_TARGET = null;
         this.isDead = true;
@@ -168,7 +236,7 @@ export class EnemyState extends EntityState {
      */
     attack() {
         // entity animation set to attack
-        this.state = EntityCurrentState.ATTACK;
+        this.anim_state = EntityCurrentState.ATTACK;
 
         this.AI_ATTACK_INTERVAL += 100;
 
@@ -344,6 +412,10 @@ export class EnemyState extends EntityState {
         this.z = updatedPos.z;
     }
 
+    setTarget(target) {
+        this.AI_CURRENT_TARGET = target;
+    }
+
     /**
      * Check if player can move from sourcePos to newPos
      * @param {Vector3} sourcePos source position
@@ -362,5 +434,50 @@ export class EnemyState extends EntityState {
      */
     calculateRotation(v1: Vector3, v2: Vector3): number {
         return Math.atan2(v1.x - v2.x, v1.z - v2.z);
+    }
+
+    /**
+     * Move entity toward a Vector3 position
+     * @param {Vector3} source
+     * @param {Vector3} destination
+     * @param {number} speed movement speed
+     * @returns {Vector3} new position
+     */
+    moveTo(source: Vector3, destination: Vector3, speed: number): Vector3 {
+        let currentX = source.x;
+        let currentZ = source.z;
+        let targetX = destination.x;
+        let targetZ = destination.z;
+        let newPos = new Vector3(source.x, source.y, source.z);
+
+        if (targetX < currentX) {
+            newPos.x -= speed;
+            if (newPos.x < targetX) {
+                newPos.x = targetX;
+            }
+        }
+
+        if (targetX > currentX) {
+            newPos.x += speed;
+            if (newPos.x > targetX) {
+                newPos.x = targetX;
+            }
+        }
+
+        if (targetZ < currentZ) {
+            newPos.z -= speed;
+            if (newPos.z < targetZ) {
+                newPos.z = targetZ;
+            }
+        }
+
+        if (targetZ > currentZ) {
+            newPos.z += speed;
+            if (newPos.z > targetZ) {
+                newPos.z = targetZ;
+            }
+        }
+
+        return newPos;
     }
 }

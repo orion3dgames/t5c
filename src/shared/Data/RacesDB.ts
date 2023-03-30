@@ -1,6 +1,7 @@
 import { ILootTableEntry, LootTableEntry } from "../Entities/Player/LootTable";
 
 type Race = {
+    key: string;
     title: string;
     speed: number;
     scale: number;
@@ -26,6 +27,7 @@ interface raceDataMap {
 
 let RacesDB: raceDataMap = {
     player_hobbit: {
+        key: "player_hobbit",
         title: "Hobbit",
         speed: 0.6,
         scale: 0.02,
@@ -49,6 +51,7 @@ let RacesDB: raceDataMap = {
         drops: [],
     },
     monster_bear: {
+        key: "monster_bear",
         title: "Bear",
         speed: 0.2,
         scale: 0.02,
@@ -72,6 +75,7 @@ let RacesDB: raceDataMap = {
         drops: [LootTableEntry("apple", 50, 1, 1, 1, 2), LootTableEntry("pear", 5, 1, 10, 1, 2)],
     },
     monster_unicorn: {
+        key: "monster_unicorn",
         title: "Unicorn",
         speed: 0.3,
         scale: 0.0125,

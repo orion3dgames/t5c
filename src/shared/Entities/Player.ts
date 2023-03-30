@@ -5,7 +5,7 @@ import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 import { NavMesh } from "../yuka";
 import { Room } from "colyseus.js";
 
-import { EntityState } from "../../server/rooms/schema/EntityState";
+import { PlayerState } from "../../server/rooms/schema/PlayerState";
 import { PlayerCamera } from "./Player/PlayerCamera";
 import { EntityUtils } from "./Entity/EntityUtils";
 import { EntityActions } from "./Entity/EntityActions";
@@ -34,7 +34,7 @@ export class Player extends Entity {
     public abilities;
     public inventory;
 
-    constructor(entity: EntityState, room: Room, scene: Scene, ui: UserInterface, shadow: CascadedShadowGenerator, navMesh: NavMesh, _loadedAssets: any[], input: PlayerInput) {
+    constructor(entity: PlayerState, room: Room, scene: Scene, ui: UserInterface, shadow: CascadedShadowGenerator, navMesh: NavMesh, _loadedAssets: any[], input: PlayerInput) {
         super(entity, room, scene, ui, shadow, navMesh, _loadedAssets);
 
         this._input = input;

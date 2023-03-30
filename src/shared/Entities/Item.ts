@@ -8,8 +8,6 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { Room } from "colyseus.js";
-
-import { EntityState } from "../../server/rooms/schema/EntityState";
 import { UserInterface } from "../../client/Controllers/UserInterface";
 import { PlayerInput } from "../../client/Controllers/PlayerInput";
 

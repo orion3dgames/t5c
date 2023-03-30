@@ -3,7 +3,7 @@ import { Leveling } from "../../../shared/Entities/Player/Leveling";
 import { randomNumberInRange } from "../../../shared/Utils";
 import { GetLoot } from "../../../shared/Entities/Player/LootTable";
 import { nanoid } from "nanoid";
-import { ItemState } from "../schema/ItemState";
+import { LootState } from "../schema/LootState";
 
 export class dropCTRL {
     private _owner;
@@ -81,7 +81,7 @@ export class dropCTRL {
                 z: currentPosition.z,
                 quantity: drop.quantity,
             };
-            let entity = new ItemState(this, data);
+            let entity = new LootState(this, data);
             this._owner._gameroom.state.items.set(sessionId, entity);
         });
     }

@@ -1,7 +1,7 @@
 import { Schema, type } from "@colyseus/schema";
 import { Vector3 } from "../../../shared/yuka";
 
-export class ItemState extends Schema {
+export class LootState extends Schema {
     // networked player specific
     @type("string") public key: string = "";
     @type("string") public sessionId: string;

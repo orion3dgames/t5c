@@ -10,7 +10,7 @@ import { PlayerInputs } from "../../shared/types";
 import { NavMesh } from "../../shared/yuka";
 import { nanoid } from "nanoid";
 import { randomNumberInRange } from "../../shared/Utils";
-import { ItemState } from "./schema/ItemState";
+import { LootState } from "./schema/LootState";
 import { dataDB } from "../../shared/Data/dataDB";
 
 import { Dispatcher } from "@colyseus/command";
@@ -74,14 +74,14 @@ export class GameRoom extends Room<GameRoomState> {
                     this.database.updateCharacter(playerClient.auth.id, entity);
 
                     // update player items
-                    if (entity.inventory && entity.inventory.size > 0) {
-                        //this.database.saveItems(entity.inventory);
-                    }
+                    //if (entity.inventory && entity.inventory.size > 0) {
+                    //this.database.saveItems(entity.inventory);
+                    //}
 
                     // update player abilities
-                    if (entity.abilities && entity.abilities.size > 0) {
-                        //this.database.saveAbilities(entity.abilities);
-                    }
+                    //if (entity.abilities && entity.abilities.size > 0) {
+                    //this.database.saveAbilities(entity.abilities);
+                    //}
 
                     //Logger.info("[gameroom][onCreate] player " + playerClient.auth.name + " saved to database.");
                 });
@@ -102,7 +102,8 @@ export class GameRoom extends Room<GameRoomState> {
     //////////////////////////////////////////////////////////////////////////
     // on client join
     async onJoin(client: Client, options: any) {
-        this.dispatcher.dispatch(new OnPlayerJoinCommand(), { client: client });
+        this.state.addPlayer(client);
+        //this.dispatcher.dispatch(new OnPlayerJoinCommand(), { client: client });
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -207,7 +208,7 @@ export class GameRoom extends Room<GameRoomState> {
                     y: 0.25,
                     z: currentPosition.z,
                 };
-                let entity = new ItemState(this, data);
+                let entity = new LootState(this, data);
                 this.state.items.set(sessionId, entity);
             }
 

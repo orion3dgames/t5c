@@ -7,7 +7,6 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { Room } from "colyseus.js";
 
-import { EntityState } from "../../server/rooms/schema/EntityState";
 import { PlayerCamera } from "./Player/PlayerCamera";
 import { EntityAnimator } from "./Entity/EntityAnimator";
 import { EntityMove } from "./Entity/EntityMove";
@@ -48,7 +47,7 @@ export class Entity {
     public characterChatLabel: Rectangle;
     public characterLabel: Rectangle;
     public sessionId: string;
-    public entity: EntityState;
+    public entity;
     public isCurrentPlayer: boolean;
 
     // character
@@ -79,7 +78,7 @@ export class Entity {
     // flags
     public blocked: boolean = false; // if true, player will not moved
 
-    constructor(entity: EntityState, room: Room, scene: Scene, ui: UserInterface, shadow: CascadedShadowGenerator, navMesh: NavMesh, _loadedAssets: AssetContainer[]) {
+    constructor(entity, room: Room, scene: Scene, ui: UserInterface, shadow: CascadedShadowGenerator, navMesh: NavMesh, _loadedAssets: AssetContainer[]) {
         // setup class variables
         this._scene = scene;
         this._room = room;

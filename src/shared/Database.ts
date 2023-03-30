@@ -293,6 +293,16 @@ class Database {
             this.run(sql_abilities);
         });
 
+        // add default items
+        let items = [
+            { qty: 1, key: "apple" },
+            { qty: 100, key: "pear" },
+        ];
+        items.forEach((item) => {
+            const sql = `INSERT INTO character_inventory ("owner_id", "qty", "key") VALUES ("${c.id}", "${item.qty}", "${item.key}")`;
+            this.run(sql);
+        });
+
         return await this.getCharacter(c.id);
     }
 
