@@ -43,7 +43,40 @@ export class Player extends Entity {
 
         this._auth = AuthController.getInstance();
 
+        this.setEntity(entity);
+
         this.spawnPlayer();
+    }
+
+    public setEntity(entity) {
+        console.log("SET LISTENERS FOR ABILITIES AND INVENTORY", entity);
+
+        // set abilities
+        /*
+        if (entity.inventory) {
+            entity.inventory.onAdd((item, sessionId) => {
+                console.log("onAdd", item, sessionId);
+            });
+            entity.inventory.onRemove((item, sessionId) => {
+                console.log("onRemove", item, sessionId);
+            });
+            entity.inventory.onChange((item, sessionId) => {
+                console.log("onChange", item, sessionId);
+            });
+        }*/
+        /*
+        if (entity.abilities) {
+            entity.abilities.forEach((element) => {
+                console.log("ABILITY", element);
+            });
+        }
+
+        // set inventory
+        if (entity.inventory) {
+            entity.inventory.forEach((element) => {
+                console.log("INVENTORY", element);
+            });
+        }*/
     }
 
     private async spawnPlayer() {

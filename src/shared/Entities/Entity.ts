@@ -67,6 +67,10 @@ export class Entity {
     public state: number = EntityCurrentState.IDLE;
     public AI_CURRENT_STATE: number = 0;
 
+    //
+    public abilities = [];
+    public inventory = [];
+
     // raceData
     public rotationFix;
     public meshIndex;
@@ -93,7 +97,7 @@ export class Entity {
         // update player data from server data
         Object.assign(this, dataDB.get("race", entity.race));
 
-        // update player data from server data
+        // set entity
         Object.assign(this, this.entity);
 
         // spawn player

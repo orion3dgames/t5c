@@ -174,16 +174,6 @@ export class GameScene {
         this.room.state.players.onAdd((entity, sessionId) => {
             var isCurrentPlayer = sessionId === this.room.sessionId;
 
-            console.log("ADDING PLAYER", entity);
-
-            entity.abilities.forEach((element) => {
-                console.log("ABILITY", element);
-            });
-
-            entity.inventory.forEach((element) => {
-                console.log("INVENTORY", element);
-            });
-
             //////////////////
             // if player type
             if (entity.type === "player" && isCurrentPlayer) {

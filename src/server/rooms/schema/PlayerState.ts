@@ -11,6 +11,7 @@ import { NavMesh, Vector3 } from "../../../shared/yuka";
 
 import { InventoryItem } from "../schema/InventoryItem";
 import { AbilityItem } from "./AbilityItem";
+import { LootState } from "./LootState";
 
 export class PlayerData extends Schema {
     @type({ map: InventoryItem }) inventory = new MapSchema<InventoryItem>();
@@ -125,7 +126,14 @@ export class PlayerState extends Schema {
         // add a 5 second grace period where the player can not be targeted by the ennemies
         setTimeout(() => {
             this.gracePeriod = false;
+            this.inventory.set("pear", new InventoryItem({ key: "pear", qty: 100 }));
+            console.log("ADDED PEAR TO INVENTORY");
         }, Config.PLAYER_GRACE_PERIOD);
+
+        setTimeout(() => {
+            let item = this.inventory.get("apple");
+            item.qty += 10;
+        }, 1000);
     }
 
     // runs on every server iteration
@@ -156,21 +164,18 @@ export class PlayerState extends Schema {
         this.moveCTRL.update();
     }
 
-    addItemToInventory(item: Item) {
-        console.log("Pick up item", item.key, item.quantity);
-
-        /*
+    addItemToInventory(loot: LootState) {
         let data = {
-            key: item.key,
-            qty: item.quantity,
+            key: loot.key,
+            qty: loot.quantity,
         };
-
+        console.log("Pick up item", data);
         let inventoryItem = this.inventory.get(data.key);
         if (inventoryItem) {
             inventoryItem.qty += data.qty;
         } else {
-            //this.inventory.set(data.key, new InventoryItem(data));
-        }*/
+            this.inventory.set(data.key, new InventoryItem(data));
+        }
     }
 
     setAsDead() {

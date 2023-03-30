@@ -139,7 +139,7 @@ export class GameRoom extends Room<GameRoomState> {
             const itemState = this.state.items.get(data.sessionId);
             if (playerState && itemState) {
                 playerState.setTarget(itemState);
-                //this.state.items.delete(data.sessionId);
+                this.state.items.delete(data.sessionId);
             }
         });
 

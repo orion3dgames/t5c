@@ -6,6 +6,7 @@ import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import Config from "../../../shared/Config";
 import { Grid } from "@babylonjs/gui/2D/controls/grid";
+import { Container } from "@babylonjs/gui/2D/controls/container";
 
 export class UI_Panel {
     private _playerUI;
@@ -39,12 +40,13 @@ export class UI_Panel {
         //
         this.selectedTab = "";
         this._tabs = {
-            character: {
-                title: "Character",
-            },
             inventory: {
                 title: "Inventory",
             },
+            character: {
+                title: "Character",
+            },
+
             skills: {
                 title: "Skills",
             },
@@ -212,7 +214,11 @@ export class UI_Panel {
     }
 
     // refresh panel
-    private _update() {}
+    private _update() {
+        if (this.selectedTab === "inventory") {
+            this.refreshItems();
+        }
+    }
 
     ///////////////////////////////////////
     ///////////////////////////////////////
@@ -231,6 +237,43 @@ export class UI_Panel {
     ///////////////////////////////////////
     ///////////////////////////////////////
     // INVENTORY PANEL
+
+    public refreshItems() {
+        let tab = this.tabContent["inventory"] as Rectangle;
+        const panel = tab.getChildByName("inventoryRightPanel") as Rectangle;
+        const childPanel = panel.children[0] as Grid;
+        if (childPanel) {
+            let i = 0;
+            this._currentPlayer.inventory.forEach((element) => {
+                let child = childPanel.children[i] as Container;
+                if (child) {
+                    const itemTxt = new TextBlock("itemTxt" + i);
+                    itemTxt.text = element.key;
+                    itemTxt.color = "#FFF";
+                    itemTxt.top = "5px";
+                    itemTxt.left = "0";
+                    itemTxt.fontSize = "16px;";
+                    itemTxt.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+                    itemTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+                    itemTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+                    child.addControl(itemTxt);
+
+                    const itemTxtQty = new TextBlock("itemTxtQty" + i);
+                    itemTxtQty.text = element.qty;
+                    itemTxtQty.color = "#FFF";
+                    itemTxtQty.top = "5px";
+                    itemTxtQty.left = "0";
+                    itemTxtQty.fontSize = "16px;";
+                    itemTxtQty.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+                    itemTxtQty.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+                    itemTxtQty.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+                    child.addControl(itemTxtQty);
+                }
+                i++;
+            });
+        }
+    }
+
     public inventory(panel, tab) {
         console.log(tab, this._currentPlayer);
 
@@ -247,7 +290,7 @@ export class UI_Panel {
         panel.addControl(leftPanel);
 
         const leftPanelTxt = new TextBlock("leftPanelTxt");
-        leftPanelTxt.text = "3d character to be displayed here...";
+        leftPanelTxt.text = "";
         leftPanelTxt.color = "#FFF";
         leftPanelTxt.top = "5px";
         leftPanelTxt.left = "0";

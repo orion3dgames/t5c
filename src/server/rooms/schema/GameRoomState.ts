@@ -99,6 +99,8 @@ export class GameRoomState extends Schema {
         };
         let entity = new LootState(this, data);
         this.items.set(sessionId, entity);
+
+        Logger.info("[gameroom][state][createEntity] created new item " + randData.key + ": " + sessionId);
     }
 
     public update(deltaTime: number) {
@@ -112,7 +114,7 @@ export class GameRoomState extends Schema {
             if (this.entities.size < maxEntities) {
                 this.createEntity(this.entities.size);
             }
-            if (this.items.size < 20) {
+            if (this.items.size < 50) {
                 this.createItem();
             }
         }
@@ -142,7 +144,7 @@ export class GameRoomState extends Schema {
         // for each players
         if (this.players.size > 0) {
             this.players.forEach((player) => {
-                //player.update();
+                player.update();
             });
         }
     }
