@@ -207,6 +207,7 @@ export class GameRoom extends Room<GameRoomState> {
                     x: currentPosition.x,
                     y: 0.25,
                     z: currentPosition.z,
+                    quantity: 1,
                 };
                 let entity = new LootState(this, data);
                 this.state.items.set(sessionId, entity);

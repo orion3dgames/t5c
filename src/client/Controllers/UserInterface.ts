@@ -124,7 +124,7 @@ export class UserInterface {
         });
 
         // create panel
-        this._UIPanel = new UI_Panel(this._playerUI, this._scene, currentPlayer);
+        this._UIPanel = new UI_Panel(this._playerUI, this._scene, currentPlayer, this._loadedAssets);
     }
 
     public refreshEntityUI() {

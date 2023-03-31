@@ -37,7 +37,7 @@ export class moveCTRL {
                 this._owner.AI_CURRENT_ABILITY = null;
             } else {
                 this._owner.rot = this.calculateRotation(start, destination);
-                this.setPosition(this._owner.moveTo(start, destination, this._owner.speed));
+                this.setPosition(this.moveTo(start, destination, this._owner.speed));
             }
         }
     }

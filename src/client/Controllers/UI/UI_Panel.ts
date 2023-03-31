@@ -7,11 +7,14 @@ import { Control } from "@babylonjs/gui/2D/controls/control";
 import Config from "../../../shared/Config";
 import { Grid } from "@babylonjs/gui/2D/controls/grid";
 import { Container } from "@babylonjs/gui/2D/controls/container";
+import { dataDB } from "../../../shared/Data/dataDB";
+import { Item } from "../../../shared/Data/ItemDB";
 
 export class UI_Panel {
     private _playerUI;
     private _scene;
     private _currentPlayer;
+    private _loadedAssets;
     private _options;
     private _tabs;
     private tabContent: Rectangle[] = [];
@@ -23,6 +26,7 @@ export class UI_Panel {
         _playerUI,
         _scene,
         _currentPlayer,
+        _loadedAssets,
         options = {
             name: "Default Name",
             horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
@@ -33,20 +37,20 @@ export class UI_Panel {
     ) {
         //
         this._playerUI = _playerUI;
+        this._loadedAssets = _loadedAssets;
         this._scene = _scene;
         this._currentPlayer = _currentPlayer;
         this._options = options;
 
         //
-        this.selectedTab = "";
+        this.selectedTab = "character";
         this._tabs = {
-            inventory: {
-                title: "Inventory",
-            },
             character: {
                 title: "Character",
             },
-
+            inventory: {
+                title: "Inventory",
+            },
             skills: {
                 title: "Skills",
             },
@@ -171,7 +175,7 @@ export class UI_Panel {
         }
 
         // add selected tab
-        this.setSelectedTab("character");
+        this.setSelectedTab(this.selectedTab);
     }
 
     // open panel
@@ -199,11 +203,12 @@ export class UI_Panel {
 
     // open panel
     public open(key) {
+        /*
         if (this.selectedTab === key) {
             this.selectedTabUI.isVisible = false;
             this.selectedTab = "";
             return false;
-        }
+        }*/
         this.setSelectedTab(key);
     }
 
@@ -247,12 +252,20 @@ export class UI_Panel {
             this._currentPlayer.inventory.forEach((element) => {
                 let child = childPanel.children[i] as Container;
                 if (child) {
+                    let item = dataDB.get("item", element.key) as Item;
+
+                    // add icon
+                    var imageData = this._loadedAssets[item.icon];
+                    var img = new Image("item_image_" + element.key, imageData);
+                    img.stretch = Image.STRETCH_FILL;
+                    child.addControl(img);
+
                     const itemTxt = new TextBlock("itemTxt" + i);
                     itemTxt.text = element.key;
                     itemTxt.color = "#FFF";
                     itemTxt.top = "5px";
-                    itemTxt.left = "0";
-                    itemTxt.fontSize = "16px;";
+                    itemTxt.left = "5px";
+                    itemTxt.fontSize = "12px;";
                     itemTxt.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
                     itemTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
                     itemTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
@@ -261,9 +274,9 @@ export class UI_Panel {
                     const itemTxtQty = new TextBlock("itemTxtQty" + i);
                     itemTxtQty.text = element.qty;
                     itemTxtQty.color = "#FFF";
-                    itemTxtQty.top = "5px";
-                    itemTxtQty.left = "0";
-                    itemTxtQty.fontSize = "16px;";
+                    itemTxtQty.top = "-2px";
+                    itemTxtQty.left = "-2px";
+                    itemTxtQty.fontSize = "12px;";
                     itemTxtQty.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
                     itemTxtQty.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
                     itemTxtQty.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;

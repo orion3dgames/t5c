@@ -2,6 +2,7 @@ type Item = {
     key: string;
     name: string;
     description: string;
+    icon: string;
     value: number;
     type: ItemType;
     canEquip?: {
@@ -62,6 +63,7 @@ let ItemsDB: itemDataMap = {
         key: "apple",
         name: "Apple",
         description: "A delicious apple.",
+        icon: "ITEM_apple",
         type: ItemType.CONSUMABLE,
         value: 25,
         canEquip: {
@@ -84,6 +86,7 @@ let ItemsDB: itemDataMap = {
         key: "pear",
         name: "Pear",
         description: "A delicious pear.",
+        icon: "ITEM_pear",
         type: ItemType.CONSUMABLE,
         value: 200,
         benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 40 }],

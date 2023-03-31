@@ -66,11 +66,15 @@ export class Environment {
             { name: "apple", filename: "apple.glb", extension: "glb", instantiate: true },
             { name: "pear", filename: "pear.glb", extension: "glb", instantiate: true },
 
-            // image
+            // abilities
             { name: "ABILITY_base_attack", filename: "icons/ABILITY_base_attack.png", extension: "png", type: "image" },
             { name: "ABILITY_fireball", filename: "icons/ABILITY_fireball.png", extension: "png", type: "image" },
             { name: "ABILITY_poisonball", filename: "icons/ABILITY_poisonball.png", extension: "png", type: "image" },
             { name: "ABILITY_heal", filename: "icons/ABILITY_heal.png", extension: "png", type: "image" },
+
+            // items
+            { name: "ITEM_apple", filename: "icons/ITEM_apple.png", extension: "png", type: "image" },
+            { name: "ITEM_pear", filename: "icons/ITEM_pear.png", extension: "png", type: "image" },
 
             // textures
             { name: "selected_circle_green", filename: "selected_circle_green.png", extension: "png", type: "texture" },
