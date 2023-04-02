@@ -87,10 +87,12 @@ export class DebugScene {
         //////////////////////////////////////////////////////////
         const PLANE_SIZE = 20;
         const INST_COUNT = 200;
-        const PICKED_ANIMS = ["Walk", "Run", "Idle", "Wave", "Roll"];
-        const URL_MESH = "male.gltf";
+        const PICKED_ANIMS = ["Hobbit_Attack", "Hobbit_Idle"];
+        const URL_MESH = "player_hobbit.glb";
         const { meshes, animationGroups, skeletons } = await SceneLoader.ImportMeshAsync("", "./models/", URL_MESH, scene);
 
+
+        console.log(animationGroups);
         const selectedAnimationGroups = animationGroups.filter((ag) => PICKED_ANIMS.includes(ag.name));
         const skeleton = skeletons[0];
         const root = meshes[0];
@@ -126,7 +128,8 @@ export class DebugScene {
             merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
             setAnimationParameters(merged.instancedBuffers.bakedVertexAnimationSettingsInstanced, 0);
 
-            //const bufferFromMesh = await this.bakeVertexData(merged, selectedAnimationGroups);
+            const bufferFromMesh = await this.bakeVertexData(merged, selectedAnimationGroups)
+            /*
             //let vertexDataJson = b.serializeBakedVertexDataToJSON(bufferFromMesh);
             //new JavascriptDataDownloader(vertexDataJson).download();
 
@@ -135,7 +138,7 @@ export class DebugScene {
 
             let req = await request("get", "./models/male_baked_animation.json", {}, false, { headers: { "Content-Type": "application/json" } });
             let bufferFromMesh = b.loadBakedVertexDataFromJSON(JSON.parse(req.data));
-
+            */
             const buffer = bufferFromMesh;
 
             manager.texture = b.textureFromBakedVertexData(buffer);

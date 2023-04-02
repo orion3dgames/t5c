@@ -29,7 +29,7 @@ export class CharacterEditor {
     public _environment;
     public _newState: State;
     public _button: Button;
-    public _shadow;
+    public _shadow: CascadedShadowGenerator;
     private _loadedAssets: MeshAssetTask[] = [];
     public results;
     public selection;
@@ -51,6 +51,7 @@ export class CharacterEditor {
 
         let scene = new Scene(app.engine);
         scene.clearColor = new Color4(0, 0, 0, 1);
+
 
         // camera
         var camera = new ArcRotateCamera("camera1", Math.PI / 2, Math.PI / 4, 3, new Vector3(0, 0.5, 0), scene);
@@ -79,8 +80,9 @@ export class CharacterEditor {
         this._shadow.autoCalcDepthBounds = true;
         this._shadow.shadowMaxZ = 1000;
 
-        // Built-in 'ground' shape.
+        // add ground
         const ground = MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, scene);
+        ground.receiveShadows = true;
 
         // load scene
         this._scene = scene;
@@ -338,12 +340,9 @@ export class CharacterEditor {
 
         //
         this.selection = {
-            GENDER: "player_male",
+            GENDER: "player_female",
             ANIMATION: "IDLE",
         };
-
-        // load the rest
-        app.engine.displayLoadingUI();
 
         this.loadMainMesh(this.selection);
     }
@@ -355,7 +354,11 @@ export class CharacterEditor {
         // load player mesh
         const playerMesh = result.loadedMeshes[0];
         result.loadedMeshes.forEach((m) => {
-            m.isVisible = true;
+            if(CHARACTER.MAIN_MESH.includes(m.name)){
+                m.isVisible = true;
+            }else{
+                m.isVisible = false;
+            }
         });
 
         // get animations
@@ -365,6 +368,9 @@ export class CharacterEditor {
 
         // scale model
         playerMesh.scaling = new Vector3(CHARACTER.SCALE, CHARACTER.SCALE, CHARACTER.SCALE);
+
+        // set shadow caster
+        this._shadow.addShadowCaster(playerMesh);
 
         // get select animations
         let meshAnimations = CHARACTER.ANIMATIONS;
@@ -383,9 +389,11 @@ export class CharacterEditor {
         }
 
         // GENDER OPTIONS
-        var sizeOptions = new RadioGroup("Gender");
+        var radioGroupGender = new RadioGroup("Gender");
         for (let key in this.CHARACTER) {
-            sizeOptions.addRadio(key, () => {
+            console.log(key);
+            radioGroupGender.addRadio(key, () => {
+                /*
                 // hide current mesh
                 const result = this._loadedAssets[this.selection.GENDER];
                 const playerMesh = result.loadedMeshes[0];
@@ -395,13 +403,14 @@ export class CharacterEditor {
 
                 // show mesh
                 this.selection.GENDER = key;
-                this.loadMainMesh(this.selection);
+                this.loadMainMesh(this.selection);*/
             });
         }
 
         // ANIMATION OPTIONSd
         var radioGroupAnim = new RadioGroup("Animation");
         this._playerAnimations.forEach((anim) => {
+            console.log(anim);
             radioGroupAnim.addRadio(anim.name, () => {
                 this._playerAnimations.forEach((element) => {
                     element.stop();
@@ -410,7 +419,7 @@ export class CharacterEditor {
             });
         });
 
-        var selectBox = new SelectionPanel("sp", [sizeOptions, radioGroupAnim]);
+        var selectBox = new SelectionPanel("sp", [radioGroupGender, radioGroupAnim]);
         selectBox.background = "rgba(255, 255, 255, .7)";
         selectBox.top = "15px;";
         selectBox.left = "15px;";
