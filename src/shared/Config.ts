@@ -3,7 +3,7 @@ import State from "../client/Screens/Screens";
 let Config = {
     // general settings
     title: "T5C",
-    version: "Version 0.2.1",
+    version: "Version 0.2.2",
     lang: "en",
 
     // server settings
@@ -33,7 +33,7 @@ let Config = {
 
     // default scene
     //defaultScene: isLocal() ? State.GAME : State.LOGIN,
-    defaultScene: State.GAME,
+    defaultScene: State.LOGIN,
 };
 
 export default Config;
