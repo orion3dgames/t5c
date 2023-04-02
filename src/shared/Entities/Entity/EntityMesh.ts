@@ -101,6 +101,8 @@ export class EntityMesh {
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);
 
+        
+
         // setup collisions for current player
         if (this.isCurrentPlayer) {
             // teleport trigger

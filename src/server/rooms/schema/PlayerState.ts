@@ -126,14 +126,7 @@ export class PlayerState extends Schema {
         // add a 5 second grace period where the player can not be targeted by the ennemies
         setTimeout(() => {
             this.gracePeriod = false;
-            this.inventory.set("pear", new InventoryItem({ key: "pear", qty: 100 }));
-            console.log("ADDED PEAR TO INVENTORY");
         }, Config.PLAYER_GRACE_PERIOD);
-
-        setTimeout(() => {
-            let item = this.inventory.get("apple");
-            item.qty += 10;
-        }, 1000);
     }
 
     // runs on every server iteration
@@ -176,6 +169,7 @@ export class PlayerState extends Schema {
         } else {
             this.inventory.set(data.key, new InventoryItem(data));
         }
+        this._gameroom.state.items.delete(loot.sessionId);
     }
 
     setAsDead() {

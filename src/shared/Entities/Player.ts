@@ -18,6 +18,7 @@ import { EntityCurrentState } from "./Entity/EntityCurrentState";
 import { AuthController } from "../../client/Controllers/AuthController";
 import { dataDB } from "../Data/dataDB";
 import { SceneController } from "../../client/Controllers/Scene";
+import { Ability } from "../Data/AbilitiesDB";
 
 export class Player extends Entity {
     public input;
@@ -43,40 +44,7 @@ export class Player extends Entity {
 
         this._auth = AuthController.getInstance();
 
-        this.setEntity(entity);
-
         this.spawnPlayer();
-    }
-
-    public setEntity(entity) {
-        console.log("SET LISTENERS FOR ABILITIES AND INVENTORY", entity);
-
-        // set abilities
-        if (entity.inventory) {
-            /*
-            entity.inventory.onAdd((item, sessionId) => {
-                console.log("onAdd", item, sessionId);
-            });
-            entity.inventory.onRemove((item, sessionId) => {
-                console.log("onRemove", item, sessionId);
-            });*/
-            entity.inventory.onChange((item, sessionId) => {
-                console.log("onChange", item, sessionId);
-            });
-        }
-        /*
-        if (entity.abilities) {
-            entity.abilities.forEach((element) => {
-                console.log("ABILITY", element);
-            });
-        }
-
-        // set inventory
-        if (entity.inventory) {
-            entity.inventory.forEach((element) => {
-                console.log("INVENTORY", element);
-            });
-        }*/
     }
 
     private async spawnPlayer() {
@@ -187,7 +155,7 @@ export class Player extends Entity {
         this.ability_in_cooldown.forEach((cooldown, digit) => {
             if (cooldown > 0) {
                 let cooldownUI = this.ui._playerUI.getControlByName("ability_" + digit + "_cooldown");
-                let ability = this.getAbilityByDigit(digit);
+                let ability = this.getAbilityByDigit(digit) as Ability;
                 if (ability) {
                     this.ability_in_cooldown[digit] -= delta;
                     let percentage = ((this.ability_in_cooldown[digit] / ability.cooldown) * 100) / 100;
@@ -196,25 +164,27 @@ export class Player extends Entity {
             }
         });
 
-        if (this.state === EntityCurrentState.DEAD) {
+        if (this.anim_state === EntityCurrentState.DEAD) {
             this.ui.revivePanel.isVisible = true;
         } else {
             this.ui.revivePanel.isVisible = false;
         }
     }
 
-    public getAbilityByDigit(digit) {
-        let link = this.abilities[digit - 1];
-        if (link) {
-            return dataDB.get("ability", link.key);
-        }
-        return false;
+    public getAbilityByDigit(digit):Ability|boolean {
+        let found = false;
+        this.abilities.forEach((element) => {
+            if(element.digit === digit){
+                found = dataDB.get("ability", element.key);
+            }  
+        });
+        return found;
     }
 
     // player is casting
     public startCasting(data) {
         let digit = data.digit;
-        let ability = this.getAbilityByDigit(digit);
+        let ability = this.getAbilityByDigit(digit) as Ability;
         if (ability) {
             this.isCasting = true;
             this.castingElapsed = 0;
@@ -248,7 +218,7 @@ export class Player extends Entity {
         // server confirms ability can be cast
         this._room.onMessage("entity_ability_cast", (data) => {
             let digit = data.digit;
-            let ability = this.getAbilityByDigit(digit);
+            let ability = this.getAbilityByDigit(digit) as Ability;
             if (ability) {
                 // if you are sender, cancel casting and strat cooldown on client
                 if (data.fromId === this.sessionId) {

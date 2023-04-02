@@ -30,8 +30,7 @@ export class moveCTRL {
                     this._owner.abilitiesCTRL.startAutoAttack(this._owner, target, ability);
                 }
                 if (target instanceof LootState) {
-                    this._owner.addItemToInventory(target);
-                    //this._owner._gameroom.state.items.delete(target.sessionId);
+                    this._owner.addItemToInventory(target);  
                 }
                 this._owner.AI_CURRENT_TARGET = null;
                 this._owner.AI_CURRENT_ABILITY = null;

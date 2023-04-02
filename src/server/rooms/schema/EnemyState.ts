@@ -166,6 +166,25 @@ export class EnemyState extends Schema {
         return this._gameroom.clients.get(this.sessionId);
     }
 
+    // make sure no value are out of range
+    normalizeStats() {
+        // health
+        if (this.health > this.maxHealth) {
+            this.health = this.maxHealth;
+        }
+        if (this.health < 0) {
+            this.health = 0;
+        }
+
+        // mana
+        if (this.mana > this.maxMana) {
+            this.mana = this.maxMana;
+        }
+        if (this.mana < 0) {
+            this.mana = 0;
+        }
+    }
+
     /**
      * monitor a target
      */

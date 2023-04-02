@@ -21,6 +21,7 @@ import Config from "../Config";
 import { EntityCurrentState } from "./Entity/EntityCurrentState";
 import { PlayerInput } from "../../client/Controllers/PlayerInput";
 import { dataDB } from "../Data/dataDB";
+import { ActionManager } from "@babylonjs/core/Actions/actionManager";
 
 export class Entity {
     public _scene: Scene;
@@ -64,7 +65,7 @@ export class Entity {
     public level: number;
     public experience: number;
     public location: string = "";
-    public state: number = EntityCurrentState.IDLE;
+    public anim_state: number = EntityCurrentState.IDLE;
     public AI_CURRENT_STATE: number = 0;
 
     //
@@ -170,6 +171,10 @@ export class Entity {
 
         if (this.AI_CURRENT_STATE === AI_STATE.WANDER) {
             this.debugMesh.material = this._scene.getMaterialByName("debug_entity_neutral");
+        }
+
+        if(this.type !== 'player' && this.anim_state === EntityCurrentState.DEAD){
+            
         }
 
         // tween entity

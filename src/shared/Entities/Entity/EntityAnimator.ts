@@ -71,15 +71,15 @@ export class EntityAnimator {
             this._currentAnim = this._walk;
 
             // if player has died
-        } else if (player.state === EntityCurrentState.DEAD) {
+        } else if (player.anim_state === EntityCurrentState.DEAD) {
             this._currentAnim = this._death;
 
             // if player is attacking
-        } else if (player.state === EntityCurrentState.ATTACK) {
+        } else if (player.anim_state === EntityCurrentState.ATTACK) {
             this._currentAnim = this._attack;
 
             // if player is being attacked
-        } else if (player.state === EntityCurrentState.TAKING_DAMAGE) {
+        } else if (player.anim_state === EntityCurrentState.TAKING_DAMAGE) {
             this._currentAnim = this._damage;
 
             // all other cases, should be idle

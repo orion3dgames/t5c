@@ -26,11 +26,11 @@ export class abilitiesCTRL {
     }
 
     public create() {
-        for (let index in this.abilitiesOwned) {
-            const link = this.abilitiesOwned[index];
-            const skill = this.abilitiesDB[link.key];
+        this.abilitiesOwned.forEach(element => {
+            const skill = this.abilitiesDB[element.key];
+            skill.digit = element.digit;
             this.abilities.push(new Ability(skill));
-        }
+        });
     }
 
     public update() {}
@@ -93,14 +93,14 @@ export class abilitiesCTRL {
     }
 
     doAutoAttack(owner, target, ability) {
-        owner.state = EntityCurrentState.ATTACK;
+        owner.anim_state = EntityCurrentState.ATTACK;
         this.castAbility(owner, target, ability, 1);
     }
 
     cancelAutoAttack(owner) {
         owner.AI_CURRENT_TARGET = null;
         owner.AI_CURRENT_ABILITY = null;
-        owner.state = EntityCurrentState.IDLE;
+        owner.anim_state = EntityCurrentState.IDLE;
         clearInterval(this.attackTimer);
     }
 

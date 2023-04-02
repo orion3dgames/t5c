@@ -123,7 +123,7 @@ export class GameRoomState extends Schema {
         // for each entity
         if (this.entities.size > 0) {
             this.entities.forEach((entity) => {
-                /*
+                
                 // entity update
                 entity.update();
 
@@ -137,7 +137,7 @@ export class GameRoomState extends Schema {
                     } else if (entity.AI_CURRENT_STATE === AI_STATE.ATTACKING) {
                         entity.attack();
                     }
-                }*/
+                }
             });
         }
 

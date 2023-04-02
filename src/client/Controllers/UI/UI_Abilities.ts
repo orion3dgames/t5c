@@ -5,6 +5,7 @@ import { Image } from "@babylonjs/gui/2D/controls/image";
 import Config from "../../../shared/Config";
 import { dataDB } from "../../../shared/Data/dataDB";
 import { Player } from "../../../shared/Entities/Player";
+import { Ability } from "../../../shared/Data/AbilitiesDB";
 
 export class UI_Abilities {
     private _playerUI;
@@ -133,7 +134,8 @@ export class UI_Abilities {
     }
 
     addAbilityIcon(digit, headlineRect: Rectangle) {
-        let ability = this._currentPlayer.getAbilityByDigit(digit);
+        let ability = this._currentPlayer.getAbilityByDigit(digit) as Ability;
+
         if (ability) {
             var imageData = this._loadedAssets[ability.icon];
             var img = new Image("ability_image_" + digit, imageData);
