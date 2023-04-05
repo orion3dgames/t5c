@@ -8,7 +8,7 @@ import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 
-import { UI_Chats, UI_Abilities, UI_Debug, UI_EntitySelected, UI_Panel } from "./UI";
+import { UI_Chats, UI_Abilities, UI_Debug, UI_EntitySelected, UI_Panel, UI_Tooltip } from "./UI";
 
 import { Room } from "colyseus.js";
 import State from "../Screens/Screens";
@@ -45,6 +45,9 @@ export class UserInterface {
     public _UICastingTimer;
     public _UICastingTimerInside;
     public _UICastingTimerText;
+
+    // tooltip
+    public _UITooltip;
 
     // revive panel
     public revivePanel;
@@ -125,6 +128,9 @@ export class UserInterface {
 
         // create panel
         this._UIPanel = new UI_Panel(this._playerUI, this._scene, currentPlayer, this._loadedAssets);
+
+        // create panel
+        this._UITooltip = new UI_Tooltip(this._playerUI, this._engine, this._scene, this._gameRoom, this._currentPlayer);
     }
 
     public refreshEntityUI() {
@@ -186,7 +192,7 @@ export class UserInterface {
     }
 
     public castingBar() {
-        // add tooltip
+        // add casting bar
         const castingBar = new Rectangle("castingBar");
         castingBar.top = "-75px";
         castingBar.width = "150px";
