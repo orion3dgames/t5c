@@ -10,8 +10,10 @@ Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 - server controlled collisions
 - persistence with mysql lite
 - abilities
-- roadming monsters (with basic ai & attacks)
+- roaming monsters (with basic ai & attacks)
 - selecting characters and monsters
+- monsters have a loottable and can drop items
+- ability to pick up items 
 - and more...
 
 ## Roadmap
