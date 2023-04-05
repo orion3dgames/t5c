@@ -6,7 +6,7 @@ import Config from "../../shared/Config";
 import Logger from "../../shared/Logger";
 import loadNavMeshFromFile from "../../shared/Utils/loadNavMeshFromFile";
 import { PlayerState } from "./schema/PlayerState";
-import { PlayerInputs } from "../../shared/types";
+import { PlayerInputs } from "../../shared/Types";
 import { NavMesh } from "../../shared/yuka";
 import { nanoid } from "nanoid";
 import { randomNumberInRange } from "../../shared/Utils";
@@ -138,7 +138,7 @@ export class GameRoom extends Room<GameRoomState> {
             const playerState: PlayerState = this.state.players.get(client.sessionId);
             const itemState = this.state.items.get(data.sessionId);
             if (playerState && itemState) {
-                playerState.setTarget(itemState);  
+                playerState.setTarget(itemState);
             }
         });
 

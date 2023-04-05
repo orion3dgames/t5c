@@ -66,7 +66,7 @@ let AbilitiesDB: abilityMap = {
     base_attack: {
         label: "Attack",
         key: "base_attack",
-        icon: "ABILITY_base_attack",
+        icon: "ICON_ABILITY_base_attack",
         sound: "enemy_attack_1",
         description: "A unimpressive attack that deals very little damage.",
         castSelf: false,
@@ -90,7 +90,7 @@ let AbilitiesDB: abilityMap = {
     fireball: {
         label: "Fireball",
         key: "fireball",
-        icon: "ABILITY_fireball",
+        icon: "ICON_ABILITY_fireball",
         sound: "fire_attack_2",
         description: "Hurls a massive fiery ball that explodes on contact with target.",
         castSelf: false,
@@ -118,7 +118,7 @@ let AbilitiesDB: abilityMap = {
     poisonball: {
         label: "Poison Cloud",
         key: "poisonball",
-        icon: "ABILITY_poisonball",
+        icon: "ICON_ABILITY_poisonball",
         sound: "fire_attack_2",
         description: "Trow a bottle of viscous poisonous liquid onto target that will damage target overtime.",
         castSelf: false,
@@ -146,7 +146,7 @@ let AbilitiesDB: abilityMap = {
     heal: {
         label: "Heal",
         key: "heal",
-        icon: "ABILITY_heal",
+        icon: "ICON_ABILITY_heal",
         sound: "heal_1",
         description: "A spell from ancient times that will leave target feeling fresh & revigorated.",
         castSelf: true,

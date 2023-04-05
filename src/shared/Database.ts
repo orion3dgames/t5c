@@ -1,7 +1,7 @@
 import sqlite3 from "sqlite3";
 import Logger from "./Logger";
 import { nanoid } from "nanoid";
-import { PlayerCharacter, PlayerUser } from "./types";
+import { PlayerCharacter, PlayerUser } from "./Types";
 import { ParsedQs } from "qs";
 import Config from "./Config";
 import { dataDB } from "./Data/dataDB";

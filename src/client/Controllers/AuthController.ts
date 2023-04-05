@@ -1,5 +1,5 @@
 import { dataDB } from "../../shared/Data/dataDB";
-import { PlayerCharacter } from "../../shared/types";
+import { PlayerCharacter } from "../../shared/Types";
 import { apiUrl } from "../../shared/Utils";
 import request from "../../shared/Utils/requests";
 import State from "../Screens/Screens";

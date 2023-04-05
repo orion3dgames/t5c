@@ -88,18 +88,16 @@ export class Environment {
         if (abilities) {
             for (let key in abilities) {
                 let el = abilities[key];
-                assetsToLoad.push({ name: "ICON_" + el.key, filename: "icons/" + el.icon + ".png", extension: "png", type: "image" });
+                assetsToLoad.push({ name: el.icon, filename: "icons/" + el.icon + ".png", extension: "png", type: "image" });
             }
         }
 
         // add items (icons & mesh)
         let items = dataDB.load("items");
-        console.log("ITEMS", items);
         if (items) {
             for (let key in items) {
-                console.log(key);
                 let el = items[key];
-                assetsToLoad.push({ name: "ICON_" + el.key, filename: "icons/" + el.icon + ".png", extension: "png", type: "image" });
+                assetsToLoad.push({ name: el.icon, filename: "icons/" + el.icon + ".png", extension: "png", type: "image" });
                 assetsToLoad.push({ name: "ITEM_" + el.key, filename: "items/" + el.key + ".glb", extension: "glb", instantiate: true });
             }
         }
@@ -112,8 +110,6 @@ export class Environment {
                 assetsToLoad.push({ name: "RACE_" + el.key, filename: "races/" + el.key + ".glb", extension: "glb", instantiate: true });
             }
         }
-
-        console.log(assetsToLoad);
 
         assetsToLoad.forEach((obj) => {
             let assetTask;

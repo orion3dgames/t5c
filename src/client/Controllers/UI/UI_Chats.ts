@@ -5,13 +5,13 @@ import { Control } from "@babylonjs/gui/2D/controls/control";
 import { InputText } from "@babylonjs/gui/2D/controls/inputText";
 import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
-import { PlayerMessage } from "../../../shared/types/index";
+import { PlayerMessage } from "../../../shared/Types/index";
 import Config from "../../../shared/Config";
 
 export class UI_Chats {
     private _playerUI;
-    private _chatUI:StackPanel;
-    private _chatUIScroll:ScrollViewer;
+    private _chatUI: StackPanel;
+    private _chatUIScroll: ScrollViewer;
     private _chatRoom;
     private _currentPlayer;
     private _entities;
@@ -213,40 +213,35 @@ export class UI_Chats {
 
         this._chatUIScroll.verticalBar.value = 1;
 
-        this.messages
-            .slice()
-            .forEach((msg: PlayerMessage) => {
-                // container
-                var headlineRect = new Rectangle("chatMsgRect_" + msg.createdAt);
-                headlineRect.width = "100%";
-                headlineRect.thickness = 0;
-                headlineRect.paddingBottom = "1px";
-                headlineRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-                headlineRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-                headlineRect.adaptHeightToChildren = true;
-                this._chatUI.addControl(headlineRect);
+        this.messages.slice().forEach((msg: PlayerMessage) => {
+            // container
+            var headlineRect = new Rectangle("chatMsgRect_" + msg.createdAt);
+            headlineRect.width = "100%";
+            headlineRect.thickness = 0;
+            headlineRect.paddingBottom = "1px";
+            headlineRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            headlineRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            headlineRect.adaptHeightToChildren = true;
+            this._chatUI.addControl(headlineRect);
 
-                let prefix = "[GLOBAL] " + msg.name + ": ";
-                if (this._currentPlayer) {
-                    prefix =
-                        msg.senderID == this._currentPlayer.sessionId ? "You said: " : "[GLOBAL] " + msg.name + ": ";
-                }
+            let prefix = "[GLOBAL] " + msg.name + ": ";
+            if (this._currentPlayer) {
+                prefix = msg.senderID == this._currentPlayer.sessionId ? "You said: " : "[GLOBAL] " + msg.name + ": ";
+            }
 
-                // message
-                var roomTxt = new TextBlock("chatMsgTxt_" + msg.createdAt);
-                roomTxt.paddingLeft = "5fdsfpx";
-                roomTxt.text = prefix + msg.message;
-                roomTxt.textHorizontalAlignment = 0;
-                roomTxt.fontSize = "11px";
-                roomTxt.color = msg.color;
-                roomTxt.left = "0px";
-                roomTxt.textWrapping = TextWrapping.WordWrap;
-                roomTxt.resizeToFit = true;
-                roomTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-                roomTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-                headlineRect.addControl(roomTxt);
-            });
+            // message
+            var roomTxt = new TextBlock("chatMsgTxt_" + msg.createdAt);
+            roomTxt.paddingLeft = "5fdsfpx";
+            roomTxt.text = prefix + msg.message;
+            roomTxt.textHorizontalAlignment = 0;
+            roomTxt.fontSize = "11px";
+            roomTxt.color = msg.color;
+            roomTxt.left = "0px";
+            roomTxt.textWrapping = TextWrapping.WordWrap;
+            roomTxt.resizeToFit = true;
+            roomTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            roomTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            headlineRect.addControl(roomTxt);
+        });
     }
-
-    
 }

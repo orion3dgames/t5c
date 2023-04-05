@@ -1,6 +1,6 @@
 import Logger from "../../../shared/Logger";
 import { Vector3 } from "../../../shared/yuka";
-import { PlayerInputs } from "../../../shared/types";
+import { PlayerInputs } from "../../../shared/Types";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { EnemyState } from "../schema/EnemyState";
 import { LootState } from "../schema/LootState";
@@ -30,7 +30,7 @@ export class moveCTRL {
                     this._owner.abilitiesCTRL.startAutoAttack(this._owner, target, ability);
                 }
                 if (target instanceof LootState) {
-                    this._owner.addItemToInventory(target);  
+                    this._owner.addItemToInventory(target);
                 }
                 this._owner.AI_CURRENT_TARGET = null;
                 this._owner.AI_CURRENT_ABILITY = null;
@@ -116,7 +116,18 @@ export class moveCTRL {
             this._owner.isMoving = true;
             this._owner.state = EntityCurrentState.WALKING;
 
-            Logger.info("Valid position for " + this._owner.name + ": ( x: " + this._owner.x + ", y: " + this._owner.y + ", z: " + this._owner.z + ", rot: " + this._owner.rot);
+            Logger.info(
+                "Valid position for " +
+                    this._owner.name +
+                    ": ( x: " +
+                    this._owner.x +
+                    ", y: " +
+                    this._owner.y +
+                    ", z: " +
+                    this._owner.z +
+                    ", rot: " +
+                    this._owner.rot
+            );
         } else {
             // collision detected, return player old position
             this._owner.x = oldX;
@@ -126,7 +137,18 @@ export class moveCTRL {
             this._owner.sequence = playerInput.seq;
             this._owner.state = EntityCurrentState.IDLE;
 
-            Logger.warning("Invalid position for " + this._owner.name + ": ( x: " + this._owner.x + ", y: " + this._owner.y + ", z: " + this._owner.z + ", rot: " + this._owner.rot);
+            Logger.warning(
+                "Invalid position for " +
+                    this._owner.name +
+                    ": ( x: " +
+                    this._owner.x +
+                    ", y: " +
+                    this._owner.y +
+                    ", z: " +
+                    this._owner.z +
+                    ", rot: " +
+                    this._owner.rot
+            );
         }
     }
 

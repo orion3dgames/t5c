@@ -13,7 +13,7 @@ import { GameRoom } from "./rooms/GameRoom";
 import { ChatRoom } from "./rooms/ChatRoom";
 
 import databaseInstance from "../shared/Database";
-import { PlayerUser } from "../shared/types";
+import { PlayerUser } from "../shared/Types";
 import Logger from "../shared/Logger";
 import Config from "../shared/Config";
 
