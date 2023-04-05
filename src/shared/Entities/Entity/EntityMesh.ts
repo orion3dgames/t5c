@@ -53,11 +53,7 @@ export class EntityMesh {
         // debug aggro mesh
         if (this._entity.type === "entity") {
             var material = this._scene.getMaterialByName("debug_entity_neutral");
-            const sphere = MeshBuilder.CreateCylinder(
-                "debug_" + this._entity.race,
-                { diameter: Config.MONSTER_AGGRO_DISTANCE * 2, height: 0.1 },
-                this._scene
-            );
+            const sphere = MeshBuilder.CreateCylinder("debug_" + this._entity.race, { diameter: Config.MONSTER_AGGRO_DISTANCE * 2, height: 0.1 }, this._scene);
             sphere.isVisible = false;
             sphere.parent = box;
             sphere.material = material;
@@ -66,26 +62,22 @@ export class EntityMesh {
 
         // add selected image
         var material = this._scene.getMaterialByName("entity_selected");
-        const selectedMesh = MeshBuilder.CreateCylinder(
-            "entity_selected_" + this._entity.race,
-            { diameter: 2, height: 0.01, tessellation: 10 },
-            this._scene
-        );
+        const selectedMesh = MeshBuilder.CreateCylinder("entity_selected_" + this._entity.race, { diameter: 2, height: 0.01, tessellation: 10 }, this._scene);
         selectedMesh.parent = box;
         selectedMesh.material = material;
         selectedMesh.isVisible = false;
         selectedMesh.isPickable = false;
         selectedMesh.checkCollisions = false;
-        selectedMesh.position = new Vector3(0,-1,0);
+        selectedMesh.position = new Vector3(0, -1, 0);
         this.selectedMesh = selectedMesh;
 
         // load player mesh
-        const result = this._loadedAssets[this._entity.race].instantiateModelsToScene();
+        const result = this._loadedAssets["RACE_" + this._entity.race].instantiateModelsToScene();
         const playerMesh = result.rootNodes[0];
         this._animationGroups = result.animationGroups;
 
         // set initial player scale & rotation
-        
+
         playerMesh.name = this._entity.sessionId + "_mesh";
         playerMesh.parent = box;
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
@@ -95,13 +87,11 @@ export class EntityMesh {
         playerMesh.scaling.set(this._entity.scale, this._entity.scale, this._entity.scale);
         playerMesh.isPickable = false;
         playerMesh.checkCollisions = false;
-        playerMesh.position = new Vector3(0,-1,0);
+        playerMesh.position = new Vector3(0, -1, 0);
         this.playerMesh = playerMesh;
 
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);
-
-        
 
         // setup collisions for current player
         if (this.isCurrentPlayer) {
@@ -128,7 +118,7 @@ export class EntityMesh {
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
                 let meshes = ev.meshUnderPointer.getChildMeshes();
-                let mesh =  meshes[this._entity.meshIndex];
+                let mesh = meshes[this._entity.meshIndex];
                 mesh.outlineColor = new Color3(0, 1, 0);
                 mesh.outlineWidth = 3;
                 mesh.renderOutline = true;
@@ -139,7 +129,7 @@ export class EntityMesh {
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
                 let meshes = ev.meshUnderPointer.getChildMeshes();
-                let mesh =  meshes[this._entity.meshIndex];
+                let mesh = meshes[this._entity.meshIndex];
                 mesh.renderOutline = false;
             })
         );

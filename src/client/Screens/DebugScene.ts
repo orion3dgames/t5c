@@ -57,6 +57,11 @@ export class DebugScene {
 
     public results;
 
+    public PLANE_SIZE = 20;
+    public INST_COUNT = 200;
+    public PICKED_ANIMS = ["Hobbit_Attack", "Hobbit_Idle", "Hobbit_Walk"];
+    public URL_MESH = "female_all.glb";
+
     constructor() {
         this._newState = State.NULL;
     }
@@ -79,26 +84,20 @@ export class DebugScene {
         light.specular = Color3.Black();
 
         // Built-in 'ground' shape.
-        const ground = MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, scene);
+        //const ground = MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, scene);
 
         // load scene
         this._scene = scene;
 
         //////////////////////////////////////////////////////////
-        const PLANE_SIZE = 20;
-        const INST_COUNT = 200;
-        const PICKED_ANIMS = ["Hobbit_Attack", "Hobbit_Idle"];
-        const URL_MESH = "player_hobbit.glb";
-        const { meshes, animationGroups, skeletons } = await SceneLoader.ImportMeshAsync("", "./models/", URL_MESH, scene);
+        const { meshes, animationGroups, skeletons } = await SceneLoader.ImportMeshAsync("", "./models/", this.URL_MESH, scene);
 
-
-        console.log(animationGroups);
-        const selectedAnimationGroups = animationGroups.filter((ag) => PICKED_ANIMS.includes(ag.name));
+        const selectedAnimationGroups = animationGroups.filter((ag) => this.PICKED_ANIMS.includes(ag.name));
         const skeleton = skeletons[0];
         const root = meshes[0];
 
         root.position.setAll(0);
-        root.scaling.setAll(1);
+        root.scaling.setAll(0.1);
         root.rotationQuaternion = null;
         root.rotation.setAll(0);
 
@@ -107,70 +106,74 @@ export class DebugScene {
         root.setEnabled(false);
 
         if (merged) {
-            merged.visibility = 1;
-
-            merged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
-            merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-
-            const ranges = this.calculateRanges(selectedAnimationGroups);
-
-            const setAnimationParameters = (vec, animIndex = Math.floor(Math.random() * selectedAnimationGroups.length)) => {
-                const anim = ranges[animIndex];
-                const from = Math.floor(anim.from);
-                const to = Math.floor(anim.to);
-                const ofst = Math.floor(Math.random() * (to - from - 1));
-                vec.set(from, to - 1, ofst, 60); // skip one frame to avoid weird artifacts
-            };
-
-            const b = new VertexAnimationBaker(scene, merged);
-            const manager = new BakedVertexAnimationManager(scene);
-            merged.bakedVertexAnimationManager = manager;
-            merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-            setAnimationParameters(merged.instancedBuffers.bakedVertexAnimationSettingsInstanced, 0);
-
-            const bufferFromMesh = await this.bakeVertexData(merged, selectedAnimationGroups)
-            /*
-            //let vertexDataJson = b.serializeBakedVertexDataToJSON(bufferFromMesh);
-            //new JavascriptDataDownloader(vertexDataJson).download();
-
-            // load prebaked vat animations
-            // 2 mo for the baked animation, not sure if it is worth it for the moment to work on that
-
-            let req = await request("get", "./models/male_baked_animation.json", {}, false, { headers: { "Content-Type": "application/json" } });
-            let bufferFromMesh = b.loadBakedVertexDataFromJSON(JSON.parse(req.data));
-            */
-            const buffer = bufferFromMesh;
-
-            manager.texture = b.textureFromBakedVertexData(buffer);
-
-            const createInst = (id) => {
-                const instance = merged.createInstance("instance_" + id);
-                instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-                setAnimationParameters(instance.instancedBuffers.bakedVertexAnimationSettingsInstanced);
-                instance.position.x = Math.random() * PLANE_SIZE - PLANE_SIZE / 2;
-                instance.position.z = Math.random() * PLANE_SIZE - PLANE_SIZE / 2;
-                instance.rotation.y = 0;
-                return instance;
-            };
-
-            for (let i = 0; i < INST_COUNT; i++) {
-                createInst(i + "");
-            }
-
-            scene.registerBeforeRender(() => {
-                manager.time += scene.getEngine().getDeltaTime() / 1000.0;
-            });
-
-            //dispose resources
-            meshes.forEach((m) => m.dispose(false, true));
-            animationGroups.forEach((ag) => ag.dispose());
-            skeletons.forEach((s) => s.dispose());
+            //this.prepareMerge(merged, selectedAnimationGroups, meshes, animationGroups, skeletons);
         }
+    }
+
+    async prepareMerge(merged, selectedAnimationGroups, meshes, animationGroups, skeletons) {
+        merged.visibility = 0;
+
+        merged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
+        merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+
+        const ranges = this.calculateRanges(selectedAnimationGroups);
+
+        const setAnimationParameters = (vec, animIndex = Math.floor(Math.random() * selectedAnimationGroups.length)) => {
+            const anim = ranges[animIndex];
+            const from = Math.floor(anim.from);
+            const to = Math.floor(anim.to);
+            const ofst = Math.floor(Math.random() * (to - from - 1));
+            vec.set(from, to, ofst, 60); // skip one frame to avoid weird artifacts
+        };
+
+        const b = new VertexAnimationBaker(this._scene, merged);
+        const manager = new BakedVertexAnimationManager(this._scene);
+        merged.bakedVertexAnimationManager = manager;
+        merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+        setAnimationParameters(merged.instancedBuffers.bakedVertexAnimationSettingsInstanced, 0);
+
+        const bufferFromMesh = await this.bakeVertexData(merged, selectedAnimationGroups);
+        /*
+        //let vertexDataJson = b.serializeBakedVertexDataToJSON(bufferFromMesh);
+        //new JavascriptDataDownloader(vertexDataJson).download();
+        // load prebaked vat animations
+        // 2 mo for the baked animation, not sure if it is worth it for the moment to work on that
+        let req = await request("get", "./models/male_baked_animation.json", {}, false, { headers: { "Content-Type": "application/json" } });
+        let bufferFromMesh = b.loadBakedVertexDataFromJSON(JSON.parse(req.data));
+        */
+        const buffer = bufferFromMesh;
+
+        manager.texture = b.textureFromBakedVertexData(buffer);
+
+        const createInst = (id) => {
+            const instance = merged.createInstance("instance_" + id);
+            instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+            setAnimationParameters(instance.instancedBuffers.bakedVertexAnimationSettingsInstanced);
+            instance.position.x = Math.random() * this.PLANE_SIZE - this.PLANE_SIZE / 2;
+            instance.position.z = Math.random() * this.PLANE_SIZE - this.PLANE_SIZE / 2;
+            instance.rotation.y = 0;
+            return instance;
+        };
+
+        for (let i = 0; i < this.INST_COUNT; i++) {
+            createInst(i + "");
+        }
+
+        this._scene.registerBeforeRender(() => {
+            manager.time += this._scene.getEngine().getDeltaTime() / 1000.0;
+        });
+
+        //dispose resources
+        meshes.forEach((m) => m.dispose(false, true));
+        animationGroups.forEach((ag) => ag.dispose());
+        skeletons.forEach((s) => s.dispose());
     }
 
     merge(mesh, skeleton) {
         // pick what you want to merge
         const allChildMeshes = mesh.getChildTransformNodes(true)[0].getChildMeshes(false);
+
+        console.log(allChildMeshes);
 
         // Ignore Backpack because pf different attributes
         // https://forum.babylonjs.com/t/error-during-merging-meshes-from-imported-glb/23483

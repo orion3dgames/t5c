@@ -86,7 +86,7 @@ export class Item {
         };
 
         // load player mesh
-        const result = await this._loadedAssets[entity.key].instantiateModelsToScene();
+        const result = await this._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene();
         const playerMesh = result.rootNodes[0];
 
         // set initial player scale & rotation

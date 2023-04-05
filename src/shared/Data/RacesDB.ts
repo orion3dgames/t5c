@@ -72,7 +72,14 @@ let RacesDB: raceDataMap = {
         experienceGain: { min: 2000, max: 4000 },
         goldGain: { min: 120, max: 250 },
         damage_multiplier: 1.3,
-        drops: [LootTableEntry("apple", 50, 1, 1, 1, 2), LootTableEntry("pear", 5, 1, 10, 1, 2)],
+        drops: [
+            LootTableEntry("potion_heal", 25, 1, 1, 1, 1),
+            LootTableEntry("pear", 5, 1, 10, 1, 1),
+            LootTableEntry("apple", 20, 1, 10, 1, 1),
+            LootTableEntry(null, 20, 1, 1, 1, 1),
+            LootTableEntry("amulet_01", 1, 1, 1, 1, 2),
+            LootTableEntry(null, 80, 1, 1, 1, 2),
+        ],
     },
     monster_unicorn: {
         key: "monster_unicorn",
@@ -96,7 +103,14 @@ let RacesDB: raceDataMap = {
         experienceGain: { min: 300, max: 600 },
         goldGain: { min: 45, max: 75 },
         damage_multiplier: 1,
-        drops: [LootTableEntry("apple", 50, 1, 1, 1, 2), LootTableEntry("pear", 5, 1, 10, 1, 2)],
+        drops: [
+            LootTableEntry("potion_heal", 10, 1, 1, 1, 1),
+            LootTableEntry("pear", 15, 1, 10, 1, 1),
+            LootTableEntry("apple", 20, 1, 10, 1, 1),
+            LootTableEntry(null, 20, 1, 1, 1, 1),
+            LootTableEntry("amulet_01", 1, 1, 1, 1, 2),
+            LootTableEntry(null, 80, 1, 1, 1, 2),
+        ],
     },
 };
 

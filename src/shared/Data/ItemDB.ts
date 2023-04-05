@@ -59,13 +59,13 @@ enum PlayerSlots {
 }
 
 let ItemsDB: itemDataMap = {
-    apple: {
-        key: "apple",
-        name: "Apple",
-        description: "A delicious apple.",
-        icon: "ITEM_apple",
-        type: ItemType.CONSUMABLE,
-        value: 25,
+    amulet_01: {
+        key: "amulet_01",
+        name: "Amulet",
+        description: "An ancient amulet from forgotten times, it's effect are still unknowm.",
+        icon: "ITEM_amulet_01",
+        type: ItemType.ARMOR,
+        value: 2000,
         canEquip: {
             slot: PlayerSlots.AMULET,
         },
@@ -82,6 +82,20 @@ let ItemsDB: itemDataMap = {
             meshIndex: 1,
         },
     },
+
+    apple: {
+        key: "apple",
+        name: "Apple",
+        description: "A delicious apple.",
+        icon: "ITEM_apple",
+        type: ItemType.CONSUMABLE,
+        value: 54,
+        benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 5 }],
+        mesh: {
+            meshIndex: 1,
+        },
+    },
+
     pear: {
         key: "pear",
         name: "Pear",
@@ -89,7 +103,20 @@ let ItemsDB: itemDataMap = {
         icon: "ITEM_pear",
         type: ItemType.CONSUMABLE,
         value: 200,
-        benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 40 }],
+        benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 20 }],
+        mesh: {
+            meshIndex: 1,
+        },
+    },
+
+    potion_heal: {
+        key: "potion_heal",
+        name: "Heal Potion",
+        description: "A very useful potion that restores up to 50 health..",
+        icon: "ITEM_potion_heal",
+        type: ItemType.CONSUMABLE,
+        value: 150,
+        benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 50 }],
         mesh: {
             meshIndex: 1,
         },

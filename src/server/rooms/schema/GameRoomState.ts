@@ -11,6 +11,7 @@ import { randomNumberInRange } from "../../../shared/Utils";
 import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 import { dataDB } from "../../../shared/Data/dataDB";
 import { Client } from "colyseus";
+import { GetLoot, LootTableEntry } from "../../../shared/Entities/Player/LootTable";
 
 export class GameRoomState extends Schema {
     // networked variables
@@ -81,26 +82,39 @@ export class GameRoomState extends Schema {
         let randomRegion = this.navMesh.getRandomRegion();
         let point = randomRegion.centroid;
 
-        // item pool to chose from
-        let randTypes = ["apple", "pear"];
-        let randResult = randTypes[Math.floor(Math.random() * randTypes.length)];
-        let randData = dataDB.get("item", randResult);
+        // set up loot
+        let lootTable = [
+            LootTableEntry("potion_heal", 25, 1, 1, 1, 1),
+            LootTableEntry("pear", 5, 1, 10, 1, 1),
+            LootTableEntry("apple", 20, 1, 10, 1, 1),
+            LootTableEntry(null, 20, 1, 1, 1, 1),
+            LootTableEntry("amulet_01", 1, 1, 1, 1, 2),
+            LootTableEntry(null, 150, 1, 1, 1, 2),
+        ];
+        // generate loot
+        let loot = GetLoot(lootTable);
 
-        // drop item on the ground
-        let sessionId = nanoid(10);
-        let data = {
-            key: randData.key,
-            name: randData.name,
-            sessionId: sessionId,
-            x: point.x,
-            y: 0.25,
-            z: point.z,
-            quantity: 1,
-        };
-        let entity = new LootState(this, data);
-        this.items.set(sessionId, entity);
-
-        Logger.info("[gameroom][state][createEntity] created new item " + randData.key + ": " + sessionId);
+        // iterate loot
+        loot.forEach((drop) => {
+            // drop item on the ground
+            let item = dataDB.get("item", drop.id);
+            let sessionId = nanoid(10);
+            let currentPosition = point;
+            currentPosition.x += randomNumberInRange(0.1, 1.5);
+            currentPosition.z += randomNumberInRange(0.1, 1.5);
+            let data = {
+                key: drop.id,
+                name: item.name,
+                sessionId: sessionId,
+                x: currentPosition.x,
+                y: 0.25,
+                z: currentPosition.z,
+                quantity: drop.quantity,
+            };
+            let entity = new LootState(this, data);
+            this.items.set(sessionId, entity);
+            Logger.info("[gameroom][state][createEntity] created new item " + item.key + ": " + sessionId);
+        });
     }
 
     public update(deltaTime: number) {
@@ -123,7 +137,6 @@ export class GameRoomState extends Schema {
         // for each entity
         if (this.entities.size > 0) {
             this.entities.forEach((entity) => {
-                
                 // entity update
                 entity.update();
 

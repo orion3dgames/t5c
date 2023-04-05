@@ -7,10 +7,21 @@ import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
 import { CreateGround } from "@babylonjs/core/Meshes/Builders/groundBuilder";
 import { WaterMaterial } from "@babylonjs/materials/water";
 import { Sound } from "@babylonjs/core/Audio/sound";
-import { AssetsManager, BinaryFileAssetTask, ContainerAssetTask, CubeTextureAssetTask, HDRCubeTextureAssetTask, ImageAssetTask, MeshAssetTask, TextFileAssetTask, TextureAssetTask } from "@babylonjs/core/Misc/assetsManager";
+import {
+    AssetsManager,
+    BinaryFileAssetTask,
+    ContainerAssetTask,
+    CubeTextureAssetTask,
+    HDRCubeTextureAssetTask,
+    ImageAssetTask,
+    MeshAssetTask,
+    TextFileAssetTask,
+    TextureAssetTask,
+} from "@babylonjs/core/Misc/assetsManager";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Tags } from "@babylonjs/core/Misc/tags";
 import { AuthController } from "./AuthController";
+import { dataDB } from "../../shared/Data/dataDB";
 
 export class Environment {
     private _scene: Scene;
@@ -51,43 +62,58 @@ export class Environment {
 
         let assetsToLoad = [
             // sounds
-            { name: "enemy_attack_1", filename: "enemy_attack_1.wav", extension: "wav" },
-            { name: "enemy_attack_2", filename: "enemy_attack_2.wav", extension: "wav" },
-            { name: "fire_attack_1", filename: "fire_attack_1.wav", extension: "wav" },
-            { name: "fire_attack_2", filename: "fire_attack_2.wav", extension: "wav" },
-            { name: "heal_1", filename: "heal_1.wav", extension: "wav" },
-            { name: "music", filename: "music.mp3", extension: "mp3" },
-            { name: "player_walking", filename: "player_walking.wav", extension: "wav" },
-
-            // models
-            { name: "player_hobbit", filename: "player_hobbit.glb", extension: "glb", instantiate: true },
-            { name: "monster_unicorn", filename: "monster_unicorn.glb", extension: "glb", instantiate: true },
-            { name: "monster_bear", filename: "monster_bear.glb", extension: "glb", instantiate: true },
-            { name: "apple", filename: "apple.glb", extension: "glb", instantiate: true },
-            { name: "pear", filename: "pear.glb", extension: "glb", instantiate: true },
-
-            // abilities
-            { name: "ABILITY_base_attack", filename: "icons/ABILITY_base_attack.png", extension: "png", type: "image" },
-            { name: "ABILITY_fireball", filename: "icons/ABILITY_fireball.png", extension: "png", type: "image" },
-            { name: "ABILITY_poisonball", filename: "icons/ABILITY_poisonball.png", extension: "png", type: "image" },
-            { name: "ABILITY_heal", filename: "icons/ABILITY_heal.png", extension: "png", type: "image" },
-
-            // items
-            { name: "ITEM_apple", filename: "icons/ITEM_apple.png", extension: "png", type: "image" },
-            { name: "ITEM_pear", filename: "icons/ITEM_pear.png", extension: "png", type: "image" },
+            { name: "SOUND_enemy_attack_1", filename: "enemy_attack_1.wav", extension: "wav" },
+            { name: "SOUND_enemy_attack_2", filename: "enemy_attack_2.wav", extension: "wav" },
+            { name: "SOUND_fire_attack_1", filename: "fire_attack_1.wav", extension: "wav" },
+            { name: "SOUND_fire_attack_2", filename: "fire_attack_2.wav", extension: "wav" },
+            { name: "SOUND_heal_1", filename: "heal_1.wav", extension: "wav" },
+            { name: "MUSIC_01", filename: "music.mp3", extension: "mp3" },
+            { name: "SOUND_player_walking", filename: "player_walking.wav", extension: "wav" },
 
             // textures
-            { name: "selected_circle_green", filename: "selected_circle_green.png", extension: "png", type: "texture" },
-            { name: "particle_01", filename: "particle_01.png", extension: "png", type: "texture" },
+            { name: "TXT_selected_circle_green", filename: "selected_circle_green.png", extension: "png", type: "texture" },
+            { name: "TXT_particle_01", filename: "particle_01.png", extension: "png", type: "texture" },
 
             // environment
             {
-                name: environmentName,
-                filename: environmentModel + ".glb",
+                name: "ENV_" + environmentName,
+                filename: "environment/" + environmentModel + ".glb",
                 extension: "glb",
                 instantiate: false,
             },
         ];
+
+        // add abilities (icons)
+        let abilities = dataDB.load("abilities");
+        if (abilities) {
+            for (let key in abilities) {
+                let el = abilities[key];
+                assetsToLoad.push({ name: "ICON_" + el.key, filename: "icons/" + el.icon + ".png", extension: "png", type: "image" });
+            }
+        }
+
+        // add items (icons & mesh)
+        let items = dataDB.load("items");
+        console.log("ITEMS", items);
+        if (items) {
+            for (let key in items) {
+                console.log(key);
+                let el = items[key];
+                assetsToLoad.push({ name: "ICON_" + el.key, filename: "icons/" + el.icon + ".png", extension: "png", type: "image" });
+                assetsToLoad.push({ name: "ITEM_" + el.key, filename: "items/" + el.key + ".glb", extension: "glb", instantiate: true });
+            }
+        }
+
+        // add races (mesh)
+        let races = dataDB.load("races");
+        if (races) {
+            for (let key in races) {
+                let el = races[key];
+                assetsToLoad.push({ name: "RACE_" + el.key, filename: "races/" + el.key + ".glb", extension: "glb", instantiate: true });
+            }
+        }
+
+        console.log(assetsToLoad);
 
         assetsToLoad.forEach((obj) => {
             let assetTask;
@@ -192,7 +218,7 @@ export class Environment {
         material.diffuseColor = new Color3(1.0, 0, 0);
 
         // entity selected circle
-        var texture = this._loadedAssets["selected_circle_green"];
+        var texture = this._loadedAssets["TXT_selected_circle_green"];
         texture.hasAlpha = true;
         var material = new StandardMaterial("entity_selected");
         material.diffuseTexture = texture;
@@ -274,7 +300,7 @@ export class Environment {
         });*/
 
         // instantiate the scene
-        let key = this._auth.currentLocation.mesh;
+        let key = "ENV_" + this._auth.currentLocation.mesh;
         this.allMeshes = this._loadedAssets[key].loadedMeshes;
 
         //Loop through all environment meshes that were imported

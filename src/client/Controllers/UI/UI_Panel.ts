@@ -31,10 +31,10 @@ export class UI_Panel {
             name: "Default Name",
             horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
             vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
-            //width: 1, // 50% screen width
-            //height: 1, // 50% screen height
-            width: "500px;", // 50% screen width
-            height: "400px", // 50% screen height
+            width: 1, // 50% screen width
+            height: 1, // 50% screen height
+            //width: "500px;", // 50% screen width
+            //height: "400px", // 50% screen height
         }
     ) {
         //
@@ -58,7 +58,7 @@ export class UI_Panel {
             },
         };
 
-        // 
+        //
         if (this._currentPlayer) {
             let entity = this._currentPlayer.entity;
             entity.inventory.onAdd((item, sessionId) => {
@@ -83,7 +83,6 @@ export class UI_Panel {
             // refresh
             this._update();
         });
-
     }
 
     // create panel
@@ -99,7 +98,7 @@ export class UI_Panel {
         mainPanel.height = this._options.height;
         mainPanel.verticalAlignment = this._options.horizontal_position;
         mainPanel.horizontalAlignment = this._options.vertical_position;
-        mainPanel.isVisible = false;
+        mainPanel.isVisible = true;
         mainPanel.thickness = 0;
         this._playerUI.addControl(mainPanel);
         this.selectedTabUI = mainPanel;
@@ -207,12 +206,12 @@ export class UI_Panel {
         }
 
         // remove children
-        if(this.tabContent[key]){
+        if (this.tabContent[key]) {
             this.tabContent[key].getDescendants().forEach((element) => {
                 element.dispose();
             });
         }
-        
+
         // refresh tab content
         this[key](this.tabContent[key], key);
 
@@ -241,9 +240,7 @@ export class UI_Panel {
     }
 
     // refresh panel
-    private _update() {
-   
-    }
+    private _update() {}
 
     ///////////////////////////////////////
     ///////////////////////////////////////
@@ -265,9 +262,9 @@ export class UI_Panel {
 
     public refreshItems() {
         let tab = this.tabContent["inventory"] as Rectangle;
-        if(!tab) return false;
+        if (!tab) return false;
         const panel = tab.getChildByName("inventoryRightPanel") as Rectangle;
-        if(!panel || !panel.children) return false;
+        if (!panel || !panel.children) return false;
         const childPanel = panel.children[0] as Grid;
         if (childPanel) {
             let i = 0;
@@ -318,7 +315,7 @@ export class UI_Panel {
         leftPanel.top = "5px";
         leftPanel.left = 0;
         leftPanel.width = 0.45;
-        leftPanel.height = .92;
+        leftPanel.height = 0.92;
         leftPanel.background = "#222";
         leftPanel.thickness = 1;
         panel.addControl(leftPanel);
@@ -385,8 +382,7 @@ export class UI_Panel {
             }
         }
 
-        // 
+        //
         this.refreshItems();
-
     }
 }

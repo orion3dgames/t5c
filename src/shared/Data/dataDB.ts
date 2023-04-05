@@ -38,12 +38,14 @@ export class dataDB {
             case "locations":
                 returnData = LocationsDB ?? false;
                 break;
-            case "item":
+            case "items":
                 returnData = ItemsDB ?? false;
+                break;
             case "":
                 returnData = false;
                 break;
         }
+
         return returnData;
     }
 }
