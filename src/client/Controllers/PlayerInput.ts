@@ -65,6 +65,7 @@ export class PlayerInput {
                     this.movementX = pointerInfo.event.movementX / 100;
                     this.movementY = pointerInfo.event.movementY / 100;
                 }
+                console.log(pointerInfo);
             }
         });
 

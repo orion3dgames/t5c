@@ -13,14 +13,11 @@ export class UI_Tooltip {
     private _scene: Scene;
     private _gameRoom;
     private _currentPlayer;
-    private _entities;
-    private ping: number = 0;
-    private _debugTextUI;
 
-    private tooltip_container;
-    private tooltip_image;
-    private tooltip_name;
-    private tooltip_description;
+    private tooltipContainer: Rectangle;
+    private tooltipImage;
+    private tooltipName;
+    private tooltipDescription;
 
     constructor(_playerUI, _engine: Engine, _scene: Scene, _gameRoom, _currentPlayer) {
         this._playerUI = _playerUI;
@@ -49,23 +46,22 @@ export class UI_Tooltip {
         tooltipBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
         tooltipBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         this._playerUI.addControl(tooltipBar);
-        this.tooltip_container = tooltipBar;
+        this.tooltipContainer = tooltipBar;
     }
 
     generateItem(data) {
-        /*
-        const text = new TextBlock("debugText");
-        debugText.color = "#FFF";
-        debugText.top = "5px"; 
-        debugText.left = "5px";
-        debugText.fontSize = "12px;";
-        debugText.resizeToFit = true;
-        debugText.text = "TEXT";
-        debugText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        debugText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        debugText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        debugText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        this.tooltipBar.addControl(debugText);*/
+        const tooltipName = new TextBlock("tooltipName");
+        tooltipName.color = "#FFF";
+        tooltipName.top = "5px";
+        tooltipName.left = "5px";
+        tooltipName.fontSize = "12px;";
+        tooltipName.resizeToFit = true;
+        tooltipName.text = data.name;
+        tooltipName.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        tooltipName.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        tooltipName.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        tooltipName.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        this.tooltipContainer.addControl(tooltipName);
     }
 
     /** called externally to refresh tooltip with content */

@@ -22,6 +22,9 @@ export class UI_Panel {
     private selectedTab;
     private selectedTabUI;
 
+    // inventory tab
+    private _inventoryGrid: Rectangle[] = [];
+
     constructor(
         _playerUI,
         _scene,
@@ -45,7 +48,7 @@ export class UI_Panel {
         this._options = options;
 
         //
-        this.selectedTab = "";
+        this.selectedTab = "character";
         this._tabs = {
             character: {
                 title: "Character",
@@ -59,7 +62,10 @@ export class UI_Panel {
         };
 
         //
-        if (this._currentPlayer) {
+        this._createUI();
+
+        //
+        if (this._currentPlayer && this.selectedTab === "inventory") {
             let entity = this._currentPlayer.entity;
             entity.inventory.onAdd((item, sessionId) => {
                 //console.log("onAdd", item, sessionId);
@@ -74,9 +80,6 @@ export class UI_Panel {
                 this.refreshItems();
             });
         }
-
-        //
-        this._createUI();
 
         // some ui must be constantly refreshed as things change
         this._scene.registerBeforeRender(() => {
@@ -100,6 +103,7 @@ export class UI_Panel {
         mainPanel.horizontalAlignment = this._options.vertical_position;
         mainPanel.isVisible = true;
         mainPanel.thickness = 0;
+        mainPanel.isPointerBlocker = true;
         this._playerUI.addControl(mainPanel);
         this.selectedTabUI = mainPanel;
 
@@ -199,27 +203,26 @@ export class UI_Panel {
 
     // open panel
     public setSelectedTab(key) {
+        // remove children
+        for (var i in this.tabContent[key]._children) {
+            let el = this.tabContent[key]._children[i];
+            el.dispose();
+        }
+
         // hide all tabs buttons
         for (let tabId in this._tabs) {
             this.tabContent[tabId].isVisible = false;
             this.tabButtons[tabId].background = "#000";
         }
 
-        // remove children
-        if (this.tabContent[key]) {
-            this.tabContent[key].getDescendants().forEach((element) => {
-                element.dispose();
-            });
-        }
-
-        // refresh tab content
-        this[key](this.tabContent[key], key);
-
         // show
         this.selectedTabUI.isVisible = true;
         this.tabContent[key].isVisible = true;
         this.tabButtons[key].background = "green";
         this.selectedTab = key;
+
+        // refresh tab content
+        this[key](this.tabContent[key], key);
     }
 
     // open panel
@@ -259,57 +262,58 @@ export class UI_Panel {
     ///////////////////////////////////////
     ///////////////////////////////////////
     // INVENTORY PANEL
-
     public refreshItems() {
-        let tab = this.tabContent["inventory"] as Rectangle;
-        if (!tab) return false;
-        const panel = tab.getChildByName("inventoryRightPanel") as Rectangle;
-        if (!panel || !panel.children) return false;
-        const childPanel = panel.children[0] as Grid;
-        if (childPanel) {
-            let i = 0;
-            this._currentPlayer.inventory.forEach((element) => {
-                let child = childPanel.children[i] as Container;
-                if (child) {
-                    let item = dataDB.get("item", element.key) as Item;
+        if (this.selectedTab !== "inventory") return false;
+        let i = 0;
+        this._currentPlayer.inventory.forEach((element) => {
+            let child = this._inventoryGrid[i];
+            let item = dataDB.get("item", element.key) as Item;
 
-                    // add icon
-                    var imageData = this._loadedAssets[item.icon];
-                    var img = new Image("item_image_" + element.key, imageData);
-                    img.stretch = Image.STRETCH_FILL;
-                    child.addControl(img);
-
-                    const itemTxt = new TextBlock("itemTxt" + i);
-                    itemTxt.text = element.key;
-                    itemTxt.color = "#FFF";
-                    itemTxt.top = "5px";
-                    itemTxt.left = "5px";
-                    itemTxt.fontSize = "12px;";
-                    itemTxt.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-                    itemTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-                    itemTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-                    child.addControl(itemTxt);
-
-                    const itemTxtQty = new TextBlock("itemTxtQty" + i);
-                    itemTxtQty.text = element.qty;
-                    itemTxtQty.color = "#FFF";
-                    itemTxtQty.top = "-2px";
-                    itemTxtQty.left = "-2px";
-                    itemTxtQty.fontSize = "12px;";
-                    itemTxtQty.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-                    itemTxtQty.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-                    itemTxtQty.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-                    child.addControl(itemTxtQty);
-                }
-                i++;
+            // on hover tooltip
+            child.onPointerEnterObservable.add(() => {
+                console.log("HOVER IN", item.key);
             });
-        }
+            // on hover tooltip
+            child.onPointerOutObservable.add(() => {
+                console.log("HOVER OUT", item.key);
+            });
+
+            // add icon
+            var imageData = this._loadedAssets[item.icon];
+            var img = new Image("itemImage_" + element.key, imageData);
+            img.stretch = Image.STRETCH_FILL;
+            child.addControl(img);
+
+            const itemTxt = new TextBlock("itemTxt" + i);
+            itemTxt.text = element.key;
+            itemTxt.color = "#FFF";
+            itemTxt.top = "5px";
+            itemTxt.left = "5px";
+            itemTxt.fontSize = "12px;";
+            itemTxt.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            itemTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            itemTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            child.addControl(itemTxt);
+
+            const itemTxtQty = new TextBlock("itemTxtQty" + i);
+            itemTxtQty.text = element.qty;
+            itemTxtQty.color = "#FFF";
+            itemTxtQty.top = "-2px";
+            itemTxtQty.left = "-2px";
+            itemTxtQty.fontSize = "12px;";
+            itemTxtQty.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+            itemTxtQty.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+            itemTxtQty.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+            child.addControl(itemTxtQty);
+
+            i++;
+        });
     }
 
     public inventory(panel, tab) {
         //console.log(tab, this._currentPlayer);
 
-        const leftPanel = new Rectangle("inventoryLeftPanel");
+        let leftPanel = new Rectangle("inventoryLeftPanel");
         leftPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         leftPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         leftPanel.top = "5px";
@@ -320,7 +324,7 @@ export class UI_Panel {
         leftPanel.thickness = 1;
         panel.addControl(leftPanel);
 
-        const leftPanelTxt = new TextBlock("leftPanelTxt");
+        let leftPanelTxt = new TextBlock("leftPanelTxt");
         leftPanelTxt.text = "character model here...";
         leftPanelTxt.color = "#FFF";
         leftPanelTxt.top = "5px";
@@ -331,7 +335,7 @@ export class UI_Panel {
         leftPanelTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         leftPanel.addControl(leftPanelTxt);
 
-        const rightPanel = new Rectangle("inventoryRightPanel");
+        let rightPanel = new Rectangle("inventoryRightPanel");
         rightPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         rightPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         rightPanel.top = "5px";
@@ -341,7 +345,7 @@ export class UI_Panel {
         rightPanel.thickness = 0;
         panel.addControl(rightPanel);
 
-        var grid = new Grid();
+        let grid = new Grid();
         grid.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         grid.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         grid.left = "5px;";
@@ -356,8 +360,6 @@ export class UI_Panel {
         let inventorySpaceCols = inventorySpaceW;
         let inventorySpaceRows = inventorySpace / inventorySpaceW;
 
-        //console.log(size, inventorySpaceCols, inventorySpaceRows);
-
         for (let i = 0; i <= inventorySpaceW; i++) {
             grid.addColumnDefinition(size, true);
         }
@@ -366,9 +368,12 @@ export class UI_Panel {
             grid.addRowDefinition(size, true);
         }
 
+        this._inventoryGrid = [];
+
+        let i = 0;
         for (let r = 0; r < inventorySpaceRows; r++) {
             for (let col = 0; col < inventorySpaceCols; col++) {
-                const inventorySpace = new Rectangle("inventorySpace_" + r + col);
+                const inventorySpace = new Rectangle("inventorySpace_" + i);
                 inventorySpace.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
                 inventorySpace.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
                 inventorySpace.top = 0.1;
@@ -379,6 +384,10 @@ export class UI_Panel {
                 inventorySpace.thickness = 0;
                 inventorySpace.cornerRadius = 0;
                 grid.addControl(inventorySpace, r, col);
+
+                this._inventoryGrid.push(inventorySpace);
+
+                i++;
             }
         }
 

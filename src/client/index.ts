@@ -1,10 +1,8 @@
 import { isLocal } from "../shared/Utils";
 
 if (process.env.NODE_ENV !== "production") {
-    /*
     import("@babylonjs/core/Debug/debugLayer");
     import("@babylonjs/inspector");
-    */
 }
 
 import "@babylonjs/core/Animations/animatable";
@@ -30,8 +28,7 @@ import { DebugScene } from "./Screens/DebugScene";
 import Config from "../shared/Config";
 import { Network } from "./Controllers/Network";
 import { Loading } from "./Controllers/Loading";
-import { dataDB } from "./../shared/Data/dataDB";
-import { PlayerLocation, PlayerUser, PlayerCharacter } from "../shared/types";
+import { PlayerLocation, PlayerUser, PlayerCharacter } from "../Shared/Types";
 import { Entity } from "../shared/Entities/Entity";
 
 // App class is our entire game application
