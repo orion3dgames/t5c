@@ -1,29 +1,31 @@
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
-import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
+import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { Control } from "@babylonjs/gui/2D/controls/control";
+import { Image } from "@babylonjs/gui/2D/controls/image";
 import { countPlayers, roundTo } from "../../../shared/Utils";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import Config from "../../../shared/Config";
+import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 
 export class UI_Tooltip {
     private _playerUI;
-    private _engine: Engine;
-    private _scene: Scene;
-    private _gameRoom;
     private _currentPlayer;
+    private _loadedAssets;
+    private _scene: Scene;
+    private _engine: Engine;
 
     private tooltipContainer: Rectangle;
     private tooltipImage;
     private tooltipName;
     private tooltipDescription;
 
-    constructor(_playerUI, _engine: Engine, _scene: Scene, _gameRoom, _currentPlayer) {
-        this._playerUI = _playerUI;
-        this._engine = _engine;
-        this._scene = _scene;
-        this._gameRoom = _gameRoom;
+    constructor(_UI, _currentPlayer) {
+        this._playerUI = _UI._playerUI;
+        this._loadedAssets = _UI._loadedAssets;
+        this._engine = _UI._engine;
+        this._scene = _UI._scene;
         this._currentPlayer = _currentPlayer;
 
         this._createUI();
@@ -37,42 +39,123 @@ export class UI_Tooltip {
 
     _createUI() {
         const tooltipBar = new Rectangle("tooltipBar");
-        tooltipBar.top = "0x";
+        tooltipBar.left = "0px";
+        tooltipBar.top = "0px";
         tooltipBar.width = "150px";
-        tooltipBar.height = "150px";
         tooltipBar.thickness = 1;
         tooltipBar.background = Config.UI_CENTER_PANEL_BG;
         tooltipBar.isVisible = true;
         tooltipBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-        tooltipBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        tooltipBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER
+        tooltipBar.adaptHeightToChildren = true;
+
         this._playerUI.addControl(tooltipBar);
         this.tooltipContainer = tooltipBar;
-    }
 
-    generateItem(data) {
+        const tooltipImage = new Rectangle("tooltipImage");
+        tooltipImage.top = "5x";
+        tooltipImage.left = "5x";
+        tooltipImage.width = "25px";
+        tooltipImage.height = "25px";
+        tooltipImage.thickness = 1;
+        tooltipImage.background = Config.UI_CENTER_PANEL_BG;
+        tooltipImage.isVisible = true;
+        tooltipImage.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        tooltipImage.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT
+        tooltipBar.addControl(tooltipImage);
+        this.tooltipImage = tooltipImage;
+
+        // add name
         const tooltipName = new TextBlock("tooltipName");
         tooltipName.color = "#FFF";
         tooltipName.top = "5px";
-        tooltipName.left = "5px";
+        tooltipName.left = "35px";
         tooltipName.fontSize = "12px;";
         tooltipName.resizeToFit = true;
-        tooltipName.text = data.name;
+        tooltipName.text = "Item Name";
         tooltipName.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         tooltipName.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         tooltipName.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         tooltipName.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        this.tooltipContainer.addControl(tooltipName);
+        tooltipBar.addControl(tooltipName);
+        this.tooltipName = tooltipName;
+
+        // add description
+        const tooltipDescription = new TextBlock("tooltipDescription");
+        tooltipDescription.color = "#FFF";
+        tooltipDescription.top = "35px";
+        tooltipDescription.left = "5px";
+        tooltipDescription.width = 1;
+        tooltipDescription.fontSize = "11px;";
+        tooltipDescription.resizeToFit = true;
+        tooltipDescription.text = "Item Description Item Description Item Description Item Description";
+        tooltipDescription.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        tooltipDescription.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        tooltipDescription.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        tooltipDescription.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        tooltipDescription.textWrapping = TextWrapping.WordWrap;
+        tooltipBar.addControl(tooltipDescription);
+        this.tooltipDescription = tooltipDescription;
+    }
+
+    generateItem(data) {
+        this.tooltipName.text = data.name;
+        this.tooltipDescription.text = data.description+"\n";
+    }
+
+    generateAbility(data) {
+        this.tooltipName.text = data.label;
+        this.tooltipDescription.text = data.description+"\n";
     }
 
     /** called externally to refresh tooltip with content */
-    refresh(type, data) {
+    public refresh(type, data, el:Rectangle) {
+
+        console.log('REFRESH', type, data);
+
+        // show tooltip
+        this.tooltipContainer.isVisible = true;
+
+        // remove image
+        this.tooltipImage.children.forEach(element => {
+            element.dispose();
+        });
+
+        // add image
+        var imageData = this._loadedAssets[data.icon];
+        var img = new Image("tooltipImageImg", imageData);
+        img.stretch = Image.STRETCH_FILL;
+        this.tooltipImage.addControl(img);
+
         switch (type) {
             case "item":
                 this.generateItem(data);
                 break;
+            case "ability":
+                this.generateAbility(data);
+                break;
         }
     }
 
+    public close() {
+        //this.tooltipContainer.isVisible = false;
+    }
+    
+
     // debug panel refresh
-    private _update() {}
+    private _update() {
+        let heightTooltip = this.tooltipContainer.heightInPixels;
+        var width = this._engine.getRenderWidth();
+        var height = this._engine.getRenderHeight();
+        let x = this._scene.pointerX - (width / 2.0);
+        let y = this._scene.pointerY - (height / 2.0) + heightTooltip;
+
+        if(this._scene.pointerY > (height/2)){
+            y -= heightTooltip * 2
+        }
+
+        this.tooltipContainer.leftInPixels = x; //slight offset 
+        this.tooltipContainer.topInPixels = y; //slight offset  
+        
+    }
 }

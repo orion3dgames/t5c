@@ -80,7 +80,7 @@ export class UserInterface {
         centerPanel.thickness = 0;
         centerPanel.background = Config.UI_CENTER_PANEL_BG;
         centerPanel.alpha = 1;
-        centerPanel.isPointerBlocker = true;
+        centerPanel.isPointerBlocker = false;
         centerPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         centerPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         this._playerUI.addControl(centerPanel);
@@ -108,7 +108,7 @@ export class UserInterface {
         this._currentPlayer = currentPlayer;
 
         // create abilities ui + events
-        this._UIAbilities = new UI_Abilities(this._centerUI, this._gameRoom, currentPlayer, this._loadedAssets);
+        this._UIAbilities = new UI_Abilities(this, currentPlayer);
 
         // create chat ui + events
         this._UIChat = new UI_Chats(this._centerUI, this._chatRoom, currentPlayer, this._entities);
@@ -127,10 +127,11 @@ export class UserInterface {
         });
 
         // create panel
-        this._UIPanel = new UI_Panel(this._playerUI, this._scene, currentPlayer, this._loadedAssets);
+        this._UIPanel = new UI_Panel(this, currentPlayer);
 
-        // create panel
-        this._UITooltip = new UI_Tooltip(this._playerUI, this._engine, this._scene, this._gameRoom, this._currentPlayer);
+        // create tooltip
+        this._UITooltip = new UI_Tooltip(this, currentPlayer);
+ 
     }
 
     public refreshEntityUI() {

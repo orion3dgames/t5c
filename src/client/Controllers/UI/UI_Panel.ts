@@ -9,9 +9,12 @@ import { Grid } from "@babylonjs/gui/2D/controls/grid";
 import { Container } from "@babylonjs/gui/2D/controls/container";
 import { dataDB } from "../../../shared/Data/dataDB";
 import { Item } from "../../../shared/Data/ItemDB";
+import { UI_Tooltip } from "./UI_Tooltip";
 
 export class UI_Panel {
+    private _UI;
     private _playerUI;
+    private _UITooltip:UI_Tooltip;
     private _scene;
     private _currentPlayer;
     private _loadedAssets;
@@ -26,24 +29,24 @@ export class UI_Panel {
     private _inventoryGrid: Rectangle[] = [];
 
     constructor(
-        _playerUI,
-        _scene,
+        _UI,
         _currentPlayer,
-        _loadedAssets,
         options = {
             name: "Default Name",
             horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
             vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
-            width: 1, // 50% screen width
-            height: 1, // 50% screen height
-            //width: "500px;", // 50% screen width
-            //height: "400px", // 50% screen height
+            //width: 1, // 50% screen width
+            //height: 1, // 50% screen height
+            width: "500px;", // 50% screen width
+            height: "400px", // 50% screen height
         }
     ) {
         //
-        this._playerUI = _playerUI;
-        this._loadedAssets = _loadedAssets;
-        this._scene = _scene;
+        this._UI = _UI;
+        this._playerUI = _UI._playerUI;
+        this._UITooltip = _UI._UITooltip;
+        this._loadedAssets = _UI._loadedAssets;
+        this._scene = _UI._scene;
         this._currentPlayer = _currentPlayer;
         this._options = options;
 
@@ -101,7 +104,7 @@ export class UI_Panel {
         mainPanel.height = this._options.height;
         mainPanel.verticalAlignment = this._options.horizontal_position;
         mainPanel.horizontalAlignment = this._options.vertical_position;
-        mainPanel.isVisible = true;
+        mainPanel.isVisible = false;
         mainPanel.thickness = 0;
         mainPanel.isPointerBlocker = true;
         this._playerUI.addControl(mainPanel);
@@ -271,11 +274,13 @@ export class UI_Panel {
 
             // on hover tooltip
             child.onPointerEnterObservable.add(() => {
-                console.log("HOVER IN", item.key);
+                //console.log("HOVER IN", item.key, this);
+                this._UI._UITooltip.refresh('item', item, child);
             });
             // on hover tooltip
             child.onPointerOutObservable.add(() => {
-                console.log("HOVER OUT", item.key);
+                //console.log("HOVER OUT", item.key, this);
+                this._UI._UITooltip.close();
             });
 
             // add icon

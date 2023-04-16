@@ -25,12 +25,13 @@ export class EntityActions {
     constructor(scene, _loadedAssets) {
         this._scene = scene;
         this._loadedAssets = _loadedAssets;
-        this.particleTxt_01 = this._loadedAssets["particle_01"];
+        this.particleTxt_01 = this._loadedAssets["TXT_particle_01"];
     }
 
     public playSound() {}
 
     public process(data, ability) {
+        console.log(ability);
         /*
         let soundToPlay = this._scene.getSoundByName("sound_"+ability.key);
         if(!soundToPlay){

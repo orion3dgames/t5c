@@ -9,65 +9,24 @@ import { Ability } from "../../../shared/Data/AbilitiesDB";
 
 export class UI_Abilities {
     private _playerUI;
+    private _UI;
     private _gameRoom;
     private _loadedAssets;
     private _currentPlayer: Player;
-    private _tooltip: Rectangle;
-    private _tooltipTxt: TextBlock;
-    private abilities;
+    private _UITooltip;
     private abylity_number: number = 9;
 
-    constructor(_playerUI, _gameRoom, _currentPlayer, _loadedAssets) {
-        this._playerUI = _playerUI;
+    constructor(_UI, _currentPlayer) {
+        this._playerUI = _UI._playerUI;
         this._currentPlayer = _currentPlayer;
-        this._gameRoom = _gameRoom;
-        this._loadedAssets = _loadedAssets;
-        this.abilities = dataDB.load("abilities");
-
+        this._gameRoom = _UI._gameRoom;
+        this._loadedAssets = _UI._loadedAssets;
+        this._UI = _UI;
         // create ui
         this._createUI();
 
         // add ui events
         this._createEvents();
-
-        this._createTooltip();
-    }
-
-    _createTooltip() {
-        let width = 330;
-
-        // add tooltip
-        const toolTipPanel = new Rectangle("toolTipPanel");
-        toolTipPanel.top = "-200px";
-        toolTipPanel.left = 0;
-        toolTipPanel.width = width + "px";
-        toolTipPanel.adaptHeightToChildren = true;
-        toolTipPanel.thickness = 1;
-        toolTipPanel.background = Config.UI_CENTER_PANEL_BG;
-        toolTipPanel.isVisible = false;
-        toolTipPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        toolTipPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        this._playerUI.addControl(toolTipPanel);
-        this._tooltip = toolTipPanel;
-
-        // add tooltip text
-        var toolTipText = new TextBlock("toolTipText");
-        toolTipText.paddingTop = "5px";
-        toolTipText.paddingBottom = "5px";
-        toolTipText.paddingRight = "5px";
-        toolTipText.paddingLeft = "5px";
-        toolTipText.text = "NONE";
-        toolTipText.fontSize = "12px";
-        toolTipText.color = "#FFF";
-        toolTipText.top = "0px";
-        toolTipText.left = "0px";
-        toolTipText.width = 1;
-        toolTipText.textWrapping = TextWrapping.WordWrap;
-        toolTipText.resizeToFit = true;
-        toolTipText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        toolTipText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        toolTipPanel.addControl(toolTipText);
-        this._tooltipTxt = toolTipText;
     }
 
     _createUI() {
@@ -164,13 +123,11 @@ export class UI_Abilities {
     }
 
     showTooltip(ability) {
-        this._tooltip.isVisible = true;
-        this._tooltipTxt.text = ability.description;
+        this._UI._UITooltip.refresh('ability', ability);
     }
 
     hideTooltip() {
-        this._tooltip.isVisible = false;
-        this._tooltipTxt.text = "";
+        this._UI._UITooltip.close();
     }
 
     _createEvents() {}
