@@ -95,7 +95,9 @@ export class GameScene {
         let location = this._auth.currentLocation;
 
         // black background
-        scene.clearColor = new Color4(location.skyColor, location.skyColor, location.skyColor, 1);
+        if(location.skyColor){
+            scene.clearColor = new Color4(location.skyColor, location.skyColor, location.skyColor, 1);
+        }
 
         if (location.sun) {
             // ambient light
