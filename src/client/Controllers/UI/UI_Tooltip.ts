@@ -36,7 +36,7 @@ export class UI_Tooltip {
         });
     }
 
-    _createUI() {
+    private _createUI() {
         const tooltipBar = new Rectangle("tooltipBar");
         tooltipBar.left = "0px";
         tooltipBar.top = "0px";
@@ -97,22 +97,23 @@ export class UI_Tooltip {
         this.tooltipDescription = tooltipDescription;
     }
 
-    generateItem(data) {
+    private generateItem(data) {
         this.tooltipName.text = data.name;
         this.tooltipDescription.text = data.description + "\n";
     }
 
-    generateAbility(data) {
+    private generateAbility(data) {
         this.tooltipName.text = data.label;
         this.tooltipDescription.text = data.description + "\n";
     }
 
     /** called externally to refresh tooltip with content */
     public refresh(type, data, el: Rectangle) {
+        // set tooltip target
         this.tooltipTarget = el;
 
-        // show tooltip
-        this.tooltipContainer.isVisible = true;
+        // position tooltip
+        this.setPosition();
 
         // remove image
         this.tooltipImage.children.forEach((element) => {
@@ -133,14 +134,18 @@ export class UI_Tooltip {
                 this.generateAbility(data);
                 break;
         }
+
+        // show tooltip
+        this.tooltipContainer.isVisible = true;
     }
 
+    /** called externally to hide tooltip */
     public close() {
         this.tooltipContainer.isVisible = false;
         this.tooltipTarget = null;
     }
 
-    private _update() {
+    private setPosition() {
         if (this.tooltipTarget) {
             let heightOffset = this.tooltipContainer.heightInPixels + this.tooltipTarget.heightInPixels / 2;
             let widthOffset = this.tooltipTarget.widthInPixels / 2;
@@ -150,4 +155,6 @@ export class UI_Tooltip {
             this.tooltipContainer.topInPixels = y - heightOffset; //slight offset
         }
     }
+
+    private _update() {}
 }
