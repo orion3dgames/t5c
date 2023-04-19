@@ -1,6 +1,6 @@
 import Logger from "../../../shared/Logger";
 import { Vector3 } from "../../../shared/yuka";
-import { PlayerInputs } from "../../../shared/Types";
+import { PlayerInputs } from "../../../shared/types";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { EnemyState } from "../schema/EnemyState";
 import { LootState } from "../schema/LootState";

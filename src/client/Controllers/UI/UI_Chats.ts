@@ -5,7 +5,7 @@ import { Control } from "@babylonjs/gui/2D/controls/control";
 import { InputText } from "@babylonjs/gui/2D/controls/inputText";
 import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
-import { PlayerMessage } from "../../../shared/Types/index";
+import { PlayerMessage } from "../../../shared/types/index";
 import Config from "../../../shared/Config";
 
 export class UI_Chats {

@@ -6,7 +6,7 @@ import Config from "../../shared/Config";
 import Logger from "../../shared/Logger";
 import loadNavMeshFromFile from "../../shared/Utils/loadNavMeshFromFile";
 import { PlayerState } from "./schema/PlayerState";
-import { PlayerInputs } from "../../shared/Types";
+import { PlayerInputs } from "../../shared/types";
 import { NavMesh } from "../../shared/yuka";
 import { nanoid } from "nanoid";
 import { randomNumberInRange } from "../../shared/Utils";
