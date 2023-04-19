@@ -14,7 +14,7 @@ import { UI_Tooltip } from "./UI_Tooltip";
 export class UI_Panel {
     private _UI;
     private _playerUI;
-    private _UITooltip:UI_Tooltip;
+    private _UITooltip: UI_Tooltip;
     private _scene;
     private _currentPlayer;
     private _loadedAssets;
@@ -35,10 +35,10 @@ export class UI_Panel {
             name: "Default Name",
             horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
             vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
-            //width: 1, // 50% screen width
-            //height: 1, // 50% screen height
-            width: "500px;", // 50% screen width
-            height: "400px", // 50% screen height
+            width: 1, // 50% screen width
+            height: 1, // 50% screen height
+            //width: "500px;", // 50% screen width
+            //height: "400px", // 50% screen height
         }
     ) {
         //
@@ -104,7 +104,7 @@ export class UI_Panel {
         mainPanel.height = this._options.height;
         mainPanel.verticalAlignment = this._options.horizontal_position;
         mainPanel.horizontalAlignment = this._options.vertical_position;
-        mainPanel.isVisible = false;
+        mainPanel.isVisible = true;
         mainPanel.thickness = 0;
         mainPanel.isPointerBlocker = true;
         this._playerUI.addControl(mainPanel);
@@ -275,7 +275,7 @@ export class UI_Panel {
             // on hover tooltip
             child.onPointerEnterObservable.add(() => {
                 //console.log("HOVER IN", item.key, this);
-                this._UI._UITooltip.refresh('item', item, child);
+                this._UI._UITooltip.refresh("item", item, child);
             });
             // on hover tooltip
             child.onPointerOutObservable.add(() => {

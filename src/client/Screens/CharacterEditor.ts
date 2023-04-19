@@ -52,7 +52,6 @@ export class CharacterEditor {
         let scene = new Scene(app.engine);
         scene.clearColor = new Color4(0, 0, 0, 1);
 
-
         // camera
         var camera = new ArcRotateCamera("camera1", Math.PI / 2, Math.PI / 4, 3, new Vector3(0, 0.5, 0), scene);
         camera.attachControl(app.canvas, true);
@@ -100,7 +99,6 @@ export class CharacterEditor {
 
         // set up ui
         const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-        guiMenu.idealHeight = 720;
         this._ui = guiMenu;
 
         const usernameInput = new InputText("newCharacterInput");
@@ -303,7 +301,18 @@ export class CharacterEditor {
 
         let CHARACTER = {
             player_male: {
-                MAIN_MESH: ["Casual2_Body_primitive0", "Casual2_Body_primitive1", "Casual2_Feet_primitive0", "Casual2_Feet_primitive1", "Casual2_Head_primitive0", "Casual2_Head_primitive1", "Casual2_Head_primitive2", "Casual2_Head_primitive3", "Casual2_Head_primitive4", "Casual2_Legs"],
+                MAIN_MESH: [
+                    "Casual2_Body_primitive0",
+                    "Casual2_Body_primitive1",
+                    "Casual2_Feet_primitive0",
+                    "Casual2_Feet_primitive1",
+                    "Casual2_Head_primitive0",
+                    "Casual2_Head_primitive1",
+                    "Casual2_Head_primitive2",
+                    "Casual2_Head_primitive3",
+                    "Casual2_Head_primitive4",
+                    "Casual2_Legs",
+                ],
                 OPTIONS: CHARACTER_DATA,
                 SCALE: 1,
                 ANIMATIONS: {
@@ -313,7 +322,18 @@ export class CharacterEditor {
                 },
             },
             player_female: {
-                MAIN_MESH: ["Casual_Body_primitive0", "Casual_Body_primitive1", "Casual_Feet_primitive0", "Casual_Feet_primitive1", "Casual_Head_primitive0", "Casual_Head_primitive1", "Casual_Head_primitive2", "Casual_Head_primitive3", "Casual_Head_primitive4", "Casual_Legs"],
+                MAIN_MESH: [
+                    "Casual_Body_primitive0",
+                    "Casual_Body_primitive1",
+                    "Casual_Feet_primitive0",
+                    "Casual_Feet_primitive1",
+                    "Casual_Head_primitive0",
+                    "Casual_Head_primitive1",
+                    "Casual_Head_primitive2",
+                    "Casual_Head_primitive3",
+                    "Casual_Head_primitive4",
+                    "Casual_Legs",
+                ],
                 OPTIONS: CHARACTER_DATA,
                 SCALE: 1,
                 ANIMATIONS: {
@@ -354,9 +374,9 @@ export class CharacterEditor {
         // load player mesh
         const playerMesh = result.loadedMeshes[0];
         result.loadedMeshes.forEach((m) => {
-            if(CHARACTER.MAIN_MESH.includes(m.name)){
+            if (CHARACTER.MAIN_MESH.includes(m.name)) {
                 m.isVisible = true;
-            }else{
+            } else {
                 m.isVisible = false;
             }
         });

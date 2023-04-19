@@ -26,7 +26,8 @@ export class abilitiesCTRL {
     }
 
     public create() {
-        this.abilitiesOwned.forEach(element => {
+        this.abilitiesOwned.forEach((element) => {
+            console.log(element);
             const skill = this.abilitiesDB[element.key];
             skill.digit = element.digit;
             this.abilities.push(new Ability(skill));

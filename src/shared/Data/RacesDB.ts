@@ -1,3 +1,4 @@
+import { AbilityItem } from "src/server/rooms/schema/AbilityItem";
 import { ILootTableEntry, LootTableEntry } from "../Entities/Player/LootTable";
 
 type Race = {
@@ -19,6 +20,7 @@ type Race = {
     goldGain: {};
     damage_multiplier: number;
     drops?: ILootTableEntry[];
+    default_abilities?: string[];
 };
 
 interface raceDataMap {
@@ -49,6 +51,7 @@ let RacesDB: raceDataMap = {
         goldGain: {},
         damage_multiplier: 0,
         drops: [],
+        default_abilities: ["base_attack"],
     },
     monster_bear: {
         key: "monster_bear",
@@ -80,6 +83,7 @@ let RacesDB: raceDataMap = {
             LootTableEntry("amulet_01", 1, 1, 1, 1, 2),
             LootTableEntry(null, 80, 1, 1, 1, 2),
         ],
+        default_abilities: ["base_attack"],
     },
     monster_unicorn: {
         key: "monster_unicorn",
@@ -111,6 +115,7 @@ let RacesDB: raceDataMap = {
             LootTableEntry("amulet_01", 1, 1, 1, 1, 2),
             LootTableEntry(null, 80, 1, 1, 1, 2),
         ],
+        default_abilities: ["base_attack"],
     },
 };
 

@@ -39,7 +39,6 @@ export class LoginScene {
 
         //--GUI--
         const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-        guiMenu.idealHeight = 720;
 
         // background image
         const imageRect = new Rectangle("background");

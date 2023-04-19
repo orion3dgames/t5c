@@ -63,14 +63,12 @@ export class UserInterface {
         this._loadedAssets = _loadedAssets;
 
         // create ui
-        const _namesUI = AdvancedDynamicTexture.CreateFullscreenUI("UI", true, this._scene);
+        const _namesUI = AdvancedDynamicTexture.CreateFullscreenUI("UI_Names", true, this._scene);
         this._namesUI = _namesUI;
-        this._namesUI.idealHeight = 720;
 
         // create ui
-        const playerUI = AdvancedDynamicTexture.CreateFullscreenUI("UI", true, this._scene);
+        const playerUI = AdvancedDynamicTexture.CreateFullscreenUI("UI_Player", true, this._scene);
         this._playerUI = playerUI;
-        this._playerUI.idealHeight = 720;
 
         // center panel
         const centerPanel = new Rectangle("centerPanel");
@@ -131,7 +129,6 @@ export class UserInterface {
 
         // create tooltip
         this._UITooltip = new UI_Tooltip(this, currentPlayer);
- 
     }
 
     public refreshEntityUI() {

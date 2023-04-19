@@ -102,7 +102,7 @@ export class UI_Abilities {
             headlineRect.addControl(img);
 
             headlineRect.onPointerEnterObservable.add(() => {
-                this.showTooltip(ability);
+                this.showTooltip(ability, headlineRect);
             });
 
             headlineRect.onPointerOutObservable.add(() => {
@@ -122,8 +122,8 @@ export class UI_Abilities {
         }
     }
 
-    showTooltip(ability) {
-        this._UI._UITooltip.refresh('ability', ability);
+    showTooltip(ability, headlineRect) {
+        this._UI._UITooltip.refresh("ability", ability, headlineRect);
     }
 
     hideTooltip() {

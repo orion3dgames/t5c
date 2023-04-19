@@ -2,12 +2,9 @@ import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Image } from "@babylonjs/gui/2D/controls/image";
-import { countPlayers, roundTo } from "../../../shared/Utils";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
-import { Button } from "@babylonjs/gui/2D/controls/button";
 import Config from "../../../shared/Config";
-import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 
 export class UI_Tooltip {
     private _playerUI;
@@ -16,6 +13,7 @@ export class UI_Tooltip {
     private _scene: Scene;
     private _engine: Engine;
 
+    private tooltipTarget;
     private tooltipContainer: Rectangle;
     private tooltipImage;
     private tooltipName;
@@ -28,6 +26,7 @@ export class UI_Tooltip {
         this._scene = _UI._scene;
         this._currentPlayer = _currentPlayer;
 
+        // create basic tooltip ui
         this._createUI();
 
         // some ui must be constantly refreshed as things change
@@ -44,10 +43,10 @@ export class UI_Tooltip {
         tooltipBar.width = "150px";
         tooltipBar.thickness = 1;
         tooltipBar.background = Config.UI_CENTER_PANEL_BG;
-        tooltipBar.isVisible = true;
-        tooltipBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-        tooltipBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER
+        tooltipBar.isVisible = false;
         tooltipBar.adaptHeightToChildren = true;
+        tooltipBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        tooltipBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
 
         this._playerUI.addControl(tooltipBar);
         this.tooltipContainer = tooltipBar;
@@ -61,7 +60,7 @@ export class UI_Tooltip {
         tooltipImage.background = Config.UI_CENTER_PANEL_BG;
         tooltipImage.isVisible = true;
         tooltipImage.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        tooltipImage.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT
+        tooltipImage.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         tooltipBar.addControl(tooltipImage);
         this.tooltipImage = tooltipImage;
 
@@ -100,24 +99,23 @@ export class UI_Tooltip {
 
     generateItem(data) {
         this.tooltipName.text = data.name;
-        this.tooltipDescription.text = data.description+"\n";
+        this.tooltipDescription.text = data.description + "\n";
     }
 
     generateAbility(data) {
         this.tooltipName.text = data.label;
-        this.tooltipDescription.text = data.description+"\n";
+        this.tooltipDescription.text = data.description + "\n";
     }
 
     /** called externally to refresh tooltip with content */
-    public refresh(type, data, el:Rectangle) {
-
-        console.log('REFRESH', type, data);
+    public refresh(type, data, el: Rectangle) {
+        this.tooltipTarget = el;
 
         // show tooltip
         this.tooltipContainer.isVisible = true;
 
         // remove image
-        this.tooltipImage.children.forEach(element => {
+        this.tooltipImage.children.forEach((element) => {
             element.dispose();
         });
 
@@ -138,24 +136,18 @@ export class UI_Tooltip {
     }
 
     public close() {
-        //this.tooltipContainer.isVisible = false;
+        this.tooltipContainer.isVisible = false;
+        this.tooltipTarget = null;
     }
-    
 
-    // debug panel refresh
     private _update() {
-        let heightTooltip = this.tooltipContainer.heightInPixels;
-        var width = this._engine.getRenderWidth();
-        var height = this._engine.getRenderHeight();
-        let x = this._scene.pointerX - (width / 2.0);
-        let y = this._scene.pointerY - (height / 2.0) + heightTooltip;
-
-        if(this._scene.pointerY > (height/2)){
-            y -= heightTooltip * 2
+        if (this.tooltipTarget) {
+            let heightOffset = this.tooltipContainer.heightInPixels + this.tooltipTarget.heightInPixels / 2;
+            let widthOffset = this.tooltipTarget.widthInPixels / 2;
+            let x = this.tooltipTarget.centerX;
+            let y = this.tooltipTarget.centerY;
+            this.tooltipContainer.leftInPixels = x - widthOffset; //slight offset
+            this.tooltipContainer.topInPixels = y - heightOffset; //slight offset
         }
-
-        this.tooltipContainer.leftInPixels = x; //slight offset 
-        this.tooltipContainer.topInPixels = y; //slight offset  
-        
     }
 }

@@ -128,7 +128,7 @@ export class GameRoomState extends Schema {
             if (this.entities.size < maxEntities) {
                 this.createEntity(this.entities.size);
             }
-            if (this.items.size < 50) {
+            if (this.items.size < 5) {
                 this.createItem();
             }
         }
@@ -202,8 +202,8 @@ export class GameRoomState extends Schema {
             wisdom: 20,
             experience: data.experience ?? 0,
 
-            temp_abilities: data.abilities ?? [],
-            temp_inventory: data.inventory ?? [],
+            default_abilities: data.abilities ?? [],
+            default_inventory: data.inventory ?? [],
         };
 
         this._gameroom.state.players.set(client.sessionId, new PlayerState(this._gameroom, player));

@@ -5,6 +5,9 @@ import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurren
 import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 import { Vector3, NavMesh } from "../../../shared/yuka";
 import { dataDB } from "../../../shared/Data/dataDB";
+import { PlayerState } from "./PlayerState";
+import { abilitiesCTRL } from "../ctrl/abilityCTRL";
+import { AbilityItem } from "./AbilityItem";
 
 export class EnemyState extends Schema {
     /////////////////////////////////////////////////////////////
@@ -44,6 +47,11 @@ export class EnemyState extends Schema {
     public raceData;
     public client;
 
+    //
+    public abilitiesCTRL: abilitiesCTRL;
+    public abilities: AbilityItem[] = [];
+    public default_abilities;
+
     // public vars
     public currentRegion;
     public wanderRegion;
@@ -52,7 +60,7 @@ export class EnemyState extends Schema {
 
     public AI_CURRENT_TARGET_POSITION = null;
     public AI_CURRENT_TARGET_DISTANCE = 0;
-    public AI_CURRENT_TARGET;
+    public AI_CURRENT_TARGET: PlayerState | null;
     public AI_CURRENT_TARGET_FOUND = false;
     public AI_CURRENT_ABILITY;
     public AI_STATE_REMAINING_DURATION: number = 0;
@@ -72,6 +80,12 @@ export class EnemyState extends Schema {
 
         Object.assign(this, data);
         Object.assign(this, dataDB.get("race", this.race));
+
+        this.default_abilities.forEach((element) => {
+            this.abilities.push(new AbilityItem({ key: element, digit: 1 }));
+        });
+
+        this.abilitiesCTRL = new abilitiesCTRL(this);
     }
 
     // runs on every server iteration
@@ -250,6 +264,10 @@ export class EnemyState extends Schema {
         }, Config.MONSTER_RESPAWN_RATE);
     }
 
+    calculateDamage(owner, target) {
+        return 10;
+    }
+
     /**
      * ATTACK BEHAVIOUR
      */
@@ -260,22 +278,13 @@ export class EnemyState extends Schema {
         this.AI_ATTACK_INTERVAL += 100;
 
         if (this.AI_ATTACK_INTERVAL === this.AI_ATTACK_INTERVAL_RATE) {
-            let damage = 10;
+            let damage = this.calculateDamage(this, this.AI_CURRENT_TARGET);
             this.AI_ATTACK_INTERVAL = 0;
             this.AI_CURRENT_TARGET.health -= damage;
             this.AI_CURRENT_TARGET.normalizeStats();
-
-            /*
-            // inform player
-            let caster = this._gameroom.clients.get(this.AI_CURRENT_TARGET.sessionId);
-            caster.send("notification", {
-                type: "event",
-                message: this.name + " attacked you, and you lost " + damage + " health.",
-                date: new Date(),
-            });*/
         }
 
-        if (this.AI_CURRENT_TARGET.health <= 0) {
+        if (this.AI_CURRENT_TARGET.isEntityDead()) {
             this.returnToWandering();
         }
     }
@@ -354,33 +363,6 @@ export class EnemyState extends Schema {
         }
     }
 
-    goToDestination() {
-        // save current position
-        let currentPos = this.getPosition();
-
-        // move entity
-        if (this.destinationPath.length > 0) {
-            // get next waypoint
-            let destinationOnPath = this.destinationPath[0];
-            destinationOnPath.y = 0;
-
-            // calculate next position towards destination
-            let updatedPos = this.moveTo(currentPos, destinationOnPath, this.speed);
-            this.setPosition(updatedPos);
-
-            // calculate rotation
-            this.rot = this.calculateRotation(currentPos, updatedPos);
-
-            // check if arrived at waypoint
-            if (destinationOnPath.equals(updatedPos)) {
-                this.destinationPath.shift();
-            }
-        } else {
-            // something is wrong, let's cancel destination
-            this.resetDestination();
-        }
-    }
-
     /**
      * Finds a new random valid position on navmesh and sets is as the new destination for this entity
      * @param {Vector3} currentPos
@@ -412,13 +394,6 @@ export class EnemyState extends Schema {
         this.wanderRegion = false;
         this.targetRegion = false;
         this.destinationPath = false;
-    }
-
-    calculatePathDistance() {
-        if (this.destinationPath.length > 0) {
-            this.destinationPath.forEach((element) => {});
-        }
-        return 0;
     }
 
     setLocation(location: string): void {

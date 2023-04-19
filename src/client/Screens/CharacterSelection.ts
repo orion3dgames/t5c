@@ -43,7 +43,6 @@ export class CharacterSelectionScene {
 
         // set up ui
         const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-        guiMenu.idealHeight = 720;
         this._ui = guiMenu;
 
         // add main ui container

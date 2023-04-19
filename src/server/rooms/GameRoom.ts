@@ -14,7 +14,7 @@ import { LootState } from "./schema/LootState";
 import { dataDB } from "../../shared/Data/dataDB";
 
 import { Dispatcher } from "@colyseus/command";
-import { OnPlayerJoinCommand, Auth } from "./commands";
+import { Auth } from "./commands";
 
 export class GameRoom extends Room<GameRoomState> {
     public maxClients = 64;

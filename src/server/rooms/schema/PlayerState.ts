@@ -102,10 +102,10 @@ export class PlayerState extends Schema {
 
         // assign player data
         // todo: must be better way to do this
-        data.temp_abilities.forEach((element) => {
+        data.default_abilities.forEach((element) => {
             this.abilities.set(element.key, new AbilityItem(element));
         });
-        data.temp_inventory.forEach((element) => {
+        data.default_inventory.forEach((element) => {
             this.inventory.set(element.key, new InventoryItem(element));
         });
 
