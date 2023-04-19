@@ -28,7 +28,7 @@ import { DebugScene } from "./Screens/DebugScene";
 import Config from "../shared/Config";
 import { Network } from "./Controllers/Network";
 import { Loading } from "./Controllers/Loading";
-import { PlayerLocation, PlayerUser, PlayerCharacter } from "../Shared/Types";
+import { PlayerLocation, PlayerUser, PlayerCharacter } from "../shared/types";
 import { Entity } from "../shared/Entities/Entity";
 
 // App class is our entire game application
