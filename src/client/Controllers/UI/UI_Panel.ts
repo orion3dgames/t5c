@@ -35,10 +35,10 @@ export class UI_Panel {
             name: "Default Name",
             horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
             vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
-            //width: 1, // 50% screen width
-            //height: 1, // 50% screen height
-            width: "500px;", // 50% screen width
-            height: "400px", // 50% screen height
+            width: 1, // 50% screen width
+            height: 1, // 50% screen height
+            //width: "500px;", // 50% screen width
+            //height: "400px", // 50% screen height
         }
     ) {
         //
@@ -104,7 +104,7 @@ export class UI_Panel {
         mainPanel.height = this._options.height;
         mainPanel.verticalAlignment = this._options.horizontal_position;
         mainPanel.horizontalAlignment = this._options.vertical_position;
-        mainPanel.isVisible = false;
+        mainPanel.isVisible = true;
         mainPanel.thickness = 0;
         mainPanel.isPointerBlocker = true;
         this._playerUI.addControl(mainPanel);
@@ -289,6 +289,7 @@ export class UI_Panel {
             img.stretch = Image.STRETCH_FILL;
             child.addControl(img);
 
+            /*
             const itemTxt = new TextBlock("itemTxt" + i);
             itemTxt.text = element.key;
             itemTxt.color = "#FFF";
@@ -298,7 +299,7 @@ export class UI_Panel {
             itemTxt.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             itemTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             itemTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-            child.addControl(itemTxt);
+            child.addControl(itemTxt);*/
 
             const itemTxtQty = new TextBlock("itemTxtQty" + i);
             itemTxtQty.text = element.qty;

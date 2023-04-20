@@ -5,6 +5,7 @@ import { Image } from "@babylonjs/gui/2D/controls/image";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import Config from "../../../shared/Config";
+import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 
 export class UI_Tooltip {
     private _playerUI;
@@ -51,23 +52,36 @@ export class UI_Tooltip {
         this._playerUI.addControl(tooltipBar);
         this.tooltipContainer = tooltipBar;
 
+        const tooltipBarStack = new StackPanel("tooltipBarStack");
+        tooltipBarStack.width = 1;
+        tooltipBarStack.setPaddingInPixels(5, 5, 5, 5);
+        tooltipBar.addControl(tooltipBarStack);
+
+        let headerHeight = "30px";
+        let tooltipHeader = new Rectangle("tooltipHeader");
+        tooltipHeader.thickness = 0;
+        tooltipHeader.height = headerHeight;
+        tooltipHeader.adaptHeightToChildren = true;
+        tooltipHeader.paddingBottom = "5px";
+        tooltipBarStack.addControl(tooltipHeader);
+
         const tooltipImage = new Rectangle("tooltipImage");
-        tooltipImage.top = "5x";
-        tooltipImage.left = "5x";
-        tooltipImage.width = "25px";
-        tooltipImage.height = "25px";
+        tooltipImage.top = "0x";
+        tooltipImage.left = "0x";
+        tooltipImage.width = headerHeight;
+        tooltipImage.height = headerHeight;
         tooltipImage.thickness = 1;
         tooltipImage.background = Config.UI_CENTER_PANEL_BG;
         tooltipImage.isVisible = true;
         tooltipImage.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         tooltipImage.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        tooltipBar.addControl(tooltipImage);
+        tooltipHeader.addControl(tooltipImage);
         this.tooltipImage = tooltipImage;
 
         // add name
         const tooltipName = new TextBlock("tooltipName");
         tooltipName.color = "#FFF";
-        tooltipName.top = "5px";
+        tooltipName.top = "0px";
         tooltipName.left = "35px";
         tooltipName.fontSize = "12px;";
         tooltipName.resizeToFit = true;
@@ -76,35 +90,35 @@ export class UI_Tooltip {
         tooltipName.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         tooltipName.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         tooltipName.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        tooltipBar.addControl(tooltipName);
+        tooltipHeader.addControl(tooltipName);
         this.tooltipName = tooltipName;
 
         // add description
         const tooltipDescription = new TextBlock("tooltipDescription");
         tooltipDescription.color = "#FFF";
-        tooltipDescription.top = "35px";
-        tooltipDescription.left = "5px";
+        tooltipDescription.top = "0px";
+        tooltipDescription.left = "0px";
         tooltipDescription.width = 1;
         tooltipDescription.fontSize = "11px;";
         tooltipDescription.resizeToFit = true;
-        tooltipDescription.text = "Item Description Item Description Item Description Item Description";
+        tooltipDescription.text = "";
         tooltipDescription.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         tooltipDescription.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         tooltipDescription.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         tooltipDescription.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         tooltipDescription.textWrapping = TextWrapping.WordWrap;
-        tooltipBar.addControl(tooltipDescription);
+        tooltipBarStack.addControl(tooltipDescription);
         this.tooltipDescription = tooltipDescription;
     }
 
     private generateItem(data) {
         this.tooltipName.text = data.name;
-        this.tooltipDescription.text = data.description + "\n";
+        this.tooltipDescription.text = data.description;
     }
 
     private generateAbility(data) {
         this.tooltipName.text = data.label;
-        this.tooltipDescription.text = data.description + "\n";
+        this.tooltipDescription.text = data.description;
     }
 
     /** called externally to refresh tooltip with content */
