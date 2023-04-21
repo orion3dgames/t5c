@@ -324,22 +324,17 @@ export class UI_Panel {
         leftPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         leftPanel.top = "5px";
         leftPanel.left = 0;
-        leftPanel.width = 0.45;
+        leftPanel.width = 0.48;
         leftPanel.height = 0.92;
         leftPanel.background = "#222";
         leftPanel.thickness = 1;
         panel.addControl(leftPanel);
 
-        let leftPanelTxt = new TextBlock("leftPanelTxt");
-        leftPanelTxt.text = "character model here...";
-        leftPanelTxt.color = "#FFF";
-        leftPanelTxt.top = "5px";
-        leftPanelTxt.left = "0";
-        leftPanelTxt.fontSize = "16px;";
-        leftPanelTxt.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        leftPanelTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        leftPanelTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        leftPanel.addControl(leftPanelTxt);
+        // add icon
+        var imageData = this._loadedAssets["IMG_character_inventory"];
+        var img = new Image("itemImage_IMG_character_inventory", imageData);
+        img.stretch = Image.STRETCH_FILL;
+        leftPanel.addControl(img);
 
         let rightPanel = new Rectangle("inventoryRightPanel");
         rightPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;

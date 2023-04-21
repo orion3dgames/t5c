@@ -74,6 +74,8 @@ export class Environment {
             { name: "TXT_selected_circle_green", filename: "selected_circle_green.png", extension: "png", type: "texture" },
             { name: "TXT_particle_01", filename: "particle_01.png", extension: "png", type: "texture" },
 
+            { name: "IMG_character_inventory", filename: "character_inventory.jpg", extension: "png", type: "image" },
+
             // environment
             {
                 name: "ENV_" + environmentName,
