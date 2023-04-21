@@ -14,6 +14,7 @@ import { UI_Tooltip } from "./UI_Tooltip";
 export class UI_Panel {
     private _UI;
     private _playerUI;
+    private _gameRoom;
     private _UITooltip: UI_Tooltip;
     private _scene;
     private _currentPlayer;
@@ -37,8 +38,8 @@ export class UI_Panel {
             vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
             //width: 1, // 50% screen width
             //height: 1, // 50% screen height
-            width: "500px;", // 50% screen width
-            height: "400px", // 50% screen height
+            width: "800px;", // 50% screen width
+            height: "600px", // 50% screen height
         }
     ) {
         //
@@ -46,6 +47,7 @@ export class UI_Panel {
         this._playerUI = _UI._playerUI;
         this._UITooltip = _UI._UITooltip;
         this._loadedAssets = _UI._loadedAssets;
+        this._gameRoom = _UI._gameRoom;
         this._scene = _UI._scene;
         this._currentPlayer = _currentPlayer;
         this._options = options;
@@ -259,7 +261,66 @@ export class UI_Panel {
     ///////////////////////////////////////
     // SKILLS PANEL
     public skills(panel, tab) {
-        //console.log(tab, panel, tab);
+        let skillsPanel = new Rectangle("skillsPanel");
+        skillsPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        skillsPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        skillsPanel.top = "5px";
+        skillsPanel.left = 0;
+        skillsPanel.width = 1;
+        skillsPanel.height = 0.98;
+        skillsPanel.background = "#222";
+        skillsPanel.thickness = 1;
+        panel.addControl(skillsPanel);
+
+        const skillsPanelStack = new StackPanel("skillsPanelStack");
+        skillsPanelStack.width = 1;
+        skillsPanelStack.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        skillsPanelStack.setPaddingInPixels(5, 5, 5, 5);
+        skillsPanel.addControl(skillsPanelStack);
+
+        let Abilities = dataDB.load("abilities");
+        for (let key in Abilities) {
+            let ability = Abilities[key];
+
+            let skillsPanel = new Rectangle("abilityCont" + ability.key);
+            skillsPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            skillsPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            skillsPanel.top = "5px";
+            skillsPanel.left = 0;
+            skillsPanel.width = 1;
+            skillsPanel.height = "50px";
+            skillsPanel.background = "#CCC";
+            skillsPanel.thickness = 1;
+            skillsPanelStack.addControl(skillsPanel);
+
+            const tooltipName = new TextBlock("abilityName" + ability.key);
+            tooltipName.color = "#FFF";
+            tooltipName.top = "0px";
+            tooltipName.left = "0px";
+            tooltipName.fontSize = "24px;";
+            tooltipName.resizeToFit = true;
+            tooltipName.text = ability.label;
+            tooltipName.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            tooltipName.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+            tooltipName.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            tooltipName.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            skillsPanel.addControl(tooltipName);
+
+            const abilityLearn = Button.CreateSimpleButton("abilityLearn" + ability.key, "Learn Skill");
+            abilityLearn.top = "0px;";
+            abilityLearn.left = "15px;";
+            abilityLearn.width = "190px;";
+            abilityLearn.height = "30px";
+            abilityLearn.color = "white";
+            abilityLearn.background = "#000";
+            abilityLearn.thickness = 1;
+            abilityLearn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            abilityLearn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+            skillsPanel.addControl(abilityLearn);
+            abilityLearn.onPointerDownObservable.add(() => {
+                this._gameRoom.send("learn_skill", ability.key);
+            });
+        }
     }
 
     ///////////////////////////////////////
@@ -325,9 +386,9 @@ export class UI_Panel {
         leftPanel.top = "5px";
         leftPanel.left = 0;
         leftPanel.width = 0.48;
-        leftPanel.height = 0.92;
+        leftPanel.height = 0.98;
         leftPanel.background = "#222";
-        leftPanel.thickness = 1;
+        leftPanel.thickness = 0;
         panel.addControl(leftPanel);
 
         // add icon
@@ -339,9 +400,10 @@ export class UI_Panel {
         let rightPanel = new Rectangle("inventoryRightPanel");
         rightPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         rightPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        rightPanel.left = "15px";
         rightPanel.top = "5px";
-        rightPanel.width = 0.5;
-        rightPanel.height = 1;
+        rightPanel.width = 0.52;
+        rightPanel.height = 0.98;
         rightPanel.background = "";
         rightPanel.thickness = 0;
         panel.addControl(rightPanel);
@@ -355,9 +417,9 @@ export class UI_Panel {
         grid.height = 1;
         rightPanel.addControl(grid);
 
-        let inventorySpace = 35;
-        let inventorySpaceW = 5;
-        let size = 46;
+        let inventorySpace = 48;
+        let inventorySpaceW = 6;
+        let size = 64;
         let inventorySpaceCols = inventorySpaceW;
         let inventorySpaceRows = inventorySpace / inventorySpaceW;
 
