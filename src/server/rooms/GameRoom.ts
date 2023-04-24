@@ -142,6 +142,14 @@ export class GameRoom extends Room<GameRoomState> {
             }
         });
 
+        this.onMessage("learn_skill", (client, ability_key) => {
+            const playerState: PlayerState = this.state.players.get(client.sessionId);
+            const ability = dataDB.get("ability", ability_key);
+            if (playerState && ability) {
+                playerState.abilitiesCTRL.learnAbility(ability);
+            }
+        });
+
         /////////////////////////////////////
         // on player input
         this.onMessage("playerInput", (client, playerInput: PlayerInputs) => {

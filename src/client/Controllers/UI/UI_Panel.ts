@@ -36,10 +36,10 @@ export class UI_Panel {
             name: "Default Name",
             horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
             vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
-            //width: 1, // 50% screen width
-            //height: 1, // 50% screen height
-            width: "800px;", // 50% screen width
-            height: "600px", // 50% screen height
+            width: 1, // 50% screen width
+            height: 1, // 50% screen height
+            //width: "800px;", // 50% screen width
+            //height: "600px", // 50% screen height
         }
     ) {
         //
@@ -70,20 +70,27 @@ export class UI_Panel {
         this._createUI();
 
         //
-        if (this._currentPlayer && this.selectedTab === "inventory") {
-            let entity = this._currentPlayer.entity;
-            entity.inventory.onAdd((item, sessionId) => {
-                //console.log("onAdd", item, sessionId);
-                this.refreshItems();
-            });
-            entity.inventory.onRemove((item, sessionId) => {
-                //console.log("onRemove", item, sessionId);
-                this.refreshItems();
-            });
-            entity.inventory.onChange((item, sessionId) => {
-                //console.log("onChange", item, sessionId);
-                this.refreshItems();
-            });
+        let entity = this._currentPlayer.entity;
+        if (entity) {
+            if (this.selectedTab === "inventory") {
+                entity.inventory.onAdd((item, sessionId) => {
+                    this.setSelectedTab("inventory");
+                });
+                entity.inventory.onRemove((item, sessionId) => {
+                    this.setSelectedTab("inventory");
+                });
+            }
+
+            if (this.selectedTab === "skills") {
+                entity.abilities.onAdd((item, sessionId) => {
+                    console.log("onAdd", item);
+                    this.setSelectedTab("skills");
+                });
+                entity.abilities.onRemove((item, sessionId) => {
+                    console.log("onRemove", item);
+                    this.setSelectedTab("skills");
+                });
+            }
         }
 
         // some ui must be constantly refreshed as things change
@@ -106,7 +113,7 @@ export class UI_Panel {
         mainPanel.height = this._options.height;
         mainPanel.verticalAlignment = this._options.horizontal_position;
         mainPanel.horizontalAlignment = this._options.vertical_position;
-        mainPanel.isVisible = false;
+        mainPanel.isVisible = true;
         mainPanel.thickness = 0;
         mainPanel.isPointerBlocker = true;
         this._playerUI.addControl(mainPanel);
@@ -228,6 +235,8 @@ export class UI_Panel {
 
         // refresh tab content
         this[key](this.tabContent[key], key);
+
+        console.log("NEW TAB OPENED", key);
     }
 
     // open panel
@@ -280,6 +289,10 @@ export class UI_Panel {
 
         let Abilities = dataDB.load("abilities");
         for (let key in Abilities) {
+            // dont need to learn base attack
+            if (key === "base_attack") continue;
+
+            // get ability details
             let ability = Abilities[key];
 
             let skillsPanel = new Rectangle("abilityCont" + ability.key);
@@ -306,20 +319,38 @@ export class UI_Panel {
             tooltipName.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             skillsPanel.addControl(tooltipName);
 
-            const abilityLearn = Button.CreateSimpleButton("abilityLearn" + ability.key, "Learn Skill");
-            abilityLearn.top = "0px;";
-            abilityLearn.left = "15px;";
-            abilityLearn.width = "190px;";
-            abilityLearn.height = "30px";
-            abilityLearn.color = "white";
-            abilityLearn.background = "#000";
-            abilityLearn.thickness = 1;
-            abilityLearn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-            abilityLearn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-            skillsPanel.addControl(abilityLearn);
-            abilityLearn.onPointerDownObservable.add(() => {
-                this._gameRoom.send("learn_skill", ability.key);
-            });
+            let entity = this._currentPlayer.entity;
+            if (entity.abilities[ability.key]) {
+                const abilityLearn = Button.CreateSimpleButton("abilityForget" + ability.key, "Forget Ability");
+                abilityLearn.top = "0px;";
+                abilityLearn.left = "15px;";
+                abilityLearn.width = "190px;";
+                abilityLearn.height = "30px";
+                abilityLearn.color = "white";
+                abilityLearn.background = "#000";
+                abilityLearn.thickness = 1;
+                abilityLearn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+                abilityLearn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+                skillsPanel.addControl(abilityLearn);
+                abilityLearn.onPointerDownObservable.add(() => {
+                    this._gameRoom.send("learn_skill", ability.key);
+                });
+            } else {
+                const abilityLearn = Button.CreateSimpleButton("abilityLearn" + ability.key, "Learn Ability");
+                abilityLearn.top = "0px;";
+                abilityLearn.left = "15px;";
+                abilityLearn.width = "190px;";
+                abilityLearn.height = "30px";
+                abilityLearn.color = "white";
+                abilityLearn.background = "#000";
+                abilityLearn.thickness = 1;
+                abilityLearn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+                abilityLearn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+                skillsPanel.addControl(abilityLearn);
+                abilityLearn.onPointerDownObservable.add(() => {
+                    this._gameRoom.send("learn_skill", ability.key);
+                });
+            }
         }
     }
 

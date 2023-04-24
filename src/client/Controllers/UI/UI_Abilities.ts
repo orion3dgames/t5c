@@ -9,6 +9,7 @@ import { Ability } from "../../../shared/Data/AbilitiesDB";
 
 export class UI_Abilities {
     private _playerUI;
+    private _abilityUI;
     private _UI;
     private _gameRoom;
     private _loadedAssets;
@@ -32,6 +33,10 @@ export class UI_Abilities {
     _createUI() {
         let width = 330;
 
+        if (this._abilityUI) {
+            this._abilityUI.dispose();
+        }
+
         // add stack panel
         const abilityPanel = new Rectangle("abilityPanel");
         abilityPanel.top = "-13px;";
@@ -42,6 +47,7 @@ export class UI_Abilities {
         abilityPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         abilityPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         this._playerUI.addControl(abilityPanel);
+        this._abilityUI = abilityPanel;
 
         for (let i = 1; i <= this.abylity_number; i++) {
             // calculate responsive width and height
@@ -130,5 +136,17 @@ export class UI_Abilities {
         this._UI._UITooltip.close();
     }
 
-    _createEvents() {}
+    _createEvents() {
+        let entity = this._currentPlayer.entity;
+        if (entity.abilities) {
+            entity.abilities.onAdd((item, sessionId) => {
+                console.log("onAdd", item, sessionId);
+                this._createUI();
+            });
+            entity.abilities.onRemove((item, sessionId) => {
+                console.log("onRemove", item, sessionId);
+                this._createUI();
+            });
+        }
+    }
 }

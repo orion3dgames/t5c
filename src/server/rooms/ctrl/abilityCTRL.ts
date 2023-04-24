@@ -3,6 +3,7 @@ import { Ability } from "../../../shared/Entities/Common/Ability";
 import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { dropCTRL } from "./dropCTRL";
 import { dataDB } from "../../../shared/Data/dataDB";
+import { AbilityItem } from "../schema/AbilityItem";
 
 export class abilitiesCTRL {
     private _owner;
@@ -22,10 +23,16 @@ export class abilitiesCTRL {
         this._owner = owner;
         this.abilitiesOwned = this._owner.abilities;
         this.abilitiesDB = dataDB.load("abilities");
-        this.create();
+        this.refreshAbilities();
     }
 
-    public create() {
+    public update() {}
+
+    /**
+     * refresh player abilities, useful after any changes
+     */
+    public refreshAbilities() {
+        this.abilities = [];
         this.abilitiesOwned.forEach((element) => {
             const skill = this.abilitiesDB[element.key];
             skill.digit = element.digit;
@@ -33,7 +40,28 @@ export class abilitiesCTRL {
         });
     }
 
-    public update() {}
+    /**
+     * allow player to learn a ability
+     * @param ability
+     */
+    public learnAbility(ability: Ability) {
+        // if ability exists, then delete it
+        if (this._owner.abilities[ability.key]) {
+            this._owner.abilities.delete(ability.key);
+        } else {
+            // else let's add it to the player
+            this._owner.abilities.set(
+                ability.key,
+                new AbilityItem({
+                    digit: this.abilities.length + 1,
+                    key: ability.key,
+                })
+            );
+        }
+        // refresh abilities
+        this.abilitiesOwned = this._owner.abilities;
+        this.refreshAbilities();
+    }
 
     /**
      * process ability
