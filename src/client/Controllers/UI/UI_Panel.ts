@@ -69,28 +69,21 @@ export class UI_Panel {
         //
         this._createUI();
 
-        //
+        // dynamic events
         let entity = this._currentPlayer.entity;
         if (entity) {
-            if (this.selectedTab === "inventory") {
-                entity.inventory.onAdd((item, sessionId) => {
-                    this.setSelectedTab("inventory");
-                });
-                entity.inventory.onRemove((item, sessionId) => {
-                    this.setSelectedTab("inventory");
-                });
-            }
-
-            if (this.selectedTab === "skills") {
-                entity.abilities.onAdd((item, sessionId) => {
-                    console.log("onAdd", item);
-                    this.setSelectedTab("skills");
-                });
-                entity.abilities.onRemove((item, sessionId) => {
-                    console.log("onRemove", item);
-                    this.setSelectedTab("skills");
-                });
-            }
+            entity.inventory.onAdd((item, sessionId) => {
+                this.setSelectedTab("inventory");
+            });
+            entity.inventory.onRemove((item, sessionId) => {
+                this.setSelectedTab("inventory");
+            });
+            entity.abilities.onAdd((item, sessionId) => {
+                this.setSelectedTab("skills");
+            });
+            entity.abilities.onRemove((item, sessionId) => {
+                this.setSelectedTab("skills");
+            });
         }
 
         // some ui must be constantly refreshed as things change
@@ -235,8 +228,6 @@ export class UI_Panel {
 
         // refresh tab content
         this[key](this.tabContent[key], key);
-
-        console.log("NEW TAB OPENED", key);
     }
 
     // open panel

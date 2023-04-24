@@ -32,6 +32,7 @@ export class UI_Abilities {
 
     _createUI() {
         let width = 330;
+        let abilityRect = [];
 
         if (this._abilityUI) {
             this._abilityUI.dispose();
@@ -65,9 +66,6 @@ export class UI_Abilities {
             headlineRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             abilityPanel.addControl(headlineRect);
 
-            // add ability icon and events
-            this.addAbilityIcon(i, headlineRect);
-
             // add ability number
             var roomTxt = new TextBlock("ability_text_" + i);
             roomTxt.paddingLeft = "5px";
@@ -95,37 +93,45 @@ export class UI_Abilities {
             abilityCooldown.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             abilityCooldown.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             headlineRect.addControl(abilityCooldown);
+
+            abilityRect[i] = headlineRect;
         }
-    }
 
-    addAbilityIcon(digit, headlineRect: Rectangle) {
-        let ability = this._currentPlayer.getAbilityByDigit(digit) as Ability;
-
-        if (ability) {
-            var imageData = this._loadedAssets[ability.icon];
-            var img = new Image("ability_image_" + digit, imageData);
-            img.stretch = Image.STRETCH_FILL;
-            headlineRect.addControl(img);
-
-            headlineRect.onPointerEnterObservable.add(() => {
-                this.showTooltip(ability, headlineRect);
-            });
-
-            headlineRect.onPointerOutObservable.add(() => {
-                this.hideTooltip();
-            });
-
-            headlineRect.onPointerClickObservable.add(() => {
-                let entity = global.T5C.selectedEntity;
-                if (entity && !this._currentPlayer.isCasting) {
-                    this._gameRoom.send("entity_ability_key", {
-                        senderId: this._gameRoom.sessionId,
-                        targetId: entity.sessionId,
-                        digit: digit,
-                    });
+        // add learned abilities
+        if (this._currentPlayer.abilities) {
+            this._currentPlayer.abilities.forEach((data) => {
+                let ability = dataDB.get("ability", data.key);
+                if (ability) {
+                    this.addAbilityIcon(data.digit, ability, abilityRect[data.digit]);
                 }
             });
         }
+    }
+
+    addAbilityIcon(digit, ability, headlineRect: Rectangle) {
+        var imageData = this._loadedAssets[ability.icon];
+        var img = new Image("ability_image_" + digit, imageData);
+        img.stretch = Image.STRETCH_FILL;
+        headlineRect.addControl(img);
+
+        headlineRect.onPointerEnterObservable.add(() => {
+            this.showTooltip(ability, headlineRect);
+        });
+
+        headlineRect.onPointerOutObservable.add(() => {
+            this.hideTooltip();
+        });
+
+        headlineRect.onPointerClickObservable.add(() => {
+            let entity = global.T5C.selectedEntity;
+            if (entity && !this._currentPlayer.isCasting) {
+                this._gameRoom.send("entity_ability_key", {
+                    senderId: this._gameRoom.sessionId,
+                    targetId: entity.sessionId,
+                    digit: digit,
+                });
+            }
+        });
     }
 
     showTooltip(ability, headlineRect) {
@@ -140,11 +146,9 @@ export class UI_Abilities {
         let entity = this._currentPlayer.entity;
         if (entity.abilities) {
             entity.abilities.onAdd((item, sessionId) => {
-                console.log("onAdd", item, sessionId);
                 this._createUI();
             });
             entity.abilities.onRemove((item, sessionId) => {
-                console.log("onRemove", item, sessionId);
                 this._createUI();
             });
         }

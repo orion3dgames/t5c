@@ -50,6 +50,7 @@ export class abilitiesCTRL {
             this._owner.abilities.delete(ability.key);
         } else {
             // else let's add it to the player
+            console.log(this.abilities.length);
             this._owner.abilities.set(
                 ability.key,
                 new AbilityItem({
