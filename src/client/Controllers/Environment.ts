@@ -195,12 +195,13 @@ export class Environment {
         });
 
         this._assetsManager.onProgress = (remainingCount, totalCount, lastFinishedTask) => {
-            this.showLoadingMessage("loading: " + lastFinishedTask.name);
+            let loadingMsg = (((totalCount - remainingCount) / totalCount) * 100).toFixed(0) + "%";
+            this.showLoadingMessage(loadingMsg);
         };
 
         this._assetsManager.onFinish = () => {
             console.log("loading complete", this._loadedAssets);
-            this.showLoadingMessage("loading complete");
+            this.showLoadingMessage("100%");
         };
 
         await this._assetsManager.loadAsync();
