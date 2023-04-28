@@ -10,6 +10,7 @@ import { Container } from "@babylonjs/gui/2D/controls/container";
 import { dataDB } from "../../../shared/Data/dataDB";
 import { Item } from "../../../shared/Data/ItemDB";
 import { UI_Tooltip } from "./UI_Tooltip";
+import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
 
 export class UI_Panel {
     private _UI;
@@ -106,7 +107,7 @@ export class UI_Panel {
         mainPanel.height = this._options.height;
         mainPanel.verticalAlignment = this._options.horizontal_position;
         mainPanel.horizontalAlignment = this._options.vertical_position;
-        mainPanel.isVisible = true;
+        mainPanel.isVisible = false;
         mainPanel.thickness = 0;
         mainPanel.isPointerBlocker = true;
         this._playerUI.addControl(mainPanel);
@@ -430,20 +431,31 @@ export class UI_Panel {
         rightPanel.thickness = 0;
         panel.addControl(rightPanel);
 
+        let inventoryRightScrollPanel = new ScrollViewer("inventoryRightScrollPanel");
+        inventoryRightScrollPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        inventoryRightScrollPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        inventoryRightScrollPanel.left = 0;
+        inventoryRightScrollPanel.top = 0;
+        inventoryRightScrollPanel.width = 1;
+        inventoryRightScrollPanel.height = 1;
+        inventoryRightScrollPanel.thickness = 0;
+        inventoryRightScrollPanel.horizontalBar.isVisible = false;
+        rightPanel.addControl(inventoryRightScrollPanel);
+
+        let inventorySpace = 100;
+        let inventorySpaceW = 6;
+        let size = 64;
+        let inventorySpaceCols = inventorySpaceW;
+        let inventorySpaceRows = inventorySpace / inventorySpaceW;
+
         let grid = new Grid();
         grid.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         grid.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         grid.left = "5px;";
         grid.background = "";
         grid.width = 1;
-        grid.height = 1;
-        rightPanel.addControl(grid);
-
-        let inventorySpace = 48;
-        let inventorySpaceW = 6;
-        let size = 64;
-        let inventorySpaceCols = inventorySpaceW;
-        let inventorySpaceRows = inventorySpace / inventorySpaceW;
+        grid.heightInPixels = inventorySpaceRows * (size + 10);
+        inventoryRightScrollPanel.addControl(grid);
 
         for (let i = 0; i <= inventorySpaceW; i++) {
             grid.addColumnDefinition(size, true);

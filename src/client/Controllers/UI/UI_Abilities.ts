@@ -89,6 +89,7 @@ export class UI_Abilities {
             abilityCooldown.height = 0;
             abilityCooldown.thickness = 0;
             abilityCooldown.isVisible = true;
+            abilityCooldown.zIndex = 1;
             abilityCooldown.background = "rgba(0,0,0,.7)";
             abilityCooldown.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             abilityCooldown.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;

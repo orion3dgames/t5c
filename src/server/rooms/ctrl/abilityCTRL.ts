@@ -32,12 +32,21 @@ export class abilitiesCTRL {
      * refresh player abilities, useful after any changes
      */
     public refreshAbilities() {
+        let i = 1;
         this.abilities = [];
         this.abilitiesOwned.forEach((element) => {
+            const digit = i;
+
             const skill = this.abilitiesDB[element.key];
-            skill.digit = element.digit;
+            skill.digit = digit;
             this.abilities.push(new Ability(skill));
+
+            element.digit = digit;
+
+            i++;
         });
+
+        this._owner.abilities;
     }
 
     /**
@@ -50,7 +59,7 @@ export class abilitiesCTRL {
             this._owner.abilities.delete(ability.key);
         } else {
             // else let's add it to the player
-            console.log(this.abilities.length);
+            console.log("learnAbility", "DIGIT", this.abilities.length, this._owner.abilities.size);
             this._owner.abilities.set(
                 ability.key,
                 new AbilityItem({
