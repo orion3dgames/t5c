@@ -273,6 +273,10 @@ export class UserInterface {
         });
     }
 
+    public openTab(tab: string = "inventory") {
+        this._UIPanel.open(tab);
+    }
+
     // create misc stuff
     ////////////////////////////
     public createMisc() {
@@ -288,7 +292,7 @@ export class UserInterface {
         inventoryButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         this._playerUI.addControl(inventoryButton);
         inventoryButton.onPointerDownObservable.add(() => {
-            this._UIPanel.open("inventory");
+            this.openTab();
         });
 
         // add a quit button

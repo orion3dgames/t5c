@@ -95,7 +95,7 @@ export class GameScene {
         let location = this._auth.currentLocation;
 
         // black background
-        if(location.skyColor){
+        if (location.skyColor) {
             scene.clearColor = new Color4(location.skyColor, location.skyColor, location.skyColor, 1);
         }
 
@@ -165,11 +165,11 @@ export class GameScene {
     }
 
     private async _initEvents() {
-        // setup input Controller
-        this._input = new PlayerInput(this._scene, this.room);
-
         // setup hud
         this._ui = new UserInterface(this._scene, this._app.engine, this.room, this.chatRoom, this.entities, this._currentPlayer, this._loadedAssets);
+
+        // setup input Controller
+        this._input = new PlayerInput(this._scene, this.room, this._ui);
 
         ////////////////////////////////////////////////////
         //  when a entity joins the room event

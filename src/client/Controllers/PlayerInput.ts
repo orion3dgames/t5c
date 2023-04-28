@@ -2,11 +2,13 @@ import { Scene } from "@babylonjs/core/scene";
 import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 import { KeyboardEventTypes } from "@babylonjs/core/Events/keyboardEvents";
 import { Room } from "colyseus.js";
+import { UserInterface } from "./UserInterface";
 
 export class PlayerInput {
     public inputMap: {};
     private _scene: Scene;
     private _gameroom;
+    private _ui: UserInterface;
 
     //simple movement
     public horizontal: number = 0;
@@ -25,9 +27,10 @@ export class PlayerInput {
     public movementX: number = 0;
     public movementY: number = 0;
 
-    constructor(scene: Scene, gameroom: Room) {
+    constructor(scene, gameroom, ui) {
         this._scene = scene;
         this._gameroom = gameroom;
+        this._ui = ui;
 
         // detect mouse movement
         this._scene.onPointerObservable.add((pointerInfo) => {
@@ -68,7 +71,7 @@ export class PlayerInput {
             }
         });
 
-        scene.onKeyboardObservable.add((kbInfo) => {
+        this._scene.onKeyboardObservable.add((kbInfo) => {
             switch (kbInfo.type) {
                 case KeyboardEventTypes.KEYDOWN:
                     if (kbInfo.event.code === "Digit1") {
@@ -97,6 +100,9 @@ export class PlayerInput {
                     }
                     if (kbInfo.event.code === "Digit9") {
                         this.digit_pressed = 9;
+                    }
+                    if (kbInfo.event.code === "KeyI") {
+                        this._ui.openTab("inventory");
                     }
                     break;
             }
