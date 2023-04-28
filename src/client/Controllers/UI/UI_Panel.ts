@@ -6,7 +6,6 @@ import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import Config from "../../../shared/Config";
 import { Grid } from "@babylonjs/gui/2D/controls/grid";
-import { Container } from "@babylonjs/gui/2D/controls/container";
 import { dataDB } from "../../../shared/Data/dataDB";
 import { Item } from "../../../shared/Data/ItemDB";
 import { UI_Tooltip } from "./UI_Tooltip";
@@ -37,10 +36,10 @@ export class UI_Panel {
             name: "Default Name",
             horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
             vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
-            width: 1, // 50% screen width
-            height: 1, // 50% screen height
-            //width: "800px;", // 50% screen width
-            //height: "600px", // 50% screen height
+            //width: 1, // 50% screen width
+            //height: 1, // 50% screen height
+            width: "800px;", // 50% screen width
+            height: "600px", // 50% screen height
         }
     ) {
         //
@@ -54,7 +53,7 @@ export class UI_Panel {
         this._options = options;
 
         //
-        this.selectedTab = "character";
+        this.selectedTab = "";
         this._tabs = {
             character: {
                 title: "Character",
@@ -62,8 +61,8 @@ export class UI_Panel {
             inventory: {
                 title: "Inventory",
             },
-            skills: {
-                title: "Skills",
+            abilities: {
+                title: "Abilities",
             },
         };
 
@@ -74,16 +73,24 @@ export class UI_Panel {
         let entity = this._currentPlayer.entity;
         if (entity) {
             entity.inventory.onAdd((item, sessionId) => {
-                this.setSelectedTab("inventory");
+                if (this.selectedTab === "inventory") {
+                    this.setSelectedTab("inventory");
+                }
             });
             entity.inventory.onRemove((item, sessionId) => {
-                this.setSelectedTab("inventory");
+                if (this.selectedTab === "inventory") {
+                    this.setSelectedTab("inventory");
+                }
             });
             entity.abilities.onAdd((item, sessionId) => {
-                this.setSelectedTab("skills");
+                if (this.selectedTab === "abilities") {
+                    this.setSelectedTab("abilities");
+                }
             });
             entity.abilities.onRemove((item, sessionId) => {
-                this.setSelectedTab("skills");
+                if (this.selectedTab === "abilities") {
+                    this.setSelectedTab("abilities");
+                }
             });
         }
 
@@ -260,8 +267,8 @@ export class UI_Panel {
 
     ///////////////////////////////////////
     ///////////////////////////////////////
-    // SKILLS PANEL
-    public skills(panel, tab) {
+    // abilities PANEL
+    public abilities(panel, tab) {
         let skillsPanel = new Rectangle("skillsPanel");
         skillsPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         skillsPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
