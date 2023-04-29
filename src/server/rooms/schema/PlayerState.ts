@@ -14,8 +14,17 @@ import { AbilityItem } from "./AbilityItem";
 import { LootState } from "./LootState";
 
 export class PlayerData extends Schema {
+    /*
     @type({ map: InventoryItem }) inventory = new MapSchema<InventoryItem>();
     @type({ map: AbilityItem }) abilities = new MapSchema<AbilityItem>();
+    */
+    @type("uint32") public gold: number = 0;
+    @type("uint8") public strength: number = 0;
+    @type("uint8") public endurance: number = 0;
+    @type("uint8") public agility: number = 0;
+    @type("uint8") public intelligence: number = 0;
+    @type("uint8") public wisdom: number = 0;
+    @type("uint32") public experience: number = 0;
 }
 
 export class PlayerState extends Schema {
@@ -45,20 +54,24 @@ export class PlayerState extends Schema {
 
     // could be remove from state
     @type("uint32") public gold: number = 0;
-    @type("uint8") public strength: number = 0;
-    @type("uint8") public endurance: number = 0;
-    @type("uint8") public agility: number = 0;
-    @type("uint8") public intelligence: number = 0;
-    @type("uint8") public wisdom: number = 0;
-    @type("uint32") public experience: number = 0;
 
+    ////////////////////////////////////////////////////////////////////////////
     // the below data only need to synchronized to the player it belongs too
+    // player data
+    @filter(function (this: PlayerState, client: Client) {
+        return this.sessionId === client.sessionId;
+    })
+    @type(PlayerData)
+    player_data: PlayerData = new PlayerData();
+
+    // inventory
     @filter(function (this: PlayerState, client: Client) {
         return this.sessionId === client.sessionId;
     })
     @type({ map: InventoryItem })
     inventory = new MapSchema<InventoryItem>();
 
+    // abilities
     @filter(function (this: PlayerState, client: Client) {
         return this.sessionId === client.sessionId;
     })
@@ -99,6 +112,9 @@ export class PlayerState extends Schema {
         // assign player data
         Object.assign(this, data);
         Object.assign(this, dataDB.get("race", this.race));
+
+        //
+        //this.player_data = data.player_data as PlayerData;
 
         // assign player data
         // todo: must be better way to do this

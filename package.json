@@ -22,7 +22,7 @@
     "@babylonjs/inspector": "5.57.1",
     "@babylonjs/materials": "5.57.1",
     "@colyseus/core": "0.15.0-preview.8",
-    "@colyseus/loadtest": "0.15.0-preview.0",
+    "@colyseus/loadtest": "0.15.0-preview.10",
     "@colyseus/monitor": "^0.15.0-preview.3",
     "@colyseus/ws-transport": "0.15.0-preview.2",
     "@colyseus/command": "0.2.1",

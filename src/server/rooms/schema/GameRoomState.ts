@@ -202,6 +202,14 @@ export class GameRoomState extends Schema {
             wisdom: 20,
             experience: data.experience ?? 0,
 
+            player_data: {
+                strength: 15,
+                endurance: 16,
+                agility: 15,
+                intelligence: 20,
+                wisdom: 20,
+            },
+
             default_abilities: data.abilities ?? [],
             default_inventory: data.inventory ?? [],
         };
