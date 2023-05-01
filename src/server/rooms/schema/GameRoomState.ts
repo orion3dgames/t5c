@@ -169,6 +169,15 @@ export class GameRoomState extends Schema {
      */
     addPlayer(client: Client): void {
         // prepare player data
+
+        let player_data = {
+            strength: 15,
+            endurance: 16,
+            agility: 15,
+            intelligence: 20,
+            wisdom: 20,
+        };
+
         let data = client.auth;
         let player = {
             id: data.id,
@@ -202,14 +211,7 @@ export class GameRoomState extends Schema {
             wisdom: 20,
             experience: data.experience ?? 0,
 
-            player_data: {
-                strength: 15,
-                endurance: 16,
-                agility: 15,
-                intelligence: 20,
-                wisdom: 20,
-            },
-
+            default_player_data: player_data,
             default_abilities: data.abilities ?? [],
             default_inventory: data.inventory ?? [],
         };

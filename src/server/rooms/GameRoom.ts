@@ -13,7 +13,6 @@ import { randomNumberInRange } from "../../shared/Utils";
 import { LootState } from "./schema/LootState";
 import { dataDB } from "../../shared/Data/dataDB";
 
-import { Dispatcher } from "@colyseus/command";
 import { Auth } from "./commands";
 
 export class GameRoom extends Room<GameRoomState> {
@@ -22,8 +21,6 @@ export class GameRoom extends Room<GameRoomState> {
     public database: any;
     public delayedInterval!: Delayed;
     public navMesh: NavMesh;
-
-    dispatcher = new Dispatcher(this);
 
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
@@ -251,9 +248,6 @@ export class GameRoom extends Room<GameRoomState> {
     //////////////////////////////////////////////////////////////////////////
     // cleanup callback, called after there are no more clients in the room. (see `autoDispose`)
     onDispose() {
-        // stop dispatcher
-        this.dispatcher.stop();
-
         //log
         Logger.warning(`[onDispose] game room removed. `);
     }

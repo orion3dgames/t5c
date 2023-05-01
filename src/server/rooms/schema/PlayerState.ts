@@ -14,10 +14,8 @@ import { AbilityItem } from "./AbilityItem";
 import { LootState } from "./LootState";
 
 export class PlayerData extends Schema {
-    /*
-    @type({ map: InventoryItem }) inventory = new MapSchema<InventoryItem>();
-    @type({ map: AbilityItem }) abilities = new MapSchema<AbilityItem>();
-    */
+    //@type({ map: InventoryItem }) inventory = new MapSchema<InventoryItem>();
+    //@type({ map: AbilityItem }) abilities = new MapSchema<AbilityItem>();
     @type("uint32") public gold: number = 0;
     @type("uint8") public strength: number = 0;
     @type("uint8") public endurance: number = 0;
@@ -123,6 +121,9 @@ export class PlayerState extends Schema {
         });
         data.default_inventory.forEach((element) => {
             this.inventory.set(element.key, new InventoryItem(element));
+        });
+        Object.entries(data.default_player_data).forEach(([k, v]) => {
+            this.player_data[k] = v;
         });
 
         // set controllers

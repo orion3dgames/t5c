@@ -1,5 +1,3 @@
-import { Command } from "@colyseus/command";
-import { GameRoom } from "../GameRoom";
 import Logger from "../../../shared/Logger";
 
 class Auth {
