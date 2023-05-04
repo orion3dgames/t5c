@@ -3,10 +3,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { RadioGroup, SelectionPanel, SliderGroup } from "@babylonjs/gui/2D/controls/selector";
+import { RadioGroup, SelectionPanel } from "@babylonjs/gui/2D/controls/";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-
-import "@babylonjs/gui/2D/controls/selector";
 
 import { InputText } from "@babylonjs/gui/2D/controls/inputText";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
@@ -17,7 +15,7 @@ import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { SceneController } from "../Controllers/Scene";
 import { AuthController } from "../Controllers/AuthController";
 import State from "./Screens";
-import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
+import { request, apiUrl, generateRandomPlayerName, isLocal } from "../../shared/Utils";
 import { Environment } from "../Controllers/Environment";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
@@ -53,7 +51,7 @@ export class CharacterEditor {
         scene.clearColor = new Color4(0, 0, 0, 1);
 
         // camera
-        var camera = new ArcRotateCamera("camera1", Math.PI / 2, Math.PI / 4, 3, new Vector3(0, 0.5, 0), scene);
+        var camera = new ArcRotateCamera("camera1", Math.PI / 2, Math.PI / 4, 3, new Vector3(0, 0.8, 0), scene);
         camera.attachControl(app.canvas, true);
         camera.lowerRadiusLimit = 2;
         camera.upperRadiusLimit = 10;
@@ -86,12 +84,43 @@ export class CharacterEditor {
         // load scene
         this._scene = scene;
 
-        // check if user token is valid
-        let user = await this._auth.loggedIn();
-        if (!user) {
-            // if token not valid, send back to login screen
-            SceneController.goToScene(State.LOGIN);
+        //
+        app.engine.displayLoadingUI();
+
+        ///////////////////// END DEBUG CODE /////////////////////////////
+        ///////////////////// DEBUG CODE /////////////////////////////////
+        // if local skip login screen
+        if (isLocal()) {
+            // set location
+            //let tempLocation = "lh_town";
+            let tempLocation = "lh_town";
+            this._auth.setLocation(tempLocation);
+
+            // get random user
+            let req = await request("get", apiUrl() + "/returnRandomUser");
+            let character = JSON.parse(req.data).user;
+            character.location = tempLocation;
+
+            // set user
+            this._auth.setUser({
+                id: character.user_id,
+                username: character.username,
+                password: character.password,
+                token: character.token,
+            });
+
+            //set character
+            this._auth.setCharacter(character);
+        } else {
+            // check if user token is valid
+            let user = await this._auth.loggedIn();
+            if (!user) {
+                // if token not valid, send back to login screen
+                SceneController.goToScene(State.LOGIN);
+            }
         }
+        ///////////////////// END DEBUG CODE /////////////////////////////
+        ///////////////////// END DEBUG CODE /////////////////////////////
 
         /////////////////////////////////////////////////////////
         //////////////////////// UI
@@ -366,7 +395,11 @@ export class CharacterEditor {
 
         //this.loadSelectionUI();
 
+        //
+
         this.loadMainMesh(this.selection);
+
+        app.engine.hideLoadingUI();
     }
 
     loadMainMesh(selection) {
@@ -414,9 +447,7 @@ export class CharacterEditor {
         var radioGroupGender = new RadioGroup("Gender");
         for (let key in this.CHARACTER) {
             console.log(key);
-            /*
             radioGroupGender.addRadio(key, () => {
-                
                 // hide current mesh
                 const result = this._loadedAssets[this.selection.GENDER];
                 const playerMesh = result.loadedMeshes[0];
@@ -428,7 +459,6 @@ export class CharacterEditor {
                 this.selection.GENDER = key;
                 this.loadMainMesh(this.selection);
             });
-            */
         }
 
         // ANIMATION OPTIONSd
@@ -436,16 +466,14 @@ export class CharacterEditor {
         this._playerAnimations.forEach((anim) => {
             console.log(anim);
             radioGroupAnim.addRadio(anim.name, () => {
-                /*
                 this._playerAnimations.forEach((element) => {
                     element.stop();
                 });
                 anim.start(true, 1.0, anim.from, anim.to, false);
-                */
             });
         });
 
-        var selectBox = new SelectionPanel("sp", [radioGroupAnim]);
+        var selectBox = new SelectionPanel("sp", [radioGroupGender, radioGroupAnim]);
         selectBox.background = "rgba(255, 255, 255, .7)";
         selectBox.top = "15px;";
         selectBox.left = "15px;";
