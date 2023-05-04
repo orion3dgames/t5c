@@ -111,9 +111,6 @@ export class PlayerState extends Schema {
         Object.assign(this, data);
         Object.assign(this, dataDB.get("race", this.race));
 
-        //
-        //this.player_data = data.player_data as PlayerData;
-
         // assign player data
         // todo: must be better way to do this
         data.default_abilities.forEach((element) => {

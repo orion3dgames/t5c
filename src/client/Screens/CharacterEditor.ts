@@ -1,12 +1,12 @@
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { RadioGroup, SelectionPanel, SliderGroup } from "@babylonjs/gui/2D/controls/selector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { AssetContainer } from "@babylonjs/core/assetContainer";
+
+import "@babylonjs/gui/2D/controls/selector";
 
 import { InputText } from "@babylonjs/gui/2D/controls/inputText";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
@@ -364,6 +364,8 @@ export class CharacterEditor {
             ANIMATION: "IDLE",
         };
 
+        //this.loadSelectionUI();
+
         this.loadMainMesh(this.selection);
     }
 
@@ -412,8 +414,9 @@ export class CharacterEditor {
         var radioGroupGender = new RadioGroup("Gender");
         for (let key in this.CHARACTER) {
             console.log(key);
+            /*
             radioGroupGender.addRadio(key, () => {
-                /*
+                
                 // hide current mesh
                 const result = this._loadedAssets[this.selection.GENDER];
                 const playerMesh = result.loadedMeshes[0];
@@ -423,8 +426,9 @@ export class CharacterEditor {
 
                 // show mesh
                 this.selection.GENDER = key;
-                this.loadMainMesh(this.selection);*/
+                this.loadMainMesh(this.selection);
             });
+            */
         }
 
         // ANIMATION OPTIONSd
@@ -432,14 +436,16 @@ export class CharacterEditor {
         this._playerAnimations.forEach((anim) => {
             console.log(anim);
             radioGroupAnim.addRadio(anim.name, () => {
+                /*
                 this._playerAnimations.forEach((element) => {
                     element.stop();
                 });
                 anim.start(true, 1.0, anim.from, anim.to, false);
+                */
             });
         });
 
-        var selectBox = new SelectionPanel("sp", [radioGroupGender, radioGroupAnim]);
+        var selectBox = new SelectionPanel("sp", [radioGroupAnim]);
         selectBox.background = "rgba(255, 255, 255, .7)";
         selectBox.top = "15px;";
         selectBox.left = "15px;";

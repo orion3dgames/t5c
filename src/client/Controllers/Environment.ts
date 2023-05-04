@@ -235,7 +235,7 @@ export class Environment {
             let assetTask;
             switch (obj.extension) {
                 case "glb":
-                    assetTask = this._assetsManager.addMeshTask(obj.name, "", "", "./models/" + obj.filename);
+                    assetTask = this._assetsManager.addMeshTask(obj.name, "", "", "./models/races/" + obj.filename);
                     break;
                 default:
                     console.error('Error loading asset "' + obj.name + '". Unrecognized file extension "' + obj.extension + '"');
