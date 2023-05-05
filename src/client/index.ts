@@ -14,7 +14,6 @@ import "@babylonjs/loaders/glTF/2.0/Extensions/KHR_draco_mesh_compression";
 import("@babylonjs/core/Rendering/depthRendererSceneComponent");
 
 import { Engine } from "@babylonjs/core/Engines/engine";
-import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { Scene } from "@babylonjs/core/scene";
 
 // IMPORT SCREEN
@@ -71,9 +70,11 @@ class App {
 
     private async _init(): Promise<void> {
         // create engine
+        /*
         this.engine = (await EngineFactory.CreateAsync(this.canvas, {
             antialiasing: true,
-        })) as Engine;
+        })) as Engine;*/
+        this.engine = new Engine(this.canvas, true);
 
         // loading
         var loadingScreen = new Loading("Loading Assets...");
