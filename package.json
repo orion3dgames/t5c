@@ -22,10 +22,10 @@
     "@babylonjs/inspector": "6.2.0",
     "@babylonjs/materials": "6.2.0",
 
-    "@colyseus/core": "0.15.0",
-    "@colyseus/loadtest": "0.15.0",
+    "@colyseus/core": "^0.15.0",
+    "@colyseus/loadtest": "^0.15.0",
     "@colyseus/monitor": "^0.15.0",
-    "@colyseus/ws-transport": "0.15.0",
+    "@colyseus/ws-transport": "^0.15.0",
 
     "@types/node": "^17.0.12",
     "@types/react": "16.7.3",
@@ -48,8 +48,8 @@
     "@babylonjs/serializers": "6.2.0",
     "babylonjs-gltf2interface": "6.2.0",
     
-    "colyseus.js": "0.15.0",
-    "colyseus": "0.15.0",
+    "colyseus.js": "^0.15.0",
+    "colyseus": "^0.15.0",
 
     "cors": "^2.8.5",
     "dotenv-webpack": "^8.0.1",

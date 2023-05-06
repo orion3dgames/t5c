@@ -67,7 +67,7 @@ export class GameRoom extends Room<GameRoomState> {
                 //Logger.info("[gameroom][onCreate] Saving data for room " + options.location + " with " + this.state.players.size + " players");
                 this.state.players.forEach((entity) => {
                     // update player
-                    let playerClient = this.clients.hashedArray[entity.sessionId];
+                    let playerClient = this.clients.find((c) => c.sessionId === entity.sessionId);
                     this.database.updateCharacter(playerClient.auth.id, entity);
 
                     // update player items

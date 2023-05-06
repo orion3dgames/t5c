@@ -70,11 +70,10 @@ class App {
 
     private async _init(): Promise<void> {
         // create engine
-        /*
-        this.engine = (await EngineFactory.CreateAsync(this.canvas, {
-            antialiasing: true,
-        })) as Engine;*/
-        this.engine = new Engine(this.canvas, true);
+        this.engine = new Engine(this.canvas, true, {
+            adaptToDeviceRatio: true,
+            antialias: true,
+        });
 
         // loading
         var loadingScreen = new Loading("Loading Assets...");
