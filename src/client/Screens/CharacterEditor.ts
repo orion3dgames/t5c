@@ -20,6 +20,9 @@ import { Environment } from "../Controllers/Environment";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { MeshAssetTask } from "@babylonjs/core/Misc/assetsManager";
+import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
+import { RacesDB } from "../../shared/Data/RacesDB";
+import { dataDB } from "../../shared/Data/dataDB";
 
 export class CharacterEditor {
     public _scene: Scene;
@@ -31,7 +34,7 @@ export class CharacterEditor {
     private _loadedAssets: MeshAssetTask[] = [];
     public results;
     public selection;
-    public CHARACTER;
+    public RACE;
 
     public _ui;
     public _uiRadioOptions;
@@ -83,9 +86,6 @@ export class CharacterEditor {
 
         // load scene
         this._scene = scene;
-
-        //
-        app.engine.displayLoadingUI();
 
         ///////////////////// END DEBUG CODE /////////////////////////////
         ///////////////////// DEBUG CODE /////////////////////////////////
@@ -182,298 +182,48 @@ export class CharacterEditor {
         //////////////////////// MESHES
         /////////////////////////////////////////////////////////
 
-        /*
-        Adventurer_Body_primitive0
-        Adventurer_Body_primitive1
-        Adventurer_Body_primitive2
-        Adventurer_Feet_primitive0
-        Adventurer_Feet_primitive1
-        Adventurer_Head_primitive0
-        Adventurer_Head_primitive1
-        Adventurer_Head_primitive2
-        Adventurer_Head_primitive3
-        Adventurer_Legs_primitive0
-        Adventurer_Legs_primitive1
-        Backpack_primitive0
-        Backpack_primitive1
-        Backpack_primitive2
-        Backpack_primitive3
-        Beach_Body_primitive0
-        Beach_Body_primitive1
-        Beach_Feet_primitive0
-        Beach_Feet_primitive1
-        Beach_Head_primitive0
-        Beach_Head_primitive1
-        Beach_Head_primitive2
-        Beach_Head_primitive3
-        Beach_Head_primitive4
-        Beach_Legs_primitive0
-        Beach_Legs_primitive1
-        Beach_Legs_primitive2
-        Casual2_Body_primitive0
-        Casual2_Body_primitive1
-        Casual2_Feet_primitive0
-        Casual2_Feet_primitive1
-        Casual2_Head_primitive0
-        Casual2_Head_primitive1
-        Casual2_Head_primitive2
-        Casual2_Head_primitive3
-        Casual2_Head_primitive4
-        Casual2_Legs
-        Casual_Body_primitive0
-        Casual_Body_primitive1
-        Casual_Feet_primitive0
-        Casual_Feet_primitive1
-        Casual_Head_primitive0
-        Casual_Head_primitive1
-        Casual_Head_primitive2
-        Casual_Head_primitive3
-        Casual_Legs_primitive0
-        Casual_Legs_primitive1
-        Farmer_Body_primitive0
-        Farmer_Body_primitive1
-        Farmer_Body_primitive2
-        Farmer_Body_primitive3
-        Farmer_Feet_primitive0
-        Farmer_Feet_primitive1
-        Farmer_Head_primitive0
-        Farmer_Head_primitive1
-        Farmer_Head_primitive2
-        Farmer_Head_primitive3
-        Farmer_Head_primitive4
-        Farmer_Pants
-        Horse_Head_primitive0
-        Horse_Head_primitive1
-        Horse_Head_primitive2
-        Horse_Head_primitive3
-        Horse_Head_primitive4
-        Horse_Head_primitive5
-        King_Body_primitive0
-        King_Body_primitive1
-        King_Body_primitive2
-        King_Body_primitive3
-        King_Body_primitive4
-        King_Feet
-        King_Head_primitive0
-        King_Head_primitive1
-        King_Head_primitive2
-        King_Head_primitive3
-        King_Legs_primitive0
-        King_Legs_primitive1
-        King_Legs_primitive2
-        
-        Pistol_primitive1
-        Pistol_primitive2
-        Punk_Body_primitive0
-        Punk_Body_primitive1
-        Punk_Body_primitive2
-        Punk_Feet_primitive0
-        Punk_Feet_primitive1
-        Punk_Head_primitive0
-        Punk_Head_primitive1
-        Punk_Head_primitive2
-        Punk_Head_primitive3
-        Punk_Head_primitive4
-        Punk_Head_primitive5
-        Punk_Legs_primitive0
-        Punk_Legs_primitive1
-        SpaceSuit_Body_primitive0
-        SpaceSuit_Body_primitive1
-        SpaceSuit_Body_primitive2
-        SpaceSuit_Body_primitive3
-        SpaceSuit_Feet_primitive0
-        SpaceSuit_Feet_primitive1
-        SpaceSuit_Head_primitive0
-        SpaceSuit_Head_primitive1
-        SpaceSuit_Head_primitive2
-        SpaceSuit_Legs_primitive0
-        SpaceSuit_Legs_primitive1
-        SpaceSuit_Legs_primitive2
-        SpaceSuit_Legs_primitive3
-        Suit_Body_primitive0
-        Suit_Body_primitive1
-        Suit_Body_primitive2
-        Suit_Body_primitive3
-        Suit_Feet
-        Suit_Head_primitive0
-        Suit_Head_primitive1
-        Suit_Head_primitive2
-        Suit_Head_primitive3
-        Suit_Legs
-        Swat_Body_primitive0
-        Swat_Body_primitive1
-        Swat_Body_primitive2
-        Swat_Feet
-        Swat_Head_primitive0
-        Swat_Head_primitive1
-        Swat_Head_primitive2
-        Swat_Legs_primitive0
-        Swat_Legs_primitive1
-        Worker_Body_primitive0
-        Worker_Body_primitive1
-        Worker_Body_primitive2
-        Worker_Body_primitive3
-        Worker_Feet_primitive0
-        Worker_Feet_primitive1
-        Worker_Head_primitive0
-        Worker_Head_primitive1
-        Worker_Head_primitive2
-        Worker_Head_primitive3
-        Worker_Head_primitive4
-        Worker_Legs_primitive0
-        Worker_Legs_primitive1
-        */
-
-        let CHARACTER_DATA = {
-            WEAPON: ["None", "Sword_primitive0", "Sword_primitive1", "Sword_primitive2", "Pistol_primitive0"],
-        };
-
-        let CHARACTER = {
-            player_male: {
-                MAIN_MESH: [
-                    "Casual2_Body_primitive0",
-                    "Casual2_Body_primitive1",
-                    "Casual2_Feet_primitive0",
-                    "Casual2_Feet_primitive1",
-                    "Casual2_Head_primitive0",
-                    "Casual2_Head_primitive1",
-                    "Casual2_Head_primitive2",
-                    "Casual2_Head_primitive3",
-                    "Casual2_Head_primitive4",
-                    "Casual2_Legs",
-                ],
-                OPTIONS: CHARACTER_DATA,
-                SCALE: 1,
-                ANIMATIONS: {
-                    IDLE: 4,
-                    WALK: 22,
-                    DEATH: 1,
-                },
-            },
-            player_female: {
-                MAIN_MESH: [
-                    "Casual_Body_primitive0",
-                    "Casual_Body_primitive1",
-                    "Casual_Feet_primitive0",
-                    "Casual_Feet_primitive1",
-                    "Casual_Head_primitive0",
-                    "Casual_Head_primitive1",
-                    "Casual_Head_primitive2",
-                    "Casual_Head_primitive3",
-                    "Casual_Head_primitive4",
-                    "Casual_Legs",
-                ],
-                OPTIONS: CHARACTER_DATA,
-                SCALE: 1,
-                ANIMATIONS: {
-                    IDLE: 4,
-                    WALK: 22,
-                    DEATH: 1,
-                },
-            },
-        };
-
-        this.CHARACTER = CHARACTER;
+        // set default model
+        let RACE = dataDB.get('race', 'male_adventurer');
+        this.RACE = RACE;
 
         // load assets and remove them all from scene
-        this._environment = new Environment(this._scene, this._shadow, this._loadedAssets);
-        await this._environment.loadCharacterEditor();
-
-        // hide all meshes
-        for (let i in this._loadedAssets) {
-            const result = this._loadedAssets[i];
-            result.loadedMeshes.forEach((element) => {
-                element.isVisible = false;
-            });
-        }
-
-        //
-        this.selection = {
-            GENDER: "player_female",
-            ANIMATION: "IDLE",
-        };
-
-        //this.loadSelectionUI();
-
-        //
-
-        this.loadMainMesh(this.selection);
-
-        app.engine.hideLoadingUI();
-    }
-
-    loadMainMesh(selection) {
-        let CHARACTER = this.CHARACTER[selection.GENDER];
-        const result = this._loadedAssets[selection.GENDER];
-
-        // load player mesh
-        const playerMesh = result.loadedMeshes[0];
-        result.loadedMeshes.forEach((m) => {
-            if (CHARACTER.MAIN_MESH.includes(m.name)) {
-                m.isVisible = true;
-            } else {
-                m.isVisible = false;
-            }
-        });
-
-        // get animations
-        const animationGroups = result.loadedAnimationGroups;
-        animationGroups[0].stop();
-        animationGroups[CHARACTER.ANIMATIONS.IDLE].play(true);
-
-        // scale model
-        playerMesh.scaling = new Vector3(CHARACTER.SCALE, CHARACTER.SCALE, CHARACTER.SCALE);
-
-        // set shadow caster
-        this._shadow.addShadowCaster(playerMesh);
-
-        // get select animations
-        let meshAnimations = CHARACTER.ANIMATIONS;
-        const selectedAnimationGroups = [animationGroups[meshAnimations.IDLE], animationGroups[meshAnimations.WALK], animationGroups[meshAnimations.DEATH]];
-
-        //
+        const playerMesh = await SceneLoader.ImportMeshAsync("", "./models/races/", RACE.key+".glb", scene);
         this._playerMesh = playerMesh;
-        this._playerAnimations = selectedAnimationGroups;
+        this._playerAnimations = playerMesh.animationGroups;
+
+        // default animations
+        this._playerAnimations[RACE.animations.IDLE].play(true);
+
 
         this.loadSelectionUI();
+
     }
 
     loadSelectionUI() {
+
         if (this._uiRadioOptions) {
             this._uiRadioOptions.dispose();
         }
 
-        // GENDER OPTIONS
-        var radioGroupGender = new RadioGroup("Gender");
-        for (let key in this.CHARACTER) {
-            console.log(key);
-            radioGroupGender.addRadio(key, () => {
-                // hide current mesh
-                const result = this._loadedAssets[this.selection.GENDER];
-                const playerMesh = result.loadedMeshes[0];
-                result.loadedMeshes.forEach((m) => {
-                    m.isVisible = false;
-                });
+        let meshAnimations = this.RACE.animations;
+        const selectedAnimationGroups = [
+            this._playerAnimations[meshAnimations.IDLE], 
+            this._playerAnimations[meshAnimations.WALK], 
+            this._playerAnimations[meshAnimations.DEATH]
+        ];
 
-                // show mesh
-                this.selection.GENDER = key;
-                this.loadMainMesh(this.selection);
-            });
-        }
-
-        // ANIMATION OPTIONSd
+        // show animations options
         var radioGroupAnim = new RadioGroup("Animation");
-        this._playerAnimations.forEach((anim) => {
-            console.log(anim);
+        selectedAnimationGroups.forEach((anim) => {
             radioGroupAnim.addRadio(anim.name, () => {
-                this._playerAnimations.forEach((element) => {
+                selectedAnimationGroups.forEach((element) => {
                     element.stop();
                 });
                 anim.start(true, 1.0, anim.from, anim.to, false);
             });
         });
 
-        var selectBox = new SelectionPanel("sp", [radioGroupGender, radioGroupAnim]);
+        var selectBox = new SelectionPanel("sp", [radioGroupAnim]);
         selectBox.background = "rgba(255, 255, 255, .7)";
         selectBox.top = "15px;";
         selectBox.left = "15px;";

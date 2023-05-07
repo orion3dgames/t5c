@@ -132,7 +132,7 @@ export class PlayerState extends Schema {
     }
 
     public getClient() {
-        return this._gameroom.clients[this.sessionId];
+        return this._gameroom.clients.getById(this.sessionId);
     }
 
     // on player state initialized

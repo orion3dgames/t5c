@@ -5,6 +5,9 @@ import { PlayerCharacter, PlayerUser } from "./types";
 import { ParsedQs } from "qs";
 import Config from "./Config";
 import { dataDB } from "./Data/dataDB";
+import { Item } from "./Entities/Item";
+import { InventoryItem } from "../server/rooms/schema/InventoryItem";
+import { AbilityItem } from "src/server/rooms/schema/AbilityItem";
 
 class Database {
     private db;
@@ -339,6 +342,32 @@ class Database {
         sql = sql.slice(0, -1);
         sql += " WHERE id= " + character_id;
         return this.run(sql, []);
+    }
+
+    // removes and saves character items
+    // terrible way to do it
+    async saveItems(character_id: number, items: []) {
+        const sql = `DELETE FROM character_inventory WHERE owner_id=?;`;
+        await this.run(sql, [character_id]);
+        let sqlItems = `INSERT INTO character_inventory (owner_id, qty, key) VALUES `;
+        items.forEach((element:InventoryItem) => {
+            sqlItems += ` ('${character_id}', '${element.qty}', '${element.key}'),`;
+        });
+        sqlItems = sqlItems.slice(0, -1);
+        return await this.run(sqlItems);
+    }
+
+    // removes and saves character abilities
+    // terrible way to do it
+    async saveAbilities(character_id: number, abilities: []) {
+        const sql = `DELETE FROM character_abilities WHERE owner_id=?;`;
+        await this.run(sql, [character_id]);
+        let sqlItems = `INSERT INTO character_abilities (owner_id, digit, key) VALUES `;
+        abilities.forEach((element:AbilityItem) => {
+            sqlItems += ` ('${character_id}', '${element.digit}', '${element.key}'),`;
+        });
+        sqlItems = sqlItems.slice(0, -1);
+        return await this.run(sqlItems);
     }
 
     async toggleOnlineStatus(character_id: number, online: number) {

@@ -84,6 +84,7 @@ export class GameRoomState extends Schema {
 
         // set up loot
         let lootTable = [
+            LootTableEntry("sword_01", 25, 1, 1, 1, 1),
             LootTableEntry("potion_heal", 25, 1, 1, 1, 1),
             LootTableEntry("pear", 5, 1, 10, 1, 1),
             LootTableEntry("apple", 20, 1, 10, 1, 1),
@@ -128,7 +129,7 @@ export class GameRoomState extends Schema {
             if (this.entities.size < maxEntities) {
                 this.createEntity(this.entities.size);
             }
-            if (this.items.size < 5) {
+            if (this.items.size < 20) {
                 this.createItem();
             }
         }
@@ -196,7 +197,7 @@ export class GameRoomState extends Schema {
             sessionId: client.sessionId,
             name: data.name,
             type: "player",
-            race: "player_hobbit",
+            race: "male_adventurer",
 
             location: data.location,
             sequence: 0,

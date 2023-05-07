@@ -8,6 +8,7 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import Config from "../../Config";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math";
 import { Entity } from "../Entity";
+import { Skeleton } from "@babylonjs/core/Bones/skeleton";
 
 export class EntityMesh {
     private _entity: Entity;
@@ -15,6 +16,7 @@ export class EntityMesh {
     private _loadedAssets;
     private _room;
     private _animationGroups: AnimationGroup[];
+    private _skeleton: Skeleton;
     public mesh: Mesh;
     public playerMesh;
     public isCurrentPlayer: boolean;
@@ -31,7 +33,7 @@ export class EntityMesh {
 
     public async load() {
         // create collision cube
-        const box = MeshBuilder.CreateBox(this._entity.sessionId, { width: 2, height: 2, depth: 2 }, this._scene);
+        const box = MeshBuilder.CreateBox(this._entity.sessionId, { width: 1.5, height: 2.5, depth: 1.5 }, this._scene);
         box.visibility = 0;
         box.setPivotMatrix(Matrix.Translation(0, 1, 0), false);
 
@@ -75,6 +77,25 @@ export class EntityMesh {
         const result = this._loadedAssets["RACE_" + this._entity.race].instantiateModelsToScene();
         const playerMesh = result.rootNodes[0];
         this._animationGroups = result.animationGroups;
+        this._skeleton = result.skeletons[0];
+        
+
+        /////////////////////////////
+        // equip weapon
+        if (this._entity.type === "player") {
+
+            let bone = this._skeleton.bones[37];
+            console.log(bone, playerMesh);
+        
+            const weapon = this._loadedAssets["ITEM_sword_01"].instantiateModelsToScene();
+            const weaponMesh = weapon.rootNodes[0];
+            weaponMesh.attachToBone(bone, playerMesh);
+
+        }
+
+
+        /////////////////////////////
+        //Wrist.L
 
         // set initial player scale & rotation
 

@@ -28,6 +28,31 @@ interface raceDataMap {
 }
 
 let RacesDB: raceDataMap = {
+    male_adventurer: {
+        key: "male_adventurer",
+        title: "Adventurer",
+        speed: 0.6,
+        scale: 1.3,
+        rotationFix: Math.PI,
+        animationSpeed: 1.3,
+        meshIndex: 1,
+        animations: {
+            IDLE: 4,
+            WALK: 22,
+            ATTACK: 21,
+            DEATH: 0,
+            DAMAGE: 1,
+        },
+        baseHealth: 100,
+        baseMana: 100,
+        healthRegen: 0.2,
+        manaRegen: 0.4, // per second
+        experienceGain: {},
+        goldGain: {},
+        damage_multiplier: 0,
+        drops: [],
+        default_abilities: ["base_attack"],
+    },
     player_hobbit: {
         key: "player_hobbit",
         title: "Hobbit",
@@ -76,6 +101,7 @@ let RacesDB: raceDataMap = {
         goldGain: { min: 120, max: 250 },
         damage_multiplier: 1.3,
         drops: [
+            LootTableEntry("sword_01", 10, 1, 1, 1, 1),
             LootTableEntry("potion_heal", 25, 1, 1, 1, 1),
             LootTableEntry("pear", 5, 1, 10, 1, 1),
             LootTableEntry("apple", 20, 1, 10, 1, 1),
@@ -108,6 +134,7 @@ let RacesDB: raceDataMap = {
         goldGain: { min: 45, max: 75 },
         damage_multiplier: 1,
         drops: [
+            LootTableEntry("sword_01", 10, 1, 1, 1, 1),
             LootTableEntry("potion_heal", 10, 1, 1, 1, 1),
             LootTableEntry("pear", 15, 1, 10, 1, 1),
             LootTableEntry("apple", 20, 1, 10, 1, 1),

@@ -70,8 +70,8 @@ export class dropCTRL {
             // drop item on the ground
             let sessionId = nanoid(10);
             let currentPosition = target.getPosition();
-            currentPosition.x += randomNumberInRange(0.1, 1.5);
-            currentPosition.z += randomNumberInRange(0.1, 1.5);
+            currentPosition.x += randomNumberInRange(-2, 2);
+            currentPosition.z += randomNumberInRange(-2, 2);
             let data = {
                 key: drop.id,
                 name: "Apple",

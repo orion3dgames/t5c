@@ -48,6 +48,7 @@ export class GameRoom extends Room<GameRoomState> {
 
         // Set the simulation interval callback
         // use to check stuff on the server at regular interval
+        this.s
         this.setSimulationInterval((dt) => {
             this.state.update(dt);
         }, Config.updateRate);
@@ -61,24 +62,52 @@ export class GameRoom extends Room<GameRoomState> {
 
         ///////////////////////////////////////////////////////////////////////////
         // if players are in a room, make sure we save any changes to the database.
+
+        /*
+        this.spawnTimer += deltaTime;
+        let spawnTime = 300;
+        if (this.spawnTimer >= spawnTime) {
+            this.spawnTimer = 0;
+            let maxEntities = this.roomDetails.monsters;
+            if (this.entities.size < maxEntities) {
+                this.createEntity(this.entities.size);
+            }
+            if (this.items.size < 20) {
+                this.createItem();
+            }
+        }*/
+
+
+        let saveTimer = 0;
+        let saveInterval = 5000;
         this.delayedInterval = this.clock.setInterval(() => {
+            saveTimer += 1000;
+            
             // only save if there is any players
             if (this.state.players.size > 0) {
                 //Logger.info("[gameroom][onCreate] Saving data for room " + options.location + " with " + this.state.players.size + " players");
                 this.state.players.forEach((entity) => {
-                    // update player
-                    let playerClient = this.clients.find((c) => c.sessionId === entity.sessionId);
+
+                    // update player every second...
+                    let playerClient = this.clients.getById(entity.sessionId);
                     this.database.updateCharacter(playerClient.auth.id, entity);
 
-                    // update player items
-                    //if (entity.inventory && entity.inventory.size > 0) {
-                    //this.database.saveItems(entity.inventory);
-                    //}
+                    if (saveTimer >= saveInterval) {
+                        saveTimer = 0;
 
-                    // update player abilities
-                    //if (entity.abilities && entity.abilities.size > 0) {
-                    //this.database.saveAbilities(entity.abilities);
-                    //}
+                        // update player items
+                        if (entity.inventory && entity.inventory.size > 0) {
+                            this.database.saveItems(playerClient.auth.id, entity.inventory);
+                        }
+
+                        // update player abilities
+                        if (entity.abilities && entity.abilities.size > 0) {
+                            this.database.saveAbilities(playerClient.auth.id, entity.abilities);
+                        }
+                    }
+                    
+
+                    
 
                     //Logger.info("[gameroom][onCreate] player " + playerClient.auth.name + " saved to database.");
                 });
