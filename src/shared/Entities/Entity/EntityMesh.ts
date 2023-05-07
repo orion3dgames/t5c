@@ -79,23 +79,16 @@ export class EntityMesh {
         this._animationGroups = result.animationGroups;
         this._skeleton = result.skeletons[0];
         
-
         /////////////////////////////
         // equip weapon
         if (this._entity.type === "player") {
-
             let bone = this._skeleton.bones[37];
-            console.log(bone, playerMesh);
-        
-            const weapon = this._loadedAssets["ITEM_sword_01"].instantiateModelsToScene();
+            const weapon = this._loadedAssets["ITEM_sword_01"].instantiateModelsToScene((name)=>"PlayerSword");
             const weaponMesh = weapon.rootNodes[0];
+            weaponMesh.parent = this.mesh;
             weaponMesh.attachToBone(bone, playerMesh);
-
         }
-
-
         /////////////////////////////
-        //Wrist.L
 
         // set initial player scale & rotation
 

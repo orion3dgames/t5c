@@ -10,10 +10,13 @@ type Item = {
     };
     requirements?: {};
     benefits?: {};
-    mesh?: {
+    meshData?: {
         scale?: number;
         rotationFix?: number;
         meshIndex?: number;
+        width?: number;
+        height?: number;
+        depth?: number;
     };
 };
 
@@ -76,8 +79,12 @@ let ItemsDB: itemDataMap = {
         benefits: [
             { key: PlayerKeys.STRENGTH, type: ItemEffect.ADD, amount: 10 },
         ],
-        mesh: {
-            meshIndex: 1,
+        meshData: {
+            meshIndex: 0,
+            scale: 1.2,
+            width: 1, 
+            height: 0.20, 
+            depth: 0.20
         },
     },
 
@@ -100,8 +107,12 @@ let ItemsDB: itemDataMap = {
             { key: PlayerKeys.STRENGTH, type: ItemEffect.ADD, amount: 8 },
             { key: PlayerKeys.WISDOM, type: ItemEffect.REMOVE, amount: 2 },
         ],
-        mesh: {
-            meshIndex: 1,
+        meshData: {
+            meshIndex: 0,
+            scale: 0.25,
+            width: 0.40, 
+            height: 0.40, 
+            depth: 0.40
         },
     },
 
@@ -113,8 +124,12 @@ let ItemsDB: itemDataMap = {
         type: ItemType.CONSUMABLE,
         value: 54,
         benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 5 }],
-        mesh: {
-            meshIndex: 1,
+        meshData: {
+            meshIndex: 0,
+            scale: 0.25,
+            width: 0.40, 
+            height: 0.40, 
+            depth: 0.40
         },
     },
 
@@ -126,8 +141,12 @@ let ItemsDB: itemDataMap = {
         type: ItemType.CONSUMABLE,
         value: 200,
         benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 20 }],
-        mesh: {
-            meshIndex: 1,
+        meshData: {
+            meshIndex: 0,
+            scale: 0.25,
+            width: 0.40, 
+            height: 0.40, 
+            depth: 0.40
         },
     },
 
@@ -139,8 +158,12 @@ let ItemsDB: itemDataMap = {
         type: ItemType.CONSUMABLE,
         value: 150,
         benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 50 }],
-        mesh: {
-            meshIndex: 1,
+        meshData: {
+            meshIndex: 0,
+            scale: 0.25,
+            width: 0.40, 
+            height: 0.40, 
+            depth: 0.40
         },
     },
 };

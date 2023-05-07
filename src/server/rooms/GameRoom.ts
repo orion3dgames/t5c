@@ -61,22 +61,6 @@ export class GameRoom extends Room<GameRoomState> {
 
         ///////////////////////////////////////////////////////////////////////////
         // if players are in a room, make sure we save any changes to the database.
-
-        /*
-        this.spawnTimer += deltaTime;
-        let spawnTime = 300;
-        if (this.spawnTimer >= spawnTime) {
-            this.spawnTimer = 0;
-            let maxEntities = this.roomDetails.monsters;
-            if (this.entities.size < maxEntities) {
-                this.createEntity(this.entities.size);
-            }
-            if (this.items.size < 20) {
-                this.createItem();
-            }
-        }*/
-
-
         let saveTimer = 0;
         let saveInterval = 5000;
         this.delayedInterval = this.clock.setInterval(() => {
@@ -105,9 +89,6 @@ export class GameRoom extends Room<GameRoomState> {
                         }
                     }
                     
-
-                    
-
                     //Logger.info("[gameroom][onCreate] player " + playerClient.auth.name + " saved to database.");
                 });
             }
@@ -234,7 +215,7 @@ export class GameRoom extends Room<GameRoomState> {
                 currentPosition.x += randomNumberInRange(0.1, 1.5);
                 currentPosition.z += randomNumberInRange(0.1, 1.5);
                 let data = {
-                    key: "apple",
+                    key: "potion_heal",
                     sessionId: sessionId,
                     x: currentPosition.x,
                     y: 0.25,

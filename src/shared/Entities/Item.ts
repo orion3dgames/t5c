@@ -38,10 +38,8 @@ export class Item {
     public rot: number;
     public quantity: number;
 
-    // raceData
-    public rotationFix;
-    public scale: number = 1;
-    public meshIndex: number = 0;
+    // 
+    public meshData;
 
     // flags
     public blocked: boolean = false; // if true, player will not moved
@@ -67,16 +65,25 @@ export class Item {
     }
 
     public async spawn(entity) {
-        const box = MeshBuilder.CreateBox(this.entity.sessionId, { width: 1, height: 1, depth: 1 }, this._scene);
+        //
+        const box = MeshBuilder.CreateBox(this.entity.sessionId, {
+            width: this.meshData.width ?? 1, 
+            height: this.meshData.height ?? 1, 
+            depth: this.meshData.depth ?? 1, 
+        }, this._scene);
         box.visibility = 0.5;
 
         // set collision mesh
         this.mesh = box;
+        this.mesh.name = entity.key+"_box";
         this.mesh.isPickable = true;
         this.mesh.isVisible = true;
-        this.mesh.checkCollisions = true;
-        this.mesh.showBoundingBox = true;
+        this.mesh.checkCollisions = false;
+        this.mesh.showBoundingBox = false;
         this.mesh.position = new Vector3(this.entity.x, this.entity.y, this.entity.z);
+
+        // offset mesh from the ground
+        this.y = this.y + (this.meshData.height / 2)
 
         this.mesh.metadata = {
             sessionId: this.entity.sessionId,
@@ -86,22 +93,20 @@ export class Item {
         };
 
         // load player mesh
-        const result = await this._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene();
+        const result = await this._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene(name => "instance_" + this.entity.sessionId);
         const playerMesh = result.rootNodes[0];
+        console.log(result);
 
         // set initial player scale & rotation
-        playerMesh.name = entity.sessionId + "_apple";
+        playerMesh.name = entity.key+"_mesh";
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
-        if (entity.rotationFix) {
-            playerMesh.rotation.set(0, entity.rotationFix, 0);
-        }
-        playerMesh.scaling = new Vector3(0.25, 0.25, 0.25);
+        playerMesh.scaling = new Vector3(this.meshData.scale, this.meshData.scale, this.meshData.scale);
         playerMesh.isPickable = true;
         playerMesh.checkCollisions = false;
         playerMesh.parent = this.mesh;
 
         // add mesh to shadow generator
-        //this._shadow.addShadowCaster(this.mesh, true);
+        this._shadow.addShadowCaster(this.mesh, true);
         this.setPosition();
 
         //////////////////////////////////////////////
@@ -121,11 +126,11 @@ export class Item {
         this.mesh.actionManager = new ActionManager(this._scene);
 
         // register hover over player
-        console.log(this.meshIndex);
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
                 let meshes = ev.meshUnderPointer.getChildMeshes();
-                let mesh = meshes[this.meshIndex];
+                console.log(meshes);
+                let mesh = meshes[this.meshData.meshIndex];
                 mesh.outlineColor = new Color3(0, 1, 0);
                 mesh.outlineWidth = 3;
                 mesh.renderOutline = true;
@@ -136,7 +141,7 @@ export class Item {
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
                 let meshes = ev.meshUnderPointer.getChildMeshes();
-                let mesh = meshes[this.meshIndex];
+                let mesh = meshes[this.meshData.meshIndex];
                 mesh.renderOutline = false;
             })
         );
@@ -153,7 +158,7 @@ export class Item {
 
         //////////////////////////////////////////////////////////////////////////
         // misc
-        this.characterLabel = this.ui.createEntityLabel(this);
+        //this.characterLabel = this.ui.createEntityLabel(this);
     }
 
     public update(delta) {}
@@ -180,7 +185,12 @@ export class Item {
     }
 
     public remove() {
-        this.characterLabel.dispose();
-        this.mesh.dispose();
+        if(this.characterLabel){
+            this.characterLabel.dispose();
+        }
+        if(this.mesh){
+            this.mesh.dispose();
+        }
     }
+        
 }
