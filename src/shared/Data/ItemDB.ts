@@ -59,6 +59,28 @@ enum PlayerSlots {
 }
 
 let ItemsDB: itemDataMap = {
+
+    sword_01: {
+        key: "sword_01",
+        name: "Sword",
+        description: "Description.",
+        icon: "ICON_ITEM_sword_01",
+        type: ItemType.WEAPON,
+        value: 2000,
+        canEquip: {
+            slot: PlayerSlots.HAND_1,
+        },
+        requirements: [
+            { key: PlayerKeys.STRENGTH, amount: 20 },
+        ],
+        benefits: [
+            { key: PlayerKeys.STRENGTH, type: ItemEffect.ADD, amount: 10 },
+        ],
+        mesh: {
+            meshIndex: 1,
+        },
+    },
+
     amulet_01: {
         key: "amulet_01",
         name: "Amulet",
