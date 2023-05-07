@@ -129,7 +129,7 @@ export class GameRoomState extends Schema {
             if (this.entities.size < maxEntities) {
                 this.createEntity(this.entities.size);
             }
-            if (this.items.size < 2) {
+            if (this.items.size < 0) {
                 this.createItem();
             }
         }

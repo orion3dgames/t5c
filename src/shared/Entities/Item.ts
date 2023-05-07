@@ -71,7 +71,7 @@ export class Item {
             height: this.meshData.height ?? 1, 
             depth: this.meshData.depth ?? 1, 
         }, this._scene);
-        box.visibility = 0.5;
+        box.visibility = 0;
 
         // set collision mesh
         this.mesh = box;
