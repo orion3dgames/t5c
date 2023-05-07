@@ -48,7 +48,6 @@ export class GameRoom extends Room<GameRoomState> {
 
         // Set the simulation interval callback
         // use to check stuff on the server at regular interval
-        this.s
         this.setSimulationInterval((dt) => {
             this.state.update(dt);
         }, Config.updateRate);
