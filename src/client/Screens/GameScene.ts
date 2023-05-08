@@ -75,18 +75,18 @@ export class GameScene {
             // get random user
             let req = await request("get", apiUrl() + "/returnRandomUser");
             let character = JSON.parse(req.data).user;
-            character.location = tempLocation;
-
-            // set user
-            this._auth.setUser({
-                id: character.user_id,
-                username: character.username,
-                password: character.password,
-                token: character.token,
-            });
-
-            //set character
-            this._auth.setCharacter(character);
+            if (character) {
+                character.location = tempLocation;
+                // set user
+                this._auth.setUser({
+                    id: character.user_id,
+                    username: character.username,
+                    password: character.password,
+                    token: character.token,
+                });
+                //set character
+                this._auth.setCharacter(character);
+            }
         }
         ///////////////////// END DEBUG CODE /////////////////////////////
         ///////////////////// END DEBUG CODE /////////////////////////////

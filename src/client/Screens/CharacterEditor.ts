@@ -99,25 +99,26 @@ export class CharacterEditor {
             // get random user
             let req = await request("get", apiUrl() + "/returnRandomUser");
             let character = JSON.parse(req.data).user;
-            character.location = tempLocation;
+            if (character) {
+                character.location = tempLocation;
+                // set user
+                this._auth.setUser({
+                    id: character.user_id,
+                    username: character.username,
+                    password: character.password,
+                    token: character.token,
+                });
 
-            // set user
-            this._auth.setUser({
-                id: character.user_id,
-                username: character.username,
-                password: character.password,
-                token: character.token,
-            });
-
-            //set character
-            this._auth.setCharacter(character);
-        } else {
-            // check if user token is valid
-            let user = await this._auth.loggedIn();
-            if (!user) {
-                // if token not valid, send back to login screen
-                SceneController.goToScene(State.LOGIN);
+                //set character
+                this._auth.setCharacter(character);
             }
+        }
+
+        // check if user token is valid
+        let user = await this._auth.loggedIn();
+        if (!user) {
+            // if token not valid, send back to login screen
+            SceneController.goToScene(State.LOGIN);
         }
         ///////////////////// END DEBUG CODE /////////////////////////////
         ///////////////////// END DEBUG CODE /////////////////////////////
@@ -183,33 +184,30 @@ export class CharacterEditor {
         /////////////////////////////////////////////////////////
 
         // set default model
-        let RACE = dataDB.get('race', 'male_adventurer');
+        let RACE = dataDB.get("race", "male_adventurer");
         this.RACE = RACE;
 
         // load assets and remove them all from scene
-        const playerMesh = await SceneLoader.ImportMeshAsync("", "./models/races/", RACE.key+".glb", scene);
+        const playerMesh = await SceneLoader.ImportMeshAsync("", "./models/races/", RACE.key + ".glb", scene);
         this._playerMesh = playerMesh;
         this._playerAnimations = playerMesh.animationGroups;
 
         // default animations
         this._playerAnimations[RACE.animations.IDLE].play(true);
 
-
         this.loadSelectionUI();
-
     }
 
     loadSelectionUI() {
-
         if (this._uiRadioOptions) {
             this._uiRadioOptions.dispose();
         }
 
         let meshAnimations = this.RACE.animations;
         const selectedAnimationGroups = [
-            this._playerAnimations[meshAnimations.IDLE], 
-            this._playerAnimations[meshAnimations.WALK], 
-            this._playerAnimations[meshAnimations.DEATH]
+            this._playerAnimations[meshAnimations.IDLE],
+            this._playerAnimations[meshAnimations.WALK],
+            this._playerAnimations[meshAnimations.DEATH],
         ];
 
         // show animations options
