@@ -15,6 +15,7 @@ import Config from "../Config";
 import { dataDB } from "../Data/dataDB";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { randomNumberInRange } from "../Utils";
 
 export class Item {
     public _scene: Scene;
@@ -83,7 +84,8 @@ export class Item {
         this.mesh.position = new Vector3(this.entity.x, this.entity.y, this.entity.z);
 
         // offset mesh from the ground
-        this.y = this.y + (this.meshData.height / 2)
+        this.y = this.y + (this.meshData.height / 2);
+        this.mesh.rotation = new Vector3(0, randomNumberInRange(0,360), 0);
 
         this.mesh.metadata = {
             sessionId: this.entity.sessionId,
@@ -95,7 +97,6 @@ export class Item {
         // load player mesh
         const result = await this._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene(name => "instance_" + this.entity.sessionId);
         const playerMesh = result.rootNodes[0];
-        console.log(result);
 
         // set initial player scale & rotation
         playerMesh.name = entity.key+"_mesh";
@@ -129,10 +130,9 @@ export class Item {
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
                 let meshes = ev.meshUnderPointer.getChildMeshes();
-                console.log(meshes);
                 let mesh = meshes[this.meshData.meshIndex];
                 mesh.outlineColor = new Color3(0, 1, 0);
-                mesh.outlineWidth = 3;
+                mesh.outlineWidth = 0.3;
                 mesh.renderOutline = true;
             })
         );
