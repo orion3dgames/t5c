@@ -248,6 +248,13 @@ export class GameScene {
                 entity.lod(this._currentPlayer);
             }
 
+            // items update
+            for (let sessionId in this.items) {
+                const item = this.items[sessionId];
+                item.update(delta);
+                item.lod(this._currentPlayer);
+            }
+
             // player update
             for (let sessionId in this.players) {
                 const entity = this.players[sessionId];
