@@ -80,7 +80,7 @@ let ItemsDB: itemDataMap = {
             { key: PlayerKeys.STRENGTH, type: ItemEffect.ADD, amount: 10 },
         ],
         meshData: {
-            meshIndex: 0,
+            meshIndex: 1,
             scale: 1.2,
             width: 1, 
             height: 0.20, 
@@ -108,7 +108,7 @@ let ItemsDB: itemDataMap = {
             { key: PlayerKeys.WISDOM, type: ItemEffect.REMOVE, amount: 2 },
         ],
         meshData: {
-            meshIndex: 0,
+            meshIndex: 1,
             scale: 0.25,
             width: 0.40, 
             height: 0.40, 
@@ -125,7 +125,7 @@ let ItemsDB: itemDataMap = {
         value: 54,
         benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 5 }],
         meshData: {
-            meshIndex: 0,
+            meshIndex: 1,
             scale: 0.25,
             width: 0.40, 
             height: 0.40, 
@@ -142,8 +142,8 @@ let ItemsDB: itemDataMap = {
         value: 200,
         benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 20 }],
         meshData: {
-            meshIndex: 0,
-            scale: 0.25,
+            meshIndex: 1,
+            scale: 0.20,
             width: 0.40, 
             height: 0.40, 
             depth: 0.40
@@ -159,7 +159,7 @@ let ItemsDB: itemDataMap = {
         value: 150,
         benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 50 }],
         meshData: {
-            meshIndex: 0,
+            meshIndex: 1,
             scale: 0.25,
             width: 0.40, 
             height: 0.40, 
