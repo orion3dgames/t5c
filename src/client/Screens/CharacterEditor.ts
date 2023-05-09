@@ -91,16 +91,10 @@ export class CharacterEditor {
         ///////////////////// DEBUG CODE /////////////////////////////////
         // if local skip login screen
         if (isLocal()) {
-            // set location
-            //let tempLocation = "lh_town";
-            let tempLocation = "lh_town";
-            this._auth.setLocation(tempLocation);
-
             // get random user
             let req = await request("get", apiUrl() + "/returnRandomUser");
             let character = JSON.parse(req.data).user;
             if (character) {
-                character.location = tempLocation;
                 // set user
                 this._auth.setUser({
                     id: character.user_id,
@@ -108,7 +102,6 @@ export class CharacterEditor {
                     password: character.password,
                     token: character.token,
                 });
-
                 //set character
                 this._auth.setCharacter(character);
             }
