@@ -84,9 +84,17 @@ export class GameScene {
                     password: character.password,
                     token: character.token,
                 });
+
                 //set character
                 this._auth.setCharacter(character);
             }
+        }
+
+        // check if user token is valid
+        let user = await this._auth.loggedIn();
+        if (!user) {
+            // if token not valid, send back to login screen
+            SceneController.goToScene(State.LOGIN);
         }
         ///////////////////// END DEBUG CODE /////////////////////////////
         ///////////////////// END DEBUG CODE /////////////////////////////
