@@ -7,6 +7,7 @@ import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollVie
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { PlayerMessage } from "../../../shared/types/index";
 import Config from "../../../shared/Config";
+import { generatePanel, getBg, getPadding } from "./UI_Theme";
 
 export class UI_Chats {
     private _playerUI;
@@ -45,52 +46,63 @@ export class UI_Chats {
     }
 
     _createUI() {
-        // add stack panel
-        const chatPanel = new Rectangle("chatPanel");
-        chatPanel.top = "-50px;";
-        chatPanel.height = "122px";
-        chatPanel.width = "400px";
-        chatPanel.thickness = 0;
-        chatPanel.background = Config.UI_CENTER_PANEL_BG;
-        chatPanel.alpha = 1;
+
+        const chatPanel = generatePanel(
+            "chatPanel",
+            Control.HORIZONTAL_ALIGNMENT_LEFT,
+            Control.VERTICAL_ALIGNMENT_BOTTOM,
+            "300px;",
+            "200px",
+            "-35px",
+            "15px"
+        );
+        chatPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         chatPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        chatPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         this._playerUI.addControl(chatPanel);
+
+        const paddingPanel = new Rectangle("paddingPanel");
+        paddingPanel.width = 1;
+        paddingPanel.height = 1;
+        paddingPanel.thickness = 0;
+        paddingPanel.setPaddingInPixels(getPadding());
+        chatPanel.addControl(paddingPanel);
 
         // add chat input
         const chatInput = new InputText("chatInput");
-        chatInput.width = 0.9;
-        chatInput.height = "22px;";
+        chatInput.width = 0.8;
+        chatInput.height = "24px;";
         chatInput.top = "0px";
         chatInput.color = "#FFF";
-        chatInput.fontSize = "11px";
+        chatInput.fontSize = "12px";
+        chatInput.thickness = 0;
+        chatInput.background = getBg();
         chatInput.placeholderText = "Write message here...";
         chatInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         chatInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        chatPanel.addControl(chatInput);
+        paddingPanel.addControl(chatInput);
         this._chatInput = chatInput;
 
         // add chat send button
         const chatButton = Button.CreateSimpleButton("chatButton", "SEND");
-        chatButton.width = 0.1;
-        chatButton.height = "22px;";
+        chatButton.width = 0.2;
+        chatButton.height = "24px;";
         chatButton.top = "0px";
         chatButton.color = "#FFF";
-        chatButton.fontSize = "11px";
+        chatButton.fontSize = "12px";
         chatButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         chatButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        chatPanel.addControl(chatButton);
+        paddingPanel.addControl(chatButton);
         this._chatButton = chatButton;
 
         // add scrollable container
         const chatScrollViewer = new ScrollViewer("chatScrollViewer");
         chatScrollViewer.width = 1;
-        chatScrollViewer.height = "100px";
+        chatScrollViewer.height = "168px;";
         chatScrollViewer.top = "-22px";
-        chatScrollViewer.background = Config.UI_CENTER_PANEL_BG;
+        chatScrollViewer.thickness = 0;
         chatScrollViewer.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         chatScrollViewer.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        chatPanel.addControl(chatScrollViewer);
+        paddingPanel.addControl(chatScrollViewer);
         this._chatUIScroll = chatScrollViewer;
 
         // add stack panel
@@ -234,7 +246,7 @@ export class UI_Chats {
             roomTxt.paddingLeft = "5fdsfpx";
             roomTxt.text = prefix + msg.message;
             roomTxt.textHorizontalAlignment = 0;
-            roomTxt.fontSize = "11px";
+            roomTxt.fontSize = "12px";
             roomTxt.color = msg.color;
             roomTxt.left = "0px";
             roomTxt.textWrapping = TextWrapping.WordWrap;

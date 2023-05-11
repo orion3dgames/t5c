@@ -20,6 +20,8 @@ import { Entity } from "../../shared/Entities/Entity";
 import { Player } from "../../shared/Entities/Player";
 import { Item } from "../../shared/Entities/Item";
 
+import { getBg } from "./UI/UI_Theme";
+
 export class UserInterface {
     private _scene: Scene;
     private _engine: Engine;
@@ -73,20 +75,6 @@ export class UserInterface {
         const playerUI = AdvancedDynamicTexture.CreateFullscreenUI("UI_Player", true, this._scene);
         this._playerUI = playerUI;
 
-        // center panel
-        const centerPanel = new Rectangle("centerPanel");
-        centerPanel.top = "0px;";
-        centerPanel.height = "170px";
-        centerPanel.width = "400px";
-        centerPanel.thickness = 0;
-        centerPanel.background = Config.UI_CENTER_PANEL_BG;
-        centerPanel.alpha = 1;
-        centerPanel.isPointerBlocker = false;
-        centerPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        centerPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        this._playerUI.addControl(centerPanel);
-        this._centerUI = centerPanel;
-
         /////////////////////////////////////
         // create interface
         this.createMisc();
@@ -112,18 +100,18 @@ export class UserInterface {
         this._UIAbilities = new UI_Abilities(this, currentPlayer);
 
         // create chat ui + events
-        this._UIChat = new UI_Chats(this._centerUI, this._chatRoom, currentPlayer, this._entities);
+        this._UIChat = new UI_Chats(this._playerUI, this._chatRoom, currentPlayer, this._entities);
 
         // create debug ui + events
         this._UIDebug = new UI_Debug(this._playerUI, this._engine, this._scene, this._gameRoom, this._currentPlayer, this._entities);
 
         // create selected entity panel
         this._UITargetSelected = new UI_EntitySelected(this._playerUI, this._scene, {
-            position: "RIGHT",
+            panelName: "target",
             currentPlayer: false,
         });
         this._UIPlayerSelected = new UI_EntitySelected(this._playerUI, this._scene, {
-            position: "LEFT",
+            panelName: "player",
             currentPlayer: currentPlayer,
         });
 
@@ -156,11 +144,12 @@ export class UserInterface {
         /////////////////////////////////////
         //////////////////// mana bar
         const experienceBar = new Rectangle("experienceBar");
-        experienceBar.top = "-2px;";
+        experienceBar.top = "00px;";
         experienceBar.left = "0px";
-        experienceBar.width = "400px;";
-        experienceBar.height = "10px";
-        experienceBar.background = Config.UI_CENTER_PANEL_BG;
+        experienceBar.width = 1;
+        experienceBar.height = "20px";
+        experienceBar.thickness = 0;
+        experienceBar.background = getBg();
         experienceBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         experienceBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         this._playerUI.addControl(experienceBar);
@@ -284,7 +273,7 @@ export class UserInterface {
     ////////////////////////////
     public createMisc() {
         const inventoryButton = Button.CreateSimpleButton("inventoryButton", "I");
-        inventoryButton.top = "-17px;";
+        inventoryButton.top = "-150px;";
         inventoryButton.left = "-190px;";
         inventoryButton.width = "30px;";
         inventoryButton.height = "30px";
@@ -300,7 +289,7 @@ export class UserInterface {
 
         // add a quit button
         const quitButton = Button.CreateSimpleButton("quitButton", "Q");
-        quitButton.top = "-17px;";
+        quitButton.top = "-150px;";
         quitButton.left = "190px;";
         quitButton.width = "30px;";
         quitButton.height = "30px";

@@ -5,6 +5,8 @@ import Config from "../../../shared/Config";
 import { getHealthColorFromValue, roundTo } from "../../../shared/Utils";
 import { Leveling } from "../../../shared/Entities/Player/Leveling";
 
+import { generatePanel, getPadding } from "./UI_Theme";
+
 export class UI_EntitySelected {
     private _playerUI;
     private _scene;
@@ -22,7 +24,7 @@ export class UI_EntitySelected {
     private _manaBarInside;
     private _manaBarText;
 
-    constructor(_playerUI, _scene, options = { position: "LEFT", currentPlayer: false }) {
+    constructor(_playerUI, _scene, options = { panelName: "", currentPlayer: false }) {
         this._playerUI = _playerUI;
         this._scene = _scene;
         this._options = options;
@@ -37,73 +39,61 @@ export class UI_EntitySelected {
     }
 
     _createUI() {
-        //let alignHoriz = this._options.position === 'LEFT' ? Control.HORIZONTAL_ALIGNMENT_LEFT : Control.HORIZONTAL_ALIGNMENT_RIGHT;
+       
         let alignHoriz = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        let marginLeft = this._options.position === "LEFT" ? "15px" : "-15px;";
-        let marginLeft2 = "5px";
-        let barWidth = 180;
-        let barHeight = 15;
+        let panelWidth = 260;
+        let barWidth = 198;
+        let leftMargin = this._options.panelName === "target" ? panelWidth + 30 : 15;
 
         ////////////////////////////////////
         //////////////////// panel
-        const selectedEntityBar = new Rectangle("selectedEntityBar");
-        selectedEntityBar.top = "15px;";
-        selectedEntityBar.left = marginLeft;
-        selectedEntityBar.width = barWidth + 10 + "px;";
-        selectedEntityBar.height = "63px;";
-        selectedEntityBar.background = Config.UI_CENTER_PANEL_BG;
-        selectedEntityBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        selectedEntityBar.horizontalAlignment =
-            this._options.position === "LEFT" ? Control.HORIZONTAL_ALIGNMENT_LEFT : Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        selectedEntityBar.isVisible = false;
+        const selectedEntityBar = generatePanel(
+            "selected"+this._options.panelName,
+            Control.HORIZONTAL_ALIGNMENT_LEFT,
+            Control.VERTICAL_ALIGNMENT_TOP,
+            panelWidth+"px;",
+            "55px",
+            "15px",
+            leftMargin+"px",
+        );
         this._playerUI.addControl(selectedEntityBar);
 
-        ////////////////////////////////////
-        //////////////////// entity name
-        const entityNameTxt = new TextBlock("entityNameTxt", "");
-        entityNameTxt.text = "XXXXXX";
-        entityNameTxt.color = "#FFF";
-        entityNameTxt.top = "5px";
-        entityNameTxt.left = marginLeft2;
-        entityNameTxt.fontSize = "13px;";
-        entityNameTxt.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        entityNameTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        entityNameTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        selectedEntityBar.addControl(entityNameTxt);
+        const paddingPanel = new Rectangle("paddingPanel");
+        paddingPanel.width = 1;
+        paddingPanel.height = 1;
+        paddingPanel.thickness = 0;
+        paddingPanel.setPaddingInPixels(getPadding());
+        selectedEntityBar.addControl(paddingPanel);
 
-        const entityLevelTxt = new TextBlock("entityLevelTxt", "");
-        entityLevelTxt.text = "XXXXX";
-        entityLevelTxt.color = "#FFF";
-        entityLevelTxt.top = "5px";
-        entityLevelTxt.left = "-5px";
-        entityLevelTxt.fontSize = "14px;";
-        entityLevelTxt.fontWeight = "bold";
-        entityLevelTxt.lineSpacing = "-2px;";
-        entityLevelTxt.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        entityLevelTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        entityLevelTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        entityLevelTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        selectedEntityBar.addControl(entityLevelTxt);
+        const imgPanel = new Rectangle("imgPanel");
+        imgPanel.width = "45px";
+        imgPanel.height = "45px;";
+        imgPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        imgPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        imgPanel.background = "black";
+        imgPanel.thickness = 0;
+        paddingPanel.addControl(imgPanel);
 
         ////////////////////////////////////
         //////////////////// health bar
+
         const healthBar = new Rectangle("healthBar");
-        healthBar.top = "25px;";
-        healthBar.left = marginLeft2;
+        healthBar.top = "0px;";
+        healthBar.left = "50px";
         healthBar.width = barWidth + "px;";
-        healthBar.height = barHeight + "px";
-        healthBar.background = Config.UI_CENTER_PANEL_BG;
+        healthBar.height = "25px";
+        healthBar.thickness = 0;
         healthBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         healthBar.horizontalAlignment = alignHoriz;
-        selectedEntityBar.addControl(healthBar);
+        paddingPanel.addControl(healthBar);
 
         const healthBarInside = new Rectangle("healthBarInside");
         healthBarInside.top = "0px;";
         healthBarInside.left = "0px;";
-        healthBarInside.width = barWidth - 2 + "px;";
+        healthBarInside.width = 1;
         healthBarInside.thickness = 0;
-        healthBarInside.height = barHeight - 1 + "px";
-        healthBarInside.background = "green";
+        healthBarInside.height = 1;
+        healthBarInside.background = "#75ed1b";
         healthBarInside.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         healthBarInside.horizontalAlignment = alignHoriz;
         healthBar.addControl(healthBarInside);
@@ -111,33 +101,33 @@ export class UI_EntitySelected {
         const healthBarText = new TextBlock("healthBarText", "");
         healthBarText.text = "0";
         healthBarText.color = "#FFF";
-        healthBarText.top = "1px";
-        healthBarText.left = "3px";
-        healthBarText.fontSize = "12px;";
-        healthBarText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        healthBarText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        healthBarText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        healthBarText.horizontalAlignment = alignHoriz;
-        healthBarInside.addControl(healthBarText);
+        healthBarText.top = "0px";
+        healthBarText.left = "-5px";
+        healthBarText.fontSize = "14px;";
+        healthBarText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        healthBarText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        healthBarText.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        healthBarText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        healthBar.addControl(healthBarText);
 
         /////////////////////////////////////
         //////////////////// mana bar
         const manaBar = new Rectangle("manaBar");
-        manaBar.top = "43px;";
-        manaBar.left = "5px";
+        manaBar.top = "28px;";
+        manaBar.left = "50px";
         manaBar.width = barWidth + "px;";
-        manaBar.height = barHeight + "px";
-        manaBar.background = Config.UI_CENTER_PANEL_BG;
+        manaBar.height = "17px";
+        manaBar.thickness = 0;
         manaBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         manaBar.horizontalAlignment = alignHoriz;
-        selectedEntityBar.addControl(manaBar);
+        paddingPanel.addControl(manaBar);
 
         const manaBarInside = new Rectangle("manaBarInside");
         manaBarInside.top = "0px;";
         manaBarInside.left = "0px;";
-        manaBarInside.width = barWidth - 2 + "px;";
+        manaBarInside.width = 1;
         manaBarInside.thickness = 0;
-        manaBarInside.height = barHeight - 1 + "px";
+        manaBarInside.height = 1;
         manaBarInside.background = "blue";
         manaBarInside.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         manaBarInside.horizontalAlignment = alignHoriz;
@@ -147,21 +137,50 @@ export class UI_EntitySelected {
         manaBarText.text = "0";
         manaBarText.color = "#FFF";
         manaBarText.top = "1px";
-        manaBarText.left = "3px";
+        manaBarText.left = "-5px";
         manaBarText.fontSize = "12px;";
-        manaBarText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        manaBarText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        manaBarText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        manaBarText.horizontalAlignment = alignHoriz;
-        manaBarInside.addControl(manaBarText);
+        manaBarText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        manaBarText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        manaBarText.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        manaBarText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        manaBar.addControl(manaBarText);
+
+        ///////////////////////////////////////////////////
+
+        ////////////////////////////////////
+        //////////////////// entity name
+        const entityNameTxt = new TextBlock("entityNameTxt", "");
+        entityNameTxt.text = "XXXXXX";
+        entityNameTxt.color = "#FFF";
+        entityNameTxt.top = "0px";
+        entityNameTxt.left = "5px";
+        entityNameTxt.fontSize = "14px;";
+        entityNameTxt.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        entityNameTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        entityNameTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        healthBar.addControl(entityNameTxt);
+
+        const entityLevelTxt = new TextBlock("entityLevelTxt", "");
+        entityLevelTxt.text = "XXXXX";
+        entityLevelTxt.color = "#FFF";
+        entityLevelTxt.top = "0px";
+        entityLevelTxt.left = "5px";
+        entityLevelTxt.fontSize = "12px;";
+        entityLevelTxt.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        entityLevelTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        entityLevelTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        entityLevelTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        manaBar.addControl(entityLevelTxt);
 
         /////////////////////////////////////
-        this._selectedEntityBar = selectedEntityBar;
         this._entityNameTxt = entityNameTxt;
         this._entityLevelTxt = entityLevelTxt;
+        this._selectedEntityBar = selectedEntityBar;
+        
         this._healthBar = healthBar;
         this._healthBarInside = healthBarInside;
         this._healthBarText = healthBarText;
+
         this._manaBar = manaBar;
         this._manaBarInside = manaBarInside;
         this._manaBarText = manaBarText;
@@ -169,6 +188,7 @@ export class UI_EntitySelected {
 
     // refresh panel
     private _update() {
+        
         this._selectedEntityBar.isVisible = false;
 
         let entity = global.T5C.selectedEntity ? global.T5C.selectedEntity : false;
@@ -182,19 +202,20 @@ export class UI_EntitySelected {
 
             // update name
             this._entityNameTxt.text = entity.name;
-            this._entityLevelTxt.text = "Lvl: " + entity.level;
+            this._entityLevelTxt.text = "Lvl " + entity.level;
 
             // health
             let health = roundTo(entity.health, 0);
             let healthWidth = entity.health / entity.maxHealth;
             this._healthBarInside.width = healthWidth;
-            this._healthBarText.text = health;
+            this._healthBarText.text = health + "/"+entity.maxHealth;
 
             // mana
             let mana = roundTo(entity.mana, 0);
             let manaWidth = entity.mana / entity.maxMana;
             this._manaBarInside.width = manaWidth;
-            this._manaBarText.text = mana;
+            this._manaBarText.text = mana + "/"+entity.maxMana;
         }
+        
     }
 }

@@ -6,6 +6,7 @@ import Config from "../../../shared/Config";
 import { dataDB } from "../../../shared/Data/dataDB";
 import { Player } from "../../../shared/Entities/Player";
 import { Ability } from "../../../shared/Data/AbilitiesDB";
+import { generatePanel, getBg, getPadding } from "./UI_Theme";
 
 export class UI_Abilities {
     private _playerUI;
@@ -31,29 +32,49 @@ export class UI_Abilities {
     }
 
     _createUI() {
-        let width = 330;
+        let width = 460;
         let abilityRect = [];
 
         if (this._abilityUI) {
             this._abilityUI.dispose();
         }
 
+        const abilityMainPanel = generatePanel(
+            "abilityPanel",
+            Control.HORIZONTAL_ALIGNMENT_LEFT,
+            Control.VERTICAL_ALIGNMENT_BOTTOM,
+            "470px;",
+            "62px",
+            "-35px",
+            "15px"
+        );
+        abilityMainPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        abilityMainPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        this._playerUI.addControl(abilityMainPanel);
+
+        const paddingPanel = new Rectangle("paddingPanel");
+        paddingPanel.width = 1;
+        paddingPanel.height = 1;
+        paddingPanel.thickness = 0;
+        paddingPanel.setPaddingInPixels(getPadding());
+        abilityMainPanel.addControl(paddingPanel);
+        this._abilityUI = abilityMainPanel;
+
         // add stack panel
         const abilityPanel = new Rectangle("abilityPanel");
-        abilityPanel.top = "-13px;";
+        abilityPanel.top = "0px;"; 
         abilityPanel.width = width + "px";
         abilityPanel.adaptHeightToChildren = true;
         abilityPanel.thickness = 0;
-        abilityPanel.background = Config.UI_CENTER_PANEL_BG;
         abilityPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         abilityPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        this._playerUI.addControl(abilityPanel);
-        this._abilityUI = abilityPanel;
-
+        paddingPanel.addControl(abilityPanel);
+        
         for (let i = 1; i <= this.abylity_number; i++) {
             // calculate responsive width and height
+            let iconGutter = 2;
             let iconWidth = width / this.abylity_number;
-            let leftMargin = i > 1 ? (i - 1) * iconWidth + "px" : "0px";
+            let leftMargin = i > 1 ? (i - 1) * iconWidth + iconGutter + "px" : "0px";
 
             // container
             var headlineRect = new Rectangle("ability_" + i);
@@ -61,7 +82,8 @@ export class UI_Abilities {
             headlineRect.left = leftMargin;
             headlineRect.width = iconWidth + "px";
             headlineRect.height = iconWidth + "px";
-            headlineRect.thickness = 1;
+            headlineRect.thickness = 0;
+            headlineRect.background = getBg();
             headlineRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             headlineRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             abilityPanel.addControl(headlineRect);
@@ -107,6 +129,7 @@ export class UI_Abilities {
                 }
             });
         }
+        
     }
 
     addAbilityIcon(digit, ability, headlineRect: Rectangle) {
