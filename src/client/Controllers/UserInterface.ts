@@ -13,16 +13,19 @@ import { UI_Chats, UI_Abilities, UI_Debug, UI_EntitySelected, UI_Panel, UI_Toolt
 import { Room } from "colyseus.js";
 import State from "../Screens/Screens";
 import { SceneController } from "../Controllers/Scene";
-import { Entity } from "../../shared/Entities/Entity";
 import Config from "../../shared/Config";
 import { Leveling } from "../../shared/Entities/Player/Leveling";
+
+import { Entity } from "../../shared/Entities/Entity";
+import { Player } from "../../shared/Entities/Player";
+import { Item } from "../../shared/Entities/Item";
 
 export class UserInterface {
     private _scene: Scene;
     private _engine: Engine;
     private _gameRoom: Room;
     private _chatRoom: Room;
-    public _entities: Entity[];
+    public _entities: (Entity | Player | Item)[];
     private _currentPlayer;
     private _loadedAssets;
 
@@ -52,7 +55,7 @@ export class UserInterface {
     // revive panel
     public revivePanel;
 
-    constructor(scene: Scene, engine: Engine, gameRoom: Room, chatRoom: Room, entities: Entity[], currentPlayer, _loadedAssets) {
+    constructor(scene: Scene, engine: Engine, gameRoom: Room, chatRoom: Room, entities: (Entity | Player | Item)[], currentPlayer, _loadedAssets) {
         // set var we will be needing
         this._scene = scene;
         this._engine = engine;
@@ -344,7 +347,7 @@ export class UserInterface {
     // obsolete, keeping just in case
     public createEntityLabel(entity) {
         var rect1 = new Rectangle("player_nameplate_" + entity.sessionId);
-        rect1.isVisible = true;
+        rect1.isVisible = false;
         rect1.width = "200px";
         rect1.height = "40px";
         rect1.thickness = 0;
@@ -355,6 +358,25 @@ export class UserInterface {
         label.text = entity.name;
         label.color = "blue";
         label.fontWeight = "bold";
+        rect1.addControl(label);
+        return rect1;
+    }
+
+    // obsolete, keeping just in case
+    public createItemLabel(entity) {
+        var rect1 = new Rectangle("player_nameplate_" + entity.sessionId);
+        rect1.isVisible = true;
+        rect1.width = "200px";
+        rect1.height = "40px";
+        rect1.thickness = 0;
+        rect1.zIndex = this._namesUI.addControl(rect1);
+        rect1.linkWithMesh(entity.mesh);
+        rect1.linkOffsetY = -30;
+        var label = new TextBlock("player_nameplate_text_" + entity.sessionId);
+        label.text = entity.name;
+        label.color = "black";
+        label.fontWeight = "bold";
+        label.fontSize = "14px";
         rect1.addControl(label);
         return rect1;
     }

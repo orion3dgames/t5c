@@ -31,7 +31,7 @@ export class EntityActions {
     public playSound() {}
 
     public process(data, ability) {
-        console.log(ability);
+        //console.log(ability);
         /*
         let soundToPlay = this._scene.getSoundByName("sound_"+ability.key);
         if(!soundToPlay){

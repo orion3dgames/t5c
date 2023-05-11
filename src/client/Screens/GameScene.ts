@@ -45,6 +45,8 @@ export class GameScene {
     private players: Player[] = [];
     private items: Item[] = [];
 
+    private _entities: (Entity | Player | Item)[] = [];
+
     constructor() {}
 
     async createScene(app): Promise<void> {
@@ -167,7 +169,7 @@ export class GameScene {
 
     private async _initEvents() {
         // setup hud
-        this._ui = new UserInterface(this._scene, this._app.engine, this.room, this.chatRoom, this.entities, this._currentPlayer, this._loadedAssets);
+        this._ui = new UserInterface(this._scene, this._app.engine, this.room, this.chatRoom, this._entities, this._currentPlayer, this._loadedAssets);
 
         // setup input Controller
         this._input = new PlayerInput(this._scene, this.room, this._ui);
@@ -190,7 +192,7 @@ export class GameScene {
                 this._ui.setCurrentPlayer(_player);
 
                 // add to entities
-                this.players[sessionId] = _player;
+                this._entities[sessionId] = _player;
 
                 // player is load, let's hide the loading gui
                 this._app.engine.hideLoadingUI();
@@ -205,32 +207,40 @@ export class GameScene {
 
         // add non player entities
         this.room.state.entities.onAdd((entity, sessionId) => {
-            this.entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._loadedAssets);
+            this._entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._loadedAssets);
         });
 
-        // add non player entities
+        // add items entities
         this.room.state.items.onAdd((entity, sessionId) => {
-            this.items[sessionId] = new Item(entity, this.room, this._scene, this._ui, this._shadow, this._loadedAssets);
+            this._entities[sessionId] = new Item(entity, this.room, this._scene, this._ui, this._shadow, this._loadedAssets);
         });
-        this.room.state.items.onRemove((player, sessionId) => {
-            this.items[sessionId].remove();
-            delete this.items[sessionId];
-        });
+
+        /////////////////////////////////////////////////////////////
+        ////////////////////  REMOVING EVENTS  //////////////////
+        /////////////////////////////////////////////////////////////
 
         // when a player leaves the room event
         this.room.state.players.onRemove((player, sessionId) => {
-            if (this.players[sessionId]) {
-                this.players[sessionId].remove();
-                delete this.players[sessionId];
-            } else {
-                this.entities[sessionId].remove();
-                delete this.entities[sessionId];
+            if (this._entities[sessionId]) {
+                this._entities[sessionId].remove();
+                delete this._entities[sessionId];
             }
         });
-        // when a player leaves the room event
-        this.room.state.entities.onRemove((player, sessionId) => {
-            this.entities[sessionId].remove();
-            delete this.entities[sessionId];
+
+        // remove items entities
+        this.room.state.items.onRemove((item, sessionId) => {
+            if (this._entities[sessionId]) {
+                this._entities[sessionId].remove();
+                delete this._entities[sessionId];
+            }
+        });
+
+        // when a entity leaves the room event
+        this.room.state.entities.onRemove((entity, sessionId) => {
+            if (this._entities[sessionId]) {
+                this._entities[sessionId].remove();
+                delete this._entities[sessionId];
+            }
         });
         ////////////////////////////////////////////////////
 
@@ -243,23 +253,10 @@ export class GameScene {
             let delta = this._app.engine.getFps();
 
             // entities update
-            for (let sessionId in this.entities) {
-                const entity = this.entities[sessionId];
+            for (let sessionId in this._entities) {
+                const entity = this._entities[sessionId];
                 entity.update(delta);
                 entity.lod(this._currentPlayer);
-            }
-
-            // items update
-            for (let sessionId in this.items) {
-                const item = this.items[sessionId];
-                item.update(delta);
-                item.lod(this._currentPlayer);
-            }
-
-            // player update
-            for (let sessionId in this.players) {
-                const entity = this.players[sessionId];
-                entity.update(delta);
             }
 
             /////////////////
@@ -270,9 +267,11 @@ export class GameScene {
             let updateRate = Config.updateRate / 1000; // game is networked update every 100ms
             if (timePassed >= updateRate) {
                 // player uppdate at server rate
-                for (let sessionId in this.players) {
-                    const entity = this.players[sessionId];
-                    entity.updateServerRate(Config.updateRate);
+                for (let sessionId in this._entities) {
+                    const entity = this._entities[sessionId];
+                    if (entity) {
+                        entity.updateServerRate(Config.updateRate);
+                    }
                 }
 
                 // detect movement

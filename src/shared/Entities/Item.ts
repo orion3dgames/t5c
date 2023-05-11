@@ -30,6 +30,7 @@ export class Item {
     public sessionId;
     public mesh: AbstractMesh;
     public characterLabel: Rectangle;
+    public type: string = "";
 
     public name: string = "";
     public key: string;
@@ -39,7 +40,7 @@ export class Item {
     public rot: number;
     public quantity: number;
 
-    // 
+    //
     public meshData;
 
     // flags
@@ -54,6 +55,7 @@ export class Item {
         this._shadow = shadow;
         this.sessionId = entity.sessionId;
         this.entity = entity;
+        this.type = "item";
 
         // update player data from server data
         Object.assign(this, dataDB.get("item", entity.key));
@@ -67,16 +69,20 @@ export class Item {
 
     public async spawn(entity) {
         //
-        const box = MeshBuilder.CreateBox(this.entity.sessionId, {
-            width: this.meshData.width ?? 1, 
-            height: this.meshData.height ?? 1, 
-            depth: this.meshData.depth ?? 1, 
-        }, this._scene);
+        const box = MeshBuilder.CreateBox(
+            this.entity.sessionId,
+            {
+                width: this.meshData.width ?? 1,
+                height: this.meshData.height ?? 1,
+                depth: this.meshData.depth ?? 1,
+            },
+            this._scene
+        );
         box.visibility = 0;
 
         // set collision mesh
         this.mesh = box;
-        this.mesh.name = entity.key+"_box";
+        this.mesh.name = entity.key + "_box";
         this.mesh.isPickable = true;
         this.mesh.isVisible = true;
         this.mesh.checkCollisions = false;
@@ -84,8 +90,8 @@ export class Item {
         this.mesh.position = new Vector3(this.entity.x, this.entity.y, this.entity.z);
 
         // offset mesh from the ground
-        this.y = this.y + (this.meshData.height / 2);
-        this.mesh.rotation = new Vector3(0, randomNumberInRange(0,360), 0);
+        this.y = this.y + this.meshData.height / 2;
+        this.mesh.rotation = new Vector3(0, randomNumberInRange(0, 360), 0);
 
         this.mesh.metadata = {
             sessionId: this.entity.sessionId,
@@ -95,11 +101,11 @@ export class Item {
         };
 
         // load player mesh
-        const result = await this._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene(name => "instance_" + this.entity.sessionId);
+        const result = await this._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene((name) => "instance_" + this.entity.sessionId);
         const playerMesh = result.rootNodes[0];
 
         // set initial player scale & rotation
-        playerMesh.name = entity.key+"_mesh";
+        playerMesh.name = entity.key + "_mesh";
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
         playerMesh.scaling = new Vector3(this.meshData.scale, this.meshData.scale, this.meshData.scale);
         playerMesh.isPickable = true;
@@ -158,10 +164,12 @@ export class Item {
 
         //////////////////////////////////////////////////////////////////////////
         // misc
-        //this.characterLabel = this.ui.createEntityLabel(this);
+        this.characterLabel = this.ui.createItemLabel(this);
+        this.characterLabel.isVisible = false;
     }
 
     public update(delta) {}
+    public updateServerRate(delta) {}
 
     // basic performance (only enable entities in a range around the player)
     public lod(_currentPlayer) {
@@ -185,12 +193,11 @@ export class Item {
     }
 
     public remove() {
-        if(this.characterLabel){
+        if (this.characterLabel) {
             this.characterLabel.dispose();
         }
-        if(this.mesh){
+        if (this.mesh) {
             this.mesh.dispose();
         }
     }
-        
 }

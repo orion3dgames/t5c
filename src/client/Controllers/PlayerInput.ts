@@ -17,6 +17,7 @@ export class PlayerInput {
     // moving
     public left_click: boolean;
     public right_click: boolean;
+    public mouse_moving: boolean = false;
 
     // moving
     public player_can_move: boolean = false;
@@ -54,6 +55,7 @@ export class PlayerInput {
                     this.right_click = false;
                 }
                 this.player_can_move = false;
+                this.mouse_moving = false;
             }
 
             if (pointerInfo.type === PointerEventTypes.POINTERMOVE) {
@@ -65,8 +67,9 @@ export class PlayerInput {
                     this._updateFromMouse(pointerInfo);
                 }
                 if (this.right_click) {
+                    this.mouse_moving = true;
                     this.movementX = pointerInfo.event.movementX / 100;
-                    this.movementY = pointerInfo.event.movementY / 100;
+                    this.movementX = pointerInfo.event.movementX / 100;
                 }
             }
         });

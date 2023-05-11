@@ -67,6 +67,7 @@ export class Entity {
     public location: string = "";
     public anim_state: number = EntityCurrentState.IDLE;
     public AI_CURRENT_STATE: number = 0;
+    public isDead: boolean = false;
 
     //
     public abilities = [];
@@ -94,6 +95,7 @@ export class Entity {
         this.sessionId = entity.sessionId; // network id from colyseus
         this.isCurrentPlayer = this._room.sessionId === entity.sessionId;
         this.entity = entity;
+        this.type = "entity";
 
         // update player data from server data
         Object.assign(this, dataDB.get("race", entity.race));
@@ -172,9 +174,12 @@ export class Entity {
         if (this.AI_CURRENT_STATE === AI_STATE.WANDER) {
             this.debugMesh.material = this._scene.getMaterialByName("debug_entity_neutral");
         }
-
-        if(this.type !== 'player' && this.anim_state === EntityCurrentState.DEAD){
-            
+        if (this.type !== "player" && this.anim_state === EntityCurrentState.DEAD && !this.isDead) {
+            console.log("DEAD");
+            this.isDead = true;
+            global.T5C.selectedEntity = null;
+            this.meshController.selectedMesh.isVisible = false;
+            this.meshController.mesh.actionManager.dispose();
         }
 
         // tween entity
@@ -182,6 +187,8 @@ export class Entity {
             this.moveController.tween();
         }
     }
+
+    public updateServerRate(delta) {}
 
     // basic performance (only enable entities in a range around the player)
     public lod(_currentPlayer) {

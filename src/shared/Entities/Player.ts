@@ -53,10 +53,12 @@ export class Player extends Entity {
 
         this._auth = AuthController.getInstance();
 
-        this.spawnPlayer();
+        this.type = "player";
+
+        this.spawnPlayer(input);
     }
 
-    private async spawnPlayer() {
+    private async spawnPlayer(input) {
         //spawn
         this.utilsController = new EntityUtils(this._scene, this._room);
         this.cameraController = new PlayerCamera(this._scene, this._input);
