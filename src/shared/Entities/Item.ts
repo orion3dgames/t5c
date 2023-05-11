@@ -165,7 +165,6 @@ export class Item {
         //////////////////////////////////////////////////////////////////////////
         // misc
         this.characterLabel = this.ui.createItemLabel(this);
-        this.characterLabel.isVisible = false;
     }
 
     public update(delta) {}

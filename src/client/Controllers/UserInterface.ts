@@ -347,7 +347,7 @@ export class UserInterface {
     // obsolete, keeping just in case
     public createEntityLabel(entity) {
         var rect1 = new Rectangle("player_nameplate_" + entity.sessionId);
-        rect1.isVisible = false;
+        rect1.isVisible = true;
         rect1.width = "200px";
         rect1.height = "40px";
         rect1.thickness = 0;
