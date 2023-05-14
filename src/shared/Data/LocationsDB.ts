@@ -27,7 +27,7 @@ let LocationsDB = {
             z: -2.51,
             rot: -180,
         },
-        monsters: 0,
+        monsters: 5,
         waterPlane: false,
         skyColor: 0,
     },
