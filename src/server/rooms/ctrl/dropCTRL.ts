@@ -50,9 +50,9 @@ export class dropCTRL {
         let goldGains = target.goldGain;
         if (goldGains.min && goldGains.max) {
             let gold = Math.floor(randomNumberInRange(goldGains.min, goldGains.max));
-            this._owner.gold += gold;
+            this._owner.player_data.gold += gold;
 
-            Logger.info(`[gameroom][addGold] player has gained ${gold} gold, total: ${this._owner.gold}`);
+            Logger.info(`[gameroom][addGold] player has gained ${gold} gold, total: ${this._owner.player_data.gold}`);
 
             // inform player
             this._client.send("notification", {

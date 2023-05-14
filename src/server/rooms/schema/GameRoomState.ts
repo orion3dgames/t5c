@@ -180,6 +180,7 @@ export class GameRoomState extends Schema {
             intelligence: 20,
             wisdom: 20,
             experience: data.experience ?? 0,
+            gold: data.gold ?? 0,
         };
 
         let player = {

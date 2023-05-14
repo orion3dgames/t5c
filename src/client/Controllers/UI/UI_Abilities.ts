@@ -50,6 +50,7 @@ export class UI_Abilities {
         );
         abilityMainPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         abilityMainPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        abilityMainPanel.isPointerBlocker = true;
         this._playerUI.addControl(abilityMainPanel);
 
         const paddingPanel = new Rectangle("paddingPanel");

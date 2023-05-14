@@ -8,7 +8,7 @@ import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 
-import { UI_Chats, UI_Abilities, UI_Debug, UI_EntitySelected, UI_Panel, UI_Tooltip } from "./UI";
+import { UI_Chats, UI_Abilities, UI_Debug, UI_EntitySelected, UI_Inventory, UI_Tooltip } from "./UI";
 
 import { Room } from "colyseus.js";
 import State from "../Screens/Screens";
@@ -41,7 +41,7 @@ export class UserInterface {
     private _UIDebug: UI_Debug;
     private _UITargetSelected: UI_EntitySelected;
     private _UIPlayerSelected: UI_EntitySelected;
-    private _UIPanel: UI_Panel;
+    private _UIInventory: UI_Inventory;
 
     // experience bar
     private experienceBarUI;
@@ -112,29 +112,30 @@ export class UserInterface {
         });
 
         // create panel
-        this._UIPanel = new UI_Panel(this, currentPlayer);
+        //this._UIPanel = new UI_Panel(this, currentPlayer);
+        this._UIInventory = new UI_Inventory(this, currentPlayer);
 
         // create tooltip
         this._UITooltip = new UI_Tooltip(this, currentPlayer);
 
         // some ui must be constantly refreshed as things change
         this._scene.registerBeforeRender(() => {
-            // refresh
-            //this._refreshDebugPanel(debugTextUI);
             this.refreshEntityUI();
         });
     }
 
     public refreshEntityUI() {
         
+        // update level text
         if (this._currentPlayer) {
             let player_experience = this._currentPlayer.player_data.experience;
             let progress = Leveling.getLevelProgress(player_experience);
             this.experienceBarUI.width = progress / 100;
             this.experienceBarTextRight.text = progress + "%";
-            this.experienceBarTextLeft.text = player_experience+ "/"+Leveling.getTotalLevelXp(this._currentPlayer.level);
+            this.experienceBarTextLeft.text = player_experience.toLocaleString()+ " / "+Leveling.getTotalLevelXp(this._currentPlayer.level).toLocaleString()+" EXP";
         }
 
+        // hide entity labels if out of distance
         for(let sessionId in this._entities){
             let entity = this._entities[sessionId];
             if(entity && entity.mesh && entity.mesh.isEnabled()){
@@ -142,14 +143,8 @@ export class UserInterface {
             }else{
                 entity.characterLabel.isVisible = false;
             }
-            /*
-            let player = this._entities[sessionId];
-            // update player color outline
-            let mesh = player.playerMesh.getChildMeshes()[0];
-            if(mesh){
-                mesh.outlineColor = Color3.FromHexString(getHealthColorFromValue(player.health));
-            }*/
-        } 
+        }
+
     }
 
     public experienceBar() {
@@ -307,8 +302,8 @@ export class UserInterface {
         });
     }
 
-    public openTab(tab: string = "inventory") {
-        this._UIPanel.open(tab);
+    public openTab() {
+        this._UIInventory.open();
     }
 
     // create misc stuff

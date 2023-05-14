@@ -105,7 +105,7 @@ export class PlayerInput {
                         this.digit_pressed = 9;
                     }
                     if (kbInfo.event.code === "KeyI") {
-                        this._ui.openTab("inventory");
+                        //this._ui.openTab("inventory");
                     }
                     break;
             }

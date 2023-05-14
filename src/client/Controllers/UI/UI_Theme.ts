@@ -25,6 +25,8 @@ const generatePanel = function (
     panel.background = bg;
     panel.color = "rgba(0,0,0,1)";
 
+    console.log('DEBUG', panel.verticalAlignment, vertical_position, Control.VERTICAL_ALIGNMENT_TOP)
+
     return panel;
 };
 

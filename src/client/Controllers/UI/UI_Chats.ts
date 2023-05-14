@@ -58,6 +58,7 @@ export class UI_Chats {
         );
         chatPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         chatPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        chatPanel.isPointerBlocker = true;
         this._playerUI.addControl(chatPanel);
 
         const paddingPanel = new Rectangle("paddingPanel");

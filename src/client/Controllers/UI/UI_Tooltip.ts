@@ -42,8 +42,9 @@ export class UI_Tooltip {
         tooltipBar.left = "0px";
         tooltipBar.top = "0px";
         tooltipBar.width = "150px";
-        tooltipBar.thickness = 1;
-        tooltipBar.background = Config.UI_CENTER_PANEL_BG;
+        tooltipBar.thickness = 2;
+        tooltipBar.background = "rgba(0,0,0,1)";
+        tooltipBar.color = "#000000";
         tooltipBar.isVisible = false;
         tooltipBar.adaptHeightToChildren = true;
         tooltipBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
