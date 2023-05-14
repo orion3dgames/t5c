@@ -52,7 +52,7 @@ export class UI_EntitySelected {
             Control.HORIZONTAL_ALIGNMENT_LEFT,
             Control.VERTICAL_ALIGNMENT_TOP,
             panelWidth+"px;",
-            "55px",
+            "62px",
             "15px",
             leftMargin+"px",
         );

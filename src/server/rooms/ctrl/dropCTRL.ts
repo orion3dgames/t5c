@@ -21,13 +21,13 @@ export class dropCTRL {
 
         // does player level up?
         let doesLevelUp = false;
-        if (Leveling.doesPlayerlevelUp(this._owner.level, this._owner.experience, amount)) {
+        if (Leveling.doesPlayerlevelUp(this._owner.level, this._owner.player_data.experience, amount)) {
             doesLevelUp = true;
         }
 
         // add experience to player
-        this._owner.experience += amount;
-        this._owner.level = Leveling.convertXpToLevel(this._owner.experience);
+        this._owner.player_data.experience += amount;
+        this._owner.level = Leveling.convertXpToLevel(this._owner.player_data.experience);
         Logger.info(`[gameroom][addExperience] player has gained ${amount} experience`);
 
         if (doesLevelUp) {

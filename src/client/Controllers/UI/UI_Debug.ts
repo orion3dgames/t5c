@@ -5,6 +5,7 @@ import { countPlayers, roundTo } from "../../../shared/Utils";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { Button } from "@babylonjs/gui/2D/controls/button";
+import { generatePanel } from "./UI_Theme";
 
 export class UI_Debug {
 
@@ -51,16 +52,19 @@ export class UI_Debug {
 
     _createUI(){
  
-        // add stack panel
-        const debugPanel = new Rectangle("debugPanel");
-        debugPanel.top = "90px;"
-        debugPanel.left = "15px;"
-        debugPanel.width = "190px;"
-        debugPanel.adaptHeightToChildren = true;
-        debugPanel.background = "rgba(0,0,0,.5)";
+        const debugPanel = generatePanel(
+            "debugPanel",
+            Control.HORIZONTAL_ALIGNMENT_CENTER,
+            Control.VERTICAL_ALIGNMENT_TOP,
+            "120px;",
+            "90px",
+            "15px", 
+            "-15px",
+        );
         debugPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        debugPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        debugPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         this._playerUI.addControl(debugPanel);
+
 
         const debugText = new TextBlock("debugText");
         debugText.color = "#FFF";
@@ -69,39 +73,32 @@ export class UI_Debug {
         debugText.fontSize = "12px;";
         debugText.resizeToFit = true;
         debugText.text = "TEXT";
-        debugText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        debugText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         debugText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         debugText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         debugText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         debugPanel.addControl(debugText);
         this._debugTextUI = debugText;
 
-        //reset position button
-        const resetButton = Button.CreateSimpleButton("resetButton", "Reset Position");
-        resetButton.top = "160px;";
-        resetButton.left = "15px;";
-        resetButton.width = "190px;";
-        resetButton.height = "30px";
-        resetButton.color = "white";
-        resetButton.background = "#000";
-        resetButton.thickness = 1;
-        resetButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        resetButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        this._playerUI.addControl(resetButton);
-        resetButton.onPointerDownObservable.add(() => {
-            this._gameRoom.send("reset_position");
-        });
-
     }
 
     // debug panel refresh
     private _update(){
+
+        let entityCount = countPlayers(this._entities);
+        let count = 0;
+        for (let index in this._entities) {
+            const element = this._entities[index];
+            if(element.mesh && element.mesh.isEnabled()){
+                count += 1;
+            }
+        }
         
         let locationText = "";
-        locationText += "Total Entities: "+(countPlayers(this._entities) + 1)+" \n";
+        locationText += "Total Entities: "+entityCount+" \n";
+        locationText += "Visible Entities: "+count+" \n";
         locationText += "FPS: "+roundTo(this._engine.getFps(), 0)+" \n";
         locationText += "Ping: "+this.ping+"ms\n";
-        locationText += "Gold: "+this._currentPlayer.gold+"\n";
         this._debugTextUI.text = locationText;
     }
 

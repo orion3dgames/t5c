@@ -20,7 +20,8 @@ import { Entity } from "../../shared/Entities/Entity";
 import { Player } from "../../shared/Entities/Player";
 import { Item } from "../../shared/Entities/Item";
 
-import { getBg } from "./UI/UI_Theme";
+import { generatePanel, getBg } from "./UI/UI_Theme";
+import { Grid, StackPanel } from "@babylonjs/gui";
 
 export class UserInterface {
     private _scene: Scene;
@@ -44,7 +45,8 @@ export class UserInterface {
 
     // experience bar
     private experienceBarUI;
-    private experienceBarUIText;
+    private experienceBarTextLeft;
+    private experienceBarTextRight;
 
     // casting bar
     public _UICastingTimer;
@@ -81,13 +83,7 @@ export class UserInterface {
         this.experienceBar();
         this.castingBar();
         this.createRevivePanel();
-
-        // some ui must be constantly refreshed as things change
-        this._scene.registerBeforeRender(() => {
-            // refresh
-            //this._refreshDebugPanel(debugTextUI);
-            this.refreshEntityUI();
-        });
+    
     }
 
     // set current player
@@ -120,35 +116,52 @@ export class UserInterface {
 
         // create tooltip
         this._UITooltip = new UI_Tooltip(this, currentPlayer);
+
+        // some ui must be constantly refreshed as things change
+        this._scene.registerBeforeRender(() => {
+            // refresh
+            //this._refreshDebugPanel(debugTextUI);
+            this.refreshEntityUI();
+        });
     }
 
     public refreshEntityUI() {
+        
         if (this._currentPlayer) {
-            let progress = Leveling.getLevelProgress(this._currentPlayer.experience);
+            let player_experience = this._currentPlayer.player_data.experience;
+            let progress = Leveling.getLevelProgress(player_experience);
             this.experienceBarUI.width = progress / 100;
-            this.experienceBarUIText.text = progress + "%";
+            this.experienceBarTextRight.text = progress + "%";
+            this.experienceBarTextLeft.text = player_experience+ "/"+Leveling.getTotalLevelXp(this._currentPlayer.level);
         }
 
-        /*
         for(let sessionId in this._entities){
+            let entity = this._entities[sessionId];
+            if(entity && entity.mesh && entity.mesh.isEnabled()){
+                entity.characterLabel.isVisible = true;
+            }else{
+                entity.characterLabel.isVisible = false;
+            }
+            /*
             let player = this._entities[sessionId];
             // update player color outline
             let mesh = player.playerMesh.getChildMeshes()[0];
             if(mesh){
                 mesh.outlineColor = Color3.FromHexString(getHealthColorFromValue(player.health));
-            }
-        } */
+            }*/
+        } 
     }
 
     public experienceBar() {
         /////////////////////////////////////
         //////////////////// mana bar
         const experienceBar = new Rectangle("experienceBar");
-        experienceBar.top = "00px;";
+        experienceBar.top = "2px;";
         experienceBar.left = "0px";
         experienceBar.width = 1;
         experienceBar.height = "20px";
-        experienceBar.thickness = 0;
+        experienceBar.thickness = 2;
+        experienceBar.color = "rgba(0,0,0,1)";
         experienceBar.background = getBg();
         experienceBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         experienceBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
@@ -159,26 +172,55 @@ export class UserInterface {
         experienceBarInside.left = "0px;";
         experienceBarInside.width = "400px;";
         experienceBarInside.thickness = 0;
-        experienceBarInside.height = "10px";
+        experienceBarInside.height = "20px";
         experienceBarInside.background = "violet";
         experienceBarInside.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         experienceBarInside.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         experienceBar.addControl(experienceBarInside);
         this.experienceBarUI = experienceBarInside;
 
-        const experienceBarText = new TextBlock("experienceBarText");
-        experienceBarText.text = "0";
-        experienceBarText.color = "#FFF";
-        experienceBarText.top = "2px";
-        experienceBarText.left = "5px";
-        experienceBarText.fontSize = "8px;";
-        experienceBarText.lineSpacing = "-1px";
-        experienceBarText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        experienceBarText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-        experienceBarText.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-        experienceBarText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        experienceBar.addControl(experienceBarText);
-        this.experienceBarUIText = experienceBarText;
+        const experienceBarTextRight = new TextBlock("experienceBarTextRight");
+        experienceBarTextRight.text = "0";
+        experienceBarTextRight.color = "#FFF";
+        experienceBarTextRight.top = "0px";
+        experienceBarTextRight.left = "-5px";
+        experienceBarTextRight.fontSize = "11px;";
+        experienceBarTextRight.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        experienceBarTextRight.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        experienceBarTextRight.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        experienceBarTextRight.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        experienceBar.addControl(experienceBarTextRight);
+        this.experienceBarTextRight = experienceBarTextRight;
+
+        const experienceBarTextLeft = new TextBlock("experienceBarTextLeft");
+        experienceBarTextLeft.text = "0";
+        experienceBarTextLeft.color = "#FFF";
+        experienceBarTextLeft.top = "1px";
+        experienceBarTextLeft.left = "5px";
+        experienceBarTextLeft.fontSize = "11px;";
+        experienceBarTextLeft.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        experienceBarTextLeft.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        experienceBarTextLeft.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        experienceBarTextLeft.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        experienceBar.addControl(experienceBarTextLeft);
+        this.experienceBarTextLeft = experienceBarTextLeft;
+
+        // bars
+        for (let i = 0; i <= 9; i++) {
+            if(i!== 0){
+                let expBar = new Rectangle("expBar"+i);
+                expBar.top = 0;
+                expBar.left = 0.1 * i * 100+"%";
+                expBar.top = "6px";
+                expBar.width = "2px";
+                expBar.height = "22px";
+                expBar.thickness = 0;
+                expBar.background = "white";
+                expBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+                expBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+                experienceBar.addControl(expBar);
+            }
+        }
     }
 
     public castingBar() {
@@ -272,33 +314,61 @@ export class UserInterface {
     // create misc stuff
     ////////////////////////////
     public createMisc() {
-        const inventoryButton = Button.CreateSimpleButton("inventoryButton", "I");
-        inventoryButton.top = "-150px;";
-        inventoryButton.left = "-190px;";
-        inventoryButton.width = "30px;";
+
+        const grid = new Grid('griddddd');
+        grid.top = "-110px";
+        grid.width = "460px";
+        grid.height = "36px;"
+        grid.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        grid.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        grid.addColumnDefinition(100, true);
+        grid.addColumnDefinition(100, true);
+        grid.addColumnDefinition(100, true);
+        grid.addColumnDefinition(100, true);
+        this._playerUI.addControl(grid);
+
+        /// 
+        const inventoryButton = Button.CreateSimpleButton("inventoryButton", "Inventory");
+        inventoryButton.top = "0;";
+        inventoryButton.left = "0px;";
+        inventoryButton.width = "100px";
         inventoryButton.height = "30px";
         inventoryButton.color = "white";
-        inventoryButton.background = "#000";
+        inventoryButton.background = getBg();
         inventoryButton.thickness = 1;
-        inventoryButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         inventoryButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        this._playerUI.addControl(inventoryButton);
+        grid.addControl(inventoryButton, 0, 0);
+
         inventoryButton.onPointerDownObservable.add(() => {
             this.openTab();
         });
 
+        //reset position button
+        const resetButton = Button.CreateSimpleButton("resetButton", "Unstuck");
+        resetButton.top = "0px;";
+        resetButton.left = "0px;";
+        resetButton.width = "100px;";
+        resetButton.height = "30px";
+        resetButton.color = "white";
+        resetButton.background = getBg();
+        resetButton.thickness = 1;
+        resetButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        grid.addControl(resetButton, 0, 2);
+        resetButton.onPointerDownObservable.add(() => {
+            this._gameRoom.send("reset_position");
+        });
+
         // add a quit button
-        const quitButton = Button.CreateSimpleButton("quitButton", "Q");
-        quitButton.top = "-150px;";
-        quitButton.left = "190px;";
-        quitButton.width = "30px;";
+        const quitButton = Button.CreateSimpleButton("quitButton", "Quit");
+        quitButton.top = "0px;";
+        quitButton.left = "0px;";
+        quitButton.width = "100px;";
         quitButton.height = "30px";
         quitButton.color = "white";
-        quitButton.background = "#000";
+        quitButton.background = getBg();
         quitButton.thickness = 1;
-        quitButton.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         quitButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        this._playerUI.addControl(quitButton);
+        grid.addControl(quitButton, 0, 3);
 
         quitButton.onPointerDownObservable.add(() => {
             this._gameRoom.leave();

@@ -10,7 +10,7 @@ const generatePanel = function (
     top = "0px",
     left = "0px",
     bg = getBg(),
-    thickness = 0,
+    thickness = 3,
     cornerRadius = 2,
 ) {
     const panel:Rectangle = new Rectangle("panel-"+panelName);
@@ -23,6 +23,7 @@ const generatePanel = function (
     panel.thickness = thickness;
     panel.cornerRadius = cornerRadius;
     panel.background = bg;
+    panel.color = "rgba(0,0,0,1)";
 
     return panel;
 };

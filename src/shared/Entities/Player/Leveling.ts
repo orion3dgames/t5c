@@ -20,6 +20,16 @@ const LEVEL_EXPERIENCE = [
 ];
 
 export class Leveling {
+
+    /**
+     * convert experience to level (eg: 500 xp would return level 1)
+     * @param experience
+     * @returns level number
+     */
+    public static getTotalLevelXp(currentLevel: number): number {
+        return LEVEL_EXPERIENCE[currentLevel];
+    }
+
     /**
      * convert experience to level (eg: 500 xp would return level 1)
      * @param experience

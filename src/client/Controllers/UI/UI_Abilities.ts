@@ -46,7 +46,7 @@ export class UI_Abilities {
             "470px;",
             "62px",
             "-35px",
-            "15px"
+            "0px"
         );
         abilityMainPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         abilityMainPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
@@ -72,9 +72,10 @@ export class UI_Abilities {
         
         for (let i = 1; i <= this.abylity_number; i++) {
             // calculate responsive width and height
-            let iconGutter = 2;
-            let iconWidth = width / this.abylity_number;
-            let leftMargin = i > 1 ? (i - 1) * iconWidth + iconGutter + "px" : "0px";
+            let iconGutter = 4;
+            let iconWidth = width / this.abylity_number - iconGutter;
+            let iconLeft =  iconWidth +iconGutter;
+            let leftMargin = i > 1 ? (i - 1) * iconLeft + "px" : "0px";
 
             // container
             var headlineRect = new Rectangle("ability_" + i);
@@ -83,39 +84,12 @@ export class UI_Abilities {
             headlineRect.width = iconWidth + "px";
             headlineRect.height = iconWidth + "px";
             headlineRect.thickness = 0;
-            headlineRect.background = getBg();
+            headlineRect.background = "rgba(255,255,255,.2)";
             headlineRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             headlineRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             abilityPanel.addControl(headlineRect);
 
-            // add ability number
-            var roomTxt = new TextBlock("ability_text_" + i);
-            roomTxt.paddingLeft = "5px";
-            roomTxt.text = "" + i;
-            roomTxt.fontSize = "12px";
-            roomTxt.color = "#FFF";
-            roomTxt.top = "5px";
-            roomTxt.left = "0px";
-            roomTxt.width = "20px";
-            roomTxt.height = "15px";
-            roomTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-            roomTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-            headlineRect.addControl(roomTxt);
-
-            // add cooldown
-            // container
-            var abilityCooldown = new Rectangle("ability_" + i + "_cooldown");
-            abilityCooldown.top = 0;
-            abilityCooldown.left = 0;
-            abilityCooldown.width = iconWidth + "px";
-            abilityCooldown.height = 0;
-            abilityCooldown.thickness = 0;
-            abilityCooldown.isVisible = true;
-            abilityCooldown.zIndex = 1;
-            abilityCooldown.background = "rgba(0,0,0,.7)";
-            abilityCooldown.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-            abilityCooldown.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-            headlineRect.addControl(abilityCooldown);
+            
 
             abilityRect[i] = headlineRect;
         }
@@ -133,6 +107,9 @@ export class UI_Abilities {
     }
 
     addAbilityIcon(digit, ability, headlineRect: Rectangle) {
+
+        
+
         var imageData = this._loadedAssets[ability.icon];
         var img = new Image("ability_image_" + digit, imageData);
         img.stretch = Image.STRETCH_FILL;
@@ -156,6 +133,36 @@ export class UI_Abilities {
                 });
             }
         });
+
+        // add ability number
+        var roomTxt = new TextBlock("ability_text_" + digit);
+        roomTxt.paddingLeft = "5px";
+        roomTxt.text = "" + digit;
+        roomTxt.fontSize = "12px";
+        roomTxt.color = "#FFF";
+        roomTxt.top = "5px";
+        roomTxt.left = "0px";
+        roomTxt.width = "20px";
+        roomTxt.height = "15px";
+        roomTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        roomTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        headlineRect.addControl(roomTxt);
+
+
+        // add cooldown
+        // container
+        var abilityCooldown = new Rectangle("ability_" + digit + "_cooldown");
+        abilityCooldown.top = 0;
+        abilityCooldown.left = 0;
+        abilityCooldown.width = 1;
+        abilityCooldown.height = 0;
+        abilityCooldown.thickness = 0;
+        abilityCooldown.isVisible = true;
+        abilityCooldown.zIndex = 1;
+        abilityCooldown.background = "rgba(0,0,0,.7)";
+        abilityCooldown.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        abilityCooldown.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        headlineRect.addControl(abilityCooldown);
     }
 
     showTooltip(ability, headlineRect) {
