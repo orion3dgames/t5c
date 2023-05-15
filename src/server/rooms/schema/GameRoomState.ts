@@ -16,6 +16,7 @@ import Config from "../../../shared/Config";
 
 export class GameRoomState extends Schema {
     // networked variables
+    /*
     @filterChildren(function (client, key, value: PlayerState, root) {
         const isSelf = value.name === client.sessionId;
         const player = (this as GameRoomState).players.get(client.sessionId);
@@ -23,7 +24,7 @@ export class GameRoomState extends Schema {
         const isWithinZBounds = Math.abs(player.z - value.z) < Config.PLAYER_VIEW_DISTANCE;
         const isWithinBounds = isWithinXBounds && isWithinZBounds;
         return isSelf || isWithinBounds;
-    })
+    })*/
     @type({ map: EnemyState })
     entities = new MapSchema<EnemyState>();
 
