@@ -1,139 +1,75 @@
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { Image } from "@babylonjs/gui/2D/controls/image";
-import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
-import { Button } from "@babylonjs/gui/2D/controls/button";
+import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Control } from "@babylonjs/gui/2D/controls/control";
-import Config from "../../../shared/Config";
 import { Grid } from "@babylonjs/gui/2D/controls/grid";
-import { dataDB } from "../../../shared/Data/dataDB";
-import { Item } from "../../../shared/Data/ItemDB";
-import { UI_Tooltip } from "./UI_Tooltip";
-import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
-import { generatePanel } from "./UI_Theme";
+import { dataDB } from "../../../../shared/Data/dataDB";
+import { Item } from "../../../../shared/Data/ItemDB";
+import { Panel } from "./Panel";
 
-export class UI_Inventory {
-    private _UI;
-    private _playerUI;
-    private _gameRoom;
-    private _UITooltip: UI_Tooltip;
-    private _scene;
-    private _currentPlayer;
-    private _loadedAssets;
-    private _options;
-
+export class Panel_Abilities extends Panel {
     // inventory tab
     private panel: Rectangle;
     private _inventoryGrid: Rectangle[] = [];
     private _goldUI: TextBlock;
 
-    constructor(
-        _UI,
-        _currentPlayer
-    ) {
-        //
-        this._UI = _UI;
-        this._playerUI = _UI._playerUI;
-        this._UITooltip = _UI._UITooltip;
-        this._loadedAssets = _UI._loadedAssets;
-        this._gameRoom = _UI._gameRoom;
-        this._scene = _UI._scene;
-        this._currentPlayer = _currentPlayer;
+    public sceneRendered = false;
 
-        //
-        this._createUI();
+    constructor(_UI, _currentPlayer, options) {
+        super(_UI, _currentPlayer, options);
+
+        this.createContent();
 
         // dynamic events
         let entity = this._currentPlayer.entity;
         if (entity) {
             entity.inventory.onAdd((item, sessionId) => {
-                this.refreshItems();
+                this.refresh();
             });
             entity.inventory.onRemove((item, sessionId) => {
-                this.refreshItems();
+                this.refresh();
             });
             entity.inventory.onChange((item, sessionId) => {
-                this.refreshItems();
+                this.refresh();
             });
         }
 
         // some ui must be constantly refreshed as things change
-        this._scene.registerBeforeRender(() => {
+        this._scene.registerAfterRender(() => {
             // refresh
-            this._update();
+            if (!this.sceneRendered) {
+                this.createContent();
+            }
+            this.sceneRendered = true;
+
+            this.update();
         });
     }
 
     // open panel
     public open() {
-        this.refreshItems();
-        this.panel.isVisible = true;
-    }
-
-    // close panel
-    public close() {
-        this.panel.isVisible = false;
+        super.open();
+        this.refresh();
     }
 
     // refresh panel
-    private _update() {
-        if(this._currentPlayer){
-            this._goldUI.text = "Gold: "+this._currentPlayer.player_data.gold;
-        }  
+    public update() {
+        super.update();
+        if (this._currentPlayer) {
+            this._goldUI.text = "Gold: " + this._currentPlayer.player_data.gold;
+        }
     }
 
     // create panel
-    private _createUI() {
+    private createContent() {
+        let panel: Rectangle = this._panelContent;
 
-        const panel = generatePanel(
-            "chatPanel",
-            Control.HORIZONTAL_ALIGNMENT_LEFT,
-            Control.VERTICAL_ALIGNMENT_BOTTOM,
-            "246px;",
-            "300px",
-            "-30px",
-            "-15px"
-        );
-        panel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        panel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        panel.isPointerBlocker = true;
-        this._playerUI.addControl(panel);
-        this.panel = panel;
-
-        // panel title 
-        var panelTitle = new TextBlock("panelTitle");
-        panelTitle.text = "Inventory";
-        panelTitle.fontSize = "12px";
-        panelTitle.color = "#FFFFFF";
-        panelTitle.top = "5px";
-        panelTitle.left = "5px";
-        panelTitle.fontSize = "18px";
-        panelTitle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        panelTitle.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        panelTitle.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        panelTitle.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        panel.addControl(panelTitle);
-
-        // close button
-        const mainPanelClose = Button.CreateSimpleButton("mainPanelClose", "X");
-        mainPanelClose.width = "20px";
-        mainPanelClose.height = "20px";
-        mainPanelClose.color = "white";
-        mainPanelClose.top = "5px";
-        mainPanelClose.left = "-5px";
-        mainPanelClose.thickness = 1;
-        mainPanelClose.background = "black";
-        mainPanelClose.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        mainPanelClose.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        panel.addControl(mainPanelClose);
-
-        // on click send
-        mainPanelClose.onPointerDownObservable.add(() => {
-            this.close();
+        // if already exists
+        panel.children.forEach((el) => {
+            el.dispose();
         });
 
-        //////////////////////////////////////////
-
-        // panel title 
+        // panel title
         var goldTitle = new TextBlock("goldTitle");
         goldTitle.text = "Gold: 0";
         goldTitle.fontSize = "12px";
@@ -155,18 +91,21 @@ export class UI_Inventory {
         let inventoryGrid = new Rectangle("inventoryGrid");
         inventoryGrid.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         inventoryGrid.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        inventoryGrid.left = "5px";
-        inventoryGrid.top = "32px";
+        inventoryGrid.left = "0px";
+        inventoryGrid.top = "0px";
         inventoryGrid.width = 1;
         inventoryGrid.height = 1;
         inventoryGrid.thickness = 0;
         panel.addControl(inventoryGrid);
 
+        let panelWidth = panel.widthInPixels;
         let inventorySpace = 25;
         let inventorySpaceW = 5;
-        let size = 47;
+        let size = panelWidth / 5;
         let inventorySpaceCols = inventorySpaceW;
         let inventorySpaceRows = inventorySpace / inventorySpaceW;
+
+        console.log(panelWidth, inventorySpace, inventorySpaceW, size, inventorySpaceCols, inventorySpaceRows);
 
         let grid = new Grid();
         grid.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
@@ -208,17 +147,13 @@ export class UI_Inventory {
         }
 
         //
-        this.refreshItems();
-
+        this.refresh();
     }
 
     ///////////////////////////////////////
     ///////////////////////////////////////
     // INVENTORY PANEL
-    public refreshItems() {
-
-        console.log('refreshItems');
-
+    public refresh() {
         let i = 0;
         this._currentPlayer.inventory.forEach((element) => {
             let child = this._inventoryGrid[i];
@@ -226,12 +161,12 @@ export class UI_Inventory {
 
             // dispose
             console.log(child);
-            if(child.children){
-                child.children.forEach((el)=>{
+            if (child.children) {
+                child.children.forEach((el) => {
                     el.dispose();
-                })
+                });
             }
-        
+
             // on hover tooltip
             child.onPointerEnterObservable.add(() => {
                 //console.log("HOVER IN", item.key, this);

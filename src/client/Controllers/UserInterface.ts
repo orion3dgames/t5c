@@ -8,7 +8,7 @@ import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 
-import { UI_Chats, UI_Abilities, UI_Debug, UI_EntitySelected, UI_Inventory, UI_Tooltip } from "./UI";
+import { UI_Chats, UI_Abilities, UI_Debug, UI_EntitySelected, UI_Tooltip, Panel_Inventory, Panel_Abilities, Panel_Character } from "./UI";
 
 import { Room } from "colyseus.js";
 import State from "../Screens/Screens";
@@ -36,12 +36,18 @@ export class UserInterface {
     public _playerUI;
     private _namesUI;
     private _centerUI;
+
+    // interface
     public _UIChat: UI_Chats;
-    private _UIAbilities: UI_Abilities;
     private _UIDebug: UI_Debug;
+    private _UIAbilities: UI_Abilities;
     private _UITargetSelected: UI_EntitySelected;
     private _UIPlayerSelected: UI_EntitySelected;
-    private _UIInventory: UI_Inventory;
+
+    // openable panels
+    private panelInventory: Panel_Inventory;
+    private panelAbilities: Panel_Abilities;
+    private panelCharacter: Panel_Character;
 
     // experience bar
     private experienceBarUI;
@@ -83,7 +89,6 @@ export class UserInterface {
         this.experienceBar();
         this.castingBar();
         this.createRevivePanel();
-    
     }
 
     // set current player
@@ -112,8 +117,15 @@ export class UserInterface {
         });
 
         // create panel
-        //this._UIPanel = new UI_Panel(this, currentPlayer);
-        this._UIInventory = new UI_Inventory(this, currentPlayer);
+        this.panelInventory = new Panel_Inventory(this, currentPlayer, {
+            name: "Inventory",
+            width: "246px;",
+            height: "300px;",
+            top: "-30px;",
+            left: "-15px;",
+            horizontal_position: Control.HORIZONTAL_ALIGNMENT_RIGHT,
+            vertical_position: Control.VERTICAL_ALIGNMENT_BOTTOM,
+        });
 
         // create tooltip
         this._UITooltip = new UI_Tooltip(this, currentPlayer);
@@ -125,26 +137,25 @@ export class UserInterface {
     }
 
     public refreshEntityUI() {
-        
         // update level text
         if (this._currentPlayer) {
             let player_experience = this._currentPlayer.player_data.experience;
             let progress = Leveling.getLevelProgress(player_experience);
             this.experienceBarUI.width = progress / 100;
             this.experienceBarTextRight.text = progress + "%";
-            this.experienceBarTextLeft.text = player_experience.toLocaleString()+ " / "+Leveling.getTotalLevelXp(this._currentPlayer.level).toLocaleString()+" EXP";
+            this.experienceBarTextLeft.text =
+                player_experience.toLocaleString() + " / " + Leveling.getTotalLevelXp(this._currentPlayer.level).toLocaleString() + " EXP";
         }
 
         // hide entity labels if out of distance
-        for(let sessionId in this._entities){
+        for (let sessionId in this._entities) {
             let entity = this._entities[sessionId];
-            if(entity && entity.mesh && entity.mesh.isEnabled()){
+            if (entity && entity.mesh && entity.mesh.isEnabled()) {
                 entity.characterLabel.isVisible = true;
-            }else{
+            } else {
                 entity.characterLabel.isVisible = false;
             }
         }
-
     }
 
     public experienceBar() {
@@ -202,10 +213,10 @@ export class UserInterface {
 
         // bars
         for (let i = 0; i <= 9; i++) {
-            if(i!== 0){
-                let expBar = new Rectangle("expBar"+i);
+            if (i !== 0) {
+                let expBar = new Rectangle("expBar" + i);
                 expBar.top = 0;
-                expBar.left = 0.1 * i * 100+"%";
+                expBar.left = 0.1 * i * 100 + "%";
                 expBar.top = "6px";
                 expBar.width = "2px";
                 expBar.height = "22px";
@@ -302,18 +313,15 @@ export class UserInterface {
         });
     }
 
-    public openTab() {
-        this._UIInventory.open();
-    }
+    public openTab() {}
 
     // create misc stuff
     ////////////////////////////
     public createMisc() {
-
-        const grid = new Grid('griddddd');
+        const grid = new Grid("griddddd");
         grid.top = "-110px";
         grid.width = "460px";
-        grid.height = "36px;"
+        grid.height = "36px;";
         grid.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         grid.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         grid.addColumnDefinition(100, true);
@@ -322,7 +330,7 @@ export class UserInterface {
         grid.addColumnDefinition(100, true);
         this._playerUI.addControl(grid);
 
-        /// 
+        ///
         const inventoryButton = Button.CreateSimpleButton("inventoryButton", "Inventory");
         inventoryButton.top = "0;";
         inventoryButton.left = "0px;";

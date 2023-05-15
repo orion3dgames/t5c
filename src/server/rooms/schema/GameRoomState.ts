@@ -1,4 +1,4 @@
-import { Schema, type, MapSchema } from "@colyseus/schema";
+import { Schema, type, MapSchema, filterChildren } from "@colyseus/schema";
 import { EnemyState } from "./EnemyState";
 import { PlayerData, PlayerState } from "./PlayerState";
 import { LootState } from "./LootState";
@@ -12,10 +12,21 @@ import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 import { dataDB } from "../../../shared/Data/dataDB";
 import { Client } from "colyseus";
 import { GetLoot, LootTableEntry } from "../../../shared/Entities/Player/LootTable";
+import Config from "../../../shared/Config";
 
 export class GameRoomState extends Schema {
     // networked variables
-    @type({ map: EnemyState }) entities = new MapSchema<EnemyState>();
+    @filterChildren(function (client, key, value: PlayerState, root) {
+        const isSelf = value.name === client.sessionId;
+        const player = (this as GameRoomState).players.get(client.sessionId);
+        const isWithinXBounds = Math.abs(player.x - value.x) < Config.PLAYER_VIEW_DISTANCE;
+        const isWithinZBounds = Math.abs(player.z - value.z) < Config.PLAYER_VIEW_DISTANCE;
+        const isWithinBounds = isWithinXBounds && isWithinZBounds;
+        return isSelf || isWithinBounds;
+    })
+    @type({ map: EnemyState })
+    entities = new MapSchema<EnemyState>();
+
     @type({ map: PlayerState }) players = new MapSchema<PlayerState>();
     @type({ map: LootState }) items = new MapSchema<LootState>();
     @type("number") serverTime: number = 0.0;
