@@ -4,6 +4,7 @@ import { ILootTableEntry, LootTableEntry } from "../Entities/Player/LootTable";
 type Race = {
     key: string;
     title: string;
+    icon: string;
     speed: number;
     scale: number;
     rotationFix: number;
@@ -31,6 +32,7 @@ let RacesDB: raceDataMap = {
     male_adventurer: {
         key: "male_adventurer",
         title: "Adventurer",
+        icon: "ICON_RACE_male_adventurer",
         speed: 0.6,
         scale: 1.3,
         rotationFix: Math.PI,
@@ -53,34 +55,10 @@ let RacesDB: raceDataMap = {
         drops: [],
         default_abilities: ["base_attack"],
     },
-    player_hobbit: {
-        key: "player_hobbit",
-        title: "Hobbit",
-        speed: 0.6,
-        scale: 0.02,
-        rotationFix: 0,
-        animationSpeed: 1.3,
-        meshIndex: 2,
-        animations: {
-            IDLE: 3,
-            WALK: 6,
-            ATTACK: 0,
-            DEATH: 2,
-            DAMAGE: 1,
-        },
-        baseHealth: 100,
-        baseMana: 100,
-        healthRegen: 0.2,
-        manaRegen: 0.4, // per second
-        experienceGain: {},
-        goldGain: {},
-        damage_multiplier: 0,
-        drops: [],
-        default_abilities: ["base_attack"],
-    },
     monster_bear: {
         key: "monster_bear",
         title: "Bear",
+        icon: "ICON_RACE_monster_bear",
         speed: 0.2,
         scale: 0.02,
         rotationFix: 3.14,
@@ -114,6 +92,7 @@ let RacesDB: raceDataMap = {
     monster_unicorn: {
         key: "monster_unicorn",
         title: "Unicorn",
+        icon: "ICON_RACE_monster_unicorn",
         speed: 0.3,
         scale: 0.0125,
         rotationFix: 3.14,

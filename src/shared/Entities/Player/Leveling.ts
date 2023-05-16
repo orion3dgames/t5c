@@ -1,8 +1,3 @@
-/**
- * Happy to have experience as set numbers as seen below.
- * Dayd, if you want to make something more dynamic, go ahead ;)
- */
-
 import { roundTo } from "../../Utils";
 
 // level progression
@@ -20,14 +15,13 @@ const LEVEL_EXPERIENCE = [
 ];
 
 export class Leveling {
-
     /**
-     * convert experience to level (eg: 500 xp would return level 1)
-     * @param experience
+     * return total xp required for level
+     * @param level
      * @returns level number
      */
-    public static getTotalLevelXp(currentLevel: number): number {
-        return LEVEL_EXPERIENCE[currentLevel];
+    public static getTotalLevelXp(level: number): number {
+        return LEVEL_EXPERIENCE[level];
     }
 
     /**
