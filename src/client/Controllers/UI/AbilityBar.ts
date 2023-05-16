@@ -152,11 +152,11 @@ export class AbilityBar {
     }
 
     showTooltip(ability, headlineRect) {
-        this._UI._UITooltip.refresh("ability", ability, headlineRect);
+        this._UI._Tooltip.refresh("ability", ability, headlineRect);
     }
 
     hideTooltip() {
-        this._UI._UITooltip.close();
+        this._UI._Tooltip.close();
     }
 
     _createEvents() {

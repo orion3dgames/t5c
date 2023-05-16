@@ -74,7 +74,7 @@ export class Panel_Inventory extends Panel {
         goldTitle.text = "Gold: 0";
         goldTitle.fontSize = "12px";
         goldTitle.color = "rgba(255,255,255,.9)";
-        goldTitle.top = "-5px";
+        goldTitle.top = "-33px";
         goldTitle.left = "5px";
         goldTitle.fontSize = "14px";
         goldTitle.width = 1;
@@ -160,7 +160,6 @@ export class Panel_Inventory extends Panel {
             let item = dataDB.get("item", element.key) as Item;
 
             // dispose
-            console.log(child);
             if (child.children) {
                 child.children.forEach((el) => {
                     el.dispose();
@@ -170,12 +169,12 @@ export class Panel_Inventory extends Panel {
             // on hover tooltip
             child.onPointerEnterObservable.add(() => {
                 //console.log("HOVER IN", item.key, this);
-                this._UI._UITooltip.refresh("item", item, child);
+                this._UI._Tooltip.refresh("item", item, child);
             });
             // on hover tooltip
             child.onPointerOutObservable.add(() => {
                 //console.log("HOVER OUT", item.key, this);
-                this._UI._UITooltip.close();
+                this._UI._Tooltip.close();
             });
 
             // add icon

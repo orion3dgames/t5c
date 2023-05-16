@@ -22,6 +22,11 @@ export class Panel {
     private _panel;
     public _panelContent;
 
+    // drag stuff
+    public _isPointerDown: boolean = false;
+    public _pointerDownPosition;
+    public _isDragging: boolean = false;
+
     constructor(_UI, _currentPlayer, options) {
         //
         this._UI = _UI;
@@ -109,7 +114,7 @@ export class Panel {
         panelHeader.thickness = 0;
         this._panel.addControl(panelHeader);
 
-        // panel title
+        // header title
         var panelTitle = new TextBlock("panelTitle");
         panelTitle.text = this._options.name;
         panelTitle.fontSize = "12px";
@@ -135,10 +140,27 @@ export class Panel {
         mainPanelClose.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         mainPanelClose.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         panelHeader.addControl(mainPanelClose);
-
-        // on click send
         mainPanelClose.onPointerDownObservable.add(() => {
             this.close();
+        });
+
+        // drag and drop events
+        panelHeader.onPointerDownObservable.add((e) => {
+            this._isPointerDown = true;
+            this._pointerDownPosition = { x: e.x, y: e.y };
+        });
+        panelHeader.onPointerUpObservable.add((e) => {
+            this._isPointerDown = false;
+        });
+        panelHeader.onPointerMoveObservable.add((event) => {
+            if (this._isPointerDown) {
+                var deltaX = event.x - this._pointerDownPosition.x;
+                var deltaY = event.y - this._pointerDownPosition.y;
+                this._panel.leftInPixels += deltaX;
+                this._panel.topInPixels += deltaY;
+                this._pointerDownPosition.x = event.x;
+                this._pointerDownPosition.y = event.y;
+            }
         });
     }
 

@@ -44,6 +44,8 @@ export class EntitySelectedBar {
         ////////////////////////////////////
         //////////////////// panel
         const selectedEntityBar = generatePanel("selected" + this._options.panelName, panelWidth + "px;", "62px", "15px", leftMargin + "px");
+        selectedEntityBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        selectedEntityBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         this._playerUI.addControl(selectedEntityBar);
 
         const paddingPanel = new Rectangle("paddingPanel");
