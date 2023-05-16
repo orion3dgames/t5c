@@ -73,6 +73,7 @@ export class Panel {
         panel.background = options.background;
         panel.color = options.color;
         panel.isPointerBlocker = true;
+        panel.isVisible = false;
         this._playerUI.addControl(panel);
 
         this._panel = panel;
@@ -143,7 +144,12 @@ export class Panel {
 
     // open panel
     public open() {
-        this._panel.isVisible = true;
+        // if already open, close panel
+        if (this._panel.isVisible) {
+            this._panel.isVisible = false;
+        } else {
+            this._panel.isVisible = true;
+        }
     }
 
     // close panel

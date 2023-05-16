@@ -58,7 +58,7 @@ class AuthController {
             return JSON.parse(req.data).user;
         } else {
             // something went wrong
-            console.log("Something went wrong.");
+            console.error("Something went wrong.");
         }
     }
 

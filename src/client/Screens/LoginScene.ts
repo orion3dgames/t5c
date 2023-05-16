@@ -152,7 +152,7 @@ export class LoginScene {
 
         ///////////////////////////////////////////
         // guest button
-        const joinGuestBtn = Button.CreateSimpleButton("joinGuestBtn", "Guest Login");
+        const joinGuestBtn = Button.CreateSimpleButton("joinGuestBtn", "Quick Play");
         joinGuestBtn.width = 0.8;
         joinGuestBtn.height = "30px";
         joinGuestBtn.color = "white";
@@ -161,9 +161,8 @@ export class LoginScene {
         joinGuestBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         joinGuestBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         formContainer.addControl(joinGuestBtn);
-
         joinGuestBtn.onPointerDownObservable.add(async () => {
-            await this.login(generateRandomPlayerName(), generateRandomPlayerName());
+            SceneController.goToScene(State.GAME);
         });
 
         // load scene

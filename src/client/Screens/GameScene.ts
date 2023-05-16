@@ -67,8 +67,8 @@ export class GameScene {
 
         ///////////////////// END DEBUG CODE /////////////////////////////
         ///////////////////// DEBUG CODE /////////////////////////////////
-        // if local skip login screen
-        if (isLocal()) {
+        // if no user set, get random user instead
+        if (!this._auth.currentUser) {
             // get random user
             let req = await request("get", apiUrl() + "/returnRandomUser");
             let character = JSON.parse(req.data).user;
