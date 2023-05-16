@@ -6,14 +6,12 @@ import { Grid } from "@babylonjs/gui/2D/controls/grid";
 import { dataDB } from "../../../../shared/Data/dataDB";
 import { Item } from "../../../../shared/Data/ItemDB";
 import { Panel } from "./Panel";
+import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
+import { Button } from "@babylonjs/gui/2D/controls/button";
 
 export class Panel_Abilities extends Panel {
     // inventory tab
     private panel: Rectangle;
-    private _inventoryGrid: Rectangle[] = [];
-    private _goldUI: TextBlock;
-
-    public sceneRendered = false;
 
     constructor(_UI, _currentPlayer, options) {
         super(_UI, _currentPlayer, options);
@@ -23,41 +21,22 @@ export class Panel_Abilities extends Panel {
         // dynamic events
         let entity = this._currentPlayer.entity;
         if (entity) {
-            entity.inventory.onAdd((item, sessionId) => {
+            entity.abilities.onAdd((item, sessionId) => {
                 this.refresh();
             });
-            entity.inventory.onRemove((item, sessionId) => {
+            entity.abilities.onRemove((item, sessionId) => {
                 this.refresh();
             });
-            entity.inventory.onChange((item, sessionId) => {
+            entity.abilities.onChange((item, sessionId) => {
                 this.refresh();
             });
         }
-
-        // some ui must be constantly refreshed as things change
-        this._scene.registerAfterRender(() => {
-            // refresh
-            if (!this.sceneRendered) {
-                this.createContent();
-            }
-            this.sceneRendered = true;
-
-            this.update();
-        });
     }
 
     // open panel
     public open() {
         super.open();
         this.refresh();
-    }
-
-    // refresh panel
-    public update() {
-        super.update();
-        if (this._currentPlayer) {
-            this._goldUI.text = "Gold: " + this._currentPlayer.player_data.gold;
-        }
     }
 
     // create panel
@@ -70,132 +49,80 @@ export class Panel_Abilities extends Panel {
         });
 
         // panel title
-        var goldTitle = new TextBlock("goldTitle");
-        goldTitle.text = "Gold: 0";
-        goldTitle.fontSize = "12px";
-        goldTitle.color = "rgba(255,255,255,.9)";
-        goldTitle.top = "-5px";
-        goldTitle.left = "5px";
-        goldTitle.fontSize = "14px";
-        goldTitle.width = 1;
-        goldTitle.height = "30px;";
-        goldTitle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        goldTitle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        goldTitle.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        goldTitle.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        panel.addControl(goldTitle);
-        this._goldUI = goldTitle;
+        const skillsPanelStack = new StackPanel("skillsPanelStack");
+        skillsPanelStack.width = 1;
+        skillsPanelStack.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        skillsPanelStack.setPaddingInPixels(5, 5, 5, 5);
+        panel.addControl(skillsPanelStack);
 
-        ///////////////////////////////////////////////////////
+        let Abilities = dataDB.load("abilities");
+        for (let key in Abilities) {
+            // get ability details
+            let ability = Abilities[key];
 
-        let inventoryGrid = new Rectangle("inventoryGrid");
-        inventoryGrid.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        inventoryGrid.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        inventoryGrid.left = "0px";
-        inventoryGrid.top = "0px";
-        inventoryGrid.width = 1;
-        inventoryGrid.height = 1;
-        inventoryGrid.thickness = 0;
-        panel.addControl(inventoryGrid);
+            let skillsPanel = new Rectangle("abilityCont" + ability.key);
+            skillsPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            skillsPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            skillsPanel.top = "5px";
+            skillsPanel.left = 0;
+            skillsPanel.width = 1;
+            skillsPanel.height = "50px";
+            skillsPanel.background = "#CCC";
+            skillsPanel.thickness = 1;
+            skillsPanelStack.addControl(skillsPanel);
 
-        let panelWidth = panel.widthInPixels;
-        let inventorySpace = 25;
-        let inventorySpaceW = 5;
-        let size = panelWidth / 5;
-        let inventorySpaceCols = inventorySpaceW;
-        let inventorySpaceRows = inventorySpace / inventorySpaceW;
+            const tooltipName = new TextBlock("abilityName" + ability.key);
+            tooltipName.color = "#FFF";
+            tooltipName.top = "0px";
+            tooltipName.left = "0px";
+            tooltipName.fontSize = "24px;";
+            tooltipName.resizeToFit = true;
+            tooltipName.text = ability.label;
+            tooltipName.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            tooltipName.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+            tooltipName.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            tooltipName.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            skillsPanel.addControl(tooltipName);
 
-        console.log(panelWidth, inventorySpace, inventorySpaceW, size, inventorySpaceCols, inventorySpaceRows);
-
-        let grid = new Grid();
-        grid.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        grid.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        grid.left = "0px;";
-        grid.width = 1;
-        grid.heightInPixels = inventorySpaceRows * (size + 10);
-        inventoryGrid.addControl(grid);
-
-        for (let i = 0; i <= inventorySpaceW; i++) {
-            grid.addColumnDefinition(size, true);
-        }
-
-        for (let i = 0; i <= inventorySpaceRows; i++) {
-            grid.addRowDefinition(size, true);
-        }
-
-        this._inventoryGrid = [];
-
-        let i = 0;
-        for (let r = 0; r < inventorySpaceRows; r++) {
-            for (let col = 0; col < inventorySpaceCols; col++) {
-                const inventorySpace = new Rectangle("inventorySpace_" + i);
-                inventorySpace.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-                inventorySpace.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-                inventorySpace.top = 0.1;
-                inventorySpace.left = 0.1;
-                inventorySpace.width = 0.9;
-                inventorySpace.height = 0.9;
-                inventorySpace.background = "rgba(255,255,255,.1)";
-                inventorySpace.thickness = 0;
-                inventorySpace.cornerRadius = 0;
-                grid.addControl(inventorySpace, r, col);
-
-                this._inventoryGrid.push(inventorySpace);
-
-                i++;
+            let entity = this._currentPlayer.entity;
+            if (entity.abilities[ability.key]) {
+                const abilityLearn = Button.CreateSimpleButton("abilityForget" + ability.key, "Forget Ability");
+                abilityLearn.top = "0px;";
+                abilityLearn.left = "15px;";
+                abilityLearn.width = "190px;";
+                abilityLearn.height = "30px";
+                abilityLearn.color = "white";
+                abilityLearn.background = "#000";
+                abilityLearn.thickness = 1;
+                abilityLearn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+                abilityLearn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+                skillsPanel.addControl(abilityLearn);
+                abilityLearn.onPointerDownObservable.add(() => {
+                    this._gameRoom.send("learn_skill", ability.key);
+                });
+            } else {
+                const abilityLearn = Button.CreateSimpleButton("abilityLearn" + ability.key, "Learn Ability");
+                abilityLearn.top = "0px;";
+                abilityLearn.left = "15px;";
+                abilityLearn.width = "190px;";
+                abilityLearn.height = "30px";
+                abilityLearn.color = "white";
+                abilityLearn.background = "#000";
+                abilityLearn.thickness = 1;
+                abilityLearn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+                abilityLearn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+                skillsPanel.addControl(abilityLearn);
+                abilityLearn.onPointerDownObservable.add(() => {
+                    this._gameRoom.send("learn_skill", ability.key);
+                });
             }
         }
-
-        //
-        this.refresh();
     }
 
     ///////////////////////////////////////
     ///////////////////////////////////////
     // INVENTORY PANEL
     public refresh() {
-        let i = 0;
-        this._currentPlayer.inventory.forEach((element) => {
-            let child = this._inventoryGrid[i];
-            let item = dataDB.get("item", element.key) as Item;
-
-            // dispose
-            console.log(child);
-            if (child.children) {
-                child.children.forEach((el) => {
-                    el.dispose();
-                });
-            }
-
-            // on hover tooltip
-            child.onPointerEnterObservable.add(() => {
-                //console.log("HOVER IN", item.key, this);
-                this._UI._UITooltip.refresh("item", item, child);
-            });
-            // on hover tooltip
-            child.onPointerOutObservable.add(() => {
-                //console.log("HOVER OUT", item.key, this);
-                this._UI._UITooltip.close();
-            });
-
-            // add icon
-            var imageData = this._loadedAssets[item.icon];
-            var img = new Image("itemImage_" + element.key, imageData);
-            img.stretch = Image.STRETCH_FILL;
-            child.addControl(img);
-
-            const itemTxtQty = new TextBlock("itemTxtQty" + i);
-            itemTxtQty.text = element.qty;
-            itemTxtQty.color = "#FFF";
-            itemTxtQty.top = "-2px";
-            itemTxtQty.left = "-2px";
-            itemTxtQty.fontSize = "12px;";
-            itemTxtQty.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-            itemTxtQty.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-            itemTxtQty.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-            child.addControl(itemTxtQty);
-
-            i++;
-        });
+        this.createContent();
     }
 }

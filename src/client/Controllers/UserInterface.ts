@@ -1,6 +1,5 @@
 import { Scene } from "@babylonjs/core/scene";
 import { Engine } from "@babylonjs/core/Engines/engine";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { Button } from "@babylonjs/gui/2D/controls/button";
@@ -8,7 +7,7 @@ import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 
-import { UI_Chats, UI_Abilities, UI_Debug, UI_EntitySelected, UI_Tooltip, Panel_Inventory, Panel_Abilities, Panel_Character } from "./UI";
+import { ChatBox, AbilityBar, DebugBox, EntitySelectedBar, Tooltip, Panel_Inventory, Panel_Abilities, Panel_Character } from "./UI";
 
 import { Room } from "colyseus.js";
 import State from "../Screens/Screens";
@@ -20,8 +19,8 @@ import { Entity } from "../../shared/Entities/Entity";
 import { Player } from "../../shared/Entities/Player";
 import { Item } from "../../shared/Entities/Item";
 
-import { generatePanel, getBg } from "./UI/UI_Theme";
-import { Grid, StackPanel } from "@babylonjs/gui";
+import { generatePanel, getBg } from "./UI/Theme";
+import { Grid } from "@babylonjs/gui";
 
 export class UserInterface {
     private _scene: Scene;
@@ -38,11 +37,12 @@ export class UserInterface {
     private _centerUI;
 
     // interface
-    public _UIChat: UI_Chats;
-    private _UIDebug: UI_Debug;
-    private _UIAbilities: UI_Abilities;
-    private _UITargetSelected: UI_EntitySelected;
-    private _UIPlayerSelected: UI_EntitySelected;
+    public _ChatBox: ChatBox;
+    private _DebugBox: DebugBox;
+    private _AbilityBar: AbilityBar;
+    private _targetEntitySelectedBar: EntitySelectedBar;
+    private _playerEntitySelectedBar: EntitySelectedBar;
+    private _Tooltip: Tooltip;
 
     // openable panels
     private panelInventory: Panel_Inventory;
@@ -98,20 +98,20 @@ export class UserInterface {
         this._currentPlayer = currentPlayer;
 
         // create abilities ui + events
-        this._UIAbilities = new UI_Abilities(this, currentPlayer);
+        this._AbilityBar = new AbilityBar(this, currentPlayer);
 
         // create chat ui + events
-        this._UIChat = new UI_Chats(this._playerUI, this._chatRoom, currentPlayer, this._entities);
+        this._ChatBox = new ChatBox(this._playerUI, this._chatRoom, currentPlayer, this._entities);
 
         // create debug ui + events
-        this._UIDebug = new UI_Debug(this._playerUI, this._engine, this._scene, this._gameRoom, this._currentPlayer, this._entities);
+        this._DebugBox = new DebugBox(this._playerUI, this._engine, this._scene, this._gameRoom, this._currentPlayer, this._entities);
 
         // create selected entity panel
-        this._UITargetSelected = new UI_EntitySelected(this._playerUI, this._scene, {
+        this._targetEntitySelectedBar = new EntitySelectedBar(this._playerUI, this._scene, {
             panelName: "target",
             currentPlayer: false,
         });
-        this._UIPlayerSelected = new UI_EntitySelected(this._playerUI, this._scene, {
+        this._playerEntitySelectedBar = new EntitySelectedBar(this._playerUI, this._scene, {
             panelName: "player",
             currentPlayer: currentPlayer,
         });
@@ -127,8 +127,30 @@ export class UserInterface {
             vertical_position: Control.VERTICAL_ALIGNMENT_BOTTOM,
         });
 
+        // create panel
+        this.panelAbilities = new Panel_Abilities(this, currentPlayer, {
+            name: "Abilities",
+            width: "500px;",
+            height: "300px;",
+            top: "0px;",
+            left: "5px;",
+            horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
+            vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
+        });
+
+        // create panel
+        this.panelCharacter = new Panel_Character(this, currentPlayer, {
+            name: "Character",
+            width: "500px;",
+            height: "300px;",
+            top: "30px;",
+            left: "30px;",
+            horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
+            vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
+        });
+
         // create tooltip
-        this._UITooltip = new UI_Tooltip(this, currentPlayer);
+        this._Tooltip = new Tooltip(this, currentPlayer);
 
         // some ui must be constantly refreshed as things change
         this._scene.registerBeforeRender(() => {
@@ -313,7 +335,19 @@ export class UserInterface {
         });
     }
 
-    public openTab() {}
+    public openPanel(key) {
+        switch (key) {
+            case "inventory":
+                this.panelInventory.open();
+                break;
+            case "character":
+                this.panelCharacter.open();
+                break;
+            case "abilities":
+                this.panelAbilities.open();
+                break;
+        }
+    }
 
     // create misc stuff
     ////////////////////////////
@@ -324,39 +358,69 @@ export class UserInterface {
         grid.height = "36px;";
         grid.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         grid.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        grid.addColumnDefinition(100, true);
-        grid.addColumnDefinition(100, true);
-        grid.addColumnDefinition(100, true);
-        grid.addColumnDefinition(100, true);
+        grid.addColumnDefinition(75, true);
+        grid.addColumnDefinition(75, true);
+        grid.addColumnDefinition(75, true);
+        grid.addColumnDefinition(75, true);
+        grid.addColumnDefinition(75, true);
         this._playerUI.addControl(grid);
 
         ///
         const inventoryButton = Button.CreateSimpleButton("inventoryButton", "Inventory");
         inventoryButton.top = "0;";
         inventoryButton.left = "0px;";
-        inventoryButton.width = "100px";
+        inventoryButton.width = "75px";
         inventoryButton.height = "30px";
         inventoryButton.color = "white";
         inventoryButton.background = getBg();
         inventoryButton.thickness = 1;
         inventoryButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         grid.addControl(inventoryButton, 0, 0);
-
         inventoryButton.onPointerDownObservable.add(() => {
-            this.openTab();
+            this.openPanel("inventory");
+        });
+
+        ///
+        const abiliyButton = Button.CreateSimpleButton("abiliyButton", "Abilities");
+        abiliyButton.top = "0;";
+        abiliyButton.left = "0px;";
+        abiliyButton.width = "75px";
+        abiliyButton.height = "30px";
+        abiliyButton.color = "white";
+        abiliyButton.background = getBg();
+        abiliyButton.thickness = 1;
+        abiliyButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        grid.addControl(abiliyButton, 0, 1);
+        abiliyButton.onPointerDownObservable.add(() => {
+            this.openPanel("abilities");
+        });
+
+        ///
+        const charButton = Button.CreateSimpleButton("charButton", "Character");
+        charButton.top = "0;";
+        charButton.left = "0px;";
+        charButton.width = "75px";
+        charButton.height = "30px";
+        charButton.color = "white";
+        charButton.background = getBg();
+        charButton.thickness = 1;
+        charButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        grid.addControl(charButton, 0, 2);
+        charButton.onPointerDownObservable.add(() => {
+            this.openPanel("character");
         });
 
         //reset position button
         const resetButton = Button.CreateSimpleButton("resetButton", "Unstuck");
         resetButton.top = "0px;";
         resetButton.left = "0px;";
-        resetButton.width = "100px;";
+        resetButton.width = "75px;";
         resetButton.height = "30px";
         resetButton.color = "white";
         resetButton.background = getBg();
         resetButton.thickness = 1;
         resetButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        grid.addControl(resetButton, 0, 2);
+        grid.addControl(resetButton, 0, 3);
         resetButton.onPointerDownObservable.add(() => {
             this._gameRoom.send("reset_position");
         });
@@ -365,13 +429,13 @@ export class UserInterface {
         const quitButton = Button.CreateSimpleButton("quitButton", "Quit");
         quitButton.top = "0px;";
         quitButton.left = "0px;";
-        quitButton.width = "100px;";
+        quitButton.width = "75px;";
         quitButton.height = "30px";
         quitButton.color = "white";
         quitButton.background = getBg();
         quitButton.thickness = 1;
         quitButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        grid.addControl(quitButton, 0, 3);
+        grid.addControl(quitButton, 0, 4);
 
         quitButton.onPointerDownObservable.add(() => {
             this._gameRoom.leave();

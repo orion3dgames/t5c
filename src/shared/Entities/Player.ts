@@ -223,7 +223,7 @@ export class Player extends Entity {
 
     public registerServerMessages() {
         this._room.onMessage("notification", (data) => {
-            this.ui._UIChat.addNotificationMessage(data.type, data.message, data.message);
+            this.ui._ChatBox.addNotificationMessage(data.type, data.message, data.message);
         });
 
         // on teleport confirmation

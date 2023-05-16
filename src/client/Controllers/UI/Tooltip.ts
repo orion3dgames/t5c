@@ -6,8 +6,9 @@ import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import Config from "../../../shared/Config";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
+import { generatePanel } from "./Theme";
 
-export class UI_Tooltip {
+export class Tooltip {
     private _playerUI;
     private _currentPlayer;
     private _loadedAssets;
@@ -38,18 +39,12 @@ export class UI_Tooltip {
     }
 
     private _createUI() {
-        const tooltipBar = new Rectangle("tooltipBar");
-        tooltipBar.left = "0px";
-        tooltipBar.top = "0px";
-        tooltipBar.width = "150px";
-        tooltipBar.thickness = 2;
-        tooltipBar.background = "rgba(0,0,0,1)";
-        tooltipBar.color = "#000000";
+        const tooltipBar = generatePanel("tooltipBar", "150px;", "100px", "0px", "0px");
+        tooltipBar.color = "#FFF";
         tooltipBar.isVisible = false;
         tooltipBar.adaptHeightToChildren = true;
         tooltipBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         tooltipBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-
         this._playerUI.addControl(tooltipBar);
         this.tooltipContainer = tooltipBar;
 

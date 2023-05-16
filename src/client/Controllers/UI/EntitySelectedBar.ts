@@ -1,13 +1,10 @@
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
-import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
+import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Control } from "@babylonjs/gui/2D/controls/control";
-import Config from "../../../shared/Config";
-import { getHealthColorFromValue, roundTo } from "../../../shared/Utils";
-import { Leveling } from "../../../shared/Entities/Player/Leveling";
+import { generatePanel, getPadding } from "./Theme";
+import { roundTo } from "../../../shared/Utils";
 
-import { generatePanel, getPadding } from "./UI_Theme";
-
-export class UI_EntitySelected {
+export class EntitySelectedBar {
     private _playerUI;
     private _scene;
     private _options;
@@ -39,7 +36,6 @@ export class UI_EntitySelected {
     }
 
     _createUI() {
-       
         let alignHoriz = Control.HORIZONTAL_ALIGNMENT_LEFT;
         let panelWidth = 260;
         let barWidth = 198;
@@ -47,15 +43,7 @@ export class UI_EntitySelected {
 
         ////////////////////////////////////
         //////////////////// panel
-        const selectedEntityBar = generatePanel(
-            "selected"+this._options.panelName,
-            Control.HORIZONTAL_ALIGNMENT_LEFT,
-            Control.VERTICAL_ALIGNMENT_TOP,
-            panelWidth+"px;",
-            "62px",
-            "15px",
-            leftMargin+"px",
-        );
+        const selectedEntityBar = generatePanel("selected" + this._options.panelName, panelWidth + "px;", "62px", "15px", leftMargin + "px");
         this._playerUI.addControl(selectedEntityBar);
 
         const paddingPanel = new Rectangle("paddingPanel");
@@ -176,7 +164,7 @@ export class UI_EntitySelected {
         this._entityNameTxt = entityNameTxt;
         this._entityLevelTxt = entityLevelTxt;
         this._selectedEntityBar = selectedEntityBar;
-        
+
         this._healthBar = healthBar;
         this._healthBarInside = healthBarInside;
         this._healthBarText = healthBarText;
@@ -188,7 +176,6 @@ export class UI_EntitySelected {
 
     // refresh panel
     private _update() {
-        
         this._selectedEntityBar.isVisible = false;
 
         let entity = global.T5C.selectedEntity ? global.T5C.selectedEntity : false;
@@ -208,14 +195,13 @@ export class UI_EntitySelected {
             let health = roundTo(entity.health, 0);
             let healthWidth = entity.health / entity.maxHealth;
             this._healthBarInside.width = healthWidth;
-            this._healthBarText.text = health + "/"+entity.maxHealth;
+            this._healthBarText.text = health + "/" + entity.maxHealth;
 
             // mana
             let mana = roundTo(entity.mana, 0);
             let manaWidth = entity.mana / entity.maxMana;
             this._manaBarInside.width = manaWidth;
-            this._manaBarText.text = mana + "/"+entity.maxMana;
+            this._manaBarText.text = mana + "/" + entity.maxMana;
         }
-        
     }
 }

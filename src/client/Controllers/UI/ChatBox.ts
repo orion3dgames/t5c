@@ -6,10 +6,9 @@ import { InputText } from "@babylonjs/gui/2D/controls/inputText";
 import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { PlayerMessage } from "../../../shared/types/index";
-import Config from "../../../shared/Config";
-import { generatePanel, getBg, getPadding } from "./UI_Theme";
+import { generatePanel, getBg, getPadding } from "./Theme";
 
-export class UI_Chats {
+export class ChatBox {
     private _playerUI;
     private _chatUI: StackPanel;
     private _chatUIScroll: ScrollViewer;
@@ -46,16 +45,7 @@ export class UI_Chats {
     }
 
     _createUI() {
-
-        const chatPanel = generatePanel(
-            "chatPanel",
-            Control.HORIZONTAL_ALIGNMENT_LEFT,
-            Control.VERTICAL_ALIGNMENT_BOTTOM,
-            "300px;",
-            "200px",
-            "-35px",
-            "15px"
-        );
+        const chatPanel = generatePanel("chatPanel", "300px;", "200px", "-35px", "15px");
         chatPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         chatPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         chatPanel.isPointerBlocker = true;

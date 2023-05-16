@@ -4,15 +4,15 @@ import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Control } from "@babylonjs/gui/2D/controls/control";
-import { UI_Tooltip } from "../UI_Tooltip";
-import { getBg } from "../UI_Theme";
+import { Tooltip } from "../Tooltip";
+import { getBg } from "../Theme";
 import { Scene } from "@babylonjs/core/scene";
 
 export class Panel {
     public _UI;
     public _playerUI;
-    private _gameRoom;
-    private _UITooltip: UI_Tooltip;
+    public _gameRoom;
+    private _UITooltip: Tooltip;
     public _scene: Scene;
     public _currentPlayer;
     public _loadedAssets;
