@@ -2,10 +2,10 @@ import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { getBg } from "./Theme";
-import { Grid } from "@babylonjs/gui/2D/controls/grid";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import State from "../../Screens/Screens";
 import { SceneController } from "../../Controllers/Scene";
+import { StackPanel } from "@babylonjs/gui";
 
 export class MainMenu {
     private _UI;
@@ -60,17 +60,15 @@ export class MainMenu {
             },
         };
 
-        const grid = new Grid("griddddd");
+        const grid = new StackPanel("griddddd");
         grid.top = "-110px";
         grid.width = "460px";
         grid.height = "36px;";
+        grid.spacing = 5;
         grid.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         grid.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        grid.addColumnDefinition(85, true);
-        grid.addColumnDefinition(85, true);
-        grid.addColumnDefinition(85, true);
-        grid.addColumnDefinition(85, true);
-        grid.addColumnDefinition(50, true);
+        grid.isVertical = false;
+
         this._playerUI.addControl(grid);
 
         let i = 0;
@@ -78,15 +76,15 @@ export class MainMenu {
             let menuItem = menuItems[index];
 
             const button = Button.CreateSimpleButton("inventoryButton", menuItem.menuTitle);
-            button.top = "0;";
-            button.left = "0px;";
-            button.width = 1;
+            button.width = "85px";
             button.height = "30px";
             button.color = "white";
             button.background = getBg();
-            button.thickness = 1;
+            button.thickness = 0;
+            button.fontSize = "12px;";
             button.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-            grid.addControl(button, 0, i);
+            button.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+            grid.addControl(button);
 
             if (menuItem.click) {
                 button.onPointerDownObservable.add(() => {

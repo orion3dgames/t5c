@@ -40,7 +40,6 @@ export class Tooltip {
 
     private _createUI() {
         const tooltipBar = generatePanel("tooltipBar", "150px;", "100px", "0px", "0px");
-        tooltipBar.color = "#FFF";
         tooltipBar.isVisible = false;
         tooltipBar.adaptHeightToChildren = true;
         tooltipBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
@@ -79,7 +78,7 @@ export class Tooltip {
         tooltipName.color = "#FFF";
         tooltipName.top = "0px";
         tooltipName.left = "35px";
-        tooltipName.fontSize = "12px;";
+        tooltipName.fontSize = "14px;";
         tooltipName.resizeToFit = true;
         tooltipName.text = "Item Name";
         tooltipName.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
@@ -95,7 +94,7 @@ export class Tooltip {
         tooltipDescription.top = "0px";
         tooltipDescription.left = "0px";
         tooltipDescription.width = 1;
-        tooltipDescription.fontSize = "11px;";
+        tooltipDescription.fontSize = "12px;";
         tooltipDescription.resizeToFit = true;
         tooltipDescription.text = "";
         tooltipDescription.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;

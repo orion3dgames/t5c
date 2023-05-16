@@ -1,3 +1,3 @@
-import { generatePanel, applyFont, getBg, getPadding } from "./Theme1";
+import { generatePanel, applyFont, getBg, getPadding, applyTheme } from "./Theme1";
 
-export { applyFont, getBg, getPadding, generatePanel };
+export { applyFont, getBg, getPadding, generatePanel, applyTheme };
