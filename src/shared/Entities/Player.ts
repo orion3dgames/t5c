@@ -165,11 +165,12 @@ export class Player extends Entity {
         // check if casting
         if (this.isCasting === true) {
             // increment casting timer
-            this.ui._UICastingTimer.isVisible = true; // show timer
+            this.ui._CastingBar.open();
             this.castingElapsed += delta; // increment casting timer by server delta
             let widthInPercentage = ((this.castingElapsed / this.castingTarget) * 100) / 100; // percentage between 0 and 1
-            this.ui._UICastingTimerText.text = this.castingElapsed + "/" + this.castingTarget;
-            this.ui._UICastingTimerInside.width = widthInPercentage;
+            let text = this.castingElapsed + "/" + this.castingTarget;
+            let width = widthInPercentage;
+            this.ui._CastingBar.update(text, width);
         }
 
         // check for cooldowns  (estethic only as server really controls cooldowns)
@@ -186,9 +187,9 @@ export class Player extends Entity {
         });
 
         if (this.anim_state === EntityCurrentState.DEAD) {
-            this.ui.revivePanel.isVisible = true;
+            this.ui._RessurectBox.open();
         } else {
-            this.ui.revivePanel.isVisible = false;
+            this.ui._RessurectBox.close();
         }
     }
 
@@ -211,8 +212,7 @@ export class Player extends Entity {
             this.castingElapsed = 0;
             this.castingTarget = ability.castTime;
             this.castingDigit = digit;
-            this.ui._UICastingTimer.isVisible = true;
-            this.ui._UICastingTimerText.text = "Start Casting";
+            this.ui._CastingBar.open();
         }
     }
 
@@ -247,8 +247,7 @@ export class Player extends Entity {
                     this.castingElapsed = 0;
                     this.castingTarget = 0;
                     this.isCasting = false;
-                    this.ui._UICastingTimer.isVisible = false;
-                    this.ui._UICastingTimerText.text = "";
+                    this.ui._CastingBar.close();
                     this.ability_in_cooldown[digit] = ability.cooldown; // set cooldown
                 }
 
