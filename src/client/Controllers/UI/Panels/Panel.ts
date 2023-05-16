@@ -5,7 +5,7 @@ import { Button } from "@babylonjs/gui/2D/controls/button";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Tooltip } from "../Tooltip";
-import { getBg } from "../Theme";
+import { applyTheme, getBg } from "../Theme";
 import { Scene } from "@babylonjs/core/scene";
 
 export class Panel {
@@ -42,16 +42,10 @@ export class Panel {
             name: options.name ?? "Panel Name",
             horizontal_position: options.horizontal_position ?? Control.HORIZONTAL_ALIGNMENT_CENTER,
             vertical_position: options.vertical_position ?? Control.VERTICAL_ALIGNMENT_CENTER,
-            //width: "200px",
-            //height: "200px",
             width: options.width ?? 1,
             height: options.height ?? 1,
             top: options.top ?? "0px",
             left: options.left ?? "0px",
-            thickness: 3,
-            cornerRadius: 2,
-            background: getBg(),
-            color: "rgba(0,0,0,1)",
         };
 
         //
@@ -66,7 +60,7 @@ export class Panel {
 
     // create panel
     private _create(options) {
-        const panel: Rectangle = new Rectangle("panel-" + options.name);
+        let panel: Rectangle = new Rectangle("panel-" + options.name);
         panel.top = options.top;
         panel.left = options.left;
         panel.width = options.width;
@@ -79,6 +73,7 @@ export class Panel {
         panel.color = options.color;
         panel.isPointerBlocker = true;
         panel.isVisible = false;
+        panel = applyTheme(panel);
         this._playerUI.addControl(panel);
 
         this._panel = panel;

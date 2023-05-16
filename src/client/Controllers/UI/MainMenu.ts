@@ -1,7 +1,7 @@
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
-import { getBg } from "./Theme";
+import { getBg, createButton } from "./Theme";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import State from "../../Screens/Screens";
 import { SceneController } from "../../Controllers/Scene";
@@ -74,24 +74,15 @@ export class MainMenu {
         let i = 0;
         for (let index in menuItems) {
             let menuItem = menuItems[index];
-
-            const button = Button.CreateSimpleButton("inventoryButton", menuItem.menuTitle);
-            button.width = "85px";
-            button.height = "30px";
-            button.color = "white";
-            button.background = getBg();
-            button.thickness = 0;
-            button.fontSize = "12px;";
+            let button = createButton("button_" + i, menuItem.menuTitle, 85, 30);
             button.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
             button.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
             grid.addControl(button);
-
             if (menuItem.click) {
                 button.onPointerDownObservable.add(() => {
                     menuItem.click();
                 });
             }
-
             i++;
         }
     }

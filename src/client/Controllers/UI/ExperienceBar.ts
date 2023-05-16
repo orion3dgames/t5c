@@ -94,10 +94,10 @@ export class ExperienceBar {
                 expBar.top = 0;
                 expBar.left = 0.1 * i * 100 + "%";
                 expBar.top = "6px";
-                expBar.width = "2px";
+                expBar.width = "1px";
                 expBar.height = "22px";
                 expBar.thickness = 0;
-                expBar.background = "white";
+                expBar.background = "rgba(255,255,255,.4)";
                 expBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
                 expBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
                 experienceBar.addControl(expBar);

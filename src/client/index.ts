@@ -169,6 +169,9 @@ class App {
         //resize if the screen is resized/rotated
         window.addEventListener("resize", () => {
             this.engine.resize();
+            if (this.currentScene && this.currentScene.resize) {
+                this.currentScene.resize();
+            }
         });
     }
 

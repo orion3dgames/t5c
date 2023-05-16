@@ -8,6 +8,7 @@ import { Item } from "../../../../shared/Data/ItemDB";
 import { Panel } from "./Panel";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Button } from "@babylonjs/gui/2D/controls/button";
+import { applyTheme } from "../Theme";
 
 export class Panel_Abilities extends Panel {
     // inventory tab
@@ -69,6 +70,7 @@ export class Panel_Abilities extends Panel {
             skillsPanel.height = "50px";
             skillsPanel.background = "#CCC";
             skillsPanel.thickness = 1;
+            skillsPanel = applyTheme(skillsPanel);
             skillsPanelStack.addControl(skillsPanel);
 
             const tooltipName = new TextBlock("abilityName" + ability.key);

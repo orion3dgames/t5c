@@ -19,6 +19,7 @@ export class ChatBox {
 
     private _chatButton;
     private _chatInput;
+    public chatPanel;
 
     public messages: PlayerMessage[] = [];
 
@@ -50,6 +51,7 @@ export class ChatBox {
         chatPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         chatPanel.isPointerBlocker = true;
         this._playerUI.addControl(chatPanel);
+        this.chatPanel = chatPanel;
 
         const paddingPanel = new Rectangle("paddingPanel");
         paddingPanel.width = 1;

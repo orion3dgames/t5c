@@ -297,4 +297,11 @@ export class GameScene {
             }
         });
     }
+
+    // triggered on resize event
+    public resize() {
+        if (this._ui) {
+            this._ui.resize();
+        }
+    }
 }

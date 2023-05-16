@@ -161,6 +161,10 @@ export class UserInterface {
         });
     }
 
+    public resize() {
+        this._ChatBox.chatPanel.top = "-150px;";
+    }
+
     public refreshEntityUI() {
         // hide entity labels if out of distance
         for (let sessionId in this._entities) {

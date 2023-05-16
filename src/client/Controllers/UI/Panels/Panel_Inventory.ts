@@ -105,8 +105,7 @@ export class Panel_Inventory extends Panel {
         let inventorySpaceCols = inventorySpaceW;
         let inventorySpaceRows = inventorySpace / inventorySpaceW;
 
-        console.log(panelWidth, inventorySpace, inventorySpaceW, size, inventorySpaceCols, inventorySpaceRows);
-
+        // create grid
         let grid = new Grid();
         grid.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         grid.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
