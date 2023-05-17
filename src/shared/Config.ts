@@ -1,4 +1,5 @@
 import State from "../client/Screens/Screens";
+import { isLocal } from "./Utils";
 
 let Config = {
     // general settings
@@ -32,8 +33,8 @@ let Config = {
     initialLocation: "lh_town",
 
     // default scene
-    //defaultScene: isLocal() ? State.GAME : State.LOGIN,
-    defaultScene: State.GAME,
+    defaultScene: isLocal() ? State.GAME : State.LOGIN,
+    //defaultScene: State.LOGIN,
 };
 
 export default Config;
