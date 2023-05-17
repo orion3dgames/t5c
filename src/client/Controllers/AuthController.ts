@@ -59,6 +59,7 @@ class AuthController {
             });
             //set character
             this.setCharacter(character);
+            console.log(character);
         }
     }
 

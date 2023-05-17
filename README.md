@@ -9,11 +9,12 @@ Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 - global chat (works accross zones)
 - server controlled collisions
 - persistence with mysql lite
-- abilities
+- 4 abilities ( basic attack, fireball, dot, heal )
 - roaming monsters (with basic ai & attacks)
 - selecting characters and monsters
 - monsters have a loottable and can drop items
 - ability to pick up items 
+- standard UI (experience bar, abilities bar, panels, etc...)
 - and more...
 
 ## Roadmap
@@ -25,8 +26,8 @@ You can follow the progress here: [FORUM POST](https://forum.babylonjs.com/t/mul
 - Run `yarn install`
 
 ## Technology
-- Babylon.js (3d rendering engine)
-- Colyseus (networking)
+- Babylon.js 6 (3d rendering engine)
+- Colyseus 0.15 (networking)
 - SQLite (database)
 
 ## How to run client

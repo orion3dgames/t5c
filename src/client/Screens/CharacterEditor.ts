@@ -87,7 +87,7 @@ export class CharacterEditor {
         // if no user logged in, force a auto login
         // to be remove later or
         if (!this._auth.currentUser) {
-            this._auth.forceLogin();
+            await this._auth.forceLogin();
         }
 
         // check if user token is valid

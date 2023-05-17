@@ -60,15 +60,15 @@ export class MainMenu {
             },
         };
 
-        const grid = new StackPanel("griddddd");
-        grid.top = "-110px";
+        const grid = new StackPanel("mainmenu");
+        grid.top = "15px";
+        grid.left = "-2px";
         grid.width = "460px";
         grid.height = "36px;";
         grid.spacing = 5;
-        grid.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        grid.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        grid.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        grid.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         grid.isVertical = false;
-
         this._playerUI.addControl(grid);
 
         let i = 0;
