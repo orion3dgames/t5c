@@ -33,8 +33,8 @@ let Config = {
     initialLocation: "lh_town",
 
     // default scene
-    defaultScene: isLocal() ? State.GAME : State.LOGIN,
-    //defaultScene: State.LOGIN,
+    //defaultScene: isLocal() ? State.GAME : State.LOGIN,
+    defaultScene: State.LOGIN,
 };
 
 export default Config;
