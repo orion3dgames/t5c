@@ -5,23 +5,20 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { RadioGroup, SelectionPanel } from "@babylonjs/gui/2D/controls/";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-
 import { InputText } from "@babylonjs/gui/2D/controls/inputText";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
-
-import { SceneController } from "../Controllers/Scene";
-import { AuthController } from "../Controllers/AuthController";
-import State from "./Screens";
-import { request, apiUrl, generateRandomPlayerName, isLocal } from "../../shared/Utils";
-import { Environment } from "../Controllers/Environment";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { MeshAssetTask } from "@babylonjs/core/Misc/assetsManager";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
-import { RacesDB } from "../../shared/Data/RacesDB";
+
+import { SceneController } from "../Controllers/Scene";
+import { AuthController } from "../Controllers/AuthController";
+import State from "./Screens";
+import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
 import { dataDB } from "../../shared/Data/dataDB";
 
 export class CharacterEditor {
@@ -87,24 +84,10 @@ export class CharacterEditor {
         // load scene
         this._scene = scene;
 
-        ///////////////////// END DEBUG CODE /////////////////////////////
-        ///////////////////// DEBUG CODE /////////////////////////////////
-        // if local skip login screen
+        // if no user logged in, force a auto login
+        // to be remove later or
         if (!this._auth.currentUser) {
-            // get random user
-            let req = await request("get", apiUrl() + "/returnRandomUser");
-            let character = JSON.parse(req.data).user;
-            if (character) {
-                // set user
-                this._auth.setUser({
-                    id: character.user_id,
-                    username: character.username,
-                    password: character.password,
-                    token: character.token,
-                });
-                //set character
-                this._auth.setCharacter(character);
-            }
+            this._auth.forceLogin();
         }
 
         // check if user token is valid
@@ -113,8 +96,6 @@ export class CharacterEditor {
             // if token not valid, send back to login screen
             SceneController.goToScene(State.LOGIN);
         }
-        ///////////////////// END DEBUG CODE /////////////////////////////
-        ///////////////////// END DEBUG CODE /////////////////////////////
 
         /////////////////////////////////////////////////////////
         //////////////////////// UI

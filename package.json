@@ -13,14 +13,14 @@
     "server-dev": "ts-node-dev --respawn --transpile-only src/server/index.ts",
     "server-start": "ts-node --transpile-only src/server/index.ts",
     "server-build": "tsc",
-    "loadtest": "npx colyseus-loadtest ./src/server/loadtest/test.ts --room game_room --numClients 20 --endpoint ws://localhost:3000"
+    "loadtest": "npx tsx loadtest/test.ts --room game_room --numClients 10 --endpoint ws://localhost:3000"
   },
   "author": "Orion",
   "license": "GPL-3.0",
   "devDependencies": { 
-    "@babylonjs/gui-editor": "6.2.0",
-    "@babylonjs/inspector": "6.2.0",
-    "@babylonjs/materials": "6.2.0",
+    "@babylonjs/gui-editor": "^6.3.0",
+    "@babylonjs/inspector": "^6.3.0",
+    "@babylonjs/materials": "^6.3.0",
 
     "@colyseus/core": "^0.15.0",
     "@colyseus/loadtest": "^0.15.0",
@@ -28,13 +28,14 @@
     "@colyseus/ws-transport": "^0.15.0",
 
     "@types/node": "^17.0.12",
-    "@types/react": "16.7.3",
-    "@types/react-dom": "16.0.9",
+    "@types/react": "^16.7.3",
+    "@types/react-dom": "^16.0.9",
     "copy-webpack-plugin": "^11.0.0",
     "ts-loader": "^9.2.6",
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.4",
+
     "webpack": "^5.66.0",
     "webpack-bundle-analyzer": "^4.7.0",
     "webpack-cli": "^5.0.1",
@@ -42,11 +43,11 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
-    "@babylonjs/core": "6.2.0",
-    "@babylonjs/gui": "6.2.0",
-    "@babylonjs/loaders": "6.2.0",
-    "@babylonjs/serializers": "6.2.0",
-    "babylonjs-gltf2interface": "6.2.0",
+    "@babylonjs/core": "^6.3.0",
+    "@babylonjs/gui": "^6.3.0",
+    "@babylonjs/loaders": "^6.3.0",
+    "@babylonjs/serializers": "^6.3.0",
+    "babylonjs-gltf2interface": "^6.3.0",
     
     "colyseus.js": "^0.15.0",
     "colyseus": "^0.15.0",

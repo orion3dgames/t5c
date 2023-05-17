@@ -45,6 +45,24 @@ class AuthController {
     }
 
     // check login details
+    public async forceLogin() {
+        // get random user
+        let req = await request("get", apiUrl() + "/returnRandomUser");
+        let character = JSON.parse(req.data).user;
+        if (character) {
+            // set user
+            this.setUser({
+                id: character.user_id,
+                username: character.username,
+                password: character.password,
+                token: character.token,
+            });
+            //set character
+            this.setCharacter(character);
+        }
+    }
+
+    // check login details
     public async loggedIn() {
         let user = this.currentUser;
 

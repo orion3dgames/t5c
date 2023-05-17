@@ -14,8 +14,6 @@ import { Image } from "@babylonjs/gui/2D/controls/image";
 
 import Config from "../../shared/Config";
 import State from "./Screens";
-import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
-import alertMessage from "../../shared/Utils/alertMessage";
 import { SceneController } from "../Controllers/Scene";
 import { AuthController } from "../Controllers/AuthController";
 

@@ -2,21 +2,16 @@ import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
-
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Button } from "@babylonjs/gui/2D/controls/button";
-import { InputText } from "@babylonjs/gui/2D/controls/inputText";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
 
 import State from "./Screens";
-import { PlayerCharacter, PlayerUser } from "../../shared/types";
-import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
-import alertMessage from "../../shared/Utils/alertMessage";
-import { dataDB } from "../../shared/Data/dataDB";
+import { PlayerCharacter } from "../../shared/types";
 import { SceneController } from "../Controllers/Scene";
 import { AuthController } from "../Controllers/AuthController";
 
@@ -142,6 +137,12 @@ export class CharacterSelectionScene {
         // load scene
         this._scene = scene;
         await this._scene.whenReadyAsync();
+
+        // if no user logged in, force a auto login
+        // to be remove later or
+        if (!this._auth.currentUser) {
+            this._auth.forceLogin();
+        }
 
         // check if user token is valid
         let user = await this._auth.loggedIn();

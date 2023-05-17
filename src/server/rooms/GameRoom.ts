@@ -65,12 +65,11 @@ export class GameRoom extends Room<GameRoomState> {
         let saveInterval = 5000;
         this.delayedInterval = this.clock.setInterval(() => {
             saveTimer += 1000;
-            
+
             // only save if there is any players
             if (this.state.players.size > 0) {
                 //Logger.info("[gameroom][onCreate] Saving data for room " + options.location + " with " + this.state.players.size + " players");
                 this.state.players.forEach((entity) => {
-
                     // update player every second...
                     let playerClient = this.clients.getById(entity.sessionId);
                     this.database.updateCharacter(playerClient.auth.id, entity);
@@ -88,7 +87,7 @@ export class GameRoom extends Room<GameRoomState> {
                             this.database.saveAbilities(playerClient.auth.id, entity.abilities);
                         }
                     }
-                    
+
                     //Logger.info("[gameroom][onCreate] player " + playerClient.auth.name + " saved to database.");
                 });
             }

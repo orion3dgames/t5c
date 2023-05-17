@@ -16,12 +16,8 @@ import { Item } from "../../shared/Entities/Item";
 import Config from "../../shared/Config";
 import { Room } from "colyseus.js";
 import { PlayerInputs } from "../../shared/types";
-import { apiUrl, isLocal, request } from "../../shared/Utils";
 import { NavMesh } from "../../shared/yuka";
-import loadNavMeshFromString from "../../shared/Utils/loadNavMeshFromString";
-import { createConvexRegionHelper, createGraphHelper } from "../../shared/Utils/navMeshHelper";
 import { SceneController } from "../Controllers/Scene";
-import { dataDB } from "../../shared/Data/dataDB";
 import { AuthController } from "../Controllers/AuthController";
 
 export class GameScene {
@@ -65,24 +61,10 @@ export class GameScene {
         // set scene
         this._scene = scene;
 
-        ///////////////////// END DEBUG CODE /////////////////////////////
-        ///////////////////// DEBUG CODE /////////////////////////////////
-        // if no user set, get random user instead
+        // if no user logged in, force a auto login
+        // to be remove later or
         if (!this._auth.currentUser) {
-            // get random user
-            let req = await request("get", apiUrl() + "/returnRandomUser");
-            let character = JSON.parse(req.data).user;
-            if (character) {
-                // set user
-                this._auth.setUser({
-                    id: character.user_id,
-                    username: character.username,
-                    password: character.password,
-                    token: character.token,
-                });
-                //set character
-                this._auth.setCharacter(character);
-            }
+            this._auth.forceLogin();
         }
 
         // check if user token is valid
@@ -91,8 +73,6 @@ export class GameScene {
             // if token not valid, send back to login screen
             SceneController.goToScene(State.LOGIN);
         }
-        ///////////////////// END DEBUG CODE /////////////////////////////
-        ///////////////////// END DEBUG CODE /////////////////////////////
 
         //
         let location = this._auth.currentLocation;

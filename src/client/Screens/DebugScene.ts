@@ -1,32 +1,16 @@
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
-
-import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
-import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
-import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
-import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Button } from "@babylonjs/gui/2D/controls/button";
-import { InputText } from "@babylonjs/gui/2D/controls/inputText";
-import { InputPassword } from "@babylonjs/gui/2D/controls/inputPassword";
-import { Image } from "@babylonjs/gui/2D/controls/image";
-
-import Config from "../../shared/Config";
-import State from "./Screens";
-import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
-import alertMessage from "../../shared/Utils/alertMessage";
-import { SceneController } from "../Controllers/Scene";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
-import { CheckboxGroup, RadioGroup, SelectionPanel, SliderGroup } from "@babylonjs/gui/2D/controls/selector";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { BakedVertexAnimationManager } from "@babylonjs/core/BakedVertexAnimation/bakedVertexAnimationManager";
 import { VertexAnimationBaker } from "@babylonjs/core/BakedVertexAnimation/vertexAnimationBaker";
 import { Engine } from "@babylonjs/core/Engines/engine";
+
+import State from "./Screens";
 
 class JavascriptDataDownloader {
     private data;
