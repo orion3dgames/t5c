@@ -1,17 +1,17 @@
 import { Client } from "@colyseus/core";
 import { Schema, MapSchema, type, filter, OPERATION } from "@colyseus/schema";
 import Config from "../../../shared/Config";
-import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
 import { GameRoom } from "../GameRoom";
-import { abilitiesCTRL } from "../ctrl/abilityCTRL";
-import { moveCTRL } from "../ctrl/moveCTRL";
+import { abilitiesCTRL } from "../controllers/abilityCTRL";
+import { moveCTRL } from "../controllers/moveCTRL";
 import { dataDB } from "../../../shared/Data/dataDB";
-import { Item } from "src/shared/Entities/Item";
 import { NavMesh, Vector3 } from "../../../shared/yuka";
 
-import { InventoryItem } from "../schema/InventoryItem";
-import { AbilityItem } from "./AbilityItem";
-import { LootState } from "./LootState";
+import { InventorySchema } from "./InventorySchema";
+import { AbilitySchema } from "./AbilitySchema";
+import { LootSchema } from "./LootSchema";
+import { EntityState } from "../../../shared/Entities/Entity/EntityState";
+import { Item } from "../../../shared/Entities/Item";
 
 export class PlayerData extends Schema {
     //@type({ map: InventoryItem }) inventory = new MapSchema<InventoryItem>();
@@ -25,7 +25,7 @@ export class PlayerData extends Schema {
     @type("uint32") public experience: number = 0;
 }
 
-export class PlayerState extends Schema {
+export class PlayerSchema extends Schema {
     /////////////////////////////////////////////////////////////
     // the below will be synced to all the players
     @type("number") public id: number = 0;
@@ -48,7 +48,7 @@ export class PlayerState extends Schema {
     @type("string") public location: string = "";
     @type("number") public sequence: number = 0; // latest input sequence
     @type("boolean") public blocked: boolean = false; // if true, used to block player and to prevent movement
-    @type("int8") public anim_state: EntityCurrentState = EntityCurrentState.IDLE;
+    @type("int8") public anim_state: EntityState = EntityState.IDLE;
 
     // could be remove from state
     @type("uint32") public gold: number = 0;
@@ -56,25 +56,25 @@ export class PlayerState extends Schema {
     ////////////////////////////////////////////////////////////////////////////
     // the below data only need to synchronized to the player it belongs too
     // player data
-    @filter(function (this: PlayerState, client: Client) {
+    @filter(function (this: PlayerSchema, client: Client) {
         return this.sessionId === client.sessionId;
     })
     @type(PlayerData)
     player_data: PlayerData = new PlayerData();
 
     // inventory
-    @filter(function (this: PlayerState, client: Client) {
+    @filter(function (this: PlayerSchema, client: Client) {
         return this.sessionId === client.sessionId;
     })
-    @type({ map: InventoryItem })
-    inventory = new MapSchema<InventoryItem>();
+    @type({ map: InventorySchema })
+    inventory = new MapSchema<InventorySchema>();
 
     // abilities
-    @filter(function (this: PlayerState, client: Client) {
+    @filter(function (this: PlayerSchema, client: Client) {
         return this.sessionId === client.sessionId;
     })
-    @type({ map: AbilityItem })
-    abilities = new MapSchema<AbilityItem>();
+    @type({ map: AbilitySchema })
+    abilities = new MapSchema<AbilitySchema>();
 
     /////////////////////////////////////////////////////////////
     // does not need to be synced
@@ -114,10 +114,10 @@ export class PlayerState extends Schema {
         // assign player data
         // todo: must be better way to do this
         data.default_abilities.forEach((element) => {
-            this.abilities.set(element.key, new AbilityItem(element));
+            this.abilities.set(element.key, new AbilitySchema(element));
         });
         data.default_inventory.forEach((element) => {
-            this.inventory.set(element.key, new InventoryItem(element));
+            this.inventory.set(element.key, new InventorySchema(element));
         });
         Object.entries(data.default_player_data).forEach(([k, v]) => {
             this.player_data[k] = v;
@@ -171,7 +171,7 @@ export class PlayerState extends Schema {
         this.moveCTRL.update();
     }
 
-    addItemToInventory(loot: LootState) {
+    addItemToInventory(loot: LootSchema) {
         let data = {
             key: loot.key,
             qty: loot.quantity,
@@ -181,7 +181,7 @@ export class PlayerState extends Schema {
         if (inventoryItem) {
             inventoryItem.qty += data.qty;
         } else {
-            this.inventory.set(data.key, new InventoryItem(data));
+            this.inventory.set(data.key, new InventorySchema(data));
         }
         this._gameroom.state.items.delete(loot.sessionId);
     }
@@ -191,7 +191,7 @@ export class PlayerState extends Schema {
         this.isDead = true;
         this.health = 0;
         this.blocked = true;
-        this.anim_state = EntityCurrentState.DEAD;
+        this.anim_state = EntityState.DEAD;
     }
 
     resetPosition() {
@@ -206,7 +206,7 @@ export class PlayerState extends Schema {
         this.health = this.maxHealth;
         this.mana = this.maxMana;
         this.blocked = false;
-        this.anim_state = EntityCurrentState.IDLE;
+        this.anim_state = EntityState.IDLE;
         this.gracePeriod = true;
         setTimeout(() => {
             this.gracePeriod = false;

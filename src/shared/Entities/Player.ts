@@ -5,7 +5,7 @@ import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 import { NavMesh } from "../yuka";
 import { Room } from "colyseus.js";
 
-import { PlayerState } from "../../server/rooms/schema/PlayerState";
+import { PlayerSchema } from "../../server/rooms/schema/PlayerSchema";
 import { PlayerCamera } from "./Player/PlayerCamera";
 import { EntityUtils } from "./Entity/EntityUtils";
 import { EntityActions } from "./Entity/EntityActions";
@@ -14,7 +14,7 @@ import { PlayerInput } from "../../client/Controllers/PlayerInput";
 import { UserInterface } from "../../client/Controllers/UserInterface";
 import Config from "../Config";
 import State from "../../client/Screens/Screens";
-import { EntityCurrentState } from "./Entity/EntityCurrentState";
+import { EntityState } from "./Entity/EntityState";
 import { AuthController } from "../../client/Controllers/AuthController";
 import { dataDB } from "../Data/dataDB";
 import { SceneController } from "../../client/Controllers/Scene";
@@ -36,7 +36,7 @@ export class Player extends Entity {
     public inventory;
 
     constructor(
-        entity: PlayerState,
+        entity: PlayerSchema,
         room: Room,
         scene: Scene,
         ui: UserInterface,
@@ -186,7 +186,7 @@ export class Player extends Entity {
             }
         });
 
-        if (this.anim_state === EntityCurrentState.DEAD) {
+        if (this.anim_state === EntityState.DEAD) {
             this.ui._RessurectBox.open();
         } else {
             this.ui._RessurectBox.close();

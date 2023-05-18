@@ -1,15 +1,15 @@
 import { Schema, type } from "@colyseus/schema";
 import Logger from "../../../shared/Logger";
 import Config from "../../../shared/Config";
-import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
+import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 import { Vector3, NavMesh } from "../../../shared/yuka";
 import { dataDB } from "../../../shared/Data/dataDB";
-import { PlayerState } from "./PlayerState";
-import { abilitiesCTRL } from "../ctrl/abilityCTRL";
-import { AbilityItem } from "./AbilityItem";
+import { PlayerSchema } from "./PlayerSchema";
+import { abilitiesCTRL } from "../controllers/abilityCTRL";
+import { AbilitySchema } from "./AbilitySchema";
 
-export class EnemyState extends Schema {
+export class EnemySchema extends Schema {
     /////////////////////////////////////////////////////////////
     // the below will be synced to all the players
     @type("number") public id: number = 0;
@@ -32,7 +32,7 @@ export class EnemyState extends Schema {
     @type("string") public location: string = "";
     @type("number") public sequence: number = 0; // latest input sequence
     @type("boolean") public blocked: boolean = false; // if true, used to block player and to prevent movement
-    @type("int8") public anim_state: EntityCurrentState = EntityCurrentState.IDLE;
+    @type("int8") public anim_state: EntityState = EntityState.IDLE;
     @type("number") public AI_CURRENT_STATE: AI_STATE = 0;
 
     public manaRegen: number = 0;
@@ -49,7 +49,7 @@ export class EnemyState extends Schema {
 
     //
     public abilitiesCTRL: abilitiesCTRL;
-    public abilities: AbilityItem[] = [];
+    public abilities: AbilitySchema[] = [];
     public default_abilities;
 
     // public vars
@@ -60,7 +60,7 @@ export class EnemyState extends Schema {
 
     public AI_CURRENT_TARGET_POSITION = null;
     public AI_CURRENT_TARGET_DISTANCE = 0;
-    public AI_CURRENT_TARGET: PlayerState | null;
+    public AI_CURRENT_TARGET: PlayerSchema | null;
     public AI_CURRENT_TARGET_FOUND = false;
     public AI_CURRENT_ABILITY;
     public AI_STATE_REMAINING_DURATION: number = 0;
@@ -82,7 +82,7 @@ export class EnemyState extends Schema {
         Object.assign(this, dataDB.get("race", this.race));
 
         this.default_abilities.forEach((element) => {
-            this.abilities.push(new AbilityItem({ key: element, digit: 1 }));
+            this.abilities.push(new AbilitySchema({ key: element, digit: 1 }));
         });
 
         this.abilitiesCTRL = new abilitiesCTRL(this);
@@ -252,7 +252,7 @@ export class EnemyState extends Schema {
     setAsDead() {
         this.health = 0;
         this.blocked = true;
-        this.anim_state = EntityCurrentState.DEAD;
+        this.anim_state = EntityState.DEAD;
         this.AI_CURRENT_STATE = AI_STATE.IDLE;
         this.AI_CURRENT_TARGET = null;
         this.isDead = true;
@@ -273,7 +273,7 @@ export class EnemyState extends Schema {
      */
     attack() {
         // entity animation set to attack
-        this.anim_state = EntityCurrentState.ATTACK;
+        this.anim_state = EntityState.ATTACK;
 
         this.AI_ATTACK_INTERVAL += 100;
 

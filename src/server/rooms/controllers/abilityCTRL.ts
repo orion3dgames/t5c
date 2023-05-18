@@ -1,9 +1,9 @@
 import Logger from "../../../shared/Logger";
-import { Ability } from "../../../shared/Entities/Common/Ability";
-import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
+import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { dropCTRL } from "./dropCTRL";
 import { dataDB } from "../../../shared/Data/dataDB";
-import { AbilityItem } from "../schema/AbilityItem";
+import { AbilitySchema } from "../schema/AbilitySchema";
+import { Ability } from "../../../shared/Entities/Common/Ability";
 
 export class abilitiesCTRL {
     private _owner;
@@ -62,7 +62,7 @@ export class abilitiesCTRL {
             console.log("learnAbility", "DIGIT", this.abilities.length, this._owner.abilities.size);
             this._owner.abilities.set(
                 ability.key,
-                new AbilityItem({
+                new AbilitySchema({
                     digit: this.abilities.length + 1,
                     key: ability.key,
                 })
@@ -131,14 +131,14 @@ export class abilitiesCTRL {
     }
 
     doAutoAttack(owner, target, ability) {
-        owner.anim_state = EntityCurrentState.ATTACK;
+        owner.anim_state = EntityState.ATTACK;
         this.castAbility(owner, target, ability, 1);
     }
 
     cancelAutoAttack(owner) {
         owner.AI_CURRENT_TARGET = null;
         owner.AI_CURRENT_ABILITY = null;
-        owner.anim_state = EntityCurrentState.IDLE;
+        owner.anim_state = EntityState.IDLE;
         clearInterval(this.attackTimer);
     }
 

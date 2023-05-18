@@ -1,9 +1,9 @@
 import Logger from "../../../shared/Logger";
 import { Vector3 } from "../../../shared/yuka";
 import { PlayerInputs } from "../../../shared/types";
-import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
-import { EnemyState } from "../schema/EnemyState";
-import { LootState } from "../schema/LootState";
+import { EntityState } from "../../../shared/Entities/Entity/EntityState";
+import { EnemySchema } from "../schema/EnemySchema";
+import { LootSchema } from "../schema/LootSchema";
 
 export class moveCTRL {
     private _owner;
@@ -26,10 +26,10 @@ export class moveCTRL {
             if (distance < 3) {
                 let ability = this._owner.AI_CURRENT_ABILITY;
                 let target = this._owner.AI_CURRENT_TARGET;
-                if (target instanceof EnemyState) {
+                if (target instanceof EnemySchema) {
                     this._owner.abilitiesCTRL.startAutoAttack(this._owner, target, ability);
                 }
-                if (target instanceof LootState) {
+                if (target instanceof LootSchema) {
                     this._owner.addItemToInventory(target);
                 }
                 this._owner.AI_CURRENT_TARGET = null;
@@ -74,7 +74,7 @@ export class moveCTRL {
      */
     processPlayerInput(playerInput: PlayerInputs) {
         if (this._owner.blocked && !this._owner.isDead) {
-            this._owner.state = EntityCurrentState.IDLE;
+            this._owner.state = EntityState.IDLE;
             Logger.warning("Player " + this._owner.name + " is blocked, no movement will be processed");
             return false;
         }
@@ -114,7 +114,7 @@ export class moveCTRL {
             this._owner.rot = newRot;
             this._owner.sequence = playerInput.seq;
             this._owner.isMoving = true;
-            this._owner.state = EntityCurrentState.WALKING;
+            this._owner.state = EntityState.WALKING;
 
             Logger.info(
                 "Valid position for " +
@@ -135,7 +135,7 @@ export class moveCTRL {
             this._owner.z = oldZ;
             this._owner.rot = oldRot;
             this._owner.sequence = playerInput.seq;
-            this._owner.state = EntityCurrentState.IDLE;
+            this._owner.state = EntityState.IDLE;
 
             Logger.warning(
                 "Invalid position for " +

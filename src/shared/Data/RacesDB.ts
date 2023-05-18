@@ -1,4 +1,3 @@
-import { AbilityItem } from "src/server/rooms/schema/AbilityItem";
 import { ILootTableEntry, LootTableEntry } from "../Entities/Player/LootTable";
 
 type Race = {

@@ -1,7 +1,7 @@
 import { Schema, type } from "@colyseus/schema";
 import { dataDB } from "../../../shared/Data/dataDB";
 
-export class AbilityItem extends Schema {
+export class AbilitySchema extends Schema {
     // networked player specific
     @type("number") public id: number;
     @type("string") public key: string = "";

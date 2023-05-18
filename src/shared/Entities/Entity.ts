@@ -18,7 +18,7 @@ import { UserInterface } from "../../client/Controllers/UserInterface";
 import { NavMesh } from "../yuka";
 import { AI_STATE } from "./Entity/AIState";
 import Config from "../Config";
-import { EntityCurrentState } from "./Entity/EntityCurrentState";
+import { EntityState } from "./Entity/EntityState";
 import { PlayerInput } from "../../client/Controllers/PlayerInput";
 import { dataDB } from "../Data/dataDB";
 import { ActionManager } from "@babylonjs/core/Actions/actionManager";
@@ -65,7 +65,7 @@ export class Entity {
     public level: number;
     public experience: number;
     public location: string = "";
-    public anim_state: number = EntityCurrentState.IDLE;
+    public anim_state: number = EntityState.IDLE;
     public AI_CURRENT_STATE: number = 0;
     public isDead: boolean = false;
 
@@ -174,7 +174,7 @@ export class Entity {
         if (this.AI_CURRENT_STATE === AI_STATE.WANDER) {
             this.debugMesh.material = this._scene.getMaterialByName("debug_entity_neutral");
         }
-        if (this.type !== "player" && this.anim_state === EntityCurrentState.DEAD && !this.isDead) {
+        if (this.type !== "player" && this.anim_state === EntityState.DEAD && !this.isDead) {
             console.log("DEAD");
             this.isDead = true;
             global.T5C.selectedEntity = null;

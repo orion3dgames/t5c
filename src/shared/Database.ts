@@ -6,8 +6,8 @@ import { ParsedQs } from "qs";
 import Config from "./Config";
 import { dataDB } from "./Data/dataDB";
 import { Item } from "./Entities/Item";
-import { InventoryItem } from "../server/rooms/schema/InventoryItem";
-import { AbilityItem } from "src/server/rooms/schema/AbilityItem";
+import { InventorySchema } from "../server/rooms/schema/InventorySchema";
+import { AbilitySchema } from "src/server/rooms/schema/AbilitySchema";
 
 class Database {
     private db;
@@ -350,7 +350,7 @@ class Database {
         const sql = `DELETE FROM character_inventory WHERE owner_id=?;`;
         await this.run(sql, [character_id]);
         let sqlItems = `INSERT INTO character_inventory (owner_id, qty, key) VALUES `;
-        items.forEach((element:InventoryItem) => {
+        items.forEach((element: InventorySchema) => {
             sqlItems += ` ('${character_id}', '${element.qty}', '${element.key}'),`;
         });
         sqlItems = sqlItems.slice(0, -1);
@@ -363,7 +363,7 @@ class Database {
         const sql = `DELETE FROM character_abilities WHERE owner_id=?;`;
         await this.run(sql, [character_id]);
         let sqlItems = `INSERT INTO character_abilities (owner_id, digit, key) VALUES `;
-        abilities.forEach((element:AbilityItem) => {
+        abilities.forEach((element: AbilitySchema) => {
             sqlItems += ` ('${character_id}', '${element.digit}', '${element.key}'),`;
         });
         sqlItems = sqlItems.slice(0, -1);

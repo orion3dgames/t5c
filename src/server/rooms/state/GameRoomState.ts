@@ -1,9 +1,9 @@
 import { Schema, type, MapSchema, filterChildren } from "@colyseus/schema";
-import { EnemyState } from "./EnemyState";
-import { PlayerData, PlayerState } from "./PlayerState";
-import { LootState } from "./LootState";
+import { EnemySchema } from "../schema/EnemySchema";
+import { PlayerSchema } from "../schema/PlayerSchema";
+import { LootSchema } from "../schema/LootSchema";
 import { GameRoom } from "../GameRoom";
-import { EntityCurrentState } from "../../../shared/Entities/Entity/EntityCurrentState";
+import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { NavMesh } from "../../../shared/yuka";
 import { nanoid } from "nanoid";
 import Logger from "../../../shared/Logger";
@@ -12,7 +12,6 @@ import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 import { dataDB } from "../../../shared/Data/dataDB";
 import { Client } from "colyseus";
 import { GetLoot, LootTableEntry } from "../../../shared/Entities/Player/LootTable";
-import Config from "../../../shared/Config";
 
 export class GameRoomState extends Schema {
     // networked variables
@@ -25,11 +24,11 @@ export class GameRoomState extends Schema {
         const isWithinBounds = isWithinXBounds && isWithinZBounds;
         return isSelf || isWithinBounds;
     })*/
-    @type({ map: EnemyState })
-    entities = new MapSchema<EnemyState>();
+    @type({ map: EnemySchema })
+    entities = new MapSchema<EnemySchema>();
 
-    @type({ map: PlayerState }) players = new MapSchema<PlayerState>();
-    @type({ map: LootState }) items = new MapSchema<LootState>();
+    @type({ map: PlayerSchema }) players = new MapSchema<PlayerSchema>();
+    @type({ map: LootSchema }) items = new MapSchema<LootSchema>();
     @type("number") serverTime: number = 0.0;
 
     // not networked variables
@@ -76,11 +75,11 @@ export class GameRoomState extends Schema {
             maxHealth: randData.baseHealth,
             maxMana: randData.baseMana,
             level: 1,
-            state: EntityCurrentState.IDLE,
+            state: EntityState.IDLE,
             toRegion: false,
         };
 
-        let entity = new EnemyState(this._gameroom, data);
+        let entity = new EnemySchema(this._gameroom, data);
 
         // add to colyseus state
         this.entities.set(sessionId, entity);
@@ -124,7 +123,7 @@ export class GameRoomState extends Schema {
                 z: currentPosition.z,
                 quantity: drop.quantity,
             };
-            let entity = new LootState(this, data);
+            let entity = new LootSchema(this, data);
             this.items.set(sessionId, entity);
             Logger.info("[gameroom][state][createEntity] created new item " + item.key + ": " + sessionId);
         });
@@ -217,7 +216,7 @@ export class GameRoomState extends Schema {
             location: data.location,
             sequence: 0,
             blocked: false,
-            state: EntityCurrentState.IDLE,
+            state: EntityState.IDLE,
 
             gold: data.gold ?? 0,
             strength: 15,
@@ -232,7 +231,7 @@ export class GameRoomState extends Schema {
             default_inventory: data.inventory ?? [],
         };
 
-        this._gameroom.state.players.set(client.sessionId, new PlayerState(this._gameroom, player));
+        this._gameroom.state.players.set(client.sessionId, new PlayerSchema(this._gameroom, player));
 
         // set player as online
         this._gameroom.database.toggleOnlineStatus(client.auth.id, 1);

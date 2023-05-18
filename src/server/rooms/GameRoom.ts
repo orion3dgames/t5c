@@ -1,16 +1,16 @@
 import http from "http";
 import { Room, Client, Delayed } from "@colyseus/core";
-import { GameRoomState } from "./schema/GameRoomState";
+import { GameRoomState } from "./state/GameRoomState";
 import databaseInstance from "../../shared/Database";
 import Config from "../../shared/Config";
 import Logger from "../../shared/Logger";
 import loadNavMeshFromFile from "../../shared/Utils/loadNavMeshFromFile";
-import { PlayerState } from "./schema/PlayerState";
+import { PlayerSchema } from "./schema/PlayerSchema";
 import { PlayerInputs } from "../../shared/types";
 import { NavMesh } from "../../shared/yuka";
 import { nanoid } from "nanoid";
 import { randomNumberInRange } from "../../shared/Utils";
-import { LootState } from "./schema/LootState";
+import { LootSchema } from "./schema/LootSchema";
 import { dataDB } from "../../shared/Data/dataDB";
 
 import { Auth } from "./commands";
@@ -126,21 +126,21 @@ export class GameRoom extends Room<GameRoomState> {
         /////////////////////////////////////
         // on player reset position
         this.onMessage("reset_position", (client, data) => {
-            const playerState: PlayerState = this.state.players.get(client.sessionId);
+            const playerState: PlayerSchema = this.state.players.get(client.sessionId);
             if (playerState) {
                 playerState.resetPosition();
             }
         });
 
         this.onMessage("revive_pressed", (client, data) => {
-            const playerState: PlayerState = this.state.players.get(client.sessionId);
+            const playerState: PlayerSchema = this.state.players.get(client.sessionId);
             if (playerState) {
                 playerState.ressurect();
             }
         });
 
         this.onMessage("pickup_item", (client, data) => {
-            const playerState: PlayerState = this.state.players.get(client.sessionId);
+            const playerState: PlayerSchema = this.state.players.get(client.sessionId);
             const itemState = this.state.items.get(data.sessionId);
             if (playerState && itemState) {
                 playerState.setTarget(itemState);
@@ -148,7 +148,7 @@ export class GameRoom extends Room<GameRoomState> {
         });
 
         this.onMessage("learn_skill", (client, ability_key) => {
-            const playerState: PlayerState = this.state.players.get(client.sessionId);
+            const playerState: PlayerSchema = this.state.players.get(client.sessionId);
             const ability = dataDB.get("ability", ability_key);
             if (playerState && ability) {
                 playerState.abilitiesCTRL.learnAbility(ability);
@@ -158,7 +158,7 @@ export class GameRoom extends Room<GameRoomState> {
         /////////////////////////////////////
         // on player input
         this.onMessage("playerInput", (client, playerInput: PlayerInputs) => {
-            const playerState: PlayerState = this.state.players.get(client.sessionId);
+            const playerState: PlayerSchema = this.state.players.get(client.sessionId);
             if (playerState) {
                 playerState.moveCTRL.processPlayerInput(playerInput);
             } else {
@@ -169,7 +169,7 @@ export class GameRoom extends Room<GameRoomState> {
         /////////////////////////////////////
         // on player teleport
         this.onMessage("playerTeleport", (client, location) => {
-            const playerState: PlayerState = this.state.players.get(client.sessionId);
+            const playerState: PlayerSchema = this.state.players.get(client.sessionId);
 
             if (playerState) {
                 // update player location in database
@@ -200,7 +200,7 @@ export class GameRoom extends Room<GameRoomState> {
         // player entity_attack
         this.onMessage("entity_ability_key", (client, data: any) => {
             // get players involved
-            let sender: PlayerState = this.state.players[client.sessionId];
+            let sender: PlayerSchema = this.state.players[client.sessionId];
             let target = this.state.entities[data.targetId];
 
             if (!target) {
@@ -221,7 +221,7 @@ export class GameRoom extends Room<GameRoomState> {
                     z: currentPosition.z,
                     quantity: 1,
                 };
-                let entity = new LootState(this, data);
+                let entity = new LootSchema(this, data);
                 this.state.items.set(sessionId, entity);
             }
 

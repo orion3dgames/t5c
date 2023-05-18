@@ -1,4 +1,4 @@
-export enum EntityCurrentState {
+export enum EntityState {
     IDLE = 0,
     WALKING = 1,
     RUNNING = 2,
