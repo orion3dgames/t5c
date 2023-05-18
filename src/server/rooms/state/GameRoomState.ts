@@ -231,6 +231,8 @@ export class GameRoomState extends Schema {
             default_inventory: data.inventory ?? [],
         };
 
+        console.log(player);
+
         this._gameroom.state.players.set(client.sessionId, new PlayerSchema(this._gameroom, player));
 
         // set player as online
