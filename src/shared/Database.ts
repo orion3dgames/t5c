@@ -266,7 +266,7 @@ class Database {
 
     async createCharacter(token, name) {
         // create a character
-        let raceData = dataDB.get("race", "player_hobbit");
+        let raceData = dataDB.get("race", "male_adventurer");
         let user = await this.getUserByToken(token);
         let defaultLocation = dataDB.get("location", Config.initialLocation);
         const sql = `INSERT INTO characters ("user_id", "name","location","x","y","z","rot","level","experience","health", "mana") VALUES (
