@@ -134,7 +134,7 @@ export class UserInterface {
         this.panelAbilities = new Panel_Abilities(this, currentPlayer, {
             name: "Abilities",
             width: "500px;",
-            height: "300px;",
+            height: "400px;",
             top: "0px;",
             left: "5px;",
             horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,

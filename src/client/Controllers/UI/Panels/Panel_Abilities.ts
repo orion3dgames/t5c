@@ -9,6 +9,7 @@ import { Panel } from "./Panel";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { applyTheme } from "../Theme";
+import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
 
 export class Panel_Abilities extends Panel {
     // inventory tab
@@ -49,34 +50,55 @@ export class Panel_Abilities extends Panel {
             el.dispose();
         });
 
+        // add scrollable container
+        const scrollViewer = new ScrollViewer("scrollViewer");
+        scrollViewer.width = .99;
+        scrollViewer.height = .92;
+        scrollViewer.top = 0;
+        scrollViewer.thickness = 0;
+        scrollViewer.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        scrollViewer.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        panel.addControl(scrollViewer);
+
         // panel title
         const skillsPanelStack = new StackPanel("skillsPanelStack");
         skillsPanelStack.width = 1;
+        skillsPanelStack.adaptHeightToChildren = true;
         skillsPanelStack.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         skillsPanelStack.setPaddingInPixels(5, 5, 5, 5);
-        panel.addControl(skillsPanelStack);
+        scrollViewer.addControl(skillsPanelStack);
+
+        this.addAbilities(skillsPanelStack);
+        //this.addAbilities(skillsPanelStack);
+    }
+
+    addAbilities(skillsPanelStack){
 
         let Abilities = dataDB.load("abilities");
         for (let key in Abilities) {
             // get ability details
             let ability = Abilities[key];
 
+            let hasRequirements = Object.keys(ability.requiredToLearn).length;
+
             let skillsPanel = new Rectangle("abilityCont" + ability.key);
             skillsPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             skillsPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-            skillsPanel.top = "5px";
-            skillsPanel.left = 0;
+            skillsPanel.top = "0px";
+            skillsPanel.left = "0px;";
             skillsPanel.width = 1;
-            skillsPanel.height = "50px";
+            skillsPanel.height = hasRequirements > 0 ? "70px" : "47px";
             skillsPanel.background = "#CCC";
             skillsPanel.thickness = 1;
+            skillsPanel.paddingLeft = "5px;";
+            skillsPanel.paddingBottom = "5px;";
             skillsPanel = applyTheme(skillsPanel);
             skillsPanelStack.addControl(skillsPanel);
 
             const tooltipName = new TextBlock("abilityName" + ability.key);
             tooltipName.color = "#FFF";
-            tooltipName.top = "0px";
-            tooltipName.left = "0px";
+            tooltipName.top = "5px";
+            tooltipName.left = "5px";
             tooltipName.fontSize = "24px;";
             tooltipName.resizeToFit = true;
             tooltipName.text = ability.label;
@@ -86,12 +108,27 @@ export class Panel_Abilities extends Panel {
             tooltipName.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             skillsPanel.addControl(tooltipName);
 
+            if(hasRequirements > 0){
+                const abilityDescr = new TextBlock("abilityDescr" + ability.key);
+                abilityDescr.color = "rgba(255,255,255,.6)";
+                abilityDescr.top = "-6px";
+                abilityDescr.left = "5px";
+                abilityDescr.fontSize = "12px;";
+                abilityDescr.resizeToFit = true;
+                abilityDescr.text = this.objToString(ability.requiredToLearn);
+                abilityDescr.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+                abilityDescr.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+                abilityDescr.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+                abilityDescr.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+                skillsPanel.addControl(abilityDescr);
+            }
+
             let entity = this._currentPlayer.entity;
             if (entity.abilities[ability.key]) {
-                const abilityLearn = Button.CreateSimpleButton("abilityForget" + ability.key, "Forget Ability");
-                abilityLearn.top = "0px;";
-                abilityLearn.left = "15px;";
-                abilityLearn.width = "190px;";
+                const abilityLearn = Button.CreateSimpleButton("abilityForget" + ability.key, "Forget");
+                abilityLearn.top = "2px;";
+                abilityLearn.left = "-2px;";
+                abilityLearn.width = "100px;";
                 abilityLearn.height = "30px";
                 abilityLearn.color = "white";
                 abilityLearn.background = "#000";
@@ -103,10 +140,10 @@ export class Panel_Abilities extends Panel {
                     this._gameRoom.send("learn_skill", ability.key);
                 });
             } else {
-                const abilityLearn = Button.CreateSimpleButton("abilityLearn" + ability.key, "Learn Ability");
-                abilityLearn.top = "0px;";
-                abilityLearn.left = "15px;";
-                abilityLearn.width = "190px;";
+                const abilityLearn = Button.CreateSimpleButton("abilityLearn" + ability.key, "Learn");
+                abilityLearn.top = "2px;";
+                abilityLearn.left = "-2px;";
+                abilityLearn.width = "100px;";
                 abilityLearn.height = "30px";
                 abilityLearn.color = "white";
                 abilityLearn.background = "#000";
@@ -119,6 +156,14 @@ export class Panel_Abilities extends Panel {
                 });
             }
         }
+    }
+
+    public objToString (obj) {
+        let str = '';
+        for (const [p, val] of Object.entries(obj)) {
+            str += `| ${p}:${val} `;
+        }
+        return str;
     }
 
     ///////////////////////////////////////

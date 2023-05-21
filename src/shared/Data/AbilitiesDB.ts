@@ -112,7 +112,7 @@ let AbilitiesDB: abilityMap = {
             health: -50,
         },
         requiredToLearn: {
-            level: 3,
+            level: 2,
         },
     },
     poisonball: {
@@ -140,7 +140,7 @@ let AbilitiesDB: abilityMap = {
             health: -10,
         },
         requiredToLearn: {
-            level: 5,
+            level: 3,
         },
     },
     heal: {
@@ -168,7 +168,7 @@ let AbilitiesDB: abilityMap = {
             health: 50,
         },
         requiredToLearn: {
-            level: 4,
+            level: 3,
             intelligence: 18,
             wisdom: 24,
         },
