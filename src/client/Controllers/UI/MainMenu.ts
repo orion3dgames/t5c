@@ -57,7 +57,7 @@ export class MainMenu {
                     this._gameRoom.leave();
                     SceneController.goToScene(State.CHARACTER_SELECTION);
                 },
-            },
+            }
         };
 
         const grid = new StackPanel("mainmenu");
@@ -74,6 +74,7 @@ export class MainMenu {
         let i = 0;
         for (let index in menuItems) {
             let menuItem = menuItems[index];
+
             let button = createButton("button_" + i, menuItem.menuTitle, 85, 30);
             button.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
             button.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
@@ -83,8 +84,10 @@ export class MainMenu {
                     menuItem.click();
                 });
             }
+
             i++;
         }
+
     }
 
     public openPanel(key) {

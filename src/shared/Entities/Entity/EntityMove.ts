@@ -70,15 +70,21 @@ export class EntityMove {
     }
 
     public tween() {
+       
+        // continuously lerp between current position and next position
         this._mesh.position = Vector3.Lerp(this._mesh.position, this.nextPosition, 0.15);
-        const gap = Math.abs(this._mesh.rotation.y - this.nextRotation.y);
+        
+        // rotation
         // TODO DAYD : make it better
         // maybe look into Scalar.LerpAngle ??? https://doc.babylonjs.com/typedoc/classes/BABYLON.Scalar#LerpAngle
+        const gap = Math.abs(this._mesh.rotation.y - this.nextRotation.y);
         if (gap > Math.PI) this._mesh.rotation.y = this.nextRotation.y;
         else this._mesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.8);
+        
     }
 
     public move(input: PlayerInputs): void {
+
         let speed = this.speed;
 
         // save current position
@@ -102,19 +108,7 @@ export class EntityMove {
                 this.nextPosition.y = newY;
                 this.nextPosition.z = newZ;
                 this.nextRotation.y = this.nextRotation.y + (newRotY - this.nextRotation.y);
-
-                //console.log('VALID position for', new Vector3Y( oldX, oldY, oldZ), new Vector3Y(newX, newY, newZ), foundPath);
-            } else {
-                //console.error('INVALID position for', new Vector3Y( oldX, oldY, oldZ), new Vector3Y(newX, newY, newZ, foundPath));
             }
-        } else {
-            // not current player, just move straight away
-            this.nextPosition.x = newX;
-            this.nextPosition.y = newY;
-            this.nextPosition.z = newZ;
-            this.nextRotation.y = this.nextRotation.y + (newRotY - this.nextRotation.y);
-
-            //console.log('entity move');
         }
     }
 }
