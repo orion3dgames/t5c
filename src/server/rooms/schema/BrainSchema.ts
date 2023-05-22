@@ -103,6 +103,11 @@ export class BrainSchema extends Schema {
 
     //
     patrolling() {
+
+        if (this.AI_TARGET_DISTANCE < Config.MONSTER_ATTACK_DISTANCE) {
+            
+        }
+
         // if entity has a target, start searching for it
         if (this.AI_TARGET != null) {
             this.brain.setState(this.searching());
@@ -113,8 +118,7 @@ export class BrainSchema extends Schema {
             this.setRandomDestination(this.getPosition());
         }
 
-        if (this.AI_TARGET_DISTANCE < Config.MONSTER_ATTACK_DISTANCE) {
-        }
+        
 
         // else just continue patrolling
         this.moveTowards();
