@@ -145,6 +145,7 @@ export class Player extends Entity {
 
     // update at server rate
     public updateServerRate(delta) {
+
         // if digit pressed
         if (this._input.digit_pressed > 0 && !this.isCasting) {
             // get all necessary vars

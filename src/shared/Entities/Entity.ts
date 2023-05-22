@@ -136,7 +136,7 @@ export class Entity {
 
             // update player position
             this.moveController.setPositionAndRotation(this.entity);
-
+     
             // do server reconciliation on client if current player only & not blocked
             if (this.isCurrentPlayer && !this.blocked) {
                 this.moveController.reconcileMove(this.entity.sequence); // set default entity position
@@ -167,6 +167,7 @@ export class Entity {
     }
 
     public update(delta) {
+
         if (this.AI_CURRENT_STATE === AI_STATE.SEEKING || this.AI_CURRENT_STATE === AI_STATE.ATTACKING) {
             this.debugMesh.material = this._scene.getMaterialByName("debug_entity_active");
         }
@@ -184,6 +185,7 @@ export class Entity {
 
         // tween entity
         if (this && this.moveController) {
+            
             this.moveController.tween();
         }
     }
