@@ -106,7 +106,8 @@ export class EntityMesh {
 
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);
-
+        //this.mesh.actionManager.isRecursive = true;
+        
         // setup collisions for current player
         if (this.isCurrentPlayer) {
             // teleport trigger
@@ -134,7 +135,7 @@ export class EntityMesh {
                 let meshes = ev.meshUnderPointer.getChildMeshes();
                 let mesh = meshes[this._entity.meshIndex];
                 mesh.outlineColor = new Color3(0, 1, 0);
-                mesh.outlineWidth = 3;
+                mesh.outlineWidth = 0.05;
                 mesh.renderOutline = true;
             })
         );

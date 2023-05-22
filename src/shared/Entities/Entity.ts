@@ -141,6 +141,8 @@ export class Entity {
             if (this.isCurrentPlayer && !this.blocked) {
                 this.moveController.reconcileMove(this.entity.sequence); // set default entity position
             }
+
+            console.log(this.entity);
         });
 
         //////////////////////////////////////////////////////////////////////////

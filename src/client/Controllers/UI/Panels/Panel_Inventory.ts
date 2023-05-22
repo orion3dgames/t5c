@@ -25,11 +25,13 @@ export class Panel_Inventory extends Panel {
         if (entity) {
             entity.inventory.onAdd((item, sessionId) => {
                 this.refresh();
+                // todo: could be a performance issue here?
+                // orion to keep an eye on this one
+                item.onChange((item, sessionId) => {
+                    this.refresh();
+                });
             });
             entity.inventory.onRemove((item, sessionId) => {
-                this.refresh();
-            });
-            entity.inventory.onChange((item, sessionId) => {
                 this.refresh();
             });
         }

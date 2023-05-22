@@ -160,7 +160,7 @@ let ItemsDB: itemDataMap = {
         benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 50 }],
         meshData: {
             meshIndex: 1,
-            scale: 0.25,
+            scale: 1,
             width: 0.40, 
             height: 0.40, 
             depth: 0.40
