@@ -3,12 +3,13 @@ export default class FSM {
 
     constructor() {}
 
-    public setState(state): void {
-        this.activeState = state;
+    public setState(state, context): void {
+        this.activeState = state.bind(context);
+        console.log("SET STATE", state);
     }
 
     public update(): void {
-        if (this.activeState != null) {
+        if (this.activeState) {
             this.activeState();
         }
     }
