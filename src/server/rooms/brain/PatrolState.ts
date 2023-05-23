@@ -1,5 +1,5 @@
 import State from "./State";
-import { BrainSchema } from "../schema/BrainSchema";
+import { BrainSchema } from "../schema/BrainSchema2";
 
 export default class PatrolState extends State {
     enter(entity) {

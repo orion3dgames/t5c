@@ -1,4 +1,4 @@
-import { BrainSchema } from "../schema/BrainSchema";
+import { BrainSchema } from "../schema/BrainSchema2";
 
 export default class State {
     /**

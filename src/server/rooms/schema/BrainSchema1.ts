@@ -6,12 +6,10 @@ import { dataDB } from "../../../shared/Data/dataDB";
 import { abilitiesCTRL } from "../controllers/abilityCTRL";
 import { AbilitySchema } from "./AbilitySchema";
 
-import StateMachine from "./../brain/StateMachine";
-import PatrolState from "./../brain/PatrolState";
-
+import FSM from "../brain/fsm";
 import Config from "../../../shared/Config";
 
-export class BrainSchema extends Schema {
+export class BrainSchema1 extends Schema {
     /////////////////////////////////////////////////////////////
     // the below will be synced to all the players
     @type("number") public id: number = 0;
@@ -28,8 +26,8 @@ export class BrainSchema extends Schema {
 
     @type("string") public sessionId: string;
     @type("string") public name: string = "";
-    @type("string") public type: string = "player";
-    @type("string") public race: string = "player_hobbit";
+    @type("string") public type: string = "";
+    @type("string") public race: string = "";
 
     @type("string") public location: string = "";
     @type("number") public sequence: number = 0; // latest input sequence
@@ -53,16 +51,16 @@ export class BrainSchema extends Schema {
     public abilities: AbilitySchema[] = [];
     public default_abilities;
 
-    public stateMachine: StateMachine;
+    public brain: FSM;
     public velocity: Vector3 = new Vector3();
 
-    public AI_CLOSEST_PLAYER = null;
-    public AI_CLOSEST_PLAYER_DISTANCE = null;
+    public AI_CLOSEST_PLAYER: any = null;
+    public AI_CLOSEST_PLAYER_DISTANCE: any = null;
     public AI_VELOCITY;
-    public AI_TARGET = null;
-    public AI_TARGET_DISTANCE = null;
-    public AI_NAV_TARGET = null;
-    public AI_NAV_WAYPOINTS = [];
+    public AI_TARGET: any = null;
+    public AI_TARGET_DISTANCE: any = null;
+    public AI_NAV_TARGET: any = null;
+    public AI_NAV_WAYPOINTS: Vector3[] = [];
     public AI_SEARCHING_TIMER: any = false;
 
     constructor(gameroom, data, ...args: any[]) {
@@ -80,9 +78,11 @@ export class BrainSchema extends Schema {
 
         this.abilitiesCTRL = new abilitiesCTRL(this);
 
-        this.stateMachine = new StateMachine(this);
-        this.stateMachine.add("PATROL", new PatrolState());
-        //this.stateMachine.changeTo("PATROL");
+        // initialize the brain
+        this.brain = new FSM();
+
+        // default brain state
+        this.brain.setState(this.patrolling, this);
     }
 
     // runs on every server iteration
@@ -99,15 +99,14 @@ export class BrainSchema extends Schema {
             this.monitorTarget();
         }
 
-        //
-        this.stateMachine.update();
+        // Update the FSM controlling the "brain". It will invoke the currently active state function
+        this.brain.update();
     }
 
-    /*
     //
     patrolling() {
         // if there is a closest player, and in aggro range
-        if (this.AI_CLOSEST_PLAYER != null && this.AI_CLOSEST_PLAYER_DISTANCE < Config.MONSTER_ATTACK_DISTANCE) {
+        if (this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE < Config.MONSTER_ATTACK_DISTANCE) {
             console.log("FOUND CLOSEST PLAYER");
             this.AI_TARGET = this.AI_CLOSEST_PLAYER;
 
@@ -179,12 +178,11 @@ export class BrainSchema extends Schema {
 
         if (this.AI_TARGET.isEntityDead()) {
             this.patrolling()
-        }
+        }*/
     }
 
     //
     fleeing() {}
-    */
 
     ////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////
@@ -239,10 +237,10 @@ export class BrainSchema extends Schema {
     }
 
     resetDestination(): void {
-        this.AI_TARGET = false;
-        this.AI_NAV_TARGET = false;
+        this.AI_TARGET = null;
+        this.AI_NAV_TARGET = null;
         this.AI_NAV_WAYPOINTS = [];
-        this.AI_SEARCHING_TIMER = false;
+        this.AI_SEARCHING_TIMER = null;
     }
 
     /**
@@ -298,7 +296,7 @@ export class BrainSchema extends Schema {
         this.AI_NAV_TARGET = this._gameroom.navMesh.getRandomRegion();
         this.AI_NAV_WAYPOINTS = this._gameroom.navMesh.findPath(currentPos, this.AI_NAV_TARGET.centroid);
         if (this.AI_NAV_WAYPOINTS.length === 0) {
-            this.AI_NAV_TARGET = false;
+            this.AI_NAV_TARGET = null;
             this.AI_NAV_WAYPOINTS = [];
         }
     }

@@ -1,15 +1,17 @@
 import { Schema, type } from "@colyseus/schema";
-import { EntityState } from "../../../../shared/Entities/Entity/EntityState";
-import { AI_STATE } from "../../../../shared/Entities/Entity/AIState";
-import { NavMesh, Vector3 } from "../../../../shared/yuka";
-import { dataDB } from "../../../../shared/Data/dataDB";
-import { abilitiesCTRL } from "../../controllers/abilityCTRL";
-import { AbilitySchema } from ".././AbilitySchema";
+import { EntityState } from "../../../shared/Entities/Entity/EntityState";
+import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
+import { NavMesh, Vector3 } from "../../../shared/yuka";
+import { dataDB } from "../../../shared/Data/dataDB";
+import { abilitiesCTRL } from "../controllers/abilityCTRL";
+import { AbilitySchema } from "./AbilitySchema";
 
-import FSM from "../../brain/fsm";
-import Config from "../../../../shared/Config";
+import StateMachine from "../brain/StateMachine";
+import PatrolState from "../brain/PatrolState";
 
-export class BrainSchema extends Schema {
+import Config from "../../../shared/Config";
+
+export class BrainSchema2 extends Schema {
     /////////////////////////////////////////////////////////////
     // the below will be synced to all the players
     @type("number") public id: number = 0;
@@ -51,7 +53,7 @@ export class BrainSchema extends Schema {
     public abilities: AbilitySchema[] = [];
     public default_abilities;
 
-    public brain: FSM;
+    public stateMachine: StateMachine;
     public velocity: Vector3 = new Vector3();
 
     public AI_CLOSEST_PLAYER = null;
@@ -78,11 +80,9 @@ export class BrainSchema extends Schema {
 
         this.abilitiesCTRL = new abilitiesCTRL(this);
 
-        // initialize the brain
-        this.brain = new FSM();
-
-        // default brain state
-        this.brain.setState(this.patrolling, this);
+        this.stateMachine = new StateMachine(this);
+        this.stateMachine.add("PATROL", new PatrolState());
+        //this.stateMachine.changeTo("PATROL");
     }
 
     // runs on every server iteration
@@ -99,10 +99,11 @@ export class BrainSchema extends Schema {
             this.monitorTarget();
         }
 
-        // Update the FSM controlling the "brain". It will invoke the currently active state function
-        this.brain.update();
+        //
+        this.stateMachine.update();
     }
 
+    /*
     //
     patrolling() {
         // if there is a closest player, and in aggro range
@@ -178,11 +179,12 @@ export class BrainSchema extends Schema {
 
         if (this.AI_TARGET.isEntityDead()) {
             this.patrolling()
-        }*/
+        }
     }
 
     //
     fleeing() {}
+    */
 
     ////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////

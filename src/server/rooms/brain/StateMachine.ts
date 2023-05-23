@@ -1,4 +1,4 @@
-import { BrainSchema } from "../schema/BrainSchema";
+import { BrainSchema } from "../schema/BrainSchema2";
 import State from "./State";
 
 /**
