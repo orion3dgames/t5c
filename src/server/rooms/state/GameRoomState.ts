@@ -1,5 +1,6 @@
 import { Schema, type, MapSchema, filterChildren } from "@colyseus/schema";
 import { EnemySchema } from "../schema/EnemySchema";
+import { BrainSchema1 } from "../schema/BrainSchema1";
 import { PlayerSchema } from "../schema/PlayerSchema";
 import { LootSchema } from "../schema/LootSchema";
 import { GameRoom } from "../GameRoom";
@@ -24,9 +25,7 @@ export class GameRoomState extends Schema {
         const isWithinBounds = isWithinXBounds && isWithinZBounds;
         return isSelf || isWithinBounds;
     })*/
-    @type({ map: EnemySchema })
-    entities = new MapSchema<EnemySchema>();
-
+    @type({ map: EnemySchema }) entities = new MapSchema<EnemySchema>();
     @type({ map: PlayerSchema }) players = new MapSchema<PlayerSchema>();
     @type({ map: LootSchema }) items = new MapSchema<LootSchema>();
     @type("number") serverTime: number = 0.0;
