@@ -307,16 +307,18 @@ export class abilitiesCTRL {
         // set target as dead
         target.setAsDead();
 
-        // inform player
+        // get player
         let client = owner.getClient();
-        client.send("notification", {
-            type: "event",
-            message: "You've killed " + target.name + ".",
-            date: new Date(),
-        });
 
         // update caster rewards
         if (client) {
+            // send notif to player
+            client.send("notification", {
+                type: "event",
+                message: "You've killed " + target.name + ".",
+                date: new Date(),
+            });
+
             let drop = new dropCTRL(owner, client);
             drop.addExperience(target);
             drop.addGold(target);
