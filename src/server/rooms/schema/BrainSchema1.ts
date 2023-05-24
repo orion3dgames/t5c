@@ -54,6 +54,7 @@ export class BrainSchema1 extends Schema {
     public brain: FSM;
     public velocity: Vector3 = new Vector3();
 
+    public AI_STATE;
     public AI_CLOSEST_PLAYER: any = null;
     public AI_CLOSEST_PLAYER_DISTANCE: any = null;
     public AI_VELOCITY;
@@ -62,6 +63,12 @@ export class BrainSchema1 extends Schema {
     public AI_NAV_TARGET: any = null;
     public AI_NAV_WAYPOINTS: Vector3[] = [];
     public AI_SEARCHING_TIMER: any = false;
+
+    public AI_ATTACK_INTERVAL:number = 0;
+    public AI_ATTACK_INTERVAL_RATE:number = 1000;
+
+    public AI_DEAD_INTERVAL:number = 0;
+    public AI_DEAD_INTERVAL_RATE:number = 5000;
 
     constructor(gameroom, data, ...args: any[]) {
         super(gameroom, data, args);
@@ -89,13 +96,11 @@ export class BrainSchema1 extends Schema {
     update() {
         // if does not have a target, keep monitoring the closest player
         if (this.AI_TARGET === null || this.AI_TARGET === undefined) {
-            console.log("SEARCHING FOR CLOSEST PLAYER", this.AI_CLOSEST_PLAYER_DISTANCE);
             this.findClosestPlayer();
         }
 
         // if entity has a target, monitor it's position
         if (this.AI_TARGET != null && this.AI_TARGET !== undefined) {
-            console.log("MONITORING TARGET POSITION", this.AI_TARGET.x, this.AI_TARGET.z);
             this.monitorTarget();
         }
 
@@ -105,9 +110,13 @@ export class BrainSchema1 extends Schema {
 
     //
     patrolling() {
+
+        this.anim_state = EntityState.WALKING;
+        this.AI_CURRENT_STATE = AI_STATE.WANDER;
+
         // if there is a closest player, and in aggro range
-        if (this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE < Config.MONSTER_ATTACK_DISTANCE) {
-            console.log("FOUND CLOSEST PLAYER");
+        if (this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE < Config.MONSTER_AGGRO_DISTANCE) {
+            console.log("FOUND CLOSEST PLAYER", this.AI_CLOSEST_PLAYER_DISTANCE, Config.MONSTER_AGGRO_DISTANCE);
             this.AI_TARGET = this.AI_CLOSEST_PLAYER;
 
             // reset closest player to null and
@@ -118,6 +127,7 @@ export class BrainSchema1 extends Schema {
         // if entity has a target, start searching for it
         if (this.AI_TARGET && this.AI_TARGET.sessionId) {
             console.log("START CHASING", this.AI_TARGET.sessionId);
+            this.AI_NAV_WAYPOINTS = [];
             this.brain.setState(this.searching, this);
         }
 
@@ -127,66 +137,151 @@ export class BrainSchema1 extends Schema {
         }
 
         // else just continue patrolling
-        console.log("AI IS PATROLLING", this.AI_CLOSEST_PLAYER);
+        console.log(this.name+" IS PATROLLING");
         this.moveTowards();
     }
 
     //
     searching() {
+
+        this.AI_CURRENT_STATE = AI_STATE.SEEKING;
+
+        // if target is not available
+        if (this.AI_TARGET === null || this.AI_TARGET === undefined || this.AI_TARGET.isEntityDead()) {
+            this.resetDestination();
+            this.brain.setState(this.patrolling, this);
+        }
+
+        // start timer
         if (this.AI_SEARCHING_TIMER === false) {
             this.AI_SEARCHING_TIMER = 0;
         }
 
         // iterate searching timer
-        this.AI_SEARCHING_TIMER += 1;
+        this.AI_SEARCHING_TIMER += 100;
 
         // if entity is close enough to player, start attacking it
         if (this.AI_TARGET_DISTANCE < Config.MONSTER_ATTACK_DISTANCE) {
-            //this.AI_SEARCHING_TIMER = false;
-            //this.brain.setState(this.attacking);
+            this.AI_SEARCHING_TIMER = false;
+            this.brain.setState(this.attacking, this);
+        }
+
+        // if player come back into range, reset timer
+        if ( this.AI_TARGET_DISTANCE < Config.MONSTER_AGGRO_DISTANCE) {
+            this.AI_SEARCHING_TIMER = 0;
         }
 
         // if entity has been searching for over 50 server iterations, go back to patrolling
-        if (this.AI_SEARCHING_TIMER > 50) {
-            //this.resetDestination();
-            //this.brain.setState(this.patrolling);
+        if (this.AI_SEARCHING_TIMER > 5000) {
+            this.resetDestination();
+            this.AI_TARGET = null;
+            this.brain.setState(this.patrolling, this);
         }
 
-        // else keep moving towards target
-        this.moveTowards();
+        // if target has moved
+        if(this.AI_NAV_WAYPOINTS.length < 1 && this.AI_TARGET !== null){
+            this.setTargetDestination(this.AI_TARGET.getPosition());      
+        }
+
+        if(this.AI_TARGET !== null){
+            // else keep moving towards target
+            console.log(this.name+" has found a target and is heading towards it", this.AI_TARGET.sessionId);
+            this.moveTowards('seek');
+        }
+
+        
     }
 
     //
     attacking() {
+
+        console.log(this.name+" is attacking target", this.AI_TARGET.sessionId);
+
+        if (this.AI_TARGET === null || this.AI_TARGET === undefined || this.AI_TARGET.isEntityDead()) {
+            console.log("TARGET IS NOT AVAILABLE ANYMORE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ");
+            this.resetDestination();
+            this.brain.setState(this.patrolling, this);
+            return false;
+        }
+
+        // set state and anim state
+        this.anim_state = EntityState.ATTACK;
+        this.AI_CURRENT_STATE = AI_STATE.ATTACKING;
+
         // if target is escaping, go back to searching
         if (this.AI_TARGET_DISTANCE > Config.MONSTER_ATTACK_DISTANCE) {
-            //this.brain.setState(this.searching);
+            this.AI_NAV_WAYPOINTS = [];
+            this.brain.setState(this.searching, this);
         }
 
-        /*
-        // entity animation set to attack
-        this.anim_state = EntityState.ATTACK;
-
-        //
+        // attack target loop
         this.AI_ATTACK_INTERVAL += 100;
         if (this.AI_ATTACK_INTERVAL === this.AI_ATTACK_INTERVAL_RATE) {
-            let damage = this.calculateDamage(this, this.AI_CURRENT_TARGET);
+            let damage = this.calculateDamage(this, this.AI_TARGET);
             this.AI_ATTACK_INTERVAL = 0;
-            this.AI_CURRENT_TARGET.health -= damage;
-            this.AI_CURRENT_TARGET.normalizeStats();
+            this.AI_TARGET.health -= damage;
+            this.AI_TARGET.normalizeStats();
         }
-
-        if (this.AI_TARGET.isEntityDead()) {
-            this.patrolling()
-        }*/
     }
 
-    //
-    fleeing() {}
+    dead() {
+
+        if(this.isDead === false){
+            this.health = 0;
+            this.blocked = true;
+            this.anim_state = EntityState.DEAD;
+            this.AI_CURRENT_STATE = AI_STATE.IDLE;
+            this.AI_TARGET = null;
+            this.isDead = true;
+        }
+
+        this.AI_DEAD_INTERVAL += 100;
+
+        // delete so entity can be respawned
+        if (this.AI_DEAD_INTERVAL === this.AI_DEAD_INTERVAL_RATE) {
+            this._gameroom.state.entities.delete(this.sessionId);
+        }
+
+    }
 
     ////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////
+
+    // make sure no value are out of range
+    normalizeStats() {
+        // health
+        if (this.health > this.maxHealth) {
+            this.health = this.maxHealth;
+        }
+        if (this.health < 0) {
+            this.health = 0;
+        }
+
+        // mana
+        if (this.mana > this.maxMana) {
+            this.mana = this.maxMana;
+        }
+        if (this.mana < 0) {
+            this.mana = 0;
+        }
+    }
+
+    setTarget(target) {
+        this.AI_TARGET = target;
+    }
+
+    isEntityDead() {
+        return this.health <= 0;
+    }
+
+    setAsDead() {
+        this.brain.setState(this.dead, this);
+    }
+
+    calculateDamage(owner, target) {
+        return 10;
+    }
 
     // get position vector
     getPosition() {
@@ -210,7 +305,7 @@ export class BrainSchema1 extends Schema {
         return Math.atan2(v1.x - v2.x, v1.z - v2.z);
     }
 
-    moveTowards() {
+    moveTowards(type:string = 'seek') {
         this.anim_state = EntityState.WALKING;
         // move entity
         if (this.AI_NAV_WAYPOINTS.length > 0) {
@@ -237,10 +332,9 @@ export class BrainSchema1 extends Schema {
     }
 
     resetDestination(): void {
-        this.AI_TARGET = null;
         this.AI_NAV_TARGET = null;
         this.AI_NAV_WAYPOINTS = [];
-        this.AI_SEARCHING_TIMER = null;
+        this.AI_SEARCHING_TIMER = false;
     }
 
     /**
@@ -266,7 +360,7 @@ export class BrainSchema1 extends Schema {
      * monitor a target
      */
     monitorTarget() {
-        if (this.AI_TARGET !== null && this.AI_TARGET !== undefined && this.AI_TARGET.sessionId) {
+        if (this.AI_TARGET !== null && this.AI_TARGET !== undefined) {
             let targetPos = this.AI_TARGET.getPosition();
             let entityPos = this.getPosition();
             let distanceBetween = entityPos.distanceTo(targetPos);
