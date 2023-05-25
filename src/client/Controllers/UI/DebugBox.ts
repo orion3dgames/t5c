@@ -45,9 +45,9 @@ export class DebugBox {
     }
 
     _createUI() {
-        const debugPanel = generatePanel("debugPanel", "120px;", "80px", "95px", "15px");
-        debugPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        debugPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        const debugPanel = generatePanel("debugPanel", "120px;", "80px", "0px", "-15px");
+        debugPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        debugPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         this._playerUI.addControl(debugPanel);
 
         const debugText = new TextBlock("debugText");
