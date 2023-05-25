@@ -5,11 +5,11 @@ import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 
 const createButton = function (name, text, width, height) {
     let result = new Button(name);
-    result.width = "85px";
-    result.height = "30px";
+    result.width = width;
+    result.height = height;
     result = applyTheme(result);
 
-    const textBlock = new TextBlock(name + "_button", text);
+    let textBlock = new TextBlock(name + "_button", text);
     textBlock.width = 1;
     textBlock.textWrapping = true;
     textBlock.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
