@@ -155,6 +155,14 @@ export class GameRoom extends Room<GameRoomState> {
             }
         });
 
+        this.onMessage("add_stats_point", (client, stat_key) => {
+            const playerState: PlayerSchema = this.state.players.get(client.sessionId);
+            if (playerState && playerState.player_data.points > 0) {
+                playerState.player_data[stat_key] += 1;
+                playerState.player_data.points -= 1;
+            }
+        });
+
         /////////////////////////////////////
         // on player input
         this.onMessage("playerInput", (client, playerInput: PlayerInputs) => {

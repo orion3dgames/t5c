@@ -36,6 +36,7 @@ export class dropCTRL {
             this._owner.maxHealth = this._owner.maxHealth + 50;
             this._owner.health = this._owner.maxHealth;
             this._owner.mana = this._owner.maxMana;
+            this._owner.player_data.points += 5;
 
             // inform player
             this._client.send("notification", {

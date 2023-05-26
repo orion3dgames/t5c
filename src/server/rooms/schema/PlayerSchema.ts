@@ -23,6 +23,7 @@ export class PlayerData extends Schema {
     @type("uint8") public intelligence: number = 0;
     @type("uint8") public wisdom: number = 0;
     @type("uint32") public experience: number = 0;
+    @type("uint32") public points: number = 5;
 }
 
 export class PlayerSchema extends Schema {

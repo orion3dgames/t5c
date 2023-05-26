@@ -2,7 +2,7 @@ import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { Panel } from "./Panel";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Control } from "@babylonjs/gui/2D/controls/control";
-import { applyTheme } from "../Theme";
+import { applyTheme, createButton } from "../Theme";
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 
 export class Panel_Character extends Panel {
@@ -11,6 +11,9 @@ export class Panel_Character extends Panel {
     private attributes;
     private stats;
 
+    private leftPanel: Rectangle;
+    private rightPanel: Rectangle;
+
     constructor(_UI, _currentPlayer, options) {
         super(_UI, _currentPlayer, options);
 
@@ -18,21 +21,26 @@ export class Panel_Character extends Panel {
         this.attributes = {
             strength: {
                 name: "Strength",
+                button: true,
             },
             endurance: {
                 name: "Endurance",
+                button: true,
             },
             agility: {
                 name: "Agility",
+                button: true,
             },
             intelligence: {
                 name: "Intelligence",
+                button: true,
             },
             wisdom: {
                 name: "Wisdom",
+                button: true,
             },
             points: {
-                name: "Points Available",
+                name: "Available Points",
             },
         };
 
@@ -77,11 +85,6 @@ export class Panel_Character extends Panel {
         this.refresh();
     }
 
-    // refresh panel
-    public update() {
-        super.update();
-    }
-
     // create panel
     private createContent() {
         let panel: Rectangle = this._panelContent;
@@ -91,7 +94,7 @@ export class Panel_Character extends Panel {
             el.dispose();
         });
 
-        // LEFT PANEL
+        // left panel
         let leftPanel = new Rectangle("leftPanel");
         leftPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         leftPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
@@ -103,8 +106,9 @@ export class Panel_Character extends Panel {
         leftPanel.paddingLeft = "0px;";
         leftPanel.paddingBottom = "5px;";
         panel.addControl(leftPanel);
-        this.leftPanelContent(leftPanel);
+        this.leftPanel = leftPanel;
 
+        // right panel
         let rightPanel = new Rectangle("rightPanel");
         rightPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         rightPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
@@ -116,10 +120,17 @@ export class Panel_Character extends Panel {
         rightPanel.paddingLeft = "0px;";
         rightPanel.paddingBottom = "5px;";
         panel.addControl(rightPanel);
-        this.rightPanelContent(rightPanel);
+        this.rightPanel = rightPanel;
+
+        this.refresh();
     }
 
     private leftPanelContent(panel) {
+        // if already exists
+        panel.children.forEach((el) => {
+            el.dispose();
+        });
+
         // panel title
         const stackPanel = new StackPanel("stackPanel");
         stackPanel.width = 1;
@@ -172,12 +183,14 @@ export class Panel_Character extends Panel {
             valueText.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
             panelRectangle.addControl(valueText);
         }
-
-        //
-        this.refresh();
     }
 
     private rightPanelContent(panel) {
+        // if already exists
+        panel.children.forEach((el) => {
+            el.dispose();
+        });
+
         // panel title
         const stackPanel = new StackPanel("stackPanel");
         stackPanel.width = 1;
@@ -230,14 +243,26 @@ export class Panel_Character extends Panel {
             valueText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
             valueText.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
             panelRectangle.addControl(valueText);
-        }
 
-        //
-        this.refresh();
+            //
+            if (line.button && this._currentPlayer.player_data.points > 0) {
+                let button = createButton("button", "+", "20px", "20px");
+                button.background = "green";
+                button.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+                button.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+                panelRectangle.addControl(button);
+                button.onPointerDownObservable.add(() => {
+                    this._gameRoom.send("add_stats_point", key);
+                });
+
+                // push the value text to the left
+                valueText.left = "-30px";
+            }
+        }
     }
 
-    ///////////////////////////////////////
-    ///////////////////////////////////////
-    // INVENTORY PANEL
-    public refresh() {}
+    public refresh() {
+        this.leftPanelContent(this.leftPanel);
+        this.rightPanelContent(this.rightPanel);
+    }
 }
