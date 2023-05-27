@@ -39,11 +39,16 @@ export class EntitySelectedBar {
         let alignHoriz = Control.HORIZONTAL_ALIGNMENT_LEFT;
         let panelWidth = 260;
         let barWidth = 198;
-        let leftMargin = this._options.panelName === "target" ? panelWidth + 30 : 15;
 
+        let leftMargin = 15;
+        let topMargin = 15;
+        if (this._options.panelName === "target") {
+            leftMargin = 80;
+            topMargin = 90;
+        }
         ////////////////////////////////////
         //////////////////// panel
-        const selectedEntityBar = generatePanel("selected" + this._options.panelName, panelWidth + "px;", "62px", "15px", leftMargin + "px");
+        const selectedEntityBar = generatePanel("selected" + this._options.panelName, panelWidth + "px;", "62px", topMargin + "px", leftMargin + "px");
         selectedEntityBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         selectedEntityBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         this._playerUI.addControl(selectedEntityBar);

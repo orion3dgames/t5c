@@ -94,6 +94,9 @@ export class UserInterface {
         // set current player
         this._currentPlayer = currentPlayer;
 
+        // create debug ui + events
+        this._DebugBox = new DebugBox(this._playerUI, this._engine, this._scene, this._gameRoom, this._currentPlayer, this._entities);
+
         // create main interface elements
         this._MainMenu = new MainMenu(this, currentPlayer);
         this._CastingBar = new CastingBar(this, currentPlayer);
@@ -105,9 +108,6 @@ export class UserInterface {
 
         // create chat ui + events
         this._ChatBox = new ChatBox(this._playerUI, this._chatRoom, currentPlayer, this._entities);
-
-        // create debug ui + events
-        this._DebugBox = new DebugBox(this._playerUI, this._engine, this._scene, this._gameRoom, this._currentPlayer, this._entities);
 
         // create selected entity panel
         this._targetEntitySelectedBar = new EntitySelectedBar(this._playerUI, this._scene, {
@@ -159,10 +159,17 @@ export class UserInterface {
         this._scene.registerBeforeRender(() => {
             this.refreshEntityUI();
         });
+
+        // initial resize event
+        this.resize();
     }
 
     public resize() {
-        this._ChatBox.chatPanel.top = "-150px;";
+        if (this._engine.getRenderWidth() < 1100) {
+            this._ChatBox.chatPanel.top = "-115px;";
+        } else {
+            this._ChatBox.chatPanel.top = "-30px;";
+        }
     }
 
     public refreshEntityUI() {
