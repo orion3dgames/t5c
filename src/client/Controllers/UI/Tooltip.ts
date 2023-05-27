@@ -42,7 +42,8 @@ export class Tooltip {
     }
 
     private _createUI() {
-        const tooltipBar = generatePanel("tooltipBar", "150px;", "100px", "0px", "0px");
+        const tooltipBar = generatePanel("tooltipBar", "200px;", "200px", "0px", "0px");
+        tooltipBar.background = "#222222";
         tooltipBar.isVisible = false;
         tooltipBar.adaptHeightToChildren = true;
         tooltipBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
@@ -79,11 +80,12 @@ export class Tooltip {
         // add name
         const tooltipName = new TextBlock("tooltipName");
         tooltipName.color = "#FFF";
-        tooltipName.top = "0px";
-        tooltipName.left = "35px";
-        tooltipName.fontSize = "14px;";
+        tooltipName.top = "3px";
+        tooltipName.left = "40px";
+        tooltipName.fontSize = "18px;";
         tooltipName.resizeToFit = true;
         tooltipName.text = "Item Name";
+        tooltipName.fontWeight = "bold";
         tooltipName.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         tooltipName.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         tooltipName.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
@@ -91,13 +93,15 @@ export class Tooltip {
         tooltipHeader.addControl(tooltipName);
         this.tooltipName = tooltipName;
 
+
+
         // add description
         const tooltipDescription = new TextBlock("tooltipDescription");
         tooltipDescription.color = "#FFF";
         tooltipDescription.top = "0px";
         tooltipDescription.left = "0px";
         tooltipDescription.width = 1;
-        tooltipDescription.fontSize = "12px;";
+        tooltipDescription.fontSize = "14px;";
         tooltipDescription.resizeToFit = true;
         tooltipDescription.text = "";
         tooltipDescription.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;

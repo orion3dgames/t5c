@@ -54,6 +54,41 @@ let RacesDB: raceDataMap = {
         drops: [],
         default_abilities: ["base_attack"],
     },
+    male_enemy: {
+        key: "male_enemy",
+        title: "Enemy",
+        icon: "ICON_RACE_male_enemy",
+        speed: 0.2,
+        scale: 1.3,
+        rotationFix: Math.PI,
+        animationSpeed: 1.3,
+        meshIndex: 1,
+        animations: {
+            IDLE: 4,
+            WALK: 22,
+            ATTACK: 21,
+            DEATH: 0,
+            DAMAGE: 1,
+        },
+        baseHealth: 200,
+        baseMana: 100,
+        healthRegen: 0.2,
+        manaRegen: 0.4, // per second
+        experienceGain: { min: 2000, max: 4000 },
+        goldGain: { min: 120, max: 250 },
+        damage_multiplier: 1.3,
+        drops: [
+            LootTableEntry("sword_01", 10, 1, 1, 1, 1),
+            LootTableEntry("potion_heal", 25, 1, 1, 1, 1),
+            LootTableEntry("pear", 5, 1, 10, 1, 1),
+            LootTableEntry("apple", 20, 1, 10, 1, 1),
+            LootTableEntry(null, 20, 1, 1, 1, 1),
+            LootTableEntry("amulet_01", 1, 1, 1, 1, 2),
+            LootTableEntry(null, 80, 1, 1, 1, 2),
+        ],
+        default_abilities: ["base_attack"],
+    },
+    /*
     monster_bear: {
         key: "monster_bear",
         title: "Bear",
@@ -122,6 +157,7 @@ let RacesDB: raceDataMap = {
         ],
         default_abilities: ["base_attack"],
     },
+    */
 };
 
 export { RacesDB, Race };

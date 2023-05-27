@@ -54,7 +54,7 @@ export class GameRoomState extends Schema {
         let point = randomRegion.centroid;
 
         // monster pool to chose from
-        let randTypes = ["monster_unicorn", "monster_bear"];
+        let randTypes = ["male_enemy"];
         let randResult = randTypes[Math.floor(Math.random() * randTypes.length)];
         let randData = dataDB.get("race", randResult);
 

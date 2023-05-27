@@ -87,7 +87,7 @@ export class Panel_Abilities extends Panel {
             skillsPanel.top = "0px";
             skillsPanel.left = "0px;";
             skillsPanel.width = 1;
-            skillsPanel.height = hasRequirements > 0 ? "70px" : "47px";
+            skillsPanel.height = "70px";
             skillsPanel.background = "#CCC";
             skillsPanel.thickness = 1;
             skillsPanel.paddingLeft = "5px;";
@@ -95,10 +95,34 @@ export class Panel_Abilities extends Panel {
             skillsPanel = applyTheme(skillsPanel);
             skillsPanelStack.addControl(skillsPanel);
 
+            // add icon
+            let imageBLoc = new Rectangle("imageBLoc" + ability.key);
+            imageBLoc.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            imageBLoc.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            imageBLoc.top = "0px";
+            imageBLoc.left = "0px;";
+            imageBLoc.width = "60px;";
+            imageBLoc.height = "60px;";
+            imageBLoc.thickness = 0;
+            skillsPanel.addControl(imageBLoc);
+            var imageData = this._loadedAssets[ability.icon];
+            var img = new Image("itemImage_" + ability.key, imageData);
+            img.stretch = Image.STRETCH_FILL;
+            imageBLoc.addControl(img);
+
+            // on hover tooltip
+            imageBLoc.onPointerEnterObservable.add(() => {
+                this._UI._Tooltip.refresh("ability", ability, imageBLoc, "left", "center");
+            });
+            // on hover tooltip
+            imageBLoc.onPointerOutObservable.add(() => {
+                this._UI._Tooltip.close();
+            });
+
             const tooltipName = new TextBlock("abilityName" + ability.key);
             tooltipName.color = "#FFF";
             tooltipName.top = "5px";
-            tooltipName.left = "5px";
+            tooltipName.left = "80px";
             tooltipName.fontSize = "24px;";
             tooltipName.resizeToFit = true;
             tooltipName.text = ability.label;
@@ -108,20 +132,18 @@ export class Panel_Abilities extends Panel {
             tooltipName.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             skillsPanel.addControl(tooltipName);
 
-            if(hasRequirements > 0){
-                const abilityDescr = new TextBlock("abilityDescr" + ability.key);
-                abilityDescr.color = "rgba(255,255,255,.6)";
-                abilityDescr.top = "-6px";
-                abilityDescr.left = "5px";
-                abilityDescr.fontSize = "12px;";
-                abilityDescr.resizeToFit = true;
-                abilityDescr.text = this.objToString(ability.requiredToLearn);
-                abilityDescr.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-                abilityDescr.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-                abilityDescr.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-                abilityDescr.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-                skillsPanel.addControl(abilityDescr);
-            }
+            const abilityDescr = new TextBlock("abilityDescr" + ability.key);
+            abilityDescr.color = "rgba(255,255,255,.6)";
+            abilityDescr.top = "-6px";
+            abilityDescr.left = "80px";
+            abilityDescr.fontSize = "12px;";
+            abilityDescr.resizeToFit = true;
+            abilityDescr.text = hasRequirements ? this.objToString(ability.requiredToLearn) : "Default" ;
+            abilityDescr.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            abilityDescr.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+            abilityDescr.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+            abilityDescr.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            skillsPanel.addControl(abilityDescr);
 
             let entity = this._currentPlayer.entity;
             if (entity.abilities[ability.key]) {

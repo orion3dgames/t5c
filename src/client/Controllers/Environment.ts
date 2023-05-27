@@ -110,6 +110,7 @@ export class Environment {
             for (let key in races) {
                 let el = races[key];
                 assetsToLoad.push({ name: "RACE_" + el.key, filename: "races/" + el.key + ".glb", extension: "glb", instantiate: true });
+                assetsToLoad.push({ name: el.icon, filename: "portrait/" + el.icon + ".png", extension: "png", type: "image" });
             }
         }
 

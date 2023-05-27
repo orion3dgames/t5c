@@ -1,5 +1,6 @@
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
+import { Image } from "@babylonjs/gui/2D/controls/image";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { generatePanel, getPadding } from "./Theme";
 import { roundTo } from "../../../shared/Utils";
@@ -7,6 +8,7 @@ import { roundTo } from "../../../shared/Utils";
 export class EntitySelectedBar {
     private _playerUI;
     private _scene;
+    private _loadedAssets;
     private _options;
 
     private _selectedEntityBar;
@@ -21,10 +23,11 @@ export class EntitySelectedBar {
     private _manaBarInside;
     private _manaBarText;
 
-    constructor(_playerUI, _scene, options = { panelName: "", currentPlayer: false }) {
+    constructor(_playerUI, loadedAssets, _scene, options = { panelName: "", currentPlayer: false }) {
         this._playerUI = _playerUI;
         this._scene = _scene;
         this._options = options;
+        this._loadedAssets = loadedAssets; 
 
         this._createUI();
 
@@ -69,6 +72,15 @@ export class EntitySelectedBar {
         imgPanel.thickness = 0;
         paddingPanel.addControl(imgPanel);
 
+        if (this._options.currentPlayer !== false) {
+            
+            let entity = this._options.currentPlayer;
+            var imageData = this._loadedAssets[entity.icon];
+            var img = new Image("itemImage_" + entity.key, imageData);
+            img.stretch = Image.STRETCH_FILL;
+            imgPanel.addControl(img);
+        }
+        
         ////////////////////////////////////
         //////////////////// health bar
 

@@ -110,11 +110,11 @@ export class UserInterface {
         this._ChatBox = new ChatBox(this._playerUI, this._chatRoom, currentPlayer, this._entities);
 
         // create selected entity panel
-        this._targetEntitySelectedBar = new EntitySelectedBar(this._playerUI, this._scene, {
+        this._targetEntitySelectedBar = new EntitySelectedBar(this._playerUI, this._loadedAssets, this._scene, {
             panelName: "target",
             currentPlayer: false,
         });
-        this._playerEntitySelectedBar = new EntitySelectedBar(this._playerUI, this._scene, {
+        this._playerEntitySelectedBar = new EntitySelectedBar(this._playerUI, this._loadedAssets, this._scene, {
             panelName: "player",
             currentPlayer: currentPlayer,
         });
