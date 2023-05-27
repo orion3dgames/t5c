@@ -138,6 +138,7 @@ export class PlayerSchema extends Schema {
 
     // on player state initialized
     start() {
+        
         // add a 5 second grace period where the player can not be targeted by the ennemies
         setTimeout(() => {
             this.gracePeriod = false;
@@ -219,7 +220,7 @@ export class PlayerSchema extends Schema {
      * @returns true if health smaller than 0 and not already set as dead.
      */
     isEntityDead() {
-        return this.health <= 0 && this.isDead === false;
+        return this.health <= 0;
     }
 
     setLocation(location: string): void {

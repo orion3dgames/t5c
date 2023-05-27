@@ -96,6 +96,7 @@ export class BrainSchema1 extends Schema {
     update() {
         // if does not have a target, keep monitoring the closest player
         if (this.AI_TARGET === null || this.AI_TARGET === undefined) {
+            //console.log('FIND CLOSEST PLAYER');
             this.findClosestPlayer();
         }
 
@@ -115,8 +116,10 @@ export class BrainSchema1 extends Schema {
         this.AI_CURRENT_STATE = AI_STATE.WANDER;
 
         // if there is a closest player, and in aggro range
-        if (this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE < Config.MONSTER_AGGRO_DISTANCE) {
-            console.log("FOUND CLOSEST PLAYER", this.AI_CLOSEST_PLAYER_DISTANCE, Config.MONSTER_AGGRO_DISTANCE);
+    if (    this.AI_CLOSEST_PLAYER_DISTANCE != null && 
+            this.AI_CLOSEST_PLAYER_DISTANCE < Config.MONSTER_AGGRO_DISTANCE
+            ) {
+            //console.log("FOUND CLOSEST PLAYER", this.AI_CLOSEST_PLAYER_DISTANCE, Config.MONSTER_AGGRO_DISTANCE);
             this.AI_TARGET = this.AI_CLOSEST_PLAYER;
 
             // reset closest player to null and
@@ -126,7 +129,7 @@ export class BrainSchema1 extends Schema {
 
         // if entity has a target, start searching for it
         if (this.AI_TARGET && this.AI_TARGET.sessionId) {
-            console.log("START CHASING", this.AI_TARGET.sessionId);
+            //console.log("START CHASING", this.AI_TARGET.sessionId);
             this.AI_NAV_WAYPOINTS = [];
             this.brain.setState(this.searching, this);
         }
@@ -137,7 +140,7 @@ export class BrainSchema1 extends Schema {
         }
 
         // else just continue patrolling
-        console.log(this.name+" IS PATROLLING");
+        //console.log(this.name+" IS PATROLLING IN", this._gameroom.metadata.location, this.AI_CLOSEST_PLAYER_DISTANCE);
         this.moveTowards();
     }
 
@@ -146,10 +149,10 @@ export class BrainSchema1 extends Schema {
 
         this.AI_CURRENT_STATE = AI_STATE.SEEKING;
 
-        // if target is not available
         if (this.AI_TARGET === null || this.AI_TARGET === undefined || this.AI_TARGET.isEntityDead()) {
-            this.resetDestination();
+            this.cancelTarget();
             this.brain.setState(this.patrolling, this);
+            return false;
         }
 
         // start timer
@@ -185,7 +188,7 @@ export class BrainSchema1 extends Schema {
 
         if(this.AI_TARGET !== null){
             // else keep moving towards target
-            console.log(this.name+" has found a target and is heading towards it", this.AI_TARGET.sessionId);
+            //console.log(this.name+" has found a target and is heading towards it", this.AI_TARGET.sessionId);
             this.moveTowards('seek');
         }
 
@@ -195,11 +198,10 @@ export class BrainSchema1 extends Schema {
     //
     attacking() {
 
-        console.log(this.name+" is attacking target", this.AI_TARGET.sessionId);
+        //console.log(this.name+" is attacking target", this.AI_TARGET.isEntityDead(), this.AI_TARGET.sessionId);
 
         if (this.AI_TARGET === null || this.AI_TARGET === undefined || this.AI_TARGET.isEntityDead()) {
-            console.log("TARGET IS NOT AVAILABLE ANYMORE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ");
-            this.resetDestination();
+            this.cancelTarget();
             this.brain.setState(this.patrolling, this);
             return false;
         }
@@ -280,7 +282,7 @@ export class BrainSchema1 extends Schema {
     }
 
     calculateDamage(owner, target) {
-        return 10;
+        return 30;
     }
 
     // get position vector
@@ -337,13 +339,19 @@ export class BrainSchema1 extends Schema {
         this.AI_SEARCHING_TIMER = false;
     }
 
+    cancelTarget(){
+        this.AI_SEARCHING_TIMER = false;
+        this.AI_NAV_WAYPOINTS = [];
+        this.AI_TARGET = null;
+    }
+
     /**
      * entity must always know the closest player at all times
      */
     findClosestPlayer() {
         let closestDistance = 1000000;
         this._gameroom.state.players.forEach((entity) => {
-            if (this.type === "entity" && entity.type === "player" && !entity.gracePeriod) {
+            if (this.type === "entity" && entity.type === "player" && !entity.gracePeriod && !entity.isDead) {
                 let playerPos = entity.getPosition();
                 let entityPos = this.getPosition();
                 let distanceBetween = entityPos.distanceTo(playerPos);

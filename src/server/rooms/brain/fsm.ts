@@ -5,7 +5,7 @@ export default class FSM {
 
     public setState(state, context): void {
         this.activeState = state.bind(context);
-        console.log("SET STATE", state);
+        //console.log("SET STATE", state);
     }
 
     public update(): void {
