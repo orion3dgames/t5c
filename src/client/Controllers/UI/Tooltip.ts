@@ -21,6 +21,9 @@ export class Tooltip {
     private tooltipName;
     private tooltipDescription;
 
+    private horizontal = "center";
+    private vertical = "top";
+
     constructor(_UI, _currentPlayer) {
         this._playerUI = _UI._playerUI;
         this._loadedAssets = _UI._loadedAssets;
@@ -117,11 +120,14 @@ export class Tooltip {
     }
 
     /** called externally to refresh tooltip with content */
-    public refresh(type, data, el: Rectangle) {
+    public refresh(type, data, el: Rectangle, horizontal = "left", vertical = "center") {
         // set tooltip target
         this.tooltipTarget = el;
 
         // position tooltip
+        this.horizontal = horizontal;
+        this.vertical = vertical;
+
         this.setPosition();
 
         // remove image
@@ -156,14 +162,44 @@ export class Tooltip {
 
     private setPosition() {
         if (this.tooltipTarget) {
-            let heightOffset = this.tooltipContainer.heightInPixels + this.tooltipTarget.heightInPixels / 2;
-            let widthOffset = this.tooltipTarget.widthInPixels / 2;
+
+            let tooltipHeight = this.tooltipContainer.heightInPixels;
+            let tooltipWidth = this.tooltipContainer.widthInPixels;
+            let targetHeight = this.tooltipTarget.heightInPixels;
+            let targetWidth = this.tooltipTarget.widthInPixels;
             let x = this.tooltipTarget.centerX;
             let y = this.tooltipTarget.centerY;
-            this.tooltipContainer.leftInPixels = x - widthOffset; //slight offset
-            this.tooltipContainer.topInPixels = y - heightOffset; //slight offset
+
+            if(this.horizontal === 'left'){
+                x -= (targetWidth / 2) + (tooltipWidth);
+            }
+
+            if(this.horizontal === 'center'){
+                x -= (tooltipWidth / 2);
+            }
+
+            if(this.horizontal === 'right'){
+                x += (targetWidth / 2);
+            }
+
+            if(this.vertical === 'top'){
+                y -= (targetHeight / 2) + (tooltipHeight);
+            }
+
+            if(this.vertical === 'center'){
+                y -= (tooltipHeight / 2);
+            }
+
+            if(this.vertical === 'bottom'){
+                y += (targetHeight / 2);
+            }
+
+            this.tooltipContainer.leftInPixels = x;
+            this.tooltipContainer.topInPixels = y;
         }
     }
 
-    private _update() {}
+    private _update() {
+        this.setPosition();
+    }
 }

@@ -52,7 +52,7 @@ const getFont = function () {
 };
 
 const getBg = function () {
-    return "rgba(0,0,0,.8)";
+    return "rgba(0,0,0,.9)";
 };
 
 const getPadding = function (multiplier = 1) {
