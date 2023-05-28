@@ -20,6 +20,7 @@ export class Tooltip {
     private tooltipImage;
     private tooltipName;
     private tooltipDescription;
+    private tooltipStats;
 
     private horizontal = "center";
     private vertical = "top";
@@ -56,20 +57,19 @@ export class Tooltip {
         tooltipBarStack.setPaddingInPixels(5, 5, 5, 5);
         tooltipBar.addControl(tooltipBarStack);
 
-        let headerHeight = "30px";
+        let headerHeight = "35px";
         let tooltipHeader = new Rectangle("tooltipHeader");
         tooltipHeader.thickness = 0;
         tooltipHeader.height = headerHeight;
-        tooltipHeader.adaptHeightToChildren = true;
         tooltipHeader.paddingBottom = "5px";
         tooltipBarStack.addControl(tooltipHeader);
 
         const tooltipImage = new Rectangle("tooltipImage");
-        tooltipImage.top = "0x";
+        tooltipImage.top = "2px";
         tooltipImage.left = "0x";
-        tooltipImage.width = headerHeight;
-        tooltipImage.height = headerHeight;
-        tooltipImage.thickness = 1;
+        tooltipImage.width = "25px";
+        tooltipImage.height = "25px";
+        tooltipImage.thickness = 0;
         tooltipImage.background = Config.UI_CENTER_PANEL_BG;
         tooltipImage.isVisible = true;
         tooltipImage.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
@@ -80,8 +80,8 @@ export class Tooltip {
         // add name
         const tooltipName = new TextBlock("tooltipName");
         tooltipName.color = "#FFF";
-        tooltipName.top = "3px";
-        tooltipName.left = "40px";
+        tooltipName.top = "4px";
+        tooltipName.left = "30px";
         tooltipName.fontSize = "18px;";
         tooltipName.resizeToFit = true;
         tooltipName.text = "Item Name";
@@ -93,7 +93,21 @@ export class Tooltip {
         tooltipHeader.addControl(tooltipName);
         this.tooltipName = tooltipName;
 
-
+        // 
+        const tooltipStats = new TextBlock("tooltipStats");
+        tooltipStats.color = "green";
+        tooltipStats.top = "0px";
+        tooltipStats.left = "0px";
+        tooltipStats.fontSize = "14px;";
+        tooltipStats.resizeToFit = true;
+        tooltipStats.fontWeight = "bold";
+        tooltipStats.text = "";
+        tooltipStats.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        tooltipStats.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        tooltipStats.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        tooltipStats.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        tooltipBarStack.addControl(tooltipStats);
+        this.tooltipStats = tooltipStats;
 
         // add description
         const tooltipDescription = new TextBlock("tooltipDescription");
@@ -109,6 +123,7 @@ export class Tooltip {
         tooltipDescription.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         tooltipDescription.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         tooltipDescription.textWrapping = TextWrapping.WordWrap;
+        tooltipDescription.paddingBottom = "5px";
         tooltipBarStack.addControl(tooltipDescription);
         this.tooltipDescription = tooltipDescription;
     }
@@ -116,11 +131,40 @@ export class Tooltip {
     private generateItem(data) {
         this.tooltipName.text = data.name;
         this.tooltipDescription.text = data.description;
+        
+        let stats = "";
+        for(let key in data.benefits){
+            let benefit = data.benefits[key];
+            let title = benefit.key.charAt(0).toUpperCase() + benefit.key.slice(1);
+            stats += title+": "+(benefit.type === 1 ? "+":"-")+" "+benefit.amount+"\n";
+        }
+        stats = stats.slice(0, -1);
+        this.tooltipStats.text = stats;
+
     }
 
     private generateAbility(data) {
         this.tooltipName.text = data.label;
         this.tooltipDescription.text = data.description;
+
+        let stats = "";
+
+        if(data.casterPropertyAffected.mana > 0){
+            stats += "Cost: "+data.casterPropertyAffected.mana+" Mana\n";
+        }
+
+        if(data.cooldown > 0){
+            stats += "Cooldown: "+(data.cooldown/1000)+"s\n";
+        }
+
+        if(data.castTime > 0){
+            stats += "Cast time: "+(data.castTime/1000)+"s\n";
+        }else{
+            stats += "Instant Cast\n";
+        }
+
+        stats = stats.slice(0, -1);
+        this.tooltipStats.text = stats;
     }
 
     /** called externally to refresh tooltip with content */
