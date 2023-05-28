@@ -122,18 +122,26 @@ export class AbilityBar {
         });
 
         // add ability number
+        var abilityNumber = new Rectangle("abilityNumber" + digit + "_cooldown");
+        abilityNumber.top = "0px";
+        abilityNumber.left = "0px";
+        abilityNumber.width = "15px";
+        abilityNumber.height = "15px;";
+        abilityNumber.thickness = 0;
+        abilityNumber.isVisible = true;
+        abilityNumber.background = "rgba(0,0,0,.7)";
+        abilityNumber.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        abilityNumber.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        headlineRect.addControl(abilityNumber);
+
         var roomTxt = new TextBlock("ability_text_" + digit);
-        roomTxt.paddingLeft = "5px";
         roomTxt.text = "" + digit;
         roomTxt.fontSize = "12px";
         roomTxt.color = "#FFF";
-        roomTxt.top = "5px";
-        roomTxt.left = "0px";
-        roomTxt.width = "20px";
-        roomTxt.height = "15px";
+        roomTxt.fontWeight = "bold";
         roomTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         roomTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        headlineRect.addControl(roomTxt);
+        abilityNumber.addControl(roomTxt);
 
         // add cooldown
         // container
