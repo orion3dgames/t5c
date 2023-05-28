@@ -46,7 +46,7 @@ export class ChatBox {
     }
 
     _createUI() {
-        const chatPanel = generatePanel("chatPanel", "300px;", "200px", "-35px", "15px");
+        const chatPanel = generatePanel("chatPanel", "350px;", "200px", "-35px", "15px");
         chatPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         chatPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         chatPanel.isPointerBlocker = true;
@@ -113,8 +113,7 @@ export class ChatBox {
         // add default chat message
         this.addNotificationMessage(
             "system",
-            "Welcome to T5C, you can move around by left clicking and dragging the mouse" +
-                +"around. Use ability by selecting a target an then typing the appropriate digits on the keyboard.",
+            "Welcome to T5C, you can move around by left clicking and dragging the mouse around. Use ability by selecting a target an then typing the appropriate digits on the keyboard.",
             new Date()
         );
 
@@ -236,7 +235,7 @@ export class ChatBox {
 
             // message
             var roomTxt = new TextBlock("chatMsgTxt_" + msg.createdAt);
-            roomTxt.paddingLeft = "5fdsfpx";
+            roomTxt.paddingLeft = "5px";
             roomTxt.text = prefix + msg.message;
             roomTxt.textHorizontalAlignment = 0;
             roomTxt.fontSize = "12px";
