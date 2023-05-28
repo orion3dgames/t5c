@@ -25,7 +25,7 @@ export class GameRoomState extends Schema {
         const isWithinBounds = isWithinXBounds && isWithinZBounds;
         return isSelf || isWithinBounds;
     })*/
-    @type({ map: EnemySchema }) entities = new MapSchema<EnemySchema>();
+    @type({ map: BrainSchema1 }) entities = new MapSchema<BrainSchema1>();
     @type({ map: PlayerSchema }) players = new MapSchema<PlayerSchema>();
     @type({ map: LootSchema }) items = new MapSchema<LootSchema>();
     @type("number") serverTime: number = 0.0;
@@ -78,7 +78,7 @@ export class GameRoomState extends Schema {
             toRegion: false,
         };
 
-        let entity = new EnemySchema(this._gameroom, data);
+        let entity = new BrainSchema1(this._gameroom, data);
 
         // add to colyseus state
         this.entities.set(sessionId, entity);
@@ -155,11 +155,11 @@ export class GameRoomState extends Schema {
                 if (entity.type === "entity") {
                     if (entity.AI_CURRENT_STATE === AI_STATE.IDLE) {
                     } else if (entity.AI_CURRENT_STATE === AI_STATE.SEEKING) {
-                        entity.seek();
+                        //entity.seek();
                     } else if (entity.AI_CURRENT_STATE === AI_STATE.WANDER) {
-                        entity.wander();
+                        //entity.wander();
                     } else if (entity.AI_CURRENT_STATE === AI_STATE.ATTACKING) {
-                        entity.attack();
+                        //entity.attack();
                     }
                 }
             });

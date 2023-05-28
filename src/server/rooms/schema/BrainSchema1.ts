@@ -116,9 +116,7 @@ export class BrainSchema1 extends Schema {
         this.AI_CURRENT_STATE = AI_STATE.WANDER;
 
         // if there is a closest player, and in aggro range
-    if (    this.AI_CLOSEST_PLAYER_DISTANCE != null && 
-            this.AI_CLOSEST_PLAYER_DISTANCE < Config.MONSTER_AGGRO_DISTANCE
-            ) {
+        if (this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE < Config.MONSTER_AGGRO_DISTANCE) {
             //console.log("FOUND CLOSEST PLAYER", this.AI_CLOSEST_PLAYER_DISTANCE, Config.MONSTER_AGGRO_DISTANCE);
             this.AI_TARGET = this.AI_CLOSEST_PLAYER;
 

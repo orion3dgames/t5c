@@ -3,6 +3,7 @@ import { Vector3 } from "../../../shared/yuka";
 import { PlayerInputs } from "../../../shared/types";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { EnemySchema } from "../schema/EnemySchema";
+import { BrainSchema1 } from "../schema/BrainSchema1";
 import { LootSchema } from "../schema/LootSchema";
 
 export class moveCTRL {
@@ -26,7 +27,7 @@ export class moveCTRL {
             if (distance < 3) {
                 let ability = this._owner.AI_CURRENT_ABILITY;
                 let target = this._owner.AI_CURRENT_TARGET;
-                if (target instanceof EnemySchema) {
+                if (target instanceof BrainSchema1) {
                     this._owner.abilitiesCTRL.startAutoAttack(this._owner, target, ability);
                 }
                 if (target instanceof LootSchema) {
