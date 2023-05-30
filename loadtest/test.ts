@@ -1,6 +1,8 @@
 import { Client, Room } from "colyseus.js";
 import { cli, Options } from "@colyseus/loadtest";
 
+import { GameRoom } from "../src/server/rooms/GameRoom";
+
 import node_http from "../src/shared/Utils/node_http";
 
 async function main(options: Options) {
@@ -16,22 +18,22 @@ async function main(options: Options) {
             }
         });
     }
+
     if (foundRoom) {
         // get random user
-        let req = await node_http("http://localhost:8080/returnRandomUser");
+        let req = await node_http("http://localhost:3000/returnRandomUser");
         let character = req.user;
 
         // join room
         const room: Room = await client.joinById(foundRoom.roomId, {
             token: character.token,
             character_id: character.id,
+            AI_MODE: true,
         });
 
-        let sessionId = room.sessionId;
-        let player = room.state.players.get(sessionId);
+        console.log("adding ai player", room.sessionId);
 
-        console.log("joined successfully!", player);
-
+        /*
         room.onMessage("*", (type, message) => {
             console.log("onMessage:", type, message);
         });
@@ -46,7 +48,7 @@ async function main(options: Options) {
 
         room.onLeave((code) => {
             console.log(room.sessionId, "left.");
-        });
+        });*/
     }
 }
 

@@ -178,7 +178,7 @@ export class GameRoomState extends Schema {
      * @param sessionId
      * @param data
      */
-    addPlayer(client: Client): void {
+    addPlayer(client: Client, AI_MODE = false): void {
         // prepare player data
 
         let data = client.auth;
@@ -236,6 +236,11 @@ export class GameRoomState extends Schema {
 
         // set player as online
         this._gameroom.database.toggleOnlineStatus(client.auth.id, 1);
+
+        if (AI_MODE === true) {
+            const playerState: PlayerSchema = this._gameroom.state.players.get(client.sessionId);
+            playerState.set_AI_mode();
+        }
 
         // log
         Logger.info(`[gameroom][onJoin] player ${client.sessionId} joined room ${this._gameroom.roomId}.`);

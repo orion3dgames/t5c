@@ -16,6 +16,7 @@ import databaseInstance from "../shared/Database";
 import { PlayerUser } from "../shared/types";
 import Logger from "../shared/Logger";
 import Config from "../shared/Config";
+import { generateRandomPlayerName } from "../shared/Utils";
 
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
@@ -221,8 +222,33 @@ class GameServer {
         app.get("/register", function (req, res) {});
 
         app.get("/returnRandomUser", function (req, res) {
+            database.saveUser(generateRandomPlayerName(), generateRandomPlayerName()).then((user) => {
+                database.createCharacter(user.token, generateRandomPlayerName()).then((character) => {
+                    character.user_id = user.id;
+                    character.token = user.token;
+                    character.password = user.password;
+                    return res.send({
+                        message: "Successful",
+                        user: character,
+                    });
+                });
+            });
+            /*
+                .then((user) => {
+                    return database.createCharacter(user.token, generateRandomPlayerName());
+                });
+            /*
             database.returnRandomUserAndChar().then((user) => {
                 if (!user) {
+                    database.saveUser(generateRandomPlayerName(), generateRandomPlayerName()).then((user) => {
+                        console.log(user);
+                        return user;
+                    });
+                    
+                        .then((user) => {
+                            return database.createCharacter(user.token, generateRandomPlayerName());
+                        });
+
                     return res.status(400).send({
                         message: "Failed",
                     });
@@ -233,6 +259,7 @@ class GameServer {
                     });
                 }
             });
+            */
         });
     }
 }

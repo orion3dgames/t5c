@@ -99,7 +99,9 @@ export class GameRoom extends Room<GameRoomState> {
     //////////////////////////////////////////////////////////////////////////
     // authorize client based on provided options before WebSocket handshake is complete
     async onAuth(client: Client, authData: any, request: http.IncomingMessage) {
-        return await Auth.check(this.database, authData);
+        let character = await Auth.check(this.database, authData);
+        character.AI_MODE = authData.AI_MODE ?? false;
+        return character;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -107,7 +109,7 @@ export class GameRoom extends Room<GameRoomState> {
     //////////////////////////////////////////////////////////////////////////
     // on client join
     async onJoin(client: Client, options: any) {
-        this.state.addPlayer(client);
+        this.state.addPlayer(client, client.auth.AI_MODE ?? false);
         //this.dispatcher.dispatch(new OnPlayerJoinCommand(), { client: client });
     }
 

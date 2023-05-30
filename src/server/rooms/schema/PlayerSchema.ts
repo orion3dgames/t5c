@@ -101,6 +101,11 @@ export class PlayerSchema extends Schema {
     public AI_CURRENT_TARGET;
     public AI_CURRENT_ABILITY;
 
+    // load test ai
+    public AI_MODE = false;
+    public AI_NAV_TARGET = null;
+    public AI_NAV_WAYPOINTS = [];
+
     constructor(gameroom: GameRoom, data) {
         super(gameroom, data);
 
@@ -138,7 +143,6 @@ export class PlayerSchema extends Schema {
 
     // on player state initialized
     start() {
-        
         // add a 5 second grace period where the player can not be targeted by the ennemies
         setTimeout(() => {
             this.gracePeriod = false;
@@ -171,6 +175,48 @@ export class PlayerSchema extends Schema {
 
         //
         this.moveCTRL.update();
+
+        // load test AI mode
+        if (this.AI_MODE === true) {
+            this.AI_Mode();
+        }
+    }
+
+    public set_AI_mode() {
+        this.AI_MODE = true;
+    }
+
+    public AI_Mode() {
+        // save current position
+        let currentPos = this.getPosition();
+
+        if (this.AI_NAV_TARGET === null || this.AI_NAV_WAYPOINTS.length === 0) {
+            this.AI_NAV_TARGET = this._gameroom.navMesh.getRandomRegion();
+            this.AI_NAV_WAYPOINTS = this._gameroom.navMesh.findPath(currentPos, this.AI_NAV_TARGET.centroid);
+        }
+
+        // move entity
+        if (this.AI_NAV_WAYPOINTS.length > 0) {
+            // get next waypoint
+            let destinationOnPath = this.AI_NAV_WAYPOINTS[0];
+            destinationOnPath.y = 0;
+
+            // calculate next position towards destination
+            let updatedPos = this.moveCTRL.moveTo(currentPos, destinationOnPath, this.speed);
+            this.moveCTRL.setPosition(updatedPos);
+
+            // calculate rotation
+            this.rot = this.moveCTRL.calculateRotation(currentPos, updatedPos);
+
+            // check if arrived at waypoint
+            if (destinationOnPath.equals(updatedPos)) {
+                this.AI_NAV_WAYPOINTS.shift();
+            }
+        } else {
+            // something is wrong, let's look for a new destination
+            this.AI_NAV_TARGET = null;
+            this.AI_NAV_WAYPOINTS = [];
+        }
     }
 
     addItemToInventory(loot: LootSchema) {

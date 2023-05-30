@@ -158,7 +158,7 @@ export class GameScene {
         //  when a entity joins the room event
         this.room.state.players.onAdd((entity, sessionId) => {
             var isCurrentPlayer = sessionId === this.room.sessionId;
-        
+
             //////////////////
             // if player type
             if (isCurrentPlayer) {
@@ -221,7 +221,7 @@ export class GameScene {
                 delete this._entities[sessionId];
             }
         });
-        
+
         ////////////////////////////////////////////////////
 
         ////////////////////////////////////////////////////
@@ -236,12 +236,9 @@ export class GameScene {
             for (let sessionId in this._entities) {
                 const entity = this._entities[sessionId];
                 entity.update(delta);
-                
-                if(entity.type !== 'player'){ 
-                    entity.lod(this._currentPlayer);
-                }
+                entity.lod(this._currentPlayer);
             }
-            
+
             /////////////////
             // server update rate
             // every 100ms loop
@@ -249,11 +246,10 @@ export class GameScene {
             let timePassed = (timeNow - timeThen) / 1000;
             let updateRate = Config.updateRate / 1000; // game is networked update every 100ms
             if (timePassed >= updateRate) {
-
                 // player uppdate at server rate
                 for (let sessionId in this._entities) {
                     const entity = this._entities[sessionId];
-                    if (entity && entity.type === 'player') {
+                    if (entity && entity.type === "player") {
                         entity.updateServerRate(Config.updateRate);
                     }
                 }
