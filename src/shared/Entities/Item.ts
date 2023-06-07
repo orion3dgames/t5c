@@ -108,7 +108,7 @@ export class Item {
         playerMesh.name = entity.key + "_mesh";
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
         playerMesh.scaling = new Vector3(this.meshData.scale, this.meshData.scale, this.meshData.scale);
-        playerMesh.isPickable = true;
+        playerMesh.isPickable = false;
         playerMesh.checkCollisions = false;
         playerMesh.parent = this.mesh;
 
@@ -135,20 +135,22 @@ export class Item {
         // register hover over player
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
-                let meshes = ev.meshUnderPointer.getChildMeshes();
-                let mesh = meshes[this.meshData.meshIndex];
-                mesh.outlineColor = new Color3(0, 1, 0);
-                mesh.outlineWidth = 0.3;
-                mesh.renderOutline = true;
+                let mesh = ev.meshUnderPointer;
+                for (const childMesh of mesh.getChildMeshes()) {
+                    childMesh.outlineColor = new Color3(0, 1, 0);
+                    childMesh.outlineWidth = 0.1;
+                    childMesh.renderOutline = true;
+                }
             })
         );
 
         // register hover out player
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
-                let meshes = ev.meshUnderPointer.getChildMeshes();
-                let mesh = meshes[this.meshData.meshIndex];
-                mesh.renderOutline = false;
+                let mesh = ev.meshUnderPointer;
+                for (const childMesh of mesh.getChildMeshes()) {
+                    childMesh.renderOutline = false;
+                }
             })
         );
 

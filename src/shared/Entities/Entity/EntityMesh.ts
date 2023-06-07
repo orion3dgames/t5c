@@ -78,12 +78,12 @@ export class EntityMesh {
         const playerMesh = result.rootNodes[0];
         this._animationGroups = result.animationGroups;
         this._skeleton = result.skeletons[0];
-        
+
         /////////////////////////////
         // equip weapon
         if (this._entity.type === "player") {
             let bone = this._skeleton.bones[37];
-            const weapon = this._loadedAssets["ITEM_sword_01"].instantiateModelsToScene((name)=>"PlayerSword");
+            const weapon = this._loadedAssets["ITEM_sword_01"].instantiateModelsToScene((name) => "PlayerSword");
             const weaponMesh = weapon.rootNodes[0];
             weaponMesh.parent = this.mesh;
             weaponMesh.attachToBone(bone, playerMesh);
@@ -107,7 +107,7 @@ export class EntityMesh {
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);
         //this.mesh.actionManager.isRecursive = true;
-        
+
         // setup collisions for current player
         if (this.isCurrentPlayer) {
             // teleport trigger
@@ -132,20 +132,22 @@ export class EntityMesh {
         // register hover over player
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
-                let meshes = ev.meshUnderPointer.getChildMeshes();
-                let mesh = meshes[this._entity.meshIndex];
-                mesh.outlineColor = new Color3(0, 1, 0);
-                mesh.outlineWidth = 0.05;
-                mesh.renderOutline = true;
+                let mesh = ev.meshUnderPointer;
+                for (const childMesh of mesh.getChildMeshes()) {
+                    childMesh.outlineColor = new Color3(0, 1, 0);
+                    childMesh.outlineWidth = 0.03;
+                    childMesh.renderOutline = true;
+                }
             })
         );
 
         // register hover out player
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
-                let meshes = ev.meshUnderPointer.getChildMeshes();
-                let mesh = meshes[this._entity.meshIndex];
-                mesh.renderOutline = false;
+                let mesh = ev.meshUnderPointer;
+                for (const childMesh of mesh.getChildMeshes()) {
+                    childMesh.renderOutline = false;
+                }
             })
         );
     }
