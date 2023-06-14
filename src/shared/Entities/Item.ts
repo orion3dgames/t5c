@@ -13,11 +13,8 @@ import { PlayerInput } from "../../client/Controllers/PlayerInput";
 
 import Config from "../Config";
 import { dataDB } from "../Data/dataDB";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { randomNumberInRange } from "../Utils";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { child } from "winston";
 
 export class Item {
     public _scene: Scene;

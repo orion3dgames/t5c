@@ -4,7 +4,7 @@ import { isLocal } from "./Utils";
 let Config = {
     // general settings
     title: "T5C",
-    version: "Version 0.2.2",
+    version: "Version 0.2.3",
     lang: "en",
 
     // server settings

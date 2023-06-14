@@ -202,7 +202,6 @@ export class Panel_Character extends Panel {
         for (let key in this.attributes) {
             // get ability details
             let line = this.attributes[key];
-            console.log(line, key);
 
             let panelRectangle = new Rectangle("cont" + key);
             panelRectangle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;

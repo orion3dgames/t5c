@@ -1,6 +1,6 @@
 {
   "name": "t5c",
-  "version": "0.2.1",
+  "version": "0.2.3",
   "repository": {
     "url": "git+https://github.com/oriongunning/t5c.git"
   },
@@ -18,9 +18,9 @@
   "author": "Orion",
   "license": "GPL-3.0",
   "devDependencies": { 
-    "@babylonjs/gui-editor": "^6.3.0",
-    "@babylonjs/inspector": "^6.3.0",
-    "@babylonjs/materials": "^6.3.0",
+    "@babylonjs/gui-editor": "^6.7.0",
+    "@babylonjs/inspector": "^6.7.0",
+    "@babylonjs/materials": "^6.7.0",
 
     "@colyseus/core": "^0.15.0",
     "@colyseus/loadtest": "^0.15.0",
@@ -44,11 +44,11 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
-    "@babylonjs/core": "^6.3.0",
-    "@babylonjs/gui": "^6.3.0",
-    "@babylonjs/loaders": "^6.3.0",
-    "@babylonjs/serializers": "^6.3.0",
-    "babylonjs-gltf2interface": "^6.3.0",
+    "@babylonjs/core": "^6.7.0",
+    "@babylonjs/gui": "^6.7.0",
+    "@babylonjs/loaders": "^6.7.0",
+    "@babylonjs/serializers": "^6.7.0",
+    "babylonjs-gltf2interface": "^6.7.0",
     
     "colyseus.js": "^0.15.0",
     "colyseus": "^0.15.0",
@@ -64,7 +64,7 @@
   "peerDependencies": {},
   "browserslist": {
     "production": [
-      "> 5%"
+      "> 4%"
     ],
     "development": [
       "last 1 chrome version",
