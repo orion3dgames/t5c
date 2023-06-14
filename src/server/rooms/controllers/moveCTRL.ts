@@ -80,7 +80,8 @@ export class moveCTRL {
             return false;
         }
 
-        this._owner.abilitiesCTRL.cancelAutoAttack(this);
+        // cancel any auto attack
+        this._owner.abilitiesCTRL.cancelAutoAttack(this._owner);
 
         let speed = this._owner.speed;
 

@@ -154,9 +154,7 @@ export class PlayerSchema extends Schema {
         this.isMoving = false;
 
         // always check if player is dead ??
-        if (this.isEntityDead()) {
-            this.setAsDead();
-        } else if (this.isDead) {
+        if (this.isEntityDead() && !this.isDead) {
             this.setAsDead();
         }
 
@@ -180,6 +178,8 @@ export class PlayerSchema extends Schema {
         if (this.AI_MODE === true) {
             this.AI_Mode();
         }
+
+        console.log("update", EntityState[this.anim_state]);
     }
 
     public set_AI_mode() {

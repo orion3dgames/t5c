@@ -7,6 +7,7 @@ import fs from "fs";
 
 import { Server, matchMaker } from "@colyseus/core";
 import { monitor } from "@colyseus/monitor";
+import { playground } from "@colyseus/playground";
 
 import { WebSocketTransport } from "@colyseus/ws-transport";
 import { GameRoom } from "./rooms/GameRoom";
@@ -84,6 +85,9 @@ class GameServer {
 
         // start monitor
         app.use("/colyseus", monitor());
+
+        // bind it as an express middleware
+        app.use("/playground", playground);
 
         //////////////////////////////////////////////////
         //// SERVING CLIENT DIST FOLDER TO EXPRESS ///////

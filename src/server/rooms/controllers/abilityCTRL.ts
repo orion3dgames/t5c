@@ -123,25 +123,6 @@ export class abilitiesCTRL {
         }
     }
 
-    startAutoAttack(owner, target, ability) {
-        this.doAutoAttack(owner, target, ability);
-        this.attackTimer = setInterval(() => {
-            this.doAutoAttack(owner, target, ability);
-        }, 900);
-    }
-
-    doAutoAttack(owner, target, ability) {
-        owner.anim_state = EntityState.ATTACK;
-        this.castAbility(owner, target, ability, 1);
-    }
-
-    cancelAutoAttack(owner) {
-        owner.AI_CURRENT_TARGET = null;
-        owner.AI_CURRENT_ABILITY = null;
-        owner.anim_state = EntityState.IDLE;
-        clearInterval(this.attackTimer);
-    }
-
     getByDigit(digit) {
         return this.abilities[digit - 1];
     }
@@ -253,8 +234,10 @@ export class abilitiesCTRL {
             target.setTarget(owner);
         }
 
+        //
         this.affectCaster(owner, ability);
 
+        //
         if (ability.repeat > 0) {
             let repeat = 1;
             let timer = setInterval(() => {
@@ -272,6 +255,7 @@ export class abilitiesCTRL {
             this.affectTarget(target, ability);
         }
 
+        //
         this.startCooldown(digit, ability);
 
         // make sure no values are out of range.
@@ -292,6 +276,7 @@ export class abilitiesCTRL {
             this.player_casting_timer = false;
         }
 
+        // if target is dead, process target death
         if (target.isEntityDead()) {
             this.processDeath(owner, target);
         }
@@ -302,6 +287,7 @@ export class abilitiesCTRL {
             return false;
         }
 
+        // cancel auto attack timer
         this.cancelAutoAttack(owner);
 
         // set target as dead
@@ -319,10 +305,41 @@ export class abilitiesCTRL {
                 date: new Date(),
             });
 
+            // process drops, experience and gold
             let drop = new dropCTRL(owner, client);
             drop.addExperience(target);
             drop.addGold(target);
             drop.dropItems(target);
         }
     }
+
+    //////////////////////////////////////////////
+    ////////////// BASIC AUTO ATTACK /////////////
+    //////////////////////////////////////////////
+
+    startAutoAttack(owner, target, ability) {
+        this.doAutoAttack(owner, target, ability);
+        this.attackTimer = setInterval(() => {
+            this.doAutoAttack(owner, target, ability);
+        }, 900);
+    }
+
+    doAutoAttack(owner, target, ability) {
+        // only auto attack if entity has a target
+        if (owner.AI_CURRENT_TARGET !== null) {
+            owner.anim_state = EntityState.ATTACK;
+            this.castAbility(owner, target, ability, 1);
+        }
+    }
+
+    cancelAutoAttack(owner) {
+        owner.AI_CURRENT_TARGET = null;
+        owner.AI_CURRENT_ABILITY = null;
+        owner.anim_state = EntityState.IDLE;
+        clearInterval(this.attackTimer);
+    }
+
+    //////////////////////////////////////////////
+    //////////////////////////////////////////////
+    //////////////////////////////////////////////
 }
