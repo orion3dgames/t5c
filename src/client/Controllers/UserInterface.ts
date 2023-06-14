@@ -34,6 +34,7 @@ import { Item } from "../../shared/Entities/Item";
 
 import { generatePanel, getBg } from "./UI/Theme";
 import { Grid } from "@babylonjs/gui";
+import { HighlightLayer } from "@babylonjs/core/Layers/highlightLayer";
 
 export class UserInterface {
     private _scene: Scene;
@@ -47,7 +48,7 @@ export class UserInterface {
     //UI Elements
     public _playerUI;
     private _namesUI;
-    private _centerUI;
+    public _hightlight;
 
     // interface
     public _ChatBox: ChatBox;
@@ -86,6 +87,12 @@ export class UserInterface {
         // create ui
         const playerUI = AdvancedDynamicTexture.CreateFullscreenUI("UI_Player", true, this._scene);
         this._playerUI = playerUI;
+
+        // set highlight layer
+        this._hightlight = new HighlightLayer("hl", this._scene);
+        this._hightlight.blurHorizontalSize = 0.5;
+        this._hightlight.blurVerticalSize = 0.5;
+        this._hightlight.innerGlow = false;
     }
 
     // set current player

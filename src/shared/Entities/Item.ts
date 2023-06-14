@@ -16,6 +16,8 @@ import { dataDB } from "../Data/dataDB";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { randomNumberInRange } from "../Utils";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { child } from "winston";
 
 export class Item {
     public _scene: Scene;
@@ -136,10 +138,15 @@ export class Item {
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
                 let mesh = ev.meshUnderPointer;
+                console.log(mesh.name);
                 for (const childMesh of mesh.getChildMeshes()) {
-                    childMesh.outlineColor = new Color3(0, 1, 0);
+                    childMesh.overlayColor = new Color3(1, 1, 1);
+                    childMesh.overlayAlpha = 0.3;
+                    childMesh.renderOverlay = true;
+                    //this.ui._hightlight.addMesh(childMesh as Mesh, new Color3(0, 1, 0));
+                    /*childMesh.outlineColor = new BABYLON.Color3(0, 1, 0);
                     childMesh.outlineWidth = 0.1;
-                    childMesh.renderOutline = true;
+                    childMesh.renderOutline = true;*/
                 }
             })
         );
@@ -149,7 +156,9 @@ export class Item {
             new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
                 let mesh = ev.meshUnderPointer;
                 for (const childMesh of mesh.getChildMeshes()) {
-                    childMesh.renderOutline = false;
+                    childMesh.renderOverlay = false;
+                    //childMesh.renderOutline = false;
+                    //this.ui._hightlight.removeMesh(childMesh as Mesh);
                 }
             })
         );

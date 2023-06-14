@@ -13,6 +13,7 @@ import { Skeleton } from "@babylonjs/core/Bones/skeleton";
 export class EntityMesh {
     private _entity: Entity;
     private _scene: Scene;
+    private _ui;
     private _loadedAssets;
     private _room;
     private _animationGroups: AnimationGroup[];
@@ -26,6 +27,7 @@ export class EntityMesh {
     constructor(entity: Entity) {
         this._entity = entity;
         this._scene = entity._scene;
+        this._ui = entity.ui;
         this._loadedAssets = entity._loadedAssets;
         this.isCurrentPlayer = entity.isCurrentPlayer;
         this._room = entity._room;
@@ -134,9 +136,15 @@ export class EntityMesh {
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
                 let mesh = ev.meshUnderPointer;
                 for (const childMesh of mesh.getChildMeshes()) {
+                    childMesh.overlayColor = new Color3(1, 1, 1);
+                    childMesh.overlayAlpha = 0.3;
+                    childMesh.renderOverlay = true;
+                    //this._ui._hightlight.addMesh(childMesh as Mesh, new Color3(1, 1, 1));
+                    /*
                     childMesh.outlineColor = new Color3(0, 1, 0);
                     childMesh.outlineWidth = 0.03;
                     childMesh.renderOutline = true;
+                    */
                 }
             })
         );
@@ -146,7 +154,9 @@ export class EntityMesh {
             new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
                 let mesh = ev.meshUnderPointer;
                 for (const childMesh of mesh.getChildMeshes()) {
-                    childMesh.renderOutline = false;
+                    childMesh.renderOverlay = false;
+                    this._ui._hightlight.removeMesh(childMesh as Mesh);
+                    //childMesh.renderOutline = false;
                 }
             })
         );
