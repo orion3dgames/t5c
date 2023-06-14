@@ -83,11 +83,14 @@ class GameServer {
             matchMaker.createRoom("game_room", { location: "lh_dungeon_01" });
         });
 
-        // start monitor
-        app.use("/colyseus", monitor());
+        // start dev routes
+        if (process.env.NODE_ENV !== "production") {
+            // start monitor
+            app.use("/colyseus", monitor());
 
-        // bind it as an express middleware
-        app.use("/playground", playground);
+            // bind it as an express middleware
+            app.use("/playground", playground);
+        }
 
         //////////////////////////////////////////////////
         //// SERVING CLIENT DIST FOLDER TO EXPRESS ///////
