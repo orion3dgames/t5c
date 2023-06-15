@@ -174,8 +174,9 @@ export class Entity {
         if (this.AI_CURRENT_STATE === AI_STATE.WANDER) {
             this.debugMesh.material = this._scene.getMaterialByName("debug_entity_neutral");
         }
+
+        // what to do when an entity dies
         if (this.type !== "player" && this.anim_state === EntityState.DEAD && !this.isDead) {
-            console.log("DEAD");
             this.isDead = true;
             global.T5C.selectedEntity = null;
             this.meshController.selectedMesh.isVisible = false;

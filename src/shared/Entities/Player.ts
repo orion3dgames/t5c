@@ -145,7 +145,6 @@ export class Player extends Entity {
 
     // update at server rate
     public updateServerRate(delta) {
-
         // if digit pressed
         if (this._input.digit_pressed > 0 && !this.isCasting) {
             // get all necessary vars
@@ -189,7 +188,9 @@ export class Player extends Entity {
 
         if (this.anim_state === EntityState.DEAD) {
             this.ui._RessurectBox.open();
+            this.cameraController.bw(true);
         } else {
+            this.cameraController.bw(false);
             this.ui._RessurectBox.close();
         }
     }

@@ -2,20 +2,19 @@ import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { UniversalCamera } from "@babylonjs/core/Cameras/universalCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { BlackAndWhitePostProcess } from "@babylonjs/core/PostProcesses/blackAndWhitePostProcess";
 
 export class PlayerCamera {
     public camera;
     private _scene: Scene;
     private _input;
     public _camRoot;
+    private _postProcess: BlackAndWhitePostProcess; //
+
     constructor(scene: Scene, input) {
         this._scene = scene;
         this._input = input;
         this._build();
-    }
-
-    degrees_to_radians(degrees) {
-        return degrees * (Math.PI / 180);
     }
 
     private _build() {
@@ -41,6 +40,18 @@ export class PlayerCamera {
 
         // set as active camera
         this._scene.activeCamera = this.camera;
+    }
+
+    // post processing effect black and white
+    // used when current player dies and click ressurects
+    public bw(activate: boolean) {
+        if (activate === true && !this._postProcess) {
+            this._postProcess = new BlackAndWhitePostProcess("bandw", 1.0, this.camera);
+        }
+        if (activate === false && this._postProcess) {
+            this._postProcess.dispose();
+            this._postProcess = null;
+        }
     }
 
     public follow(playerPosition, rotationY): void {
