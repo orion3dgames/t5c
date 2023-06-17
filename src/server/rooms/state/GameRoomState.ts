@@ -1,5 +1,5 @@
 import { Schema, type, MapSchema, filterChildren } from "@colyseus/schema";
-import { EnemySchema } from "../schema/EnemySchema";
+import { EnemySchema } from "../schema/_EnemySchema";
 import { BrainSchema1 } from "../schema/BrainSchema1";
 import { PlayerSchema } from "../schema/PlayerSchema";
 import { LootSchema } from "../schema/LootSchema";

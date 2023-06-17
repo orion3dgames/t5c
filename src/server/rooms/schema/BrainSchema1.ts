@@ -64,11 +64,11 @@ export class BrainSchema1 extends Schema {
     public AI_NAV_WAYPOINTS: Vector3[] = [];
     public AI_SEARCHING_TIMER: any = false;
 
-    public AI_ATTACK_INTERVAL:number = 0;
-    public AI_ATTACK_INTERVAL_RATE:number = 1000;
+    public AI_ATTACK_INTERVAL: number = 0;
+    public AI_ATTACK_INTERVAL_RATE: number = 1000;
 
-    public AI_DEAD_INTERVAL:number = 0;
-    public AI_DEAD_INTERVAL_RATE:number = 5000;
+    public AI_DEAD_INTERVAL: number = 0;
+    public AI_DEAD_INTERVAL_RATE: number = 5000;
 
     constructor(gameroom, data, ...args: any[]) {
         super(gameroom, data, args);
@@ -111,7 +111,6 @@ export class BrainSchema1 extends Schema {
 
     //
     patrolling() {
-
         this.anim_state = EntityState.WALKING;
         this.AI_CURRENT_STATE = AI_STATE.WANDER;
 
@@ -144,7 +143,6 @@ export class BrainSchema1 extends Schema {
 
     //
     searching() {
-
         this.AI_CURRENT_STATE = AI_STATE.SEEKING;
 
         if (this.AI_TARGET === null || this.AI_TARGET === undefined || this.AI_TARGET.isEntityDead()) {
@@ -168,7 +166,7 @@ export class BrainSchema1 extends Schema {
         }
 
         // if player come back into range, reset timer
-        if ( this.AI_TARGET_DISTANCE < Config.MONSTER_AGGRO_DISTANCE) {
+        if (this.AI_TARGET_DISTANCE < Config.MONSTER_AGGRO_DISTANCE) {
             this.AI_SEARCHING_TIMER = 0;
         }
 
@@ -180,22 +178,19 @@ export class BrainSchema1 extends Schema {
         }
 
         // if target has moved
-        if(this.AI_NAV_WAYPOINTS.length < 1 && this.AI_TARGET !== null){
-            this.setTargetDestination(this.AI_TARGET.getPosition());      
+        if (this.AI_NAV_WAYPOINTS.length < 1 && this.AI_TARGET !== null) {
+            this.setTargetDestination(this.AI_TARGET.getPosition());
         }
 
-        if(this.AI_TARGET !== null){
+        if (this.AI_TARGET !== null) {
             // else keep moving towards target
             //console.log(this.name+" has found a target and is heading towards it", this.AI_TARGET.sessionId);
-            this.moveTowards('seek');
+            this.moveTowards("seek");
         }
-
-        
     }
 
     //
     attacking() {
-
         //console.log(this.name+" is attacking target", this.AI_TARGET.isEntityDead(), this.AI_TARGET.sessionId);
 
         if (this.AI_TARGET === null || this.AI_TARGET === undefined || this.AI_TARGET.isEntityDead()) {
@@ -225,8 +220,7 @@ export class BrainSchema1 extends Schema {
     }
 
     dead() {
-
-        if(this.isDead === false){
+        if (this.isDead === false) {
             this.health = 0;
             this.blocked = true;
             this.anim_state = EntityState.DEAD;
@@ -241,7 +235,6 @@ export class BrainSchema1 extends Schema {
         if (this.AI_DEAD_INTERVAL === this.AI_DEAD_INTERVAL_RATE) {
             this._gameroom.state.entities.delete(this.sessionId);
         }
-
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -280,7 +273,7 @@ export class BrainSchema1 extends Schema {
     }
 
     calculateDamage(owner, target) {
-        return 30;
+        return 10;
     }
 
     // get position vector
@@ -305,7 +298,7 @@ export class BrainSchema1 extends Schema {
         return Math.atan2(v1.x - v2.x, v1.z - v2.z);
     }
 
-    moveTowards(type:string = 'seek') {
+    moveTowards(type: string = "seek") {
         this.anim_state = EntityState.WALKING;
         // move entity
         if (this.AI_NAV_WAYPOINTS.length > 0) {
@@ -337,7 +330,7 @@ export class BrainSchema1 extends Schema {
         this.AI_SEARCHING_TIMER = false;
     }
 
-    cancelTarget(){
+    cancelTarget() {
         this.AI_SEARCHING_TIMER = false;
         this.AI_NAV_WAYPOINTS = [];
         this.AI_TARGET = null;

@@ -99,8 +99,8 @@ export class abilitiesCTRL {
 
         // if there is a minRange, set target as target
         if (ability.minRange > 0) {
-            owner.AI_CURRENT_TARGET = target;
-            owner.AI_CURRENT_ABILITY = ability; // store ability to use once user gets close enough
+            owner.AI_TARGET = target;
+            owner.AI_ABILITY = ability; // store ability to use once user gets close enough
             return false;
         }
 
@@ -326,15 +326,15 @@ export class abilitiesCTRL {
 
     doAutoAttack(owner, target, ability) {
         // only auto attack if entity has a target
-        if (owner.AI_CURRENT_TARGET !== null) {
+        if (target !== null) {
             owner.anim_state = EntityState.ATTACK;
             this.castAbility(owner, target, ability, 1);
         }
     }
 
     cancelAutoAttack(owner) {
-        owner.AI_CURRENT_TARGET = null;
-        owner.AI_CURRENT_ABILITY = null;
+        owner.AI_TARGET = null;
+        owner.AI_ABILITY = null;
         owner.anim_state = EntityState.IDLE;
         clearInterval(this.attackTimer);
     }

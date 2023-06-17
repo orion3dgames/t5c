@@ -2,7 +2,6 @@ import Logger from "../../../shared/Logger";
 import { Vector3 } from "../../../shared/yuka";
 import { PlayerInputs } from "../../../shared/types";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
-import { EnemySchema } from "../schema/EnemySchema";
 import { BrainSchema1 } from "../schema/BrainSchema1";
 import { LootSchema } from "../schema/LootSchema";
 
@@ -22,19 +21,19 @@ export class moveCTRL {
         // autoattack stop if casting, moving, dying
         if (this._owner.hasTarget()) {
             let start = this._owner.getPosition();
-            let destination = this._owner.AI_CURRENT_TARGET_POSITION;
-            let distance = this._owner.AI_CURRENT_TARGET_DISTANCE;
+            let destination = this._owner.AI_TARGET.getPosition();
+            let distance = this._owner.AI_TARGET_DISTANCE;
             if (distance < 3) {
-                let ability = this._owner.AI_CURRENT_ABILITY;
-                let target = this._owner.AI_CURRENT_TARGET;
+                let ability = this._owner.AI_ABILITY;
+                let target = this._owner.AI_TARGET;
                 if (target instanceof BrainSchema1) {
                     this._owner.abilitiesCTRL.startAutoAttack(this._owner, target, ability);
                 }
                 if (target instanceof LootSchema) {
                     this._owner.addItemToInventory(target);
                 }
-                this._owner.AI_CURRENT_TARGET = null;
-                this._owner.AI_CURRENT_ABILITY = null;
+                this._owner.AI_ARGET = null;
+                this._owner.AI_ABILITY = null;
             } else {
                 this._owner.rot = this.calculateRotation(start, destination);
                 this.setPosition(this.moveTo(start, destination, this._owner.speed));
