@@ -1,15 +1,14 @@
 import { Schema, type, MapSchema, filterChildren } from "@colyseus/schema";
-import { EnemySchema } from "../schema/_EnemySchema";
 import { BrainSchema1 } from "../schema/BrainSchema1";
 import { PlayerSchema } from "../schema/PlayerSchema";
 import { LootSchema } from "../schema/LootSchema";
+import { spawnController } from "../controllers/spawnController";
 import { GameRoom } from "../GameRoom";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { NavMesh } from "../../../shared/yuka";
 import { nanoid } from "nanoid";
 import Logger from "../../../shared/Logger";
 import { randomNumberInRange } from "../../../shared/Utils";
-import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 import { dataDB } from "../../../shared/Data/dataDB";
 import { Client } from "colyseus";
 import { GetLoot, LootTableEntry } from "../../../shared/Entities/Player/LootTable";
@@ -31,11 +30,11 @@ export class GameRoomState extends Schema {
     @type("number") serverTime: number = 0.0;
 
     // not networked variables
-    private _gameroom: GameRoom = null;
+    public _gameroom: GameRoom = null;
+    private _spawnController: spawnController;
     public navMesh: NavMesh = null;
     private timer: number = 0;
     private spawnTimer: number = 0;
-
     private roomDetails;
 
     constructor(gameroom: GameRoom, _navMesh: NavMesh, ...args: any[]) {
@@ -43,6 +42,7 @@ export class GameRoomState extends Schema {
         this._gameroom = gameroom;
         this.navMesh = _navMesh;
         this.roomDetails = dataDB.get("location", this._gameroom.metadata.location);
+        this._spawnController = new spawnController(this);
     }
 
     public createEntity(delta) {
@@ -131,6 +131,7 @@ export class GameRoomState extends Schema {
     public update(deltaTime: number) {
         //////////////////////////////////////////////
         // entity spawning script (span a monster every .5 second)
+        /*
         this.spawnTimer += deltaTime;
         let spawnTime = 300;
         if (this.spawnTimer >= spawnTime) {
@@ -139,10 +140,10 @@ export class GameRoomState extends Schema {
             if (this.entities.size < maxEntities) {
                 this.createEntity(this.entities.size);
             }
-            if (this.items.size < 20) {
+            if (this.items.size < 0) {
                 this.createItem();
             }
-        }
+        }*/
 
         //////////////////////////////////////////////
         // for each entity
@@ -150,18 +151,6 @@ export class GameRoomState extends Schema {
             this.entities.forEach((entity) => {
                 // entity update
                 entity.update();
-
-                // only move non playing entities
-                if (entity.type === "entity") {
-                    if (entity.AI_CURRENT_STATE === AI_STATE.IDLE) {
-                    } else if (entity.AI_CURRENT_STATE === AI_STATE.SEEKING) {
-                        //entity.seek();
-                    } else if (entity.AI_CURRENT_STATE === AI_STATE.WANDER) {
-                        //entity.wander();
-                    } else if (entity.AI_CURRENT_STATE === AI_STATE.ATTACKING) {
-                        //entity.attack();
-                    }
-                }
             });
         }
 

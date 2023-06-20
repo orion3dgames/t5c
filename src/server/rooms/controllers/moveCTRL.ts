@@ -117,6 +117,7 @@ export class moveCTRL {
             this._owner.isMoving = true;
             this._owner.state = EntityState.WALKING;
 
+            /*
             Logger.info(
                 "Valid position for " +
                     this._owner.name +
@@ -129,6 +130,7 @@ export class moveCTRL {
                     ", rot: " +
                     this._owner.rot
             );
+            */
         } else {
             // collision detected, return player old position
             this._owner.x = oldX;
@@ -138,6 +140,7 @@ export class moveCTRL {
             this._owner.sequence = playerInput.seq;
             this._owner.state = EntityState.IDLE;
 
+            /*
             Logger.warning(
                 "Invalid position for " +
                     this._owner.name +
@@ -149,7 +152,7 @@ export class moveCTRL {
                     this._owner.z +
                     ", rot: " +
                     this._owner.rot
-            );
+            );*/
         }
     }
 

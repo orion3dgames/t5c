@@ -19,10 +19,11 @@ let Config = {
 
     // game settings
     PLAYER_NAMEPLATE_TIMEOUT: 15000, // 15 seconds
-    PLAYER_VIEW_DISTANCE: 20,
-    PLAYER_GRACE_PERIOD: 5000,
+    PLAYER_VIEW_DISTANCE: 22,
+    PLAYER_GRACE_PERIOD: 0,
     MONSTER_RESPAWN_RATE: 20000,
-    MONSTER_AGGRO_DISTANCE: 6,
+    MONSTER_SEARCHING_PERIOD: 2000,
+    MONSTER_AGGRO_DISTANCE: 7,
     MONSTER_ATTACK_DISTANCE: 2,
 
     // UI SETTINGS
@@ -34,7 +35,7 @@ let Config = {
 
     // default scene
     //defaultScene: isLocal() ? State.GAME : State.LOGIN,
-    defaultScene: State.LOGIN,
+    defaultScene: State.GAME,
 };
 
 export default Config;

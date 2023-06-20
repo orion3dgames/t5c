@@ -70,6 +70,8 @@ export class BrainSchema1 extends Schema {
     public AI_DEAD_INTERVAL: number = 0;
     public AI_DEAD_INTERVAL_RATE: number = 5000;
 
+    public AI_SPAWN_INFO;
+
     constructor(gameroom, data, ...args: any[]) {
         super(gameroom, data, args);
 
@@ -137,15 +139,17 @@ export class BrainSchema1 extends Schema {
         }
 
         // else just continue patrolling
-        //console.log(this.name+" IS PATROLLING IN", this._gameroom.metadata.location, this.AI_CLOSEST_PLAYER_DISTANCE);
+        //console.log(this.name + " IS PATROLLING IN", this._gameroom.metadata.location, this.AI_CLOSEST_PLAYER_DISTANCE);
         this.moveTowards();
     }
 
     //
     searching() {
+        //console.log(this.name + " is searching for target", this._gameroom.metadata.location, this.AI_TARGET.isEntityDead(), this.AI_TARGET.name);
+
         this.AI_CURRENT_STATE = AI_STATE.SEEKING;
 
-        if (this.AI_TARGET === null || this.AI_TARGET === undefined || this.AI_TARGET.isEntityDead()) {
+        if (this.AI_TARGET === null || this.AI_TARGET === undefined || this.AI_TARGET === false || this.AI_TARGET.isEntityDead()) {
             this.cancelTarget();
             this.brain.setState(this.patrolling, this);
             return false;
@@ -171,10 +175,11 @@ export class BrainSchema1 extends Schema {
         }
 
         // if entity has been searching for over 50 server iterations, go back to patrolling
-        if (this.AI_SEARCHING_TIMER > 5000) {
+        if (this.AI_SEARCHING_TIMER > Config.MONSTER_SEARCHING_PERIOD) {
             this.resetDestination();
             this.AI_TARGET = null;
             this.brain.setState(this.patrolling, this);
+            return false;
         }
 
         // if target has moved
@@ -191,9 +196,9 @@ export class BrainSchema1 extends Schema {
 
     //
     attacking() {
-        //console.log(this.name+" is attacking target", this.AI_TARGET.isEntityDead(), this.AI_TARGET.sessionId);
+        //console.log(this.name + " is attacking target", this._gameroom.metadata.location, this.AI_TARGET.isEntityDead(), this.AI_TARGET.name);
 
-        if (this.AI_TARGET === null || this.AI_TARGET === undefined || this.AI_TARGET.isEntityDead()) {
+        if (this.AI_TARGET === null || this.AI_TARGET === undefined || this.AI_TARGET === false || this.AI_TARGET.isEntityDead() === true) {
             this.cancelTarget();
             this.brain.setState(this.patrolling, this);
             return false;
