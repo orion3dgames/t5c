@@ -91,7 +91,7 @@ export class BrainSchema1 extends Schema {
         this.brain = new FSM();
 
         // default brain state
-        this.brain.setState(this.patrolling, this);
+        this.brain.setState(this.decision, this);
     }
 
     // runs on every server iteration
@@ -109,6 +109,26 @@ export class BrainSchema1 extends Schema {
 
         // Update the FSM controlling the "brain". It will invoke the currently active state function
         this.brain.update();
+    }
+
+    // initial state, will process AI_SPAWN_INFO,
+    /*
+    {
+        type: "global",
+        behaviour: "patrol",
+        aggressive: 1,
+        description: "will randomly patrol along the navmesh",
+        points: [],
+        radius: 0,
+        amount: 1,
+        race: "male_enemy",
+    },
+    */
+    decision() {
+        let info = this.AI_SPAWN_INFO;
+        if (info.behaviour === "patrol") {
+            this.brain.setState(this.patrolling, this);
+        }
     }
 
     //
@@ -139,7 +159,7 @@ export class BrainSchema1 extends Schema {
         }
 
         // else just continue patrolling
-        //console.log(this.name + " IS PATROLLING IN", this._gameroom.metadata.location, this.AI_CLOSEST_PLAYER_DISTANCE);
+        console.log(this.name + " IS PATROLLING IN", this._gameroom.metadata.location, this.AI_CLOSEST_PLAYER_DISTANCE);
         this.moveTowards();
     }
 

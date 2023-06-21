@@ -24,16 +24,13 @@ export class spawnController {
         let dynamic = this._location.dynamic;
         let spawns = dynamic.spawns ?? [];
         spawns.forEach((spawnInfo) => {
-            if (spawnInfo.type === "wander") {
-                this.wander(spawnInfo);
-            }
-            if (spawnInfo.type === "point") {
-                //this.point(spawnEl);
+            if (spawnInfo.type === "global") {
+                this.global(spawnInfo);
             }
         });
     }
 
-    private wander(e) {
+    private global(e) {
         for (let i = 0; i < e.amount; i++) {
             this.createEntity(i, e);
         }
