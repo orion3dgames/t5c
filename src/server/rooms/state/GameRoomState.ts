@@ -2,10 +2,11 @@ import { Schema, type, MapSchema, filterChildren } from "@colyseus/schema";
 import { BrainSchema1 } from "../schema/BrainSchema1";
 import { PlayerSchema } from "../schema/PlayerSchema";
 import { LootSchema } from "../schema/LootSchema";
+import { Enemy } from "../brain/Enemy";
 import { spawnController } from "../controllers/spawnController";
 import { GameRoom } from "../GameRoom";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
-import { NavMesh } from "../../../shared/yuka";
+import { NavMesh, EntityManager, Time } from "../../../shared/yuka";
 import { nanoid } from "nanoid";
 import Logger from "../../../shared/Logger";
 import { randomNumberInRange } from "../../../shared/Utils";
@@ -37,12 +38,33 @@ export class GameRoomState extends Schema {
     private spawnTimer: number = 0;
     private roomDetails;
 
+    public entityManager;
+    public time;
+
     constructor(gameroom: GameRoom, _navMesh: NavMesh, ...args: any[]) {
         super(...args);
         this._gameroom = gameroom;
         this.navMesh = _navMesh;
         this.roomDetails = dataDB.get("location", this._gameroom.metadata.location);
         this._spawnController = new spawnController(this);
+
+        this.entityManager = new EntityManager();
+        this.time = new Time();
+
+        // add entity
+        this.createEntity(1);
+    }
+
+    public update(deltaTime: number) {
+        const delta = this.time.update().getDelta();
+
+        this.entityManager.entities.forEach((element) => {
+            if (element.schema) {
+                Object.assign(element, this.entities.get(element.schema.sessionId));
+            }
+        });
+
+        this.entityManager.update(delta);
     }
 
     public createEntity(delta) {
@@ -78,88 +100,17 @@ export class GameRoomState extends Schema {
             toRegion: false,
         };
 
-        let entity = new BrainSchema1(this._gameroom, data);
+        let schema = new BrainSchema1(this._gameroom, data);
 
         // add to colyseus state
-        this.entities.set(sessionId, entity);
+        this.entities.set(sessionId, schema);
+
+        // add to yuka
+        const girl = new Enemy(this, schema);
+        this.entityManager.add(girl);
 
         // log
         Logger.info("[gameroom][state][createEntity] created new entity " + randData.key + ": " + sessionId);
-    }
-
-    public createItem() {
-        // get starting starting position
-        let randomRegion = this.navMesh.getRandomRegion();
-        let point = randomRegion.centroid;
-
-        // set up loot
-        let lootTable = [
-            LootTableEntry("sword_01", 25, 1, 1, 1, 1),
-            LootTableEntry("potion_heal", 25, 1, 1, 1, 1),
-            LootTableEntry("pear", 5, 1, 10, 1, 1),
-            LootTableEntry("apple", 20, 1, 10, 1, 1),
-            LootTableEntry(null, 20, 1, 1, 1, 1),
-            LootTableEntry("amulet_01", 1, 1, 1, 1, 2),
-            LootTableEntry(null, 150, 1, 1, 1, 2),
-        ];
-        // generate loot
-        let loot = GetLoot(lootTable);
-
-        // iterate loot
-        loot.forEach((drop) => {
-            // drop item on the ground
-            let item = dataDB.get("item", drop.id);
-            let sessionId = nanoid(10);
-            let currentPosition = point;
-            currentPosition.x += randomNumberInRange(0.1, 1.5);
-            currentPosition.z += randomNumberInRange(0.1, 1.5);
-            let data = {
-                key: drop.id,
-                name: item.name,
-                sessionId: sessionId,
-                x: currentPosition.x,
-                y: 0.25,
-                z: currentPosition.z,
-                quantity: drop.quantity,
-            };
-            let entity = new LootSchema(this, data);
-            this.items.set(sessionId, entity);
-            Logger.info("[gameroom][state][createEntity] created new item " + item.key + ": " + sessionId);
-        });
-    }
-
-    public update(deltaTime: number) {
-        //////////////////////////////////////////////
-        // entity spawning script (span a monster every .5 second)
-        /*
-        this.spawnTimer += deltaTime;
-        let spawnTime = 300;
-        if (this.spawnTimer >= spawnTime) {
-            this.spawnTimer = 0;
-            let maxEntities = this.roomDetails.monsters;
-            if (this.entities.size < maxEntities) {
-                this.createEntity(this.entities.size);
-            }
-            if (this.items.size < 0) {
-                this.createItem();
-            }
-        }*/
-
-        //////////////////////////////////////////////
-        // for each entity
-        if (this.entities.size > 0) {
-            this.entities.forEach((entity) => {
-                // entity update
-                entity.update();
-            });
-        }
-
-        // for each players
-        if (this.players.size > 0) {
-            this.players.forEach((player) => {
-                player.update();
-            });
-        }
     }
 
     /**

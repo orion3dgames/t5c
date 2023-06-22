@@ -2939,7 +2939,7 @@ const { debug } = require("console");
 		/**
 		* Constructs a new game entity.
 		*/
-		constructor() {
+		constructor(...args) {
 
 			/**
 			* The name of this game entity.
@@ -9207,14 +9207,14 @@ const { debug } = require("console");
 	* @author {@link https://github.com/Mugen87|Mugen87}
 	*/
 	class State {
-
+ 
 		/**
 		* This method is called once during a state transition when the {@link StateMachine} makes
 		* this state active.
 		*
 		* @param {GameEntity} owner - The game entity that represents the execution context of this state.
 		*/
-		enter( /* owner */ ) {}
+		enter(  ) {}
 
 		/**
 		* This method is called per simulation step if this state is active.
