@@ -318,6 +318,9 @@ export class abilitiesCTRL {
     //////////////////////////////////////////////
 
     startAutoAttack(owner, target, ability) {
+        if (!owner || !target || !ability) {
+            return false;
+        }
         this.doAutoAttack(owner, target, ability);
         this.attackTimer = setInterval(() => {
             this.doAutoAttack(owner, target, ability);

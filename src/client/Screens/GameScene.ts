@@ -19,6 +19,8 @@ import { PlayerInputs } from "../../shared/types";
 import { NavMesh } from "../../shared/yuka";
 import { SceneController } from "../Controllers/Scene";
 import { AuthController } from "../Controllers/AuthController";
+import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
+import { RenderTargetTexture } from "@babylonjs/core/Materials/Textures/renderTargetTexture";
 
 export class GameScene {
     private _app;
@@ -105,11 +107,14 @@ export class GameScene {
 
         // shadow generator
         this._shadow = new CascadedShadowGenerator(1024, light);
+        this._shadow.autoCalcDepthBounds = true;
         this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_LOW;
         this._shadow.lambda = 0.94;
         this._shadow.bias = 0.018;
         this._shadow.autoCalcDepthBounds = true;
         this._shadow.shadowMaxZ = 1000;
+        this._shadow.stabilizeCascades = false;
+        this._shadow.depthClamp = true;
 
         // load assets and remove them all from scene
         this._environment = new Environment(this._scene, this._shadow, this._loadedAssets);
