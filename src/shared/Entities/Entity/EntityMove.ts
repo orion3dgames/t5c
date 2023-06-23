@@ -100,8 +100,8 @@ export class EntityMove {
 
         // check it fits in navmesh
         if (this.isCurrentPlayer) {
-            let sourcePos = new Vector3(oldX, oldY, oldZ); // new pos
-            let destinationPos = new Vector3(newX, newY, newZ); // new pos
+            let sourcePos = new Vector3Y(oldX, oldY, oldZ); // new pos
+            let destinationPos = new Vector3Y(newX, newY, newZ); // new pos
             const foundPath: any = this._navMesh.checkPath(sourcePos, destinationPos);
             if (foundPath) {
                 this.nextPosition.x = newX;
