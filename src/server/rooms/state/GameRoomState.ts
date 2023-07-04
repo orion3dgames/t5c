@@ -1,5 +1,5 @@
 import { Schema, type, MapSchema, filterChildren } from "@colyseus/schema";
-import { BrainSchema1 } from "../schema/BrainSchema1";
+import { YukaSchema } from "../schema/YukaSchema";
 import { PlayerSchema } from "../schema/PlayerSchema";
 import { LootSchema } from "../schema/LootSchema";
 import { Enemy } from "../brain/Enemy";
@@ -13,6 +13,7 @@ import { randomNumberInRange } from "../../../shared/Utils";
 import { dataDB } from "../../../shared/Data/dataDB";
 import { Client } from "colyseus";
 import { GetLoot, LootTableEntry } from "../../../shared/Entities/Player/LootTable";
+import IdleState from "../brain/states/IdleState";
 
 export class GameRoomState extends Schema {
     // networked variables
@@ -25,7 +26,7 @@ export class GameRoomState extends Schema {
         const isWithinBounds = isWithinXBounds && isWithinZBounds;
         return isSelf || isWithinBounds;
     })*/
-    @type({ map: BrainSchema1 }) entities = new MapSchema<BrainSchema1>();
+    @type({ map: YukaSchema }) entities = new MapSchema<YukaSchema>();
     @type({ map: PlayerSchema }) players = new MapSchema<PlayerSchema>();
     @type({ map: LootSchema }) items = new MapSchema<LootSchema>();
     @type("number") serverTime: number = 0.0;
@@ -46,25 +47,26 @@ export class GameRoomState extends Schema {
         this._gameroom = gameroom;
         this.navMesh = _navMesh;
         this.roomDetails = dataDB.get("location", this._gameroom.metadata.location);
-        this._spawnController = new spawnController(this);
+        //this._spawnController = new spawnController(this);
 
         this.entityManager = new EntityManager();
         this.time = new Time();
 
         // add entity
         this.createEntity(1);
+        this.createEntity(1);
     }
 
     public update(deltaTime: number) {
         const delta = this.time.update().getDelta();
 
-        this.entityManager.entities.forEach((element) => {
-            if (element.schema) {
-                Object.assign(element, this.entities.get(element.schema.sessionId));
-            }
-        });
+        this.entityManager.entities.forEach((element) => {});
 
         this.entityManager.update(delta);
+    }
+
+    getEntities() {
+        return this.entityManager.entities;
     }
 
     public createEntity(delta) {
@@ -100,13 +102,13 @@ export class GameRoomState extends Schema {
             toRegion: false,
         };
 
-        let schema = new BrainSchema1(this._gameroom, data);
+        let schema = new YukaSchema();
 
         // add to colyseus state
         this.entities.set(sessionId, schema);
 
         // add to yuka
-        const girl = new Enemy(this, schema);
+        const girl = new Enemy(this, schema, data);
         this.entityManager.add(girl);
 
         // log

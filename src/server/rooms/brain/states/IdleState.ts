@@ -1,17 +1,23 @@
+import Config from "../../../../shared/Config";
 import { State } from "../../../../shared/yuka";
+import { randomNumberInRange } from "../../../../shared/Utils";
 
 class IdleState extends State {
     enter(owner) {
-        console.log("ENTER", owner.sessionId);
+        console.log("----------------------------------");
+        owner.IDLE_TIMER = 0;
+        owner.IDLE_TIMER_LENGTH = randomNumberInRange(2000, 6000);
     }
 
     execute(owner) {
-        console.log("execute", owner.x);
+        owner.IDLE_TIMER += Config.updateRate;
+        if (owner.IDLE_TIMER > owner.IDLE_TIMER_LENGTH) {
+            owner._stateMachine.changeTo("PATROL");
+        }
+        console.log("[IdleState] idle entity", owner.IDLE_TIMER, owner.IDLE_TIMER_LENGTH);
     }
 
-    exit(owner) {
-        console.log("exit", owner.sessionId);
-    }
+    exit(owner) {}
 }
 
 export default IdleState;

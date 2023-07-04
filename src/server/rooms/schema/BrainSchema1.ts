@@ -51,7 +51,7 @@ export class BrainSchema1 extends Schema {
     public abilities: AbilitySchema[] = [];
     public default_abilities;
 
-    public brain;
+    public brain: FSM;
     public velocity: Vector3 = new Vector3();
 
     public AI_STATE;
@@ -92,11 +92,6 @@ export class BrainSchema1 extends Schema {
 
         // default brain state
         this.brain.setState(this.decision, this);
-
-        setTimeout(function () {
-            this.name = "TEST";
-            console.log("UPDATE NAME");
-        }, 2000);
     }
 
     // runs on every server iteration
