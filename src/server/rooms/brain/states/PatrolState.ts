@@ -5,10 +5,12 @@ import { State } from "../../../../shared/yuka";
 class PatrolState extends State {
     enter(owner) {
         console.log("----------------------------------");
-        if (owner.AI_TARGET === null && owner.AI_TARGET_WAYPOINTS.length < 1) {
-            console.log("[PatrolState] find a new destination");
-            owner.setRandomDestination(owner.getPosition());
-        }
+
+        // cancel any targets
+        owner.resetDestination();
+
+        // find a destination
+        owner.setRandomDestination(owner.getPosition());
     }
 
     execute(owner) {
@@ -19,6 +21,7 @@ class PatrolState extends State {
         // once arrive at destination, stay idle a while
         if (owner.AI_TARGET_WAYPOINTS.length < 1) {
             owner._stateMachine.changeTo("IDLE");
+            return false;
         }
 
         // if there is a closest player, and in aggro range
@@ -29,6 +32,7 @@ class PatrolState extends State {
         // if entity has a target, start searching for it
         if (owner.hasValidTarget()) {
             owner._stateMachine.changeTo("CHASE");
+            return false;
         }
 
         // move to destination

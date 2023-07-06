@@ -2,7 +2,7 @@ import { dataDB } from "../../../shared/Data/dataDB";
 import { Vehicle, StateMachine, Vector3 } from "../../../shared/yuka";
 import { abilitiesCTRL } from "../controllers/abilityCTRL";
 import { AbilitySchema } from "../schema/AbilitySchema";
-import { IdleState, PatrolState, ChaseState } from "../brain/states";
+import { IdleState, PatrolState, ChaseState, AttackState } from "../brain/states";
 import Config from "../../../shared/Config";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 
@@ -20,6 +20,10 @@ class Enemy extends Vehicle {
     public z;
     public rot;
     public anim_state;
+    public health;
+    public maxHealth;
+    public mana;
+    public maxMana;
 
     public name;
     public race;
@@ -39,8 +43,8 @@ class Enemy extends Vehicle {
     // TIMERS
     public IDLE_TIMER = 0;
     public IDLE_TIMER_LENGTH = 0;
-
     public CHASE_TIMER = 0;
+    public ATTACK_TIMER = 0;
 
     // AI
     public AI_CURRENT_STATE;
@@ -74,6 +78,7 @@ class Enemy extends Vehicle {
         this._stateMachine.add("IDLE", new IdleState());
         this._stateMachine.add("PATROL", new PatrolState());
         this._stateMachine.add("CHASE", new ChaseState());
+        this._stateMachine.add("ATTACK", new AttackState());
         this._stateMachine.changeTo("IDLE");
     }
 
@@ -81,12 +86,11 @@ class Enemy extends Vehicle {
     update(delta) {
         /////////////////////////////////////////////////////////////////
         // if players are connected, start monitoring them
-        if (this._gameroom.entities.size > 0) {
+        if (this._gameroom.players.size > 0) {
             // if does not have a target, keep monitoring the closest player
             if (this.AI_TARGET === null || this.AI_TARGET === undefined) {
-                this.findClosestEntity();
+                this.findClosestPlayer();
             }
-
             // if entity has a target, monitor it's position
             if (this.AI_TARGET != null && this.AI_TARGET !== undefined) {
                 this.monitorTarget();
@@ -205,7 +209,7 @@ class Enemy extends Vehicle {
      * @returns {Vector3} new position
      */
     moveTo(source: Vector3, destination: Vector3, speed: number): Vector3 {
-        speed = 3;
+        speed = 0.5;
         let currentX = source.x;
         let currentZ = source.z;
         let targetX = destination.x;
@@ -268,7 +272,7 @@ class Enemy extends Vehicle {
      */
     findClosestPlayer() {
         let closestDistance = 1000000;
-        this._gameroom.state.players.forEach((entity) => {
+        this._gameroom.players.forEach((entity) => {
             if (this.type === "entity" && entity.type === "player" && !entity.gracePeriod && !entity.isDead) {
                 let playerPos = entity.getPosition();
                 let entityPos = this.getPosition();
@@ -287,10 +291,24 @@ class Enemy extends Vehicle {
      */
     monitorTarget() {
         if (this.AI_TARGET !== null && this.AI_TARGET !== undefined) {
+            //console.log("[monitorTarget]", this.sessionId, this.AI_TARGET);
             let targetPos = this.AI_TARGET.getPosition();
             let entityPos = this.getPosition();
             let distanceBetween = entityPos.distanceTo(targetPos);
             this.AI_TARGET_DISTANCE = distanceBetween;
+        }
+    }
+
+    /**
+     * Finds a valid position on navmesh matching targetPos and sets is as the new destination for this entity
+     * @param {Vector3} targetPos
+     */
+    setTargetDestination(targetPos: Vector3): void {
+        let currentPos = new Vector3(this.x, this.y, this.z);
+        let target = this._gameroom.navMesh.getClosestRegion(targetPos);
+        this.AI_TARGET_WAYPOINTS = this._gameroom.navMesh.findPath(currentPos, targetPos);
+        if (this.AI_TARGET_WAYPOINTS.length === 0) {
+            this.AI_TARGET_WAYPOINTS = [];
         }
     }
 
@@ -299,6 +317,33 @@ class Enemy extends Vehicle {
         this.AI_TARGET_WAYPOINTS = [];
         this.AI_TARGET_DISTANCE = null;
         console.log("resetDestination()", this.AI_TARGET, this.AI_TARGET_WAYPOINTS);
+    }
+
+    // make sure no value are out of range
+    normalizeStats() {
+        // health
+        if (this.health > this.maxHealth) {
+            this.health = this.maxHealth;
+        }
+        if (this.health < 0) {
+            this.health = 0;
+        }
+
+        // mana
+        if (this.mana > this.maxMana) {
+            this.mana = this.maxMana;
+        }
+        if (this.mana < 0) {
+            this.mana = 0;
+        }
+    }
+
+    isEntityDead() {
+        return this.health <= 0;
+    }
+
+    calculateDamage(owner, target) {
+        return 10;
     }
 }
 

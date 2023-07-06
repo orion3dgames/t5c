@@ -195,7 +195,7 @@ export class BrainSchema1 extends Schema {
         }
 
         // if entity has been searching for over 50 server iterations, go back to patrolling
-        if (this.AI_SEARCHING_TIMER > Config.MONSTER_SEARCHING_PERIOD) {
+        if (this.AI_SEARCHING_TIMER > Config.MONSTER_CHASE_PERIOD) {
             this.resetDestination();
             this.AI_TARGET = null;
             this.brain.setState(this.patrolling, this);

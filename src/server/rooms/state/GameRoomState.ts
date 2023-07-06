@@ -54,7 +54,6 @@ export class GameRoomState extends Schema {
 
         // add entity
         this.createEntity(1);
-        this.createEntity(1);
     }
 
     public update(deltaTime: number) {
