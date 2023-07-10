@@ -201,4 +201,13 @@ export class GameRoomState extends Schema {
     removeEntity(sessionId: string) {
         this.entities.delete(sessionId);
     }
+
+    getEntityBySessionId(sessionId) {
+        const entities = this.entityManager.entities;
+        for (let i = 0, l = entities.length; i < l; i++) {
+            const entity = entities[i];
+            if (entity.sessionId === sessionId) return entity;
+        }
+        return null;
+    }
 }

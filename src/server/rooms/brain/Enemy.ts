@@ -46,6 +46,7 @@ class Enemy extends Vehicle {
     public IDLE_TIMER_LENGTH = 0;
     public CHASE_TIMER = 0;
     public ATTACK_TIMER = 0;
+    public DEAD_TIMER = 0;
 
     // AI
     public AI_CURRENT_STATE;
@@ -321,6 +322,10 @@ class Enemy extends Vehicle {
         if (this.AI_TARGET_WAYPOINTS.length === 0) {
             this.AI_TARGET_WAYPOINTS = [];
         }
+    }
+
+    setTarget(target) {
+        this.AI_TARGET = target;
     }
 
     resetDestination(): void {

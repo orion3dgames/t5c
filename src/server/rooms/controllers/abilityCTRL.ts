@@ -92,6 +92,8 @@ export class abilitiesCTRL {
         // cancel any existing auto attack
         this.cancelAutoAttack(owner);
 
+        console.log(target);
+
         // make sure player can cast this ability
         if (!this.canEntityCastAbility(target, ability, digit)) {
             return false;

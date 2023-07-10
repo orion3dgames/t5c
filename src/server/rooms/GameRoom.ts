@@ -211,7 +211,7 @@ export class GameRoom extends Room<GameRoomState> {
         this.onMessage("entity_ability_key", (client, data: any) => {
             // get players involved
             let sender: PlayerSchema = this.state.players[client.sessionId];
-            let target = this.state.entities[data.targetId];
+            let target = this.state.getEntityBySessionId(data.targetId);
 
             if (!target) {
                 target = this.state.players[data.targetId];
