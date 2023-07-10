@@ -6,13 +6,14 @@ class IdleState extends State {
     enter(owner) {
         console.log("----------------------------------");
         owner.IDLE_TIMER = 0;
-        owner.IDLE_TIMER_LENGTH = randomNumberInRange(2000, 6000);
+        owner.IDLE_TIMER_LENGTH = 1000;
     }
 
     execute(owner) {
         owner.IDLE_TIMER += Config.updateRate;
         if (owner.IDLE_TIMER > owner.IDLE_TIMER_LENGTH) {
             owner._stateMachine.changeTo("PATROL");
+            return false;
         }
         console.log("[IdleState] idle entity", owner.IDLE_TIMER, owner.IDLE_TIMER_LENGTH);
     }

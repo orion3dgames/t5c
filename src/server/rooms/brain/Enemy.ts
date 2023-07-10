@@ -14,6 +14,7 @@ class Enemy extends Vehicle {
     public _vehicle;
 
     public type;
+    public level;
     public sessionId;
     public x;
     public y;
@@ -110,15 +111,27 @@ class Enemy extends Vehicle {
     // send updates to colyseus schema
     syncUpdate() {
         let update = {
+            sessionId: this.sessionId,
+            type: this.type,
             race: this.race,
+            name: this.name,
+
             x: this.x,
             y: this.y,
             z: this.z,
+            rot: this.rot,
+
+            health: this.health,
+            maxHealth: this.maxHealth,
+            mana: this.mana,
+            maxMana: this.maxMana,
+            level: this.level,
+
+            anim_state: this.anim_state,
         };
         for (const key in update) {
             this._schema[key] = update[key];
         }
-        //console.log("[ENTITY] syncUpdate to colyseus", update);
     }
 
     isAnyPlayerInAggroRange() {
@@ -197,7 +210,7 @@ class Enemy extends Vehicle {
             }
         } else {
             // something is wrong, let's look for a new destination
-            this.resetDestination();
+            //this.resetDestination();
         }
     }
 
@@ -291,7 +304,6 @@ class Enemy extends Vehicle {
      */
     monitorTarget() {
         if (this.AI_TARGET !== null && this.AI_TARGET !== undefined) {
-            //console.log("[monitorTarget]", this.sessionId, this.AI_TARGET);
             let targetPos = this.AI_TARGET.getPosition();
             let entityPos = this.getPosition();
             let distanceBetween = entityPos.distanceTo(targetPos);
@@ -304,9 +316,8 @@ class Enemy extends Vehicle {
      * @param {Vector3} targetPos
      */
     setTargetDestination(targetPos: Vector3): void {
-        let currentPos = new Vector3(this.x, this.y, this.z);
-        let target = this._gameroom.navMesh.getClosestRegion(targetPos);
-        this.AI_TARGET_WAYPOINTS = this._gameroom.navMesh.findPath(currentPos, targetPos);
+        console.log("[setTargetDestination]", this.AI_TARGET_WAYPOINTS);
+        this.AI_TARGET_WAYPOINTS = this._gameroom.navMesh.findPath(this.getPosition(), targetPos);
         if (this.AI_TARGET_WAYPOINTS.length === 0) {
             this.AI_TARGET_WAYPOINTS = [];
         }

@@ -4,33 +4,25 @@ import { State } from "../../../../shared/yuka";
 
 class ChaseState extends State {
     enter(owner) {
-        console.log("----------------------------------");
+        console.log("[ChaseState] ----------------------------------");
 
         // set chase timer
         owner.CHASE_TIMER = 0;
 
-        // set target
-        if (owner.AI_TARGET_WAYPOINTS.length < 1 && owner.AI_TARGET !== null) {
-            owner.setTargetDestination(owner.AI_TARGET.getPosition());
-        }
+        //
+        owner.AI_TARGET_WAYPOINTS = [];
     }
 
     execute(owner) {
-        owner.CHASE_TIMER += Config.updateRate;
-
         // if target is dead or invalid
         if (owner.AI_TARGET === null || owner.AI_TARGET === undefined || owner.AI_TARGET === false || owner.AI_TARGET.isEntityDead()) {
-            owner._stateMachine.changeTo("PATROL");
             console.log("[ChaseState] invalid target");
+            owner._stateMachine.changeTo("PATROL");
             return false;
         }
 
-        // if entity has been chasing for longer than Config.MONSTER_SEARCHING_PERIOD
-        if (owner.CHASE_TIMER > Config.MONSTER_CHASE_PERIOD) {
-            owner._stateMachine.changeTo("PATROL");
-            console.log("[ChaseState] target lost");
-            return false;
-        }
+        // iterate searching timer
+        owner.CHASE_TIMER += Config.updateRate;
 
         // if entity is close enough to player, start attacking it
         if (owner.AI_TARGET_DISTANCE < Config.MONSTER_ATTACK_DISTANCE) {
@@ -39,15 +31,23 @@ class ChaseState extends State {
             return false;
         }
 
+        // if entity has been chasing for longer than Config.MONSTER_SEARCHING_PERIOD
+        if (owner.CHASE_TIMER > Config.MONSTER_CHASE_PERIOD) {
+            console.log("[ChaseState] target lost");
+            owner._stateMachine.changeTo("PATROL");
+            return false;
+        }
+
         // if player come back into range, reset chase timer
         if (owner.AI_TARGET_DISTANCE < Config.MONSTER_AGGRO_DISTANCE) {
             owner.CHASE_TIMER = 0;
-            console.log("[ChaseState] target found again");
+            console.log("[ChaseState] target back in range");
         }
 
         // if target has moved, keep searching for target
         if (owner.AI_TARGET_WAYPOINTS.length < 1 && owner.AI_TARGET !== null) {
-            owner.setTargetDestination(owner.AI_TARGET.getPosition());
+            //owner.setTargetDestination(owner.AI_TARGET.getPosition());
+            owner.AI_TARGET_WAYPOINTS[0] = owner.AI_TARGET.getPosition();
             console.log("[ChaseState] target not a previous location, search again");
         }
 

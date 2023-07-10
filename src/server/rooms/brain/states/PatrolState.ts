@@ -4,7 +4,7 @@ import { State } from "../../../../shared/yuka";
 
 class PatrolState extends State {
     enter(owner) {
-        console.log("----------------------------------");
+        console.log("[PatrolState] ----------------------------------");
 
         // cancel any targets
         owner.resetDestination();

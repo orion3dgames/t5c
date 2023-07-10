@@ -62,6 +62,13 @@ export class GameRoomState extends Schema {
         this.entityManager.entities.forEach((element) => {});
 
         this.entityManager.update(delta);
+
+        // for each players
+        if (this.players.size > 0) {
+            this.players.forEach((player) => {
+                player.update();
+            });
+        }
     }
 
     getEntities() {
