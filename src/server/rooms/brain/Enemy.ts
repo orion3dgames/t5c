@@ -2,9 +2,10 @@ import { dataDB } from "../../../shared/Data/dataDB";
 import { Vehicle, StateMachine, Vector3 } from "../../../shared/yuka";
 import { abilitiesCTRL } from "../controllers/abilityCTRL";
 import { AbilitySchema } from "../schema/AbilitySchema";
-import { IdleState, PatrolState, ChaseState, AttackState } from "../brain/states";
+import { IdleState, PatrolState, ChaseState, AttackState, DeadState } from "../brain/states";
 import Config from "../../../shared/Config";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
+import { YukaSchema } from "../schema/YukaSchema";
 
 class Enemy extends Vehicle {
     public _navMesh;
@@ -57,12 +58,16 @@ class Enemy extends Vehicle {
     public AI_CLOSEST_PLAYER = null;
     public AI_CLOSEST_PLAYER_DISTANCE = null;
 
-    constructor(gameroom, schema, data, ...args: any[]) {
+    constructor(gameroom, data, ...args: any[]) {
         super();
 
         // variables
         this._navMesh = gameroom.navMesh;
         this._gameroom = gameroom;
+
+        // initialize Colyseus Schema
+        let schema = new YukaSchema();
+        gameroom.entities.set(data.sessionId, schema);
         this._schema = schema;
 
         // assign data
@@ -70,22 +75,29 @@ class Enemy extends Vehicle {
         Object.assign(this, dataDB.get("race", this.race));
 
         // abilities
+        /*
         this.default_abilities.forEach((element) => {
             this.abilities.push(new AbilitySchema({ key: element, digit: 1 }));
         });
-        this.abilitiesCTRL = new abilitiesCTRL(this);
+        this.abilitiesCTRL = new abilitiesCTRL(this);*/
 
-        // start state machine
+        // initialize state machine
         this._stateMachine = new StateMachine(this);
         this._stateMachine.add("IDLE", new IdleState());
         this._stateMachine.add("PATROL", new PatrolState());
         this._stateMachine.add("CHASE", new ChaseState());
         this._stateMachine.add("ATTACK", new AttackState());
+        this._stateMachine.add("DEAD", new DeadState());
+
+        // initial state
         this._stateMachine.changeTo("IDLE");
     }
 
     // entity update
     update(delta) {
+        // do whatever YUKA does
+        super.update(delta);
+
         /////////////////////////////////////////////////////////////////
         // if players are connected, start monitoring them
         if (this._gameroom.players.size > 0) {
@@ -102,15 +114,12 @@ class Enemy extends Vehicle {
         // update state machine
         this._stateMachine.update();
 
-        // do whatever YUKA does
-        super.update(delta);
-
         // update COLYSEUS schema
-        this.syncUpdate();
+        this.sync();
     }
 
     // send updates to colyseus schema
-    syncUpdate() {
+    sync() {
         let update = {
             sessionId: this.sessionId,
             type: this.type,
@@ -131,7 +140,10 @@ class Enemy extends Vehicle {
             anim_state: this.anim_state,
         };
         for (const key in update) {
-            this._schema[key] = update[key];
+            // only update if they is a change
+            if (update[key] !== this._schema[key]) {
+                this._schema[key] = update[key];
+            }
         }
     }
 

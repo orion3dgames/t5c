@@ -7,7 +7,7 @@ import { randomNumberInRange } from "../../../shared/Utils";
 import { dataDB } from "../../../shared/Data/dataDB";
 import { GameRoomState } from "../state/GameRoomState";
 
-export class spawnController {
+export class spawnCTRL {
     private _state: GameRoomState;
     private _room: GameRoom;
     private _location;

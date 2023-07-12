@@ -46,7 +46,7 @@ class ChaseState extends State {
 
         // if target has moved, keep searching for target
         if (owner.AI_TARGET_WAYPOINTS.length < 1 && owner.AI_TARGET !== null) {
-            //owner.setTargetDestination(owner.AI_TARGET.getPosition());
+            // set target position
             owner.AI_TARGET_WAYPOINTS[0] = owner.AI_TARGET.getPosition();
             console.log("[ChaseState] target not a previous location, search again");
         }

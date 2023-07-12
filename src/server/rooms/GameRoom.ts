@@ -1,6 +1,7 @@
 import http from "http";
 import { Room, Client, Delayed } from "@colyseus/core";
 import { GameRoomState } from "./state/GameRoomState";
+import { Player } from "./brain/Player";
 import databaseInstance from "../../shared/Database";
 import Config from "../../shared/Config";
 import Logger from "../../shared/Logger";
@@ -128,29 +129,29 @@ export class GameRoom extends Room<GameRoomState> {
         /////////////////////////////////////
         // on player reset position
         this.onMessage("reset_position", (client, data) => {
-            const playerState: PlayerSchema = this.state.players.get(client.sessionId);
+            const playerState: Player = this.state.getEntityBySessionId(client.sessionId);
             if (playerState) {
                 playerState.resetPosition();
             }
         });
 
         this.onMessage("revive_pressed", (client, data) => {
-            const playerState: PlayerSchema = this.state.players.get(client.sessionId);
+            const playerState: Player = this.state.getEntityBySessionId(client.sessionId);
             if (playerState) {
                 playerState.ressurect();
             }
         });
 
         this.onMessage("pickup_item", (client, data) => {
-            const playerState: PlayerSchema = this.state.players.get(client.sessionId);
+            const playerState: Player = this.state.getEntityBySessionId(client.sessionId);
             const itemState = this.state.items.get(data.sessionId);
             if (playerState && itemState) {
-                playerState.setTarget(itemState);
+                //playerState.setTarget(itemState);
             }
         });
 
         this.onMessage("learn_skill", (client, ability_key) => {
-            const playerState: PlayerSchema = this.state.players.get(client.sessionId);
+            const playerState: Player = this.state.getEntityBySessionId(client.sessionId);
             const ability = dataDB.get("ability", ability_key);
             if (playerState && ability) {
                 playerState.abilitiesCTRL.learnAbility(ability);
@@ -158,7 +159,7 @@ export class GameRoom extends Room<GameRoomState> {
         });
 
         this.onMessage("add_stats_point", (client, stat_key) => {
-            const playerState: PlayerSchema = this.state.players.get(client.sessionId);
+            const playerState: Player = this.state.getEntityBySessionId(client.sessionId);
             if (playerState && playerState.player_data.points > 0) {
                 playerState.player_data[stat_key] += 1;
                 playerState.player_data.points -= 1;
@@ -168,7 +169,7 @@ export class GameRoom extends Room<GameRoomState> {
         /////////////////////////////////////
         // on player input
         this.onMessage("playerInput", (client, playerInput: PlayerInputs) => {
-            const playerState: PlayerSchema = this.state.players.get(client.sessionId);
+            const playerState: Player = this.state.getEntityBySessionId(client.sessionId);
             if (playerState) {
                 playerState.moveCTRL.processPlayerInput(playerInput);
             } else {
@@ -179,7 +180,7 @@ export class GameRoom extends Room<GameRoomState> {
         /////////////////////////////////////
         // on player teleport
         this.onMessage("playerTeleport", (client, location) => {
-            const playerState: PlayerSchema = this.state.players.get(client.sessionId);
+            const playerState: Player = this.state.getEntityBySessionId(client.sessionId);
 
             if (playerState) {
                 // update player location in database
@@ -210,7 +211,7 @@ export class GameRoom extends Room<GameRoomState> {
         // player entity_attack
         this.onMessage("entity_ability_key", (client, data: any) => {
             // get players involved
-            let sender: PlayerSchema = this.state.players[client.sessionId];
+            let sender = this.state.getEntityBySessionId(client.sessionId);
             let target = this.state.getEntityBySessionId(data.targetId);
 
             if (!target) {

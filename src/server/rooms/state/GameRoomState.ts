@@ -1,9 +1,10 @@
 import { Schema, type, MapSchema, filterChildren } from "@colyseus/schema";
-import { YukaSchema } from "../schema/YukaSchema";
 import { PlayerSchema } from "../schema/PlayerSchema";
+import { Player } from "../brain/Player";
+import { YukaSchema } from "../schema/YukaSchema";
 import { LootSchema } from "../schema/LootSchema";
 import { Enemy } from "../brain/Enemy";
-import { spawnController } from "../controllers/spawnController";
+import { spawnCTRL } from "../controllers/spawnCTRL";
 import { GameRoom } from "../GameRoom";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { NavMesh, EntityManager, Time } from "../../../shared/yuka";
@@ -33,7 +34,7 @@ export class GameRoomState extends Schema {
 
     // not networked variables
     public _gameroom: GameRoom = null;
-    private _spawnController: spawnController;
+    private _spawnController: spawnCTRL;
     public navMesh: NavMesh = null;
     private timer: number = 0;
     private spawnTimer: number = 0;
@@ -59,16 +60,15 @@ export class GameRoomState extends Schema {
     public update(deltaTime: number) {
         const delta = this.time.update().getDelta();
 
-        this.entityManager.entities.forEach((element) => {});
-
         this.entityManager.update(delta);
 
         // for each players
+        /*
         if (this.players.size > 0) {
             this.players.forEach((player) => {
                 player.update();
             });
-        }
+        }*/
     }
 
     getEntities() {
@@ -108,13 +108,8 @@ export class GameRoomState extends Schema {
             toRegion: false,
         };
 
-        let schema = new YukaSchema();
-
-        // add to colyseus state
-        this.entities.set(sessionId, schema);
-
         // add to yuka
-        const girl = new Enemy(this, schema, data);
+        const girl = new Enemy(this, data);
         this.entityManager.add(girl);
 
         // log
@@ -165,30 +160,17 @@ export class GameRoomState extends Schema {
             blocked: false,
             state: EntityState.IDLE,
 
-            gold: data.gold ?? 0,
-            strength: 15,
-            endurance: 16,
-            agility: 15,
-            intelligence: 20,
-            wisdom: 20,
-            experience: data.experience ?? 0,
-
-            default_player_data: player_data,
-            default_abilities: data.abilities ?? [],
-            default_inventory: data.inventory ?? [],
+            player_data: player_data,
+            abilities: data.abilities ?? [],
+            inventory: data.inventory ?? [],
         };
 
-        console.log(player);
+        //console.log(player);
 
-        this._gameroom.state.players.set(client.sessionId, new PlayerSchema(this._gameroom, player));
+        this.entityManager.add(new Player(this, player));
 
         // set player as online
         this._gameroom.database.toggleOnlineStatus(client.auth.id, 1);
-
-        if (AI_MODE === true) {
-            const playerState: PlayerSchema = this._gameroom.state.players.get(client.sessionId);
-            playerState.set_AI_mode();
-        }
 
         // log
         Logger.info(`[gameroom][onJoin] player ${client.sessionId} joined room ${this._gameroom.roomId}.`);
@@ -202,6 +184,11 @@ export class GameRoomState extends Schema {
         this.entities.delete(sessionId);
     }
 
+    /**
+     * find a entity in yuka game manager
+     * @param sessionId
+     * @returns
+     */
     getEntityBySessionId(sessionId) {
         const entities = this.entityManager.entities;
         for (let i = 0, l = entities.length; i < l; i++) {

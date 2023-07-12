@@ -21,7 +21,6 @@ export class abilitiesCTRL {
 
     constructor(owner) {
         this._owner = owner;
-        this.abilitiesOwned = this._owner.abilities;
         this.abilitiesDB = dataDB.load("abilities");
         this.refreshAbilities();
     }
@@ -32,21 +31,17 @@ export class abilitiesCTRL {
      * refresh player abilities, useful after any changes
      */
     public refreshAbilities() {
+        this.abilitiesOwned = this._owner._schema.abilities;
         let i = 1;
         this.abilities = [];
         this.abilitiesOwned.forEach((element) => {
             const digit = i;
-
             const skill = this.abilitiesDB[element.key];
             skill.digit = digit;
             this.abilities.push(new Ability(skill));
-
             element.digit = digit;
-
             i++;
         });
-
-        this._owner.abilities;
     }
 
     /**
