@@ -2,8 +2,8 @@ import { Client } from "@colyseus/core";
 import { Schema, MapSchema, type, filter } from "@colyseus/schema";
 import { InventorySchema } from "./InventorySchema";
 import { AbilitySchema } from "./AbilitySchema";
+import { Entity } from "./Entity";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
-import { dataDB } from "../../../shared/Data/dataDB";
 
 export class PlayerData extends Schema {
     //@type({ map: InventoryItem }) inventory = new MapSchema<InventoryItem>();
@@ -18,10 +18,9 @@ export class PlayerData extends Schema {
     @type("uint32") public points: number = 5;
 }
 
-export class PlayerSchema extends Schema {
+export class PlayerSchema extends Entity {
     /////////////////////////////////////////////////////////////
     // the below will be synced to all the players
-    @type("number") public id: number = 0;
     @type("number") public x: number = 0;
     @type("number") public y: number = 0;
     @type("number") public z: number = 0;
@@ -33,7 +32,6 @@ export class PlayerSchema extends Schema {
     @type("int16") public maxMana: number = 0;
     @type("uint8") public level: number = 0;
 
-    @type("string") public sessionId: string;
     @type("string") public name: string = "";
     @type("string") public type: string = "player";
     @type("string") public race: string = "player_hobbit";

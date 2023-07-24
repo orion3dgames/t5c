@@ -7,6 +7,7 @@ import { Ability } from "../../../shared/Entities/Common/Ability";
 
 export class abilitiesCTRL {
     private _owner;
+    private _schema;
     public abilitiesOwned;
     public abilitiesDB;
     public abilities: Ability[] = [];
@@ -21,6 +22,7 @@ export class abilitiesCTRL {
 
     constructor(owner) {
         this._owner = owner;
+        this._schema = owner._schema;
         this.abilitiesDB = dataDB.load("abilities");
         this.refreshAbilities();
     }
@@ -31,7 +33,7 @@ export class abilitiesCTRL {
      * refresh player abilities, useful after any changes
      */
     public refreshAbilities() {
-        this.abilitiesOwned = this._owner._schema.abilities;
+        this.abilitiesOwned = this._schema.abilities;
         let i = 1;
         this.abilities = [];
         this.abilitiesOwned.forEach((element) => {
@@ -50,12 +52,12 @@ export class abilitiesCTRL {
      */
     public learnAbility(ability: Ability) {
         // if ability exists, then delete it
-        if (this._owner.abilities[ability.key]) {
-            this._owner.abilities.delete(ability.key);
+        if (this._schema.abilities[ability.key]) {
+            this._schema.abilities.delete(ability.key);
         } else {
             // else let's add it to the player
-            console.log("learnAbility", "DIGIT", this.abilities.length, this._owner.abilities.size);
-            this._owner.abilities.set(
+            console.log("learnAbility", "DIGIT", this.abilities.length, this._schema.abilities.size);
+            this._schema.abilities.set(
                 ability.key,
                 new AbilitySchema({
                     digit: this.abilities.length + 1,

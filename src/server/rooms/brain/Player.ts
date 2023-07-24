@@ -14,7 +14,7 @@ import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { PlayerSchema } from "../schema/PlayerSchema";
 import { GameRoomState } from "../state/GameRoomState";
 
-class Player extends Vehicle {
+class Player {
     /////
     public race;
     public type;
@@ -62,20 +62,20 @@ class Player extends Vehicle {
     public AI_CURRENT_TARGET_DISTANCE = null;
 
     constructor(state: GameRoomState, data) {
-        super();
         //
         this._navMesh = state.navMesh;
         this._state = state;
         this.client = this.getClient();
 
-        // initialize Colyseus Schema
-        let schema = new PlayerSchema(this, data);
-        this._state.players.set(data.sessionId, schema);
-        this._schema = schema;
-
+        // add player data
         // assign player data
         Object.assign(this, data);
         Object.assign(this, dataDB.get("race", this.race));
+
+        // initialize Colyseus Schema
+        let schema = new PlayerSchema(this, data);
+        this._state.entities.set(data.sessionId, schema);
+        this._schema = schema;
 
         // set controllers
         this.abilitiesCTRL = new abilitiesCTRL(this);
@@ -161,6 +161,24 @@ class Player extends Vehicle {
             if (update[key] !== this._schema[key]) {
                 this._schema[key] = update[key];
             }
+        }
+
+        if (this.abilities && this.abilities.length > 0) {
+            this.abilities.forEach((element) => {
+                this.abilities.set(element.key, new AbilitySchema(element));
+            });
+        }
+
+        if (data.default_inventory && data.default_inventory.length > 0) {
+            data.default_inventory.forEach((element) => {
+                this.inventory.set(element.key, new InventorySchema(element));
+            });
+        }
+
+        if (data.default_player_data && data.default_player_data.length > 0) {
+            Object.entries(data.default_player_data).forEach(([k, v]) => {
+                this.player_data[k] = v;
+            });
         }
     }
 

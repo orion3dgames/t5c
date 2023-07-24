@@ -5,9 +5,9 @@ import { AbilitySchema } from "../schema/AbilitySchema";
 import { IdleState, PatrolState, ChaseState, AttackState, DeadState } from "../brain/states";
 import Config from "../../../shared/Config";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
-import { YukaSchema } from "../schema/YukaSchema";
+import { BrainSchema } from "../schema/BrainSchema";
 
-class Enemy extends Vehicle {
+class Enemy {
     public _navMesh;
     public _gameroom;
     public _stateMachine;
@@ -59,14 +59,12 @@ class Enemy extends Vehicle {
     public AI_CLOSEST_PLAYER_DISTANCE = null;
 
     constructor(gameroom, data, ...args: any[]) {
-        super();
-
         // variables
         this._navMesh = gameroom.navMesh;
         this._gameroom = gameroom;
 
         // initialize Colyseus Schema
-        let schema = new YukaSchema();
+        let schema = new BrainSchema();
         gameroom.entities.set(data.sessionId, schema);
         this._schema = schema;
 
@@ -75,11 +73,7 @@ class Enemy extends Vehicle {
         Object.assign(this, dataDB.get("race", this.race));
 
         // abilities
-        /*
-        this.default_abilities.forEach((element) => {
-            this.abilities.push(new AbilitySchema({ key: element, digit: 1 }));
-        });
-        this.abilitiesCTRL = new abilitiesCTRL(this);*/
+        // future
 
         // initialize state machine
         this._stateMachine = new StateMachine(this);
@@ -94,21 +88,17 @@ class Enemy extends Vehicle {
     }
 
     // entity update
-    update(delta) {
-        // do whatever YUKA does
-        super.update(delta);
-
+    public update(delta) {
         /////////////////////////////////////////////////////////////////
         // if players are connected, start monitoring them
-        if (this._gameroom.players.size > 0) {
-            // if does not have a target, keep monitoring the closest player
-            if (this.AI_TARGET === null || this.AI_TARGET === undefined) {
-                this.findClosestPlayer();
-            }
-            // if entity has a target, monitor it's position
-            if (this.AI_TARGET != null && this.AI_TARGET !== undefined) {
-                this.monitorTarget();
-            }
+
+        // if does not have a target, keep monitoring the closest player
+        if (this.AI_TARGET === null || this.AI_TARGET === undefined) {
+            this.findClosestPlayer();
+        }
+        // if entity has a target, monitor it's position
+        if (this.AI_TARGET != null && this.AI_TARGET !== undefined) {
+            this.monitorTarget();
         }
 
         // update state machine
@@ -142,6 +132,7 @@ class Enemy extends Vehicle {
         for (const key in update) {
             // only update if they is a change
             if (update[key] !== this._schema[key]) {
+                console.log("[ENEMY] update ", key, update[key]);
                 this._schema[key] = update[key];
             }
         }
@@ -298,7 +289,9 @@ class Enemy extends Vehicle {
      */
     findClosestPlayer() {
         let closestDistance = 1000000;
-        this._gameroom.players.forEach((entity) => {
+        let players = this._gameroom.entityCTRL.filter("player");
+        for (let index in players) {
+            let entity = players[index];
             if (this.type === "entity" && entity.type === "player" && !entity.gracePeriod && !entity.isDead) {
                 let playerPos = entity.getPosition();
                 let entityPos = this.getPosition();
@@ -309,7 +302,7 @@ class Enemy extends Vehicle {
                     this.AI_CLOSEST_PLAYER_DISTANCE = distanceBetween;
                 }
             }
-        });
+        }
     }
 
     /**

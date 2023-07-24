@@ -1,20 +1,18 @@
-import { Schema, type, MapSchema, filterChildren } from "@colyseus/schema";
-import { PlayerSchema } from "../schema/PlayerSchema";
-import { Player } from "../brain/Player";
-import { YukaSchema } from "../schema/YukaSchema";
-import { LootSchema } from "../schema/LootSchema";
-import { Enemy } from "../brain/Enemy";
+import { Schema, type, MapSchema } from "@colyseus/schema";
+import { Client } from "colyseus";
+import { Player, Enemy } from "../brain";
+import { BrainSchema, Entity, LootSchema, PlayerSchema } from "../schema";
+
 import { spawnCTRL } from "../controllers/spawnCTRL";
+import { entityCTRL } from "../controllers/entityCTRL";
 import { GameRoom } from "../GameRoom";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
-import { NavMesh, EntityManager, Time } from "../../../shared/yuka";
+import { NavMesh } from "../../../shared/yuka";
+
 import { nanoid } from "nanoid";
 import Logger from "../../../shared/Logger";
 import { randomNumberInRange } from "../../../shared/Utils";
 import { dataDB } from "../../../shared/Data/dataDB";
-import { Client } from "colyseus";
-import { GetLoot, LootTableEntry } from "../../../shared/Entities/Player/LootTable";
-import IdleState from "../brain/states/IdleState";
 
 export class GameRoomState extends Schema {
     // networked variables
@@ -27,55 +25,48 @@ export class GameRoomState extends Schema {
         const isWithinBounds = isWithinXBounds && isWithinZBounds;
         return isSelf || isWithinBounds;
     })*/
-    @type({ map: YukaSchema }) entities = new MapSchema<YukaSchema>();
-    @type({ map: PlayerSchema }) players = new MapSchema<PlayerSchema>();
-    @type({ map: LootSchema }) items = new MapSchema<LootSchema>();
+    @type({ map: Entity }) entities = new MapSchema<BrainSchema | LootSchema | PlayerSchema>();
     @type("number") serverTime: number = 0.0;
 
     // not networked variables
     public _gameroom: GameRoom = null;
-    private _spawnController: spawnCTRL;
+    public spawnCTRL: spawnCTRL;
     public navMesh: NavMesh = null;
-    private timer: number = 0;
-    private spawnTimer: number = 0;
+    public entityCTRL: entityCTRL;
     private roomDetails;
-
-    public entityManager;
-    public time;
 
     constructor(gameroom: GameRoom, _navMesh: NavMesh, ...args: any[]) {
         super(...args);
         this._gameroom = gameroom;
         this.navMesh = _navMesh;
         this.roomDetails = dataDB.get("location", this._gameroom.metadata.location);
-        //this._spawnController = new spawnController(this);
+        //this._spawnCTRL = new spawnController(this);
+        this.entityCTRL = new entityCTRL();
 
-        this.entityManager = new EntityManager();
-        this.time = new Time();
-
-        // add entity
-        this.createEntity(1);
+        setTimeout(() => {
+            // add entity
+            this.addEntity(1);
+            this.addBot();
+        }, 2000);
     }
 
     public update(deltaTime: number) {
-        const delta = this.time.update().getDelta();
-
-        this.entityManager.update(delta);
-
-        // for each players
-        /*
-        if (this.players.size > 0) {
-            this.players.forEach((player) => {
-                player.update();
-            });
-        }*/
+        this.entityCTRL.all.forEach((entity) => {
+            entity.update(deltaTime);
+        });
     }
 
-    getEntities() {
-        return this.entityManager.entities;
+    getEntity(sessionId) {
+        return this.entityCTRL.get(sessionId);
+    }
+    deleteEntity(sessionId) {
+        return this.entityCTRL.delete(sessionId);
     }
 
-    public createEntity(delta) {
+    /**
+     * Add entity
+     */
+    public addEntity(delta) {
         // random id
         let sessionId = nanoid(10);
 
@@ -108,9 +99,8 @@ export class GameRoomState extends Schema {
             toRegion: false,
         };
 
-        // add to yuka
-        const girl = new Enemy(this, data);
-        this.entityManager.add(girl);
+        // add to manager
+        this.entityCTRL.add(new Enemy(this, data));
 
         // log
         Logger.info("[gameroom][state][createEntity] created new entity " + randData.key + ": " + sessionId);
@@ -118,10 +108,66 @@ export class GameRoomState extends Schema {
 
     /**
      * Add player
-     * @param sessionId
-     * @param data
+     * @param client
      */
-    addPlayer(client: Client, AI_MODE = false): void {
+    addBot(): void {
+        // random id
+        let sessionId = nanoid(10);
+
+        console.log(this._gameroom);
+
+        let data = this._gameroom.database.getCharacter(1).then((data) => {
+            let player_data = {
+                strength: 15,
+                endurance: 16,
+                agility: 15,
+                intelligence: 20,
+                wisdom: 20,
+                experience: data.experience ?? 0,
+                gold: data.gold ?? 0,
+            };
+
+            let player = {
+                id: data.id,
+
+                x: data.x,
+                y: data.y,
+                z: data.z,
+                rot: data.rot,
+
+                health: data.health,
+                maxHealth: data.health,
+                mana: data.mana,
+                maxMana: data.mana,
+                level: data.level,
+
+                sessionId: sessionId,
+                name: data.name,
+                type: "player",
+                race: "male_adventurer",
+
+                location: data.location,
+                sequence: 0,
+                blocked: false,
+                state: EntityState.IDLE,
+
+                player_data: player_data,
+                abilities: data.abilities ?? [],
+                inventory: data.inventory ?? [],
+            };
+
+            this.entityCTRL.add(new Player(this, player));
+
+            // log
+            Logger.info(`[gameroom][onJoin] player ${sessionId} joined room ${this._gameroom.roomId}.`);
+        });
+    }
+
+    /**
+     * Add player
+     * @param client
+     */
+    addPlayer(client: Client): void {
         // prepare player data
 
         let data = client.auth;
@@ -165,36 +211,12 @@ export class GameRoomState extends Schema {
             inventory: data.inventory ?? [],
         };
 
-        //console.log(player);
-
-        this.entityManager.add(new Player(this, player));
+        this.entityCTRL.add(new Player(this, player));
 
         // set player as online
         this._gameroom.database.toggleOnlineStatus(client.auth.id, 1);
 
         // log
         Logger.info(`[gameroom][onJoin] player ${client.sessionId} joined room ${this._gameroom.roomId}.`);
-    }
-
-    removePlayer(sessionId: string) {
-        this.players.delete(sessionId);
-    }
-
-    removeEntity(sessionId: string) {
-        this.entities.delete(sessionId);
-    }
-
-    /**
-     * find a entity in yuka game manager
-     * @param sessionId
-     * @returns
-     */
-    getEntityBySessionId(sessionId) {
-        const entities = this.entityManager.entities;
-        for (let i = 0, l = entities.length; i < l; i++) {
-            const entity = entities[i];
-            if (entity.sessionId === sessionId) return entity;
-        }
-        return null;
     }
 }

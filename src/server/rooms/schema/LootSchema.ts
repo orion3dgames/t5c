@@ -1,16 +1,16 @@
 import { Schema, type } from "@colyseus/schema";
 import { Vector3 } from "../../../shared/yuka";
 
-export class LootSchema extends Schema {
-    // networked player specific
-    @type("string") public key: string = "";
-    @type("string") public sessionId: string;
-    @type("int16") public x: number = 0;
-    @type("int16") public y: number = 0;
-    @type("int16") public z: number = 0;
-    @type("int16") public rot: number = 0;
-    @type("int16") public quantity: number = 0;
+import { Entity } from "./Entity";
 
+export class LootSchema extends Entity {
+    // networked player specific
+    @type("number") public x: number = 0;
+    @type("number") public y: number = 0;
+    @type("number") public z: number = 0;
+    @type("number") public rot: number = 0;
+    @type("string") public key: string = "";
+    @type("int16") public quantity: number = 0;
     public label;
     public description;
 
