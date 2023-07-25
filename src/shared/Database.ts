@@ -6,7 +6,7 @@ import { ParsedQs } from "qs";
 import Config from "./Config";
 import { dataDB } from "./Data/dataDB";
 import { Item } from "./Entities/Item";
-import { InventorySchema } from "../server/rooms/schema/InventorySchema";
+import { InventorySchema } from "../server/rooms/schema/player/InventorySchema";
 import { AbilitySchema } from "src/server/rooms/schema/AbilitySchema";
 
 class Database {

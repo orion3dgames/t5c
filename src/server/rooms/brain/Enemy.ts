@@ -1,7 +1,7 @@
 import { dataDB } from "../../../shared/Data/dataDB";
 import { Vehicle, StateMachine, Vector3 } from "../../../shared/yuka";
 import { abilitiesCTRL } from "../controllers/abilityCTRL";
-import { AbilitySchema } from "../schema/AbilitySchema";
+import { AbilitySchema } from "../schema/player/AbilitySchema";
 import { IdleState, PatrolState, ChaseState, AttackState, DeadState } from "../brain/states";
 import Config from "../../../shared/Config";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";

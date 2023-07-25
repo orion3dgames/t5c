@@ -1,5 +1,5 @@
 import { Schema, type } from "@colyseus/schema";
-import { dataDB } from "../../../shared/Data/dataDB";
+import { dataDB } from "../../../../shared/Data/dataDB";
 
 export class AbilitySchema extends Schema {
     // networked player specific

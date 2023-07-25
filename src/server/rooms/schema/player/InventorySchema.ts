@@ -1,4 +1,5 @@
 import { Schema, type } from "@colyseus/schema";
+import { dataDB } from "../../../../shared/Data/dataDB";
 
 export class InventorySchema extends Schema {
     // networked player specific
@@ -7,5 +8,6 @@ export class InventorySchema extends Schema {
     constructor(data) {
         super(data);
         Object.assign(this, data);
+        Object.assign(this, dataDB.get("item", this.key));
     }
 }

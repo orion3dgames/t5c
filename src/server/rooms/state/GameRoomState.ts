@@ -1,10 +1,11 @@
-import { Schema, type, MapSchema } from "@colyseus/schema";
+import { Schema, type, MapSchema, filterChildren } from "@colyseus/schema";
 import { Client } from "colyseus";
-import { Player, Enemy } from "../brain";
+import { Player, Enemy, Loot } from "../brain";
 import { BrainSchema, Entity, LootSchema, PlayerSchema } from "../schema";
 
 import { spawnCTRL } from "../controllers/spawnCTRL";
 import { entityCTRL } from "../controllers/entityCTRL";
+
 import { GameRoom } from "../GameRoom";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { NavMesh } from "../../../shared/yuka";
@@ -14,12 +15,15 @@ import Logger from "../../../shared/Logger";
 import { randomNumberInRange } from "../../../shared/Utils";
 import { dataDB } from "../../../shared/Data/dataDB";
 
+import { GetLoot, LootTableEntry } from "../../../shared/Entities/Player/LootTable";
+import Config from "../../../shared/Config";
+
 export class GameRoomState extends Schema {
     // networked variables
     /*
-    @filterChildren(function (client, key, value: PlayerState, root) {
-        const isSelf = value.name === client.sessionId;
-        const player = (this as GameRoomState).players.get(client.sessionId);
+    @filterChildren(function (client, key, value: BrainSchema | LootSchema | PlayerSchema, root) {
+        const isSelf = value.sessionId === client.sessionId;
+        const player = (this as GameRoomState).entityCTRL.get(client.sessionId);
         const isWithinXBounds = Math.abs(player.x - value.x) < Config.PLAYER_VIEW_DISTANCE;
         const isWithinZBounds = Math.abs(player.z - value.z) < Config.PLAYER_VIEW_DISTANCE;
         const isWithinBounds = isWithinXBounds && isWithinZBounds;
@@ -47,7 +51,8 @@ export class GameRoomState extends Schema {
             // add entity
             this.addEntity(1);
             this.addBot();
-        }, 2000);
+            this.addItem();
+        }, 1000);
     }
 
     public update(deltaTime: number) {
@@ -59,8 +64,57 @@ export class GameRoomState extends Schema {
     getEntity(sessionId) {
         return this.entityCTRL.get(sessionId);
     }
+
     deleteEntity(sessionId) {
         return this.entityCTRL.delete(sessionId);
+    }
+
+    /**
+     * Add item
+     */
+    public addItem() {
+        // get starting starting position
+        let randomRegion = this.navMesh.getRandomRegion();
+        let point = randomRegion.centroid;
+
+        // set up loot
+        let lootTable = [
+            LootTableEntry("sword_01", 25, 1, 1, 1, 1),
+            LootTableEntry("potion_heal", 25, 1, 1, 1, 1),
+            LootTableEntry("pear", 5, 1, 10, 1, 1),
+            LootTableEntry("apple", 20, 1, 10, 1, 1),
+            LootTableEntry(null, 20, 1, 1, 1, 1),
+            LootTableEntry("amulet_01", 1, 1, 1, 1, 2),
+            LootTableEntry(null, 150, 1, 1, 1, 2),
+        ];
+        // generate loot
+        let loot = GetLoot(lootTable);
+
+        // iterate loot
+        loot.forEach((drop) => {
+            console.log(drop);
+            // drop item on the ground
+            let item = dataDB.get("item", drop.id);
+            let sessionId = nanoid(10);
+            let currentPosition = point;
+            currentPosition.x += randomNumberInRange(0.1, 1.5);
+            currentPosition.z += randomNumberInRange(0.1, 1.5);
+            let data = {
+                key: drop.id,
+                name: item.name,
+                description: item.description,
+                sessionId: sessionId,
+                x: currentPosition.x,
+                y: 0.25,
+                z: currentPosition.z,
+                quantity: drop.quantity,
+            };
+
+            // add to manager
+            this.entityCTRL.add(new Loot(this, data));
+
+            Logger.info("[gameroom][state][createEntity] created new item " + item.key + ": " + sessionId);
+        });
     }
 
     /**
@@ -113,8 +167,6 @@ export class GameRoomState extends Schema {
     addBot(): void {
         // random id
         let sessionId = nanoid(10);
-
-        console.log(this._gameroom);
 
         let data = this._gameroom.database.getCharacter(1).then((data) => {
             let player_data = {

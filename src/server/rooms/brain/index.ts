@@ -1,4 +1,5 @@
 import { Player } from "./Player";
 import { Enemy } from "./Enemy";
+import { Loot } from "./Loot";
 
-export { Player, Enemy };
+export { Player, Enemy, Loot };

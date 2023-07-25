@@ -1,6 +1,4 @@
-import { Schema, type } from "@colyseus/schema";
-import { Vector3 } from "../../../shared/yuka";
-
+import { type } from "@colyseus/schema";
 import { Entity } from "./Entity";
 
 export class LootSchema extends Entity {
@@ -11,15 +9,4 @@ export class LootSchema extends Entity {
     @type("number") public rot: number = 0;
     @type("string") public key: string = "";
     @type("int16") public quantity: number = 0;
-    public label;
-    public description;
-
-    constructor(gameroom, data) {
-        super(gameroom, data);
-        Object.assign(this, data);
-    }
-
-    getPosition() {
-        return new Vector3(this.x, this.y, this.z);
-    }
 }

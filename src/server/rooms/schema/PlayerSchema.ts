@@ -1,13 +1,13 @@
 import { Client } from "@colyseus/core";
 import { Schema, MapSchema, type, filter } from "@colyseus/schema";
-import { InventorySchema } from "./InventorySchema";
-import { AbilitySchema } from "./AbilitySchema";
+import { InventorySchema } from "./player/InventorySchema";
+import { AbilitySchema } from "./player/AbilitySchema";
 import { Entity } from "./Entity";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 
 export class PlayerData extends Schema {
-    //@type({ map: InventoryItem }) inventory = new MapSchema<InventoryItem>();
-    //@type({ map: AbilityItem }) abilities = new MapSchema<AbilityItem>();
+    @type({ map: InventorySchema }) inventory = new MapSchema<InventorySchema>();
+    @type({ map: AbilitySchema }) abilities = new MapSchema<AbilitySchema>();
     @type("uint32") public gold: number = 0;
     @type("uint8") public strength: number = 0;
     @type("uint8") public endurance: number = 0;
@@ -41,9 +41,6 @@ export class PlayerSchema extends Entity {
     @type("boolean") public blocked: boolean = false; // if true, used to block player and to prevent movement
     @type("int8") public anim_state: EntityState = EntityState.IDLE;
 
-    // could be remove from state
-    @type("uint32") public gold: number = 0;
-
     ////////////////////////////////////////////////////////////////////////////
     // the below data only need to synchronized to the player it belongs too
     // player data
@@ -52,18 +49,4 @@ export class PlayerSchema extends Entity {
     })
     @type(PlayerData)
     player_data: PlayerData = new PlayerData();
-
-    // inventory
-    @filter(function (this: PlayerSchema, client: Client) {
-        return this.sessionId === client.sessionId;
-    })
-    @type({ map: InventorySchema })
-    inventory = new MapSchema<InventorySchema>();
-
-    // abilities
-    @filter(function (this: PlayerSchema, client: Client) {
-        return this.sessionId === client.sessionId;
-    })
-    @type({ map: AbilitySchema })
-    abilities = new MapSchema<AbilitySchema>();
 }

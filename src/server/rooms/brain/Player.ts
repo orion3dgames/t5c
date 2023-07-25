@@ -1,17 +1,14 @@
-import { Client } from "@colyseus/core";
-import { Schema, MapSchema, type, filter } from "@colyseus/schema";
 import Config from "../../../shared/Config";
 import { GameRoom } from "../GameRoom";
 import { abilitiesCTRL } from "../controllers/abilityCTRL";
 import { moveCTRL } from "../controllers/moveCTRL";
 import { dataDB } from "../../../shared/Data/dataDB";
-import { NavMesh, Vector3, Vehicle } from "../../../shared/yuka";
-
-import { InventorySchema } from "../schema/InventorySchema";
-import { AbilitySchema } from "../schema/AbilitySchema";
+import { NavMesh, Vector3 } from "../../../shared/yuka";
+import { InventorySchema } from "../schema/player/InventorySchema";
+import { AbilitySchema } from "../schema/player/AbilitySchema";
 import { LootSchema } from "../schema/LootSchema";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
-import { PlayerSchema } from "../schema/PlayerSchema";
+import { PlayerData, PlayerSchema } from "../schema/PlayerSchema";
 import { GameRoomState } from "../state/GameRoomState";
 
 class Player {
@@ -25,13 +22,14 @@ class Player {
     public y;
     public z;
     public rot;
-    public anim_state;
+    public anim_state: EntityState = EntityState.IDLE;
     public health;
     public maxHealth;
     public mana;
     public maxMana;
     public blocked;
     public location;
+    public sequence;
 
     /////////////////////////////////////////////////////////////
     // does not need to be synced
@@ -95,8 +93,6 @@ class Player {
 
     // runs on every server iteration
     update() {
-        console.log("UPDATE");
-
         this.isMoving = false;
 
         // always check if player is dead ??
@@ -144,25 +140,36 @@ class Player {
             level: this.level,
 
             anim_state: this.anim_state,
-
-            player_data: {
-                gold: this.player_data.gold ?? 0,
-                strength: this.player_data.strength ?? 0,
-                endurance: this.player_data.endurance ?? 0,
-                agility: this.player_data.agility ?? 0,
-                intelligence: this.player_data.intelligence ?? 0,
-                wisdom: this.player_data.wisdom ?? 0,
-                experience: this.player_data.experience ?? 0,
-                points: this.player_data.points ?? 0,
-            },
+            location: this.location,
+            sequence: this.sequence,
+            blocked: this.blocked,
         };
         for (const key in update) {
             // only update if they is a change
             if (update[key] !== this._schema[key]) {
                 this._schema[key] = update[key];
+                console.log("[PLAYER] update ", key, update[key]);
             }
         }
 
+        let player_data = {
+            gold: this.player_data.gold ?? 0,
+            strength: this.player_data.strength ?? 0,
+            endurance: this.player_data.endurance ?? 0,
+            agility: this.player_data.agility ?? 0,
+            intelligence: this.player_data.intelligence ?? 0,
+            wisdom: this.player_data.wisdom ?? 0,
+            experience: this.player_data.experience ?? 0,
+            points: this.player_data.points ?? 0,
+        };
+        for (const key in player_data) {
+            if (player_data[key] !== this._schema.player_data[key]) {
+                this._schema.player_data[key] = player_data[key];
+                console.log("[PLAYER] update ", key, player_data[key]);
+            }
+        }
+
+        /*
         if (this.abilities && this.abilities.length > 0) {
             this.abilities.forEach((element) => {
                 this.abilities.set(element.key, new AbilitySchema(element));
@@ -179,7 +186,7 @@ class Player {
             Object.entries(data.default_player_data).forEach(([k, v]) => {
                 this.player_data[k] = v;
             });
-        }
+        }*/
     }
 
     public getClient() {

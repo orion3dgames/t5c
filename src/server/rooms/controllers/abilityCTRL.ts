@@ -2,7 +2,7 @@ import Logger from "../../../shared/Logger";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { dropCTRL } from "./dropCTRL";
 import { dataDB } from "../../../shared/Data/dataDB";
-import { AbilitySchema } from "../schema/AbilitySchema";
+import { AbilitySchema } from "../schema/player/AbilitySchema";
 import { Ability } from "../../../shared/Entities/Common/Ability";
 
 export class abilitiesCTRL {
@@ -33,7 +33,7 @@ export class abilitiesCTRL {
      * refresh player abilities, useful after any changes
      */
     public refreshAbilities() {
-        this.abilitiesOwned = this._schema.abilities;
+        this.abilitiesOwned = this._schema.player_data.abilities;
         let i = 1;
         this.abilities = [];
         this.abilitiesOwned.forEach((element) => {
@@ -52,12 +52,12 @@ export class abilitiesCTRL {
      */
     public learnAbility(ability: Ability) {
         // if ability exists, then delete it
-        if (this._schema.abilities[ability.key]) {
-            this._schema.abilities.delete(ability.key);
+        if (this._schema.player_data.abilities[ability.key]) {
+            this._schema.player_data.abilities.delete(ability.key);
         } else {
             // else let's add it to the player
-            console.log("learnAbility", "DIGIT", this.abilities.length, this._schema.abilities.size);
-            this._schema.abilities.set(
+            console.log("learnAbility", "DIGIT", this.abilities.length, this._schema.player_data.abilities.size);
+            this._schema.player_data.abilities.set(
                 ability.key,
                 new AbilitySchema({
                     digit: this.abilities.length + 1,
