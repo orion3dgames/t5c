@@ -1,6 +1,6 @@
-import Config from "../../../../shared/Config";
-import { EntityState } from "../../../../shared/Entities/Entity/EntityState";
-import { State } from "../../../../shared/yuka";
+import Config from "../../../shared/Config";
+import { EntityState } from "../../../shared/Entities/Entity/EntityState";
+import { State } from "../../../shared/yuka";
 
 class DeadState extends State {
     enter(owner) {
@@ -20,8 +20,7 @@ class DeadState extends State {
         // delete so entity can be respawned
         if (owner.DEAD_TIMER > 5000) {
             // remove entity
-            owner._gameroom// remove schema
-            .owner._gameroom.state.entities
+            owner._gameroom.owner._gameroom.state.entities // remove schema
                 .delete(owner.sessionId);
         }
     }

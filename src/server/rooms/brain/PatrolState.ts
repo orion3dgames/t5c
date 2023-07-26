@@ -1,6 +1,6 @@
-import Config from "../../../../shared/Config";
-import { EntityState } from "../../../../shared/Entities/Entity/EntityState";
-import { State } from "../../../../shared/yuka";
+import Config from "../../../shared/Config";
+import { EntityState } from "../../../shared/Entities/Entity/EntityState";
+import { State } from "../../../shared/yuka";
 
 class PatrolState extends State {
     enter(owner) {

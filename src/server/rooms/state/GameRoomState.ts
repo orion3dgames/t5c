@@ -1,6 +1,5 @@
 import { Schema, type, MapSchema, filterChildren } from "@colyseus/schema";
 import { Client } from "colyseus";
-import { Player, Enemy, Loot } from "../brain";
 import { BrainSchema, Entity, LootSchema, PlayerSchema } from "../schema";
 
 import { spawnCTRL } from "../controllers/spawnCTRL";
@@ -30,6 +29,7 @@ export class GameRoomState extends Schema {
         return isSelf || isWithinBounds;
     })*/
     @type({ map: Entity }) entities = new MapSchema<BrainSchema | LootSchema | PlayerSchema>();
+
     @type("number") serverTime: number = 0.0;
 
     // not networked variables
@@ -45,7 +45,7 @@ export class GameRoomState extends Schema {
         this.navMesh = _navMesh;
         this.roomDetails = dataDB.get("location", this._gameroom.metadata.location);
         //this._spawnCTRL = new spawnController(this);
-        this.entityCTRL = new entityCTRL();
+        this.entityCTRL = new entityCTRL(this);
 
         setTimeout(() => {
             // add entity
@@ -92,7 +92,6 @@ export class GameRoomState extends Schema {
 
         // iterate loot
         loot.forEach((drop) => {
-            console.log(drop);
             // drop item on the ground
             let item = dataDB.get("item", drop.id);
             let sessionId = nanoid(10);
@@ -100,6 +99,7 @@ export class GameRoomState extends Schema {
             currentPosition.x += randomNumberInRange(0.1, 1.5);
             currentPosition.z += randomNumberInRange(0.1, 1.5);
             let data = {
+                type: "item",
                 key: drop.id,
                 name: item.name,
                 description: item.description,
@@ -111,7 +111,7 @@ export class GameRoomState extends Schema {
             };
 
             // add to manager
-            this.entityCTRL.add(new Loot(this, data));
+            this.entityCTRL.add(new LootSchema(this, data));
 
             Logger.info("[gameroom][state][createEntity] created new item " + item.key + ": " + sessionId);
         });
@@ -154,7 +154,7 @@ export class GameRoomState extends Schema {
         };
 
         // add to manager
-        this.entityCTRL.add(new Enemy(this, data));
+        this.entityCTRL.add(new BrainSchema(this, data));
 
         // log
         Logger.info("[gameroom][state][createEntity] created new entity " + randData.key + ": " + sessionId);
@@ -168,7 +168,7 @@ export class GameRoomState extends Schema {
         // random id
         let sessionId = nanoid(10);
 
-        let data = this._gameroom.database.getCharacter(1).then((data) => {
+        this._gameroom.database.getCharacter(1).then((data) => {
             let player_data = {
                 strength: 15,
                 endurance: 16,
@@ -203,12 +203,12 @@ export class GameRoomState extends Schema {
                 blocked: false,
                 state: EntityState.IDLE,
 
-                player_data: player_data,
-                abilities: data.abilities ?? [],
-                inventory: data.inventory ?? [],
+                initial_player_data: player_data,
+                initial_abilities: data.abilities ?? [],
+                initial_inventory: data.inventory ?? [],
             };
 
-            this.entityCTRL.add(new Player(this, player));
+            this.entityCTRL.add(new PlayerSchema(this, player));
 
             // log
             Logger.info(`[gameroom][onJoin] player ${sessionId} joined room ${this._gameroom.roomId}.`);
@@ -258,12 +258,12 @@ export class GameRoomState extends Schema {
             blocked: false,
             state: EntityState.IDLE,
 
-            player_data: player_data,
-            abilities: data.abilities ?? [],
-            inventory: data.inventory ?? [],
+            initial_player_data: player_data,
+            initial_abilities: data.abilities ?? [],
+            initial_inventory: data.inventory ?? [],
         };
 
-        this.entityCTRL.add(new Player(this, player));
+        this.entityCTRL.add(new PlayerSchema(this, player));
 
         // set player as online
         this._gameroom.database.toggleOnlineStatus(client.auth.id, 1);

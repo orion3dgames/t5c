@@ -1,37 +1,45 @@
 import { GameRoomState } from "../state/GameRoomState";
-import { Enemy } from "../brain/Enemy";
-import { Player } from "../brain/Player";
 
 export class entityCTRL {
-    public entities = [];
+    private _state: GameRoomState;
 
-    constructor() {}
+    constructor(state) {
+        this._state = state;
+    }
 
     hasEntities() {
-        return this.entities.length > 0;
+        return this._state.entities.size > 0;
     }
 
     length() {
-        return this.entities.length;
+        return this._state.entities.size;
     }
 
+    // not reactive
     filter(type) {
-        return this.entities.filter((entity) => entity.type === type);
+        return new Map(
+            Array.from(this._state.entities).filter(([_key, value]) => {
+                if (value.type === type) {
+                    return true;
+                }
+                return false;
+            })
+        );
     }
 
     get all() {
-        return this.entities;
+        return this._state.entities;
     }
 
     get(sessionId) {
-        return this.entities[sessionId];
+        return this._state.entities.get(sessionId);
     }
 
     add(entity) {
-        this.entities.push(entity);
+        this._state.entities.set(entity.sessionId, entity);
     }
 
     delete(entity) {
-        delete this.entities[entity.sessionId];
+        this._state.entities.delete(entity.sessionId);
     }
 }

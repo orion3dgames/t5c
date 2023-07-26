@@ -1,9 +1,17 @@
 import { Client } from "@colyseus/core";
 import { Schema, MapSchema, type, filter } from "@colyseus/schema";
-import { InventorySchema } from "./player/InventorySchema";
-import { AbilitySchema } from "./player/AbilitySchema";
-import { Entity } from "./Entity";
+import Config from "../../../shared/Config";
+import { GameRoom } from "../GameRoom";
+import { abilitiesCTRL } from "../controllers/abilityCTRL";
+import { moveCTRL } from "../controllers/moveCTRL";
+import { dataDB } from "../../../shared/Data/dataDB";
+import { NavMesh, Vector3 } from "../../../shared/yuka";
+import { InventorySchema } from "../schema/player/InventorySchema";
+import { AbilitySchema } from "../schema/player/AbilitySchema";
+import { LootSchema } from "../schema/LootSchema";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
+import { GameRoomState } from "../state/GameRoomState";
+import { Entity } from "../schema/Entity";
 
 export class PlayerData extends Schema {
     @type({ map: InventorySchema }) inventory = new MapSchema<InventorySchema>();
@@ -49,4 +57,197 @@ export class PlayerSchema extends Entity {
     })
     @type(PlayerData)
     player_data: PlayerData = new PlayerData();
+
+    /////////////////////////////////////////////////////////////
+    // does not need to be synced
+    public manaRegen: number = 0;
+    public healthRegen: number = 0;
+    public speed: number = 0;
+    public experienceGain: number = 0;
+    public gracePeriod: boolean = true;
+    public attackTimer;
+    public isMoving: boolean = false;
+    public isDead: boolean = false;
+
+    // controllers
+    public _navMesh: NavMesh;
+    public _schema;
+    public _state;
+    public client;
+    public abilitiesCTRL: abilitiesCTRL;
+    public moveCTRL: moveCTRL;
+
+    ////////////////////////////
+    public AI_CURRENT_TARGET = null;
+    public AI_CURRENT_TARGET_POSITION = null;
+    public AI_CURRENT_TARGET_DISTANCE = null;
+
+    constructor(state: GameRoomState, data) {
+        super();
+        //
+        this._navMesh = state.navMesh;
+        this._state = state;
+        this.client = this.getClient();
+
+        // add player data
+        // assign player data
+        Object.assign(this, data);
+        Object.assign(this, dataDB.get("race", this.race));
+
+        // data
+        console.log(data);
+        data.initial_abilities.forEach((element) => {
+            this.player_data.abilities.set(element.key, new AbilitySchema(element));
+        });
+        data.initial_inventory.forEach((element) => {
+            this.player_data.inventory.set(element.key, new InventorySchema(element));
+        });
+        Object.entries(data.initial_player_data).forEach(([k, v]) => {
+            this.player_data[k] = v;
+        });
+
+        // set controllers
+        this.abilitiesCTRL = new abilitiesCTRL(this, data);
+        this.moveCTRL = new moveCTRL(this);
+
+        //
+        this.start();
+    }
+
+    // on player state initialized
+    start() {
+        // add a 5 second grace period where the player can not be targeted by the ennemies
+        setTimeout(() => {
+            this.gracePeriod = false;
+        }, Config.PLAYER_GRACE_PERIOD);
+    }
+
+    // runs on every server iteration
+    update() {
+        this.isMoving = false;
+
+        // always check if player is dead ??
+        if (this.isEntityDead() && !this.isDead) {
+            this.setAsDead();
+        }
+
+        // if not dead
+        if (this.isDead === false) {
+            // continuously gain mana
+            if (this.mana < this.maxMana) {
+                this.mana += this.manaRegen;
+            }
+
+            // continuously gain health
+            if (this.health < this.maxHealth) {
+                this.health += this.healthRegen;
+            }
+        }
+
+        // move player
+        this.moveCTRL.update();
+    }
+
+    public getClient() {
+        return this._state._gameroom.clients.getById(this.sessionId);
+    }
+
+    addItemToInventory(loot: LootSchema) {
+        let data = {
+            key: loot.key,
+            qty: loot.quantity,
+        };
+        console.log("Pick up item", data);
+        let inventoryItem = this.player_data.inventory.get(data.key);
+        if (inventoryItem) {
+            inventoryItem.qty += data.qty;
+        } else {
+            this.player_data.inventory.set(data.key, new InventorySchema(data));
+        }
+        this._state.items.delete(loot.sessionId);
+    }
+
+    setAsDead() {
+        this.abilitiesCTRL.cancelAutoAttack(this);
+        this.isDead = true;
+        this.health = 0;
+        this.blocked = true;
+        this.anim_state = EntityState.DEAD;
+    }
+
+    resetPosition() {
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.ressurect();
+    }
+
+    ressurect() {
+        this.isDead = false;
+        this.health = this.maxHealth;
+        this.mana = this.maxMana;
+        this.blocked = false;
+        this.anim_state = EntityState.IDLE;
+        this.gracePeriod = true;
+        setTimeout(() => {
+            this.gracePeriod = false;
+        }, Config.PLAYER_GRACE_PERIOD);
+    }
+
+    /**
+     * is entity dead (isDead is there to prevent setting a player as dead multiple time)
+     * @returns true if health smaller than 0 and not already set as dead.
+     */
+    isEntityDead() {
+        return this.health <= 0;
+    }
+
+    setLocation(location: string): void {
+        this.location = location;
+    }
+
+    // make sure no value are out of range
+    normalizeStats() {
+        // health
+        if (this.health > this.maxHealth) {
+            this.health = this.maxHealth;
+        }
+        if (this.health < 0) {
+            this.health = 0;
+        }
+
+        // mana
+        if (this.mana > this.maxMana) {
+            this.mana = this.maxMana;
+        }
+        if (this.mana < 0) {
+            this.mana = 0;
+        }
+    }
+
+    getPosition() {
+        return new Vector3(this.x, this.y, this.z);
+    }
+
+    hasTarget() {
+        return this.AI_CURRENT_TARGET ?? false;
+    }
+
+    /**
+     * monitor a target
+     */
+    monitorTarget() {
+        if (this.AI_CURRENT_TARGET !== null && this.AI_CURRENT_TARGET !== undefined && this.AI_CURRENT_TARGET.sessionId) {
+            let targetPos = this.AI_CURRENT_TARGET.getPosition();
+            let entityPos = this.getPosition();
+            let distanceBetween = entityPos.distanceTo(targetPos);
+            this.AI_CURRENT_TARGET_POSITION = targetPos;
+            this.AI_CURRENT_TARGET_DISTANCE = distanceBetween;
+        } else {
+            // else entity has no target
+            this.AI_CURRENT_TARGET = null;
+            this.AI_CURRENT_TARGET_POSITION = null;
+            this.AI_CURRENT_TARGET_DISTANCE = 0;
+        }
+    }
 }

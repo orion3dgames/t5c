@@ -1,5 +1,7 @@
-import { Player } from "./Player";
-import { Enemy } from "./Enemy";
-import { Loot } from "./Loot";
+import IdleState from "./IdleState";
+import PatrolState from "./PatrolState";
+import ChaseState from "./ChaseState";
+import AttackState from "./AttackState";
+import DeadState from "./DeadState";
 
-export { Player, Enemy, Loot };
+export { IdleState, PatrolState, ChaseState, AttackState, DeadState };

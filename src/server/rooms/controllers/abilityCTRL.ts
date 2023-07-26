@@ -20,9 +20,8 @@ export class abilitiesCTRL {
     public gracePeriod: boolean = true;
     public attackTimer;
 
-    constructor(owner) {
+    constructor(owner, data) {
         this._owner = owner;
-        this._schema = owner._schema;
         this.abilitiesDB = dataDB.load("abilities");
         this.refreshAbilities();
     }
@@ -33,7 +32,7 @@ export class abilitiesCTRL {
      * refresh player abilities, useful after any changes
      */
     public refreshAbilities() {
-        this.abilitiesOwned = this._schema.player_data.abilities;
+        this.abilitiesOwned = this._owner.player_data.abilities;
         let i = 1;
         this.abilities = [];
         this.abilitiesOwned.forEach((element) => {
@@ -52,12 +51,12 @@ export class abilitiesCTRL {
      */
     public learnAbility(ability: Ability) {
         // if ability exists, then delete it
-        if (this._schema.player_data.abilities[ability.key]) {
-            this._schema.player_data.abilities.delete(ability.key);
+        if (this._owner.player_data.abilities[ability.key]) {
+            this._owner.player_data.abilities.delete(ability.key);
         } else {
             // else let's add it to the player
-            console.log("learnAbility", "DIGIT", this.abilities.length, this._schema.player_data.abilities.size);
-            this._schema.player_data.abilities.set(
+            console.log("learnAbility", "DIGIT", this.abilities.length, this._owner.player_data.abilities.size);
+            this._owner.player_data.abilities.set(
                 ability.key,
                 new AbilitySchema({
                     digit: this.abilities.length + 1,

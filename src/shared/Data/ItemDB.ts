@@ -4,7 +4,7 @@ type Item = {
     description: string;
     icon: string;
     value: number;
-    type: ItemType;
+    class: ItemClass;
     canEquip?: {
         slot: PlayerSlots;
     };
@@ -24,7 +24,7 @@ interface itemDataMap {
     [key: string]: Item;
 }
 
-enum ItemType {
+enum ItemClass {
     WEAPON = 1,
     ARMOR = 2,
     CONSUMABLE = 3,
@@ -62,29 +62,24 @@ enum PlayerSlots {
 }
 
 let ItemsDB: itemDataMap = {
-
     sword_01: {
         key: "sword_01",
         name: "Sword",
         description: "Description.",
         icon: "ICON_ITEM_sword_01",
-        type: ItemType.WEAPON,
+        class: ItemClass.WEAPON,
         value: 2000,
         canEquip: {
             slot: PlayerSlots.HAND_1,
         },
-        requirements: [
-            { key: PlayerKeys.STRENGTH, amount: 20 },
-        ],
-        benefits: [
-            { key: PlayerKeys.STRENGTH, type: ItemEffect.ADD, amount: 10 },
-        ],
+        requirements: [{ key: PlayerKeys.STRENGTH, amount: 20 }],
+        benefits: [{ key: PlayerKeys.STRENGTH, type: ItemEffect.ADD, amount: 10 }],
         meshData: {
             meshIndex: 1,
             scale: 1.2,
-            width: 1, 
-            height: 0.20, 
-            depth: 0.20
+            width: 1,
+            height: 0.2,
+            depth: 0.2,
         },
     },
 
@@ -93,7 +88,7 @@ let ItemsDB: itemDataMap = {
         name: "Amulet",
         description: "An ancient amulet from forgotten times, it's effect are still unknowm.",
         icon: "ICON_ITEM_amulet_01",
-        type: ItemType.ARMOR,
+        class: ItemClass.ARMOR,
         value: 2000,
         canEquip: {
             slot: PlayerSlots.AMULET,
@@ -110,9 +105,9 @@ let ItemsDB: itemDataMap = {
         meshData: {
             meshIndex: 1,
             scale: 0.25,
-            width: 0.40, 
-            height: 0.40, 
-            depth: 0.40
+            width: 0.4,
+            height: 0.4,
+            depth: 0.4,
         },
     },
 
@@ -121,15 +116,15 @@ let ItemsDB: itemDataMap = {
         name: "Apple",
         description: "A delicious apple.",
         icon: "ICON_ITEM_apple",
-        type: ItemType.CONSUMABLE,
+        class: ItemClass.CONSUMABLE,
         value: 54,
         benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 5 }],
         meshData: {
             meshIndex: 1,
             scale: 0.25,
-            width: 0.40, 
-            height: 0.40, 
-            depth: 0.40
+            width: 0.4,
+            height: 0.4,
+            depth: 0.4,
         },
     },
 
@@ -138,15 +133,15 @@ let ItemsDB: itemDataMap = {
         name: "Pear",
         description: "A delicious pear.",
         icon: "ICON_ITEM_pear",
-        type: ItemType.CONSUMABLE,
+        class: ItemClass.CONSUMABLE,
         value: 200,
         benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 20 }],
         meshData: {
             meshIndex: 1,
-            scale: 0.20,
-            width: 0.40, 
-            height: 0.40, 
-            depth: 0.40
+            scale: 0.2,
+            width: 0.4,
+            height: 0.4,
+            depth: 0.4,
         },
     },
 
@@ -155,15 +150,15 @@ let ItemsDB: itemDataMap = {
         name: "Heal Potion",
         description: "A very useful potion that restores up to 50 health..",
         icon: "ICON_ITEM_potion_heal",
-        type: ItemType.CONSUMABLE,
+        class: ItemClass.CONSUMABLE,
         value: 150,
         benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 50 }],
         meshData: {
             meshIndex: 1,
             scale: 1,
-            width: 0.40, 
-            height: 0.40, 
-            depth: 0.40
+            width: 0.4,
+            height: 0.4,
+            depth: 0.4,
         },
     },
 };

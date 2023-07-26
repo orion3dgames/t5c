@@ -83,7 +83,7 @@ export class dropCTRL {
                 quantity: drop.quantity,
             };
             let entity = new LootSchema(this, data);
-            this._owner._gameroom.state.items.set(sessionId, entity);
+            this._owner._gameroom.state.entities.set(sessionId, entity);
         });
     }
 }

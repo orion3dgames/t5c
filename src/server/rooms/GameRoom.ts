@@ -1,20 +1,16 @@
 import http from "http";
 import { Room, Client, Delayed } from "@colyseus/core";
 import { GameRoomState } from "./state/GameRoomState";
-import { Player } from "./brain/Player";
 import databaseInstance from "../../shared/Database";
 import Config from "../../shared/Config";
 import Logger from "../../shared/Logger";
 import loadNavMeshFromFile from "../../shared/Utils/loadNavMeshFromFile";
-import { PlayerSchema } from "./schema/PlayerSchema";
 import { PlayerInputs } from "../../shared/types";
 import { NavMesh } from "../../shared/yuka";
-import { nanoid } from "nanoid";
-import { randomNumberInRange } from "../../shared/Utils";
-import { LootSchema } from "./schema/LootSchema";
 import { dataDB } from "../../shared/Data/dataDB";
 
 import { Auth } from "./commands";
+import { Entity, PlayerSchema } from "./schema";
 
 export class GameRoom extends Room<GameRoomState> {
     public maxClients = 64;
@@ -62,21 +58,16 @@ export class GameRoom extends Room<GameRoomState> {
 
         ///////////////////////////////////////////////////////////////////////////
         // if players are in a room, make sure we save any changes to the database.
-        let saveTimer = 0;
-        let saveInterval = 5000;
         this.delayedInterval = this.clock.setInterval(() => {
-            saveTimer += 1000;
-
             // only save if there is any players
             let players = this.state.entityCTRL.filter("player");
-            if (players && players.length > 0) {
-                /*
+            if (players && players.size > 0) {
                 //Logger.info("[gameroom][onCreate] Saving data for room " + options.location + " with " + this.state.players.size + " players");
                 players.forEach((entity) => {
                     if (entity.type === "player") {
-                        /*
                         // update player every second...
                         let playerClient = this.clients.getById(entity.sessionId);
+                        /*
                         this.database.updateCharacter(playerClient.auth.id, entity);
 
                         if (saveTimer >= saveInterval) {
@@ -94,9 +85,10 @@ export class GameRoom extends Room<GameRoomState> {
                         }
                         
                         //Logger.info("[gameroom][onCreate] player " + playerClient.auth.name + " saved to database.");
+                        */
+                        Logger.info("[gameroom][onCreate] player " + entity.name + " saved to database.");
                     }
                 });
-                */
             }
         }, Config.databaseUpdateRate);
     }
@@ -135,21 +127,21 @@ export class GameRoom extends Room<GameRoomState> {
         /////////////////////////////////////
         // on player reset position
         this.onMessage("reset_position", (client, data) => {
-            const playerState: Player = this.state.getEntity(client.sessionId) as Player;
+            const playerState: PlayerSchema = this.state.getEntity(client.sessionId) as PlayerSchema;
             if (playerState) {
                 playerState.resetPosition();
             }
         });
 
         this.onMessage("revive_pressed", (client, data) => {
-            const playerState: Player = this.state.getEntity(client.sessionId) as Player;
+            const playerState: PlayerSchema = this.state.getEntity(client.sessionId) as PlayerSchema;
             if (playerState) {
                 playerState.ressurect();
             }
         });
 
         this.onMessage("pickup_item", (client, data) => {
-            const playerState: Player = this.state.getEntity(client.sessionId) as Player;
+            const playerState: PlayerSchema = this.state.getEntity(client.sessionId) as PlayerSchema;
             const itemState = this.state.getEntity(data.sessionId);
             if (playerState && itemState) {
                 //playerState.setTarget(itemState);
@@ -157,7 +149,7 @@ export class GameRoom extends Room<GameRoomState> {
         });
 
         this.onMessage("learn_skill", (client, ability_key) => {
-            const playerState: Player = this.state.getEntity(client.sessionId) as Player;
+            const playerState: PlayerSchema = this.state.getEntity(client.sessionId) as PlayerSchema;
             const ability = dataDB.get("ability", ability_key);
             if (playerState && ability) {
                 playerState.abilitiesCTRL.learnAbility(ability);
@@ -165,7 +157,7 @@ export class GameRoom extends Room<GameRoomState> {
         });
 
         this.onMessage("add_stats_point", (client, stat_key) => {
-            const playerState: Player = this.state.getEntity(client.sessionId) as Player;
+            const playerState: PlayerSchema = this.state.getEntity(client.sessionId) as PlayerSchema;
             if (playerState && playerState.player_data.points > 0) {
                 playerState.player_data[stat_key] += 1;
                 playerState.player_data.points -= 1;
@@ -175,7 +167,7 @@ export class GameRoom extends Room<GameRoomState> {
         /////////////////////////////////////
         // on player input
         this.onMessage("playerInput", (client, playerInput: PlayerInputs) => {
-            const playerState: Player = this.state.getEntity(client.sessionId) as Player;
+            const playerState: PlayerSchema = this.state.getEntity(client.sessionId) as PlayerSchema;
             if (playerState) {
                 playerState.moveCTRL.processPlayerInput(playerInput);
             } else {
@@ -186,7 +178,7 @@ export class GameRoom extends Room<GameRoomState> {
         /////////////////////////////////////
         // on player teleport
         this.onMessage("playerTeleport", (client, location) => {
-            const playerState: Player = this.state.getEntity(client.sessionId) as Player;
+            const playerState: PlayerSchema = this.state.getEntity(client.sessionId) as PlayerSchema;
             if (playerState) {
                 // update player location in database
                 let newLocation = dataDB.get("location", location);
@@ -216,8 +208,8 @@ export class GameRoom extends Room<GameRoomState> {
         // player entity_attack
         this.onMessage("entity_ability_key", (client, data: any) => {
             // get players involved
-            let sender = this.state.getEntity(client.sessionId) as Player;
-            let target = this.state.getEntity(data.targetId);
+            let sender = this.state.getEntity(client.sessionId) as PlayerSchema;
+            let target = this.state.getEntity(data.targetId) as Entity;
 
             if (data.digit === 5) {
                 /*
