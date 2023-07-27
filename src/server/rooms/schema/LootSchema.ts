@@ -4,7 +4,7 @@ import { dataDB } from "../../../shared/Data/dataDB";
 
 export class LootSchema extends Entity {
     // networked player specific
-    @type("number") public type: string = "item";
+    @type("string") public type: string = "item";
     @type("number") public x: number = 0;
     @type("number") public y: number = 0;
     @type("number") public z: number = 0;

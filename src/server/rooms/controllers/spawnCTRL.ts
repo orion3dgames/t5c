@@ -1,4 +1,4 @@
-import { BrainSchema1 } from "../schema/BrainSchema1";
+import { BrainSchema } from "../schema";
 import { GameRoom } from "../GameRoom";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { nanoid } from "nanoid";
@@ -66,7 +66,7 @@ export class spawnCTRL {
             AI_SPAWN_INFO: spawnInfo,
         };
 
-        let entity = new BrainSchema1(this._room, data);
+        let entity = new BrainSchema(this._room, data);
 
         // add to colyseus state
         this._state.entities.set(sessionId, entity);

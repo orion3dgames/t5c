@@ -50,7 +50,7 @@ export class GameRoomState extends Schema {
         setTimeout(() => {
             // add entity
             this.addEntity(1);
-            this.addBot();
+            //this.addBot();
             this.addItem();
         }, 1000);
     }
