@@ -27,6 +27,12 @@ export class spawnCTRL {
             if (spawnInfo.type === "global") {
                 this.global(spawnInfo);
             }
+            if (spawnInfo.type === "area") {
+                this.global(spawnInfo);
+            }
+            if (spawnInfo.type === "path") {
+                this.global(spawnInfo);
+            }
         });
     }
 
@@ -51,11 +57,11 @@ export class spawnCTRL {
             type: "entity",
             race: randData.key,
             name: randData.title + " #" + delta,
-            location: this._location.key,
+            location: this._room.metadata.location,
             x: 0,
             y: 0,
             z: 0,
-            rot: 0,
+            rot: randomNumberInRange(0, Math.PI),
             health: randData.baseHealth,
             mana: randData.baseMana,
             maxHealth: randData.baseHealth,
@@ -66,12 +72,10 @@ export class spawnCTRL {
             AI_SPAWN_INFO: spawnInfo,
         };
 
-        let entity = new BrainSchema(this._room, data);
-
-        // add to colyseus state
-        this._state.entities.set(sessionId, entity);
+        // add to manager
+        this._state.entityCTRL.add(new BrainSchema(this._state, data));
 
         // log
-        Logger.info("[gameroom][state][createEntity] created new entity " + randData.key + ": " + sessionId);
+        Logger.info("[gameroom][state][createEntity] created new entity " + randData.key + ": " + sessionId, spawnInfo);
     }
 }

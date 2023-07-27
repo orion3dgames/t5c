@@ -1,4 +1,4 @@
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "../yuka";
 
 let LocationsDB = {
     lh_town: {
@@ -32,15 +32,16 @@ let LocationsDB = {
                     type: "area",
                     behaviour: "patrol",
                     aggressive: 1,
-                    description: "will randomly patrol along the navmesh within the defined points",
+                    description: "will patrol towards a random point then head to another random point",
                     points: [
-                        { x: -14, y: 0, z: 3.6 },
-                        { x: 3.7, y: 0, z: 3.4 },
-                        { x: 3.7, y: 0, z: 15.3 },
-                        { x: 13.45, y: 0, z: 14.63 },
+                        new Vector3(-20.3, 0, -7.49),
+                        new Vector3(-35, 0, -8.75),
+                        new Vector3(-21, 0, -21),
+                        new Vector3(-36, 0, -36),
+                        new Vector3(-18, 0, -10),
                     ],
                     radius: 0,
-                    amount: 5,
+                    amount: 10,
                     race: "male_enemy",
                 },
                 {
@@ -49,26 +50,12 @@ let LocationsDB = {
                     aggressive: 1,
                     description:
                         "Will patrol along a path of points going back and forth (not sure about this one, maybe once it gets to the end it should go back to the first point?)",
-                    points: [
-                        { x: -14, y: 0, z: 3.6 },
-                        { x: 3.7, y: 0, z: 3.4 },
-                        { x: 3.7, y: 0, z: 15.3 },
-                        { x: 13.45, y: 0, z: 14.63 },
-                    ],
+                    points: [new Vector3(-14, 0, 3.6), new Vector3(-3.7, 0, 3.4), new Vector3(-3.7, 0, 15.3), new Vector3(-13.45, 0, 14.63)],
                     radius: 0,
                     amount: 1,
                     race: "male_enemy",
                 },
-                {
-                    type: "point",
-                    behaviour: "patrol",
-                    aggressive: 1,
-                    description: "will randomly patrol along the navmesh within the defined radius around a point.",
-                    points: [{ x: -8, y: 0, z: 14.7 }],
-                    radius: 5,
-                    amount: 5,
-                    race: "male_enemy",
-                },
+                /*
                 {
                     type: "point",
                     behaviour: "idle",
@@ -79,6 +66,7 @@ let LocationsDB = {
                     amount: 1,
                     race: "male_enemy",
                 },
+                */
             ],
         },
     },

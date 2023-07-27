@@ -1,6 +1,27 @@
 import Config from "../../../shared/Config";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
-import { State } from "../../../shared/yuka";
+import { State, Vector3 } from "../../../shared/yuka";
+
+/**
+ * type: global, area, path, point
+ * behaviour: patrol, idle
+ */
+
+function getRandomPoint(positions: Array<Vector3>) {
+    return positions[Math.floor(Math.random() * positions.length)];
+}
+
+function createRandomPath(positions: Array<Vector3>) {
+    return [getRandomPoint(positions)];
+}
+
+function createPath(positions: Array<Vector3>) {
+    let path = [];
+    positions.forEach((position) => {
+        path.push(position);
+    });
+    return path;
+}
 
 class PatrolState extends State {
     enter(owner) {
@@ -10,7 +31,15 @@ class PatrolState extends State {
         owner.resetDestination();
 
         // find a destination
-        owner.setRandomDestination(owner.getPosition());
+        if (owner.AI_SPAWN_INFO.type == "global") {
+            owner.setRandomDestination(owner.getPosition());
+        }
+        if (owner.AI_SPAWN_INFO.type == "area") {
+            owner.AI_TARGET_WAYPOINTS = createRandomPath(owner.AI_SPAWN_INFO.points);
+        }
+        if (owner.AI_SPAWN_INFO.type == "path") {
+            owner.AI_TARGET_WAYPOINTS = createPath(owner.AI_SPAWN_INFO.points);
+        }
     }
 
     execute(owner) {

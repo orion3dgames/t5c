@@ -68,6 +68,7 @@ export class BrainSchema extends Entity {
     public AI_TARGET_DISTANCE = null;
     public AI_CLOSEST_PLAYER = null;
     public AI_CLOSEST_PLAYER_DISTANCE = null;
+    public AI_SPAWN_INFO = null;
 
     constructor(gameroom, data, ...args: any[]) {
         super();
@@ -188,6 +189,7 @@ export class BrainSchema extends Entity {
                 this.AI_TARGET_WAYPOINTS.shift();
             }
         } else {
+            console.error("moveTowards failed");
             // something is wrong, let's look for a new destination
             //this.resetDestination();
         }
@@ -201,7 +203,6 @@ export class BrainSchema extends Entity {
      * @returns {Vector3} new position
      */
     moveTo(source: Vector3, destination: Vector3, speed: number): Vector3 {
-        speed = 0.5;
         let currentX = source.x;
         let currentZ = source.z;
         let targetX = destination.x;
@@ -240,9 +241,7 @@ export class BrainSchema extends Entity {
      */
     findClosestPlayer() {
         let closestDistance = 1000000;
-        let entities = this._gameroom.entityCTRL.all;
-        for (let index in entities) {
-            let entity = entities[index];
+        this._gameroom.entities.forEach((entity) => {
             if (this.type === "entity" && entity.type === "player" && !entity.gracePeriod && !entity.isDead) {
                 let playerPos = entity.getPosition();
                 let entityPos = this.getPosition();
@@ -253,7 +252,7 @@ export class BrainSchema extends Entity {
                     this.AI_CLOSEST_PLAYER_DISTANCE = distanceBetween;
                 }
             }
-        }
+        });
     }
 
     /**

@@ -9275,12 +9275,7 @@ const { debug } = require("console");
 	* @author {@link https://github.com/Mugen87|Mugen87}
 	*/
 	class StateMachine {
-
-		/**
-		* Constructs a new state machine with the given values.
-		*
-		* @param {GameEntity} owner - The owner of this state machine.
-		*/
+		
 		constructor( owner = null ) {
 
 			/**

@@ -58,7 +58,7 @@ let RacesDB: raceDataMap = {
         key: "male_enemy",
         title: "Enemy",
         icon: "ICON_RACE_male_enemy",
-        speed: 0.2,
+        speed: 0.3,
         scale: 1.3,
         rotationFix: Math.PI,
         animationSpeed: 1.3,

@@ -44,14 +44,10 @@ export class GameRoomState extends Schema {
         this._gameroom = gameroom;
         this.navMesh = _navMesh;
         this.roomDetails = dataDB.get("location", this._gameroom.metadata.location);
-        //this._spawnCTRL = new spawnController(this);
-        this.entityCTRL = new entityCTRL(this);
 
+        this.entityCTRL = new entityCTRL(this);
         setTimeout(() => {
-            // add entity
-            this.addEntity(1);
-            //this.addBot();
-            this.addItem();
+            this.spawnCTRL = new spawnCTRL(this);
         }, 1000);
     }
 
@@ -115,49 +111,6 @@ export class GameRoomState extends Schema {
 
             Logger.info("[gameroom][state][createEntity] created new item " + item.key + ": " + sessionId);
         });
-    }
-
-    /**
-     * Add entity
-     */
-    public addEntity(delta) {
-        // random id
-        let sessionId = nanoid(10);
-
-        // get starting starting position
-        let randomRegion = this.navMesh.getRandomRegion();
-        let point = randomRegion.centroid;
-
-        // monster pool to chose from
-        let randTypes = ["male_enemy"];
-        let randResult = randTypes[Math.floor(Math.random() * randTypes.length)];
-        let randData = dataDB.get("race", randResult);
-
-        // create entity
-        let data = {
-            sessionId: sessionId,
-            type: "entity",
-            race: randData.key,
-            name: randData.title + " #" + delta,
-            location: this._gameroom.metadata.location,
-            x: point.x,
-            y: 0,
-            z: point.z,
-            rot: randomNumberInRange(0, Math.PI),
-            health: randData.baseHealth,
-            mana: randData.baseMana,
-            maxHealth: randData.baseHealth,
-            maxMana: randData.baseMana,
-            level: 1,
-            state: EntityState.IDLE,
-            toRegion: false,
-        };
-
-        // add to manager
-        this.entityCTRL.add(new BrainSchema(this, data));
-
-        // log
-        Logger.info("[gameroom][state][createEntity] created new entity " + randData.key + ": " + sessionId);
     }
 
     /**
