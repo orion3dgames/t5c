@@ -1,6 +1,6 @@
 import Config from "../../../shared/Config";
-import { State } from "../../../shared/yuka";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
+import { State } from "../brain/StateManager";
 
 class AttackState extends State {
     enter(owner) {

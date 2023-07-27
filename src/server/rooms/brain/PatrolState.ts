@@ -1,6 +1,7 @@
 import Config from "../../../shared/Config";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
-import { State, Vector3 } from "../../../shared/yuka";
+import { Vector3 } from "../../../shared/yuka";
+import { State } from "../brain/StateManager";
 
 /**
  * type: global, area, path, point

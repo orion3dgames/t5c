@@ -6,7 +6,8 @@ import { abilitiesCTRL } from "../controllers/abilityCTRL";
 import { AbilitySchema } from "../schema/player/AbilitySchema";
 import { dataDB } from "../../../shared/Data/dataDB";
 import { IdleState, PatrolState, ChaseState, AttackState, DeadState } from "../brain";
-import { StateMachine, Vector3 } from "../../../shared/yuka";
+import { StateManager } from "../brain/StateManager";
+import { Vector3 } from "../../../shared/yuka";
 import Config from "../../../shared/Config";
 import { InventorySchema } from "./player/InventorySchema";
 
@@ -37,7 +38,7 @@ export class BrainSchema extends Entity {
     // PARENTS
     public _navMesh;
     public _gameroom;
-    public _stateMachine;
+    public _stateMachine: StateManager;
 
     // LOCAL VARS
     public manaRegen: number = 0;
@@ -85,7 +86,7 @@ export class BrainSchema extends Entity {
         // future
 
         // initialize state machine
-        this._stateMachine = new StateMachine(this);
+        this._stateMachine = new StateManager(this);
         this._stateMachine.add("IDLE", new IdleState());
         this._stateMachine.add("PATROL", new PatrolState());
         this._stateMachine.add("CHASE", new ChaseState());

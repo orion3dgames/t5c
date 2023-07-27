@@ -1,6 +1,6 @@
 import Config from "../../../shared/Config";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
-import { State } from "../../../shared/yuka";
+import { State } from "../brain/StateManager";
 
 class DeadState extends State {
     enter(owner) {

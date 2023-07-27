@@ -1,6 +1,6 @@
 import Config from "../../../shared/Config";
-import { State } from "../../../shared/yuka";
 import { randomNumberInRange } from "../../../shared/Utils";
+import { State } from "../brain/StateManager";
 
 class IdleState extends State {
     enter(owner) {

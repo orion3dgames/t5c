@@ -86,8 +86,8 @@ export class AbilityBar {
         }
 
         // add learned abilities
-        if (this._currentPlayer.abilities) {
-            this._currentPlayer.abilities.forEach((data) => {
+        if (this._currentPlayer.entity.player_data.abilities) {
+            this._currentPlayer.entity.player_data.abilities.forEach((data) => {
                 let ability = dataDB.get("ability", data.key);
                 if (ability) {
                     this.addAbilityIcon(data.digit, ability, abilityRect[data.digit]);
@@ -103,7 +103,7 @@ export class AbilityBar {
         headlineRect.addControl(img);
 
         headlineRect.onPointerEnterObservable.add(() => {
-            this.showTooltip(ability, headlineRect, );
+            this.showTooltip(ability, headlineRect);
         });
 
         headlineRect.onPointerOutObservable.add(() => {
