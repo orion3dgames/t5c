@@ -23,7 +23,7 @@ export class Panel_Inventory extends Panel {
         // dynamic events
         let entity = this._currentPlayer.entity;
         if (entity) {
-            entity.inventory.onAdd((item, sessionId) => {
+            entity.player_data.inventory.onAdd((item, sessionId) => {
                 this.refresh();
                 // todo: could be a performance issue here?
                 // orion to keep an eye on this one
@@ -31,7 +31,7 @@ export class Panel_Inventory extends Panel {
                     this.refresh();
                 });
             });
-            entity.inventory.onRemove((item, sessionId) => {
+            entity.player_data.inventory.onRemove((item, sessionId) => {
                 this.refresh();
             });
         }

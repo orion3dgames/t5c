@@ -2,11 +2,12 @@ import Logger from "../../../shared/Logger";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { dropCTRL } from "./dropCTRL";
 import { dataDB } from "../../../shared/Data/dataDB";
-import { AbilitySchema } from "../schema/AbilitySchema";
+import { AbilitySchema } from "../schema/player/AbilitySchema";
 import { Ability } from "../../../shared/Entities/Common/Ability";
 
 export class abilitiesCTRL {
     private _owner;
+    private _schema;
     public abilitiesOwned;
     public abilitiesDB;
     public abilities: Ability[] = [];
@@ -19,9 +20,8 @@ export class abilitiesCTRL {
     public gracePeriod: boolean = true;
     public attackTimer;
 
-    constructor(owner) {
+    constructor(owner, data) {
         this._owner = owner;
-        this.abilitiesOwned = this._owner.abilities;
         this.abilitiesDB = dataDB.load("abilities");
         this.refreshAbilities();
     }
@@ -32,21 +32,17 @@ export class abilitiesCTRL {
      * refresh player abilities, useful after any changes
      */
     public refreshAbilities() {
+        this.abilitiesOwned = this._owner.player_data.abilities;
         let i = 1;
         this.abilities = [];
         this.abilitiesOwned.forEach((element) => {
             const digit = i;
-
             const skill = this.abilitiesDB[element.key];
             skill.digit = digit;
             this.abilities.push(new Ability(skill));
-
             element.digit = digit;
-
             i++;
         });
-
-        this._owner.abilities;
     }
 
     /**
@@ -55,12 +51,12 @@ export class abilitiesCTRL {
      */
     public learnAbility(ability: Ability) {
         // if ability exists, then delete it
-        if (this._owner.abilities[ability.key]) {
-            this._owner.abilities.delete(ability.key);
+        if (this._owner.player_data.abilities[ability.key]) {
+            this._owner.player_data.abilities.delete(ability.key);
         } else {
             // else let's add it to the player
-            console.log("learnAbility", "DIGIT", this.abilities.length, this._owner.abilities.size);
-            this._owner.abilities.set(
+            console.log("learnAbility", "DIGIT", this.abilities.length, this._owner.player_data.abilities.size);
+            this._owner.player_data.abilities.set(
                 ability.key,
                 new AbilitySchema({
                     digit: this.abilities.length + 1,
@@ -91,6 +87,8 @@ export class abilitiesCTRL {
 
         // cancel any existing auto attack
         this.cancelAutoAttack(owner);
+
+        console.log(target);
 
         // make sure player can cast this ability
         if (!this.canEntityCastAbility(target, ability, digit)) {

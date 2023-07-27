@@ -6,8 +6,8 @@ import { ParsedQs } from "qs";
 import Config from "./Config";
 import { dataDB } from "./Data/dataDB";
 import { Item } from "./Entities/Item";
-import { InventorySchema } from "../server/rooms/schema/InventorySchema";
-import { AbilitySchema } from "src/server/rooms/schema/AbilitySchema";
+import { InventorySchema } from "../server/rooms/schema/player/InventorySchema";
+import { AbilitySchema } from "../server/rooms/schema/player/AbilitySchema";
 
 class Database {
     private db;
@@ -25,7 +25,7 @@ class Database {
         const usersSql = `CREATE TABLE IF NOT EXISTS "users" (
             "id" INTEGER PRIMARY KEY AUTOINCREMENT,
             "username" TEXT NOT NULL UNIQUE,
-            "password" TEXT,
+            "password" TEXT, 
             "token" TEXT
         );`;
 

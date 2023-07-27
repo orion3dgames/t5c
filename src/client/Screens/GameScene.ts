@@ -128,27 +128,24 @@ export class GameScene {
     }
 
     private async _initNetwork(): Promise<void> {
-        try {
-            let character = this._auth.currentCharacter;
-            let currentLocationKey = character.location;
-            let room = await this._app.client.findCurrentRoom(currentLocationKey);
+        let character = this._auth.currentCharacter;
+        let currentLocationKey = character.location;
+        let room = await this._app.client.findCurrentRoom(currentLocationKey);
 
-            if (room) {
-                // join game room
-                this.room = await this._app.client.joinRoom(room.roomId, this._auth.currentUser.token, character.id);
+        console.log(room);
 
-                // join global chat room (match sessionId to gameRoom)
-                this.chatRoom = await this._app.client.joinChatRoom({ sessionId: this.room.sessionId });
+        if (room) {
+            // join game room
+            this.room = await this._app.client.joinRoom(room.roomId, this._auth.currentUser.token, character.id);
 
-                // set global vars
-                this._roomId = this.room.roomId;
+            // join global chat room (match sessionId to gameRoom)
+            this.chatRoom = await this._app.client.joinChatRoom({ sessionId: this.room.sessionId });
 
-                await this._initEvents();
-            } else {
-            }
-        } catch (e) {
-            alert("Failed to connect.");
-            //SceneController.goToScene(State.CHARACTER_SELECTION);
+            // set global vars
+            this._roomId = this.room.roomId;
+
+            await this._initEvents();
+        } else {
         }
     }
 
@@ -161,66 +158,48 @@ export class GameScene {
 
         ////////////////////////////////////////////////////
         //  when a entity joins the room event
-        this.room.state.players.onAdd((entity, sessionId) => {
-            var isCurrentPlayer = sessionId === this.room.sessionId;
-
-            //////////////////
-            // if player type
-            if (isCurrentPlayer) {
-                // create player entity
-                let _player = new Player(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._loadedAssets, this._input);
-
-                // set currentPlayer
-                this._currentPlayer = _player;
-
-                // add player specific ui
-                this._ui.setCurrentPlayer(_player);
-
-                // add to entities
-                this._entities[sessionId] = _player;
-
-                // player is loaded, let's hide the loading gui
-                this._app.engine.hideLoadingUI();
-
+        this.room.state.entities.onAdd((entity, sessionId) => {
+            // if player
+            if (entity.type === "player") {
+                var isCurrentPlayer = sessionId === this.room.sessionId;
                 //////////////////
-                // else if entity or another player
-            } else {
+                // if player type
+                if (isCurrentPlayer) {
+                    // create player entity
+                    let _player = new Player(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._loadedAssets, this._input);
+
+                    // set currentPlayer
+                    this._currentPlayer = _player;
+
+                    // add player specific ui
+                    this._ui.setCurrentPlayer(_player);
+
+                    // add to entities
+                    this._entities[sessionId] = _player;
+
+                    // player is loaded, let's hide the loading gui
+                    this._app.engine.hideLoadingUI();
+
+                    //////////////////
+                    // else must be another player
+                } else {
+                    this._entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._loadedAssets);
+                }
+            }
+
+            // if entity
+            if (entity.type === "entity") {
                 this._entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._loadedAssets);
             }
-        });
 
-        // add non player entities
-        this.room.state.entities.onAdd((entity, sessionId) => {
-            this._entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._loadedAssets);
-        });
-
-        // add items entities
-        this.room.state.items.onAdd((entity, sessionId) => {
-            this._entities[sessionId] = new Item(entity, this.room, this._scene, this._ui, this._shadow, this._loadedAssets);
-        });
-
-        /////////////////////////////////////////////////////////////
-        ////////////////////  REMOVING EVENTS  //////////////////
-        /////////////////////////////////////////////////////////////
-
-        // when a player leaves the room event
-        this.room.state.players.onRemove((player, sessionId) => {
-            if (this._entities[sessionId]) {
-                this._entities[sessionId].remove();
-                delete this._entities[sessionId];
+            // if item
+            if (entity.type === "item") {
+                this._entities[sessionId] = new Item(entity, this.room, this._scene, this._ui, this._shadow, this._loadedAssets);
             }
         });
 
-        // remove items entities
-        this.room.state.items.onRemove((item, sessionId) => {
-            if (this._entities[sessionId]) {
-                this._entities[sessionId].remove();
-                delete this._entities[sessionId];
-            }
-        });
-
-        // when a entity leaves the room event
-        this.room.state.entities.onRemove((entity, sessionId) => {
+        // when an entity is removed
+        this.room.state.entities.onRemove((player, sessionId) => {
             if (this._entities[sessionId]) {
                 this._entities[sessionId].remove();
                 delete this._entities[sessionId];

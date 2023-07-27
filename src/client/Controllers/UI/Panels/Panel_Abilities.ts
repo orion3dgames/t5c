@@ -23,13 +23,13 @@ export class Panel_Abilities extends Panel {
         // dynamic events
         let entity = this._currentPlayer.entity;
         if (entity) {
-            entity.abilities.onAdd((item, sessionId) => {
+            entity.player_data.abilities.onAdd((item, sessionId) => {
                 this.refresh();
             });
-            entity.abilities.onRemove((item, sessionId) => {
+            entity.player_data.abilities.onRemove((item, sessionId) => {
                 this.refresh();
             });
-            entity.abilities.onChange((item, sessionId) => {
+            entity.player_data.abilities.onChange((item, sessionId) => {
                 this.refresh();
             });
         }
@@ -52,8 +52,8 @@ export class Panel_Abilities extends Panel {
 
         // add scrollable container
         const scrollViewer = new ScrollViewer("scrollViewer");
-        scrollViewer.width = .99;
-        scrollViewer.height = .92;
+        scrollViewer.width = 0.99;
+        scrollViewer.height = 0.92;
         scrollViewer.top = 0;
         scrollViewer.thickness = 0;
         scrollViewer.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
@@ -72,8 +72,7 @@ export class Panel_Abilities extends Panel {
         //this.addAbilities(skillsPanelStack);
     }
 
-    addAbilities(skillsPanelStack){
-
+    addAbilities(skillsPanelStack) {
         let Abilities = dataDB.load("abilities");
         for (let key in Abilities) {
             // get ability details
@@ -138,7 +137,7 @@ export class Panel_Abilities extends Panel {
             abilityDescr.left = "80px";
             abilityDescr.fontSize = "12px;";
             abilityDescr.resizeToFit = true;
-            abilityDescr.text = hasRequirements ? this.objToString(ability.requiredToLearn) : "Default" ;
+            abilityDescr.text = hasRequirements ? this.objToString(ability.requiredToLearn) : "Default";
             abilityDescr.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             abilityDescr.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
             abilityDescr.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
@@ -146,7 +145,7 @@ export class Panel_Abilities extends Panel {
             skillsPanel.addControl(abilityDescr);
 
             let entity = this._currentPlayer.entity;
-            if (entity.abilities[ability.key]) {
+            if (entity.player_data.abilities[ability.key]) {
                 const abilityLearn = Button.CreateSimpleButton("abilityForget" + ability.key, "Forget");
                 abilityLearn.top = "2px;";
                 abilityLearn.left = "-2px;";
@@ -180,8 +179,8 @@ export class Panel_Abilities extends Panel {
         }
     }
 
-    public objToString (obj) {
-        let str = 'Required ';
+    public objToString(obj) {
+        let str = "Required ";
         for (const [p, val] of Object.entries(obj)) {
             str += `| ${p}:${val} `;
         }

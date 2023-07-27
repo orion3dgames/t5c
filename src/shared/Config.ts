@@ -11,7 +11,7 @@ let Config = {
     port: 3000,
     maxClients: 20, // set maximum clients per room
     updateRate: 100, // Set frequency the patched state should be sent to all clients, in milliseconds
-    databaseUpdateRate: 1000, // the frequency at which server save players position
+    databaseUpdateRate: 5000, // the frequency at which server save players position
     logLevel: "info",
 
     // database settings
@@ -22,8 +22,8 @@ let Config = {
     PLAYER_VIEW_DISTANCE: 22,
     PLAYER_GRACE_PERIOD: 0,
     MONSTER_RESPAWN_RATE: 20000,
-    MONSTER_SEARCHING_PERIOD: 2000,
-    MONSTER_AGGRO_DISTANCE: 7,
+    MONSTER_CHASE_PERIOD: 2000,
+    MONSTER_AGGRO_DISTANCE: 10,
     MONSTER_ATTACK_DISTANCE: 2,
 
     // UI SETTINGS
