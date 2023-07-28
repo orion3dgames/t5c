@@ -1,5 +1,5 @@
 import Logger from "../../../shared/Logger";
-import { Vector3 } from "../../../shared/yuka";
+import { Vector3 } from "../../../shared/yuka-min";
 import { PlayerInputs } from "../../../shared/types";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { BrainSchema } from "../schema/BrainSchema";

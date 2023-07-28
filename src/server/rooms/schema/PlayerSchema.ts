@@ -5,7 +5,7 @@ import { GameRoom } from "../GameRoom";
 import { abilitiesCTRL } from "../controllers/abilityCTRL";
 import { moveCTRL } from "../controllers/moveCTRL";
 import { dataDB } from "../../../shared/Data/dataDB";
-import { NavMesh, Vector3 } from "../../../shared/yuka";
+import { NavMesh, Vector3 } from "../../../shared/yuka-min";
 import { InventorySchema } from "../schema/player/InventorySchema";
 import { AbilitySchema } from "../schema/player/AbilitySchema";
 import { LootSchema } from "../schema/LootSchema";

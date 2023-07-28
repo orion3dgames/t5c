@@ -2,7 +2,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 
-import { NavMesh } from "../yuka";
+import { NavMesh } from "../yuka-min";
 import { Room } from "colyseus.js";
 
 import { PlayerSchema } from "../../server/rooms/schema/PlayerSchema";

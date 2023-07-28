@@ -7,7 +7,7 @@ import { AbilitySchema } from "../schema/player/AbilitySchema";
 import { dataDB } from "../../../shared/Data/dataDB";
 import { IdleState, PatrolState, ChaseState, AttackState, DeadState } from "../brain";
 import { StateManager } from "../brain/StateManager";
-import { Vector3 } from "../../../shared/yuka";
+import { Vector3 } from "../../../shared/yuka-min";
 import Config from "../../../shared/Config";
 import { InventorySchema } from "./player/InventorySchema";
 

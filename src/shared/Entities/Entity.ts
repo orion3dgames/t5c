@@ -15,7 +15,7 @@ import { EntityActions } from "./Entity/EntityActions";
 import { EntityMesh } from "./Entity/EntityMesh";
 
 import { UserInterface } from "../../client/Controllers/UserInterface";
-import { NavMesh } from "../yuka";
+import { NavMesh } from "../yuka-min";
 import { AI_STATE } from "./Entity/AIState";
 import Config from "../Config";
 import { EntityState } from "./Entity/EntityState";

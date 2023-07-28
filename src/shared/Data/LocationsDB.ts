@@ -1,4 +1,4 @@
-import { Vector3 } from "../yuka";
+import { Vector3 } from "../yuka-min";
 
 let LocationsDB = {
     lh_town: {
@@ -25,7 +25,7 @@ let LocationsDB = {
                     description: "will randomly patrol along the navmesh",
                     points: [],
                     radius: 0,
-                    amount: 1,
+                    amount: 0,
                     race: "male_enemy",
                 },
                 {
@@ -41,7 +41,7 @@ let LocationsDB = {
                         new Vector3(-18, 0, -10),
                     ],
                     radius: 0,
-                    amount: 10,
+                    amount: 0,
                     race: "male_enemy",
                 },
                 {

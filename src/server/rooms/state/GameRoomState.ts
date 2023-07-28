@@ -7,7 +7,7 @@ import { entityCTRL } from "../controllers/entityCTRL";
 
 import { GameRoom } from "../GameRoom";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
-import { NavMesh } from "../../../shared/yuka";
+import { NavMesh } from "../../../shared/yuka-min";
 
 import { nanoid } from "nanoid";
 import Logger from "../../../shared/Logger";

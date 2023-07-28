@@ -1,6 +1,6 @@
 import Config from "../../../shared/Config";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
-import { Vector3 } from "../../../shared/yuka";
+import { Vector3 } from "../../../shared/yuka-min";
 import { State } from "../brain/StateManager";
 
 /**

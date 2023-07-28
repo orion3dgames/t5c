@@ -16,7 +16,7 @@ import { Item } from "../../shared/Entities/Item";
 import Config from "../../shared/Config";
 import { Room } from "colyseus.js";
 import { PlayerInputs } from "../../shared/types";
-import { NavMesh } from "../../shared/yuka";
+import { NavMesh } from "../../shared/yuka-min";
 import { SceneController } from "../Controllers/Scene";
 import { AuthController } from "../Controllers/AuthController";
 import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";

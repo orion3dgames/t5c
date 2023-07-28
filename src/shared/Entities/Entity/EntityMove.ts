@@ -2,7 +2,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import Config from "../../Config";
 import { PlayerInputs } from "../../types";
-import { NavMesh, Vector3 as Vector3Y } from "../../yuka";
+import { NavMesh, Vector3 as Vector3Y } from "../../yuka-min";
 
 export class EntityMove {
     private _mesh;
@@ -70,21 +70,18 @@ export class EntityMove {
     }
 
     public tween() {
-       
         // continuously lerp between current position and next position
         this._mesh.position = Vector3.Lerp(this._mesh.position, this.nextPosition, 0.15);
-        
+
         // rotation
         // TODO DAYD : make it better
         // maybe look into Scalar.LerpAngle ??? https://doc.babylonjs.com/typedoc/classes/BABYLON.Scalar#LerpAngle
         const gap = Math.abs(this._mesh.rotation.y - this.nextRotation.y);
         if (gap > Math.PI) this._mesh.rotation.y = this.nextRotation.y;
         else this._mesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.8);
-        
     }
 
     public move(input: PlayerInputs): void {
-
         let speed = this.speed;
 
         // save current position

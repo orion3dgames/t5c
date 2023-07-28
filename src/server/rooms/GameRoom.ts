@@ -6,7 +6,7 @@ import Config from "../../shared/Config";
 import Logger from "../../shared/Logger";
 import loadNavMeshFromFile from "../../shared/Utils/loadNavMeshFromFile";
 import { PlayerInputs } from "../../shared/types";
-import { NavMesh } from "../../shared/yuka";
+import { NavMesh } from "../../shared/yuka-min";
 import { dataDB } from "../../shared/Data/dataDB";
 
 import { Auth } from "./commands";
