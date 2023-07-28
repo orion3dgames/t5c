@@ -39,6 +39,9 @@ export class GameRoomState extends Schema {
     public entityCTRL: entityCTRL;
     private roomDetails;
 
+    private spawnTimer = 0;
+    private spawnInterval = 0;
+
     constructor(gameroom: GameRoom, _navMesh: NavMesh, ...args: any[]) {
         super(...args);
         this._gameroom = gameroom;
@@ -46,15 +49,20 @@ export class GameRoomState extends Schema {
         this.roomDetails = dataDB.get("location", this._gameroom.metadata.location);
 
         this.entityCTRL = new entityCTRL(this);
-        setTimeout(() => {
-            this.spawnCTRL = new spawnCTRL(this);
-        }, 1000);
+        this.spawnCTRL = new spawnCTRL(this);
     }
 
     public update(deltaTime: number) {
+        // updating entities
         this.entityCTRL.all.forEach((entity) => {
             entity.update(deltaTime);
         });
+
+        // keep updating spawn points every 5 seconds
+        this.spawnTimer += deltaTime;
+        if (this.spawnTimer > this.spawnInterval) {
+            this.spawnCTRL.update();
+        }
     }
 
     getEntity(sessionId) {

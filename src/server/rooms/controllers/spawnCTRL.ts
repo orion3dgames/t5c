@@ -12,6 +12,12 @@ export class spawnCTRL {
     private _room: GameRoom;
     private _location;
 
+    private spawnsAmount: {} = {
+        area: 0,
+        global: 0,
+        path: 0,
+    };
+
     constructor(state: GameRoomState) {
         this._state = state;
         this._room = state._gameroom;
@@ -19,7 +25,9 @@ export class spawnCTRL {
         this.process();
     }
 
-    public update() {}
+    public update() {
+        this.process();
+    }
 
     public process() {
         Logger.info("[gameroom][state][spawning] spawnController: " + this._location.key);
@@ -40,7 +48,9 @@ export class spawnCTRL {
 
     private spawn(e) {
         for (let i = 0; i < e.amount; i++) {
-            this.createEntity(i, e);
+            if (this.spawnsAmount[e.type] < e.amount) {
+                this.createEntity(i, e);
+            }
         }
     }
 
@@ -74,10 +84,19 @@ export class spawnCTRL {
             AI_SPAWN_INFO: spawnInfo,
         };
 
+        //
+        this.spawnsAmount[spawnInfo.type]++;
+
         // add to manager
         this._state.entityCTRL.add(new BrainSchema(this._state, data));
 
         // log
         Logger.info("[gameroom][state][createEntity] created new entity " + randData.key + ": " + sessionId, spawnInfo);
+    }
+
+    removeEntity(entity) {
+        this.spawnsAmount[entity.AI_SPAWN_INFO.type]--;
+
+        this._state.entities.delete(entity.sessionId);
     }
 }
