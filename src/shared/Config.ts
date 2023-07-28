@@ -11,7 +11,7 @@ let Config = {
     port: 3000,
     maxClients: 20, // set maximum clients per room
     updateRate: 100, // Set frequency the patched state should be sent to all clients, in milliseconds
-    databaseUpdateRate: 5000, // the frequency at which server save players position
+    databaseUpdateRate: 10000, // the frequency at which server save players position
     logLevel: "info",
 
     // database settings

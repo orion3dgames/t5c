@@ -58,34 +58,31 @@ export class GameRoom extends Room<GameRoomState> {
 
         ///////////////////////////////////////////////////////////////////////////
         // if players are in a room, make sure we save any changes to the database.
+        let saveTimer = 0;
+        let saveInterval = 5000;
         this.delayedInterval = this.clock.setInterval(() => {
+            saveTimer += Config.databaseUpdateRate;
             // only save if there is any players
-            let players = this.state.entityCTRL.filter("player");
-            if (players && players.size > 0) {
+            if (this.state.entityCTRL.hasEntities()) {
                 //Logger.info("[gameroom][onCreate] Saving data for room " + options.location + " with " + this.state.players.size + " players");
-                players.forEach((entity) => {
+                this.state.entityCTRL.all.forEach((entity) => {
                     if (entity.type === "player") {
+                        let player = entity as PlayerSchema;
                         // update player every second...
                         let playerClient = this.clients.getById(entity.sessionId);
-                        /*
+
                         this.database.updateCharacter(playerClient.auth.id, entity);
 
-                        if (saveTimer >= saveInterval) {
-                            saveTimer = 0;
-
-                            // update player items
-                            if (entity.inventory && entity.inventory.size > 0) {
-                                this.database.saveItems(playerClient.auth.id, entity.inventory);
-                            }
-
-                            // update player abilities
-                            if (entity.abilities && entity.abilities.size > 0) {
-                                this.database.saveAbilities(playerClient.auth.id, entity.abilities);
-                            }
+                        // update player items
+                        if (player.player_data.inventory && player.player_data.inventory.size > 0) {
+                            this.database.saveItems(playerClient.auth.id, player.player_data.inventory);
                         }
-                        
-                        //Logger.info("[gameroom][onCreate] player " + playerClient.auth.name + " saved to database.");
-                        */
+
+                        // update player abilities
+                        if (player.player_data.abilities && player.player_data.abilities.size > 0) {
+                            this.database.saveAbilities(playerClient.auth.id, player.player_data.abilities);
+                        }
+
                         Logger.info("[gameroom][onCreate] player " + entity.name + " saved to database.");
                     }
                 });
