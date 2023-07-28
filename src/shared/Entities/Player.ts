@@ -239,7 +239,6 @@ export class Player extends Entity {
 
         // server confirms ability can be cast
         this._room.onMessage("entity_ability_cast", (data) => {
-            console.log("entity_ability_cast", data);
             let digit = data.digit;
             let ability = this.getAbilityByDigit(digit) as Ability;
             if (ability) {
@@ -265,6 +264,8 @@ export class Player extends Entity {
     // to refactor
 
     public async teleport(location) {
+        // Removes onMessage, onStateChange, onLeave and onError listeners.
+
         // leave colyseus room
         await this._room.leave();
 

@@ -31,12 +31,6 @@ export class DebugBox {
             this._update();
         });
 
-        // ping server every 5 seconds to get ping
-        this._gameRoom.send("ping", { date: Date.now() });
-        setInterval(() => {
-            this._gameRoom.send("ping", { date: Date.now() });
-        }, 10000);
-
         // on teleport confirmation
         this._gameRoom.onMessage("pong", (data) => {
             let dateNow = Date.now();

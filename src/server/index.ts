@@ -89,7 +89,7 @@ class GameServer {
             app.use("/colyseus", monitor());
 
             // bind it as an express middleware
-            app.use("/playground", playground);
+            //app.use("/playground", playground);
         }
 
         //////////////////////////////////////////////////

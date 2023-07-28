@@ -132,8 +132,6 @@ export class GameScene {
         let currentLocationKey = character.location;
         let room = await this._app.client.findCurrentRoom(currentLocationKey);
 
-        console.log(room);
-
         if (room) {
             // join game room
             this.room = await this._app.client.joinRoom(room.roomId, this._auth.currentUser.token, character.id);
@@ -208,15 +206,21 @@ export class GameScene {
 
         ////////////////////////////////////////////////////
 
+        // ping server every 5 seconds to get ping
+        this.room.send("ping", { date: Date.now() });
+
         ////////////////////////////////////////////////////
         // main game loop
-        let timeThen = Date.now();
+
+        let timeServer = Date.now();
+        let timeServerSlow = Date.now();
         let sequence = 0;
         let latestInput: PlayerInputs;
         this._scene.registerBeforeRender(() => {
             let delta = this._app.engine.getFps();
+            let timeNow = Date.now();
 
-            // entities update
+            // entities update 60fps
             for (let sessionId in this._entities) {
                 const entity = this._entities[sessionId];
                 entity.update(delta);
@@ -225,9 +229,21 @@ export class GameScene {
 
             /////////////////
             // server update rate
+            // every 5000ms loop
+            let timePassedSlow = (timeNow - timeServerSlow) / 1000;
+            let updateSlow = 5000 / 1000; // game is networked update every 100ms
+            if (timePassedSlow >= updateSlow) {
+                // every 5 seconds
+                this.room.send("ping", { date: Date.now() });
+
+                // reset timer
+                timeServerSlow = timeNow;
+            }
+
+            /////////////////
+            // server update rate
             // every 100ms loop
-            let timeNow = Date.now();
-            let timePassed = (timeNow - timeThen) / 1000;
+            let timePassed = (timeNow - timeServer) / 1000;
             let updateRate = Config.updateRate / 1000; // game is networked update every 100ms
             if (timePassed >= updateRate) {
                 // player uppdate at server rate
@@ -257,7 +273,7 @@ export class GameScene {
                     this._currentPlayer.moveController.predictionMove(latestInput);
                 }
 
-                timeThen = timeNow;
+                timeServer = timeNow;
             }
         });
     }
