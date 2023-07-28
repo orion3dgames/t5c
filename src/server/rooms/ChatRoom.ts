@@ -28,7 +28,9 @@ export class ChatRoom extends Room {
     }
 
     // When a client leaves the room
-    onLeave(client: Client, consented: boolean) {}
+    onLeave(client: Client, consented: boolean) {
+        client.leave();
+    }
 
     // Cleanup callback, called after there are no more clients in the room. (see `autoDispose`)
     onDispose() {}
