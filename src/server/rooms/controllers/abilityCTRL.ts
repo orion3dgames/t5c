@@ -191,7 +191,7 @@ export class abilitiesCTRL {
             return false;
         }
 
-        Logger.info(`[canEntityCastAbility] player can cast ability`, ability);
+        //Logger.info(`[canEntityCastAbility] player can cast ability`, ability);
 
         return true;
     }
@@ -229,7 +229,7 @@ export class abilitiesCTRL {
      * @param digit
      */
     castAbility(owner, target, ability, digit) {
-        console.log("castAbility", digit, ability);
+        //console.log("castAbility", digit, ability);
 
         // rotate sender to face target
         owner.rot = owner.moveCTRL.calculateRotation(owner.getPosition(), target.getPosition());

@@ -60,7 +60,7 @@ class PatrolState extends State {
         }
 
         // if entity has a target, start searching for it
-        if (owner.hasValidTarget()) {
+        if (owner.hasValidTarget() && owner.AI_SPAWN_INFO.aggressive === true) {
             owner._stateMachine.changeTo("CHASE");
             return false;
         }

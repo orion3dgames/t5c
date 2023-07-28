@@ -21,7 +21,7 @@ let LocationsDB = {
                 {
                     type: "global",
                     behaviour: "patrol",
-                    aggressive: 1,
+                    aggressive: false,
                     description: "will randomly patrol along the navmesh",
                     points: [],
                     radius: 0,
@@ -31,7 +31,7 @@ let LocationsDB = {
                 {
                     type: "area",
                     behaviour: "patrol",
-                    aggressive: 1,
+                    aggressive: true,
                     description: "will patrol towards a random point then head to another random point",
                     points: [
                         new Vector3(-20.3, 0, -7.49),
@@ -47,7 +47,7 @@ let LocationsDB = {
                 {
                     type: "path",
                     behaviour: "patrol",
-                    aggressive: 1,
+                    aggressive: true,
                     description:
                         "Will patrol along a path of points going back and forth (not sure about this one, maybe once it gets to the end it should go back to the first point?)",
                     points: [new Vector3(-14, 0, 3.6), new Vector3(-3.7, 0, 3.4), new Vector3(-3.7, 0, 15.3), new Vector3(-13.45, 0, 14.63)],
@@ -78,7 +78,7 @@ let LocationsDB = {
                 {
                     type: "global",
                     behaviour: "patrol",
-                    aggressive: 1,
+                    aggressive: true,
                     description: "will randomly patrol along the navmesh",
                     points: [],
                     radius: 0,

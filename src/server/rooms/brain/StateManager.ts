@@ -1,3 +1,5 @@
+import { BrainSchema } from "../schema/BrainSchema";
+
 /**
  * Base class for representing a state in context of State-driven agent design.
  *
@@ -10,14 +12,14 @@ class State {
      *
      * @param {BrainSchema} owner - The game entity that represents the execution context of this state.
      */
-    enter(owner) {}
+    enter(owner: BrainSchema) {}
 
     /**
      * This method is called per simulation step if this state is active.
      *
      * @param {BrainSchema} owner - The game entity that represents the execution context of this state.
      */
-    execute(owner) {}
+    execute(owner: BrainSchema) {}
 
     /**
      * This method is called once during a state transition when the {@link StateManager} makes
@@ -25,7 +27,7 @@ class State {
      *
      * @param {BrainSchema} owner - The game entity that represents the execution context of this state.
      */
-    exit(owner) {}
+    exit(owner: BrainSchema) {}
 
     /**
      * Transforms this instance into a JSON object.
