@@ -40,7 +40,7 @@ export class GameRoomState extends Schema {
     private roomDetails;
 
     private spawnTimer = 0;
-    private spawnInterval = 5000;
+    private spawnInterval = 10000;
 
     constructor(gameroom: GameRoom, _navMesh: NavMesh, ...args: any[]) {
         super(...args);
@@ -71,110 +71,7 @@ export class GameRoomState extends Schema {
     }
 
     deleteEntity(sessionId) {
-        return this.entityCTRL.delete(sessionId);
-    }
-
-    /**
-     * Add item
-     */
-    public addItem() {
-        // get starting starting position
-        let randomRegion = this.navMesh.getRandomRegion();
-        let point = randomRegion.centroid;
-
-        // set up loot
-        let lootTable = [
-            LootTableEntry("sword_01", 25, 1, 1, 1, 1),
-            LootTableEntry("potion_heal", 25, 1, 1, 1, 1),
-            LootTableEntry("pear", 5, 1, 10, 1, 1),
-            LootTableEntry("apple", 20, 1, 10, 1, 1),
-            LootTableEntry(null, 20, 1, 1, 1, 1),
-            LootTableEntry("amulet_01", 1, 1, 1, 1, 2),
-            LootTableEntry(null, 150, 1, 1, 1, 2),
-        ];
-        // generate loot
-        let loot = GetLoot(lootTable);
-
-        // iterate loot
-        loot.forEach((drop) => {
-            // drop item on the ground
-            let item = dataDB.get("item", drop.id);
-            let sessionId = nanoid(10);
-            let currentPosition = point;
-            currentPosition.x += randomNumberInRange(0.1, 1.5);
-            currentPosition.z += randomNumberInRange(0.1, 1.5);
-            let data = {
-                type: "item",
-                key: drop.id,
-                name: item.name,
-                description: item.description,
-                sessionId: sessionId,
-                x: currentPosition.x,
-                y: 0.25,
-                z: currentPosition.z,
-                quantity: drop.quantity,
-            };
-
-            // add to manager
-            this.entityCTRL.add(new LootSchema(this, data));
-
-            Logger.info("[gameroom][state][createEntity] created new item " + item.key + ": " + sessionId);
-        });
-    }
-
-    /**
-     * Add player
-     * @param client
-     */
-    addBot(): void {
-        // random id
-        let sessionId = nanoid(10);
-
-        this._gameroom.database.getCharacter(1).then((data) => {
-            let player_data = {
-                strength: 15,
-                endurance: 16,
-                agility: 15,
-                intelligence: 20,
-                wisdom: 20,
-                experience: data.experience ?? 0,
-                gold: data.gold ?? 0,
-            };
-
-            let player = {
-                id: data.id,
-
-                x: data.x,
-                y: data.y,
-                z: data.z,
-                rot: data.rot,
-
-                health: data.health,
-                maxHealth: data.health,
-                mana: data.mana,
-                maxMana: data.mana,
-                level: data.level,
-
-                sessionId: sessionId,
-                name: data.name,
-                type: "player",
-                race: "male_adventurer",
-
-                location: data.location,
-                sequence: 0,
-                blocked: false,
-                state: EntityState.IDLE,
-
-                initial_player_data: player_data,
-                initial_abilities: data.abilities ?? [],
-                initial_inventory: data.inventory ?? [],
-            };
-
-            this.entityCTRL.add(new PlayerSchema(this, player));
-
-            // log
-            Logger.info(`[gameroom][onJoin] player ${sessionId} joined room ${this._gameroom.roomId}.`);
-        });
+        this.entities.delete(sessionId);
     }
 
     /**

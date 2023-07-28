@@ -30,7 +30,7 @@ export class spawnCTRL {
     }
 
     public process() {
-        Logger.info("[gameroom][state][spawning] spawnController: " + this._location.key);
+        //Logger.info("[gameroom][state][spawning] spawnController: " + this._location.key);
         let dynamic = this._location.dynamic;
         let spawns = dynamic.spawns ?? [];
         spawns.forEach((spawnInfo) => {
