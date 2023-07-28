@@ -71,7 +71,7 @@ export class PlayerSchema extends Entity {
 
     // controllers
     public _navMesh: NavMesh;
-    public _state;
+    public _state: GameRoomState;
     public client;
     public abilitiesCTRL: abilitiesCTRL;
     public moveCTRL: moveCTRL;
@@ -163,7 +163,9 @@ export class PlayerSchema extends Entity {
         } else {
             this.player_data.inventory.set(data.key, new InventorySchema(data));
         }
-        this._state.items.delete(loot.sessionId);
+        this._state.entities.delete(loot.sessionId);
+
+        this.AI_TARGET = null;
     }
 
     setAsDead() {
@@ -230,6 +232,10 @@ export class PlayerSchema extends Entity {
 
     hasTarget() {
         return this.AI_TARGET ?? false;
+    }
+
+    setTarget(target) {
+        this.AI_TARGET = target;
     }
 
     /**

@@ -30,9 +30,9 @@ export class Panel_Inventory extends Panel {
                 item.onChange((item, sessionId) => {
                     this.refresh();
                 });
-            });
-            entity.player_data.inventory.onRemove((item, sessionId) => {
-                this.refresh();
+                item.onRemove((item, sessionId) => {
+                    this.refresh();
+                });
             });
         }
 
@@ -156,7 +156,7 @@ export class Panel_Inventory extends Panel {
     // INVENTORY PANEL
     public refresh() {
         let i = 0;
-        this._currentPlayer.inventory.forEach((element) => {
+        this._currentPlayer.player_data.inventory.forEach((element) => {
             let child = this._inventoryGrid[i];
             let item = dataDB.get("item", element.key) as Item;
 

@@ -40,7 +40,7 @@ export class GameRoomState extends Schema {
     private roomDetails;
 
     private spawnTimer = 0;
-    private spawnInterval = 0;
+    private spawnInterval = 5000;
 
     constructor(gameroom: GameRoom, _navMesh: NavMesh, ...args: any[]) {
         super(...args);
@@ -61,6 +61,7 @@ export class GameRoomState extends Schema {
         // keep updating spawn points every 5 seconds
         this.spawnTimer += deltaTime;
         if (this.spawnTimer > this.spawnInterval) {
+            this.spawnTimer = 0;
             this.spawnCTRL.update();
         }
     }

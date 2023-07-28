@@ -32,8 +32,7 @@ export class Player extends Entity {
     public castingTarget: number = 0;
     public ability_in_cooldown;
 
-    public abilities;
-    public inventory;
+    public player_data;
 
     constructor(
         entity: PlayerSchema,
@@ -197,7 +196,7 @@ export class Player extends Entity {
 
     public getAbilityByDigit(digit): Ability | boolean {
         let found = false;
-        this.abilities.forEach((element) => {
+        this.player_data.abilities.forEach((element) => {
             if (element.digit === digit) {
                 found = dataDB.get("ability", element.key);
             }
@@ -240,6 +239,7 @@ export class Player extends Entity {
 
         // server confirms ability can be cast
         this._room.onMessage("entity_ability_cast", (data) => {
+            console.log("entity_ability_cast", data);
             let digit = data.digit;
             let ability = this.getAbilityByDigit(digit) as Ability;
             if (ability) {

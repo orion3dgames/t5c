@@ -2,8 +2,7 @@ import Logger from "../../../shared/Logger";
 import { Vector3 } from "../../../shared/yuka-min";
 import { PlayerInputs } from "../../../shared/types";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
-import { BrainSchema } from "../schema/BrainSchema";
-import { LootSchema } from "../schema/LootSchema";
+import { BrainSchema, LootSchema } from "../schema";
 
 export class moveCTRL {
     private _owner;
@@ -20,6 +19,12 @@ export class moveCTRL {
         // once you get to it start auto attacking
         // autoattack stop if casting, moving, dying
         if (this._owner.hasTarget()) {
+            // move player
+            let start = this._owner.getPosition();
+            let destination = this._owner.AI_TARGET.getPosition();
+            this._owner.rot = this.calculateRotation(start, destination);
+            this.setPosition(this.moveTo(start, destination, this._owner.speed));
+
             // if close enough
             let distance = this._owner.AI_TARGET_DISTANCE;
             if (distance < 3) {
@@ -34,12 +39,6 @@ export class moveCTRL {
                 this._owner.AI_ARGET = null;
                 this._owner.AI_ABILITY = null;
             }
-
-            // move player
-            let start = this._owner.getPosition();
-            let destination = this._owner.AI_TARGET.getPosition();
-            this._owner.rot = this.calculateRotation(start, destination);
-            this.setPosition(this.moveTo(start, destination, this._owner.speed));
         }
     }
 

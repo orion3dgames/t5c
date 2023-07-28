@@ -144,7 +144,7 @@ export class GameRoom extends Room<GameRoomState> {
             const playerState: PlayerSchema = this.state.getEntity(client.sessionId) as PlayerSchema;
             const itemState = this.state.getEntity(data.sessionId);
             if (playerState && itemState) {
-                //playerState.setTarget(itemState);
+                playerState.setTarget(itemState);
             }
         });
 
@@ -212,23 +212,7 @@ export class GameRoom extends Room<GameRoomState> {
             let target = this.state.getEntity(data.targetId) as Entity;
 
             if (data.digit === 5) {
-                /*
-                // create drops
-                let sessionId = nanoid(10);
-                let currentPosition = sender.getPosition();
-                currentPosition.x += randomNumberInRange(0.1, 1.5);
-                currentPosition.z += randomNumberInRange(0.1, 1.5);
-                let data = {
-                    key: "potion_heal",
-                    sessionId: sessionId,
-                    x: currentPosition.x,
-                    y: 0.25,
-                    z: currentPosition.z,
-                    quantity: 1,
-                };
-                let entity = new LootSchema(this, data);
-                this.state.items.set(sessionId, entity);
-                */
+                this.state.spawnCTRL.createItem(sender);
             }
 
             if (sender && target) {

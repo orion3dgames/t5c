@@ -24,15 +24,12 @@ export class Panel_Abilities extends Panel {
         let entity = this._currentPlayer.entity;
         if (entity) {
             entity.player_data.abilities.onAdd((item, sessionId) => {
-                console.log("[ABILITIES][onAdd]", item, sessionId);
                 this.refresh();
             });
             entity.player_data.abilities.onRemove((item, sessionId) => {
-                console.log("[ABILITIES][onRemove]", item, sessionId);
                 this.refresh();
             });
             entity.player_data.abilities.onChange((item, sessionId) => {
-                console.log("[ABILITIES][onChange]", item, sessionId);
                 this.refresh();
             });
         }

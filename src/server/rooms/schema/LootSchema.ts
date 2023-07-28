@@ -1,6 +1,7 @@
 import { type } from "@colyseus/schema";
 import { Entity } from "./Entity";
 import { dataDB } from "../../../shared/Data/dataDB";
+import { Vector3 } from "../../../shared/yuka-min";
 
 export class LootSchema extends Entity {
     // networked player specific
@@ -29,4 +30,8 @@ export class LootSchema extends Entity {
 
     // entity update
     public update() {}
+
+    getPosition() {
+        return new Vector3(this.x, this.y, this.z);
+    }
 }

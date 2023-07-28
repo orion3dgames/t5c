@@ -1,4 +1,4 @@
-import { BrainSchema } from "../schema";
+import { BrainSchema, LootSchema } from "../schema";
 import { GameRoom } from "../GameRoom";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { nanoid } from "nanoid";
@@ -54,7 +54,25 @@ export class spawnCTRL {
         }
     }
 
-    private createEntity(delta, spawnInfo) {
+    public createItem(sender) {
+        // create drops
+        let sessionId = nanoid(10);
+        let currentPosition = sender.getPosition();
+        currentPosition.x += randomNumberInRange(0.1, 1.5);
+        currentPosition.z += randomNumberInRange(0.1, 1.5);
+        let data = {
+            key: "potion_heal",
+            sessionId: sessionId,
+            x: currentPosition.x,
+            y: 0.25,
+            z: currentPosition.z,
+            quantity: 1,
+        };
+        let entity = new LootSchema(this, data);
+        this._state.entityCTRL.add(entity);
+    }
+
+    public createEntity(delta, spawnInfo) {
         // random id
         let sessionId = nanoid(10);
 
