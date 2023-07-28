@@ -288,7 +288,7 @@ export class BrainSchema extends Entity {
         this.AI_TARGET = null;
         this.AI_TARGET_WAYPOINTS = [];
         this.AI_TARGET_DISTANCE = null;
-        console.log("resetDestination()", this.AI_TARGET, this.AI_TARGET_WAYPOINTS);
+        //console.log("resetDestination()", this.AI_TARGET, this.AI_TARGET_WAYPOINTS);
     }
 
     // make sure no value are out of range

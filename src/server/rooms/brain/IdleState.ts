@@ -4,7 +4,6 @@ import { State } from "../brain/StateManager";
 
 class IdleState extends State {
     enter(owner) {
-        console.log("----------------------------------");
         owner.IDLE_TIMER = 0;
         owner.IDLE_TIMER_LENGTH = 1000;
     }
@@ -15,7 +14,7 @@ class IdleState extends State {
             owner._stateMachine.changeTo("PATROL");
             return false;
         }
-        console.log("[IdleState] idle entity", owner.IDLE_TIMER, owner.IDLE_TIMER_LENGTH);
+        //console.log("[IdleState] idle entity", owner.IDLE_TIMER, owner.IDLE_TIMER_LENGTH);
     }
 
     exit(owner) {}

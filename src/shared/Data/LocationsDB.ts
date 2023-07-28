@@ -25,7 +25,7 @@ let LocationsDB = {
                     description: "will randomly patrol along the navmesh",
                     points: [],
                     radius: 0,
-                    amount: 0,
+                    amount: 1,
                     race: "male_enemy",
                 },
                 {
@@ -41,7 +41,7 @@ let LocationsDB = {
                         new Vector3(-18, 0, -10),
                     ],
                     radius: 0,
-                    amount: 0,
+                    amount: 10,
                     race: "male_enemy",
                 },
                 {
@@ -55,18 +55,6 @@ let LocationsDB = {
                     amount: 1,
                     race: "male_enemy",
                 },
-                /*
-                {
-                    type: "point",
-                    behaviour: "idle",
-                    aggressive: 0,
-                    description: "will spawn on a point and stay idle, maybe useful for potential NPC's?.",
-                    points: [{ x: -9, y: 0, z: 15.7 }],
-                    radius: 0,
-                    amount: 1,
-                    race: "male_enemy",
-                },
-                */
             ],
         },
     },
@@ -89,7 +77,12 @@ let LocationsDB = {
             spawns: [
                 {
                     type: "global",
-                    amount: 1,
+                    behaviour: "patrol",
+                    aggressive: 1,
+                    description: "will randomly patrol along the navmesh",
+                    points: [],
+                    radius: 0,
+                    amount: 5,
                     race: "male_enemy",
                 },
             ],

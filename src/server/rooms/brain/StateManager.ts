@@ -111,7 +111,7 @@ class StateManager {
     }
 
     /**
-     * Updates the internal state of the FSM. Usually called by {@link GameEntity#update}.
+     * Updates the internal state of the FSM.
      *
      * @return {StateManager} A reference to this state machine.
      */

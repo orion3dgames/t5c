@@ -26,7 +26,7 @@ function createPath(positions: Array<Vector3>) {
 
 class PatrolState extends State {
     enter(owner) {
-        console.log("[PatrolState] ----------------------------------");
+        //console.log("[PatrolState] ----------------------------------");
 
         // cancel any targets
         owner.resetDestination();
@@ -69,7 +69,7 @@ class PatrolState extends State {
         owner.moveTowards();
 
         // debug
-        console.log("[PatrolState] move to ", owner.x, owner.y, owner.z);
+        //console.log("[PatrolState] move to ", owner.x, owner.y, owner.z);
     }
 
     exit(owner) {}
