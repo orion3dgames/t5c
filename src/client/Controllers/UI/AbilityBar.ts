@@ -169,11 +169,11 @@ export class AbilityBar {
 
     _createEvents() {
         let entity = this._currentPlayer.entity;
-        if (entity.abilities) {
-            entity.abilities.onAdd((item, sessionId) => {
+        if (entity.player_data.abilities) {
+            entity.player_data.abilities.onAdd((item, sessionId) => {
                 this._createUI();
             });
-            entity.abilities.onRemove((item, sessionId) => {
+            entity.player_data.abilities.onRemove((item, sessionId) => {
                 this._createUI();
             });
         }

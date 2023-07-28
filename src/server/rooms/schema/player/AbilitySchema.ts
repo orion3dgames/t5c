@@ -3,7 +3,6 @@ import { dataDB } from "../../../../shared/Data/dataDB";
 
 export class AbilitySchema extends Schema {
     // networked player specific
-    @type("number") public id: number;
     @type("string") public key: string = "";
     @type("uint8") public digit: string = "";
     constructor(data) {
