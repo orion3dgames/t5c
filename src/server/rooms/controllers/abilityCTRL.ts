@@ -88,22 +88,26 @@ export class abilitiesCTRL {
         // cancel any existing auto attack
         this.cancelAutoAttack(owner);
 
-        console.log(target);
-
         // make sure player can cast this ability
         if (!this.canEntityCastAbility(target, ability, digit)) {
             return false;
         }
 
+        console.log("can cast ability");
+
         // if there is a minRange, set target as target
-        if (ability.minRange > 0) {
+        if (ability.minRange > 0 && owner.AI_TARGET != target) {
+            console.log("minRange > 0");
             owner.AI_TARGET = target;
             owner.AI_ABILITY = ability; // store ability to use once user gets close enough
             return false;
         }
 
+        console.log("minRange = 0");
+
         // if ability can be casted
         if (ability.castTime > 0) {
+            console.log("casttime > 0");
             // inform player he can start casting
             let client = this._owner.getClient();
             client.send("ability_start_casting", {
@@ -116,6 +120,7 @@ export class abilitiesCTRL {
                 this.castAbility(this._owner, target, ability, digit);
             }, ability.castTime);
         } else {
+            console.log("casttime = 0");
             // process ability straight away
             this.castAbility(this._owner, target, ability, digit);
         }
@@ -186,7 +191,7 @@ export class abilitiesCTRL {
             return false;
         }
 
-        //Logger.info(`[canEntityCastAbility] player can cast ability`, ability.key);
+        Logger.info(`[canEntityCastAbility] player can cast ability`, ability);
 
         return true;
     }
@@ -224,6 +229,8 @@ export class abilitiesCTRL {
      * @param digit
      */
     castAbility(owner, target, ability, digit) {
+        console.log("castAbility", digit, ability);
+
         // rotate sender to face target
         owner.rot = owner.moveCTRL.calculateRotation(owner.getPosition(), target.getPosition());
 
@@ -260,7 +267,7 @@ export class abilitiesCTRL {
         target.normalizeStats();
 
         // send to clients
-        owner._gameroom.broadcast("entity_ability_cast", {
+        owner._state._gameroom.broadcast("entity_ability_cast", {
             key: ability.key,
             digit: digit,
             fromId: owner.sessionId,

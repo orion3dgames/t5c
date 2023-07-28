@@ -4,9 +4,10 @@ import { randomNumberInRange } from "../../../shared/Utils";
 import { GetLoot } from "../../../shared/Entities/Player/LootTable";
 import { nanoid } from "nanoid";
 import { LootSchema } from "../schema/LootSchema";
+import { PlayerSchema } from "../schema";
 
 export class dropCTRL {
-    private _owner;
+    private _owner: PlayerSchema;
     private _client;
 
     constructor(owner, client) {
@@ -83,7 +84,7 @@ export class dropCTRL {
                 quantity: drop.quantity,
             };
             let entity = new LootSchema(this, data);
-            this._owner._gameroom.state.entities.set(sessionId, entity);
+            this._owner._state.entities.set(sessionId, entity);
         });
     }
 }

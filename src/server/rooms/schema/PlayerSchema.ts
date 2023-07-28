@@ -71,16 +71,15 @@ export class PlayerSchema extends Entity {
 
     // controllers
     public _navMesh: NavMesh;
-    public _schema;
     public _state;
     public client;
     public abilitiesCTRL: abilitiesCTRL;
     public moveCTRL: moveCTRL;
 
     ////////////////////////////
-    public AI_CURRENT_TARGET = null;
-    public AI_CURRENT_TARGET_POSITION = null;
-    public AI_CURRENT_TARGET_DISTANCE = null;
+    public AI_TARGET = null;
+    public AI_TARGET_POSITION = null;
+    public AI_TARGET_DISTANCE = null;
 
     constructor(state: GameRoomState, data) {
         super();
@@ -230,24 +229,24 @@ export class PlayerSchema extends Entity {
     }
 
     hasTarget() {
-        return this.AI_CURRENT_TARGET ?? false;
+        return this.AI_TARGET ?? false;
     }
 
     /**
      * monitor a target
      */
     monitorTarget() {
-        if (this.AI_CURRENT_TARGET !== null && this.AI_CURRENT_TARGET !== undefined && this.AI_CURRENT_TARGET.sessionId) {
-            let targetPos = this.AI_CURRENT_TARGET.getPosition();
+        if (this.AI_TARGET !== null && this.AI_TARGET !== undefined && this.AI_TARGET.sessionId) {
+            let targetPos = this.AI_TARGET.getPosition();
             let entityPos = this.getPosition();
             let distanceBetween = entityPos.distanceTo(targetPos);
-            this.AI_CURRENT_TARGET_POSITION = targetPos;
-            this.AI_CURRENT_TARGET_DISTANCE = distanceBetween;
+            this.AI_TARGET_POSITION = targetPos;
+            this.AI_TARGET_DISTANCE = distanceBetween;
         } else {
             // else entity has no target
-            this.AI_CURRENT_TARGET = null;
-            this.AI_CURRENT_TARGET_POSITION = null;
-            this.AI_CURRENT_TARGET_DISTANCE = 0;
+            this.AI_TARGET = null;
+            this.AI_TARGET_POSITION = null;
+            this.AI_TARGET_DISTANCE = 0;
         }
     }
 }

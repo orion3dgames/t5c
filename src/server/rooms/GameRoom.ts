@@ -232,7 +232,7 @@ export class GameRoom extends Room<GameRoomState> {
             }
 
             if (sender && target) {
-                //sender.abilitiesCTRL.processAbility(sender, target, data);
+                sender.abilitiesCTRL.processAbility(sender, target, data);
             }
 
             Logger.info(`[gameroom][entity_ability_key] player action processed`, data);

@@ -20,8 +20,7 @@ class DeadState extends State {
         // delete so entity can be respawned
         if (owner.DEAD_TIMER > 5000) {
             // remove entity
-            owner._gameroom.owner._gameroom.state.entities // remove schema
-                .delete(owner.sessionId);
+            owner._state.entities.delete(owner.sessionId);
         }
     }
 

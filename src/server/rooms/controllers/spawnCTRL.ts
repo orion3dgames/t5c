@@ -19,24 +19,26 @@ export class spawnCTRL {
         this.process();
     }
 
+    public update() {}
+
     public process() {
         Logger.info("[gameroom][state][spawning] spawnController: " + this._location.key);
         let dynamic = this._location.dynamic;
         let spawns = dynamic.spawns ?? [];
         spawns.forEach((spawnInfo) => {
             if (spawnInfo.type === "global") {
-                this.global(spawnInfo);
+                this.spawn(spawnInfo);
             }
             if (spawnInfo.type === "area") {
-                this.global(spawnInfo);
+                this.spawn(spawnInfo);
             }
             if (spawnInfo.type === "path") {
-                this.global(spawnInfo);
+                this.spawn(spawnInfo);
             }
         });
     }
 
-    private global(e) {
+    private spawn(e) {
         for (let i = 0; i < e.amount; i++) {
             this.createEntity(i, e);
         }

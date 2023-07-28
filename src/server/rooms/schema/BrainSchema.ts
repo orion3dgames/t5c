@@ -37,7 +37,7 @@ export class BrainSchema extends Entity {
 
     // PARENTS
     public _navMesh;
-    public _gameroom;
+    public _state;
     public _stateMachine: StateManager;
 
     // LOCAL VARS
@@ -71,12 +71,12 @@ export class BrainSchema extends Entity {
     public AI_CLOSEST_PLAYER_DISTANCE = null;
     public AI_SPAWN_INFO = null;
 
-    constructor(gameroom, data, ...args: any[]) {
+    constructor(state, data, ...args: any[]) {
         super();
 
         // variables
-        this._navMesh = gameroom.navMesh;
-        this._gameroom = gameroom;
+        this._navMesh = state._gameroom.navMesh;
+        this._state = state;
 
         // assign data
         Object.assign(this, data);
@@ -162,8 +162,8 @@ export class BrainSchema extends Entity {
      * @param {Vector3} currentPos
      */
     setRandomDestination(currentPos: Vector3): void {
-        let randomPoint = this._gameroom.navMesh.getRandomRegion();
-        this.AI_TARGET_WAYPOINTS = this._gameroom.navMesh.findPath(currentPos, randomPoint.centroid);
+        let randomPoint = this._state.navMesh.getRandomRegion();
+        this.AI_TARGET_WAYPOINTS = this._state.navMesh.findPath(currentPos, randomPoint.centroid);
         if (this.AI_TARGET_WAYPOINTS.length === 0) {
             this.AI_TARGET_WAYPOINTS = [];
         }
@@ -242,7 +242,7 @@ export class BrainSchema extends Entity {
      */
     findClosestPlayer() {
         let closestDistance = 1000000;
-        this._gameroom.entities.forEach((entity) => {
+        this._state.entities.forEach((entity) => {
             if (this.type === "entity" && entity.type === "player" && !entity.gracePeriod && !entity.isDead) {
                 let playerPos = entity.getPosition();
                 let entityPos = this.getPosition();
@@ -274,7 +274,7 @@ export class BrainSchema extends Entity {
      */
     setTargetDestination(targetPos: Vector3): void {
         console.log("[setTargetDestination]", this.AI_TARGET_WAYPOINTS);
-        this.AI_TARGET_WAYPOINTS = this._gameroom.navMesh.findPath(this.getPosition(), targetPos);
+        this.AI_TARGET_WAYPOINTS = this._state.navMesh.findPath(this.getPosition(), targetPos);
         if (this.AI_TARGET_WAYPOINTS.length === 0) {
             this.AI_TARGET_WAYPOINTS = [];
         }
@@ -308,6 +308,10 @@ export class BrainSchema extends Entity {
         if (this.mana < 0) {
             this.mana = 0;
         }
+    }
+
+    setAsDead() {
+        this._stateMachine.changeTo("DEAD");
     }
 
     isEntityDead() {
