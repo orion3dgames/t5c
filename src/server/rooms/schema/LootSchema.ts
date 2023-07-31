@@ -16,6 +16,8 @@ export class LootSchema extends Entity {
     public name: string = "";
     public description: string = "";
 
+    public AI_TARGET;
+
     public _state;
 
     constructor(state, data, ...args: any[]) {

@@ -74,6 +74,14 @@ export class GameRoomState extends Schema {
         this.entities.delete(sessionId);
     }
 
+    removeTarget(sessionId) {
+        this.entityCTRL.all.forEach((entity) => {
+            if (entity.type === "entity" && entity.AI_TARGET && entity.AI_TARGET.sessionId === sessionId) {
+                entity.AI_TARGET = null;
+            }
+        });
+    }
+
     /**
      * Add player
      * @param client

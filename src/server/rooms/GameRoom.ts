@@ -228,6 +228,9 @@ export class GameRoom extends Room<GameRoomState> {
         // remove from state
         this.state.deleteEntity(client.sessionId);
 
+        // make sure no one has this entity as a target
+        this.state.removeTarget(client.sessionId);
+
         // colyseus client leave
         client.leave();
 
