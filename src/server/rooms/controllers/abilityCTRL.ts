@@ -4,6 +4,8 @@ import { dropCTRL } from "./dropCTRL";
 import { dataDB } from "../../../shared/Data/dataDB";
 import { AbilitySchema } from "../schema/player/AbilitySchema";
 import { Ability } from "../../../shared/Entities/Common/Ability";
+import { CALC } from "../../../shared/Data/AbilitiesDB";
+import { randomNumberInRange } from "../../../shared/Utils";
 
 export class abilitiesCTRL {
     private _owner;
@@ -196,20 +198,37 @@ export class abilitiesCTRL {
         return true;
     }
 
+    affect(type, start, amount) {
+        switch (type) {
+            case CALC.ADD:
+                start += amount;
+                break;
+            case CALC.REMOVE:
+                start -= amount;
+                break;
+            case CALC.MULTIPLY:
+                start *= amount;
+                break;
+        }
+        return start;
+    }
+
     // process caster affected properties
     affectCaster(owner, ability) {
-        for (let p in ability.casterPropertyAffected) {
-            let property = ability.casterPropertyAffected[p];
-            owner[p] -= property;
-        }
+        ability.casterPropertyAffected.forEach((p) => {
+            let result = randomNumberInRange(p.min, p.max);
+            let amount = this.affect(p.type, owner[p.key], result);
+            owner[p.key] = amount;
+        });
     }
 
     // process target affected properties
     affectTarget(target, ability) {
-        for (let p in ability.targetPropertyAffected) {
-            let property = ability.targetPropertyAffected[p] + ability.targetPropertyAffected[p] / (Math.random() * (100 - 0) + 0);
-            target[p] += property;
-        }
+        ability.targetPropertyAffected.forEach((p) => {
+            let result = randomNumberInRange(p.min, p.max);
+            let amount = this.affect(p.type, target[p.key], result);
+            target[p.key] = amount;
+        });
     }
 
     // start cooldown

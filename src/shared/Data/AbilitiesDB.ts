@@ -42,25 +42,34 @@ type Ability = {
         color?: string; // main color of effect
     };
 
-    // what properties will affect caster
-    casterPropertyAffected: {
-        [key: string]: number;
-    };
+    affinity?: string;
 
     // what properties will affect caster
-    targetPropertyAffected: {
-        [key: string]: number;
-    };
+    casterPropertyAffected: PropertyAffected[];
+
+    // what properties will affect caster
+    targetPropertyAffected: PropertyAffected[];
 
     // what properties a player must have to learn this ability
-    requiredToLearn: {
-        [key: string]: number;
-    };
+    requiredToLearn?;
 };
 
 interface abilityMap {
     [key: string]: Ability;
 }
+
+enum CALC {
+    ADD = 1,
+    REMOVE = 2,
+    MULTIPLY = 3,
+}
+
+type PropertyAffected = {
+    key: string;
+    type: CALC;
+    min: number;
+    max: number;
+};
 
 let AbilitiesDB: abilityMap = {
     base_attack: {
@@ -81,10 +90,10 @@ let AbilitiesDB: abilityMap = {
             particule: "damage",
             color: "white",
         },
-        casterPropertyAffected: {},
-        targetPropertyAffected: {
-            health: -10,
-        },
+
+        affinity: "strength",
+        casterPropertyAffected: [],
+        targetPropertyAffected: [{ key: "health", type: CALC.REMOVE, min: 1, max: 2 }],
         requiredToLearn: {},
     },
     fireball: {
@@ -94,26 +103,22 @@ let AbilitiesDB: abilityMap = {
         sound: "fire_attack_2",
         description: "Hurls a massive fiery ball that explodes on contact with target.",
         castSelf: false,
-        castTime: 1000,
-        cooldown: 2000,
+        castTime: 0,
+        cooldown: 1000,
         repeat: 0,
         repeatInterval: 0,
-        range: 2,
+        range: 0,
         minRange: 0,
         effect: {
             type: "travel",
             particule: "fireball",
             color: "orange",
         },
-        casterPropertyAffected: {
-            mana: 10,
-        },
-        targetPropertyAffected: {
-            health: -50,
-        },
-        requiredToLearn: {
-            level: 2,
-        },
+
+        affinity: "intelligence",
+        casterPropertyAffected: [{ key: "mana", type: CALC.REMOVE, min: 10, max: 10 }],
+        targetPropertyAffected: [{ key: "health", type: CALC.REMOVE, min: 8, max: 13 }],
+        requiredToLearn: {},
     },
     poisonball: {
         label: "Poison Cloud",
@@ -123,7 +128,7 @@ let AbilitiesDB: abilityMap = {
         description: "Trow a bottle of viscous poisonous liquid onto target that will damage target overtime.",
         castSelf: false,
         castTime: 0,
-        cooldown: 6000,
+        cooldown: 5000,
         repeat: 5,
         repeatInterval: 1000,
         range: 0,
@@ -133,15 +138,9 @@ let AbilitiesDB: abilityMap = {
             particule: "fireball",
             color: "green",
         },
-        casterPropertyAffected: {
-            mana: 20,
-        },
-        targetPropertyAffected: {
-            health: -10,
-        },
-        requiredToLearn: {
-            level: 3,
-        },
+        casterPropertyAffected: [{ key: "mana", type: CALC.REMOVE, min: 15, max: 15 }],
+        targetPropertyAffected: [{ key: "health", type: CALC.REMOVE, min: 1, max: 2 }],
+        requiredToLearn: {},
     },
     heal: {
         label: "Heal",
@@ -149,9 +148,9 @@ let AbilitiesDB: abilityMap = {
         icon: "ICON_ABILITY_heal",
         sound: "heal_1",
         description: "A spell from ancient times that will leave target feeling fresh & revigorated.",
-        castSelf: true,
-        castTime: 3000,
-        cooldown: 5000,
+        castSelf: false,
+        castTime: 0,
+        cooldown: 1000,
         repeat: 0,
         repeatInterval: 0,
         range: 0,
@@ -161,18 +160,10 @@ let AbilitiesDB: abilityMap = {
             particule: "heal",
             color: "white",
         },
-        casterPropertyAffected: {
-            mana: 20,
-        },
-        targetPropertyAffected: {
-            health: 50,
-        },
-        requiredToLearn: {
-            level: 3,
-            intelligence: 18,
-            wisdom: 24,
-        },
+        casterPropertyAffected: [{ key: "mana", type: CALC.REMOVE, min: 10, max: 10 }],
+        targetPropertyAffected: [{ key: "health", type: CALC.ADD, min: 5, max: 10 }],
+        requiredToLearn: {},
     },
 };
 
-export { AbilitiesDB, Ability };
+export { AbilitiesDB, Ability, PropertyAffected, CALC };

@@ -20,8 +20,11 @@ const roundToTwo = function (num: number) {
 };
 
 const roundTo = function (num: number, decimal: number = 2) {
-    let number = num.toFixed(decimal);
-    return parseFloat(number);
+    if (num) {
+        let number = num.toFixed(decimal);
+        return parseFloat(number);
+    }
+    return 0;
 };
 
 const apiUrl = function () {
@@ -248,4 +251,17 @@ const getHealthColorFromValue = function (value) {
     return `#${rHexString}${gHexString}00`; // composing both in a color code
 };
 
-export { request, generateRandomPlayerName, apiUrl, roundToTwo, roundTo, countPlayers, isLocal, clamp, randomNumberInRange, distanceBetween, getHealthColorFromValue, bytesToSize };
+export {
+    request,
+    generateRandomPlayerName,
+    apiUrl,
+    roundToTwo,
+    roundTo,
+    countPlayers,
+    isLocal,
+    clamp,
+    randomNumberInRange,
+    distanceBetween,
+    getHealthColorFromValue,
+    bytesToSize,
+};
