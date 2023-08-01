@@ -118,7 +118,7 @@ let AbilitiesDB: abilityMap = {
 
         affinity: "intelligence",
         casterPropertyAffected: [{ key: "mana", type: CALC.REMOVE, min: 10, max: 10 }],
-        targetPropertyAffected: [{ key: "health", type: CALC.REMOVE, min: 8, max: 13 }],
+        targetPropertyAffected: [{ key: "health", type: CALC.REMOVE, min: 10, max: 20 }],
         requiredToLearn: [{ key: "level", amount: 2 }],
     },
 
@@ -142,7 +142,7 @@ let AbilitiesDB: abilityMap = {
         },
         affinity: "intelligence",
         casterPropertyAffected: [{ key: "mana", type: CALC.REMOVE, min: 15, max: 15 }],
-        targetPropertyAffected: [{ key: "health", type: CALC.REMOVE, min: 1, max: 2 }],
+        targetPropertyAffected: [{ key: "health", type: CALC.REMOVE, min: 3, max: 6 }],
         requiredToLearn: [
             { key: "level", amount: 3 },
             { key: "intelligence", amount: 25 },
@@ -154,9 +154,9 @@ let AbilitiesDB: abilityMap = {
         icon: "ICON_ABILITY_heal",
         sound: "heal_1",
         description: "A spell from ancient times that will leave target feeling fresh & revigorated.",
-        castSelf: false,
+        castSelf: true,
         castTime: 0,
-        cooldown: 1000,
+        cooldown: 2000,
         repeat: 0,
         repeatInterval: 0,
         range: 0,
@@ -168,7 +168,7 @@ let AbilitiesDB: abilityMap = {
         },
         affinity: "wisdom",
         casterPropertyAffected: [{ key: "mana", type: CALC.REMOVE, min: 10, max: 10 }],
-        targetPropertyAffected: [{ key: "health", type: CALC.ADD, min: 5, max: 10 }],
+        targetPropertyAffected: [{ key: "health", type: CALC.ADD, min: 10, max: 20 }],
         requiredToLearn: [
             { key: "level", amount: 5 },
             { key: "intelligence", amount: 25 },
