@@ -1,6 +1,5 @@
 import { type } from "@colyseus/schema";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
-import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 import { Entity } from "./Entity";
 import { abilitiesCTRL } from "../controllers/abilityCTRL";
 import { AbilitySchema } from "../schema/player/AbilitySchema";
@@ -9,7 +8,7 @@ import { IdleState, PatrolState, ChaseState, AttackState, DeadState } from "../b
 import { StateManager } from "../brain/StateManager";
 import { Vector3 } from "../../../shared/yuka-min";
 import Config from "../../../shared/Config";
-import { InventorySchema } from "./player/InventorySchema";
+import { randomNumberInRange } from "../../../shared/Utils";
 
 export class BrainSchema extends Entity {
     /////////////////////////////////////////////////////////////
@@ -319,6 +318,6 @@ export class BrainSchema extends Entity {
     }
 
     calculateDamage(owner, target) {
-        return 10;
+        return randomNumberInRange(5, 10);
     }
 }
