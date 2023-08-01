@@ -15,7 +15,7 @@ export class EntityAnimator {
 
     // current anim status
     private _currentAnim: AnimationGroup = null;
-    private _prevAnim: AnimationGroup;
+    private _prevAnim: AnimationGroup = null;
 
     constructor(player_animations, entity: Entity) {
         this._playerAnimations = player_animations;
@@ -54,7 +54,7 @@ export class EntityAnimator {
 
         //initialize current and previous
         this._currentAnim = this._idle;
-        this._prevAnim = this._idle;
+        this._prevAnim = this._walk;
     }
 
     //
