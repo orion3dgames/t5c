@@ -189,6 +189,10 @@ export class Entity {
         }
     }
 
+    public getPosition() {
+        return new Vector3(this.x, this.y, this.z);
+    }
+
     public updateServerRate(delta) {}
 
     // basic performance (only enable entities in a range around the player)

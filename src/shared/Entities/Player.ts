@@ -19,6 +19,7 @@ import { AuthController } from "../../client/Controllers/AuthController";
 import { dataDB } from "../Data/dataDB";
 import { SceneController } from "../../client/Controllers/Scene";
 import { Ability } from "../Data/AbilitiesDB";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class Player extends Entity {
     public input;
@@ -120,6 +121,17 @@ export class Player extends Entity {
                 /////////////////////////////////////////////////////////////////////
                 // camera zoom on mouse wheel
                 this.cameraController.zoom(pointerInfo.event.deltaY);
+            }
+
+            // check if selected entity is too far
+            // todo: should be done on server side?
+            if (global.T5C.selectedEntity && global.T5C.selectedEntity.sessionId) {
+                let currentPos = this.getPosition();
+                let targetPos = global.T5C.selectedEntity.getPosition();
+                let distanceBetween = Vector3.Distance(currentPos, targetPos);
+                if (distanceBetween > Config.PLAYER_LOSE_FOCUS_DISTANCE) {
+                    global.T5C.selectedEntity = null;
+                }
             }
         });
 
