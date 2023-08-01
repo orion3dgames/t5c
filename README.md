@@ -1,19 +1,19 @@
-# T5C
+# T5C - The 5th Continent
 Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 
 ## Current progress:
-- fully authorative movement with client side prediction and server reconciliation (server is king)
+- fully player authorative movement with client side prediction and server reconciliation
 - Simple scene management & switching
-- animated characters (multiplayer works too)
-- zoning system (ability to teleport to different locations)
+- multiplayer animated characters
+- zoning system (ability to teleport to a different room (eg: a dungeon for example) )
 - global chat (works accross zones)
-- server controlled collisions
+- server controlled collisions (via a navmesh)
 - persistence with mysql lite
 - 4 abilities ( basic attack, fireball, dot, heal )
-- roaming monsters (with basic ai & attacks)
+- patrolling monsters (with basic FSM states: IDLE, PATROL, CHASE, ATTACK, DEAD)
 - selecting characters and monsters
-- monsters have a loottable and can drop items
-- ability to pick up items 
+- monsters have a loot table and can drop items
+- ability to pick up items and see them in your inventory
 - standard UI (experience bar, abilities bar, panels, etc...)
 - and more...
 
@@ -26,8 +26,8 @@ You can follow the progress here: [FORUM POST](https://forum.babylonjs.com/t/mul
 - Run `yarn install`
 
 ## Technology
-- Babylon.js 6 (3d rendering engine)
-- Colyseus 0.15 (networking)
+- Babylon.js 6.x.x (3d rendering engine)
+- Colyseus 0.15.x (networking)
 - SQLite (database)
 
 ## How to run client
@@ -44,4 +44,4 @@ The WebSocket server should be available locally at `ws://localhost:3000`, and [
 
 ## License
 Everything under ./src is licensed under the GNU license except for the yuka library who is MIT license.
-All models under the ./public/models folder does not fall under the GNU license and cannot be used commercially.
+All models under the ./public/races/models folder does not fall under the GNU license and cannot be used commercially.
