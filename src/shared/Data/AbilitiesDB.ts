@@ -9,7 +9,7 @@ type Ability = {
     sound: string;
 
     // ability title
-    label: string;
+    title: string;
 
     // ability description
     description: string;
@@ -73,7 +73,7 @@ type PropertyAffected = {
 
 let AbilitiesDB: abilityMap = {
     base_attack: {
-        label: "Attack",
+        title: "Attack",
         key: "base_attack",
         icon: "ICON_ABILITY_base_attack",
         sound: "enemy_attack_1",
@@ -96,8 +96,9 @@ let AbilitiesDB: abilityMap = {
         targetPropertyAffected: [{ key: "health", type: CALC.REMOVE, min: 1, max: 2 }],
         requiredToLearn: {},
     },
+
     fireball: {
-        label: "Fireball",
+        title: "Fireball",
         key: "fireball",
         icon: "ICON_ABILITY_fireball",
         sound: "fire_attack_2",
@@ -120,8 +121,9 @@ let AbilitiesDB: abilityMap = {
         targetPropertyAffected: [{ key: "health", type: CALC.REMOVE, min: 8, max: 13 }],
         requiredToLearn: {},
     },
+
     poisonball: {
-        label: "Poison Cloud",
+        title: "Poison Cloud",
         key: "poisonball",
         icon: "ICON_ABILITY_poisonball",
         sound: "fire_attack_2",
@@ -138,12 +140,14 @@ let AbilitiesDB: abilityMap = {
             particule: "fireball",
             color: "green",
         },
+        affinity: "intelligence",
         casterPropertyAffected: [{ key: "mana", type: CALC.REMOVE, min: 15, max: 15 }],
         targetPropertyAffected: [{ key: "health", type: CALC.REMOVE, min: 1, max: 2 }],
         requiredToLearn: {},
     },
+
     heal: {
-        label: "Heal",
+        title: "Heal",
         key: "heal",
         icon: "ICON_ABILITY_heal",
         sound: "heal_1",
@@ -160,6 +164,7 @@ let AbilitiesDB: abilityMap = {
             particule: "heal",
             color: "white",
         },
+        affinity: "wisdom",
         casterPropertyAffected: [{ key: "mana", type: CALC.REMOVE, min: 10, max: 10 }],
         targetPropertyAffected: [{ key: "health", type: CALC.ADD, min: 5, max: 10 }],
         requiredToLearn: {},

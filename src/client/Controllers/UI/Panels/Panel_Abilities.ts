@@ -124,7 +124,7 @@ export class Panel_Abilities extends Panel {
             tooltipName.left = "80px";
             tooltipName.fontSize = "24px;";
             tooltipName.resizeToFit = true;
-            tooltipName.text = ability.label;
+            tooltipName.text = ability.title;
             tooltipName.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             tooltipName.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
             tooltipName.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;

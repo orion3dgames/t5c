@@ -1,6 +1,6 @@
 type Item = {
     key: string;
-    name: string;
+    title: string;
     description: string;
     icon: string;
     value: number;
@@ -64,7 +64,7 @@ enum PlayerSlots {
 let ItemsDB: itemDataMap = {
     sword_01: {
         key: "sword_01",
-        name: "Sword",
+        title: "Sword",
         description: "Description.",
         icon: "ICON_ITEM_sword_01",
         class: ItemClass.WEAPON,
@@ -85,7 +85,7 @@ let ItemsDB: itemDataMap = {
 
     amulet_01: {
         key: "amulet_01",
-        name: "Amulet",
+        title: "Amulet",
         description: "An ancient amulet from forgotten times, it's effect are still unknowm.",
         icon: "ICON_ITEM_amulet_01",
         class: ItemClass.ARMOR,
@@ -113,7 +113,7 @@ let ItemsDB: itemDataMap = {
 
     apple: {
         key: "apple",
-        name: "Apple",
+        title: "Apple",
         description: "A delicious apple.",
         icon: "ICON_ITEM_apple",
         class: ItemClass.CONSUMABLE,
@@ -130,7 +130,7 @@ let ItemsDB: itemDataMap = {
 
     pear: {
         key: "pear",
-        name: "Pear",
+        title: "Pear",
         description: "A delicious pear.",
         icon: "ICON_ITEM_pear",
         class: ItemClass.CONSUMABLE,
@@ -147,7 +147,7 @@ let ItemsDB: itemDataMap = {
 
     potion_heal: {
         key: "potion_heal",
-        name: "Heal Potion",
+        title: "Heal Potion",
         description: "A very useful potion that restores up to 50 health..",
         icon: "ICON_ITEM_potion_heal",
         class: ItemClass.CONSUMABLE,

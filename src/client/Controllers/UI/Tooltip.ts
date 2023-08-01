@@ -93,7 +93,7 @@ export class Tooltip {
         tooltipHeader.addControl(tooltipName);
         this.tooltipName = tooltipName;
 
-        // 
+        //
         const tooltipStats = new TextBlock("tooltipStats");
         tooltipStats.color = "green";
         tooltipStats.top = "0px";
@@ -129,37 +129,38 @@ export class Tooltip {
     }
 
     private generateItem(data) {
-        this.tooltipName.text = data.name;
+        this.tooltipName.text = data.title;
         this.tooltipDescription.text = data.description;
-        
+
         let stats = "";
-        for(let key in data.benefits){
+        for (let key in data.benefits) {
             let benefit = data.benefits[key];
             let title = benefit.key.charAt(0).toUpperCase() + benefit.key.slice(1);
-            stats += title+": "+(benefit.type === 1 ? "+":"-")+" "+benefit.amount+"\n";
+            stats += title + ": " + (benefit.type === 1 ? "+" : "-") + " " + benefit.amount + "\n";
         }
         stats = stats.slice(0, -1);
         this.tooltipStats.text = stats;
-
     }
 
     private generateAbility(data) {
-        this.tooltipName.text = data.label;
+        this.tooltipName.text = data.title;
         this.tooltipDescription.text = data.description;
 
         let stats = "";
 
-        if(data.casterPropertyAffected.mana > 0){
-            stats += "Cost: "+data.casterPropertyAffected.mana+" Mana\n";
+        if (data.casterPropertyAffected.length > 0) {
+            data.casterPropertyAffected.forEach((element) => {
+                stats += "Cost: " + element.min + "-" + element.max + " " + element.key.toUpperCase() + "\n";
+            });
         }
 
-        if(data.cooldown > 0){
-            stats += "Cooldown: "+(data.cooldown/1000)+"s\n";
+        if (data.cooldown > 0) {
+            stats += "Cooldown: " + data.cooldown / 1000 + "s\n";
         }
 
-        if(data.castTime > 0){
-            stats += "Cast time: "+(data.castTime/1000)+"s\n";
-        }else{
+        if (data.castTime > 0) {
+            stats += "Cast time: " + data.castTime / 1000 + "s\n";
+        } else {
             stats += "Instant Cast\n";
         }
 
@@ -210,7 +211,6 @@ export class Tooltip {
 
     private setPosition() {
         if (this.tooltipTarget) {
-
             let tooltipHeight = this.tooltipContainer.heightInPixels;
             let tooltipWidth = this.tooltipContainer.widthInPixels;
             let targetHeight = this.tooltipTarget.heightInPixels;
@@ -218,28 +218,28 @@ export class Tooltip {
             let x = this.tooltipTarget.centerX;
             let y = this.tooltipTarget.centerY;
 
-            if(this.horizontal === 'left'){
-                x -= (targetWidth / 2) + (tooltipWidth);
+            if (this.horizontal === "left") {
+                x -= targetWidth / 2 + tooltipWidth;
             }
 
-            if(this.horizontal === 'center'){
-                x -= (tooltipWidth / 2);
+            if (this.horizontal === "center") {
+                x -= tooltipWidth / 2;
             }
 
-            if(this.horizontal === 'right'){
-                x += (targetWidth / 2);
+            if (this.horizontal === "right") {
+                x += targetWidth / 2;
             }
 
-            if(this.vertical === 'top'){
-                y -= (targetHeight / 2) + (tooltipHeight);
+            if (this.vertical === "top") {
+                y -= targetHeight / 2 + tooltipHeight;
             }
 
-            if(this.vertical === 'center'){
-                y -= (tooltipHeight / 2);
+            if (this.vertical === "center") {
+                y -= tooltipHeight / 2;
             }
 
-            if(this.vertical === 'bottom'){
-                y += (targetHeight / 2);
+            if (this.vertical === "bottom") {
+                y += targetHeight / 2;
             }
 
             this.tooltipContainer.leftInPixels = x;
