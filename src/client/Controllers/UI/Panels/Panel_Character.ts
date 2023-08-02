@@ -10,9 +10,11 @@ export class Panel_Character extends Panel {
     private panel: Rectangle;
     private attributes;
     private stats;
+    private slots;
 
     private leftPanel: Rectangle;
     private rightPanel: Rectangle;
+    private slotPanel: Rectangle;
 
     constructor(_UI, _currentPlayer, options) {
         super(_UI, _currentPlayer, options);
@@ -50,6 +52,10 @@ export class Panel_Character extends Panel {
                 label: "Name",
                 value: this._currentPlayer.name,
             },
+            sessionId: {
+                label: "ID",
+                value: this._currentPlayer.sessionId,
+            },
             level: {
                 label: "Level",
                 value: this._currentPlayer.level,
@@ -67,6 +73,8 @@ export class Panel_Character extends Panel {
                 value: this._currentPlayer.mana,
             },
         };
+
+        this.slots = ["HEAD", "AMULET", "CHEST", "PANTS", "SHOES", "WEAPON", "OFF_HAND", "RING_1", "RING_2"];
 
         this.createContent();
 
@@ -101,7 +109,7 @@ export class Panel_Character extends Panel {
         leftPanel.top = "0px";
         leftPanel.left = "0px;";
         leftPanel.width = 0.485;
-        leftPanel.height = 1;
+        leftPanel.height = 0.8;
         leftPanel.thickness = 0;
         leftPanel.paddingLeft = "0px;";
         leftPanel.paddingBottom = "5px;";
@@ -115,12 +123,27 @@ export class Panel_Character extends Panel {
         rightPanel.top = "0px";
         rightPanel.left = "0px";
         rightPanel.width = 0.485;
-        rightPanel.height = 1;
+        rightPanel.height = 0.8;
         rightPanel.thickness = 0;
         rightPanel.paddingLeft = "0px;";
         rightPanel.paddingBottom = "5px;";
         panel.addControl(rightPanel);
         this.rightPanel = rightPanel;
+
+        // right panel
+        let slotPanel = new Rectangle("slotPanel");
+        slotPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        slotPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        slotPanel.top = "-30px";
+        slotPanel.left = "0px";
+        slotPanel.width = 1;
+        slotPanel.adaptHeightToChildren = true;
+        slotPanel.thickness = 0;
+        slotPanel.paddingLeft = "7px;";
+        slotPanel.paddingRight = "7px;";
+        slotPanel.paddingBottom = "7px;";
+        panel.addControl(slotPanel);
+        this.slotPanel = slotPanel;
 
         this.refresh();
     }
@@ -260,8 +283,48 @@ export class Panel_Character extends Panel {
         }
     }
 
+    private slotPanelContent(panel: Rectangle) {
+        // if already exists
+        panel.getDescendants().forEach((el) => {
+            el.dispose();
+        });
+
+        let width = 484;
+
+        let i = 0;
+        this.slots.forEach((line) => {
+            i++;
+
+            // calculate responsive width and height
+            let iconGutter = 4;
+            let iconWidth = width / this.slots.length - iconGutter;
+            let iconLeft = iconWidth + iconGutter;
+            let leftMargin = i > 1 ? (i - 1) * iconLeft + "px" : "0px";
+
+            let panelRectangle = new Rectangle("slot_" + i);
+            panelRectangle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            panelRectangle.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            panelRectangle.top = "0px";
+            panelRectangle.left = leftMargin;
+            panelRectangle.width = iconWidth + "px";
+            panelRectangle.height = iconWidth + "px";
+            panelRectangle = applyTheme(panelRectangle);
+            panel.addControl(panelRectangle);
+
+            var panelText = new TextBlock("slot_text_" + i);
+            panelText.text = line;
+            panelText.fontSize = "10px";
+            panelText.color = "rgba(255,255,255, .3)";
+            panelText.fontWeight = "bold";
+            panelText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            panelText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            panelRectangle.addControl(panelText);
+        });
+    }
+
     public refresh() {
         this.leftPanelContent(this.leftPanel);
         this.rightPanelContent(this.rightPanel);
+        this.slotPanelContent(this.slotPanel);
     }
 }
