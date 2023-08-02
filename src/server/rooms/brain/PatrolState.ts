@@ -41,6 +41,9 @@ class PatrolState extends State {
         if (owner.AI_SPAWN_INFO.type == "path") {
             owner.AI_TARGET_WAYPOINTS = createPath(owner.AI_SPAWN_INFO.points);
         }
+        if (owner.AI_SPAWN_INFO.type == "static") {
+            owner._stateMachine.changeTo("IDLE");
+        }
     }
 
     execute(owner) {

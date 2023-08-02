@@ -23,6 +23,7 @@ export class spawnCTRL {
         this._room = state._gameroom;
         this._location = dataDB.get("location", this._room.metadata.location);
         this.process();
+        this.processStatic();
     }
 
     public update() {
@@ -46,12 +47,29 @@ export class spawnCTRL {
         });
     }
 
+    public processStatic() {
+        let dynamic = this._location.dynamic;
+        let spawns = dynamic.spawns ?? [];
+        spawns.forEach((spawnInfo) => {
+            if (spawnInfo.type === "static") {
+                this.spawnStatic(spawnInfo);
+            }
+        });
+    }
+
     private spawn(e) {
         for (let i = 0; i < e.amount; i++) {
-            if (this.spawnsAmount[e.type] < e.amount) {
-                this.createEntity(i, e);
+            if (this.spawnsAmount[e.type] <= e.amount) {
+                this.createEntity(e);
             }
         }
+    }
+
+    private spawnStatic(e) {
+        e.x = e.points[0].x;
+        e.y = e.points[0].y;
+        e.z = e.points[0].z;
+        this.createEntity(e);
     }
 
     public createItem(sender) {
@@ -72,30 +90,28 @@ export class spawnCTRL {
         this._state.entityCTRL.add(entity);
     }
 
-    public createEntity(delta, spawnInfo) {
+    public createEntity(spawnInfo) {
         // random id
         let sessionId = nanoid(10);
 
         // monster pool to chose from
-        let randTypes = ["male_enemy"];
-        let randResult = randTypes[Math.floor(Math.random() * randTypes.length)];
-        let randData = dataDB.get("race", randResult);
+        let raceData = dataDB.get("race", spawnInfo.race);
 
         // create entity
         let data = {
             sessionId: sessionId,
             type: "entity",
-            race: randData.key,
-            name: randData.title + " #" + delta,
+            race: raceData.key,
+            name: spawnInfo.name,
             location: this._room.metadata.location,
-            x: 0,
-            y: 0,
-            z: 0,
+            x: spawnInfo.x ?? 0,
+            y: spawnInfo.y ?? 0,
+            z: spawnInfo.z ?? 0,
             rot: randomNumberInRange(0, Math.PI),
-            health: randData.baseHealth,
-            mana: randData.baseMana,
-            maxHealth: randData.baseHealth,
-            maxMana: randData.baseMana,
+            health: raceData.baseHealth,
+            mana: raceData.baseMana,
+            maxHealth: raceData.baseHealth,
+            maxMana: raceData.baseMana,
             level: 1,
             state: EntityState.IDLE,
             toRegion: false,
@@ -109,7 +125,7 @@ export class spawnCTRL {
         this._state.entityCTRL.add(new BrainSchema(this._state, data));
 
         // log
-        Logger.info("[gameroom][state][createEntity] created new entity " + randData.key + ": " + sessionId, spawnInfo);
+        Logger.info("[gameroom][state][createEntity] created new entity " + raceData.key + ": " + sessionId, spawnInfo);
     }
 
     removeEntity(entity) {

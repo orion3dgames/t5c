@@ -9,6 +9,11 @@ class IdleState extends State {
     }
 
     execute(owner) {
+        // if static spawn, stay idle
+        if (owner.AI_SPAWN_INFO.type == "static") {
+            return false;
+        }
+
         owner.IDLE_TIMER += Config.updateRate;
         if (owner.IDLE_TIMER > owner.IDLE_TIMER_LENGTH) {
             owner._stateMachine.changeTo("PATROL");

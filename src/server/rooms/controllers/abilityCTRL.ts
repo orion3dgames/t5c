@@ -150,6 +150,12 @@ export class abilitiesCTRL {
      * @returns boolean
      */
     canEntityCastAbility(target, ability, digit) {
+        // if target is not already dead
+        if (target.AI_SPAWN_INFO && target.AI_SPAWN_INFO.canAttack === false) {
+            Logger.warning(`[canEntityCastAbility] target is not attackable`, target.health);
+            return false;
+        }
+
         // if already casting
         if (ability.castTime > 0 && this.player_casting_timer !== false) {
             Logger.warning(`[canEntityCastAbility] player is already casting an ability`, ability);
