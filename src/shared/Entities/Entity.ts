@@ -78,7 +78,7 @@ export class Entity {
     public meshIndex;
     public scale;
     public animationSpeed;
-
+    public bones;
     public raceData;
 
     // flags
@@ -213,9 +213,22 @@ export class Entity {
     }
 
     public remove() {
+        // delete any ui linked to entity
         this.characterLabel.dispose();
         this.characterChatLabel.dispose();
+
+        // delete main mesh
         this.mesh.dispose();
+
+        // delete equipment
+        if (this.meshController.equipments.length > 0) {
+            this.meshController.equipments.forEach((equipment) => {
+                equipment.dispose();
+            });
+        }
+
+        // unselect ?
+        // todo: what is this for? it looks wrong.
         if (global.T5C.selectedEntity && global.T5C.selectedEntity.sessionId === this.sessionId) {
             global.T5C.selectedEntity = false;
         }
