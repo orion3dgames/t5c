@@ -1,4 +1,4 @@
-import { Control } from "@babylonjs/gui/2D/controls";
+import { Control, TextBlock } from "@babylonjs/gui/2D/controls";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { getBg, createButton, applyTheme } from "./Theme";
@@ -7,7 +7,6 @@ import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import State from "../../Screens/Screens";
 import { SceneController } from "../../Controllers/Scene";
-import { Button } from "@babylonjs/gui/2D/controls/button";
 
 export class MainMenu {
     private _UI;
@@ -120,18 +119,21 @@ export class MainMenu {
         let menuItems = {
             inventory: {
                 menuTitle: "Inventory",
+                icon: "ICON_MENU_inventory",
                 click: () => {
                     this.openPanel("inventory");
                 },
             },
             abilities: {
                 menuTitle: "Abilities",
+                icon: "ICON_MENU_abilities",
                 click: () => {
                     this.openPanel("abilities");
                 },
             },
             character: {
                 menuTitle: "Character",
+                icon: "ICON_MENU_character",
                 click: () => {
                     this.openPanel("character");
                 },
@@ -142,17 +144,23 @@ export class MainMenu {
         grid.top = "0px";
         grid.left = "-40px";
         grid.height = "30px;";
-        grid.adaptWidthToChildren = true;
         grid.spacing = 5;
         grid.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         grid.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         grid.isVertical = false;
         this._mainPanel.addControl(grid);
 
+        // add menu tooltip
+        const buttonTooltip = createButton("button_tooltip", "", "100px", "30px", "");
+        grid.addControl(buttonTooltip);
+        let buttonTooltipText = buttonTooltip.getChildByName("button_tooltip_text") as TextBlock;
+        buttonTooltip.isVisible = false;
+
+        //
         let i = 0;
         for (let index in menuItems) {
             let menuItem = menuItems[index];
-            const button = createButton("button_" + i, menuItem.menuTitle, "85px", "30px");
+            const button = createButton("button_" + i, "", "35px", "30px", menuItem.icon);
             grid.addControl(button);
 
             if (menuItem.click) {
@@ -160,6 +168,16 @@ export class MainMenu {
                     menuItem.click();
                 });
             }
+
+            button.onPointerEnterObservable.add(() => {
+                buttonTooltipText.text = menuItem.menuTitle;
+                buttonTooltip.isVisible = true;
+            });
+
+            button.onPointerOutObservable.add(() => {
+                buttonTooltipText.text = "";
+                buttonTooltip.isVisible = false;
+            });
 
             i++;
         }

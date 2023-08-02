@@ -2,14 +2,20 @@ import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
+import { Image } from "@babylonjs/gui/2D/controls/image";
 
-const createButton = function (name, text, width, height) {
+const createButton = function (name, text, width, height, icon?: string) {
     let result = new Button(name);
     result.width = width;
     result.height = height;
     result = applyTheme(result);
 
-    let textBlock = new TextBlock(name + "_button", text);
+    if (icon) {
+        let image = new Image("img" + name, "images/icons/" + icon + ".png");
+        result.addControl(image);
+    }
+
+    let textBlock = new TextBlock(name + "_text", text);
     textBlock.width = 1;
     textBlock.textWrapping = true;
     textBlock.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
@@ -52,7 +58,7 @@ const getFont = function () {
 };
 
 const getBg = function () {
-    return "rgba(0,0,0,.9)";
+    return "rgba(0,0,0,.8)";
 };
 
 const getPadding = function (multiplier = 1) {
