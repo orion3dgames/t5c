@@ -59,7 +59,7 @@ export class spawnCTRL {
 
     private spawn(e) {
         for (let i = 0; i < e.amount; i++) {
-            if (this.spawnsAmount[e.type] <= e.amount) {
+            if (this.spawnsAmount[e.type] < e.amount) {
                 this.createEntity(e);
             }
         }
