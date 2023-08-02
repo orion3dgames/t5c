@@ -1,4 +1,4 @@
-import { type } from "@colyseus/schema";
+import { type, ArraySchema } from "@colyseus/schema";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { Entity } from "./Entity";
 import { abilitiesCTRL } from "../controllers/abilityCTRL";
@@ -9,6 +9,8 @@ import { StateManager } from "../brain/StateManager";
 import { Vector3 } from "../../../shared/yuka-min";
 import Config from "../../../shared/Config";
 import { randomNumberInRange } from "../../../shared/Utils";
+import { EquipmentSchema } from "./player/EquipmentSchema";
+import { PlayerSlots } from "../../../shared/Data/ItemDB";
 
 export class BrainSchema extends Entity {
     /////////////////////////////////////////////////////////////
@@ -32,6 +34,8 @@ export class BrainSchema extends Entity {
     @type("number") public sequence: number = 0; // latest input sequence
     @type("boolean") public blocked: boolean = false; // if true, used to block player and to prevent movement
     @type("int8") public anim_state: EntityState = EntityState.IDLE;
+
+    @type([EquipmentSchema]) equipment = new ArraySchema<EquipmentSchema>();
     //@type("number") public AI_CURRENT_STATE: AI_STATE = 0;
 
     // PARENTS
@@ -94,6 +98,9 @@ export class BrainSchema extends Entity {
 
         // initial state
         this._stateMachine.changeTo("IDLE");
+
+        //
+        this.equipment.push(new EquipmentSchema({ key: "sword_01", slot: PlayerSlots.WEAPON_1 }));
     }
 
     // entity update

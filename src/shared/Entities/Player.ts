@@ -68,9 +68,6 @@ export class Player extends Entity {
         // entity network event
         // colyseus automatically sends entity updates, so let's listen to those changes
 
-        //////////////////////////////////////////////////////////////////////////
-        // player register event
-
         // register server messages
         this.registerServerMessages();
 

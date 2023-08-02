@@ -9,6 +9,7 @@ import Config from "../../Config";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math";
 import { Entity } from "../Entity";
 import { Skeleton } from "@babylonjs/core/Bones/skeleton";
+import { PlayerSlots } from "../../../shared/Data/ItemDB";
 
 export class EntityMesh {
     private _entity: Entity;
@@ -82,20 +83,7 @@ export class EntityMesh {
         this._animationGroups = result.animationGroups;
         this._skeleton = result.skeletons[0];
 
-        /////////////////////////////
-        // equip weapon
-        if (this._entity.type === "player") {
-            let boneId = this._entity.bones.WEAPON_1;
-            let bone = this._skeleton.bones[boneId];
-            const weapon = this._loadedAssets["ITEM_sword_01"].instantiateModelsToScene((name) => "PlayerSword");
-            const weaponMesh = weapon.rootNodes[0];
-            weaponMesh.attachToBone(bone, playerMesh);
-            this.equipments.push(weaponMesh);
-        }
-        /////////////////////////////
-
         // set initial player scale & rotation
-
         playerMesh.name = this._entity.sessionId + "_mesh";
         playerMesh.parent = box;
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
@@ -162,6 +150,40 @@ export class EntityMesh {
                 }
             })
         );
+
+        this._entity.entity.equipment.onAdd((e) => {
+            this.refreshEquipement(e);
+        });
+        this._entity.entity.equipment.onRemove((e) => {
+            this.refreshEquipement(e);
+        });
+    }
+
+    public refreshEquipement(e) {
+        if (!this._entity.bones) {
+            return false;
+        }
+
+        // remove current equipped
+        if (this.equipments.length > 0) {
+            this.equipments.forEach((equipment) => {
+                equipment.dispose();
+            });
+        }
+
+        //
+        this.equipments = [];
+
+        // equip all items
+        this._entity.equipment.forEach((e) => {
+            let key = PlayerSlots[e.slot];
+            let boneId = this._entity.bones[key];
+            let bone = this._skeleton.bones[boneId];
+            const weapon = this._loadedAssets["ITEM_" + e.key].instantiateModelsToScene((name) => "PlayerSword");
+            const weaponMesh = weapon.rootNodes[0];
+            weaponMesh.attachToBone(bone, this.playerMesh);
+            this.equipments.push(weaponMesh);
+        });
     }
 
     public getAnimation() {

@@ -5,9 +5,7 @@ type Item = {
     icon: string;
     value: number;
     class: ItemClass;
-    canEquip?: {
-        slot: PlayerSlots;
-    };
+    slot?: PlayerSlots;
     requirements?: {};
     benefits?: {};
     meshData?: {
@@ -50,6 +48,7 @@ enum PlayerKeys {
 }
 
 enum PlayerSlots {
+    CANNOT_EQUIP = 0,
     HEAD = 1,
     AMULET = 2,
     CHEST = 3,
@@ -69,9 +68,7 @@ let ItemsDB: itemDataMap = {
         icon: "ICON_ITEM_sword_01",
         class: ItemClass.WEAPON,
         value: 2000,
-        canEquip: {
-            slot: PlayerSlots.WEAPON_1,
-        },
+        slot: PlayerSlots.WEAPON_1,
         requirements: [{ key: PlayerKeys.STRENGTH, amount: 20 }],
         benefits: [{ key: PlayerKeys.STRENGTH, type: ItemEffect.ADD, amount: 10 }],
         meshData: {
@@ -90,9 +87,7 @@ let ItemsDB: itemDataMap = {
         icon: "ICON_ITEM_amulet_01",
         class: ItemClass.ARMOR,
         value: 2000,
-        canEquip: {
-            slot: PlayerSlots.AMULET,
-        },
+        slot: PlayerSlots.AMULET,
         requirements: [
             { key: PlayerKeys.LEVEL, amount: 10 },
             { key: PlayerKeys.STRENGTH, amount: 20 },
@@ -163,4 +158,4 @@ let ItemsDB: itemDataMap = {
     },
 };
 
-export { ItemsDB, Item };
+export { ItemsDB, Item, PlayerSlots };

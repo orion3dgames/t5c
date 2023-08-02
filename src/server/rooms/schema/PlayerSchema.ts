@@ -1,17 +1,16 @@
 import { Client } from "@colyseus/core";
-import { Schema, MapSchema, type, filter } from "@colyseus/schema";
+import { Schema, MapSchema, ArraySchema, type, filter } from "@colyseus/schema";
 import Config from "../../../shared/Config";
 import { GameRoom } from "../GameRoom";
 import { abilitiesCTRL } from "../controllers/abilityCTRL";
 import { moveCTRL } from "../controllers/moveCTRL";
 import { dataDB } from "../../../shared/Data/dataDB";
 import { NavMesh, Vector3 } from "../../../shared/yuka-min";
-import { InventorySchema } from "../schema/player/InventorySchema";
-import { AbilitySchema } from "../schema/player/AbilitySchema";
-import { LootSchema } from "../schema/LootSchema";
+import { InventorySchema, EquipmentSchema, AbilitySchema, LootSchema } from "../schema";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { GameRoomState } from "../state/GameRoomState";
 import { Entity } from "../schema/Entity";
+import { PlayerSlots } from "../../../shared/Data/ItemDB";
 
 export class PlayerData extends Schema {
     @type({ map: InventorySchema }) inventory = new MapSchema<InventorySchema>();
@@ -48,6 +47,8 @@ export class PlayerSchema extends Entity {
     @type("number") public sequence: number = 0; // latest input sequence
     @type("boolean") public blocked: boolean = false; // if true, used to block player and to prevent movement
     @type("int8") public anim_state: EntityState = EntityState.IDLE;
+
+    @type([EquipmentSchema]) equipment = new ArraySchema<EquipmentSchema>();
 
     ////////////////////////////////////////////////////////////////////////////
     // the below data only need to synchronized to the player it belongs too
@@ -105,6 +106,9 @@ export class PlayerSchema extends Entity {
             this.player_data[k] = v;
         });
 
+        // add basic weapon
+        this.equipment.push(new EquipmentSchema({ key: "sword_01", slot: PlayerSlots.WEAPON_1 }));
+
         // set controllers
         this.abilitiesCTRL = new abilitiesCTRL(this, data);
         this.moveCTRL = new moveCTRL(this);
@@ -156,7 +160,6 @@ export class PlayerSchema extends Entity {
             key: loot.key,
             qty: loot.quantity,
         };
-        console.log("Pick up item", data);
         let inventoryItem = this.player_data.inventory.get(data.key);
         if (inventoryItem) {
             inventoryItem.qty += data.qty;

@@ -10,7 +10,8 @@ import { NavMesh } from "../../shared/yuka-min";
 import { dataDB } from "../../shared/Data/dataDB";
 
 import { Auth } from "./commands";
-import { Entity, PlayerSchema } from "./schema";
+import { Entity, EquipmentSchema, PlayerSchema } from "./schema";
+import { PlayerSlots } from "../../shared/Data/ItemDB";
 
 export class GameRoom extends Room<GameRoomState> {
     public maxClients = 64;
@@ -210,6 +211,16 @@ export class GameRoom extends Room<GameRoomState> {
 
             if (data.digit === 5) {
                 this.state.spawnCTRL.createItem(sender);
+                return false;
+            }
+
+            if (data.digit === 6) {
+                if (sender.equipment.length > 0) {
+                    sender.equipment.clear();
+                } else {
+                    sender.equipment.push(new EquipmentSchema({ key: "sword_01", slot: PlayerSlots.WEAPON_1 }));
+                }
+                return false;
             }
 
             if (sender && target) {

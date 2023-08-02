@@ -1,6 +1,8 @@
 import { Schema, type } from "@colyseus/schema";
 import { dataDB } from "../../../../shared/Data/dataDB";
 
+import { PlayerSlots } from "../../../../shared/Data/ItemDB";
+
 export class InventorySchema extends Schema {
     // networked player specific
     @type("string") public key: string = "";

@@ -72,6 +72,7 @@ export class Entity {
     //
     public abilities = [];
     public inventory = [];
+    public equipment = [];
 
     // raceData
     public rotationFix;
@@ -142,6 +143,9 @@ export class Entity {
                 this.moveController.reconcileMove(this.entity.sequence); // set default entity position
             }
         });
+
+        //////////////////////////////////////////////////////////////////////////
+        // entity register event
 
         //////////////////////////////////////////////////////////////////////////
         // player render loop
