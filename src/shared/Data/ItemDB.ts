@@ -70,7 +70,7 @@ let ItemsDB: itemDataMap = {
         class: ItemClass.WEAPON,
         value: 2000,
         canEquip: {
-            slot: PlayerSlots.HAND_1,
+            slot: PlayerSlots.WEAPON_1,
         },
         requirements: [{ key: PlayerKeys.STRENGTH, amount: 20 }],
         benefits: [{ key: PlayerKeys.STRENGTH, type: ItemEffect.ADD, amount: 10 }],

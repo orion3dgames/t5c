@@ -23,6 +23,7 @@ export class EntityMesh {
     public isCurrentPlayer: boolean;
     public debugMesh: Mesh;
     public selectedMesh: Mesh;
+    public equipments: Mesh[] = [];
 
     constructor(entity: Entity) {
         this._entity = entity;
@@ -84,11 +85,12 @@ export class EntityMesh {
         /////////////////////////////
         // equip weapon
         if (this._entity.type === "player") {
-            let bone = this._skeleton.bones[37];
+            let boneId = this._entity.bones.WEAPON_1;
+            let bone = this._skeleton.bones[boneId];
             const weapon = this._loadedAssets["ITEM_sword_01"].instantiateModelsToScene((name) => "PlayerSword");
             const weaponMesh = weapon.rootNodes[0];
-            weaponMesh.parent = this.mesh;
             weaponMesh.attachToBone(bone, playerMesh);
+            this.equipments.push(weaponMesh);
         }
         /////////////////////////////
 

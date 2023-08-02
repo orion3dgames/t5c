@@ -290,13 +290,4 @@ export class Player extends Entity {
         // switch scene
         SceneController.goToScene(State.GAME);
     }
-
-    public remove() {
-        this.characterLabel.dispose();
-        this.characterChatLabel.dispose();
-        this.mesh.dispose();
-        if (global.T5C.selectedEntity && global.T5C.selectedEntity.sessionId === this.sessionId) {
-            global.T5C.selectedEntity = false;
-        }
-    }
 }

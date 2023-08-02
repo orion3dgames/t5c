@@ -79,7 +79,7 @@ export class spawnCTRL {
         currentPosition.x += randomNumberInRange(0.1, 1.5);
         currentPosition.z += randomNumberInRange(0.1, 1.5);
         let data = {
-            key: "potion_heal",
+            key: "sword_01",
             sessionId: sessionId,
             x: currentPosition.x,
             y: 0.25,

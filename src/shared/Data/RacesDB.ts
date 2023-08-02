@@ -12,6 +12,7 @@ type Race = {
     animations: {
         [key: string]: number;
     };
+    bones?: { [key: string]: number };
     baseHealth: number;
     baseMana: number;
     healthRegen: number;
@@ -43,6 +44,9 @@ let RacesDB: raceDataMap = {
             ATTACK: 21,
             DEATH: 0,
             DAMAGE: 1,
+        },
+        bones: {
+            WEAPON_1: 37,
         },
         baseHealth: 100,
         baseMana: 100,
