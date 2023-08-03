@@ -107,7 +107,6 @@ export class GameRoom extends Room<GameRoomState> {
     // on client join
     async onJoin(client: Client, options: any) {
         this.state.addPlayer(client);
-        //this.dispatcher.dispatch(new OnPlayerJoinCommand(), { client: client });
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -118,116 +117,8 @@ export class GameRoom extends Room<GameRoomState> {
     private registerMessageHandlers() {
         /////////////////////////////////////
         // on player input
-        this.onMessage("ping", (client, data) => {
-            client.send("pong", data);
-        });
-
-        /////////////////////////////////////
-        // on player reset position
-        this.onMessage("reset_position", (client, data) => {
-            const playerState: PlayerSchema = this.state.getEntity(client.sessionId) as PlayerSchema;
-            if (playerState) {
-                playerState.resetPosition();
-            }
-        });
-
-        this.onMessage("revive_pressed", (client, data) => {
-            const playerState: PlayerSchema = this.state.getEntity(client.sessionId) as PlayerSchema;
-            if (playerState) {
-                playerState.ressurect();
-            }
-        });
-
-        this.onMessage("pickup_item", (client, data) => {
-            const playerState: PlayerSchema = this.state.getEntity(client.sessionId) as PlayerSchema;
-            const itemState = this.state.getEntity(data.sessionId);
-            if (playerState && itemState) {
-                playerState.setTarget(itemState);
-            }
-        });
-
-        this.onMessage("learn_skill", (client, ability_key) => {
-            const playerState: PlayerSchema = this.state.getEntity(client.sessionId) as PlayerSchema;
-            const ability = dataDB.get("ability", ability_key);
-            if (playerState && ability) {
-                playerState.abilitiesCTRL.learnAbility(ability);
-            }
-        });
-
-        this.onMessage("add_stats_point", (client, stat_key) => {
-            const playerState: PlayerSchema = this.state.getEntity(client.sessionId) as PlayerSchema;
-            if (playerState && playerState.player_data.points > 0) {
-                playerState.player_data[stat_key] += 1;
-                playerState.player_data.points -= 1;
-            }
-        });
-
-        /////////////////////////////////////
-        // on player input
-        this.onMessage("playerInput", (client, playerInput: PlayerInputs) => {
-            const playerState: PlayerSchema = this.state.getEntity(client.sessionId) as PlayerSchema;
-            if (playerState) {
-                playerState.moveCTRL.processPlayerInput(playerInput);
-            } else {
-                console.error(`Failed to retrieve Player State for ${client.sessionId}`);
-            }
-        });
-
-        /////////////////////////////////////
-        // on player teleport
-        this.onMessage("playerTeleport", (client, location) => {
-            const playerState: PlayerSchema = this.state.getEntity(client.sessionId) as PlayerSchema;
-            if (playerState) {
-                // update player location in database
-                let newLocation = dataDB.get("location", location);
-                let updateObj = {
-                    location: newLocation.key,
-                    x: newLocation.spawnPoint.x,
-                    y: newLocation.spawnPoint.y,
-                    z: newLocation.spawnPoint.z,
-                    rot: 0,
-                };
-                this.database.updateCharacter(client.auth.id, updateObj);
-
-                // update player state on server
-                playerState.setLocation(location);
-
-                // inform client he cand now teleport to new zone
-                client.send("playerTeleportConfirm", location);
-
-                // log
-                Logger.info(`[gameroom][playerTeleport] player teleported to ${location}`);
-            } else {
-                Logger.error(`[gameroom][playerTeleport] failed to teleported to ${location}`);
-            }
-        });
-
-        /////////////////////////////////////
-        // player entity_attack
-        this.onMessage("entity_ability_key", (client, data: any) => {
-            // get players involved
-            let sender = this.state.getEntity(client.sessionId) as PlayerSchema;
-            let target = this.state.getEntity(data.targetId) as Entity;
-
-            if (data.digit === 5) {
-                this.state.spawnCTRL.createItem(sender);
-                return false;
-            }
-
-            if (data.digit === 6) {
-                if (sender.equipment.length > 0) {
-                    sender.equipment.clear();
-                } else {
-                    sender.equipment.push(new EquipmentSchema({ key: "sword_01", slot: PlayerSlots.WEAPON }));
-                }
-                return false;
-            }
-
-            if (sender && target) {
-                sender.abilitiesCTRL.processAbility(sender, target, data);
-            }
-
-            Logger.info(`[gameroom][entity_ability_key] player action processed`, data);
+        this.onMessage("*", (client, type, data) => {
+            this.state.processMessage(client, type, data);
         });
     }
 
