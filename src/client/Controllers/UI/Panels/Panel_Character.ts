@@ -85,13 +85,14 @@ export class Panel_Character extends Panel {
         let entity = this._currentPlayer.entity;
         if (entity) {
             entity.player_data.onChange((item, sessionId) => {
-                this.refresh();
+                this.leftPanelContent(this.leftPanel);
+                this.rightPanelContent(this.rightPanel);
             });
             entity.equipment.onAdd((item, sessionId) => {
-                this.refresh();
+                this.slotPanelContent(this.slotPanel);
             });
             entity.equipment.onRemove((item, sessionId) => {
-                this.refresh();
+                this.slotPanelContent(this.slotPanel);
             });
         }
     }
