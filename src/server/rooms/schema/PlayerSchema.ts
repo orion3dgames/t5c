@@ -48,7 +48,7 @@ export class PlayerSchema extends Entity {
     @type("boolean") public blocked: boolean = false; // if true, used to block player and to prevent movement
     @type("int8") public anim_state: EntityState = EntityState.IDLE;
 
-    @type([EquipmentSchema]) equipment = new ArraySchema<EquipmentSchema>();
+    @type({ map: EquipmentSchema }) equipment = new MapSchema<EquipmentSchema>();
 
     ////////////////////////////////////////////////////////////////////////////
     // the below data only need to synchronized to the player it belongs too
@@ -106,9 +106,6 @@ export class PlayerSchema extends Entity {
             this.player_data[k] = v;
         });
 
-        // add basic weapon
-        this.equipment.push(new EquipmentSchema({ key: "sword_01", slot: PlayerSlots.WEAPON }));
-
         // set controllers
         this.abilitiesCTRL = new abilitiesCTRL(this, data);
         this.moveCTRL = new moveCTRL(this);
@@ -155,7 +152,7 @@ export class PlayerSchema extends Entity {
         return this._state._gameroom.clients.getById(this.sessionId);
     }
 
-    addItemToInventory(loot: LootSchema) {
+    pickupItem(loot: LootSchema) {
         let data = {
             key: loot.key,
             qty: loot.quantity,
@@ -169,6 +166,22 @@ export class PlayerSchema extends Entity {
         this._state.entities.delete(loot.sessionId);
 
         this.AI_TARGET = null;
+    }
+
+    equipItem(key, slot) {
+        // remove item from inventory
+        this.player_data.inventory.delete(key);
+
+        // equip
+        this.equipment.set(key, new EquipmentSchema({ key: key, slot: PlayerSlots[slot] }));
+    }
+
+    unequipItem(key, slot) {
+        // remove item from inventory
+        this.equipment.delete(key);
+
+        // equip
+        this.player_data.inventory.set(key, new InventorySchema({ key: key, quantity: 1 }));
     }
 
     setAsDead() {

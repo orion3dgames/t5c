@@ -188,6 +188,22 @@ export class GameRoomState extends Schema {
         }
 
         /////////////////////////////////////
+        // on player equip
+        // data will equal the inventory key of the clicked item
+        if (type === "equip_item") {
+            const item = dataDB.get("item", data); // does item exist in database
+            if (item) {
+                playerState.equipItem(item.key, item.slot);
+            }
+        }
+        if (type === "unequip_item") {
+            const item = dataDB.get("item", data); // does item exist in database
+            if (item) {
+                playerState.unequipItem(item.key, item.slot);
+            }
+        }
+
+        /////////////////////////////////////
         // on player add stat point
         if (type === "add_stats_point") {
             if (playerState.player_data.points > 0) {
@@ -241,10 +257,11 @@ export class GameRoomState extends Schema {
             }
 
             if (data.digit === 6) {
-                if (playerState.equipment.length > 0) {
+                let key = "sword_01";
+                if (playerState.equipment.size > 0) {
                     playerState.equipment.clear();
                 } else {
-                    playerState.equipment.push(new EquipmentSchema({ key: "sword_01", slot: PlayerSlots.WEAPON }));
+                    playerState.equipment.set(key, new EquipmentSchema({ key: "sword_01", slot: PlayerSlots.WEAPON }));
                 }
                 return false;
             }

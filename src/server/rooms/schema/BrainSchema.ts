@@ -98,9 +98,6 @@ export class BrainSchema extends Entity {
 
         // initial state
         this._stateMachine.changeTo("IDLE");
-
-        //
-        this.equipment.push(new EquipmentSchema({ key: "sword_01", slot: PlayerSlots.WEAPON }));
     }
 
     // entity update
