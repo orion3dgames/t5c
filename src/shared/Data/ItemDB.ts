@@ -6,6 +6,7 @@ type Item = {
     value: number;
     class: ItemClass;
     slot?: PlayerSlots;
+    attachMesh?;
     requirements?: {};
     benefits?: {};
     meshData?: {
@@ -68,6 +69,7 @@ let ItemsDB: itemDataMap = {
         class: ItemClass.WEAPON,
         value: 2000,
         slot: PlayerSlots.WEAPON,
+        attachMesh: true,
         requirements: [{ key: PlayerKeys.STRENGTH, amount: 20 }],
         benefits: [{ key: PlayerKeys.STRENGTH, type: ItemEffect.ADD, amount: 10 }],
         meshData: {

@@ -10,6 +10,7 @@ import { Matrix, Vector3 } from "@babylonjs/core/Maths/math";
 import { Entity } from "../Entity";
 import { Skeleton } from "@babylonjs/core/Bones/skeleton";
 import { PlayerSlots } from "../../../shared/Data/ItemDB";
+import { dataDB } from "../../../shared/Data/dataDB";
 
 export class EntityMesh {
     private _entity: Entity;
@@ -176,13 +177,16 @@ export class EntityMesh {
 
         // equip all items
         this._entity.equipment.forEach((e) => {
-            let key = PlayerSlots[e.slot];
-            let boneId = this._entity.bones[key];
-            let bone = this._skeleton.bones[boneId];
-            const weapon = this._loadedAssets["ITEM_" + e.key].instantiateModelsToScene((name) => "PlayerSword");
-            const weaponMesh = weapon.rootNodes[0];
-            weaponMesh.attachToBone(bone, this.playerMesh);
-            this.equipments.push(weaponMesh);
+            let item = dataDB.get("item", e.key);
+            if (item && item.attachMesh) {
+                let key = PlayerSlots[e.slot];
+                let boneId = this._entity.bones[key];
+                let bone = this._skeleton.bones[boneId];
+                const weapon = this._loadedAssets["ITEM_" + e.key].instantiateModelsToScene((name) => "PlayerSword");
+                const weaponMesh = weapon.rootNodes[0];
+                weaponMesh.attachToBone(bone, this.playerMesh);
+                this.equipments.push(weaponMesh);
+            }
         });
     }
 

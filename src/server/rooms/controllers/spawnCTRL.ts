@@ -24,6 +24,10 @@ export class spawnCTRL {
         this._location = dataDB.get("location", this._room.metadata.location);
         this.process();
         this.processStatic();
+
+        for (let i = 0; i < 25; i++) {
+            this.createItem();
+        }
     }
 
     public update() {
@@ -72,14 +76,26 @@ export class spawnCTRL {
         this.createEntity(e);
     }
 
-    public createItem(sender) {
+    public createItem(sender?) {
         // create drops
         let sessionId = nanoid(10);
-        let currentPosition = sender.getPosition();
-        currentPosition.x += randomNumberInRange(0.1, 1.5);
-        currentPosition.z += randomNumberInRange(0.1, 1.5);
+
+        // monster pool to chose from
+        let randTypes = ["sword_01", "amulet_01", "pear", "apple", "potion_heal"];
+        let randResult = randTypes[Math.floor(Math.random() * randTypes.length)];
+        let randData = dataDB.get("item", randResult);
+
+        //
+        let randomRegion = this._room.navMesh.getRandomRegion();
+        let currentPosition = randomRegion.centroid;
+        if (sender) {
+            let currentPosition = sender.getPosition();
+            currentPosition.x += randomNumberInRange(0.1, 1.5);
+            currentPosition.z += randomNumberInRange(0.1, 1.5);
+        }
+
         let data = {
-            key: "sword_01",
+            key: randData.key,
             sessionId: sessionId,
             x: currentPosition.x,
             y: 0.25,
@@ -88,6 +104,8 @@ export class spawnCTRL {
         };
         let entity = new LootSchema(this, data);
         this._state.entityCTRL.add(entity);
+
+        Logger.info("[gameroom][state][createEntity] created new item " + data.key + ": " + sessionId);
     }
 
     public createEntity(spawnInfo) {

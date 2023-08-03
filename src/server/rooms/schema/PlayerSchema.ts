@@ -169,11 +169,16 @@ export class PlayerSchema extends Entity {
     }
 
     equipItem(key, slot) {
-        // remove item from inventory
-        this.player_data.inventory.delete(key);
-
-        // equip
-        this.equipment.set(key, new EquipmentSchema({ key: key, slot: PlayerSlots[slot] }));
+        let inventoryItem = this.player_data.inventory.get(key);
+        if (inventoryItem && inventoryItem.qty > 0 && this.isSlotAvailable(slot) === true) {
+            inventoryItem.qty -= 1;
+            if (inventoryItem.qty < 1) {
+                // remove item from inventory
+                this.player_data.inventory.delete(key);
+            }
+            // equip
+            this.equipment.set(key, new EquipmentSchema({ key: key, slot: slot }));
+        }
     }
 
     unequipItem(key, slot) {
@@ -181,7 +186,22 @@ export class PlayerSchema extends Entity {
         this.equipment.delete(key);
 
         // equip
-        this.player_data.inventory.set(key, new InventorySchema({ key: key, quantity: 1 }));
+        this.pickupItem(
+            new LootSchema(key, {
+                key: key,
+                quantity: 1,
+            })
+        );
+    }
+
+    isSlotAvailable(slot) {
+        let available = true;
+        this.equipment.forEach((item) => {
+            if (item.slot === slot) {
+                available = false;
+            }
+        });
+        return available;
     }
 
     setAsDead() {

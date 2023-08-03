@@ -4,6 +4,9 @@ import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { applyTheme, createButton } from "../Theme";
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
+import { Image } from "@babylonjs/gui/2D/controls/image";
+import { PlayerSlots } from "../../../../shared/Data/ItemDB";
+import { dataDB } from "../../../../shared/Data/dataDB";
 
 export class Panel_Character extends Panel {
     // inventory tab
@@ -74,7 +77,7 @@ export class Panel_Character extends Panel {
             },
         };
 
-        this.slots = ["HEAD", "AMULET", "CHEST", "PANTS", "SHOES", "WEAPON", "OFF_HAND", "RING_01", "RING_02"];
+        this.slots = ["HEAD", "AMULET", "CHEST", "PANTS", "SHOES", "WEAPON", "OFF_HAND", "RING_1", "RING_2"];
 
         this.createContent();
 
@@ -82,6 +85,12 @@ export class Panel_Character extends Panel {
         let entity = this._currentPlayer.entity;
         if (entity) {
             entity.player_data.onChange((item, sessionId) => {
+                this.refresh();
+            });
+            entity.equipment.onAdd((item, sessionId) => {
+                this.refresh();
+            });
+            entity.equipment.onRemove((item, sessionId) => {
                 this.refresh();
             });
         }
@@ -319,7 +328,34 @@ export class Panel_Character extends Panel {
             panelText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             panelText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             panelRectangle.addControl(panelText);
+
+            let equipment = this.findEquip(PlayerSlots[line]);
+            if (equipment !== false) {
+                let item = dataDB.get("item", equipment.key);
+
+                // add icon
+                var imageData = this._loadedAssets[item.icon];
+                var img = new Image("itemImage_" + item.key, imageData);
+                img.stretch = Image.STRETCH_FILL;
+                panelRectangle.addControl(img);
+
+                panelRectangle.onPointerClickObservable.add((e) => {
+                    if (e.buttonIndex === 2) {
+                        this._gameRoom.send("unequip_item", item.key);
+                    }
+                });
+            }
         });
+    }
+
+    public findEquip(slot): any {
+        let found = false;
+        this._currentPlayer.equipment.forEach((item) => {
+            if (item.slot === slot) {
+                found = item;
+            }
+        });
+        return found;
     }
 
     public refresh() {

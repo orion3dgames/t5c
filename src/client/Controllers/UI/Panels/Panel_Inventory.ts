@@ -18,7 +18,7 @@ export class Panel_Inventory extends Panel {
     constructor(_UI, _currentPlayer, options) {
         super(_UI, _currentPlayer, options);
 
-        this.createContent();
+        //this.createContent();
 
         // dynamic events
         let entity = this._currentPlayer.entity;
@@ -57,7 +57,7 @@ export class Panel_Inventory extends Panel {
     // refresh panel
     public update() {
         super.update();
-        if (this._currentPlayer) {
+        if (this._currentPlayer && this._goldUI) {
             this._goldUI.text = "Gold: " + this._currentPlayer.player_data.gold;
         }
     }
@@ -68,6 +68,7 @@ export class Panel_Inventory extends Panel {
 
         // if already exists
         panel.children.forEach((el) => {
+            console.log(el.name);
             el.dispose();
         });
 
@@ -155,35 +156,42 @@ export class Panel_Inventory extends Panel {
     ///////////////////////////////////////
     // INVENTORY PANEL
     public refresh() {
+        // if inventory is empty, make sure to clear all unessacary UI elements
+        if (this._currentPlayer.player_data.inventory.size === 0) {
+            this._inventoryGrid.forEach((child) => {
+                child.getDescendants().forEach((el) => {
+                    el.dispose();
+                });
+                child.metadata = {};
+                this._UI._Tooltip.close();
+            });
+            return false;
+        }
+
+        ///////////////////////
+        // else show items
         let i = 0;
         this._currentPlayer.player_data.inventory.forEach((element) => {
             let child = this._inventoryGrid[i];
             let item = dataDB.get("item", element.key) as Item;
 
             // dispose
-            if (child.children) {
-                child.children.forEach((el) => {
-                    el.dispose();
-                });
-            }
-
-            // on hover tooltip
-            child.onPointerEnterObservable.add(() => {
-                //console.log("HOVER IN", item.key, this);
-                this._UI._Tooltip.refresh("item", item, child);
-            });
-            // on hover tooltip
-            child.onPointerOutObservable.add(() => {
-                //console.log("HOVER OUT", item.key, this);
-                this._UI._Tooltip.close();
+            child.getDescendants().forEach((el) => {
+                el.dispose();
             });
 
-            // add icon
+            // set metadata
+            child.metadata = {
+                item: item,
+            };
+
+            // add item icon
             var imageData = this._loadedAssets[item.icon];
             var img = new Image("itemImage_" + element.key, imageData);
             img.stretch = Image.STRETCH_FILL;
             child.addControl(img);
 
+            // add item qty
             const itemTxtQty = new TextBlock("itemTxtQty" + i);
             itemTxtQty.text = element.qty;
             itemTxtQty.color = "#FFF";
@@ -194,6 +202,28 @@ export class Panel_Inventory extends Panel {
             itemTxtQty.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
             itemTxtQty.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
             child.addControl(itemTxtQty);
+
+            // on item hover
+            child.onPointerEnterObservable.clear();
+            child.onPointerEnterObservable.add(() => {
+                if (child.metadata.item) {
+                    this._UI._Tooltip.refresh("item", item, child);
+                }
+            });
+            // on item unhover
+            child.onPointerOutObservable.clear();
+            child.onPointerOutObservable.add(() => {
+                if (child.metadata.item) {
+                    this._UI._Tooltip.close();
+                }
+            });
+            // on hover tooltip
+            child.onPointerClickObservable.clear();
+            child.onPointerClickObservable.add((e) => {
+                if (child.metadata.item && e.buttonIndex === 2) {
+                    this._gameRoom.send("equip_item", child.metadata.item.key);
+                }
+            });
 
             i++;
         });

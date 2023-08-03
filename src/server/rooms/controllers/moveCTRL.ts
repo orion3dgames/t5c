@@ -28,7 +28,7 @@ export class moveCTRL {
                     this._owner.abilitiesCTRL.startAutoAttack(this._owner, target, ability);
                 }
                 if (target instanceof LootSchema) {
-                    this._owner.addItemToInventory(target);
+                    this._owner.pickupItem(target);
                 }
                 this._owner.AI_ARGET = null;
                 this._owner.AI_ABILITY = null;

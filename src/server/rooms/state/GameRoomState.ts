@@ -259,9 +259,9 @@ export class GameRoomState extends Schema {
             if (data.digit === 6) {
                 let key = "sword_01";
                 if (playerState.equipment.size > 0) {
-                    playerState.equipment.clear();
+                    playerState.unequipItem(key, PlayerSlots.WEAPON);
                 } else {
-                    playerState.equipment.set(key, new EquipmentSchema({ key: "sword_01", slot: PlayerSlots.WEAPON }));
+                    playerState.equipItem(key, PlayerSlots.WEAPON);
                 }
                 return false;
             }
