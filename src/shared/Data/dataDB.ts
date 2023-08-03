@@ -1,23 +1,23 @@
-import { AbilitiesDB } from "./AbilitiesDB";
-import { RacesDB } from "./RacesDB";
+import { AbilitiesDB, Ability } from "./AbilitiesDB";
+import { Race, RacesDB } from "./RacesDB";
 import { LocationsDB } from "./LocationsDB";
-import { ItemsDB } from "./ItemDB";
+import { Item, ItemsDB } from "./ItemDB";
 
 export class dataDB {
     public static get(type, key) {
         let returnData;
         switch (type) {
             case "ability":
-                returnData = AbilitiesDB[key] ?? false;
+                returnData = (AbilitiesDB[key] as Ability) ?? false;
                 break;
             case "race":
-                returnData = RacesDB[key] ?? false;
+                returnData = (RacesDB[key] as Race) ?? false;
                 break;
             case "location":
-                returnData = LocationsDB[key] ?? false;
+                returnData = (LocationsDB[key] as Location) ?? false;
                 break;
             case "item":
-                returnData = ItemsDB[key] ?? false;
+                returnData = (ItemsDB[key] as Item) ?? false;
                 break;
             case "":
                 returnData = false;

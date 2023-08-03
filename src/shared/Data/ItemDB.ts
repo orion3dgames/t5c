@@ -159,4 +159,4 @@ let ItemsDB: itemDataMap = {
     },
 };
 
-export { ItemsDB, Item, PlayerSlots };
+export { ItemsDB, Item, PlayerSlots, ItemClass };

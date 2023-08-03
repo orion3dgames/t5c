@@ -157,16 +157,13 @@ export class Panel_Inventory extends Panel {
     // INVENTORY PANEL
     public refresh() {
         // if inventory is empty, make sure to clear all unessacary UI elements
-        if (this._currentPlayer.player_data.inventory.size === 0) {
-            this._inventoryGrid.forEach((child) => {
-                child.getDescendants().forEach((el) => {
-                    el.dispose();
-                });
-                child.metadata = {};
-                this._UI._Tooltip.close();
+        this._inventoryGrid.forEach((child) => {
+            child.getDescendants().forEach((el) => {
+                el.dispose();
             });
-            return false;
-        }
+            child.metadata = {};
+            this._UI._Tooltip.close();
+        });
 
         ///////////////////////
         // else show items

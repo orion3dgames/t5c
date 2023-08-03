@@ -10,7 +10,7 @@ import { InventorySchema, EquipmentSchema, AbilitySchema, LootSchema } from "../
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { GameRoomState } from "../state/GameRoomState";
 import { Entity } from "../schema/Entity";
-import { PlayerSlots } from "../../../shared/Data/ItemDB";
+import { ItemClass, PlayerSlots } from "../../../shared/Data/ItemDB";
 
 export class PlayerData extends Schema {
     @type({ map: InventorySchema }) inventory = new MapSchema<InventorySchema>();
@@ -169,6 +169,17 @@ export class PlayerSchema extends Entity {
     }
 
     equipItem(key, slot) {
+        let item = dataDB.get("item", key);
+
+        // only certain classs of items can be equipped
+        console.log("equipItem", item.class, ItemClass.ARMOR, ItemClass.WEAPON);
+        if (item.class !== ItemClass.ARMOR && item.class !== ItemClass.WEAPON) {
+            return false;
+        }
+
+        console.log("can equipItem");
+
+        // only if player has in inventory and player slot is available
         let inventoryItem = this.player_data.inventory.get(key);
         if (inventoryItem && inventoryItem.qty > 0 && this.isSlotAvailable(slot) === true) {
             inventoryItem.qty -= 1;
