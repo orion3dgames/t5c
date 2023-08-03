@@ -138,6 +138,13 @@ export class MainMenu {
                     this.openPanel("character");
                 },
             },
+            help: {
+                menuTitle: "Help",
+                icon: "ICON_MENU_help",
+                click: () => {
+                    this.openPanel("help");
+                },
+            },
         };
 
         const grid = new StackPanel("mainmenu");
@@ -193,6 +200,9 @@ export class MainMenu {
                 break;
             case "abilities":
                 this._UI.panelAbilities.open();
+                break;
+            case "help":
+                this._UI.panelHelp.open();
                 break;
         }
     }

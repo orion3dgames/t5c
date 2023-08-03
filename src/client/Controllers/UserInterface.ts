@@ -20,6 +20,7 @@ import {
     RessurectBox,
     Panel_Abilities,
     Panel_Character,
+    Panel_Help,
 } from "./UI";
 
 import { Room } from "colyseus.js";
@@ -66,6 +67,7 @@ export class UserInterface {
     private panelInventory: Panel_Inventory;
     private panelAbilities: Panel_Abilities;
     private panelCharacter: Panel_Character;
+    private panelHelp: Panel_Help;
 
     // tooltip
     public _UITooltip;
@@ -151,6 +153,17 @@ export class UserInterface {
         // create panel
         this.panelCharacter = new Panel_Character(this, currentPlayer, {
             name: "Character",
+            width: "500px;",
+            height: "300px;",
+            top: "30px;",
+            left: "30px;",
+            horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
+            vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
+        });
+
+        // create help panel
+        this.panelHelp = new Panel_Help(this, currentPlayer, {
+            name: "Help",
             width: "500px;",
             height: "300px;",
             top: "30px;",

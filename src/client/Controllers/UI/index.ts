@@ -12,6 +12,7 @@ import { RessurectBox } from "./RessurectBox";
 import { Panel_Inventory } from "./Panels/Panel_Inventory";
 import { Panel_Abilities } from "./Panels/Panel_Abilities";
 import { Panel_Character } from "./Panels/Panel_Character";
+import { Panel_Help } from "./Panels/Panel_Help";
 
 export {
     ChatBox,
@@ -26,4 +27,5 @@ export {
     RessurectBox,
     Panel_Abilities,
     Panel_Character,
+    Panel_Help,
 };
