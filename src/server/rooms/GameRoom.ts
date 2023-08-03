@@ -218,7 +218,7 @@ export class GameRoom extends Room<GameRoomState> {
                 if (sender.equipment.length > 0) {
                     sender.equipment.clear();
                 } else {
-                    sender.equipment.push(new EquipmentSchema({ key: "sword_01", slot: PlayerSlots.WEAPON_1 }));
+                    sender.equipment.push(new EquipmentSchema({ key: "sword_01", slot: PlayerSlots.WEAPON }));
                 }
                 return false;
             }

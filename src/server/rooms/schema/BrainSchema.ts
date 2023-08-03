@@ -100,7 +100,7 @@ export class BrainSchema extends Entity {
         this._stateMachine.changeTo("IDLE");
 
         //
-        this.equipment.push(new EquipmentSchema({ key: "sword_01", slot: PlayerSlots.WEAPON_1 }));
+        this.equipment.push(new EquipmentSchema({ key: "sword_01", slot: PlayerSlots.WEAPON }));
     }
 
     // entity update

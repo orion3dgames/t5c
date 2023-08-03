@@ -74,7 +74,7 @@ export class Panel_Character extends Panel {
             },
         };
 
-        this.slots = ["HEAD", "AMULET", "CHEST", "PANTS", "SHOES", "WEAPON", "OFF_HAND", "RING_1", "RING_2"];
+        this.slots = ["HEAD", "AMULET", "CHEST", "PANTS", "SHOES", "WEAPON", "OFF_HAND", "RING_01", "RING_02"];
 
         this.createContent();
 

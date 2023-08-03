@@ -107,7 +107,7 @@ export class PlayerSchema extends Entity {
         });
 
         // add basic weapon
-        this.equipment.push(new EquipmentSchema({ key: "sword_01", slot: PlayerSlots.WEAPON_1 }));
+        this.equipment.push(new EquipmentSchema({ key: "sword_01", slot: PlayerSlots.WEAPON }));
 
         // set controllers
         this.abilitiesCTRL = new abilitiesCTRL(this, data);

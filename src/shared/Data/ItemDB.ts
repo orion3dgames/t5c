@@ -48,16 +48,15 @@ enum PlayerKeys {
 }
 
 enum PlayerSlots {
-    CANNOT_EQUIP = 0,
     HEAD = 1,
     AMULET = 2,
     CHEST = 3,
     PANTS = 4,
     SHOES = 5,
-    WEAPON_1 = 6,
-    WEAPON_2 = 7,
-    HAND_1 = 8,
-    HAND_2 = 9,
+    WEAPON = 6,
+    OFF_HAND = 7,
+    RING_1 = 8,
+    RING_2 = 9,
 }
 
 let ItemsDB: itemDataMap = {
@@ -68,7 +67,7 @@ let ItemsDB: itemDataMap = {
         icon: "ICON_ITEM_sword_01",
         class: ItemClass.WEAPON,
         value: 2000,
-        slot: PlayerSlots.WEAPON_1,
+        slot: PlayerSlots.WEAPON,
         requirements: [{ key: PlayerKeys.STRENGTH, amount: 20 }],
         benefits: [{ key: PlayerKeys.STRENGTH, type: ItemEffect.ADD, amount: 10 }],
         meshData: {

@@ -46,8 +46,8 @@ let RacesDB: raceDataMap = {
             DAMAGE: 1,
         },
         bones: {
-            WEAPON_1: 37,
-            WEAPON_2: 14,
+            WEAPON: 37,
+            OFF_HAND: 14,
         },
         baseHealth: 100,
         baseMana: 100,
@@ -76,8 +76,8 @@ let RacesDB: raceDataMap = {
             DAMAGE: 1,
         },
         bones: {
-            WEAPON_1: 37,
-            WEAPON_2: 14,
+            WEAPON: 37,
+            OFF_HAND: 14,
         },
         baseHealth: 200,
         baseMana: 100,
@@ -97,6 +97,7 @@ let RacesDB: raceDataMap = {
         ],
         default_abilities: ["base_attack"],
     },
+    /*
     monster_bear: {
         key: "monster_bear",
         title: "Bear",
