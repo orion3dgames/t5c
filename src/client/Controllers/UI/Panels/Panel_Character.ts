@@ -344,6 +344,14 @@ export class Panel_Character extends Panel {
                         this._gameRoom.send("unequip_item", item.key);
                     }
                 });
+
+                panelRectangle.onPointerEnterObservable.add((e) => {
+                    this._UI._Tooltip.refresh("item", item, panelRectangle, "center", "top");
+                });
+
+                panelRectangle.onPointerOutObservable.add((e) => {
+                    this._UI._Tooltip.close();
+                });
             }
         });
     }
