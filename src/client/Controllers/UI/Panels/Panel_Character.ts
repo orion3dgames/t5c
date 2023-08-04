@@ -79,6 +79,8 @@ export class Panel_Character extends Panel {
 
         this.slots = ["HEAD", "AMULET", "CHEST", "PANTS", "SHOES", "WEAPON", "OFF_HAND", "RING_1", "RING_2"];
 
+        // create UI
+        this.createPanels();
         this.createContent();
 
         // dynamic events
@@ -89,10 +91,10 @@ export class Panel_Character extends Panel {
                 this.rightPanelContent(this.rightPanel);
             });
             entity.equipment.onAdd((item, sessionId) => {
-                this.slotPanelContent(this.slotPanel);
+                this.slotPanelContentRefresh("ADD", this.slotPanel, item);
             });
             entity.equipment.onRemove((item, sessionId) => {
-                this.slotPanelContent(this.slotPanel);
+                this.slotPanelContentRefresh("REMOVE", this.slotPanel, item);
             });
         }
     }
@@ -100,17 +102,18 @@ export class Panel_Character extends Panel {
     // open panel
     public open() {
         super.open();
-        this.refresh();
+    }
+
+    // create content
+    public createContent() {
+        this.leftPanelContent(this.leftPanel);
+        this.rightPanelContent(this.rightPanel);
+        this.slotPanelContent(this.slotPanel);
     }
 
     // create panel
-    private createContent() {
+    private createPanels() {
         let panel: Rectangle = this._panelContent;
-
-        // if already exists
-        panel.children.forEach((el) => {
-            el.dispose();
-        });
 
         // left panel
         let leftPanel = new Rectangle("leftPanel");
@@ -294,11 +297,6 @@ export class Panel_Character extends Panel {
     }
 
     private slotPanelContent(panel: Rectangle) {
-        // if already exists
-        panel.getDescendants().forEach((el) => {
-            el.dispose();
-        });
-
         let width = 484;
 
         let i = 0;
@@ -330,46 +328,47 @@ export class Panel_Character extends Panel {
             panelText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             panelRectangle.addControl(panelText);
 
-            let equipment = this.findEquip(PlayerSlots[line]);
-            if (equipment !== false) {
-                let item = dataDB.get("item", equipment.key);
-
-                // add icon
-                var imageData = this._loadedAssets[item.icon];
-                var img = new Image("itemImage_" + item.key, imageData);
-                img.stretch = Image.STRETCH_FILL;
-                panelRectangle.addControl(img);
-
-                panelRectangle.onPointerClickObservable.add((e) => {
-                    if (e.buttonIndex === 2) {
-                        this._gameRoom.send("unequip_item", item.key);
-                    }
-                });
-
-                panelRectangle.onPointerEnterObservable.add((e) => {
-                    this._UI._Tooltip.refresh("item", item, panelRectangle, "center", "top");
-                });
-
-                panelRectangle.onPointerOutObservable.add((e) => {
-                    this._UI._Tooltip.close();
-                });
-            }
+            // add icon
+            var img = new Image("slot_image_" + i, "./");
+            img.stretch = Image.STRETCH_FILL;
+            panelRectangle.addControl(img);
         });
     }
 
-    public findEquip(slot): any {
-        let found = false;
-        this._currentPlayer.equipment.forEach((item) => {
-            if (item.slot === slot) {
-                found = item;
-            }
-        });
-        return found;
-    }
+    private slotPanelContentRefresh(type, panel: Rectangle, data) {
+        // get information
+        let slot_id = data.slot;
+        let item_key = data.key;
+        let slotPanel = panel.getChildByName("slot_" + slot_id) as Rectangle;
+        let slotImage = slotPanel.getChildByName("slot_image_" + slot_id) as Image;
+        let item = dataDB.get("item", item_key);
 
-    public refresh() {
-        this.leftPanelContent(this.leftPanel);
-        this.rightPanelContent(this.rightPanel);
-        this.slotPanelContent(this.slotPanel);
+        // equip item
+        if (type === "ADD") {
+            var imageData = this._loadedAssets[item.icon];
+            slotImage.source = imageData;
+
+            slotPanel.onPointerClickObservable.add((e) => {
+                if (e.buttonIndex === 2) {
+                    this._gameRoom.send("unequip_item", item.key);
+                }
+            });
+
+            slotPanel.onPointerEnterObservable.add((e) => {
+                this._UI._Tooltip.refresh("item", item, slotPanel, "center", "top");
+            });
+
+            slotPanel.onPointerOutObservable.add((e) => {
+                this._UI._Tooltip.close();
+            });
+        }
+
+        // unequip
+        if (type === "REMOVE") {
+            slotImage.source = "";
+            slotPanel.onPointerClickObservable.clear();
+            slotPanel.onPointerEnterObservable.clear();
+            slotPanel.onPointerOutObservable.clear();
+        }
     }
 }
