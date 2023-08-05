@@ -69,7 +69,7 @@ export class PlayerInput {
                 if (this.right_click) {
                     this.mouse_moving = true;
                     this.movementX = pointerInfo.event.movementX / 100;
-                    this.movementX = pointerInfo.event.movementX / 100;
+                    this.movementY = pointerInfo.event.movementY / 100;
                 }
             }
         });

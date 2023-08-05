@@ -51,7 +51,12 @@ let LocationsDB = {
                     behaviour: "patrol",
                     aggressive: true,
                     canAttack: true,
-                    points: [new Vector3(4.7, 0, 2), new Vector3(30, 3.54, 2.38)],
+                    points: [
+                        new Vector3(17.47, 0.04, 2.55),
+                        new Vector3(31.77, 3.54, 2.56),
+                        new Vector3(32.46, 3.54, -11.21),
+                        new Vector3(16.87, 0.04, -8.92)
+                    ],
                     radius: 0,
                     amount: 1,
                     race: "male_enemy",
@@ -62,7 +67,7 @@ let LocationsDB = {
                     behaviour: "idle",
                     aggressive: false,
                     canAttack: false,
-                    points: [new Vector3(22.2, -3.46, -1.8)],
+                    points: [new Vector3(31.03, 3.54, -14.11)],
                     radius: 0,
                     amount: 1,
                     race: "male_adventurer",

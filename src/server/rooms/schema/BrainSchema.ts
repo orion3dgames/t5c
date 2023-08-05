@@ -167,7 +167,6 @@ export class BrainSchema extends Entity {
     setRandomDestination(currentPos: Vector3): void {
         let randomPoint = this._state.navMesh.getRandomRegion();
         this.AI_TARGET_WAYPOINTS = this._state.navMesh.findPath(currentPos, randomPoint.centroid);
-        console.log('setRandomDestination', this.AI_TARGET_WAYPOINTS);
         if (this.AI_TARGET_WAYPOINTS.length === 0) {
             this.AI_TARGET_WAYPOINTS = [];
         }

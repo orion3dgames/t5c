@@ -19,7 +19,7 @@ let Config = {
 
     // game settings
     PLAYER_NAMEPLATE_TIMEOUT: 15000, // 15 seconds
-    PLAYER_VIEW_DISTANCE: 22,
+    PLAYER_VIEW_DISTANCE: 26,
     PLAYER_LOSE_FOCUS_DISTANCE: 22,
     PLAYER_GRACE_PERIOD: 0,
 

@@ -16,10 +16,17 @@ function createRandomPath(positions: Array<Vector3>) {
     return [getRandomPoint(positions)];
 }
 
-function createPath(positions: Array<Vector3>) {
+function createPath(owner, positions: Array<Vector3>) {
+    let startPos = owner.getPosition();
     let path = [];
     positions.forEach((position) => {
-        path.push(position);
+        let waypoints = owner._state.navMesh.findPath(startPos, position);
+        if(waypoints.length > 0){
+            waypoints.forEach((w) => {
+                path.push(w); 
+            });
+        }
+        startPos = position;
     });
     return path;
 }
@@ -39,7 +46,7 @@ class PatrolState extends State {
             owner.AI_TARGET_WAYPOINTS = createRandomPath(owner.AI_SPAWN_INFO.points);
         }
         if (owner.AI_SPAWN_INFO.type == "path") {
-            owner.AI_TARGET_WAYPOINTS = createPath(owner.AI_SPAWN_INFO.points);
+            owner.AI_TARGET_WAYPOINTS = createPath(owner, owner.AI_SPAWN_INFO.points);
         }
         if (owner.AI_SPAWN_INFO.type == "static") {
             owner._stateMachine.changeTo("IDLE");
