@@ -47,7 +47,7 @@ export class MainMenu {
             menuTitle: "O",
             children: {
                 reset: {
-                    menuTitle: "Unstuck",
+                    menuTitle: "Stuck?",
                     click: () => {
                         this._gameRoom.send("reset_position");
                     },
@@ -78,7 +78,7 @@ export class MainMenu {
         drowpdownMenu.left = "-15px;";
         drowpdownMenu.width = "150px;";
         drowpdownMenu.height = "100px";
-        drowpdownMenu.isVisible = false;
+        drowpdownMenu.isVisible = true;
         drowpdownMenu.adaptHeightToChildren = true;
         drowpdownMenu = applyTheme(drowpdownMenu);
         drowpdownMenu.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;

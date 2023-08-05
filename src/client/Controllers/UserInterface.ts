@@ -138,6 +138,7 @@ export class UserInterface {
             horizontal_position: Control.HORIZONTAL_ALIGNMENT_RIGHT,
             vertical_position: Control.VERTICAL_ALIGNMENT_BOTTOM,
         });
+        this.panelInventory.open();
 
         // create panel
         this.panelAbilities = new Panel_Abilities(this, currentPlayer, {

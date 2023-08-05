@@ -315,6 +315,10 @@ export class Environment {
                 m.dispose();
             }
 
+            if (m.name.includes("castShadows")) {
+                this._shadow.addShadowCaster(m);
+            }
+
             if (m.name.includes("New Terrain 1")) {
                 m.receiveShadows = true;
                 // Add skybox and ground to the reflection and refraction
