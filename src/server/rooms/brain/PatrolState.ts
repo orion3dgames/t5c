@@ -47,6 +47,7 @@ class PatrolState extends State {
     }
 
     execute(owner) {
+        
         // set animation state
         // todo: not sure if I actually need this
         owner.anim_state = EntityState.WALKING;

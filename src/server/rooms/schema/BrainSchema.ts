@@ -167,6 +167,7 @@ export class BrainSchema extends Entity {
     setRandomDestination(currentPos: Vector3): void {
         let randomPoint = this._state.navMesh.getRandomRegion();
         this.AI_TARGET_WAYPOINTS = this._state.navMesh.findPath(currentPos, randomPoint.centroid);
+        console.log('setRandomDestination', this.AI_TARGET_WAYPOINTS);
         if (this.AI_TARGET_WAYPOINTS.length === 0) {
             this.AI_TARGET_WAYPOINTS = [];
         }
@@ -177,10 +178,11 @@ export class BrainSchema extends Entity {
         // move entity
         if (this.AI_TARGET_WAYPOINTS.length > 0) {
             let currentPos = this.getPosition();
+
             // get next waypoint
             let destinationOnPath = this.AI_TARGET_WAYPOINTS[0];
-            destinationOnPath.y = 0;
-
+            //destinationOnPath.y = 0;
+  
             // calculate next position towards destination
             let updatedPos = this.moveTo(currentPos, destinationOnPath, this.speed);
             this.setPosition(updatedPos);
@@ -189,7 +191,7 @@ export class BrainSchema extends Entity {
             this.rot = this.rotateTowards(currentPos, updatedPos);
 
             // check if arrived at waypoint
-            if (destinationOnPath.equals(updatedPos)) {
+            if (destinationOnPath.distanceTo(updatedPos) < 1) {
                 this.AI_TARGET_WAYPOINTS.shift();
             }
         } else {
@@ -207,11 +209,15 @@ export class BrainSchema extends Entity {
      * @returns {Vector3} new position
      */
     moveTo(source: Vector3, destination: Vector3, speed: number): Vector3 {
+
         let currentX = source.x;
         let currentZ = source.z;
+
         let targetX = destination.x;
         let targetZ = destination.z;
+
         let newPos = new Vector3(source.x, source.y, source.z);
+
         if (targetX < currentX) {
             newPos.x -= speed;
             if (newPos.x < targetX) {
@@ -236,6 +242,14 @@ export class BrainSchema extends Entity {
                 newPos.z = targetZ;
             }
         }
+
+        // adjust height of the entity according to the ground
+        let currentRegion = this._navMesh.getRegionForPoint( newPos, 5);
+        if(currentRegion){
+            let distance = currentRegion.plane.distanceToPoint( newPos);
+            newPos.y -= distance;
+        } ;
+
         return newPos;
     }
 

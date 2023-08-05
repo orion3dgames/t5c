@@ -80,7 +80,7 @@ class GameServer {
             matchMaker.createRoom("game_room", { location: "lh_town" });
 
             // create island room
-            matchMaker.createRoom("game_room", { location: "lh_dungeon_01" });
+            //matchMaker.createRoom("game_room", { location: "lh_dungeon_01" });
         });
 
         // start dev routes
