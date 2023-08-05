@@ -101,6 +101,12 @@ export class EntityMove {
             let destinationPos = new Vector3Y(newX, newY, newZ); // new pos
             const foundPath: any = this._navMesh.checkPath(sourcePos, destinationPos);
             if (foundPath) {
+
+                // adjust height of the entity according to the ground
+                let currentRegion = this._navMesh.getRegionForPoint( destinationPos, .5);
+                const distance = currentRegion.plane.distanceToPoint( destinationPos );
+                newY -= distance; // smooth transition*/
+
                 this.nextPosition.x = newX;
                 this.nextPosition.y = newY;
                 this.nextPosition.z = newZ;

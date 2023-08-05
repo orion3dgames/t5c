@@ -98,7 +98,7 @@ export class spawnCTRL {
             key: randData.key,
             sessionId: sessionId,
             x: currentPosition.x,
-            y: 0.25,
+            y: currentPosition.y,
             z: currentPosition.z,
             quantity: 1,
         };

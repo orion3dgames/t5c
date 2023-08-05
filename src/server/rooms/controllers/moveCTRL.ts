@@ -93,7 +93,7 @@ export class moveCTRL {
 
         // calculate new position
         let newX = this._owner.x - playerInput.h * speed;
-        let newY = this._owner.y;
+        let newY = oldY;
         let newZ = this._owner.z - playerInput.v * speed;
         let newRot = Math.atan2(playerInput.h, playerInput.v);
 
@@ -102,13 +102,12 @@ export class moveCTRL {
         let destinationPos = new Vector3(newX, newY, newZ); // new pos
         const foundPath: any = this._owner._navMesh.checkPath(sourcePos, destinationPos);
         if (foundPath) {
-            /*
+            
             // adjust height of the entity according to the ground
-            let currentRegion = this._navMesh.getClosestRegion( destinationPos );
-            const distance = currentRegion.plane.distanceToPoint( sourcePos );
-            let newY = distance * 0.2; // smooth transition
-            */
-
+            let currentRegion = this._owner._navMesh.getRegionForPoint( destinationPos, .5);
+            const distance = currentRegion.plane.distanceToPoint( destinationPos );
+            newY -= distance; // smooth transition*/
+            
             // next position validated, update player
             this._owner.x = newX;
             this._owner.y = newY;
@@ -135,7 +134,7 @@ export class moveCTRL {
         } else {
             // collision detected, return player old position
             this._owner.x = oldX;
-            this._owner.y = 0;
+            this._owner.y = oldY;
             this._owner.z = oldZ;
             this._owner.rot = oldRot;
             this._owner.sequence = playerInput.seq;

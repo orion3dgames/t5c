@@ -275,7 +275,7 @@ export class Environment {
         if (this._auth.currentLocation.waterPlane) {
             // Water
             var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 32 }, this._scene);
-            waterMesh.position = new Vector3(0, -2, 0);
+            waterMesh.position = new Vector3(0, -3, 0);
 
             var water = new WaterMaterial("water", this._scene);
             water.bumpTexture = new Texture("textures/waterbump.jpg", this._scene);
@@ -306,7 +306,8 @@ export class Environment {
             // default values
             m.checkCollisions = false;
             m.isPickable = false;
-
+            m.receiveShadows = true;
+            
             if (m.getClassName() !== "InstancedMesh") {
             }
 
@@ -316,7 +317,6 @@ export class Environment {
 
             if (m.name.includes("New Terrain 1")) {
                 m.receiveShadows = true;
-
                 // Add skybox and ground to the reflection and refraction
                 water.addToRenderList(m);
             }

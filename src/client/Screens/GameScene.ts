@@ -19,8 +19,8 @@ import { PlayerInputs } from "../../shared/types";
 import { NavMesh } from "../../shared/yuka-min";
 import { SceneController } from "../Controllers/Scene";
 import { AuthController } from "../Controllers/AuthController";
-import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
-import { RenderTargetTexture } from "@babylonjs/core/Materials/Textures/renderTargetTexture";
+
+import { createConvexRegionHelper } from "../../shared/Utils/navMeshHelper";
 
 export class GameScene {
     private _app;
@@ -80,9 +80,7 @@ export class GameScene {
         let location = this._auth.currentLocation;
 
         // black background
-        if (location.skyColor) {
-            scene.clearColor = new Color4(location.skyColor, location.skyColor, location.skyColor, 1);
-        }
+        scene.clearColor = new Color4(location.skyColor, location.skyColor, location.skyColor, 1);
 
         if (location.sun) {
             // ambient light
@@ -120,6 +118,7 @@ export class GameScene {
         this._environment = new Environment(this._scene, this._shadow, this._loadedAssets);
         this._navMesh = await this._environment.loadNavMesh();
         await this._environment.loadAssets();
+        //let navMeshGroup = createConvexRegionHelper(this._navMesh, this._scene)
 
         // load the rest
         this._app.engine.displayLoadingUI();
@@ -285,3 +284,5 @@ export class GameScene {
         }
     }
 }
+
+

@@ -39,7 +39,7 @@ export class DebugBox {
     }
 
     _createUI() {
-        const debugPanel = generatePanel("debugPanel", "120px;", "120px", "0px", "-15px");
+        const debugPanel = generatePanel("debugPanel", "120px;", "140px", "0px", "-15px");
         debugPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
         debugPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         this._playerUI.addControl(debugPanel);
@@ -76,7 +76,9 @@ export class DebugBox {
         locationText += "FPS: " + roundTo(this._engine.getFps(), 0) + " \n";
         locationText += "Ping: " + this.ping + "ms\n";
         locationText += "X: " + roundTo(this._currentPlayer.x, 2) + "\n";
-        locationText += "Z: " + roundTo(this._currentPlayer.z, 2) + "\n";
+        locationText += "y: " + roundTo(this._currentPlayer.y, 2) + "\n";
+        locationText += "z: " + roundTo(this._currentPlayer.z, 2) + "\n";
+        locationText += "Rot: " + roundTo(this._currentPlayer.rot, 2) + "\n";
         this._debugTextUI.text = locationText;
     }
 }
