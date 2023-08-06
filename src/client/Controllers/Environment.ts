@@ -275,16 +275,16 @@ export class Environment {
         if (this._auth.currentLocation.waterPlane) {
             // Water
             var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 32 }, this._scene);
-            waterMesh.position = new Vector3(0, -3, 0);
+            waterMesh.position = new Vector3(0, -4, 0);
 
             var water = new WaterMaterial("water", this._scene);
             water.bumpTexture = new Texture("textures/waterbump.jpg", this._scene);
 
             // Water properties
             water.backFaceCulling = true;
-            water.windForce = -5;
-            water.waveHeight = 0.2;
-            water.bumpHeight = 0.05;
+            water.windForce = 0.1;
+            water.waveHeight = .6;
+            water.bumpHeight = 0.5;
             water.waterColor = Color3.FromInts(0, 157, 255);
             water.colorBlendFactor = 0.5;
             waterMesh.material = water;
@@ -319,7 +319,7 @@ export class Environment {
                 this._shadow.addShadowCaster(m);
             }
 
-            if (m.name.includes("New Terrain 1")) {
+            if (m.name.includes("seafloor")) {
                 m.receiveShadows = true;
                 // Add skybox and ground to the reflection and refraction
                 water.addToRenderList(m);

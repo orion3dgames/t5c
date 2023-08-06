@@ -13,8 +13,8 @@ let LocationsDB = {
             z: -12,
             rot: -180,
         },
-        waterPlane: false,
-        skyColor: 0,
+        waterPlane: true,
+        skyColor: 255,
         dynamic: {
             spawns: [
                 {
