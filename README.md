@@ -15,7 +15,7 @@ Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 - monsters have a loot table and can drop items
 - ability to pick up items and see them in your inventory
 - standard UI (experience bar, abilities bar, panels, etc...)
-- and more...
+- and more... 
 
 ## Roadmap
 You can follow the progress here: [FORUM POST](https://forum.babylonjs.com/t/multiplayer-top-down-rpg-babylon-js-colyseus/35733)
