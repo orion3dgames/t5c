@@ -240,33 +240,12 @@ class GameServer {
                     });
                 });
             });
-            /*
-                .then((user) => {
-                    return database.createCharacter(user.token, generateRandomPlayerName());
-                });
-            /*
-            database.returnRandomUserAndChar().then((user) => {
-                if (!user) {
-                    database.saveUser(generateRandomPlayerName(), generateRandomPlayerName()).then((user) => {
-                        console.log(user);
-                        return user;
-                    });
-                    
-                        .then((user) => {
-                            return database.createCharacter(user.token, generateRandomPlayerName());
-                        });
+        });
 
-                    return res.status(400).send({
-                        message: "Failed",
-                    });
-                } else {
-                    return res.send({
-                        message: "Successful",
-                        user: user,
-                    });
-                }
-            });
-            */
+        app.get("/getHelpPage", function (req, res) {
+            let page = req.query.page;
+            let src = path.join(__dirname + "/../shared/Help/");
+            res.sendFile(src + "/" + page + ".html");
         });
     }
 }

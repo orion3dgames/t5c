@@ -202,11 +202,6 @@ export class UserInterface {
             vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
         });
 
-        this._panels.push(this.panelInventory);
-        this._panels.push(this.panelAbilities);
-        this._panels.push(this.panelCharacter);
-        this._panels.push(this.panelHelp);
-
         // create tooltip
         this._Tooltip = new Tooltip(this, currentPlayer);
 
