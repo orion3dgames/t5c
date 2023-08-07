@@ -141,21 +141,11 @@ export class Panel {
 
         // drag and drop events
         panelHeader.onPointerDownObservable.add((e) => {
-            this._isPointerDown = true;
-            this._pointerDownPosition = { x: e.x, y: e.y };
+            this._UI.startDragging(this._panel);
+            this._panel.isPointerBlocker = false;
         });
         panelHeader.onPointerUpObservable.add((e) => {
-            this._isPointerDown = false;
-        });
-        panelHeader.onPointerMoveObservable.add((event) => {
-            if (this._isPointerDown) {
-                var deltaX = event.x - this._pointerDownPosition.x;
-                var deltaY = event.y - this._pointerDownPosition.y;
-                this._panel.leftInPixels += deltaX;
-                this._panel.topInPixels += deltaY;
-                this._pointerDownPosition.x = event.x;
-                this._pointerDownPosition.y = event.y;
-            }
+            this._UI.stopDragging();
         });
     }
 

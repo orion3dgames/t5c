@@ -19,4 +19,23 @@ export class Panel_Help extends Panel {
     constructor(_UI, _currentPlayer, options) {
         super(_UI, _currentPlayer, options);
     }
+
+    // create panel
+    private createContent() {
+        let panel: Rectangle = this._panelContent;
+
+        // add item qty
+        const itemTxtQty = new TextBlock("helpContent");
+        itemTxtQty.width = 1;
+        itemTxtQty.height = 1;
+        itemTxtQty.text = "HELP TEXT HERE...";
+        itemTxtQty.color = "#FFF";
+        itemTxtQty.top = "10px";
+        itemTxtQty.left = "10px";
+        itemTxtQty.fontSize = "12px;";
+        itemTxtQty.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        itemTxtQty.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        itemTxtQty.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        panel.addControl(itemTxtQty);
+    }
 }

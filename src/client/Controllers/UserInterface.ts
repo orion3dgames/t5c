@@ -36,6 +36,7 @@ import { Item } from "../../shared/Entities/Item";
 import { generatePanel, getBg } from "./UI/Theme";
 import { Grid } from "@babylonjs/gui";
 import { HighlightLayer } from "@babylonjs/core/Layers/highlightLayer";
+import { Panel } from "./UI/Panels/Panel";
 
 export class UserInterface {
     private _scene: Scene;
@@ -64,6 +65,7 @@ export class UserInterface {
     private _ExperienceBar: ExperienceBar;
 
     // openable panels
+    private _panels: Panel[];
     private panelInventory: Panel_Inventory;
     private panelAbilities: Panel_Abilities;
     private panelCharacter: Panel_Character;
@@ -71,6 +73,9 @@ export class UserInterface {
 
     // tooltip
     public _UITooltip;
+
+    _isDragging;
+    _pointerDownPosition;
 
     constructor(scene: Scene, engine: Engine, gameRoom: Room, chatRoom: Room, entities: (Entity | Player | Item)[], currentPlayer, _loadedAssets) {
         // set var we will be needing
@@ -95,6 +100,30 @@ export class UserInterface {
         this._hightlight.blurHorizontalSize = 0.5;
         this._hightlight.blurVerticalSize = 0.5;
         this._hightlight.innerGlow = false;
+
+        // some ui must be constantly refreshed as things change
+        this._scene.registerBeforeRender(() => this.dragging());
+    }
+
+    public dragging() {
+        if (this._isDragging) {
+            var deltaX = this._scene.pointerX - this._pointerDownPosition.x;
+            var deltaY = this._scene.pointerY - this._pointerDownPosition.y;
+            this._isDragging.leftInPixels += deltaX;
+            this._isDragging.topInPixels += deltaY;
+            this._pointerDownPosition.x = this._scene.pointerX;
+            this._pointerDownPosition.y = this._scene.pointerY;
+        }
+    }
+
+    public startDragging(panel) {
+        this._isDragging = panel;
+        this._pointerDownPosition = { x: this._scene.pointerX, y: this._scene.pointerY };
+    }
+
+    public stopDragging() {
+        this._isDragging.isPointerBlocker = true;
+        this._isDragging = null;
     }
 
     // set current player
@@ -172,6 +201,11 @@ export class UserInterface {
             horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
             vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
         });
+
+        this._panels.push(this.panelInventory);
+        this._panels.push(this.panelAbilities);
+        this._panels.push(this.panelCharacter);
+        this._panels.push(this.panelHelp);
 
         // create tooltip
         this._Tooltip = new Tooltip(this, currentPlayer);
