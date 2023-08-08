@@ -1,14 +1,14 @@
 name: Deploy To Hathora Cloud
 on:
-  push:
-    branches:
-      - main
+    push:
+        branches:
+            - main
 
 jobs:
-  server:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - run: npm install -g @hathora/cli
-      - run: >
-          hathora-cloud deploy --appId app-ac6fef2b-76a4-49aa-b36d-877f9be7aacf --token ${{ secrets.HATHORA_TOKEN }}
+    server:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - run: npm install -g @hathora/cli
+            - run: >
+                  hathora-cloud deploy --appId app-ac6fef2b-76a4-49aa-b36d-877f9be7aacf --token ${{ secrets.HATHORA_TOKEN }}
