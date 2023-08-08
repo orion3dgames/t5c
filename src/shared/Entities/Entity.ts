@@ -180,7 +180,8 @@ export class Entity {
         }
 
         // what to do when an entity dies
-        if (this.type !== "player" && this.anim_state === EntityState.DEAD && !this.isDead) {
+        if (this.health < 0 && !this.isDead) {
+            console.log("ENTITY IS DEAD REMOVE ACTION MANAGER");
             this.isDead = true;
             global.T5C.selectedEntity = null;
             this.meshController.selectedMesh.isVisible = false;
@@ -221,15 +222,8 @@ export class Entity {
         this.characterLabel.dispose();
         this.characterChatLabel.dispose();
 
-        // delete main mesh
-        this.mesh.dispose();
-
-        // delete equipment
-        if (this.meshController.equipments.length > 0) {
-            this.meshController.equipments.forEach((equipment) => {
-                equipment.dispose();
-            });
-        }
+        // delete mesh, including equipment
+        this.meshController.deleteMeshes();
 
         // unselect ?
         // todo: what is this for? it looks wrong.

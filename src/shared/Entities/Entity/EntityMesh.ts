@@ -125,17 +125,12 @@ export class EntityMesh {
         // register hover over player
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
+                console.log("ACTION MANAGER HOVER");
                 let mesh = ev.meshUnderPointer;
                 for (const childMesh of mesh.getChildMeshes()) {
                     childMesh.overlayColor = new Color3(1, 1, 1);
                     childMesh.overlayAlpha = 0.3;
                     childMesh.renderOverlay = true;
-                    //this._ui._hightlight.addMesh(childMesh as Mesh, new Color3(1, 1, 1));
-                    /*
-                    childMesh.outlineColor = new Color3(0, 1, 0);
-                    childMesh.outlineWidth = 0.03;
-                    childMesh.renderOutline = true;
-                    */
                 }
             })
         );
@@ -147,20 +142,32 @@ export class EntityMesh {
                 for (const childMesh of mesh.getChildMeshes()) {
                     childMesh.renderOverlay = false;
                     this._ui._hightlight.removeMesh(childMesh as Mesh);
-                    //childMesh.renderOutline = false;
                 }
             })
         );
 
+        // check for any equipemnt changes
         this._entity.entity.equipment.onAdd((e) => {
-            this.refreshEquipement(e);
+            this.refreshMeshes(e);
         });
         this._entity.entity.equipment.onRemove((e) => {
-            this.refreshEquipement(e);
+            this.refreshMeshes(e);
         });
     }
 
-    public refreshEquipement(e) {
+    public deleteMeshes() {
+        // remove player mesh
+        this.mesh.dispose();
+
+        // remove any other mesh
+        if (this.equipments.length > 0) {
+            this.equipments.forEach((equipment) => {
+                equipment.dispose();
+            });
+        }
+    }
+
+    public refreshMeshes(e) {
         if (!this._entity.bones) {
             return false;
         }

@@ -110,7 +110,6 @@ export class EntityActions {
         var projectile = MeshBuilder.CreateSphere("Projectile", { segments: 4, diameter: 0.4 }, this._scene);
         projectile.material = material;
         projectile.position = start.clone();
-        projectile.position.y = 2;
         projectile.rotation.y = Math.PI / 2 - angle;
 
         //////////////////////////////////////////////
