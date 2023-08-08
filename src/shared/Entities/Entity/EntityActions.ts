@@ -96,6 +96,8 @@ export class EntityActions {
         setTimeout(() => {
             particleSystem.dispose(true);
         }, 500);
+
+        //
     }
 
     public particule_fireball(start, end, mesh, color) {
