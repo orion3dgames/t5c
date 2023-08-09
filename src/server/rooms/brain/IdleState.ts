@@ -5,7 +5,7 @@ import { State } from "../brain/StateManager";
 class IdleState extends State {
     enter(owner) {
         owner.IDLE_TIMER = 0;
-        owner.IDLE_TIMER_LENGTH = 1000;
+        owner.IDLE_TIMER_LENGTH = randomNumberInRange(2000, 6000);
     }
 
     execute(owner) {

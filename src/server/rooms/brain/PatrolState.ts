@@ -21,9 +21,9 @@ function createPath(owner, positions: Array<Vector3>) {
     let path = [];
     positions.forEach((position) => {
         let waypoints = owner._state.navMesh.findPath(startPos, position);
-        if(waypoints.length > 0){
+        if (waypoints.length > 0) {
             waypoints.forEach((w) => {
-                path.push(w); 
+                path.push(w);
             });
         }
         startPos = position;
@@ -54,7 +54,6 @@ class PatrolState extends State {
     }
 
     execute(owner) {
-        
         // set animation state
         // todo: not sure if I actually need this
         owner.anim_state = EntityState.WALKING;
@@ -73,6 +72,12 @@ class PatrolState extends State {
         // if entity has a target, start searching for it
         if (owner.hasValidTarget() && owner.AI_SPAWN_INFO.aggressive === true) {
             owner._stateMachine.changeTo("CHASE");
+            return false;
+        }
+
+        // add 10% chance of AI of breaking patrol and slacking off :)
+        if (Math.random() > 0.95) {
+            owner._stateMachine.changeTo("IDLE");
             return false;
         }
 
