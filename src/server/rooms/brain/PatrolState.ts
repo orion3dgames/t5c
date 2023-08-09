@@ -76,7 +76,7 @@ class PatrolState extends State {
         }
 
         // add 10% chance of AI of breaking patrol and slacking off :)
-        if (Math.random() > 0.95) {
+        if (Math.random() > 0.99) {
             owner._stateMachine.changeTo("IDLE");
             return false;
         }
