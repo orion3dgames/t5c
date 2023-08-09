@@ -1,5 +1,4 @@
 import State from "../client/Screens/Screens";
-import { isLocal } from "./Utils";
 
 let Config = {
     // general settings

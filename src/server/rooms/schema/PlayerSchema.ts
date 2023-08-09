@@ -157,27 +157,36 @@ export class PlayerSchema extends Entity {
             key: loot.key,
             qty: loot.quantity,
         };
+        let item = dataDB.get("item", loot.key);
+
         let inventoryItem = this.player_data.inventory.get(data.key);
+
         if (inventoryItem) {
             inventoryItem.qty += data.qty;
         } else {
             this.player_data.inventory.set(data.key, new InventorySchema(data));
         }
+
         this._state.entities.delete(loot.sessionId);
 
         this.AI_TARGET = null;
     }
 
-    equipItem(key, slot) {
+    equipItem(key) {
         let item = dataDB.get("item", key);
 
-        // only certain classs of items can be equipped
-        console.log("equipItem", item.class, ItemClass.ARMOR, ItemClass.WEAPON);
         if (item.class !== ItemClass.ARMOR && item.class !== ItemClass.WEAPON) {
+            console.log("this item class cannot be equipped", key);
             return false;
         }
 
-        console.log("can equipItem");
+        // make sure item is equipable
+        if (!item.equippable) {
+            console.log("item cannot be equipped", key);
+            return false;
+        }
+
+        let slot = item.equippable.slot;
 
         // only if player has in inventory and player slot is available
         let inventoryItem = this.player_data.inventory.get(key);

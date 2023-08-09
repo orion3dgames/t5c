@@ -1,18 +1,55 @@
+enum ItemClass {
+    WEAPON = 1,
+    ARMOR = 2,
+    CONSUMABLE = 3,
+    QUEST = 4,
+    OTHER = 5,
+}
+
+enum PlayerSlots {
+    HEAD = 1,
+    AMULET = 2,
+    CHEST = 3,
+    PANTS = 4,
+    SHOES = 5,
+    WEAPON = 6,
+    OFF_HAND = 7,
+    RING_1 = 8,
+    RING_2 = 9,
+}
+
+enum ItemRarity {
+    NORMAL = 0,
+    RARE = 1,
+    LEGENDARY = 2,
+}
+
 type Item = {
     key: string;
+
     title: string;
     description: string;
     icon: string;
-    value: number;
     class: ItemClass;
-    slot?: PlayerSlots;
-    attachMesh?;
+    value: number;
+    destroyable: boolean;
+    sellable: boolean;
+    tradable: boolean;
+    stackable: boolean;
+    rarity?: ItemRarity;
     requirements?: {};
     benefits?: {};
+
+    equippable?: {
+        slot: PlayerSlots;
+        mesh?: string;
+        material?: string;
+        rotation?: number;
+    };
+
     meshData?: {
         scale?: number;
         rotationFix?: number;
-        meshIndex?: number;
         width?: number;
         height?: number;
         depth?: number;
@@ -21,14 +58,6 @@ type Item = {
 
 interface itemDataMap {
     [key: string]: Item;
-}
-
-enum ItemClass {
-    WEAPON = 1,
-    ARMOR = 2,
-    CONSUMABLE = 3,
-    QUEST = 4,
-    OTHER = 5,
 }
 
 enum ItemEffect {
@@ -48,18 +77,6 @@ enum PlayerKeys {
     MANA = "mana",
 }
 
-enum PlayerSlots {
-    HEAD = 1,
-    AMULET = 2,
-    CHEST = 3,
-    PANTS = 4,
-    SHOES = 5,
-    WEAPON = 6,
-    OFF_HAND = 7,
-    RING_1 = 8,
-    RING_2 = 9,
-}
-
 let ItemsDB: itemDataMap = {
     sword_01: {
         key: "sword_01",
@@ -68,12 +85,47 @@ let ItemsDB: itemDataMap = {
         icon: "ICON_ITEM_sword_01",
         class: ItemClass.WEAPON,
         value: 2000,
-        slot: PlayerSlots.WEAPON,
-        attachMesh: true,
-        requirements: [{ key: PlayerKeys.STRENGTH, amount: 20 }],
+        destroyable: false,
+        sellable: true,
+        tradable: true,
+        stackable: false,
+        rarity: ItemRarity.NORMAL,
+        equippable: {
+            slot: PlayerSlots.WEAPON,
+            mesh: "sword_01",
+            material: "sword_material_01",
+        },
+        requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
         benefits: [{ key: PlayerKeys.STRENGTH, type: ItemEffect.ADD, amount: 10 }],
         meshData: {
-            meshIndex: 1,
+            scale: 1.2,
+            width: 1,
+            height: 0.2,
+            depth: 0.2,
+        },
+    },
+
+    shield_01: {
+        key: "shield_01",
+        title: "Shield",
+        description: "Description.",
+        icon: "ICON_ITEM_shield_01",
+        class: ItemClass.WEAPON,
+        value: 2000,
+        destroyable: false,
+        sellable: true,
+        tradable: true,
+        stackable: false,
+        rarity: ItemRarity.NORMAL,
+        equippable: {
+            slot: PlayerSlots.OFF_HAND,
+            mesh: "shield_01",
+            material: "sword_material_01",
+            rotation: Math.PI / 2,
+        },
+        requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
+        benefits: [{ key: PlayerKeys.STRENGTH, type: ItemEffect.ADD, amount: 10 }],
+        meshData: {
             scale: 1.2,
             width: 1,
             height: 0.2,
@@ -88,7 +140,14 @@ let ItemsDB: itemDataMap = {
         icon: "ICON_ITEM_amulet_01",
         class: ItemClass.ARMOR,
         value: 2000,
-        slot: PlayerSlots.AMULET,
+        destroyable: false,
+        sellable: true,
+        tradable: true,
+        stackable: false,
+        rarity: ItemRarity.NORMAL,
+        equippable: {
+            slot: PlayerSlots.AMULET,
+        },
         requirements: [
             { key: PlayerKeys.LEVEL, amount: 10 },
             { key: PlayerKeys.STRENGTH, amount: 20 },
@@ -99,7 +158,6 @@ let ItemsDB: itemDataMap = {
             { key: PlayerKeys.WISDOM, type: ItemEffect.REMOVE, amount: 2 },
         ],
         meshData: {
-            meshIndex: 1,
             scale: 0.25,
             width: 0.4,
             height: 0.4,
@@ -114,9 +172,12 @@ let ItemsDB: itemDataMap = {
         icon: "ICON_ITEM_apple",
         class: ItemClass.CONSUMABLE,
         value: 54,
+        destroyable: false,
+        sellable: true,
+        tradable: true,
+        stackable: true,
         benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 5 }],
         meshData: {
-            meshIndex: 1,
             scale: 0.25,
             width: 0.4,
             height: 0.4,
@@ -131,9 +192,12 @@ let ItemsDB: itemDataMap = {
         icon: "ICON_ITEM_pear",
         class: ItemClass.CONSUMABLE,
         value: 200,
+        destroyable: false,
+        sellable: true,
+        tradable: true,
+        stackable: true,
         benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 20 }],
         meshData: {
-            meshIndex: 1,
             scale: 0.2,
             width: 0.4,
             height: 0.4,
@@ -148,9 +212,12 @@ let ItemsDB: itemDataMap = {
         icon: "ICON_ITEM_potion_heal",
         class: ItemClass.CONSUMABLE,
         value: 150,
+        destroyable: false,
+        sellable: true,
+        tradable: true,
+        stackable: true,
         benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 50 }],
         meshData: {
-            meshIndex: 1,
             scale: 1,
             width: 0.4,
             height: 0.4,

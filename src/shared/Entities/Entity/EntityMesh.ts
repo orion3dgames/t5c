@@ -184,14 +184,29 @@ export class EntityMesh {
         // equip all items
         this._entity.equipment.forEach((e) => {
             let item = dataDB.get("item", e.key);
-            if (item && item.attachMesh) {
+            if (item && item.equippable) {
+                let equipOptions = item.equippable;
                 let key = PlayerSlots[e.slot];
-                let boneId = this._entity.bones[key];
-                let bone = this._skeleton.bones[boneId];
-                const weapon = this._loadedAssets["ITEM_" + e.key].instantiateModelsToScene((name) => "PlayerSword");
-                const weaponMesh = weapon.rootNodes[0];
-                weaponMesh.attachToBone(bone, this.playerMesh);
-                this.equipments.push(weaponMesh);
+
+                // if mesh needs to be added
+                if (equipOptions.mesh) {
+                    let boneId = this._entity.bones[key];
+                    let bone = this._skeleton.bones[boneId];
+                    const weapon = this._loadedAssets["ITEM_" + e.key].instantiateModelsToScene((name) => "player_" + e.key);
+                    const weaponMesh = weapon.rootNodes[0];
+                    weaponMesh.parent = this.playerMesh;
+                    weaponMesh.attachToBone(bone, this.playerMesh);
+
+                    // if rotationFix neede
+                    if (equipOptions.rotation) {
+                        // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
+                        weaponMesh.rotationQuaternion = null;
+                        weaponMesh.rotation.set(equipOptions.rotation, 0, 0);
+                        console.log("equipOptions.rotation");
+                    }
+
+                    this.equipments.push(weaponMesh);
+                }
             }
         });
     }

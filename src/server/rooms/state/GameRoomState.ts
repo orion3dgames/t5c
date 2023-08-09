@@ -17,7 +17,7 @@ import { dataDB } from "../../../shared/Data/dataDB";
 
 import { GetLoot, LootTableEntry } from "../../../shared/Entities/Player/LootTable";
 import Config from "../../../shared/Config";
-import { PlayerSlots } from "../../../shared/Data/ItemDB";
+import { ItemClass, PlayerSlots } from "../../../shared/Data/ItemDB";
 
 export class GameRoomState extends Schema {
     // networked variables
@@ -188,22 +188,6 @@ export class GameRoomState extends Schema {
         }
 
         /////////////////////////////////////
-        // on player equip
-        // data will equal the inventory key of the clicked item
-        if (type === "equip_item") {
-            const item = dataDB.get("item", data); // does item exist in database
-            if (item) {
-                playerState.equipItem(item.key, item.slot);
-            }
-        }
-        if (type === "unequip_item") {
-            const item = dataDB.get("item", data); // does item exist in database
-            if (item) {
-                playerState.unequipItem(item.key, item.slot);
-            }
-        }
-
-        /////////////////////////////////////
         // on player add stat point
         if (type === "add_stats_point") {
             if (playerState.player_data.points > 0) {
@@ -246,6 +230,24 @@ export class GameRoomState extends Schema {
         }
 
         /////////////////////////////////////
+        // on player equip
+        // data will equal the inventory key of the clicked item
+        if (type === "equip_item") {
+            const item = dataDB.get("item", data);
+            // does item exist in database
+            if (item) {
+                playerState.equipItem(item.key);
+            }
+        }
+        if (type === "unequip_item") {
+            const item = dataDB.get("item", data);
+            // does item exist in database
+            if (item) {
+                playerState.unequipItem(item.key, item.slot);
+            }
+        }
+
+        /////////////////////////////////////
         // player entity_attack
         if (type === "entity_ability_key") {
             // get players involved
@@ -261,7 +263,7 @@ export class GameRoomState extends Schema {
                 if (playerState.equipment.size > 0) {
                     playerState.unequipItem(key, PlayerSlots.WEAPON);
                 } else {
-                    playerState.equipItem(key, PlayerSlots.WEAPON);
+                    playerState.equipItem(key);
                 }
                 return false;
             }

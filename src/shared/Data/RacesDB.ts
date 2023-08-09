@@ -49,8 +49,8 @@ let RacesDB: raceDataMap = {
             WEAPON: 37,
             OFF_HAND: 14,
         },
-        baseHealth: 100,
-        baseMana: 100,
+        baseHealth: 50,
+        baseMana: 50,
         healthRegen: 0.2,
         manaRegen: 0.4, // per second
         experienceGain: {},
@@ -79,8 +79,8 @@ let RacesDB: raceDataMap = {
             WEAPON: 37,
             OFF_HAND: 14,
         },
-        baseHealth: 200,
-        baseMana: 100,
+        baseHealth: 50,
+        baseMana: 50,
         healthRegen: 0.2,
         manaRegen: 0.4, // per second
         experienceGain: { min: 2000, max: 4000 },
