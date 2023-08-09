@@ -125,7 +125,6 @@ export class EntityMesh {
         // register hover over player
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
-                console.log("ACTION MANAGER HOVER");
                 let mesh = ev.meshUnderPointer;
                 for (const childMesh of mesh.getChildMeshes()) {
                     childMesh.overlayColor = new Color3(1, 1, 1);

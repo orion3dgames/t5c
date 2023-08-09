@@ -180,12 +180,12 @@ export class Entity {
         }
 
         // what to do when an entity dies
-        if (this.health < 0 && !this.isDead) {
-            console.log("ENTITY IS DEAD REMOVE ACTION MANAGER");
+        if (this.health < 1 && !this.isDead) {
             this.isDead = true;
             global.T5C.selectedEntity = null;
             this.meshController.selectedMesh.isVisible = false;
             this.meshController.mesh.actionManager.dispose();
+            this.meshController.mesh.actionManager = null;
         }
 
         // tween entity

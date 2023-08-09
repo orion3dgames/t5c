@@ -135,15 +135,10 @@ export class Item {
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
                 let mesh = ev.meshUnderPointer;
-                console.log(mesh.name);
                 for (const childMesh of mesh.getChildMeshes()) {
                     childMesh.overlayColor = new Color3(1, 1, 1);
                     childMesh.overlayAlpha = 0.3;
                     childMesh.renderOverlay = true;
-                    //this.ui._hightlight.addMesh(childMesh as Mesh, new Color3(0, 1, 0));
-                    /*childMesh.outlineColor = new BABYLON.Color3(0, 1, 0);
-                    childMesh.outlineWidth = 0.1;
-                    childMesh.renderOutline = true;*/
                 }
             })
         );
@@ -154,8 +149,6 @@ export class Item {
                 let mesh = ev.meshUnderPointer;
                 for (const childMesh of mesh.getChildMeshes()) {
                     childMesh.renderOverlay = false;
-                    //childMesh.renderOutline = false;
-                    //this.ui._hightlight.removeMesh(childMesh as Mesh);
                 }
             })
         );
