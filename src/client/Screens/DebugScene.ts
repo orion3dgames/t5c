@@ -9,8 +9,14 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { BakedVertexAnimationManager } from "@babylonjs/core/BakedVertexAnimation/bakedVertexAnimationManager";
 import { VertexAnimationBaker } from "@babylonjs/core/BakedVertexAnimation/vertexAnimationBaker";
 import { Engine } from "@babylonjs/core/Engines/engine";
+import { randomNumberInRange } from "../../shared/Utils";
 
 import State from "./Screens";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
+import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
+import { Control } from "@babylonjs/gui/2D/controls/control";
+import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 
 class JavascriptDataDownloader {
     private data;
@@ -42,9 +48,9 @@ export class DebugScene {
     public results;
 
     public PLANE_SIZE = 20;
-    public INST_COUNT = 200;
-    public PICKED_ANIMS = ["Hobbit_Attack", "Hobbit_Idle", "Hobbit_Walk"];
-    public URL_MESH = "female_all.glb";
+    public INST_COUNT = 100;
+    public PICKED_ANIMS = ["Walk", "Run", "Idle", "Sword_Slash"];
+    public URL_MESH = "male_adventurer.glb";
 
     constructor() {
         this._newState = State.NULL;
@@ -56,7 +62,7 @@ export class DebugScene {
         let scene = new Scene(app.engine);
         scene.clearColor = new Color4(0, 0, 0, 1);
 
-        var camera = new ArcRotateCamera("camera1", Math.PI / 2, Math.PI / 4, 3, new Vector3(0, 0.5, 0), scene);
+        var camera = new ArcRotateCamera("camera1", Math.PI / 2, Math.PI / 4, 3, new Vector3(0, 3, 3), scene);
         camera.attachControl(app.canvas, true);
 
         camera.lowerRadiusLimit = 2;
@@ -68,35 +74,64 @@ export class DebugScene {
         light.specular = Color3.Black();
 
         // Built-in 'ground' shape.
-        //const ground = MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, scene);
+        const ground = MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, scene);
 
         // load scene
         this._scene = scene;
 
+        // add ui
+        this._ui = AdvancedDynamicTexture.CreateFullscreenUI("UI_Names", true, this._scene);
+
+        // add FPS
+        var label = new TextBlock("FPS");
+        label.text = "FPS: " + this._engine.getFps();
+        label.color = "white";
+        label.top = "15px;";
+        label.left = "15px;";
+        label.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        label.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        this._ui.addControl(label);
+
+        this._scene.registerBeforeRender(() => {
+            label.text = "FPS: " + this._engine.getFps();
+        });
+
         //////////////////////////////////////////////////////////
-        const { meshes, animationGroups, skeletons } = await SceneLoader.ImportMeshAsync("", "./models/", this.URL_MESH, scene);
+        const { meshes, animationGroups, skeletons } = await SceneLoader.ImportMeshAsync("", "./models/races/", this.URL_MESH, scene);
 
         const selectedAnimationGroups = animationGroups.filter((ag) => this.PICKED_ANIMS.includes(ag.name));
         const skeleton = skeletons[0];
         const root = meshes[0];
 
         root.position.setAll(0);
-        root.scaling.setAll(0.1);
+        root.scaling.setAll(1);
         root.rotationQuaternion = null;
         root.rotation.setAll(0);
 
         const merged = this.merge(root, skeleton);
-
         root.setEnabled(false);
 
         if (merged) {
-            //this.prepareMerge(merged, selectedAnimationGroups, meshes, animationGroups, skeletons);
+            this.prepareMerge(merged, selectedAnimationGroups, meshes, animationGroups, skeletons);
         }
     }
 
-    async prepareMerge(merged, selectedAnimationGroups, meshes, animationGroups, skeletons) {
-        merged.visibility = 0;
+    createLabel(mesh, delta) {
+        var label = new TextBlock("player_chat_label_" + delta);
+        label.text = "Pirate " + delta;
+        label.color = "white";
+        label.paddingLeft = "5px;";
+        label.paddingTop = "5px";
+        label.paddingBottom = "5px";
+        label.paddingRight = "5px";
+        label.textWrapping = TextWrapping.WordWrap;
+        label.resizeToFit = true;
+        this._ui.addControl(label);
+        label.linkWithMesh(mesh);
+        label.linkOffsetY = -130;
+    }
 
+    async prepareMerge(merged, selectedAnimationGroups, meshes, animationGroups, skeletons) {
         merged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
         merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
 
@@ -111,12 +146,13 @@ export class DebugScene {
         };
 
         const b = new VertexAnimationBaker(this._scene, merged);
-        const manager = new BakedVertexAnimationManager(this._scene);
-        merged.bakedVertexAnimationManager = manager;
+        const vatManager = new BakedVertexAnimationManager(this._scene);
+        merged.bakedVertexAnimationManager = vatManager;
         merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
         setAnimationParameters(merged.instancedBuffers.bakedVertexAnimationSettingsInstanced, 0);
 
         const bufferFromMesh = await this.bakeVertexData(merged, selectedAnimationGroups);
+
         /*
         //let vertexDataJson = b.serializeBakedVertexDataToJSON(bufferFromMesh);
         //new JavascriptDataDownloader(vertexDataJson).download();
@@ -127,24 +163,31 @@ export class DebugScene {
         */
         const buffer = bufferFromMesh;
 
-        manager.texture = b.textureFromBakedVertexData(buffer);
+        vatManager.texture = b.textureFromBakedVertexData(buffer);
 
         const createInst = (id) => {
             const instance = merged.createInstance("instance_" + id);
             instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
             setAnimationParameters(instance.instancedBuffers.bakedVertexAnimationSettingsInstanced);
-            instance.position.x = Math.random() * this.PLANE_SIZE - this.PLANE_SIZE / 2;
-            instance.position.z = Math.random() * this.PLANE_SIZE - this.PLANE_SIZE / 2;
+            instance.position.x = randomNumberInRange(-3, 3);
+            instance.position.z = randomNumberInRange(-3, 3);
             instance.rotation.y = 0;
+
+            console.log(instance);
+
+            //
+            this.createLabel(instance, id);
+
             return instance;
         };
 
         for (let i = 0; i < this.INST_COUNT; i++) {
+            console.log("CREATE INSTANCE ID: " + i);
             createInst(i + "");
         }
 
         this._scene.registerBeforeRender(() => {
-            manager.time += this._scene.getEngine().getDeltaTime() / 1000.0;
+            vatManager.time += this._scene.getEngine().getDeltaTime() / 1000.0;
         });
 
         //dispose resources
@@ -157,14 +200,12 @@ export class DebugScene {
         // pick what you want to merge
         const allChildMeshes = mesh.getChildTransformNodes(true)[0].getChildMeshes(false);
 
-        console.log(allChildMeshes);
-
         // Ignore Backpack because pf different attributes
         // https://forum.babylonjs.com/t/error-during-merging-meshes-from-imported-glb/23483
-        const childMeshes = allChildMeshes.filter((m) => !m.name.includes("Backpack"));
+        //const childMeshes = allChildMeshes.filter((m) => !m.name.includes("Backpack"));
 
         // multiMaterial = true
-        const merged = Mesh.MergeMeshes(childMeshes, false, true, undefined, undefined, true);
+        const merged = Mesh.MergeMeshes(allChildMeshes, false, true, undefined, undefined, true);
         if (merged) {
             merged.name = "_MergedModel";
             merged.skeleton = skeleton;
