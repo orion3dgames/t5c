@@ -9,7 +9,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { BakedVertexAnimationManager } from "@babylonjs/core/BakedVertexAnimation/bakedVertexAnimationManager";
 import { VertexAnimationBaker } from "@babylonjs/core/BakedVertexAnimation/vertexAnimationBaker";
 import { Engine } from "@babylonjs/core/Engines/engine";
-import { randomNumberInRange } from "../../shared/Utils";
+import { randomNumberInRange, request } from "../../shared/Utils";
 
 import State from "./Screens";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
@@ -17,6 +17,8 @@ import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
+
+import { mergeMesh, calculateRanges, bakeVertexData, setAnimationParameters, mergeMeshAndSkeleton } from "../../shared/Utils/vatUtils";
 
 class JavascriptDataDownloader {
     private data;
@@ -51,6 +53,13 @@ export class DebugScene {
     public INST_COUNT = 100;
     public PICKED_ANIMS = ["Walk", "Run", "Idle", "Sword_Slash"];
     public URL_MESH = "male_adventurer.glb";
+
+    public models = [];
+    public vatManager;
+    public playerMesh;
+
+    public animationRanges;
+    public animationGroups;
 
     constructor() {
         this._newState = State.NULL;
@@ -96,24 +105,116 @@ export class DebugScene {
             label.text = "FPS: " + this._engine.getFps();
         });
 
-        //////////////////////////////////////////////////////////
-        const { meshes, animationGroups, skeletons } = await SceneLoader.ImportMeshAsync("", "./models/races/", this.URL_MESH, scene);
+        // add VAT manager
+        this.vatManager = new BakedVertexAnimationManager(this._scene);
+        this._scene.registerBeforeRender(() => {
+            this.vatManager.time += this._scene.getEngine().getDeltaTime() / 1000.0;
+        });
 
+        // load weapon
+        const weaponLoad = await SceneLoader.ImportMeshAsync("", "./models/items/", "sword_01.glb", this._scene);
+        const weaponMesh = weaponLoad.meshes[0];
+        const weaponMeshMerged = await mergeMesh(weaponMesh);
+
+        //////////////////////////////////////////////////////////
+        // load mesh
+        //await this.loadMesh("male_enemy");
+        await this.loadMesh("male_adventurer");
+
+        ///
+        const createInst = (id) => {
+            const instance = this.playerMesh.createInstance("player_" + id);
+            instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+            let animaToPlay = Math.floor(Math.random() * this.animationGroups.length);
+            setAnimationParameters(instance.instancedBuffers.bakedVertexAnimationSettingsInstanced, animaToPlay, this.animationRanges, this.animationGroups);
+            instance.position.x = randomNumberInRange(-3, 3);
+            instance.position.z = randomNumberInRange(-3, 3);
+            instance.rotation.y = 0;
+            this.createLabel(instance, id);
+
+            // attack weapon
+            if (weaponMeshMerged) {
+                const weapon = weaponMeshMerged.createInstance("player_" + id + "_sword");
+                let boneId = 37;
+                let bone = instance.skeleton.bones[boneId];
+                weapon.attachToBone(bone, instance);
+                console.log(weapon);
+                /*
+                let boneId = this._entity.bones[key];
+                    let bone = this._skeleton.bones[boneId];
+                    const weapon = this._loadedAssets["ITEM_" + e.key].instantiateModelsToScene((name) => "player_" + e.key);
+                    const weaponMesh = weapon.rootNodes[0];
+                    weaponMesh.parent = this.playerMesh;
+                    weaponMesh.attachToBone(bone, this.playerMesh); */
+            }
+        };
+
+        for (let i = 0; i < this.INST_COUNT; i++) {
+            console.log("CREATE INSTANCE ID: " + i);
+            createInst(i + "");
+        }
+    }
+
+    async loadMesh(key) {
+        const { meshes, animationGroups, skeletons } = await SceneLoader.ImportMeshAsync("", "./models/races/", key + ".glb", this._scene);
         const selectedAnimationGroups = animationGroups.filter((ag) => this.PICKED_ANIMS.includes(ag.name));
         const skeleton = skeletons[0];
         const root = meshes[0];
 
+        // reset position & rotation
+        // not sure why?
         root.position.setAll(0);
         root.scaling.setAll(1);
         root.rotationQuaternion = null;
         root.rotation.setAll(0);
 
-        const merged = this.merge(root, skeleton);
-        root.setEnabled(false);
+        // calculate animations ranges
+        const ranges = calculateRanges(selectedAnimationGroups);
 
+        // merge mesh
+        const merged = mergeMeshAndSkeleton(root, skeleton);
+
+        // save data
+        this.playerMesh = merged;
+        this.animationRanges = ranges;
+        this.animationGroups = selectedAnimationGroups;
+
+        // disable & hide root mesh
+        root.setEnabled(false);
+        this.playerMesh.isVisible = false;
+
+        // setup vat
         if (merged) {
-            this.prepareMerge(merged, selectedAnimationGroups, meshes, animationGroups, skeletons);
+            // note sure what's happening here
+            merged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
+            merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+
+            // bake VAT
+            merged.bakedVertexAnimationManager = this.vatManager;
+            merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+            setAnimationParameters(merged.instancedBuffers.bakedVertexAnimationSettingsInstanced, 0, this.animationRanges, this.animationGroups);
+
+            // bake vertex data
+            //this.bakeToJson(merged, selectedAnimationGroups);
+
+            // load prebaked vat animations
+            const b = new VertexAnimationBaker(this._scene, merged);
+            let req = await request("get", "./models/races/male_adventurer.json", {}, false, { headers: { "Content-Type": "application/json" } });
+            let bufferFromMesh = b.loadBakedVertexDataFromJSON(JSON.parse(req.data));
+            this.vatManager.texture = b.textureFromBakedVertexData(bufferFromMesh);
+
+            //dispose resources
+            meshes.forEach((m) => m.dispose(false, true));
+            this.animationGroups.forEach((ag) => ag.dispose());
+            skeletons.forEach((s) => s.dispose());
         }
+    }
+
+    async bakeToJson(merged, selectedAnimationGroups) {
+        const b = new VertexAnimationBaker(this._scene, merged);
+        const bufferFromMesh = await bakeVertexData(merged, selectedAnimationGroups);
+        let vertexDataJson = b.serializeBakedVertexDataToJSON(bufferFromMesh);
+        new JavascriptDataDownloader(vertexDataJson).download();
     }
 
     createLabel(mesh, delta) {
@@ -129,135 +230,5 @@ export class DebugScene {
         this._ui.addControl(label);
         label.linkWithMesh(mesh);
         label.linkOffsetY = -130;
-    }
-
-    async prepareMerge(merged, selectedAnimationGroups, meshes, animationGroups, skeletons) {
-        merged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
-        merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-
-        const ranges = this.calculateRanges(selectedAnimationGroups);
-
-        const setAnimationParameters = (vec, animIndex = Math.floor(Math.random() * selectedAnimationGroups.length)) => {
-            const anim = ranges[animIndex];
-            const from = Math.floor(anim.from);
-            const to = Math.floor(anim.to);
-            const ofst = Math.floor(Math.random() * (to - from - 1));
-            vec.set(from, to, ofst, 60); // skip one frame to avoid weird artifacts
-        };
-
-        const b = new VertexAnimationBaker(this._scene, merged);
-        const vatManager = new BakedVertexAnimationManager(this._scene);
-        merged.bakedVertexAnimationManager = vatManager;
-        merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-        setAnimationParameters(merged.instancedBuffers.bakedVertexAnimationSettingsInstanced, 0);
-
-        const bufferFromMesh = await this.bakeVertexData(merged, selectedAnimationGroups);
-
-        /*
-        //let vertexDataJson = b.serializeBakedVertexDataToJSON(bufferFromMesh);
-        //new JavascriptDataDownloader(vertexDataJson).download();
-        // load prebaked vat animations
-        // 2 mo for the baked animation, not sure if it is worth it for the moment to work on that
-        let req = await request("get", "./models/male_baked_animation.json", {}, false, { headers: { "Content-Type": "application/json" } });
-        let bufferFromMesh = b.loadBakedVertexDataFromJSON(JSON.parse(req.data));
-        */
-        const buffer = bufferFromMesh;
-
-        vatManager.texture = b.textureFromBakedVertexData(buffer);
-
-        const createInst = (id) => {
-            const instance = merged.createInstance("instance_" + id);
-            instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-            setAnimationParameters(instance.instancedBuffers.bakedVertexAnimationSettingsInstanced);
-            instance.position.x = randomNumberInRange(-3, 3);
-            instance.position.z = randomNumberInRange(-3, 3);
-            instance.rotation.y = 0;
-
-            console.log(instance);
-
-            //
-            this.createLabel(instance, id);
-
-            return instance;
-        };
-
-        for (let i = 0; i < this.INST_COUNT; i++) {
-            console.log("CREATE INSTANCE ID: " + i);
-            createInst(i + "");
-        }
-
-        this._scene.registerBeforeRender(() => {
-            vatManager.time += this._scene.getEngine().getDeltaTime() / 1000.0;
-        });
-
-        //dispose resources
-        meshes.forEach((m) => m.dispose(false, true));
-        animationGroups.forEach((ag) => ag.dispose());
-        skeletons.forEach((s) => s.dispose());
-    }
-
-    merge(mesh, skeleton) {
-        // pick what you want to merge
-        const allChildMeshes = mesh.getChildTransformNodes(true)[0].getChildMeshes(false);
-
-        // Ignore Backpack because pf different attributes
-        // https://forum.babylonjs.com/t/error-during-merging-meshes-from-imported-glb/23483
-        //const childMeshes = allChildMeshes.filter((m) => !m.name.includes("Backpack"));
-
-        // multiMaterial = true
-        const merged = Mesh.MergeMeshes(allChildMeshes, false, true, undefined, undefined, true);
-        if (merged) {
-            merged.name = "_MergedModel";
-            merged.skeleton = skeleton;
-        }
-        return merged;
-    }
-
-    calculateRanges(animationGroups) {
-        return animationGroups.reduce((acc, ag, index) => {
-            if (index === 0) {
-                acc.push({ from: Math.floor(ag.from), to: Math.floor(ag.to) });
-            } else {
-                const prev = acc[index - 1];
-                acc.push({ from: prev.to + 1, to: prev.to + 1 + Math.floor(ag.to) });
-            }
-            return acc;
-        }, []);
-    }
-
-    async bakeVertexData(mesh, ags) {
-        const s = mesh.skeleton;
-        const boneCount = s.bones.length;
-        /** total number of frames in our animations */
-        const frameCount = ags.reduce((acc, ag) => acc + (Math.floor(ag.to) - Math.floor(ag.from)) + 1, 0);
-
-        // reset our loop data
-        let textureIndex = 0;
-        const textureSize = (boneCount + 1) * 4 * 4 * frameCount;
-        const vertexData = new Float32Array(textureSize);
-
-        function* captureFrame() {
-            const skeletonMatrices = s.getTransformMatrices(mesh);
-            vertexData.set(skeletonMatrices, textureIndex * skeletonMatrices.length);
-        }
-
-        let ii = 0;
-        for (const ag of ags) {
-            ag.reset();
-            const from = Math.floor(ag.from);
-            const to = Math.floor(ag.to);
-            for (let frameIndex = from; frameIndex <= to; frameIndex++) {
-                if (ii++ === 0) continue;
-                // start anim for one frame
-                ag.start(false, 1, frameIndex, frameIndex, false);
-                // wait for finishing
-                await ag.onAnimationEndObservable.runCoroutineAsync(captureFrame());
-                textureIndex++;
-                // stop anim
-                ag.stop();
-            }
-        }
-
-        return vertexData;
     }
 }
