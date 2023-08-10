@@ -22,6 +22,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Tags } from "@babylonjs/core/Misc/tags";
 import { AuthController } from "./AuthController";
 import { dataDB } from "../../shared/Data/dataDB";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
 export class Environment {
     private _scene: Scene;
@@ -283,7 +284,7 @@ export class Environment {
             // Water properties
             water.backFaceCulling = true;
             water.windForce = 0.1;
-            water.waveHeight = .6;
+            water.waveHeight = 0.6;
             water.bumpHeight = 0.5;
             water.waterColor = Color3.FromInts(0, 157, 255);
             water.colorBlendFactor = 0.5;
@@ -302,12 +303,14 @@ export class Environment {
         this.allMeshes = this._loadedAssets[key].loadedMeshes;
 
         //Loop through all environment meshes that were imported
-        this.allMeshes.forEach((m) => {
+        this.allMeshes.forEach((m: Mesh) => {
             // default values
             m.checkCollisions = false;
             m.isPickable = false;
-            m.receiveShadows = true;
-            
+            m.receiveShadows = false;
+            m.freezeWorldMatrix();
+            m.doNotSyncBoundingInfo = true;
+
             if (m.getClassName() !== "InstancedMesh") {
             }
 
@@ -328,9 +331,12 @@ export class Environment {
             // trigger meshes
             // trigger event (must have a unique key)
             if (m.name.includes("trigger")) {
+                /*
                 m.isVisible = false;
                 m.isPickable = false;
                 m.receiveShadows = false;
+                m.unfreezeWorldMatrix();
+                m.doNotSyncBoundingInfo = false;
 
                 Tags.EnableFor(m);
 
@@ -347,6 +353,7 @@ export class Environment {
                     m.metadata.location = "lh_town";
                     m.addTags("teleport");
                 }
+                */
             }
         });
     }
