@@ -194,12 +194,18 @@ export class Player extends Entity {
             }
         });
 
-        if (this.anim_state === EntityState.DEAD) {
+        if (!this.isDeadUI && this.health < 1) {
             this.ui._RessurectBox.open();
             this.cameraController.bw(true);
-        } else {
+            this.isDeadUI = true;
+            console.log("DEAD");
+        }
+
+        if (this.isDeadUI && this.health > 1) {
             this.cameraController.bw(false);
             this.ui._RessurectBox.close();
+            this.isDeadUI = false;
+            console.log("ALIVE");
         }
     }
 

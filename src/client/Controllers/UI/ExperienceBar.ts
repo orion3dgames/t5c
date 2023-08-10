@@ -27,11 +27,13 @@ export class ExperienceBar {
 
         this._createUI();
 
-        // some ui must be constantly refreshed as things change
-        this._scene.registerBeforeRender(() => {
-            // refresh
-            this._update();
-        });
+        // some ui must be refreshed as things change
+        let entity = this._currentPlayer.entity;
+        if (entity && entity.player_data) {
+            entity.player_data.onChange((item, sessionId) => {
+                this._update();
+            });
+        }
     }
 
     _createUI() {

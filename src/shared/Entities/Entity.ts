@@ -68,6 +68,7 @@ export class Entity {
     public anim_state: number = EntityState.IDLE;
     public AI_CURRENT_STATE: number = 0;
     public isDead: boolean = false;
+    public isDeadUI: boolean = false;
 
     //
     public abilities = [];
