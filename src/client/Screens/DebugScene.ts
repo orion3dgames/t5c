@@ -123,21 +123,25 @@ export class DebugScene {
 
         ///
         const createInst = (id) => {
-            const instance = this.playerMesh.createInstance("player_" + id);
-            instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+            const playerInstance = this.playerMesh.createInstance("player_" + id);
+            playerInstance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
             let animaToPlay = Math.floor(Math.random() * this.animationGroups.length);
-            setAnimationParameters(instance.instancedBuffers.bakedVertexAnimationSettingsInstanced, animaToPlay, this.animationRanges, this.animationGroups);
-            instance.position.x = randomNumberInRange(-3, 3);
-            instance.position.z = randomNumberInRange(-3, 3);
-            instance.rotation.y = 0;
-            this.createLabel(instance, id);
+            setAnimationParameters(
+                playerInstance.instancedBuffers.bakedVertexAnimationSettingsInstanced,
+                animaToPlay,
+                this.animationRanges,
+                this.animationGroups
+            );
+            playerInstance.position.x = randomNumberInRange(-3, 3);
+            playerInstance.position.z = randomNumberInRange(-3, 3);
+            playerInstance.rotation.y = 0;
+            this.createLabel(playerInstance, id);
 
             // attack weapon
             if (weaponMeshMerged) {
                 const weapon = weaponMeshMerged.createInstance("player_" + id + "_sword");
-                let boneId = 37;
-                let bone = instance.skeleton.bones[boneId];
-                weapon.attachToBone(bone, instance);
+                let bone = playerInstance.skeleton.bones[37];
+                weapon.attachToBone(bone, playerInstance);
                 console.log(weapon);
                 /*
                 let boneId = this._entity.bones[key];
