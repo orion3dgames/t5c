@@ -102,12 +102,13 @@ export class moveCTRL {
         let destinationPos = new Vector3(newX, newY, newZ); // new pos
         const foundPath: any = this._owner._navMesh.checkPath(sourcePos, destinationPos);
         if (foundPath) {
-            
             // adjust height of the entity according to the ground
-            let currentRegion = this._owner._navMesh.getRegionForPoint( destinationPos, .5);
-            const distance = currentRegion.plane.distanceToPoint( destinationPos );
-            newY -= distance; // smooth transition*/
-            
+            let currentRegion = this._owner._navMesh.getRegionForPoint(destinationPos, 0.5);
+            if (currentRegion && currentRegion.plane) {
+                const distance = currentRegion.plane.distanceToPoint(destinationPos);
+                newY -= distance; // smooth transition*/
+            }
+
             // next position validated, update player
             this._owner.x = newX;
             this._owner.y = newY;
