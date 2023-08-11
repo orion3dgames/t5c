@@ -93,7 +93,7 @@ let AbilitiesDB: abilityMap = {
 
         affinity: "strength",
         casterPropertyAffected: [],
-        targetPropertyAffected: [{ key: "health", type: CALC.REMOVE, min: 1, max: 2 }],
+        targetPropertyAffected: [{ key: "health", type: CALC.REMOVE, min: 2, max: 4 }],
         requiredToLearn: [],
     },
 
