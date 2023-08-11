@@ -79,13 +79,32 @@ export class EntityMesh {
         this.selectedMesh = selectedMesh;
 
         // load player mesh
-        const result = this._loadedAssets["RACE_" + this._entity.race].instantiateModelsToScene();
+        /*
+        let modelToLoad = "RACE_" + this._entity.race;
+        let modelToLoadKey = "LOADED_RACE_" + this._entity.race;
+
+        let mergedMesh = this.mergeMeshAndSkeleton(
+            modelToLoad,
+            this._loadedAssets[modelToLoadKey].rootNodes[0],
+            this._loadedAssets[modelToLoadKey].skeletons[0]
+        );
+        let instance = mergedMesh.createInstance("player_" + this._entity.race);
+        const playerMesh = instance;
+        this._animationGroups = this._loadedAssets[modelToLoadKey].animationGroups;
+        this._skeleton = this._loadedAssets[modelToLoadKey].skeletons[0];
+        */
+
+        // load player mesh
+        let key = "RACE_" + this._entity.race;
+        const result = this._loadedAssets[key].instantiateModelsToScene(() => {
+            return key;
+        });
         const playerMesh = result.rootNodes[0];
         this._animationGroups = result.animationGroups;
         this._skeleton = result.skeletons[0];
 
         // set initial player scale & rotation
-        playerMesh.name = this._entity.sessionId + "_mesh";
+        //playerMesh.name = this._entity.sessionId + "_mesh";
         playerMesh.parent = box;
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
         if (this._entity.rotationFix) {
@@ -152,6 +171,23 @@ export class EntityMesh {
         this._entity.entity.equipment.onRemove((e) => {
             this.refreshMeshes(e);
         });
+    }
+
+    mergeMeshAndSkeleton(key, mesh, skeleton) {
+        // pick what you want to merge
+        const allChildMeshes = mesh.getChildTransformNodes(true)[0].getChildMeshes(false);
+
+        // Ignore Backpack because pf different attributes
+        // https://forum.babylonjs.com/t/error-during-merging-meshes-from-imported-glb/23483
+        //const childMeshes = allChildMeshes.filter((m) => !m.name.includes("Backpack"));
+
+        // multiMaterial = true
+        const merged = Mesh.MergeMeshes(allChildMeshes, false, true, undefined, undefined, true);
+        if (merged) {
+            merged.name = key + "_MergedModel";
+            merged.skeleton = skeleton;
+        }
+        return merged;
     }
 
     public deleteMeshes() {

@@ -64,6 +64,9 @@ export class Player extends Entity {
         this.cameraController = new PlayerCamera(this._scene, this._input);
         this.actionsController = new EntityActions(this._scene, this._loadedAssets);
 
+        // add mesh to shadow generator
+        this._shadow.addShadowCaster(this.meshController.playerMesh, true);
+
         ///////////////////////////////////////////////////////////
         // entity network event
         // colyseus automatically sends entity updates, so let's listen to those changes

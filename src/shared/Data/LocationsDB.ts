@@ -6,7 +6,7 @@ let LocationsDB = {
         key: "lh_town",
         mesh: "lh_town",
         sun: true,
-        sunIntensity: 2,
+        sunIntensity: 1.5,
         spawnPoint: {
             x: 5,
             y: 0,
@@ -16,6 +16,12 @@ let LocationsDB = {
         waterPlane: true,
         skyColor: 255,
         dynamic: {
+            teleports: [
+                {
+                    location: "dungeon_01",
+                    point: new Vector3(-7, 0, -19),
+                },
+            ],
             spawns: [
                 {
                     type: "global",
@@ -97,18 +103,26 @@ let LocationsDB = {
         waterPlane: false,
         skyColor: 0,
         dynamic: {
-            spawns: [
-                {
-                    type: "global",
-                    behaviour: "patrol",
-                    aggressive: true,
-                    points: [],
-                    radius: 0,
-                    amount: 5,
-                    race: "male_enemy",
-                    name: "Pirate",
-                },
-            ],
+            dynamic: {
+                teleports: [
+                    {
+                        location: "lh_town",
+                        point: new Vector3(13, 0, -26),
+                    },
+                ],
+                spawns: [
+                    {
+                        type: "global",
+                        behaviour: "patrol",
+                        aggressive: true,
+                        points: [],
+                        radius: 0,
+                        amount: 5,
+                        race: "male_enemy",
+                        name: "Pirate",
+                    },
+                ],
+            },
         },
     },
 };

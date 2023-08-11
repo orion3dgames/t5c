@@ -37,6 +37,7 @@ export class PlayerCamera {
         this.camera.lockedTarget = this._camRoot.position;
         this.camera.fov = 0.35;
         this.camera.parent = yTilt;
+        console.log(this.camera.maxZ);
 
         // set as active camera
         this._scene.activeCamera = this.camera;

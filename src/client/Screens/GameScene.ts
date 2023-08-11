@@ -104,13 +104,12 @@ export class GameScene {
         light.autoCalcShadowZBounds = true;
 
         // shadow generator
-        this._shadow = new CascadedShadowGenerator(1024, light);
-        this._shadow.autoCalcDepthBounds = true;
-        this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_LOW;
-        this._shadow.lambda = 0.94;
+        this._shadow = new CascadedShadowGenerator(2048, light);
+        this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_HIGH;
+        this._shadow.lambda = 1;
         this._shadow.bias = 0.018;
         this._shadow.autoCalcDepthBounds = true;
-        this._shadow.shadowMaxZ = 1000;
+        this._shadow.shadowMaxZ = 10000;
         this._shadow.stabilizeCascades = false;
         this._shadow.depthClamp = true;
 
@@ -120,10 +119,29 @@ export class GameScene {
         await this._environment.loadAssets();
         //let navMeshGroup = createConvexRegionHelper(this._navMesh, this._scene)
 
+        //await this._instantiate();
+
         // load the rest
         this._app.engine.displayLoadingUI();
         await this._environment.prepareAssets();
         await this._initNetwork();
+    }
+
+    private async _instantiate(): Promise<void> {
+        for (let k in this._loadedAssets) {
+            if (k === "RACE_male_adventurer" || k === "RACE_male_enemy") {
+                let v = this._loadedAssets[k] as AssetContainer;
+                let modelToLoadKey = "LOADED_" + k;
+                this._loadedAssets[modelToLoadKey] = v.instantiateModelsToScene(
+                    function () {
+                        return modelToLoadKey;
+                    },
+                    false,
+                    { doNotInstantiate: false }
+                );
+            }
+        }
+        console.log("FINISH INSTANTIATE");
     }
 
     private async _initNetwork(): Promise<void> {
@@ -284,5 +302,3 @@ export class GameScene {
         }
     }
 }
-
-

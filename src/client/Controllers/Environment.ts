@@ -323,9 +323,9 @@ export class Environment {
             }
 
             if (m.name.includes("seafloor")) {
-                m.receiveShadows = true;
+                //m.receiveShadows = true;
                 // Add skybox and ground to the reflection and refraction
-                water.addToRenderList(m);
+                //water.addToRenderList(m);
             }
 
             // trigger meshes
