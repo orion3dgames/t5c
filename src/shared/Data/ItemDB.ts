@@ -26,10 +26,10 @@ enum ItemRarity {
 
 type Item = {
     key: string;
-
     title: string;
     description: string;
     icon: string;
+    material?: string;
     class: ItemClass;
     value: number;
     destroyable: boolean;
@@ -108,7 +108,7 @@ let ItemsDB: itemDataMap = {
     shield_01: {
         key: "shield_01",
         title: "Shield",
-        description: "Description.",
+        description: "A basic shield.",
         icon: "ICON_ITEM_shield_01",
         class: ItemClass.WEAPON,
         value: 2000,
@@ -120,7 +120,35 @@ let ItemsDB: itemDataMap = {
         equippable: {
             slot: PlayerSlots.OFF_HAND,
             mesh: "shield_01",
-            material: "sword_material_01",
+            material: "shield_01_base.jpg",
+            rotation: Math.PI / 2,
+        },
+        requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
+        benefits: [{ key: PlayerKeys.STRENGTH, type: ItemEffect.ADD, amount: 10 }],
+        meshData: {
+            scale: 1.2,
+            width: 1,
+            height: 0.2,
+            depth: 0.2,
+        },
+    },
+
+    shield_01_gold: {
+        key: "shield_01_gold",
+        title: "Golden Shield",
+        description: "A lovely golden shield.",
+        icon: "ICON_ITEM_shield_01_gold",
+        class: ItemClass.WEAPON,
+        value: 20000,
+        destroyable: false,
+        sellable: true,
+        tradable: true,
+        stackable: false,
+        rarity: ItemRarity.RARE,
+        equippable: {
+            slot: PlayerSlots.OFF_HAND,
+            mesh: "shield_01",
+            material: "shield_01_gold.jpg",
             rotation: Math.PI / 2,
         },
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],

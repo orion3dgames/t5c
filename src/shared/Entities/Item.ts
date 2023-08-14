@@ -15,6 +15,8 @@ import Config from "../Config";
 import { dataDB } from "../Data/dataDB";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { randomNumberInRange } from "../Utils";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 
 export class Item {
     public _scene: Scene;
@@ -102,6 +104,7 @@ export class Item {
         // load player mesh
         const result = await this._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene((name) => "instance_" + this.entity.sessionId);
         const playerMesh = result.rootNodes[0];
+        //let playerMesh = this.mergeMesh(entity.key, result.rootNodes[0]);
 
         // set initial player scale & rotation
         playerMesh.name = entity.key + "_mesh";
@@ -112,7 +115,7 @@ export class Item {
         playerMesh.parent = this.mesh;
 
         // add mesh to shadow generator
-        this._shadow.addShadowCaster(this.mesh, true);
+        //this._shadow.addShadowCaster(this.mesh, true);
         this.setPosition();
 
         //////////////////////////////////////////////
@@ -166,6 +169,15 @@ export class Item {
         //////////////////////////////////////////////////////////////////////////
         // misc
         this.characterLabel = this.ui.createItemLabel(this);
+    }
+
+    public mergeMesh(key, mesh) {
+        const allChildMeshes = mesh.getChildMeshes();
+        const merged = Mesh.MergeMeshes(allChildMeshes, false, true, undefined, undefined, true);
+        if (merged) {
+            merged.name = key + "_MergedModel";
+        }
+        return merged;
     }
 
     public update(delta) {}
