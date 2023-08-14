@@ -3,9 +3,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 const mergeMesh = function (mesh) {
     const allChildMeshes = mesh.getChildTransformNodes(true)[0].getChildMeshes(false);
     const merged = Mesh.MergeMeshes(allChildMeshes, false, true, undefined, undefined, true);
-    if (merged) {
-        merged.name = "_MergedModel";
-    }
+    merged.name = "_MergedModel";
     return merged;
 };
 
@@ -32,19 +30,21 @@ const calculateRanges = function (animationGroups) {
             acc.push({ from: Math.floor(ag.from), to: Math.floor(ag.to) });
         } else {
             const prev = acc[index - 1];
+
             acc.push({ from: prev.to + 1, to: prev.to + 1 + Math.floor(ag.to) });
         }
         return acc;
     }, []);
 };
 
-const setAnimationParameters = function (vec, animIndex, ranges, selectedAnimationGroups) {
-    animIndex = animIndex ?? Math.floor(Math.random() * selectedAnimationGroups.length);
+const setAnimationParameters = function (vec, animIndex, ranges) {
+    animIndex = animIndex ?? 0;
     const anim = ranges[animIndex];
     const from = Math.floor(anim.from);
     const to = Math.floor(anim.to);
-    const ofst = Math.floor(Math.random() * (to - from - 1));
-    vec.set(from, to, ofst, 60); // skip one frame to avoid weird artifacts
+    const ofst = 6;
+    vec.set(from, to - 1, ofst, 60); // skip one frame to avoid weird artifacts
+    return animIndex;
 };
 
 /**
