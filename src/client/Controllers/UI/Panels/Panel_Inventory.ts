@@ -148,6 +148,8 @@ export class Panel_Inventory extends Panel {
             }
         }
 
+        console.log(this._inventoryGrid);
+
         //
         this.refresh();
     }
@@ -156,6 +158,10 @@ export class Panel_Inventory extends Panel {
     ///////////////////////////////////////
     // INVENTORY PANEL
     public refresh() {
+        if (this._inventoryGrid.length < 1) {
+            return false;
+        }
+
         // if inventory is empty, make sure to clear all unessacary UI elements
         this._inventoryGrid.forEach((child) => {
             child.getDescendants().forEach((el) => {
@@ -167,9 +173,10 @@ export class Panel_Inventory extends Panel {
 
         ///////////////////////
         // else show items
-        let i = 0;
+
         this._currentPlayer.player_data.inventory.forEach((element) => {
-            let child = this._inventoryGrid[i];
+            let index = element.i;
+            let child = this._inventoryGrid[index];
             let item = dataDB.get("item", element.key) as Item;
 
             // dispose
@@ -180,6 +187,7 @@ export class Panel_Inventory extends Panel {
             // set metadata
             child.metadata = {
                 item: item,
+                index: index,
             };
 
             // add item icon
@@ -189,7 +197,7 @@ export class Panel_Inventory extends Panel {
             child.addControl(img);
 
             // add item qty
-            const itemTxtQty = new TextBlock("itemTxtQty" + i);
+            const itemTxtQty = new TextBlock("itemTxtQty" + index);
             itemTxtQty.text = element.qty;
             itemTxtQty.color = "#FFF";
             itemTxtQty.top = "-2px";
@@ -218,11 +226,9 @@ export class Panel_Inventory extends Panel {
             child.onPointerClickObservable.clear();
             child.onPointerClickObservable.add((e) => {
                 if (child.metadata.item && e.buttonIndex === 2) {
-                    this._gameRoom.send("equip_item", child.metadata.item.key);
+                    this._gameRoom.send("use_item", index);
                 }
             });
-
-            i++;
         });
     }
 }
