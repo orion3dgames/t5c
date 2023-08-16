@@ -319,7 +319,7 @@ export class Environment {
             }
 
             if (m.name.includes("castShadows")) {
-                this._shadow.addShadowCaster(m);
+                //this._shadow.addShadowCaster(m);
             }
 
             if (m.name.includes("seafloor")) {

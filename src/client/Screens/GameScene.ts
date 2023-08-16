@@ -105,12 +105,12 @@ export class GameScene {
         light.autoCalcShadowZBounds = true;
 
         // shadow generator
-        this._shadow = new CascadedShadowGenerator(2048, light);
-        this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_HIGH;
-        this._shadow.lambda = 1;
-        this._shadow.bias = 0.018;
+        this._shadow = new CascadedShadowGenerator(1024, light);
         this._shadow.autoCalcDepthBounds = true;
-        this._shadow.shadowMaxZ = 10000;
+        this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_HIGH;
+        this._shadow.lambda = 0.94;
+        this._shadow.bias = 0.018;
+        this._shadow.shadowMaxZ = 1000;
         this._shadow.stabilizeCascades = false;
         this._shadow.depthClamp = true;
 
