@@ -103,6 +103,7 @@ class Database {
             this.run(`INSERT INTO items ("key","label","description") VALUES ("pear","Pear","A delicious golden fruit.")`);
             this.run(`INSERT INTO items ("key","label","description") VALUES ("apple","Apple","One of the juciest fruit in the 5th continent.")`);
 
+
             // insert some abilities
             this.run(`DELETE FROM "abilities" where id > 0`);
             for (let i in AbilitiesDB) {
@@ -287,7 +288,7 @@ class Database {
         // add default abilities
         let abilities = [
             { digit: 1, key: "base_attack" },
-            //{ digit: 2, key: "fireball" },
+            { digit: 2, key: "fireball" },
             //{ digit: 3, key: "poisonball" },
             //{ digit: 4, key: "heal" },
         ];
@@ -297,15 +298,11 @@ class Database {
         });
 
         // add default items
-        /*
-        let items = [
-            { qty: 1, key: "apple" },
-            { qty: 100, key: "pear" },
-        ];
+        let items = [{ qty: 1, key: "apple" }];
         items.forEach((item) => {
             const sql = `INSERT INTO character_inventory ("owner_id", "qty", "key") VALUES ("${c.id}", "${item.qty}", "${item.key}")`;
             this.run(sql);
-        });*/
+        });
 
         return await this.getCharacter(c.id);
     }

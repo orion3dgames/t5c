@@ -229,6 +229,14 @@ export class GameRoomState extends Schema {
             }
         }
 
+        if (type === "drop_item") {
+            const item = playerState.getInventoryItemByIndex(data);
+            console.log("drop_item", data, item);
+            if (item) {
+                playerState.dropItem(item);
+            }
+        }
+
         /////////////////////////////////////
         // on player equip
         // data will equal the inventory index of the clicked item

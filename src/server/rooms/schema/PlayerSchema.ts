@@ -11,6 +11,7 @@ import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { GameRoomState } from "../state/GameRoomState";
 import { Entity } from "../schema/Entity";
 import { Item, ItemClass, PlayerSlots, PlayerKeys, ItemEffect } from "../../../shared/Data/ItemDB";
+import { nanoid } from "nanoid";
 
 export class PlayerData extends Schema {
     @type({ map: InventorySchema }) inventory = new MapSchema<InventorySchema>();
@@ -102,10 +103,12 @@ export class PlayerSchema extends Entity {
         data.initial_abilities.forEach((element) => {
             this.player_data.abilities.set(element.key, new AbilitySchema(element));
         });
-        /*
+        let i = 0;
         data.initial_inventory.forEach((element) => {
-            this.player_data.inventory.push(new InventorySchema(element));
-        });*/
+            element.i = "" + i;
+            this.player_data.inventory.set("" + i, new InventorySchema(element));
+            i++;
+        });
         Object.entries(data.initial_player_data).forEach(([k, v]) => {
             this.player_data[k] = v;
         });
@@ -190,6 +193,21 @@ export class PlayerSchema extends Entity {
             }
         });
         return available;
+    }
+
+    dropItem(inventoryItem) {
+        let data = {
+            key: inventoryItem.key,
+            sessionId: nanoid(10),
+            x: this.x,
+            y: this.y,
+            z: this.z,
+            quantity: inventoryItem.qty,
+        };
+        let entity = new LootSchema(this, data);
+        this._state.entityCTRL.add(entity);
+
+        this.player_data.inventory.delete("" + inventoryItem.i);
     }
 
     pickupItem(loot: LootSchema) {

@@ -103,8 +103,9 @@ export class Item {
 
         // load player mesh
         const result = await this._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene((name) => "instance_" + this.entity.sessionId);
-        const playerMesh = result.rootNodes[0];
-        //let playerMesh = this.mergeMesh(entity.key, result.rootNodes[0]);
+        const root = result.rootNodes[0];
+        let playerMesh = this.mergeMesh(entity.key, root);
+        root.setEnabled(false);
 
         // set initial player scale & rotation
         playerMesh.name = entity.key + "_mesh";
