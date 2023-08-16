@@ -87,7 +87,7 @@ export class Item {
         this.mesh.isPickable = true;
         this.mesh.isVisible = true;
         this.mesh.checkCollisions = false;
-        this.mesh.showBoundingBox = false;
+        this.mesh.showBoundingBox = true;
         this.mesh.position = new Vector3(this.entity.x, this.entity.y, this.entity.z);
 
         // offset mesh from the ground
@@ -102,10 +102,18 @@ export class Item {
         };
 
         // load player mesh
-        const result = await this._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene((name) => "instance_" + this.entity.sessionId);
+        const result = await this._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene((name) => "instance_" + this.entity.sessionId, false, {
+            doNotInstantiate: true,
+        });
         const root = result.rootNodes[0];
-        let playerMesh = this.mergeMesh(entity.key, root);
-        root.setEnabled(false);
+        let playerMesh = root;
+
+        /////////////////
+        /*
+        let modelToLoadKey = "LOADED_ITEM_" + this.key;
+        console.log(this._loadedAssets);
+        const playerMesh = this._loadedAssets[modelToLoadKey].createInstance("item_" + this.key);
+        */
 
         // set initial player scale & rotation
         playerMesh.name = entity.key + "_mesh";
@@ -176,7 +184,7 @@ export class Item {
         const allChildMeshes = mesh.getChildMeshes();
         const merged = Mesh.MergeMeshes(allChildMeshes, false, true, undefined, undefined, true);
         if (merged) {
-            merged.name = key + "_MergedModel";
+            merged.name = key + "_merged";
         }
         return merged;
     }

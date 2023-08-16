@@ -155,8 +155,6 @@ export class Panel_Inventory extends Panel {
             }
         }
 
-        console.log(this._inventoryGrid);
-
         //
         this.refresh();
     }

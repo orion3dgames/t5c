@@ -129,7 +129,7 @@ let ItemsDB: itemDataMap = {
             scale: 1.2,
             width: 1,
             height: 0.2,
-            depth: 0.2,
+            depth: 1,
         },
     },
 
@@ -157,7 +157,7 @@ let ItemsDB: itemDataMap = {
             scale: 1.2,
             width: 1,
             height: 0.2,
-            depth: 0.2,
+            depth: 1,
         },
     },
 
@@ -187,9 +187,9 @@ let ItemsDB: itemDataMap = {
         ],
         meshData: {
             scale: 0.25,
-            width: 0.4,
-            height: 0.4,
-            depth: 0.4,
+            width: 0.5,
+            height: 0.5,
+            depth: 0.5,
         },
     },
 
@@ -208,7 +208,7 @@ let ItemsDB: itemDataMap = {
         meshData: {
             scale: 0.25,
             width: 0.4,
-            height: 0.4,
+            height: 0.5,
             depth: 0.4,
         },
     },
@@ -228,7 +228,7 @@ let ItemsDB: itemDataMap = {
         meshData: {
             scale: 0.2,
             width: 0.4,
-            height: 0.4,
+            height: 0.5,
             depth: 0.4,
         },
     },
@@ -248,7 +248,7 @@ let ItemsDB: itemDataMap = {
         meshData: {
             scale: 1,
             width: 0.4,
-            height: 0.4,
+            height: 0.5,
             depth: 0.4,
         },
     },

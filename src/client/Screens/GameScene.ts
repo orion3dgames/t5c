@@ -21,6 +21,7 @@ import { SceneController } from "../Controllers/Scene";
 import { AuthController } from "../Controllers/AuthController";
 
 import { createConvexRegionHelper } from "../../shared/Utils/navMeshHelper";
+import { mergeMesh } from "../../shared/Entities/Common/MeshHelper";
 
 export class GameScene {
     private _app;
@@ -129,19 +130,21 @@ export class GameScene {
 
     private async _instantiate(): Promise<void> {
         for (let k in this._loadedAssets) {
-            if (k === "RACE_male_adventurer" || k === "RACE_male_enemy") {
+            if (k.includes("ITEM_") && this._loadedAssets[k] instanceof AssetContainer) {
                 let v = this._loadedAssets[k] as AssetContainer;
                 let modelToLoadKey = "LOADED_" + k;
-                this._loadedAssets[modelToLoadKey] = v.instantiateModelsToScene(
+                let options = { doNotInstantiate: false };
+                const root = v.instantiateModelsToScene(
                     function () {
                         return modelToLoadKey;
                     },
                     false,
                     { doNotInstantiate: false }
                 );
+                this._loadedAssets[modelToLoadKey] = mergeMesh(root.rootNodes[0]);
             }
         }
-        console.log("FINISH INSTANTIATE");
+        console.log("FINISH INSTANTIATE", this._loadedAssets);
     }
 
     private async _initNetwork(): Promise<void> {
