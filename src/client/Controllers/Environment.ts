@@ -307,7 +307,7 @@ export class Environment {
             // default values
             m.checkCollisions = false;
             m.isPickable = false;
-            m.receiveShadows = false;
+            m.receiveShadows = true;
             m.freezeWorldMatrix();
             m.doNotSyncBoundingInfo = true;
 

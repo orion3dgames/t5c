@@ -9,6 +9,7 @@ export class PlayerCamera {
     private _scene: Scene;
     private _input;
     public _camRoot;
+    public cameraPos;
     private _postProcess: BlackAndWhitePostProcess; //
 
     constructor(scene: Scene, input) {
@@ -40,6 +41,9 @@ export class PlayerCamera {
 
         // set as active camera
         this._scene.activeCamera = this.camera;
+
+        //
+        this.cameraPos = this.camera.position;
     }
 
     // post processing effect black and white
@@ -74,7 +78,7 @@ export class PlayerCamera {
 
     public zoom(deltaY): void {
         // zoom in/out
-        if (deltaY > 0 && this.camera.position.z > -50) this.camera.position.z -= 1;
-        if (deltaY < 0 && this.camera.position.z < -20) this.camera.position.z += 1;
+        if (deltaY > 0 && this.camera.position.z > -50) this.camera.position.z -= 2;
+        if (deltaY < 0 && this.camera.position.z < -20) this.camera.position.z += 2;
     }
 }
