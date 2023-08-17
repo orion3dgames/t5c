@@ -41,13 +41,13 @@ let RacesDB: raceDataMap = {
         animations: {
             IDLE: 36,
             WALK: 72,
-            ATTACK: 0,
+            ATTACK: 1,
             DEATH: 23,
             DAMAGE: 34,
         },
         bones: {
-            WEAPON: 37,
-            OFF_HAND: 14,
+            WEAPON: 12,
+            OFF_HAND: 7,
         },
         baseHealth: 50,
         baseMana: 50,

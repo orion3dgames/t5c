@@ -336,7 +336,7 @@ export class Panel_Character extends Panel {
     }
 
     private slotPanelContentRefresh(type, panel: Rectangle, data) {
-        console.log("slotPanelContentRefresh", data);
+        //console.log("slotPanelContentRefresh", data);
         // get information
         let slot_id = data.slot;
         let item_key = data.key;

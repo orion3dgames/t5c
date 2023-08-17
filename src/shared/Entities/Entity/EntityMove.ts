@@ -1,4 +1,5 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Scalar } from "@babylonjs/core/Maths/math.scalar";
 
 import Config from "../../Config";
 import { PlayerInputs } from "../../types";
@@ -78,7 +79,7 @@ export class EntityMove {
         // maybe look into Scalar.LerpAngle ??? https://doc.babylonjs.com/typedoc/classes/BABYLON.Scalar#LerpAngle
         const gap = Math.abs(this._mesh.rotation.y - this.nextRotation.y);
         if (gap > Math.PI) this._mesh.rotation.y = this.nextRotation.y;
-        else this._mesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.8);
+        else this._mesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.45);
     }
 
     public move(input: PlayerInputs): void {

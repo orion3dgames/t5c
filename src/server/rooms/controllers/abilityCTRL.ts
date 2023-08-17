@@ -229,10 +229,25 @@ export class abilitiesCTRL {
     }
 
     // process target affected properties
-    affectTarget(target, ability) {
+    affectTarget(target, owner, ability) {
         ability.targetPropertyAffected.forEach((p) => {
-            let result = randomNumberInRange(p.min, p.max);
-            let amount = this.affect(p.type, target[p.key], result);
+            // get min and max damage
+            let base_min = p.min;
+            let base_max = p.max;
+
+            // generate a random number
+            let base_damage = randomNumberInRange(base_min, base_max);
+
+            // calculate player affinity ( ex: total strengh / 5 )
+            let owner_affinity_roll = owner.player_data[ability.affinity] / 5;
+
+            // add affinity to base damage
+            base_damage += owner_affinity_roll;
+
+            // add a multiplier to increase damage per level
+            base_damage *= 1 + owner.level / 10;
+
+            let amount = this.affect(p.type, target[p.key], base_damage);
             target[p.key] = amount;
         });
     }
@@ -271,7 +286,7 @@ export class abilitiesCTRL {
         if (ability.repeat > 0) {
             let repeat = 1;
             let timer = setInterval(() => {
-                this.affectTarget(target, ability);
+                this.affectTarget(target, owner, ability);
                 if (target.isEntityDead()) {
                     this.processDeath(owner, target);
                     clearInterval(timer);
@@ -282,7 +297,7 @@ export class abilitiesCTRL {
                 repeat += 1;
             }, ability.repeatInterval);
         } else {
-            this.affectTarget(target, ability);
+            this.affectTarget(target, owner, ability);
         }
 
         //

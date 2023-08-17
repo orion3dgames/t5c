@@ -93,7 +93,7 @@ let AbilitiesDB: abilityMap = {
 
         affinity: "strength",
         casterPropertyAffected: [],
-        targetPropertyAffected: [{ key: "health", type: CALC.REMOVE, min: 2, max: 4 }],
+        targetPropertyAffected: [{ key: "health", type: CALC.REMOVE, min: 1, max: 2 }],
         requiredToLearn: [],
     },
 
@@ -118,7 +118,7 @@ let AbilitiesDB: abilityMap = {
 
         affinity: "intelligence",
         casterPropertyAffected: [{ key: "mana", type: CALC.REMOVE, min: 10, max: 10 }],
-        targetPropertyAffected: [{ key: "health", type: CALC.REMOVE, min: 10, max: 20 }],
+        targetPropertyAffected: [{ key: "health", type: CALC.REMOVE, min: 2, max: 4 }],
         requiredToLearn: [{ key: "level", amount: 2 }],
     },
 
