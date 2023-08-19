@@ -10,7 +10,8 @@ import { InventorySchema, EquipmentSchema, AbilitySchema, LootSchema } from "../
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { GameRoomState } from "../state/GameRoomState";
 import { Entity } from "../schema/Entity";
-import { ItemClass, PlayerSlots } from "../../../shared/Data/ItemDB";
+import { Item, ItemClass, PlayerSlots, PlayerKeys, ItemEffect } from "../../../shared/Data/ItemDB";
+import { nanoid } from "nanoid";
 
 export class PlayerData extends Schema {
     @type({ map: InventorySchema }) inventory = new MapSchema<InventorySchema>();
@@ -82,6 +83,9 @@ export class PlayerSchema extends Entity {
     public AI_TARGET_POSITION = null;
     public AI_TARGET_DISTANCE = null;
 
+    // inventory
+    public INVENTORY_LENGTH = 25;
+
     constructor(state: GameRoomState, data) {
         super();
         //
@@ -99,8 +103,11 @@ export class PlayerSchema extends Entity {
         data.initial_abilities.forEach((element) => {
             this.player_data.abilities.set(element.key, new AbilitySchema(element));
         });
+        let i = 0;
         data.initial_inventory.forEach((element) => {
-            this.player_data.inventory.set(element.key, new InventorySchema(element));
+            element.i = "" + i;
+            this.player_data.inventory.set("" + i, new InventorySchema(element));
+            i++;
         });
         Object.entries(data.initial_player_data).forEach(([k, v]) => {
             this.player_data[k] = v;
@@ -152,49 +159,128 @@ export class PlayerSchema extends Entity {
         return this._state._gameroom.clients.getById(this.sessionId);
     }
 
+    getInventoryItem(value, key = "index"): InventorySchema {
+        let found;
+        this.player_data.inventory.forEach((el, k) => {
+            if (key === "index" && k === value) {
+                found = el;
+            } else if (key === "key" && el.key === value) {
+                found = el;
+            }
+        });
+        return found;
+    }
+    getInventoryItemByIndex(value): InventorySchema {
+        return this.player_data.inventory.get("" + value);
+    }
+
+    findNextAvailableInventorySlot() {
+        if (this.player_data.inventory.size > 0) {
+            for (let i = 0; i < this.INVENTORY_LENGTH; i++) {
+                if (!this.player_data.inventory.get("" + i)) {
+                    return "" + i;
+                }
+            }
+        }
+        return "0";
+    }
+
+    isEquipementSlotAvailable(slot) {
+        let available = true;
+        this.equipment.forEach((item) => {
+            if (item.slot === slot) {
+                available = false;
+            }
+        });
+        return available;
+    }
+
+    dropItem(inventoryItem) {
+        let data = {
+            key: inventoryItem.key,
+            sessionId: nanoid(10),
+            x: this.x,
+            y: this.y,
+            z: this.z,
+            quantity: inventoryItem.qty,
+        };
+        let entity = new LootSchema(this, data);
+        this._state.entityCTRL.add(entity);
+
+        this.player_data.inventory.delete("" + inventoryItem.i);
+    }
+
     pickupItem(loot: LootSchema) {
         let data = {
             key: loot.key,
             qty: loot.quantity,
+            i: "" + 0,
         };
+
+        //
         let item = dataDB.get("item", loot.key);
 
-        let inventoryItem = this.player_data.inventory.get(data.key);
+        // is item already inventory
+        let inventoryItem = this.getInventoryItem(loot.key, "key");
 
-        if (inventoryItem) {
+        // is item stackable
+        if (item.stackable && inventoryItem) {
+            // increnent stack
             inventoryItem.qty += data.qty;
         } else {
-            this.player_data.inventory.set(data.key, new InventorySchema(data));
+            // find next available index
+            data.i = this.findNextAvailableInventorySlot();
+
+            // add inventory item
+            this.player_data.inventory.set("" + data.i, new InventorySchema(data));
         }
 
+        // delete loot
         this._state.entities.delete(loot.sessionId);
 
+        // stop chasing target
         this.AI_TARGET = null;
     }
 
-    equipItem(key) {
-        let item = dataDB.get("item", key);
+    consumeItem(item) {
+        item.benefits.forEach((element) => {
+            let key = element.key;
+            if (ItemEffect.ADD === element.type) {
+                this[key] += element.amount;
+            }
+            if (ItemEffect.REMOVE === element.type) {
+                this[key] -= element.amount;
+            }
+        });
 
+        this.normalizeStats();
+
+        item.qty -= 1;
+        if (item.qty < 1) {
+            this.player_data.inventory.delete(item.i);
+        }
+    }
+
+    equipItem(item) {
         if (item.class !== ItemClass.ARMOR && item.class !== ItemClass.WEAPON) {
-            console.log("this item class cannot be equipped", key);
+            console.log("this item class cannot be equipped", item);
             return false;
         }
 
         // make sure item is equipable
         if (!item.equippable) {
-            console.log("item cannot be equipped", key);
+            console.log("item cannot be equipped", item);
             return false;
         }
 
         let slot = item.equippable.slot;
+        let key = item.key;
 
-        // only if player has in inventory and player slot is available
-        let inventoryItem = this.player_data.inventory.get(key);
-        if (inventoryItem && inventoryItem.qty > 0 && this.isSlotAvailable(slot) === true) {
-            inventoryItem.qty -= 1;
-            if (inventoryItem.qty < 1) {
+        if (item && item.qty > 0 && this.isEquipementSlotAvailable(slot) === true) {
+            item.qty -= 1;
+            if (item.qty < 1) {
                 // remove item from inventory
-                this.player_data.inventory.delete(key);
+                this.player_data.inventory.delete(item.i);
             }
             // equip
             this.equipment.set(key, new EquipmentSchema({ key: key, slot: slot }));
@@ -212,16 +298,6 @@ export class PlayerSchema extends Entity {
                 quantity: 1,
             })
         );
-    }
-
-    isSlotAvailable(slot) {
-        let available = true;
-        this.equipment.forEach((item) => {
-            if (item.slot === slot) {
-                available = false;
-            }
-        });
-        return available;
     }
 
     setAsDead() {

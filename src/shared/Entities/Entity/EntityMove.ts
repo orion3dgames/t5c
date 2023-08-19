@@ -1,4 +1,5 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Scalar } from "@babylonjs/core/Maths/math.scalar";
 
 import Config from "../../Config";
 import { PlayerInputs } from "../../types";
@@ -71,14 +72,14 @@ export class EntityMove {
 
     public tween() {
         // continuously lerp between current position and next position
-        this._mesh.position = Vector3.Lerp(this._mesh.position, this.nextPosition, 0.15);
+        this._mesh.position = Vector3.Lerp(this._mesh.position, this.nextPosition, 0.1);
 
         // rotation
         // TODO DAYD : make it better
         // maybe look into Scalar.LerpAngle ??? https://doc.babylonjs.com/typedoc/classes/BABYLON.Scalar#LerpAngle
         const gap = Math.abs(this._mesh.rotation.y - this.nextRotation.y);
         if (gap > Math.PI) this._mesh.rotation.y = this.nextRotation.y;
-        else this._mesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.8);
+        else this._mesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.45);
     }
 
     public move(input: PlayerInputs): void {
@@ -101,10 +102,9 @@ export class EntityMove {
             let destinationPos = new Vector3Y(newX, newY, newZ); // new pos
             const foundPath: any = this._navMesh.checkPath(sourcePos, destinationPos);
             if (foundPath) {
-
                 // adjust height of the entity according to the ground
-                let currentRegion = this._navMesh.getRegionForPoint( destinationPos, .5);
-                const distance = currentRegion.plane.distanceToPoint( destinationPos );
+                let currentRegion = this._navMesh.getRegionForPoint(destinationPos, 0.5);
+                const distance = currentRegion.plane.distanceToPoint(destinationPos);
                 newY -= distance; // smooth transition*/
 
                 this.nextPosition.x = newX;

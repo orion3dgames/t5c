@@ -21,6 +21,7 @@ import { SceneController } from "../Controllers/Scene";
 import { AuthController } from "../Controllers/AuthController";
 
 import { createConvexRegionHelper } from "../../shared/Utils/navMeshHelper";
+import { mergeMesh } from "../../shared/Entities/Common/MeshHelper";
 
 export class GameScene {
     private _app;
@@ -104,12 +105,11 @@ export class GameScene {
         light.autoCalcShadowZBounds = true;
 
         // shadow generator
-        this._shadow = new CascadedShadowGenerator(2048, light);
-        this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_HIGH;
-        this._shadow.lambda = 1;
+        this._shadow = new CascadedShadowGenerator(1024, light);
+        this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_LOW;
+        this._shadow.lambda = 0.82;
         this._shadow.bias = 0.018;
-        this._shadow.autoCalcDepthBounds = true;
-        this._shadow.shadowMaxZ = 10000;
+        this._shadow.shadowMaxZ = 1000;
         this._shadow.stabilizeCascades = false;
         this._shadow.depthClamp = true;
 
@@ -129,19 +129,21 @@ export class GameScene {
 
     private async _instantiate(): Promise<void> {
         for (let k in this._loadedAssets) {
-            if (k === "RACE_male_adventurer" || k === "RACE_male_enemy") {
+            if (k.includes("ITEM_") && this._loadedAssets[k] instanceof AssetContainer) {
                 let v = this._loadedAssets[k] as AssetContainer;
                 let modelToLoadKey = "LOADED_" + k;
-                this._loadedAssets[modelToLoadKey] = v.instantiateModelsToScene(
+                let options = { doNotInstantiate: false };
+                const root = v.instantiateModelsToScene(
                     function () {
                         return modelToLoadKey;
                     },
                     false,
                     { doNotInstantiate: false }
                 );
+                this._loadedAssets[modelToLoadKey] = mergeMesh(root.rootNodes[0]);
             }
         }
-        console.log("FINISH INSTANTIATE");
+        console.log("FINISH INSTANTIATE", this._loadedAssets);
     }
 
     private async _initNetwork(): Promise<void> {

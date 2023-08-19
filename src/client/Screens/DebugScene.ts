@@ -18,7 +18,10 @@ import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 
-import { mergeMesh, calculateRanges, bakeVertexData, setAnimationParameters, mergeMeshAndSkeleton } from "../../shared/Utils/vatUtils";
+import { mergeMesh, calculateRanges, bakeVertexData, setAnimationParameters, mergeMeshAndSkeleton } from "../../shared/Entities/Common/VatHelper";
+import AnimationHelper from "../../shared/Entities/Common/AnimationHelper";
+import { Skeleton } from "@babylonjs/core/Bones/skeleton";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 class JavascriptDataDownloader {
     private data;
@@ -40,6 +43,8 @@ class JavascriptDataDownloader {
     }
 }
 
+const frameOffset = 6;
+
 export class DebugScene {
     public _engine: Engine;
     public _scene: Scene;
@@ -51,7 +56,7 @@ export class DebugScene {
 
     public PLANE_SIZE = 20;
     public INST_COUNT = 100;
-    public PICKED_ANIMS = ["Walk", "Run", "Idle", "Sword_Slash"];
+    public PICKED_ANIMS = ["Idle", "Roll", `Run`, "Walk", "Wave"];
     public URL_MESH = "male_adventurer.glb";
 
     public models = [];
@@ -60,6 +65,10 @@ export class DebugScene {
 
     public animationRanges;
     public animationGroups;
+    public selectedAnimationGroups;
+
+    public skeletonForAnim: Skeleton[] = []; //
+    public rootForAnim: TransformNode[] = []; //
 
     constructor() {
         this._newState = State.NULL;
@@ -107,9 +116,6 @@ export class DebugScene {
 
         // add VAT manager
         this.vatManager = new BakedVertexAnimationManager(this._scene);
-        this._scene.registerBeforeRender(() => {
-            this.vatManager.time += this._scene.getEngine().getDeltaTime() / 1000.0;
-        });
 
         // load weapon
         const weaponLoad = await SceneLoader.ImportMeshAsync("", "./models/items/", "sword_01.glb", this._scene);
@@ -122,48 +128,78 @@ export class DebugScene {
         await this.loadMesh("male_adventurer");
 
         ///
-        const createInst = (id) => {
+        const createInst = (id, animIndex) => {
             const playerInstance = this.playerMesh.createInstance("player_" + id);
             playerInstance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-            let animaToPlay = Math.floor(Math.random() * this.animationGroups.length);
-            setAnimationParameters(
-                playerInstance.instancedBuffers.bakedVertexAnimationSettingsInstanced,
-                animaToPlay,
-                this.animationRanges,
-                this.animationGroups
-            );
+            setAnimationParameters(playerInstance.instancedBuffers.bakedVertexAnimationSettingsInstanced, animIndex, this.animationRanges);
             playerInstance.position.x = randomNumberInRange(-3, 3);
             playerInstance.position.z = randomNumberInRange(-3, 3);
             playerInstance.rotation.y = 0;
             this.createLabel(playerInstance, id);
 
-            // attack weapon
+            // attach weapon
             if (weaponMeshMerged) {
                 const weapon = weaponMeshMerged.createInstance("player_" + id + "_sword");
-                let bone = playerInstance.skeleton.bones[37];
+                const skeletonAnim = this.skeletonForAnim[animIndex];
+                let bone = skeletonAnim.bones[37];
                 weapon.attachToBone(bone, playerInstance);
-                console.log(weapon);
-                /*
-                let boneId = this._entity.bones[key];
-                    let bone = this._skeleton.bones[boneId];
-                    const weapon = this._loadedAssets["ITEM_" + e.key].instantiateModelsToScene((name) => "player_" + e.key);
-                    const weaponMesh = weapon.rootNodes[0];
-                    weaponMesh.parent = this.playerMesh;
-                    weaponMesh.attachToBone(bone, this.playerMesh); */
             }
         };
 
         for (let i = 0; i < this.INST_COUNT; i++) {
             console.log("CREATE INSTANCE ID: " + i);
-            createInst(i + "");
+            createInst(i + "", Math.floor(Math.random() * this.selectedAnimationGroups.length));
+        }
+
+        //
+        this._scene.registerBeforeRender(() => {
+            this.vatManager.time += this._scene.getEngine().getDeltaTime() / 1000.0;
+
+            this.skeletonForAnim.forEach((skel) => {
+                skel.prepare();
+            });
+
+            const frame = this.vatManager.time * 60 + frameOffset;
+
+            this.selectedAnimationGroups.forEach((animationGroup) => {
+                animationGroup.goToFrame(frame);
+            });
+        });
+
+        //
+        for (const animationGroup of this.animationGroups) {
+            const indexAnim = this.PICKED_ANIMS.indexOf(animationGroup.name);
+            if (indexAnim >= 0) {
+                AnimationHelper.RetargetAnimationGroupToRoot(animationGroup, this.rootForAnim[indexAnim]);
+                AnimationHelper.RetargetSkeletonToAnimationGroup(animationGroup, this.skeletonForAnim[indexAnim]);
+                animationGroup.play(true);
+            }
         }
     }
 
     async loadMesh(key) {
         const { meshes, animationGroups, skeletons } = await SceneLoader.ImportMeshAsync("", "./models/races/", key + ".glb", this._scene);
-        const selectedAnimationGroups = animationGroups.filter((ag) => this.PICKED_ANIMS.includes(ag.name));
+
+        animationGroups.forEach((ag) => ag.stop());
+
+        this.animationGroups = animationGroups;
+        this.selectedAnimationGroups = animationGroups.filter((ag) => this.PICKED_ANIMS.includes(ag.name));
+
         const skeleton = skeletons[0];
         const root = meshes[0];
+
+        // prepare skeletons and root anims
+        this.PICKED_ANIMS.forEach((name) => {
+            const skel = skeleton.clone("skeleton_" + name);
+            this.skeletonForAnim.push(skel);
+            const rootAnim = root.instantiateHierarchy(undefined, { doNotInstantiate: true }, (source, clone) => {
+                clone.name = source.name;
+            });
+            if (rootAnim) {
+                rootAnim.name = "_root_" + name;
+                this.rootForAnim.push(rootAnim);
+            }
+        });
 
         // reset position & rotation
         // not sure why?
@@ -173,44 +209,50 @@ export class DebugScene {
         root.rotation.setAll(0);
 
         // calculate animations ranges
-        const ranges = calculateRanges(selectedAnimationGroups);
+        const ranges = calculateRanges(this.selectedAnimationGroups);
 
         // merge mesh
         const merged = mergeMeshAndSkeleton(root, skeleton);
 
-        // save data
-        this.playerMesh = merged;
-        this.animationRanges = ranges;
-        this.animationGroups = selectedAnimationGroups;
-
         // disable & hide root mesh
         root.setEnabled(false);
-        this.playerMesh.isVisible = false;
 
         // setup vat
         if (merged) {
-            // note sure what's happening here
+            // save data
+            this.playerMesh = merged;
+            this.animationRanges = ranges;
+
+            //
             merged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
             merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
 
             // bake VAT
             merged.bakedVertexAnimationManager = this.vatManager;
             merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-            setAnimationParameters(merged.instancedBuffers.bakedVertexAnimationSettingsInstanced, 0, this.animationRanges, this.animationGroups);
 
             // bake vertex data
-            //this.bakeToJson(merged, selectedAnimationGroups);
+            //this.bakeToJson(merged, this.selectedAnimationGroups);
 
+            // bake realtime
+            const b = new VertexAnimationBaker(this._scene, merged);
+            const bufferFromMesh = await bakeVertexData(merged, this.selectedAnimationGroups);
+            const buffer = bufferFromMesh;
+            this.vatManager.texture = b.textureFromBakedVertexData(buffer);
+
+            /*
             // load prebaked vat animations
+
             const b = new VertexAnimationBaker(this._scene, merged);
             let req = await request("get", "./models/races/male_adventurer.json", {}, false, { headers: { "Content-Type": "application/json" } });
             let bufferFromMesh = b.loadBakedVertexDataFromJSON(JSON.parse(req.data));
-            this.vatManager.texture = b.textureFromBakedVertexData(bufferFromMesh);
+            this.vatManager.texture = b.textureFromBakedVertexData(bufferFromMesh);*/
 
             //dispose resources
+            /*
             meshes.forEach((m) => m.dispose(false, true));
             this.animationGroups.forEach((ag) => ag.dispose());
-            skeletons.forEach((s) => s.dispose());
+            skeletons.forEach((s) => s.dispose());*/
         }
     }
 

@@ -4,7 +4,7 @@ import { Button } from "@babylonjs/gui/2D/controls/button";
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 
-const createButton = function (name, text, width, height, icon?: string) {
+const createButton = function (name, text, width, height, icon?: string, size: string = "md") {
     let result = new Button(name);
     result.width = width;
     result.height = height;
@@ -20,9 +20,19 @@ const createButton = function (name, text, width, height, icon?: string) {
     textBlock.textWrapping = true;
     textBlock.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
     textBlock.color = "white";
-    textBlock.fontSize = "14px;";
     textBlock.fontWeight = "bold";
     textBlock.fontFamily = getFont();
+
+    if (size === "md") {
+        textBlock.fontSize = "14px;";
+    } else if (size === "sm") {
+        textBlock.fontSize = "12px;";
+    } else if (size === "xs") {
+        textBlock.fontSize = "10px;";
+    } else {
+        textBlock.fontSize = "14px;";
+    }
+
     result.addControl(textBlock);
     return result;
 };

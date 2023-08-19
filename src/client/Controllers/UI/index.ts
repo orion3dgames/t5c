@@ -3,6 +3,7 @@ import { AbilityBar } from "./AbilityBar";
 import { DebugBox } from "./DebugBox";
 import { EntitySelectedBar } from "./EntitySelectedBar";
 import { Tooltip } from "./Tooltip";
+import { InventoryDropdown } from "./InventoryDropdown";
 
 import { CastingBar } from "./CastingBar";
 import { ExperienceBar } from "./ExperienceBar";
@@ -20,6 +21,7 @@ export {
     DebugBox,
     EntitySelectedBar,
     Tooltip,
+    InventoryDropdown,
     Panel_Inventory,
     CastingBar,
     ExperienceBar,

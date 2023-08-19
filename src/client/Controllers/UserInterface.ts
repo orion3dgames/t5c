@@ -13,6 +13,7 @@ import {
     DebugBox,
     EntitySelectedBar,
     Tooltip,
+    InventoryDropdown,
     Panel_Inventory,
     CastingBar,
     ExperienceBar,
@@ -63,6 +64,7 @@ export class UserInterface {
     public _CastingBar: CastingBar;
     public _RessurectBox: RessurectBox;
     private _ExperienceBar: ExperienceBar;
+    private _InventoryDropdown: InventoryDropdown;
 
     // openable panels
     private _panels: Panel[];
@@ -100,9 +102,6 @@ export class UserInterface {
         this._hightlight.blurHorizontalSize = 0.5;
         this._hightlight.blurVerticalSize = 0.5;
         this._hightlight.innerGlow = false;
-
-        // some ui must be constantly refreshed as things change
-        this._scene.registerBeforeRender(() => this.dragging());
     }
 
     public dragging() {
@@ -113,6 +112,7 @@ export class UserInterface {
             this._isDragging.topInPixels += deltaY;
             this._pointerDownPosition.x = this._scene.pointerX;
             this._pointerDownPosition.y = this._scene.pointerY;
+            this._InventoryDropdown.refresh();
         }
     }
 
@@ -168,6 +168,7 @@ export class UserInterface {
             vertical_position: Control.VERTICAL_ALIGNMENT_BOTTOM,
         });
         this.panelInventory.open();
+        this._InventoryDropdown = new InventoryDropdown(this);
 
         // create panel
         this.panelAbilities = new Panel_Abilities(this, currentPlayer, {
@@ -208,6 +209,7 @@ export class UserInterface {
         // some ui must be constantly refreshed as things change
         this._scene.registerBeforeRender(() => {
             this.refreshEntityUI();
+            this.dragging();
         });
 
         // initial resize event

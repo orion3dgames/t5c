@@ -17,7 +17,7 @@ import { dataDB } from "../../../shared/Data/dataDB";
 
 import { GetLoot, LootTableEntry } from "../../../shared/Entities/Player/LootTable";
 import Config from "../../../shared/Config";
-import { ItemClass, PlayerSlots } from "../../../shared/Data/ItemDB";
+import { Item, ItemClass, PlayerSlots } from "../../../shared/Data/ItemDB";
 
 export class GameRoomState extends Schema {
     // networked variables
@@ -120,7 +120,7 @@ export class GameRoomState extends Schema {
             sessionId: client.sessionId,
             name: data.name,
             type: "player",
-            race: "male_adventurer",
+            race: "male_knight",
 
             location: data.location,
             sequence: 0,
@@ -167,15 +167,6 @@ export class GameRoomState extends Schema {
         // on player ressurect
         if (type === "revive_pressed") {
             playerState.ressurect();
-        }
-
-        /////////////////////////////////////
-        // on player ressurect
-        if (type === "pickup_item") {
-            const itemState = this.getEntity(data.sessionId);
-            if (itemState) {
-                playerState.setTarget(itemState);
-            }
         }
 
         /////////////////////////////////////
@@ -230,15 +221,39 @@ export class GameRoomState extends Schema {
         }
 
         /////////////////////////////////////
-        // on player equip
-        // data will equal the inventory key of the clicked item
-        if (type === "equip_item") {
-            const item = dataDB.get("item", data);
-            // does item exist in database
-            if (item) {
-                playerState.equipItem(item.key);
+        // on player ressurect
+        if (type === "pickup_item") {
+            const itemState = this.getEntity(data.sessionId);
+            if (itemState) {
+                playerState.setTarget(itemState);
             }
         }
+
+        if (type === "drop_item") {
+            const item = playerState.getInventoryItemByIndex(data);
+            console.log("drop_item", data, item);
+            if (item) {
+                playerState.dropItem(item);
+            }
+        }
+
+        /////////////////////////////////////
+        // on player equip
+        // data will equal the inventory index of the clicked item
+        if (type === "use_item") {
+            const item = playerState.getInventoryItemByIndex(data);
+            console.log("use_item", data, item);
+            if (item) {
+                if (item.class === ItemClass.CONSUMABLE) {
+                    playerState.consumeItem(item);
+                } else if (item.equippable) {
+                    playerState.equipItem(item);
+                }
+            }
+        }
+
+        /////////////////////////////////////
+        // on player unequip
         if (type === "unequip_item") {
             const item = dataDB.get("item", data);
             // does item exist in database

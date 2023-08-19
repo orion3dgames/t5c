@@ -4,8 +4,11 @@ import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Grid } from "@babylonjs/gui/2D/controls/grid";
 import { dataDB } from "../../../../shared/Data/dataDB";
-import { Item } from "../../../../shared/Data/ItemDB";
+import { Item, ItemClass } from "../../../../shared/Data/ItemDB";
 import { Panel } from "./Panel";
+import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
+import { createButton } from "../Theme";
+import { InventoryDropdown } from "../InventoryDropdown";
 
 export class Panel_Inventory extends Panel {
     // inventory tab
@@ -17,8 +20,6 @@ export class Panel_Inventory extends Panel {
 
     constructor(_UI, _currentPlayer, options) {
         super(_UI, _currentPlayer, options);
-
-        //this.createContent();
 
         // dynamic events
         let entity = this._currentPlayer.entity;
@@ -52,6 +53,11 @@ export class Panel_Inventory extends Panel {
     public open() {
         super.open();
         this.refresh();
+    }
+
+    public close() {
+        super.close();
+        this._UI._InventoryDropdown.hideDropdown();
     }
 
     // refresh panel
@@ -130,6 +136,7 @@ export class Panel_Inventory extends Panel {
         let i = 0;
         for (let r = 0; r < inventorySpaceRows; r++) {
             for (let col = 0; col < inventorySpaceCols; col++) {
+                let bgColor = "rgba(255,255,255,.1)";
                 const inventorySpace = new Rectangle("inventorySpace_" + i);
                 inventorySpace.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
                 inventorySpace.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
@@ -137,7 +144,7 @@ export class Panel_Inventory extends Panel {
                 inventorySpace.left = 0.1;
                 inventorySpace.width = 0.9;
                 inventorySpace.height = 0.9;
-                inventorySpace.background = "rgba(255,255,255,.1)";
+                inventorySpace.background = bgColor;
                 inventorySpace.thickness = 0;
                 inventorySpace.cornerRadius = 0;
                 grid.addControl(inventorySpace, r, col);
@@ -156,6 +163,10 @@ export class Panel_Inventory extends Panel {
     ///////////////////////////////////////
     // INVENTORY PANEL
     public refresh() {
+        if (this._inventoryGrid.length < 1) {
+            return false;
+        }
+
         // if inventory is empty, make sure to clear all unessacary UI elements
         this._inventoryGrid.forEach((child) => {
             child.getDescendants().forEach((el) => {
@@ -167,9 +178,9 @@ export class Panel_Inventory extends Panel {
 
         ///////////////////////
         // else show items
-        let i = 0;
         this._currentPlayer.player_data.inventory.forEach((element) => {
-            let child = this._inventoryGrid[i];
+            let index = element.i;
+            let child = this._inventoryGrid[index];
             let item = dataDB.get("item", element.key) as Item;
 
             // dispose
@@ -180,6 +191,8 @@ export class Panel_Inventory extends Panel {
             // set metadata
             child.metadata = {
                 item: item,
+                index: index,
+                background: child.background,
             };
 
             // add item icon
@@ -189,7 +202,7 @@ export class Panel_Inventory extends Panel {
             child.addControl(img);
 
             // add item qty
-            const itemTxtQty = new TextBlock("itemTxtQty" + i);
+            const itemTxtQty = new TextBlock("itemTxtQty" + index);
             itemTxtQty.text = element.qty;
             itemTxtQty.color = "#FFF";
             itemTxtQty.top = "-2px";
@@ -218,11 +231,10 @@ export class Panel_Inventory extends Panel {
             child.onPointerClickObservable.clear();
             child.onPointerClickObservable.add((e) => {
                 if (child.metadata.item && e.buttonIndex === 2) {
-                    this._gameRoom.send("equip_item", child.metadata.item.key);
+                    this._UI._Tooltip.close();
+                    this._UI._InventoryDropdown.showDropdown(child, item, element);
                 }
             });
-
-            i++;
         });
     }
 }

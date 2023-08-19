@@ -81,7 +81,7 @@ export class spawnCTRL {
         let sessionId = nanoid(10);
 
         // monster pool to chose from
-        let randTypes = ["sword_01", "amulet_01", "potion_heal", "shield_01"];
+        let randTypes = ["sword_01", "amulet_01", "potion_heal", "shield_01", "shield_01_gold"];
         let randResult = randTypes[Math.floor(Math.random() * randTypes.length)];
         let randData = dataDB.get("item", randResult);
 
