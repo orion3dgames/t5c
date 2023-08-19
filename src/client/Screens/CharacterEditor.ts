@@ -1,25 +1,33 @@
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { RadioGroup, SelectionPanel } from "@babylonjs/gui/2D/controls/";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { InputText } from "@babylonjs/gui/2D/controls/inputText";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { Control } from "@babylonjs/gui/2D/controls/control";
+import { Image } from "@babylonjs/gui/2D/controls/image";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
-import { MeshAssetTask } from "@babylonjs/core/Misc/assetsManager";
+import { ContainerAssetTask, MeshAssetTask } from "@babylonjs/core/Misc/assetsManager";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 
+import { Environment } from "../Controllers/Environment";
 import { SceneController } from "../Controllers/Scene";
 import { AuthController } from "../Controllers/AuthController";
 import State from "./Screens";
 import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
 import { dataDB } from "../../shared/Data/dataDB";
+import { FollowCamera } from "@babylonjs/core/Cameras/followCamera";
+import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
+import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
+import { reloadFromCache } from "@colyseus/core/build/utils/DevMode";
+import { AssetContainer } from "@babylonjs/core/assetContainer";
+import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 
 export class CharacterEditor {
     public _scene: Scene;
@@ -28,16 +36,18 @@ export class CharacterEditor {
     public _newState: State;
     public _button: Button;
     public _shadow: CascadedShadowGenerator;
-    private _loadedAssets: MeshAssetTask[] = [];
-    public results;
-    public selection;
-    public RACE;
-
+    private _loadedAssets: AssetContainer[] = [];
     public _ui;
-    public _uiRadioOptions;
 
-    private _playerMesh;
-    private _playerAnimations;
+    private stackPanel: StackPanel;
+    private selected_mesh;
+    private selected_animations;
+    private selected_textures;
+    private selected_class;
+    private selected_variant;
+
+    private section1;
+    private section2;
 
     constructor() {
         this._newState = State.NULL;
@@ -48,13 +58,11 @@ export class CharacterEditor {
         this._auth = AuthController.getInstance();
 
         let scene = new Scene(app.engine);
-        scene.clearColor = new Color4(0, 0, 0, 1);
+        scene.clearColor = new Color4(0.1, 0.1, 0.1, 1);
 
         // camera
-        var camera = new ArcRotateCamera("camera1", Math.PI / 2, Math.PI / 4, 3, new Vector3(0, 0.8, 0), scene);
+        var camera = new ArcRotateCamera("camera1", Math.PI / 2, Math.PI / 2, 10, new Vector3(0, 1, 0), scene);
         camera.attachControl(app.canvas, true);
-        camera.lowerRadiusLimit = 2;
-        camera.upperRadiusLimit = 10;
         camera.wheelDeltaPercentage = 0.01;
 
         // scene light
@@ -78,7 +86,8 @@ export class CharacterEditor {
         this._shadow.shadowMaxZ = 1000;
 
         // add ground
-        const ground = MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, scene);
+        const ground = MeshBuilder.CreateCylinder("ground", { diameter: 3, height: 0.1 }, scene);
+        ground.position.y -= 0.1;
         ground.receiveShadows = true;
 
         // load scene
@@ -105,6 +114,64 @@ export class CharacterEditor {
         const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
         this._ui = guiMenu;
 
+        // left columm
+        const leftColumnRect = new Rectangle("columnLeft");
+        leftColumnRect.top = 0;
+        leftColumnRect.left = "0";
+        leftColumnRect.width = 0.2;
+        leftColumnRect.height = 1;
+        leftColumnRect.background = "#000000";
+        leftColumnRect.thickness = 0;
+        leftColumnRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        leftColumnRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        guiMenu.addControl(leftColumnRect);
+
+        // right columm
+        const rightColumnRect = new Rectangle("rightColumnRect");
+        rightColumnRect.top = 0;
+        rightColumnRect.left = 0;
+        rightColumnRect.width = 0.8;
+        rightColumnRect.height = 1;
+        rightColumnRect.background = "rgba(0,0,0,0)";
+        rightColumnRect.thickness = 0;
+        rightColumnRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        rightColumnRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        guiMenu.addControl(rightColumnRect);
+
+        // logo
+        var imgLogo = new Image("imgLogo", "./images/logo.png");
+        imgLogo.stretch = Image.STRETCH_UNIFORM;
+        imgLogo.top = "30px";
+        imgLogo.width = 1;
+        imgLogo.height = "65px;";
+        imgLogo.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        leftColumnRect.addControl(imgLogo);
+
+        // welcome text
+        const welcomeText = new TextBlock("infotext", "Welcome " + user.username);
+        welcomeText.width = 0.8;
+        welcomeText.height = "40px";
+        welcomeText.color = "white";
+        welcomeText.top = "100px";
+        welcomeText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        welcomeText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        leftColumnRect.addControl(welcomeText);
+
+        const sectionStackPanel = new StackPanel("sectionStackPanel");
+        sectionStackPanel.top = "160px";
+        sectionStackPanel.width = 0.8;
+        sectionStackPanel.height = 0.6;
+        sectionStackPanel.background = "";
+        sectionStackPanel.spacing = 5;
+        sectionStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        sectionStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        sectionStackPanel.adaptHeightToChildren = true;
+        sectionStackPanel.setPaddingInPixels(5, 5, 5, 5);
+        sectionStackPanel.isVertical = true;
+        leftColumnRect.addControl(sectionStackPanel);
+        this.stackPanel = sectionStackPanel;
+
+        ////////////////////////////////////////
         const usernameInput = new InputText("newCharacterInput");
         usernameInput.top = "-110px;";
         usernameInput.width = "200px";
@@ -114,7 +181,7 @@ export class CharacterEditor {
         usernameInput.placeholderText = "Enter username";
         usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         usernameInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        guiMenu.addControl(usernameInput);
+        rightColumnRect.addControl(usernameInput);
 
         // PLAY BUTTON
         const playBtn = Button.CreateSimpleButton("playBtn", "PLAY");
@@ -126,7 +193,7 @@ export class CharacterEditor {
         playBtn.thickness = 1;
         playBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         playBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        guiMenu.addControl(playBtn);
+        rightColumnRect.addControl(playBtn);
         playBtn.onPointerDownObservable.add(() => {
             // create new character via database
             this.createCharacter(this._auth.currentUser.token, usernameInput.text).then((char) => {
@@ -148,7 +215,7 @@ export class CharacterEditor {
         backBtn.thickness = 1;
         backBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         backBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        guiMenu.addControl(backBtn);
+        rightColumnRect.addControl(backBtn);
         backBtn.onPointerDownObservable.add(() => {
             SceneController.goToScene(State.CHARACTER_SELECTION);
         });
@@ -157,110 +224,205 @@ export class CharacterEditor {
         //////////////////////// MESHES
         /////////////////////////////////////////////////////////
 
-        // set default model
-        let RACE = dataDB.get("race", "male_adventurer");
-        this.RACE = RACE;
+        this._environment = new Environment(this._scene, this._shadow, this._loadedAssets);
+        await this._environment.loadCharacterEditor();
 
-        // load assets and remove them all from scene
-        const playerMesh = await SceneLoader.ImportMeshAsync("", "./models/races/", RACE.key + ".glb", scene);
-        this._playerMesh = playerMesh;
-        this._playerAnimations = playerMesh.animationGroups;
+        //
+        this.section1 = {
+            title: "Choose Class",
+            choices: [
+                {
+                    title: "Knight",
+                    description: "The knight is as knight should be, strong and righteous. It has a large health pool and uses stamina to cast its abilities.",
+                    mesh: "male_knight",
+                    material: "male_knight",
+                },
+                {
+                    title: "Mage",
+                    description:
+                        "The mage is a powerful class, but has a small health pool. It uses mana to cast spells, and should use its spells carefully if it does not want to run out of mana.",
+                    mesh: "male_mage",
+                    material: "male_mage",
+                },
+            ],
+        };
 
-        // default animations
-        this._playerAnimations[RACE.animations.IDLE].play(true);
+        this.section2 = {
+            title: "Choose Color",
+            choices: {
+                male_knight: [
+                    { title: "Color 1", material: "knight_texture.png" },
+                    { title: "Color 2", material: "knight_texture_alt_A.png" },
+                    { title: "Color 3", material: "knight_texture_alt_B.png" },
+                    { title: "Color 4", material: "knight_texture_alt_C.png" },
+                ],
+                male_mage: [
+                    { title: "Color 1", material: "mage_texture.png" },
+                    { title: "Color 2", material: "mage_texture_alt_A.png" },
+                    { title: "Color 3", material: "mage_texture_alt_B.png" },
+                    { title: "Color 4", material: "mage_texture_alt_C.png" },
+                ],
+            },
+        };
 
-        this.loadSelectionUI();
+        this.selected_class = this.section1.choices[0];
+        this.selected_variant = this.section2.choices[this.selected_class.mesh][0];
+        this.loadCharacter(this.selected_class);
     }
 
-    loadSelectionUI() {
-        if (this._uiRadioOptions) {
-            this._uiRadioOptions.dispose();
-        }
+    loadCharacter(choice) {
+        /*
+        if (this.selected_mesh && this.selected_mesh._children[0]._children.length > 0) {
+            this.selected_mesh._children[0]._children.forEach((element) => {
+                if (element.material) {
+                    console.log(element.material);
 
-        let meshAnimations = this.RACE.animations;
-        const selectedAnimationGroups = [
-            this._playerAnimations[meshAnimations.IDLE],
-            this._playerAnimations[meshAnimations.WALK],
-            this._playerAnimations[meshAnimations.DEATH],
-        ];
-
-        // show animations options
-        var radioGroupAnim = new RadioGroup("Animation");
-        selectedAnimationGroups.forEach((anim) => {
-            radioGroupAnim.addRadio(anim.name, () => {
-                selectedAnimationGroups.forEach((element) => {
-                    element.stop();
-                });
-                anim.start(true, 1.0, anim.from, anim.to, false);
-            });
-        });
-
-        var selectBox = new SelectionPanel("sp", [radioGroupAnim]);
-        selectBox.background = "rgba(255, 255, 255, .7)";
-        selectBox.top = "15px;";
-        selectBox.left = "15px;";
-        selectBox.width = 0.25;
-        selectBox.height = 0.7;
-        selectBox.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        selectBox.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        this._ui.addControl(selectBox);
-
-        this._uiRadioOptions = selectBox;
-    }
-
-    hideAll(arr) {
-        for (let key in arr) {
-            let data = arr[key];
-            data.forEach((b) => {
-                this.showMesh(b, true);
-            });
-        }
-    }
-
-    showMesh(name: string, show = false) {
-        let el = this._scene.getMeshByName(name);
-        if (el) {
-            el.isVisible = show;
-        }
-    }
-
-    showMeshes(stringArray: string[] = [], show = true) {
-        this.results.meshes.forEach((element) => {
-            element.isVisible = false;
-            if (stringArray.length > 0) {
-                if (stringArray.includes(element.name)) {
-                    element.isVisible = true;
+                    element.material.albedoTexture.dispose();
+                    element.material.dispose();
                 }
+            });
+        }*/
+        let material = this._scene.getMaterialByName(choice.material) as PBRMaterial;
+        if (material) {
+            if (material.albedoTexture) {
+                material.albedoTexture.dispose();
             }
-        });
+            material.dispose();
+        }
+
+        if (this.selected_mesh) {
+            this.selected_mesh.dispose();
+        }
+        if (this.selected_animations) {
+            this.selected_animations.forEach((element) => {
+                element.dispose();
+            });
+        }
+
+        const result = this._loadedAssets[choice.mesh].instantiateModelsToScene(
+            () => {
+                return choice.mesh;
+            },
+            true,
+            { doNotInstantiate: false }
+        );
+        this.selected_mesh = result.rootNodes[0];
+        this.selected_animations = result.animationGroups;
+
+        console.log(this.selected_mesh);
+
+        this._shadow.addShadowCaster(this.selected_mesh, true);
+
+        this.selected_animations[36].play(true);
+
+        this.refreshUI();
     }
 
-    createStackPanel($name: string, ui, vertical = true) {
-        const chatStackPanel = new StackPanel($name + "StackPanel");
-        chatStackPanel.width = "100%";
-        chatStackPanel.spacing = 5;
-        chatStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        chatStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        chatStackPanel.adaptHeightToChildren = true;
-        chatStackPanel.setPaddingInPixels(5, 0, 5, 0);
-        chatStackPanel.isVertical = vertical;
-        ui.addControl(chatStackPanel);
-        return chatStackPanel;
-    }
-
-    createButton($name: string, ui, callback: any) {
-        const btn = Button.CreateSimpleButton($name + "Btn", $name);
-        btn.width = "100px;";
-        btn.height = "22px";
-        btn.color = "white";
-        btn.background = "#222222";
-        btn.thickness = 1;
-        btn.fontSize = "12px";
-        btn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        ui.addControl(btn);
-        btn.onPointerDownObservable.add(() => {
-            callback(btn);
+    refreshUI() {
+        // if already exists
+        this.stackPanel.getDescendants().forEach((el) => {
+            el.dispose();
         });
+
+        /////////////////////////// SECTION 1 ///////////////////
+
+        const sectionTitle = new TextBlock("sectionTitle", this.section1.title);
+        sectionTitle.width = 0.8;
+        sectionTitle.height = "40px";
+        sectionTitle.color = "white";
+        sectionTitle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        sectionTitle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        sectionTitle.fontWeight = "bold";
+        this.stackPanel.addControl(sectionTitle);
+
+        this.section1.choices.forEach((choice) => {
+            const btnChoice = Button.CreateSimpleButton("btnChoice", choice.title);
+            btnChoice.top = "0px";
+            btnChoice.width = 1;
+            btnChoice.height = "30px";
+            btnChoice.color = "white";
+            btnChoice.background = "gray";
+            btnChoice.thickness = 1;
+            btnChoice.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+            btnChoice.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+            this.stackPanel.addControl(btnChoice);
+
+            if (this.selected_class && this.selected_class.title === choice.title) {
+                btnChoice.background = "green";
+            }
+
+            btnChoice.onPointerDownObservable.add(() => {
+                this.selected_class = choice;
+                this.selected_variant = this.section2.choices[this.selected_class.mesh][0];
+                this.loadCharacter(choice);
+            });
+        });
+
+        /////////////////////////// SECTION 2 ///////////////////
+
+        if (this.selected_class) {
+            console.log(this.selected_class);
+
+            let selectedChoices = this.section2.choices[this.selected_class.mesh];
+            let selectedMaterial = this._scene.getMaterialByName(this.selected_class.material) as PBRMaterial;
+            console.log("FOUND MATERIAL", selectedMaterial);
+
+            const sectionTitle = new TextBlock("sectionTitle", this.section2.title);
+            sectionTitle.width = 0.8;
+            sectionTitle.height = "40px";
+            sectionTitle.color = "white";
+            sectionTitle.top = "100px";
+            sectionTitle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+            sectionTitle.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            this.stackPanel.addControl(sectionTitle);
+
+            selectedChoices.forEach((color) => {
+                const btnChoice = Button.CreateSimpleButton("btnChoice", color.title);
+                btnChoice.top = "0px";
+                btnChoice.width = 1;
+                btnChoice.height = "30px";
+                btnChoice.color = "white";
+                btnChoice.background = "gray";
+                btnChoice.thickness = 1;
+                btnChoice.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+                btnChoice.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+                this.stackPanel.addControl(btnChoice);
+
+                if (this.selected_class && this.selected_variant && this.selected_variant.title === color.title) {
+                    btnChoice.background = "green";
+                }
+
+                btnChoice.onPointerDownObservable.add(() => {
+                    this.selected_variant = color;
+                    if (selectedMaterial) {
+                        if (selectedMaterial.albedoTexture) {
+                            selectedMaterial.albedoTexture = new Texture("./models/races/materials/" + color.material, this._scene, { invertY: false });
+                        }
+                    }
+                    this.refreshUI();
+                });
+            });
+
+            const section3Title = new TextBlock("section3Title", "Class Description");
+            section3Title.width = 0.8;
+            section3Title.height = "60px";
+            section3Title.color = "white";
+            section3Title.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+            section3Title.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+            section3Title.fontWeight = "bold";
+            this.stackPanel.addControl(section3Title);
+
+            const section3Description = new TextBlock("section3Description", this.selected_class.description);
+            section3Description.width = 0.8;
+            section3Description.height = "100px";
+            section3Description.color = "white";
+            section3Description.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+            section3Description.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            section3Description.fontSize = "16px";
+            section3Description.textWrapping = TextWrapping.WordWrap;
+            section3Description.resizeToFit = true;
+            this.stackPanel.addControl(section3Description);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////

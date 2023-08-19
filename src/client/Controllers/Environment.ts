@@ -227,15 +227,15 @@ export class Environment {
     public async loadCharacterEditor() {
         let assetsToLoad = [
             // models
-            { name: "player_male", filename: "male_all.glb", extension: "glb", instantiate: true },
-            { name: "player_female", filename: "female_all.glb", extension: "glb", instantiate: true },
+            { name: "male_mage", filename: "male_mage.glb", extension: "glb", instantiate: true },
+            { name: "male_knight", filename: "male_knight.glb", extension: "glb", instantiate: true },
         ];
 
         assetsToLoad.forEach((obj) => {
             let assetTask;
             switch (obj.extension) {
                 case "glb":
-                    assetTask = this._assetsManager.addMeshTask(obj.name, "", "", "./models/races/" + obj.filename);
+                    assetTask = this._assetsManager.addContainerTask(obj.name, "", "", "./models/races/" + obj.filename);
                     break;
                 default:
                     console.error('Error loading asset "' + obj.name + '". Unrecognized file extension "' + obj.extension + '"');
@@ -244,8 +244,8 @@ export class Environment {
 
             assetTask.onSuccess = (task) => {
                 switch (task.constructor) {
-                    case MeshAssetTask:
-                        this._loadedAssets[task.name] = task;
+                    case ContainerAssetTask:
+                        this._loadedAssets[task.name] = task.loadedContainer;
                         break;
                     default:
                         console.error('Error loading asset "' + task.name + '". Unrecognized AssetManager task type.');

@@ -102,6 +102,7 @@ export class GameScene {
         light.position = new Vector3(100, 100, 100);
         light.radius = 0.27;
         light.intensity = location.sunIntensity;
+        light.autoCalcShadowZBounds = true;
 
         // shadow generator
         this._shadow = new CascadedShadowGenerator(1024, light);

@@ -34,7 +34,7 @@ let RacesDB: raceDataMap = {
         title: "Knight",
         icon: "ICON_RACE_male_adventurer",
         speed: 0.6,
-        scale: 0.7,
+        scale: 1,
         rotationFix: Math.PI,
         animationSpeed: 1.3,
         meshIndex: 1,

@@ -120,7 +120,6 @@ export class Entity {
 
         // add mesh to shadow generator
         this._shadow.addShadowCaster(this.meshController.mesh, true);
-        //this._shadow.autoCalcDepthBounds = true;
 
         // add all entity related stuff
         this.animatorController = new EntityAnimator(this.meshController.getAnimation(), this);
