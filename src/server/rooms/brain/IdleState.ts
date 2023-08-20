@@ -25,6 +25,12 @@ class IdleState extends State {
             owner._stateMachine.changeTo("CHASE");
         }
 
+        // if entity has a target, start searching for it
+        if (owner.hasValidTarget() && owner.AI_SPAWN_INFO.aggressive === true) {
+            owner._stateMachine.changeTo("CHASE");
+            return false;
+        }
+
         // keep track of idling time
         owner.IDLE_TIMER += Config.updateRate;
         if (owner.IDLE_TIMER > owner.IDLE_TIMER_LENGTH) {
