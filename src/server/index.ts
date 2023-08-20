@@ -22,7 +22,7 @@ import { generateRandomPlayerName } from "../shared/Utils";
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
-/*
+
 if (fs.existsSync(Config.databaseLocation)) {
     fs.unlink(Config.databaseLocation, (err) => {
         if (err) {
@@ -31,7 +31,6 @@ if (fs.existsSync(Config.databaseLocation)) {
         Logger.info("File is deleted: " + Config.databaseLocation);
     });
 }
-*/
 
 class GameServer {
     constructor() {
@@ -229,7 +228,7 @@ class GameServer {
 
         app.get("/register", function (req, res) {});
 
-        /*
+        
         app.get("/returnRandomUser", function (req, res) {
             database.saveUser(generateRandomPlayerName(), generateRandomPlayerName()).then((user) => {
                 database.createCharacter(user.token, generateRandomPlayerName(), "male_knight").then((character) => {
@@ -242,8 +241,9 @@ class GameServer {
                     });
                 });
             });
-        });*/
+        });
 
+        /*
         app.get("/returnRandomUser", function (req, res) {
             database.returnRandomUserAndChar().then((user) => {
                 database.getUser(user.username, user.password).then((user) => {
@@ -254,6 +254,7 @@ class GameServer {
                 });
             });
         });
+        */
 
         app.get("/getHelpPage", function (req, res) {
             let page = req.query.page;
