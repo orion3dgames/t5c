@@ -33,6 +33,8 @@ class Database {
             "id" INTEGER PRIMARY KEY AUTOINCREMENT,
             "user_id" INTEGER,
             "name" TEXT,
+            "race" TEXT,
+            "race_color" TEXT,
             "location" TEXT,
             "level" int,
             "experience" int,
@@ -265,14 +267,15 @@ class Database {
         return character;
     }
 
-    async createCharacter(token, name) {
+    async createCharacter(token, name, race) {
         // create a character
-        let raceData = dataDB.get("race", "male_adventurer");
+        let raceData = dataDB.get("race", race);
         let user = await this.getUserByToken(token);
         let defaultLocation = dataDB.get("location", Config.initialLocation);
-        const sql = `INSERT INTO characters ("user_id", "name","location","x","y","z","rot","level","experience","health", "mana") VALUES (
+        const sql = `INSERT INTO characters ("user_id", "name", "race", "location","x","y","z","rot","level","experience","health", "mana") VALUES (
             "${user.id}",
             "${name}",
+            "${race}",
             "${defaultLocation.key}",
             "${defaultLocation.spawnPoint.x}",
             "${defaultLocation.spawnPoint.y}",

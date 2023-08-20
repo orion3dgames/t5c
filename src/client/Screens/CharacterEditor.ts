@@ -39,7 +39,9 @@ export class CharacterEditor {
     private _loadedAssets: AssetContainer[] = [];
     public _ui;
 
-    private stackPanel: StackPanel;
+    private leftStackPanel: StackPanel;
+    private rightStackPanel: StackPanel;
+
     private selected_mesh;
     private selected_animations;
     private selected_textures;
@@ -126,50 +128,58 @@ export class CharacterEditor {
         leftColumnRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         guiMenu.addControl(leftColumnRect);
 
+        const leftStackPanel = new StackPanel("leftStackPanel");
+        leftStackPanel.top = 0;
+        leftStackPanel.width = 0.8;
+        leftStackPanel.height = 0.6;
+        leftStackPanel.background = "";
+        leftStackPanel.spacing = 5;
+        leftStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        leftStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        leftStackPanel.adaptHeightToChildren = true;
+        leftStackPanel.setPaddingInPixels(5, 5, 5, 5);
+        leftStackPanel.isVertical = true;
+        leftColumnRect.addControl(leftStackPanel);
+        this.leftStackPanel = leftStackPanel;
+
+        /////////////////////////////////////////
         // right columm
         const rightColumnRect = new Rectangle("rightColumnRect");
         rightColumnRect.top = 0;
         rightColumnRect.left = 0;
-        rightColumnRect.width = 0.8;
+        rightColumnRect.width = 0.2;
         rightColumnRect.height = 1;
-        rightColumnRect.background = "rgba(0,0,0,0)";
+        rightColumnRect.background = "#000000";
         rightColumnRect.thickness = 0;
         rightColumnRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         rightColumnRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         guiMenu.addControl(rightColumnRect);
 
-        // logo
-        var imgLogo = new Image("imgLogo", "./images/logo.png");
-        imgLogo.stretch = Image.STRETCH_UNIFORM;
-        imgLogo.top = "30px";
-        imgLogo.width = 1;
-        imgLogo.height = "65px;";
-        imgLogo.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        leftColumnRect.addControl(imgLogo);
+        const rightStackPanel = new StackPanel("rightStackPanel");
+        rightStackPanel.top = 0;
+        rightStackPanel.width = 0.8;
+        rightStackPanel.height = 1;
+        rightStackPanel.background = "";
+        rightStackPanel.spacing = 5;
+        rightStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        rightStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        rightStackPanel.adaptHeightToChildren = true;
+        rightStackPanel.setPaddingInPixels(5, 5, 5, 5);
+        rightStackPanel.isVertical = true;
+        rightColumnRect.addControl(rightStackPanel);
+        this.rightStackPanel = rightStackPanel;
 
-        // welcome text
-        const welcomeText = new TextBlock("infotext", "Welcome " + user.username);
-        welcomeText.width = 0.8;
-        welcomeText.height = "40px";
-        welcomeText.color = "white";
-        welcomeText.top = "100px";
-        welcomeText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        welcomeText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        leftColumnRect.addControl(welcomeText);
-
-        const sectionStackPanel = new StackPanel("sectionStackPanel");
-        sectionStackPanel.top = "160px";
-        sectionStackPanel.width = 0.8;
-        sectionStackPanel.height = 0.6;
-        sectionStackPanel.background = "";
-        sectionStackPanel.spacing = 5;
-        sectionStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        sectionStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        sectionStackPanel.adaptHeightToChildren = true;
-        sectionStackPanel.setPaddingInPixels(5, 5, 5, 5);
-        sectionStackPanel.isVertical = true;
-        leftColumnRect.addControl(sectionStackPanel);
-        this.stackPanel = sectionStackPanel;
+        ////////////////////////////////////////////////
+        // center columm
+        const centerColumnRect = new Rectangle("centerColumnRect");
+        centerColumnRect.top = "0px;";
+        centerColumnRect.left = 0;
+        centerColumnRect.width = "300px";
+        centerColumnRect.height = "200px";
+        centerColumnRect.thickness = 0;
+        centerColumnRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        centerColumnRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        guiMenu.addControl(centerColumnRect);
 
         ////////////////////////////////////////
         const usernameInput = new InputText("newCharacterInput");
@@ -181,7 +191,7 @@ export class CharacterEditor {
         usernameInput.placeholderText = "Enter username";
         usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         usernameInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        rightColumnRect.addControl(usernameInput);
+        centerColumnRect.addControl(usernameInput);
 
         // PLAY BUTTON
         const playBtn = Button.CreateSimpleButton("playBtn", "PLAY");
@@ -193,7 +203,7 @@ export class CharacterEditor {
         playBtn.thickness = 1;
         playBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         playBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        rightColumnRect.addControl(playBtn);
+        centerColumnRect.addControl(playBtn);
         playBtn.onPointerDownObservable.add(() => {
             // create new character via database
             this.createCharacter(this._auth.currentUser.token, usernameInput.text).then((char) => {
@@ -206,7 +216,7 @@ export class CharacterEditor {
         });
 
         // BACK BUTTON
-        const backBtn = Button.CreateSimpleButton("backBtn", "BACK");
+        const backBtn = Button.CreateSimpleButton("backBtn", "CANCEL");
         backBtn.top = "-30px";
         backBtn.width = "200px";
         backBtn.height = "30px";
@@ -215,7 +225,7 @@ export class CharacterEditor {
         backBtn.thickness = 1;
         backBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         backBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        rightColumnRect.addControl(backBtn);
+        centerColumnRect.addControl(backBtn);
         backBtn.onPointerDownObservable.add(() => {
             SceneController.goToScene(State.CHARACTER_SELECTION);
         });
@@ -320,10 +330,12 @@ export class CharacterEditor {
 
     refreshUI() {
         // if already exists
-        this.stackPanel.getDescendants().forEach((el) => {
+        this.leftStackPanel.getDescendants().forEach((el) => {
             el.dispose();
         });
-
+        this.rightStackPanel.getDescendants().forEach((el) => {
+            el.dispose();
+        });
         /////////////////////////// SECTION 1 ///////////////////
 
         const sectionTitle = new TextBlock("sectionTitle", this.section1.title);
@@ -333,7 +345,7 @@ export class CharacterEditor {
         sectionTitle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         sectionTitle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         sectionTitle.fontWeight = "bold";
-        this.stackPanel.addControl(sectionTitle);
+        this.leftStackPanel.addControl(sectionTitle);
 
         this.section1.choices.forEach((choice) => {
             const btnChoice = Button.CreateSimpleButton("btnChoice", choice.title);
@@ -345,7 +357,7 @@ export class CharacterEditor {
             btnChoice.thickness = 1;
             btnChoice.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
             btnChoice.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-            this.stackPanel.addControl(btnChoice);
+            this.leftStackPanel.addControl(btnChoice);
 
             if (this.selected_class && this.selected_class.title === choice.title) {
                 btnChoice.background = "green";
@@ -374,7 +386,7 @@ export class CharacterEditor {
             sectionTitle.top = "100px";
             sectionTitle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
             sectionTitle.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-            this.stackPanel.addControl(sectionTitle);
+            this.leftStackPanel.addControl(sectionTitle);
 
             selectedChoices.forEach((color) => {
                 const btnChoice = Button.CreateSimpleButton("btnChoice", color.title);
@@ -386,7 +398,7 @@ export class CharacterEditor {
                 btnChoice.thickness = 1;
                 btnChoice.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
                 btnChoice.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-                this.stackPanel.addControl(btnChoice);
+                this.leftStackPanel.addControl(btnChoice);
 
                 if (this.selected_class && this.selected_variant && this.selected_variant.title === color.title) {
                     btnChoice.background = "green";
@@ -408,9 +420,9 @@ export class CharacterEditor {
             section3Title.height = "60px";
             section3Title.color = "white";
             section3Title.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-            section3Title.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+            section3Title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             section3Title.fontWeight = "bold";
-            this.stackPanel.addControl(section3Title);
+            this.rightStackPanel.addControl(section3Title);
 
             const section3Description = new TextBlock("section3Description", this.selected_class.description);
             section3Description.width = 0.8;
@@ -421,7 +433,7 @@ export class CharacterEditor {
             section3Description.fontSize = "16px";
             section3Description.textWrapping = TextWrapping.WordWrap;
             section3Description.resizeToFit = true;
-            this.stackPanel.addControl(section3Description);
+            this.rightStackPanel.addControl(section3Description);
         }
     }
 
@@ -441,6 +453,7 @@ export class CharacterEditor {
         let req = await request("post", apiUrl() + "/create_character", {
             token: token,
             name: name,
+            race: this.selected_class.mesh
         });
 
         // check req status

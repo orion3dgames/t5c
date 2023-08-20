@@ -19,12 +19,10 @@ class IdleState extends State {
             return false;
         }
 
-        // rotate AI each so often to give a illusion of life
-        this._rotationTimer += Config.updateRate;
-        if (this._rotationTimer > this._rotationTimerTimeout) {
-            let newRot = randomNumberInRange(0, Math.PI / 2);
-            owner.rot = newRot;
-            this._rotationTimerTimeout = randomNumberInRange(2000, 5000);
+        // if there is a closest player, and in aggro range
+        if (owner.isAnyPlayerInAggroRange()) {
+            owner.setPlayerTarget(owner.AI_CLOSEST_PLAYER);
+            owner._stateMachine.changeTo("CHASE");
         }
 
         // keep track of idling time

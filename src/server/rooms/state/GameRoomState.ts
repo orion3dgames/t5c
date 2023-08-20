@@ -120,7 +120,7 @@ export class GameRoomState extends Schema {
             sessionId: client.sessionId,
             name: data.name,
             type: "player",
-            race: "male_knight",
+            race: data.race,
 
             location: data.location,
             sequence: 0,

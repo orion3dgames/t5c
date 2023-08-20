@@ -59,7 +59,6 @@ class AuthController {
             });
             //set character
             this.setCharacter(character);
-            console.log(character);
         }
     }
 
@@ -74,7 +73,9 @@ class AuthController {
 
         // check req status
         if (req.status === 200) {
-            return JSON.parse(req.data).user;
+            let user = JSON.parse(req.data).user;
+            this.setUser(user);
+            return user;
         } else {
             // something went wrong
             console.error("Something went wrong.");

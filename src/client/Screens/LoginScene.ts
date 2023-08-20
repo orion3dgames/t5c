@@ -52,7 +52,7 @@ export class LoginScene {
 
         // middle columm
         const columnRect = new Rectangle("column");
-        columnRect.width = "320px";
+        columnRect.width = 0.2;
         columnRect.height = 1;
         columnRect.background = "#000000";
         columnRect.thickness = 0;
@@ -160,7 +160,7 @@ export class LoginScene {
         joinGuestBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         formContainer.addControl(joinGuestBtn);
         joinGuestBtn.onPointerDownObservable.add(async () => {
-            SceneController.goToScene(State.GAME);
+            SceneController.goToScene(State.CHARACTER_SELECTION);
         });
 
         // load scene
