@@ -23,6 +23,7 @@ import { generateRandomPlayerName } from "../shared/Utils";
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 
+/*
 if (fs.existsSync(Config.databaseLocation)) {
     fs.unlink(Config.databaseLocation, (err) => {
         if (err) {
@@ -30,7 +31,7 @@ if (fs.existsSync(Config.databaseLocation)) {
         }
         Logger.info("File is deleted: " + Config.databaseLocation);
     });
-}
+}*/
 
 class GameServer {
     constructor() {
