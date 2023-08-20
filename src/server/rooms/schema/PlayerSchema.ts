@@ -62,6 +62,7 @@ export class PlayerSchema extends Entity {
 
     /////////////////////////////////////////////////////////////
     // does not need to be synced
+    public id: number = 0;
     public manaRegen: number = 0;
     public healthRegen: number = 0;
     public speed: number = 0;
@@ -70,6 +71,7 @@ export class PlayerSchema extends Entity {
     public attackTimer;
     public isMoving: boolean = false;
     public isDead: boolean = false;
+    public isTeleporting: boolean = false;
 
     // controllers
     public _navMesh: NavMesh;
@@ -92,6 +94,7 @@ export class PlayerSchema extends Entity {
         this._navMesh = state.navMesh;
         this._state = state;
         this.client = this.getClient();
+        this.isTeleporting = false;
 
         // add player data
         // assign player data
@@ -149,6 +152,37 @@ export class PlayerSchema extends Entity {
             if (this.health < this.maxHealth) {
                 this.health += this.healthRegen;
             }
+        }
+
+        // check
+        let teleports = this._state.roomDetails.dynamic.teleports ?? [];
+        if(teleports.length > 0){
+            let currentPos = this.getPosition();
+            teleports.forEach(destination => {
+                let distanceTo = currentPos.distanceTo(destination.from);
+                if(distanceTo < 2 && !this.isTeleporting){
+
+                    this.isTeleporting = true;
+
+                    let client = this._state._gameroom.clients.getById(this.sessionId);
+            
+                    // update player location in database 
+                    let updateObj = {
+                        location: destination.to_map,
+                        x: destination.to_vector.x,
+                        y: destination.to_vector.y,
+                        z: destination.to_vector.z,
+                        rot: 0,
+                    };
+                    this._state._gameroom.database.updateCharacter(this.id, updateObj);
+
+                    // update player state on server
+                    this.location = updateObj.location;
+
+                    // inform client he cand now teleport to new zone
+                    client.send("playerTeleportConfirm", destination.to_map);
+                }
+            });
         }
 
         // move player
@@ -333,10 +367,6 @@ export class PlayerSchema extends Entity {
      */
     isEntityDead() {
         return this.health <= 0;
-    }
-
-    setLocation(location: string): void {
-        this.location = location;
     }
 
     // make sure no value are out of range

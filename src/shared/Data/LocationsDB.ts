@@ -18,8 +18,9 @@ let LocationsDB = {
         dynamic: {
             teleports: [
                 {
-                    location: "dungeon_01",
-                    point: new Vector3(-7, 0, -19),
+                    from: new Vector3(13.87, 0, -29.84),
+                    to_map: "lh_dungeon_01",
+                    to_vector: new Vector3(11, 0, -3),
                 },
             ],
             spawns: [
@@ -103,26 +104,26 @@ let LocationsDB = {
         waterPlane: false,
         skyColor: 0,
         dynamic: {
-            dynamic: {
-                teleports: [
-                    {
-                        location: "lh_town",
-                        point: new Vector3(13, 0, -26),
-                    },
-                ],
-                spawns: [
-                    {
-                        type: "global",
-                        behaviour: "patrol",
-                        aggressive: true,
-                        points: [],
-                        radius: 0,
-                        amount: 5,
-                        race: "male_enemy",
-                        name: "Pirate",
-                    },
-                ],
-            },
+            teleports: [
+                {
+                    from: new Vector3(11.7, 2, -8.29),
+                    to_map: "lh_town",
+                    to_vector: new Vector3(13.87, 0, -26.84),
+                }
+            ],
+            spawns: [
+                {
+                    type: "global",
+                    behaviour: "patrol",
+                    aggressive: true,
+                    canAttack: true,
+                    points: [new Vector3(0, 0, 0)],
+                    radius: 0,
+                    amount: 5,
+                    race: "male_rogue",
+                    name: "Roaming Rogue",
+                },
+            ],
         },
     },
 };

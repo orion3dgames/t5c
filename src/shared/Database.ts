@@ -341,6 +341,7 @@ class Database {
         }
         sql = sql.slice(0, -1);
         sql += " WHERE id= " + character_id;
+        console.log(sql);
         return this.run(sql, []);
     }
 

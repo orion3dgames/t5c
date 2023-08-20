@@ -138,6 +138,7 @@ let RacesDB: raceDataMap = {
             { title: "Color 4", material: "mage_texture_alt_C.png" },
         ]
     },
+    /*
     male_adventurer: {
         key: "male_adventurer",
         title: "Adventurer",

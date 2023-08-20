@@ -247,6 +247,7 @@ export class Player extends Entity {
 
         // on teleport confirmation
         this._room.onMessage("playerTeleportConfirm", (location) => {
+            console.log(location);
             this.teleport(location);
         });
 
@@ -291,7 +292,6 @@ export class Player extends Entity {
         let character = this._auth.currentCharacter;
         character.location = location;
         this._auth.setCharacter(character);
-        this._auth.setLocation(location);
 
         // switch scene
         SceneController.goToScene(State.GAME);

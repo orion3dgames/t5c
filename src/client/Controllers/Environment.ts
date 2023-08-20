@@ -57,6 +57,176 @@ export class Environment {
         return navmesh;
     }
 
+    public async preloadAssets() {
+        let assetsToLoad = [
+            // sounds
+            { name: "SOUND_enemy_attack_1", filename: "enemy_attack_1.wav", extension: "wav" },
+            { name: "SOUND_enemy_attack_2", filename: "enemy_attack_2.wav", extension: "wav" },
+            { name: "SOUND_fire_attack_1", filename: "fire_attack_1.wav", extension: "wav" },
+            { name: "SOUND_fire_attack_2", filename: "fire_attack_2.wav", extension: "wav" },
+            { name: "SOUND_heal_1", filename: "heal_1.wav", extension: "wav" },
+            { name: "MUSIC_01", filename: "music.mp3", extension: "mp3" },
+            { name: "SOUND_player_walking", filename: "player_walking.wav", extension: "wav" },
+
+            // textures
+            { name: "TXT_selected_circle_green", filename: "selected_circle_green.png", extension: "png", type: "texture" },
+            { name: "TXT_particle_01", filename: "particle_01.png", extension: "png", type: "texture" },
+
+            // environment
+            {
+                name: "ENV_lh_dungeon_01",
+                filename: "environment/lh_dungeon_01.glb",
+                extension: "glb",
+                instantiate: false,
+            },
+            {
+                name: "ENV_lh_town",
+                filename: "environment/lh_town.glb",
+                extension: "glb",
+                instantiate: false,
+            },
+        ];
+
+        // add abilities (icons)
+        let abilities = dataDB.load("abilities");
+        if (abilities) {
+            for (let key in abilities) {
+                let el = abilities[key];
+                assetsToLoad.push({ name: el.icon, filename: "icons/" + el.icon + ".png", extension: "png", type: "image" });
+            }
+        }
+
+        // add items (icons & mesh)
+        let items = dataDB.load("items");
+        if (items) {
+            for (let key in items) {
+                let el = items[key];
+                assetsToLoad.push({ name: el.icon, filename: "icons/" + el.icon + ".png", extension: "png", type: "image" });
+                assetsToLoad.push({ name: "ITEM_" + el.key, filename: "items/" + el.key + ".glb", extension: "glb", instantiate: true });
+            }
+        }
+
+        // add races (mesh)
+        let races = dataDB.load("races");
+        if (races) {
+            for (let key in races) {
+                let el = races[key];
+                assetsToLoad.push({ name: "RACE_" + el.key, filename: "races/" + el.key + ".glb", extension: "glb", instantiate: true });
+                assetsToLoad.push({ name: el.icon, filename: "portrait/" + el.icon + ".png", extension: "png", type: "image" });
+            }
+        }
+
+        assetsToLoad.forEach((obj) => {
+            let assetTask;
+            switch (obj.extension) {
+                case "png":
+                case "jpg":
+                case "jpeg":
+                case "gif":
+                    if (obj.type === "texture") {
+                        assetTask = this._assetsManager.addTextureTask(obj.name, "./textures/" + obj.filename);
+                    } else if (obj.type === "image") {
+                        assetTask = this._assetsManager.addImageTask(obj.name, "./images/" + obj.filename);
+                    }
+                    break;
+
+                case "dds":
+                    assetTask = this._assetsManager.addCubeTextureTask(obj.name, "./images/" + obj.filename);
+                    break;
+
+                case "hdr":
+                    assetTask = this._assetsManager.addHDRCubeTextureTask(obj.name, "./images/" + obj.filename, 512);
+                    break;
+
+                case "mp3":
+                case "wav":
+                    assetTask = this._assetsManager.addBinaryFileTask(obj.name, "./sounds/" + obj.filename);
+                    break;
+
+                case "babylon":
+                case "gltf":
+                case "glb":
+                case "obj":
+                    if (obj.instantiate) {
+                        assetTask = this._assetsManager.addContainerTask(obj.name, "", "", "./models/" + obj.filename);
+                    } else {
+                        assetTask = this._assetsManager.addMeshTask(obj.name, "", "", "./models/" + obj.filename);
+                    }
+                    break;
+
+                case "json":
+                case "txt":
+                    assetTask = this._assetsManager.addTextFileTask(obj.name, "./data/" + obj.filename);
+                    break;
+
+                default:
+                    console.error('Error loading asset "' + obj.name + '". Unrecognized file extension "' + obj.extension + '"');
+                    break;
+            }
+
+            assetTask.onSuccess = (task) => {
+                switch (task.constructor) {
+                    case TextureAssetTask:
+                    case CubeTextureAssetTask:
+                    case HDRCubeTextureAssetTask:
+                        this._loadedAssets[task.name] = task.texture;
+                        break;
+                    case ImageAssetTask:
+                        this._loadedAssets[task.name] = task.url;
+                        break;
+                    case BinaryFileAssetTask:
+                        this._loadedAssets[task.name] = task.data;
+                        break;
+                    case ContainerAssetTask:
+                        this._loadedAssets[task.name] = task.loadedContainer;
+                        break;
+                    case MeshAssetTask:
+                        this._loadedAssets[task.name] = task;
+                        break;
+                    case TextFileAssetTask:
+                        this._loadedAssets[task.name] = task.text;
+                        break;
+                    default:
+                        console.error('Error loading asset "' + task.name + '". Unrecognized AssetManager task type.');
+                        break;
+                }
+            };
+
+            assetTask.onError = (task, message, exception) => {
+                console.log(message, exception);
+            };
+        });
+
+        this._assetsManager.onProgress = (remainingCount, totalCount, lastFinishedTask) => {
+            let loadingMsg = (((totalCount - remainingCount) / totalCount) * 100).toFixed(0) + "%";
+            this.showLoadingMessage(loadingMsg);
+        };
+
+        this._assetsManager.onFinish = () => {
+            console.log("loading complete", this._loadedAssets);
+            this.showLoadingMessage("100%");
+        };
+
+        await this._assetsManager.loadAsync();
+
+        // debug circle inaactive
+        var material = new StandardMaterial("debug_entity_neutral");
+        material.alpha = 0.5;
+        material.diffuseColor = new Color3(1.0, 1.0, 1.0);
+
+        // debug circle active
+        var material = new StandardMaterial("debug_entity_active");
+        material.alpha = 0.5;
+        material.diffuseColor = new Color3(1.0, 0, 0);
+
+        // entity selected circle
+        var texture = this._loadedAssets["TXT_selected_circle_green"];
+        texture.hasAlpha = true;
+        var material = new StandardMaterial("entity_selected");
+        material.diffuseTexture = texture;
+        material.useAlphaFromDiffuseTexture = true;
+    }
+
     public async loadAssets() {
         let environmentName = this._auth.currentLocation.key;
         let environmentModel = this._auth.currentLocation.mesh;

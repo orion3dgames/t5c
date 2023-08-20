@@ -39,7 +39,7 @@ export class GameRoomState extends Schema {
     public spawnCTRL: spawnCTRL;
     public navMesh: NavMesh = null;
     public entityCTRL: entityCTRL;
-    private roomDetails;
+    public roomDetails;
 
     private spawnTimer = 0;
     private spawnInterval = 10000;
@@ -195,32 +195,6 @@ export class GameRoomState extends Schema {
         }
 
         /////////////////////////////////////
-        // on player teleport
-        if (type === "playerTeleport") {
-            let location = data;
-
-            // update player location in database
-            let newLocation = dataDB.get("location", location);
-            let updateObj = {
-                location: newLocation.key,
-                x: newLocation.spawnPoint.x,
-                y: newLocation.spawnPoint.y,
-                z: newLocation.spawnPoint.z,
-                rot: 0,
-            };
-            this._gameroom.database.updateCharacter(client.auth.id, updateObj);
-
-            // update player state on server
-            playerState.setLocation(location);
-
-            // inform client he cand now teleport to new zone
-            client.send("playerTeleportConfirm", location);
-
-            // log
-            Logger.info(`[gameroom][playerTeleport] player teleported to ${location}`);
-        }
-
-        /////////////////////////////////////
         // on player ressurect
         if (type === "pickup_item") {
             const itemState = this.getEntity(data.sessionId);
@@ -231,7 +205,6 @@ export class GameRoomState extends Schema {
 
         if (type === "drop_item") {
             const item = playerState.getInventoryItemByIndex(data);
-            console.log("drop_item", data, item);
             if (item) {
                 playerState.dropItem(item);
             }
@@ -242,7 +215,6 @@ export class GameRoomState extends Schema {
         // data will equal the inventory index of the clicked item
         if (type === "use_item") {
             const item = playerState.getInventoryItemByIndex(data);
-            console.log("use_item", data, item);
             if (item) {
                 if (item.class === ItemClass.CONSUMABLE) {
                     playerState.consumeItem(item);

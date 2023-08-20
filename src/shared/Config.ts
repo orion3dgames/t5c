@@ -32,11 +32,11 @@ let Config = {
     UI_CENTER_PANEL_BG: "rgba(0,0,0,.5)",
 
     // basic locations
-    initialLocation: "lh_town",
+    initialLocation: "lh_dungeon_01",
 
     // default scene
     //defaultScene: isLocal() ? State.GAME : State.LOGIN,
-    defaultScene: State.LOGIN,
+    defaultScene: State.GAME,
 };
 
 export default Config;
