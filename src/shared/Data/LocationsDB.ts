@@ -68,7 +68,7 @@ let LocationsDB = {
                     behaviour: "idle",
                     aggressive: false,
                     canAttack: false,
-                    points: [new Vector3(31.03, 3.54, -14.11)],
+                    points: [new Vector3(38.7, 3.51, -11.81)],
                     radius: 0,
                     amount: 1,
                     race: "male_adventurer",
