@@ -229,9 +229,9 @@ export class UserInterface {
         for (let sessionId in this._entities) {
             let entity = this._entities[sessionId];
             if (entity && entity.mesh && entity.mesh.isEnabled()) {
-                entity.characterLabel.isVisible = true;
+                //entity.characterLabel.isVisible = true;
             } else {
-                entity.characterLabel.isVisible = false;
+                //entity.characterLabel.isVisible = false;
             }
         }
     }
@@ -266,7 +266,7 @@ export class UserInterface {
     // obsolete, keeping just in case
     public createEntityLabel(entity) {
         var rect1 = new Rectangle("player_nameplate_" + entity.sessionId);
-        rect1.isVisible = true;
+        rect1.isVisible = false;
         rect1.width = "200px";
         rect1.height = "40px";
         rect1.thickness = 0;
@@ -275,7 +275,7 @@ export class UserInterface {
         rect1.linkOffsetY = -100;
         var label = new TextBlock("player_nameplate_text_" + entity.sessionId);
         label.text = entity.name;
-        label.color = "blue";
+        label.color = "green";
         label.fontWeight = "bold";
         rect1.addControl(label);
         return rect1;
@@ -284,7 +284,7 @@ export class UserInterface {
     // obsolete, keeping just in case
     public createItemLabel(entity) {
         var rect1 = new Rectangle("player_nameplate_" + entity.sessionId);
-        rect1.isVisible = true;
+        rect1.isVisible = false;
         rect1.width = "200px";
         rect1.height = "40px";
         rect1.thickness = 0;

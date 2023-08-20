@@ -1,5 +1,5 @@
+import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 import Config from "../../../shared/Config";
-import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { State } from "../brain/StateManager";
 
 class ChaseState extends State {
@@ -11,6 +11,8 @@ class ChaseState extends State {
 
         //
         owner.AI_TARGET_WAYPOINTS = [];
+
+        owner.ai_state = AI_STATE.SEEKING;
     }
 
     execute(owner) {

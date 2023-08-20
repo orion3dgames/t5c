@@ -1,6 +1,7 @@
 import Config from "../../../shared/Config";
 import { randomNumberInRange } from "../../../shared/Utils";
 import { State } from "../brain/StateManager";
+import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 
 class IdleState extends State {
     private _rotationTimer: number = 0;
@@ -11,6 +12,7 @@ class IdleState extends State {
         owner.IDLE_TIMER_LENGTH = randomNumberInRange(2000, 6000);
         this._rotationTimer = 0;
         this._rotationTimerTimeout = randomNumberInRange(2000, 5000);
+        owner.ai_state = AI_STATE.IDLE;
     }
 
     execute(owner) {

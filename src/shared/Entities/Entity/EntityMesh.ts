@@ -60,8 +60,9 @@ export class EntityMesh {
         // debug aggro mesh
         if (this._entity.type === "entity") {
             var material = this._scene.getMaterialByName("debug_entity_neutral");
-            const sphere = MeshBuilder.CreateCylinder("debug_" + this._entity.race, { diameter: Config.MONSTER_AGGRO_DISTANCE * 2, height: 0.1 }, this._scene);
-            sphere.isVisible = false;
+            const sphere = MeshBuilder.CreateTorus("debug_" + this._entity.race, { diameter: Config.MONSTER_AGGRO_DISTANCE * 2, thickness: 0.1 }, this._scene);
+            sphere.isVisible = true;
+            sphere.position = new Vector3(0, -1, 0);
             sphere.parent = box;
             sphere.material = material;
             this.debugMesh = sphere;
@@ -118,29 +119,7 @@ export class EntityMesh {
 
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);
-        //this.mesh.actionManager.isRecursive = true;
-
-        // setup collisions for current player
-        if (this.isCurrentPlayer) {
-            // teleport trigger
-            let targetMeshes = this._scene.getMeshesByTags("teleport");
-            targetMeshes.forEach((mesh) => {
-                this.mesh.actionManager.registerAction(
-                    new ExecuteCodeAction(
-                        {
-                            trigger: ActionManager.OnIntersectionEnterTrigger,
-                            parameter: mesh,
-                        },
-                        () => {
-                            if (this.isCurrentPlayer) {
-                                this._room.send("playerTeleport", mesh.metadata.location);
-                            }
-                        }
-                    )
-                );
-            });
-        }
-
+  
         // register hover over player
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {

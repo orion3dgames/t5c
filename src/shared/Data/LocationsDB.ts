@@ -119,7 +119,7 @@ let LocationsDB = {
                     canAttack: true,
                     points: [new Vector3(0, 0, 0)],
                     radius: 0,
-                    amount: 5,
+                    amount: 1,
                     race: "male_rogue",
                     name: "Roaming Rogue",
                 },

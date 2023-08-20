@@ -66,7 +66,7 @@ export class Entity {
     public experience: number;
     public location: string = "";
     public anim_state: number = EntityState.IDLE;
-    public AI_CURRENT_STATE: number = 0;
+    public ai_state: number = 0;
     public isDead: boolean = false;
     public isDeadUI: boolean = false;
 
@@ -172,11 +172,12 @@ export class Entity {
     }
 
     public update(delta) {
-        if (this.AI_CURRENT_STATE === AI_STATE.SEEKING || this.AI_CURRENT_STATE === AI_STATE.ATTACKING) {
+        console.log(this.sessionId, AI_STATE[this.ai_state]);
+        if (this.ai_state === AI_STATE.SEEKING || this.ai_state === AI_STATE.ATTACKING) {
             this.debugMesh.material = this._scene.getMaterialByName("debug_entity_active");
         }
 
-        if (this.AI_CURRENT_STATE === AI_STATE.WANDER) {
+        if (this.ai_state === AI_STATE.WANDER) {
             this.debugMesh.material = this._scene.getMaterialByName("debug_entity_neutral");
         }
 

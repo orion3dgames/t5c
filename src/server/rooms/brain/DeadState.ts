@@ -1,6 +1,7 @@
 import Config from "../../../shared/Config";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { State } from "../brain/StateManager";
+import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 
 class DeadState extends State {
     enter(owner) {
@@ -8,6 +9,7 @@ class DeadState extends State {
         owner.health = 0;
         owner.blocked = true;
         owner.anim_state = EntityState.DEAD;
+        owner.ai_state = AI_STATE.IDLE;
         owner.isDead = true;
         owner.resetDestination();
     }

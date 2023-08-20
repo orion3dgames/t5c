@@ -2,6 +2,7 @@ import Config from "../../../shared/Config";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { Vector3 } from "../../../shared/yuka-min";
 import { State } from "../brain/StateManager";
+import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 
 /**
  * type: global, area, path, point
@@ -51,6 +52,8 @@ class PatrolState extends State {
         if (owner.AI_SPAWN_INFO.type == "static") {
             owner._stateMachine.changeTo("IDLE");
         }
+
+        owner.ai_state = AI_STATE.WANDER;
     }
 
     execute(owner) {

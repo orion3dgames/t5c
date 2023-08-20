@@ -11,6 +11,7 @@ import Config from "../../../shared/Config";
 import { randomNumberInRange } from "../../../shared/Utils";
 import { EquipmentSchema } from "./player/EquipmentSchema";
 import { PlayerSlots } from "../../../shared/Data/ItemDB";
+import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 
 export class BrainSchema extends Entity {
     /////////////////////////////////////////////////////////////
@@ -34,10 +35,10 @@ export class BrainSchema extends Entity {
     @type("number") public sequence: number = 0; // latest input sequence
     @type("boolean") public blocked: boolean = false; // if true, used to block player and to prevent movement
     @type("int8") public anim_state: EntityState = EntityState.IDLE;
+    @type("number") public ai_state: AI_STATE = 0;
 
     @type([EquipmentSchema]) equipment = new ArraySchema<EquipmentSchema>();
-    //@type("number") public AI_CURRENT_STATE: AI_STATE = 0;
-
+    
     // PARENTS
     public _navMesh;
     public _state;
@@ -66,7 +67,6 @@ export class BrainSchema extends Entity {
     public DEAD_TIMER = 0;
 
     // AI
-    public AI_CURRENT_STATE;
     public AI_TARGET = null;
     public AI_TARGET_WAYPOINTS = [];
     public AI_TARGET_DISTANCE = null;

@@ -1,3 +1,4 @@
+import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 import Config from "../../../shared/Config";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { State } from "../brain/StateManager";
@@ -6,6 +7,8 @@ class AttackState extends State {
     enter(owner) {
         //console.log("[AttackState] ----------------------------------");
         owner.ATTACK_TIMER = 0;
+
+        owner.ai_state = AI_STATE.ATTACKING;
     }
 
     execute(owner) {
