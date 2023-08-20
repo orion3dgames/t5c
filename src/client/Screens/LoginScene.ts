@@ -178,27 +178,6 @@ export class LoginScene {
 
         // load scene
         this._ui = guiMenu;
-
-        // shadow light
-        var light = new DirectionalLight("DirectionalLight", new Vector3(-1, -2, -1), scene);
-        light.position = new Vector3(100, 100, 100);
-        light.radius = 0.27;
-        light.autoCalcShadowZBounds = true;
-
-        // shadow generator
-        this._shadow = new CascadedShadowGenerator(1024, light);
-        this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_LOW;
-        this._shadow.lambda = 0.94;
-        this._shadow.bias = 0.018;
-        this._shadow.autoCalcDepthBounds = true;
-        this._shadow.shadowMaxZ = 1000;
-
-        app.engine.displayLoadingUI();
-
-        this._environment = new Environment(this._scene, this._shadow, this._loadedAssets);
-        await this._environment.preloadAssets();
-
-        app.engine.displayLoadingUI();
     }
 
     async login(username, password) {
