@@ -90,6 +90,12 @@ export class Item {
         this.mesh.showBoundingBox = true;
         this.mesh.position = new Vector3(this.entity.x, this.entity.y, this.entity.z);
 
+        this.mesh.metadata = {
+            sessionId: entity.sessionId,
+            type: entity.type,
+            name: entity.name,
+        };
+
         // offset mesh from the ground
         this.y = this.y + this.meshData.height / 2;
         this.mesh.rotation = new Vector3(0, randomNumberInRange(0, 360), 0);
