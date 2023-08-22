@@ -30,13 +30,14 @@ let Config = {
     // UI SETTINGS
     UI_CENTER_PANEL_WIDTH: 0.6,
     UI_CENTER_PANEL_BG: "rgba(0,0,0,.5)",
+    UI_SIDEBAR_WIDTH: "320px;",
 
     // basic locations
     initialLocation: "lh_town",
 
     // default scene
     //defaultScene: isLocal() ? State.GAME : State.LOGIN,
-    defaultScene: State.LOGIN,
+    defaultScene: State.CHARACTER_EDITOR,
 };
 
 export default Config;

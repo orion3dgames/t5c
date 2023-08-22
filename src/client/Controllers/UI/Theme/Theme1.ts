@@ -75,4 +75,8 @@ const getPadding = function (multiplier = 1) {
     return multiplier * 5;
 };
 
-export { applyFont, getBg, getPadding, generatePanel, applyTheme, createButton };
+const getSidebarWidth = function () {
+    return 320;
+};
+
+export { applyFont, getBg, getPadding, generatePanel, applyTheme, createButton, getSidebarWidth };

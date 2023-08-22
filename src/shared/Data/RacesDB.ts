@@ -3,6 +3,7 @@ import { ILootTableEntry, LootTableEntry } from "../Entities/Player/LootTable";
 type Race = {
     key: string;
     title: string;
+    description: string;
     icon: string;
     speed: number;
     scale: number;
@@ -22,7 +23,7 @@ type Race = {
     damage_multiplier: number;
     drops?: ILootTableEntry[];
     default_abilities?: string[];
-    materials?,
+    materials?;
 };
 
 interface raceDataMap {
@@ -33,6 +34,7 @@ let RacesDB: raceDataMap = {
     male_knight: {
         key: "male_knight",
         title: "Knight",
+        description: "The knight is as knight should be, strong and righteous. It has a large health pool and uses stamina to cast its abilities.",
         icon: "ICON_RACE_male_knight",
         speed: 0.6,
         scale: 1,
@@ -64,11 +66,13 @@ let RacesDB: raceDataMap = {
             { title: "Color 2", material: "knight_texture_alt_A.png" },
             { title: "Color 3", material: "knight_texture_alt_B.png" },
             { title: "Color 4", material: "knight_texture_alt_C.png" },
-        ]
+        ],
     },
     male_mage: {
         key: "male_mage",
         title: "Mage",
+        description:
+            "The mage is a powerful class, but has a small health pool. It uses mana to cast spells, and should use its spells carefully if it does not want to run out of mana.",
         icon: "ICON_RACE_male_mage",
         speed: 0.6,
         scale: 1,
@@ -99,12 +103,12 @@ let RacesDB: raceDataMap = {
             { title: "Color 1", material: "mage_texture.png" },
             { title: "Color 2", material: "mage_texture_alt_A.png" },
             { title: "Color 3", material: "mage_texture_alt_B.png" },
-            { title: "Color 4", material: "mage_texture_alt_C.png" },
-        ]
+        ],
     },
     male_rogue: {
         key: "male_rogue",
         title: "Rogue",
+        description: "To be written...",
         icon: "ICON_RACE_male_mage",
         speed: 0.4,
         scale: 1,
@@ -136,7 +140,7 @@ let RacesDB: raceDataMap = {
             { title: "Color 2", material: "mage_texture_alt_A.png" },
             { title: "Color 3", material: "mage_texture_alt_B.png" },
             { title: "Color 4", material: "mage_texture_alt_C.png" },
-        ]
+        ],
     },
     /*
     male_adventurer: {

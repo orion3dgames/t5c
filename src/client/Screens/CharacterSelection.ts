@@ -17,6 +17,7 @@ import { AuthController } from "../Controllers/AuthController";
 import { Grid } from "@babylonjs/gui/2D/controls/grid";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { dataDB } from "../../shared/Data/dataDB";
+import Config from "../../shared/Config";
 
 export class CharacterSelectionScene {
     public _scene: Scene;
@@ -89,16 +90,14 @@ export class CharacterSelectionScene {
         //////////////////////////////////////////////////////////////
 
         this.generateleftPanel();
-        
     }
 
-    generateleftPanel(){
-
+    generateleftPanel() {
         // left columm
         const leftColumnRect = new Rectangle("columnLeft");
         leftColumnRect.top = 0;
         leftColumnRect.left = 0;
-        leftColumnRect.width = .2;
+        leftColumnRect.width = 0.2;
         leftColumnRect.height = 1;
         leftColumnRect.background = "#000000";
         leftColumnRect.thickness = 0;
@@ -127,7 +126,7 @@ export class CharacterSelectionScene {
 
         // welcome text
         const welcomeText = new TextBlock("infotext", "Welcome " + this._auth.currentUser.username);
-        welcomeText.width = 0.8;
+        welcomeText.width = 0.7;
         welcomeText.height = "40px";
         welcomeText.color = "white";
         welcomeText.top = "100px";
@@ -164,13 +163,12 @@ export class CharacterSelectionScene {
         });
     }
 
-    generateRightPanel(){
-
+    generateRightPanel() {
         // right columm
         const rightColumnRect = new Rectangle("rightColumnRect");
         rightColumnRect.top = 0;
         rightColumnRect.left = 0;
-        rightColumnRect.width = .8;
+        rightColumnRect.width = 0.8;
         rightColumnRect.height = 1;
         rightColumnRect.background = "rgba(255,255,255,.1)";
         rightColumnRect.thickness = 0;
@@ -204,7 +202,10 @@ export class CharacterSelectionScene {
 
         let user = this._auth.currentUser;
 
-        const characterName = new TextBlock("characterName", user.characters.length > 0 ? "You have "+user.characters.length+" character(s)" :" Please create a new character to start playing.");
+        const characterName = new TextBlock(
+            "characterName",
+            user.characters.length > 0 ? "You have " + user.characters.length + " character(s)" : " Please create a new character to start playing."
+        );
         characterName.width = 1;
         characterName.height = "40px";
         characterName.color = "white";
@@ -216,12 +217,11 @@ export class CharacterSelectionScene {
         rightStackPanel.addControl(characterName);
 
         if (user.characters.length > 0) {
-            user.characters.forEach(char => {
-
-                let race = dataDB.get('race', char.race);
+            user.characters.forEach((char) => {
+                let race = dataDB.get("race", char.race);
                 console.log(race);
 
-                const characterBloc = new Rectangle("characterBloc"+char.id);
+                const characterBloc = new Rectangle("characterBloc" + char.id);
                 characterBloc.width = 1;
                 characterBloc.height = "70px;";
                 characterBloc.background = "#000000";
@@ -230,9 +230,9 @@ export class CharacterSelectionScene {
                 characterBloc.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
                 rightStackPanel.addControl(characterBloc);
 
-                var img = new Image("itemImage_" + char.id, "./images/portrait/"+race.icon+".png");
-                img.width = "40px;"
-                img.height = "40px;"
+                var img = new Image("itemImage_" + char.id, "./images/portrait/" + race.icon + ".png");
+                img.width = "40px;";
+                img.height = "40px;";
                 img.left = "20px";
                 img.stretch = Image.STRETCH_FILL;
                 img.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
@@ -250,7 +250,7 @@ export class CharacterSelectionScene {
                 characterName.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
                 characterBloc.addControl(characterName);
 
-                const characterDetails = new TextBlock("characterDetails", "Level: "+ char.level);
+                const characterDetails = new TextBlock("characterDetails", "Level: " + char.level);
                 characterDetails.width = 0.5;
                 characterDetails.height = "40px";
                 characterDetails.color = "gray";
@@ -277,17 +277,15 @@ export class CharacterSelectionScene {
                     this._auth.setCharacter(char);
                     SceneController.goToScene(State.GAME);
                 });
-
             });
         }
-
     }
 
     async displayCharactersGUI(characters: PlayerCharacter[], scrollViewerBloc) {
         const Auth = AuthController.getInstance();
         let top = 0;
         characters.forEach((char) => {
-            const createBtn = Button.CreateSimpleButton("characterBtn-" + char.id, "" + char.name + " - Lvl "+ char.level);
+            const createBtn = Button.CreateSimpleButton("characterBtn-" + char.id, "" + char.name + " - Lvl " + char.level);
             createBtn.top = top + "px";
             createBtn.width = 1;
             createBtn.height = "30px";

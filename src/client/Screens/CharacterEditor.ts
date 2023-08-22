@@ -28,6 +28,7 @@ import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+import { RacesDB, Race } from "../../shared/Data/RacesDB";
 
 export class CharacterEditor {
     public _scene: Scene;
@@ -42,14 +43,14 @@ export class CharacterEditor {
     private leftStackPanel: StackPanel;
     private rightStackPanel: StackPanel;
 
+    private all_races: Race[] = [];
+
     private selected_mesh;
     private selected_animations;
     private selected_textures;
-    private selected_class;
-    private selected_variant;
 
-    private section1;
-    private section2;
+    private selected_race;
+    private selected_variant;
 
     constructor() {
         this._newState = State.NULL;
@@ -61,6 +62,14 @@ export class CharacterEditor {
 
         let scene = new Scene(app.engine);
         scene.clearColor = new Color4(0.1, 0.1, 0.1, 1);
+
+        // load scene
+        this._scene = scene;
+
+        this._environment = new Environment(scene, this._shadow, this._loadedAssets);
+        await this._environment.loadCharacterEditor();
+
+        app.engine.hideLoadingUI();
 
         // camera
         var camera = new ArcRotateCamera("camera1", Math.PI / 2, Math.PI / 2, 10, new Vector3(0, 1, 0), scene);
@@ -91,9 +100,6 @@ export class CharacterEditor {
         const ground = MeshBuilder.CreateCylinder("ground", { diameter: 3, height: 0.1 }, scene);
         ground.position.y -= 0.1;
         ground.receiveShadows = true;
-
-        // load scene
-        this._scene = scene;
 
         // if no user logged in, force a auto login
         // to be remove later or
@@ -169,6 +175,196 @@ export class CharacterEditor {
         rightColumnRect.addControl(rightStackPanel);
         this.rightStackPanel = rightStackPanel;
 
+        /////////////////////////////////////////////////////////
+        //////////////////////// MESHES
+        /////////////////////////////////////////////////////////
+
+        let choices = ["male_knight", "male_mage"];
+        let races = dataDB.load("races");
+
+        for (let race in races) {
+            if (choices.includes(race)) {
+                this.all_races[race] = races[race];
+            }
+        }
+
+        let defaultRace = choices[Math.floor(Math.random() * choices.length)];
+        let defaultVariant = races[defaultRace].materials[Math.floor(Math.random() * races[defaultRace].materials.length)];
+
+        this.selected_race = races[defaultRace];
+        this.selected_variant = defaultVariant;
+
+        this.loadCharacter(this.selected_race);
+    }
+
+    loadCharacter(choice) {
+        // dispose on previous model, textures & animations
+        let material = this._scene.getMaterialByName(choice.material) as PBRMaterial;
+        if (material) {
+            if (material.albedoTexture) {
+                material.albedoTexture.dispose();
+            }
+            material.dispose();
+        }
+        if (this.selected_mesh) {
+            this.selected_mesh.dispose();
+        }
+        if (this.selected_animations) {
+            this.selected_animations.forEach((element) => {
+                element.dispose();
+            });
+        }
+
+        // instatiate model
+        const result = this._loadedAssets["RACE_" + choice.key].instantiateModelsToScene(
+            () => {
+                return choice.key;
+            },
+            true,
+            { doNotInstantiate: false }
+        );
+        this.selected_mesh = result.rootNodes[0];
+        this.selected_animations = result.animationGroups;
+
+        // add shadow
+        this._shadow.addShadowCaster(this.selected_mesh, true);
+
+        // play idle animation
+        this.selected_animations[36].play(true);
+
+        // refresh UI
+        this.refreshUI();
+    }
+
+    disposeUI() {
+        // if already exists
+        this.leftStackPanel.getDescendants().forEach((el) => {
+            el.dispose();
+        });
+        this.rightStackPanel.getDescendants().forEach((el) => {
+            el.dispose();
+        });
+    }
+
+    refreshUI() {
+        this.loadCenterPanel();
+
+        // remove previous ui elements
+        this.disposeUI();
+
+        // create race section
+        this.sectionRace();
+
+        // if race selected
+        if (this.selected_race) {
+            // create race description
+            this.sectionDescription();
+
+            // create race variants
+            this.sectionVariant();
+        }
+    }
+
+    sectionRace() {
+        const sectionTitle = new TextBlock("sectionTitle", "Choose Class");
+        sectionTitle.width = 0.8;
+        sectionTitle.height = "40px";
+        sectionTitle.color = "white";
+        sectionTitle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        sectionTitle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        sectionTitle.fontWeight = "bold";
+        this.leftStackPanel.addControl(sectionTitle);
+
+        for (let raceKey in this.all_races) {
+            let choice = this.all_races[raceKey];
+
+            const btnChoice = Button.CreateSimpleButton("btnChoice", choice.title);
+            btnChoice.top = "0px";
+            btnChoice.width = 1;
+            btnChoice.height = "30px";
+            btnChoice.color = "white";
+            btnChoice.background = "gray";
+            btnChoice.thickness = 1;
+            btnChoice.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+            btnChoice.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+            this.leftStackPanel.addControl(btnChoice);
+
+            if (this.selected_race && this.selected_race.title === choice.title) {
+                btnChoice.background = "green";
+            }
+
+            btnChoice.onPointerDownObservable.add(() => {
+                this.selected_race = choice;
+                this.selected_variant = choice.materials[0];
+                this.loadCharacter(choice);
+            });
+        }
+    }
+
+    sectionDescription() {
+        const section3Title = new TextBlock("section3Title", "Class Description");
+        section3Title.width = 0.8;
+        section3Title.height = "60px";
+        section3Title.color = "white";
+        section3Title.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        section3Title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        section3Title.fontWeight = "bold";
+        this.rightStackPanel.addControl(section3Title);
+
+        const section3Description = new TextBlock("section3Description", this.selected_race.description);
+        section3Description.width = 0.8;
+        section3Description.height = "100px";
+        section3Description.color = "white";
+        section3Description.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        section3Description.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        section3Description.fontSize = "16px";
+        section3Description.textWrapping = TextWrapping.WordWrap;
+        section3Description.resizeToFit = true;
+        this.rightStackPanel.addControl(section3Description);
+    }
+
+    sectionVariant() {
+        let selectedChoices = this.selected_race.materials;
+        let selectedMaterial = this._scene.getMaterialByName(this.selected_race.key) as PBRMaterial;
+
+        const sectionTitle = new TextBlock("sectionTitle", "Choose Variant");
+        sectionTitle.width = 0.8;
+        sectionTitle.height = "40px";
+        sectionTitle.color = "white";
+        sectionTitle.top = "100px";
+        sectionTitle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        sectionTitle.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        this.leftStackPanel.addControl(sectionTitle);
+
+        selectedChoices.forEach((color) => {
+            const btnChoice = Button.CreateSimpleButton("btnChoice", color.title);
+            btnChoice.top = "0px";
+            btnChoice.width = 1;
+            btnChoice.height = "30px";
+            btnChoice.color = "white";
+            btnChoice.background = "gray";
+            btnChoice.thickness = 1;
+            btnChoice.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+            btnChoice.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+            this.leftStackPanel.addControl(btnChoice);
+
+            if (this.selected_race && this.selected_variant && this.selected_variant.title === color.title) {
+                btnChoice.background = "green";
+            }
+
+            btnChoice.onPointerDownObservable.add(() => {
+                this.selected_variant = color;
+                if (selectedMaterial) {
+                    if (selectedMaterial.albedoTexture) {
+                        selectedMaterial.albedoTexture = new Texture("./models/races/materials/" + color.material, this._scene, { invertY: false });
+                    }
+                }
+                this.refreshUI();
+            });
+        });
+    }
+
+    loadCenterPanel() {
         ////////////////////////////////////////////////
         // center columm
         const centerColumnRect = new Rectangle("centerColumnRect");
@@ -179,7 +375,7 @@ export class CharacterEditor {
         centerColumnRect.thickness = 0;
         centerColumnRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         centerColumnRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        guiMenu.addControl(centerColumnRect);
+        this._ui.addControl(centerColumnRect);
 
         ////////////////////////////////////////
         const usernameInput = new InputText("newCharacterInput");
@@ -229,212 +425,6 @@ export class CharacterEditor {
         backBtn.onPointerDownObservable.add(() => {
             SceneController.goToScene(State.CHARACTER_SELECTION);
         });
-
-        /////////////////////////////////////////////////////////
-        //////////////////////// MESHES
-        /////////////////////////////////////////////////////////
-
-        this._environment = new Environment(this._scene, this._shadow, this._loadedAssets);
-        await this._environment.loadCharacterEditor();
-
-        //
-        this.section1 = {
-            title: "Choose Class",
-            choices: [
-                {
-                    title: "Knight",
-                    description: "The knight is as knight should be, strong and righteous. It has a large health pool and uses stamina to cast its abilities.",
-                    mesh: "male_knight",
-                    material: "male_knight",
-                },
-                {
-                    title: "Mage",
-                    description:
-                        "The mage is a powerful class, but has a small health pool. It uses mana to cast spells, and should use its spells carefully if it does not want to run out of mana.",
-                    mesh: "male_mage",
-                    material: "male_mage",
-                },
-            ],
-        };
-
-        this.section2 = {
-            title: "Choose Color",
-            choices: {
-                male_knight: [
-                    { title: "Color 1", material: "knight_texture.png" },
-                    { title: "Color 2", material: "knight_texture_alt_A.png" },
-                    { title: "Color 3", material: "knight_texture_alt_B.png" },
-                    { title: "Color 4", material: "knight_texture_alt_C.png" },
-                ],
-                male_mage: [
-                    { title: "Color 1", material: "mage_texture.png" },
-                    { title: "Color 2", material: "mage_texture_alt_A.png" },
-                    { title: "Color 3", material: "mage_texture_alt_B.png" },
-                    { title: "Color 4", material: "mage_texture_alt_C.png" },
-                ],
-            },
-        };
-
-        this.selected_class = this.section1.choices[0];
-        this.selected_variant = this.section2.choices[this.selected_class.mesh][0];
-        this.loadCharacter(this.selected_class);
-    }
-
-    loadCharacter(choice) {
-        /*
-        if (this.selected_mesh && this.selected_mesh._children[0]._children.length > 0) {
-            this.selected_mesh._children[0]._children.forEach((element) => {
-                if (element.material) {
-                    console.log(element.material);
-
-                    element.material.albedoTexture.dispose();
-                    element.material.dispose();
-                }
-            });
-        }*/
-        let material = this._scene.getMaterialByName(choice.material) as PBRMaterial;
-        if (material) {
-            if (material.albedoTexture) {
-                material.albedoTexture.dispose();
-            }
-            material.dispose();
-        }
-
-        if (this.selected_mesh) {
-            this.selected_mesh.dispose();
-        }
-        if (this.selected_animations) {
-            this.selected_animations.forEach((element) => {
-                element.dispose();
-            });
-        }
-
-        const result = this._loadedAssets[choice.mesh].instantiateModelsToScene(
-            () => {
-                return choice.mesh;
-            },
-            true,
-            { doNotInstantiate: false }
-        );
-        this.selected_mesh = result.rootNodes[0];
-        this.selected_animations = result.animationGroups;
-
-        console.log(this.selected_mesh);
-
-        this._shadow.addShadowCaster(this.selected_mesh, true);
-
-        this.selected_animations[36].play(true);
-
-        this.refreshUI();
-    }
-
-    refreshUI() {
-        // if already exists
-        this.leftStackPanel.getDescendants().forEach((el) => {
-            el.dispose();
-        });
-        this.rightStackPanel.getDescendants().forEach((el) => {
-            el.dispose();
-        });
-        /////////////////////////// SECTION 1 ///////////////////
-
-        const sectionTitle = new TextBlock("sectionTitle", this.section1.title);
-        sectionTitle.width = 0.8;
-        sectionTitle.height = "40px";
-        sectionTitle.color = "white";
-        sectionTitle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        sectionTitle.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        sectionTitle.fontWeight = "bold";
-        this.leftStackPanel.addControl(sectionTitle);
-
-        this.section1.choices.forEach((choice) => {
-            const btnChoice = Button.CreateSimpleButton("btnChoice", choice.title);
-            btnChoice.top = "0px";
-            btnChoice.width = 1;
-            btnChoice.height = "30px";
-            btnChoice.color = "white";
-            btnChoice.background = "gray";
-            btnChoice.thickness = 1;
-            btnChoice.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-            btnChoice.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-            this.leftStackPanel.addControl(btnChoice);
-
-            if (this.selected_class && this.selected_class.title === choice.title) {
-                btnChoice.background = "green";
-            }
-
-            btnChoice.onPointerDownObservable.add(() => {
-                this.selected_class = choice;
-                this.selected_variant = this.section2.choices[this.selected_class.mesh][0];
-                this.loadCharacter(choice);
-            });
-        });
-
-        /////////////////////////// SECTION 2 ///////////////////
-
-        if (this.selected_class) {
-            console.log(this.selected_class);
-
-            let selectedChoices = this.section2.choices[this.selected_class.mesh];
-            let selectedMaterial = this._scene.getMaterialByName(this.selected_class.material) as PBRMaterial;
-            console.log("FOUND MATERIAL", selectedMaterial);
-
-            const sectionTitle = new TextBlock("sectionTitle", this.section2.title);
-            sectionTitle.width = 0.8;
-            sectionTitle.height = "40px";
-            sectionTitle.color = "white";
-            sectionTitle.top = "100px";
-            sectionTitle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-            sectionTitle.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-            this.leftStackPanel.addControl(sectionTitle);
-
-            selectedChoices.forEach((color) => {
-                const btnChoice = Button.CreateSimpleButton("btnChoice", color.title);
-                btnChoice.top = "0px";
-                btnChoice.width = 1;
-                btnChoice.height = "30px";
-                btnChoice.color = "white";
-                btnChoice.background = "gray";
-                btnChoice.thickness = 1;
-                btnChoice.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-                btnChoice.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-                this.leftStackPanel.addControl(btnChoice);
-
-                if (this.selected_class && this.selected_variant && this.selected_variant.title === color.title) {
-                    btnChoice.background = "green";
-                }
-
-                btnChoice.onPointerDownObservable.add(() => {
-                    this.selected_variant = color;
-                    if (selectedMaterial) {
-                        if (selectedMaterial.albedoTexture) {
-                            selectedMaterial.albedoTexture = new Texture("./models/races/materials/" + color.material, this._scene, { invertY: false });
-                        }
-                    }
-                    this.refreshUI();
-                });
-            });
-
-            const section3Title = new TextBlock("section3Title", "Class Description");
-            section3Title.width = 0.8;
-            section3Title.height = "60px";
-            section3Title.color = "white";
-            section3Title.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-            section3Title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-            section3Title.fontWeight = "bold";
-            this.rightStackPanel.addControl(section3Title);
-
-            const section3Description = new TextBlock("section3Description", this.selected_class.description);
-            section3Description.width = 0.8;
-            section3Description.height = "100px";
-            section3Description.color = "white";
-            section3Description.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-            section3Description.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-            section3Description.fontSize = "16px";
-            section3Description.textWrapping = TextWrapping.WordWrap;
-            section3Description.resizeToFit = true;
-            this.rightStackPanel.addControl(section3Description);
-        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -453,7 +443,7 @@ export class CharacterEditor {
         let req = await request("post", apiUrl() + "/create_character", {
             token: token,
             name: name,
-            race: this.selected_class.mesh
+            race: this.selected_race.mesh,
         });
 
         // check req status

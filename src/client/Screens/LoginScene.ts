@@ -22,55 +22,56 @@ import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
 
 export class LoginScene {
+    private _app;
     public _scene: Scene;
     public _newState: State;
     public _button: Button;
     public _ui;
     public _environment;
-    public _loadedAssets: AssetContainer[] = [];;
+    public _loadedAssets: AssetContainer[] = [];
     public _shadow;
-    
+
     constructor() {
         this._newState = State.NULL;
     }
 
-    public async createScene(app) {
+    async createScene(app): Promise<void> {
+        // app
+        this._app = app;
 
-
-        app.engine.displayLoadingUI();
-
+        // create scene
         let scene = new Scene(app.engine);
+
+        // set scene
         this._scene = scene;
-        
-        scene.clearColor = new Color4(0, 0, 0, 1);
+
+        // set sky color
+        this._scene.clearColor = new Color4(0.1, 0.1, 0.1, 1);
+
+        // preload assets
+        /*
+        this._environment = new Environment(scene, this._shadow, this._loadedAssets);
+        await this._environment.preloadAssets();
+        app.engine.hideLoadingUI();*/
 
         //creates and positions a free camera
-        let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), scene);
+        let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), this._scene);
         camera.setTarget(Vector3.Zero()); //targets the camera to scene origin
 
-        //--GUI--
+        // create ui
         const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        this.create(guiMenu);
+    }
 
-        // background image
-        const imageRect = new Rectangle("background");
-        imageRect.width = 1;
-        imageRect.height = 1;
-        imageRect.background = "#999999";
-        imageRect.thickness = 0;
-        guiMenu.addControl(imageRect);
-
-        var img = new Image("image", "./images/background_mainmenu_1.jpg");
-        img.stretch = Image.STRETCH_FILL;
-        imageRect.addControl(img);
-
+    create(guiMenu) {
         // middle columm
         const columnRect = new Rectangle("column");
-        columnRect.width = 0.2;
+        columnRect.width = Config.UI_SIDEBAR_WIDTH;
         columnRect.height = 1;
         columnRect.background = "#000000";
         columnRect.thickness = 0;
         columnRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        imageRect.addControl(columnRect);
+        guiMenu.addControl(columnRect);
 
         // logo
         var imgLogo = new Image("imgLogo", "./images/logo.png");
