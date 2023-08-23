@@ -443,7 +443,7 @@ export class CharacterEditor {
         let req = await request("post", apiUrl() + "/create_character", {
             token: token,
             name: name,
-            race: this.selected_race.mesh,
+            race: this.selected_race.key,
         });
 
         // check req status
