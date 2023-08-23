@@ -101,17 +101,25 @@ export class PlayerSchema extends Entity {
         Object.assign(this, data);
         Object.assign(this, dataDB.get("race", this.race));
 
-        // data
-        console.log(data);
+        // add learned abilities
         data.initial_abilities.forEach((element) => {
             this.player_data.abilities.set(element.key, new AbilitySchema(element));
         });
+
+        // add equipment
+        data.initial_equipment.forEach((element) => {
+            this.equipment.set(element.key, new EquipmentSchema(element));
+        });
+
+        // add inventory items
         let i = 0;
         data.initial_inventory.forEach((element) => {
             element.i = "" + i;
             this.player_data.inventory.set("" + i, new InventorySchema(element));
             i++;
         });
+
+        // add default player data
         Object.entries(data.initial_player_data).forEach(([k, v]) => {
             this.player_data[k] = v;
         });
@@ -156,17 +164,16 @@ export class PlayerSchema extends Entity {
 
         // check
         let teleports = this._state.roomDetails.dynamic.teleports ?? [];
-        if(teleports.length > 0){
+        if (teleports.length > 0) {
             let currentPos = this.getPosition();
-            teleports.forEach(destination => {
+            teleports.forEach((destination) => {
                 let distanceTo = currentPos.distanceTo(destination.from);
-                if(distanceTo < 2 && !this.isTeleporting){
-
+                if (distanceTo < 2 && !this.isTeleporting) {
                     this.isTeleporting = true;
 
                     let client = this._state._gameroom.clients.getById(this.sessionId);
-            
-                    // update player location in database 
+
+                    // update player location in database
                     let updateObj = {
                         location: destination.to_map,
                         x: destination.to_vector.x,

@@ -130,6 +130,7 @@ export class GameRoomState extends Schema {
             initial_player_data: player_data,
             initial_abilities: data.abilities ?? [],
             initial_inventory: data.inventory ?? [],
+            initial_equipment: data.equipment ?? [],
         };
 
         this.entityCTRL.add(new PlayerSchema(this, player));

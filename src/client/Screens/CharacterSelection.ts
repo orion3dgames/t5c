@@ -18,15 +18,18 @@ import { Grid } from "@babylonjs/gui/2D/controls/grid";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { dataDB } from "../../shared/Data/dataDB";
 import Config from "../../shared/Config";
+import { Engine } from "@babylonjs/core/Engines/engine";
 
 export class CharacterSelectionScene {
     public _scene: Scene;
+    public _engine: Engine;
     private _ui: AdvancedDynamicTexture;
     private _auth: AuthController;
     public _button: Button;
     private leftColumnRect;
     private rightColumnRect;
     private characterPanel;
+    private scrollViewerBloc;
 
     private charactersUI: Rectangle[] = [];
     private selectedCharacter;
@@ -34,6 +37,8 @@ export class CharacterSelectionScene {
     public sceneRendered = false;
 
     public async createScene(app) {
+        this._engine = app.engine;
+
         // auth controller
         this._auth = AuthController.getInstance();
 
@@ -68,18 +73,14 @@ export class CharacterSelectionScene {
             SceneController.goToScene(State.LOGIN);
         }
 
-        // some ui must be constantly refreshed as things change
-        this._scene.registerAfterRender(() => {
-            // refresh
-            if (!this.sceneRendered) {
-                this.generateRightPanel();
-            }
-            this.sceneRendered = true;
-        });
-        /////////////////////
-
         this.generateleftPanel();
         this.generateRightPanel();
+
+        if (user.characters.length > 0) {
+            this.selectCharacter(0, user.characters[0]);
+        }
+
+        this.resize();
     }
 
     generateleftPanel() {
@@ -107,30 +108,40 @@ export class CharacterSelectionScene {
 
         // welcome text
         const welcomeText = new TextBlock("infotext", "Welcome " + this._auth.currentUser.username);
-        welcomeText.width = 0.7;
-        welcomeText.height = "40px";
+        welcomeText.width = 1;
+        welcomeText.height = "100px;";
         welcomeText.color = "white";
-        welcomeText.top = "15px";
+        welcomeText.top = "0px";
         welcomeText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         welcomeText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         leftColumnRect.addControl(welcomeText);
 
+        // BOTTOM ACTIONS
+        const leftColumnBottomActions = new Rectangle("leftColumnBottomActions");
+        leftColumnBottomActions.top = "-15px";
+        leftColumnBottomActions.width = 1;
+        leftColumnBottomActions.height = "70px;";
+        leftColumnBottomActions.thickness = 0;
+        leftColumnBottomActions.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        leftColumnBottomActions.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        leftColumnRectPad.addControl(leftColumnBottomActions);
+
         // logout btn
         const logoutBtn = Button.CreateSimpleButton("logoutBtn", "LOGOUT");
-        logoutBtn.top = "-30px";
+        logoutBtn.top = "0px";
         logoutBtn.width = 1;
         logoutBtn.height = "30px";
         logoutBtn.color = "white";
         logoutBtn.thickness = 1;
         logoutBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         logoutBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        this.leftColumnRect.addControl(logoutBtn);
+        leftColumnBottomActions.addControl(logoutBtn);
         logoutBtn.onPointerDownObservable.add(() => {
             this._auth.logout();
         });
 
-        const characterEditorBtn = Button.CreateSimpleButton("characterEditorBtn", "NEW CHARACTER");
-        characterEditorBtn.top = "-70px";
+        const characterEditorBtn = Button.CreateSimpleButton("characterEditorBtn", "CREATE NEW CHARACTER");
+        characterEditorBtn.top = "-40px";
         characterEditorBtn.width = 1;
         characterEditorBtn.height = "30px";
         characterEditorBtn.color = "white";
@@ -138,7 +149,8 @@ export class CharacterSelectionScene {
         characterEditorBtn.thickness = 1;
         characterEditorBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         characterEditorBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        this.leftColumnRect.addControl(characterEditorBtn);
+        leftColumnBottomActions.addControl(characterEditorBtn);
+
         characterEditorBtn.onPointerDownObservable.add(() => {
             SceneController.goToScene(State.CHARACTER_EDITOR);
         });
@@ -150,7 +162,7 @@ export class CharacterSelectionScene {
         // add scrollable container
         var scrollViewerBloc = new ScrollViewer("chat-scroll-viewer");
         scrollViewerBloc.width = 1;
-        scrollViewerBloc.height = 0.75;
+        scrollViewerBloc.height = 0.8;
         scrollViewerBloc.left = "0px";
         scrollViewerBloc.top = "80px";
         scrollViewerBloc.thickness = 0;
@@ -158,6 +170,7 @@ export class CharacterSelectionScene {
         scrollViewerBloc.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         scrollViewerBloc.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         this.leftColumnRect.addControl(scrollViewerBloc);
+        this.scrollViewerBloc = scrollViewerBloc;
 
         const rightStackPanel = new StackPanel("rightStackPanel");
         rightStackPanel.left = 0;
@@ -178,7 +191,7 @@ export class CharacterSelectionScene {
 
         if (user.characters.length > 0) {
             let i = 0;
-            user.characters.forEach((char) => {
+            user.characters.forEach((char, k) => {
                 let race = dataDB.get("race", char.race);
 
                 const characterBloc = new Rectangle("characterBloc" + char.id);
@@ -230,19 +243,7 @@ export class CharacterSelectionScene {
                 characterBloc.addControl(characterDetails);
 
                 characterBloc.onPointerDownObservable.add(() => {
-                    //
-                    this.selectedCharacter = char;
-
-                    // reset selection
-                    this.charactersUI.forEach((element) => {
-                        element.background = "black";
-                    });
-
-                    // set current selected
-                    characterBloc.background = "green";
-
-                    // update right panel
-                    this.generateCharacterPanel();
+                    this.selectCharacter(k, char);
                 });
 
                 i++;
@@ -250,12 +251,45 @@ export class CharacterSelectionScene {
         }
     }
 
+    selectCharacter(index, char) {
+        this.selectedCharacter = char;
+
+        // reset selection
+        this.charactersUI.forEach((element) => {
+            element.background = "black";
+        });
+
+        // set current selected
+        this.charactersUI[index].background = "green";
+
+        // update right panel
+        this.generateCharacterPanel();
+    }
+
+    resize() {
+        this.generateRightPanel();
+        this.generateCharacterPanel();
+
+        //
+        let totalHeight = this._engine.getRenderHeight();
+        this.scrollViewerBloc.height = totalHeight - 185 + "px";
+
+        let totalWidth = this._engine.getRenderWidth();
+        this.rightColumnRect.width = totalWidth - 320 + "px";
+    }
+
     generateRightPanel() {
+        if (this.rightColumnRect) {
+            this.rightColumnRect.dispose();
+        }
+
+        let totalWidth = this._engine.getRenderWidth();
+
         // right columm
         const rightColumnRect = new Rectangle("rightColumnRect");
         rightColumnRect.top = 0;
         rightColumnRect.left = "320px;";
-        rightColumnRect.width = 0.8;
+        rightColumnRect.width = totalWidth - 320 + "px";
         rightColumnRect.height = 1;
         rightColumnRect.background = "rgba(255,255,255,.1)";
         rightColumnRect.thickness = 0;
@@ -300,10 +334,10 @@ export class CharacterSelectionScene {
             characterDetails.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
             this.rightColumnRect.addControl(characterDetails);
 
-            const createBtn = Button.CreateSimpleButton("characterBtn-" + char.id, "PLAY");
+            const createBtn = Button.CreateSimpleButton("characterBtn-" + char.id, "PLAY CHARACTER");
             createBtn.left = "0px;";
-            createBtn.top = "-100px";
-            createBtn.width = "100px";
+            createBtn.top = "-70px";
+            createBtn.width = "200px";
             createBtn.height = "30px";
             createBtn.background = "orange";
             createBtn.color = "white";
@@ -317,28 +351,5 @@ export class CharacterSelectionScene {
                 SceneController.goToScene(State.GAME);
             });
         }
-    }
-
-    async displayCharactersGUI(characters: PlayerCharacter[], scrollViewerBloc) {
-        const Auth = AuthController.getInstance();
-        let top = 0;
-        characters.forEach((char) => {
-            const createBtn = Button.CreateSimpleButton("characterBtn-" + char.id, "" + char.name + " - Lvl " + char.level);
-            createBtn.top = top + "px";
-            createBtn.width = 1;
-            createBtn.height = "30px";
-            createBtn.background = "#000000";
-            createBtn.color = "white";
-            createBtn.thickness = 1;
-            createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-            createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-            scrollViewerBloc.addControl(createBtn);
-            createBtn.onPointerDownObservable.add(() => {
-                Auth.setCharacter(char);
-                SceneController.goToScene(State.GAME);
-            });
-
-            top += 35;
-        });
     }
 }

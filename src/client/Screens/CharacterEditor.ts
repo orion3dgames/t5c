@@ -444,6 +444,7 @@ export class CharacterEditor {
             token: token,
             name: name,
             race: this.selected_race.key,
+            color: this.selected_variant.material,
         });
 
         // check req status

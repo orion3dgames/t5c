@@ -172,7 +172,6 @@ export class Entity {
     }
 
     public update(delta) {
-        console.log(this.sessionId, AI_STATE[this.ai_state]);
         if (this.ai_state === AI_STATE.SEEKING || this.ai_state === AI_STATE.ATTACKING) {
             this.debugMesh.material = this._scene.getMaterialByName("debug_entity_active");
         }
