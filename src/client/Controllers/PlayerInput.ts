@@ -17,6 +17,7 @@ export class PlayerInput {
     // moving
     public left_click: boolean;
     public right_click: boolean;
+    public middle_click: boolean;
     public mouse_moving: boolean = false;
 
     // moving
@@ -39,6 +40,9 @@ export class PlayerInput {
                 if (pointerInfo.event.button == 0) {
                     this.left_click = true;
                 }
+                if (pointerInfo.event.button == 1) {
+                    this.middle_click = true;
+                }
                 if (pointerInfo.event.button == 2) {
                     this.right_click = true;
                 }
@@ -50,6 +54,9 @@ export class PlayerInput {
                     this.inputMap = { rotY: null };
                     this.vertical = 0;
                     this.horizontal = 0;
+                }
+                if (pointerInfo.event.button == 1) {
+                    this.middle_click = false;
                 }
                 if (pointerInfo.event.button == 2) {
                     this.right_click = false;
@@ -68,6 +75,9 @@ export class PlayerInput {
                 }
                 if (this.right_click) {
                     this.mouse_moving = true;
+                }
+
+                if (this.middle_click) {
                     this.movementX = pointerInfo.event.movementX / 100;
                     this.movementY = pointerInfo.event.movementY / 75;
                 }
