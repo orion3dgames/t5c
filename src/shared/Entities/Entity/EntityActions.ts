@@ -81,13 +81,13 @@ export class EntityActions {
         particleSystem.color2 = Color4.FromColor3(this.colors[color][1]);
         particleSystem.colorDead = new Color4(0, 0, 0, 0.0);
         // Size of each particle (random between...
-        particleSystem.minSize = 0.5;
-        particleSystem.maxSize = 0.9;
+        particleSystem.minSize = 0.3;
+        particleSystem.maxSize = 0.6;
         // Life time of each particle (random between...
         particleSystem.minLifeTime = 0.2;
         particleSystem.maxLifeTime = 2;
         // Emission rate
-        particleSystem.emitRate = 100;
+        particleSystem.emitRate = 1000;
         particleSystem.createSphereEmitter(1);
         // Speed
         particleSystem.minEmitPower = 0.5;
@@ -128,8 +128,8 @@ export class EntityActions {
         particleSystemTrail.color2 = Color4.FromColor3(this.colors[color][1]);
         particleSystemTrail.colorDead = new Color4(0, 0, 0, 0.0);
         // Size of each particle (random between...
-        particleSystemTrail.minSize = 1;
-        particleSystemTrail.maxSize = 1;
+        particleSystemTrail.minSize = 0.4;
+        particleSystemTrail.maxSize = 0.6;
         // Life time of each particle (random between...
         particleSystemTrail.minLifeTime = 0.05;
         particleSystemTrail.maxLifeTime = 0.1;

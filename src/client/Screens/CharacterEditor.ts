@@ -390,7 +390,7 @@ export class CharacterEditor {
         centerColumnRect.addControl(usernameInput);
 
         // PLAY BUTTON
-        const playBtn = Button.CreateSimpleButton("playBtn", "PLAY");
+        const playBtn = Button.CreateSimpleButton("playBtn", "Create");
         playBtn.top = "-70px";
         playBtn.width = "200px";
         playBtn.height = "30px";
@@ -405,7 +405,7 @@ export class CharacterEditor {
             this.createCharacter(this._auth.currentUser.token, usernameInput.text).then((char) => {
                 // login as this character
                 this._auth.setCharacter(char);
-                SceneController.goToScene(State.GAME);
+                SceneController.goToScene(State.CHARACTER_SELECTION);
                 // reset text
                 usernameInput.text = "";
             });

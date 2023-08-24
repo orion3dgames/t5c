@@ -21,7 +21,7 @@ export class spawnCTRL {
         this.process();
 
         for (let i = 0; i < 25; i++) {
-            //this.createItem();
+            this.createItem();
         }
     }
 
@@ -55,9 +55,10 @@ export class spawnCTRL {
         let sessionId = nanoid(10);
 
         // monster pool to chose from
-        let randTypes = ["sword_01", "amulet_01", "potion_heal", "shield_01", "shield_01_gold"];
-        let randResult = randTypes[Math.floor(Math.random() * randTypes.length)];
-        let randData = dataDB.get("item", randResult);
+        let Items = dataDB.load("items");
+        let keys = Object.keys(Items);
+        let rand = keys[Math.floor(Math.random() * keys.length)];
+        let randData = Items[rand];
 
         //
         let randomRegion = this._room.navMesh.getRandomRegion();

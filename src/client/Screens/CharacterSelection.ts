@@ -77,7 +77,8 @@ export class CharacterSelectionScene {
         this.generateRightPanel();
 
         if (user.characters.length > 0) {
-            this.selectCharacter(0, user.characters[0]);
+            let index = user.characters.length - 1;
+            this.selectCharacter(index, user.characters[index]);
         }
 
         this.resize();

@@ -275,7 +275,7 @@ export class UserInterface {
         rect1.linkOffsetY = -100;
         var label = new TextBlock("player_nameplate_text_" + entity.sessionId);
         label.text = entity.name;
-        label.color = "green";
+        label.color = "blue";
         label.fontWeight = "bold";
         rect1.addControl(label);
         return rect1;
@@ -283,7 +283,7 @@ export class UserInterface {
 
     // obsolete, keeping just in case
     public createItemLabel(entity) {
-        var rect1 = new Rectangle("player_nameplate_" + entity.sessionId);
+        var rect1 = new Rectangle("item_nameplate_" + entity.sessionId);
         rect1.isVisible = false;
         rect1.width = "200px";
         rect1.height = "40px";
@@ -291,8 +291,8 @@ export class UserInterface {
         rect1.zIndex = this._namesUI.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
         rect1.linkOffsetY = -30;
-        var label = new TextBlock("player_nameplate_text_" + entity.sessionId);
-        label.text = entity.name;
+        var label = new TextBlock("item_nameplate_text_" + entity.sessionId);
+        label.text = entity.title;
         label.color = "black";
         label.fontWeight = "bold";
         label.fontSize = "14px";

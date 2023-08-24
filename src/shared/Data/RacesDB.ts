@@ -130,17 +130,17 @@ let RacesDB: raceDataMap = {
         baseMana: 50,
         healthRegen: 0.2,
         manaRegen: 0.4, // per second
-        experienceGain: {},
-        goldGain: {},
+        experienceGain: { min: 2000, max: 4000 },
+        goldGain: { min: 120, max: 250 },
         damage_multiplier: 0,
-        drops: [],
-        default_abilities: ["base_attack"],
-        materials: [
-            { title: "Color 1", material: "mage_texture.png" },
-            { title: "Color 2", material: "mage_texture_alt_A.png" },
-            { title: "Color 3", material: "mage_texture_alt_B.png" },
-            { title: "Color 4", material: "mage_texture_alt_C.png" },
+        drops: [
+            LootTableEntry("sword_01", 10, 1, 1, 1, 1),
+            LootTableEntry("potion_heal", 40, 1, 1, 1, 1),
+            LootTableEntry("potion_mana", 25, 1, 1, 1, 1),
+            LootTableEntry("amulet_01", 1, 1, 1, 1, 1),
         ],
+        default_abilities: ["base_attack"],
+        materials: [{ title: "Color 1", material: "mage_texture.png" }],
     },
     /*
     male_adventurer: {
