@@ -135,8 +135,9 @@ let RacesDB: raceDataMap = {
         damage_multiplier: 0,
         drops: [
             LootTableEntry("sword_01", 10, 1, 1, 1, 1),
-            LootTableEntry("potion_heal", 40, 1, 1, 1, 1),
-            LootTableEntry("potion_mana", 25, 1, 1, 1, 1),
+            LootTableEntry("potion_small_blue", 40, 1, 1, 1, 1),
+            LootTableEntry("potion_small_red", 25, 1, 1, 1, 1),
+            LootTableEntry("shield_01_gold", 5, 1, 1, 1, 1),
             LootTableEntry("amulet_01", 1, 1, 1, 1, 1),
         ],
         default_abilities: ["base_attack"],

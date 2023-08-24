@@ -24,6 +24,13 @@ import { AuthController } from "./AuthController";
 import { dataDB } from "../../shared/Data/dataDB";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
+type Asset = {
+    name: string;
+    filename: string;
+    extension: string;
+    instantiate?: boolean;
+};
+
 export class Environment {
     private _scene: Scene;
     private _shadow: CascadedShadowGenerator;
@@ -63,13 +70,13 @@ export class Environment {
 
         let assetsToLoad = [
             // sounds
-            { name: "SOUND_enemy_attack_1", filename: "enemy_attack_1.wav", extension: "wav" },
-            { name: "SOUND_enemy_attack_2", filename: "enemy_attack_2.wav", extension: "wav" },
-            { name: "SOUND_fire_attack_1", filename: "fire_attack_1.wav", extension: "wav" },
-            { name: "SOUND_fire_attack_2", filename: "fire_attack_2.wav", extension: "wav" },
-            { name: "SOUND_heal_1", filename: "heal_1.wav", extension: "wav" },
-            { name: "MUSIC_01", filename: "music.mp3", extension: "mp3" },
-            { name: "SOUND_player_walking", filename: "player_walking.wav", extension: "wav" },
+            //{ name: "SOUND_enemy_attack_1", filename: "enemy_attack_1.wav", extension: "wav" },
+            //{ name: "SOUND_enemy_attack_2", filename: "enemy_attack_2.wav", extension: "wav" },
+            //{ name: "SOUND_fire_attack_1", filename: "fire_attack_1.wav", extension: "wav" },
+            //{ name: "SOUND_fire_attack_2", filename: "fire_attack_2.wav", extension: "wav" },
+            //{ name: "SOUND_heal_1", filename: "heal_1.wav", extension: "wav" },
+            //{ name: "MUSIC_01", filename: "music.mp3", extension: "mp3" },
+            //{ name: "SOUND_player_walking", filename: "player_walking.wav", extension: "wav" },
 
             // textures
             { name: "TXT_selected_circle_green", filename: "selected_circle_green.png", extension: "png", type: "texture" },
@@ -227,17 +234,18 @@ export class Environment {
     public async preloadAssets() {
         let assetsToLoad = [
             // sounds
+            /*
             { name: "SOUND_enemy_attack_1", filename: "enemy_attack_1.wav", extension: "wav" },
             { name: "SOUND_enemy_attack_2", filename: "enemy_attack_2.wav", extension: "wav" },
             { name: "SOUND_fire_attack_1", filename: "fire_attack_1.wav", extension: "wav" },
             { name: "SOUND_fire_attack_2", filename: "fire_attack_2.wav", extension: "wav" },
             { name: "SOUND_heal_1", filename: "heal_1.wav", extension: "wav" },
             { name: "MUSIC_01", filename: "music.mp3", extension: "mp3" },
-            { name: "SOUND_player_walking", filename: "player_walking.wav", extension: "wav", instantiate: false },
+            { name: "SOUND_player_walking", filename: "player_walking.wav", extension: "wav", instantiate: false },*/
 
             // textures
             { name: "TXT_selected_circle_green", filename: "selected_circle_green.png", extension: "png", type: "texture" },
-            { name: "TXT_particle_01", filename: "particle_01.png", extension: "png", type: "texture" },
+            { name: "TXT_particle_01", filename: "particle_01.png", extension: "png", type: "texture", instantiate: false },
         ];
 
         // add locations
@@ -245,7 +253,7 @@ export class Environment {
         if (locations) {
             for (let key in locations) {
                 let el = locations[key];
-                assetsToLoad.push({ name: "ENV_" + el.key, filename: "environment/" + el.mesh + ".glb", extension: "glb" });
+                assetsToLoad.push({ name: "ENV_" + el.key, filename: "environment/" + el.mesh + ".glb", extension: "glb", type: "mesh" });
             }
         }
 
@@ -264,7 +272,7 @@ export class Environment {
             for (let key in items) {
                 let el = items[key];
                 assetsToLoad.push({ name: el.icon, filename: "icons/" + el.icon + ".png", extension: "png", type: "image" });
-                assetsToLoad.push({ name: "ITEM_" + el.key, filename: "items/" + el.key + ".glb", extension: "glb", instantiate: true });
+                assetsToLoad.push({ name: "ITEM_" + el.key, filename: "items/" + el.key + ".glb", extension: "glb", type: "mesh", instantiate: true });
             }
         }
 
@@ -273,7 +281,7 @@ export class Environment {
         if (races) {
             for (let key in races) {
                 let el = races[key];
-                assetsToLoad.push({ name: "RACE_" + el.key, filename: "races/" + el.key + ".glb", extension: "glb", instantiate: true });
+                assetsToLoad.push({ name: "RACE_" + el.key, filename: "races/" + el.key + ".glb", extension: "glb", type: "mesh", instantiate: true });
                 assetsToLoad.push({ name: el.icon, filename: "portrait/" + el.icon + ".png", extension: "png", type: "image" });
             }
         }

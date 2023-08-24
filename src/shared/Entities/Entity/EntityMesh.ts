@@ -119,7 +119,7 @@ export class EntityMesh {
 
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);
-  
+
         // register hover over player
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
@@ -212,12 +212,21 @@ export class EntityMesh {
                     weaponMesh.parent = this.playerMesh;
                     weaponMesh.attachToBone(bone, this.playerMesh);
 
+                    weaponMesh.scaling = new Vector3(item.meshData.scale, item.meshData.scale, item.meshData.scale);
+
                     // if rotationFix neede
                     if (equipOptions.rotation) {
                         // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
                         weaponMesh.rotationQuaternion = null;
                         weaponMesh.rotation.set(equipOptions.rotation, 0, 0);
-                        console.log("equipOptions.rotation");
+                    }
+
+                    // if mesh offset required
+                    if (equipOptions.offset_x) {
+                        weaponMesh.position.x += equipOptions.offset_x;
+                    }
+                    if (equipOptions.offset_z) {
+                        weaponMesh.position.z += equipOptions.offset_z;
                     }
 
                     this.equipments.push(weaponMesh);

@@ -107,7 +107,6 @@ export class Item {
         });
         const root = result.rootNodes[0];
         let playerMesh = root;
-
         /////////////////
         /*
         let modelToLoadKey = "LOADED_ITEM_" + this.key;

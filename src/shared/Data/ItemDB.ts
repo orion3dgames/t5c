@@ -45,6 +45,8 @@ type Item = {
         mesh?: string;
         material?: string;
         rotation?: number;
+        offset_x?: number;
+        offset_z?: number;
     };
 
     meshData?: {
@@ -94,12 +96,14 @@ let ItemsDB: itemDataMap = {
             slot: PlayerSlots.WEAPON,
             mesh: "sword_01",
             material: "sword_material_01",
+            offset_x: -0.7,
+            offset_z: 0,
         },
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
         benefits: [{ key: PlayerKeys.STRENGTH, type: ItemEffect.ADD, amount: 10 }],
         meshData: {
-            scale: 1.2,
-            width: 1,
+            scale: 1.3,
+            width: 1.5,
             height: 0.2,
             depth: 0.2,
         },
@@ -188,7 +192,7 @@ let ItemsDB: itemDataMap = {
         meshData: {
             scale: 0.25,
             width: 0.5,
-            height: 0.5,
+            height: 0.25,
             depth: 0.5,
         },
     },
@@ -196,7 +200,7 @@ let ItemsDB: itemDataMap = {
     potion_small_red: {
         key: "potion_small_red",
         title: "Small Health Potion",
-        description: "A very useful potion that restores up to 50 health..",
+        description: "A very useful potion that restores up to 25 health..",
         icon: "ICON_ITEM_potion_small_red",
         class: ItemClass.CONSUMABLE,
         value: 150,
@@ -206,9 +210,9 @@ let ItemsDB: itemDataMap = {
         stackable: true,
         benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 25 }],
         meshData: {
-            scale: 2,
+            scale: 1.5,
             width: 0.4,
-            height: 1.3,
+            height: 0.7,
             depth: 0.4,
         },
     },
@@ -216,7 +220,7 @@ let ItemsDB: itemDataMap = {
     potion_small_blue: {
         key: "potion_small_blue",
         title: "Small Mana Potion",
-        description: "A very useful potion that restores up to 50 mana..",
+        description: "A very useful potion that restores up to 25 mana..",
         icon: "ICON_ITEM_potion_small_blue",
         class: ItemClass.CONSUMABLE,
         value: 150,
@@ -226,9 +230,9 @@ let ItemsDB: itemDataMap = {
         stackable: true,
         benefits: [{ key: PlayerKeys.MANA, type: ItemEffect.ADD, amount: 25 }],
         meshData: {
-            scale: 2,
+            scale: 1.5,
             width: 0.4,
-            height: 1.3,
+            height: 0.7,
             depth: 0.4,
         },
     },
