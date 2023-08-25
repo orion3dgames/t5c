@@ -173,7 +173,7 @@ export class EntityActions {
         var loop = this._scene.onBeforeRenderObservable.add(() => {
             if (i < 1) {
                 projectile.position = path.getPointAt(i);
-                i += 0.005;
+                i += 0.0035;
             }
             if (projectile.intersectsMesh(mesh, true) || i > 1) {
                 this.particule_heal(mesh, color);
