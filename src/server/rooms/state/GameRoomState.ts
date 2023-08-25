@@ -5,6 +5,7 @@ import { BrainSchema, Entity, EquipmentSchema, LootSchema, PlayerSchema } from "
 import { PlayerInputs } from "../../../shared/types";
 import { spawnCTRL } from "../controllers/spawnCTRL";
 import { entityCTRL } from "../controllers/entityCTRL";
+import { gameDataCTRL } from "../controllers/gameDataCTRL";
 
 import { GameRoom } from "../GameRoom";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
@@ -39,6 +40,7 @@ export class GameRoomState extends Schema {
     public spawnCTRL: spawnCTRL;
     public navMesh: NavMesh = null;
     public entityCTRL: entityCTRL;
+    public gameDataCTRL: gameDataCTRL;
     public roomDetails;
 
     private spawnTimer = 0;
@@ -48,8 +50,20 @@ export class GameRoomState extends Schema {
         super(...args);
         this._gameroom = gameroom;
         this.navMesh = _navMesh;
+
+        // load game data
+        // in the future, it'll be in the database
+        this.gameDataCTRL = new gameDataCTRL({
+            items: dataDB.load("items"),
+            abilities: dataDB.load("abilities"),
+            locations: dataDB.load("locations"),
+            races: dataDB.load("races"),
+        });
+
+        //
         this.roomDetails = dataDB.get("location", this._gameroom.metadata.location);
 
+        // load controllers
         this.entityCTRL = new entityCTRL(this);
         this.spawnCTRL = new spawnCTRL(this);
     }
