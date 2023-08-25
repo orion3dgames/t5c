@@ -46,6 +46,7 @@ type Item = {
         material?: string;
         rotation?: number;
         offset_x?: number;
+        offset_y?: number;
         offset_z?: number;
     };
 
@@ -106,6 +107,36 @@ let ItemsDB: itemDataMap = {
             width: 1.5,
             height: 0.2,
             depth: 0.2,
+        },
+    },
+
+    helm_01: {
+        key: "helm_01",
+        title: "Helm",
+        description: "Description.",
+        icon: "ICON_ITEM_helm_01",
+        class: ItemClass.ARMOR,
+        value: 2000,
+        destroyable: false,
+        sellable: true,
+        tradable: true,
+        stackable: false,
+        rarity: ItemRarity.NORMAL,
+        equippable: {
+            slot: PlayerSlots.HEAD,
+            mesh: "helm_01",
+            material: "helm_material_01",
+            offset_x: 0,
+            offset_y: 0.575,
+            offset_z: 0.055,
+        },
+        requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
+        benefits: [{ key: PlayerKeys.STRENGTH, type: ItemEffect.ADD, amount: 10 }],
+        meshData: {
+            scale: 1,
+            width: 1,
+            height: 1,
+            depth: 1,
         },
     },
 

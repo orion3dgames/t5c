@@ -225,6 +225,9 @@ export class EntityMesh {
                     if (equipOptions.offset_x) {
                         weaponMesh.position.x += equipOptions.offset_x;
                     }
+                    if (equipOptions.offset_y) {
+                        weaponMesh.position.y += equipOptions.offset_y;
+                    }
                     if (equipOptions.offset_z) {
                         weaponMesh.position.z += equipOptions.offset_z;
                     }

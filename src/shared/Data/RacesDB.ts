@@ -51,6 +51,7 @@ let RacesDB: raceDataMap = {
         bones: {
             WEAPON: 12,
             OFF_HAND: 7,
+            HEAD: 14,
         },
         baseHealth: 50,
         baseMana: 50,
@@ -89,6 +90,7 @@ let RacesDB: raceDataMap = {
         bones: {
             WEAPON: 12,
             OFF_HAND: 7,
+            HEAD: 14,
         },
         baseHealth: 50,
         baseMana: 50,
@@ -125,6 +127,7 @@ let RacesDB: raceDataMap = {
         bones: {
             WEAPON: 12,
             OFF_HAND: 7,
+            HEAD: 14,
         },
         baseHealth: 50,
         baseMana: 50,
