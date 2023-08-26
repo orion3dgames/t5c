@@ -80,6 +80,9 @@ export class PlayerSchema extends Entity {
     public abilitiesCTRL: abilitiesCTRL;
     public moveCTRL: moveCTRL;
 
+    // TIMER
+    public spawnTimer: number = 0;
+
     ////////////////////////////
     public AI_TARGET = null;
     public AI_TARGET_POSITION = null;
