@@ -236,19 +236,26 @@ export class PlayerSchema extends Entity {
         return available;
     }
 
-    dropItem(inventoryItem) {
+    dropItem(inventoryItem, dropAll = false) {
+        let newQuantity = dropAll ? inventoryItem.qty : inventoryItem.qty - 1;
         let data = {
             key: inventoryItem.key,
             sessionId: nanoid(10),
             x: this.x,
             y: this.y,
             z: this.z,
-            quantity: inventoryItem.qty,
+            quantity: newQuantity,
         };
         let entity = new LootSchema(this, data);
         this._state.entityCTRL.add(entity);
 
-        this.player_data.inventory.delete("" + inventoryItem.i);
+        if (dropAll) {
+            this.player_data.inventory.delete("" + inventoryItem.i);
+        } else {
+            inventoryItem.qty -= 1;
+        }
+
+        console.log("dropItem", dropAll, newQuantity, inventoryItem.qty);
     }
 
     pickupItem(loot: LootSchema) {

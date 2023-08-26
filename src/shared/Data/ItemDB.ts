@@ -133,7 +133,7 @@ let ItemsDB: itemDataMap = {
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
         benefits: [{ key: PlayerKeys.STRENGTH, type: ItemEffect.ADD, amount: 10 }],
         meshData: {
-            scale: 1,
+            scale: 0.8,
             width: 1,
             height: 1,
             depth: 1,

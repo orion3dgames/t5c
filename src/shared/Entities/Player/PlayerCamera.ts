@@ -72,7 +72,7 @@ export class PlayerCamera {
             const rotationX =
                 Math.abs(this._camRoot.rotation.x + this._input.movementY) < 0.5 ? this._camRoot.rotation.x + this._input.movementY : this._camRoot.rotation.x;
             const rotationY = this._camRoot.rotation.y + this._input.movementX;
-            this._camRoot.rotation = new Vector3(rotationX, rotationY, 0);
+            this._camRoot.rotation = new Vector3(0, rotationY, 0);
         }
     }
 

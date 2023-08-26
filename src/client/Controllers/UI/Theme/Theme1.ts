@@ -12,6 +12,7 @@ const createButton = function (name, text, width, height, icon?: string, size: s
 
     if (icon) {
         let image = new Image("img" + name, "images/icons/" + icon + ".png");
+        image.stretch = Image.STRETCH_UNIFORM;
         result.addControl(image);
     }
 

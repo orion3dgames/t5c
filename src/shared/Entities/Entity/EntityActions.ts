@@ -85,7 +85,8 @@ export class EntityActions {
         particleSystem.maxSize = 0.6;
         // Life time of each particle (random between...
         particleSystem.minLifeTime = 0.2;
-        particleSystem.maxLifeTime = 2;
+        particleSystem.maxLifeTime = 1.5;
+        particleSystem.targetStopDuration = 1.5;
         // Emission rate
         particleSystem.emitRate = 1000;
         particleSystem.createSphereEmitter(1);
@@ -99,7 +100,7 @@ export class EntityActions {
 
         setTimeout(() => {
             particleSystem.dispose(true);
-        }, 250);
+        }, 1000);
 
         //
     }

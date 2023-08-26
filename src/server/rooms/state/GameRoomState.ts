@@ -72,6 +72,11 @@ export class GameRoomState extends Schema {
         // updating entities
         this.entityCTRL.all.forEach((entity) => {
             entity.update(deltaTime);
+
+            // remove loot that's been on the ground over 5 minutes
+            if (entity.type === "item" && entity.spawnTimer > 1000 * 60 * 5) {
+                this.deleteEntity(entity.sessionId);
+            }
         });
 
         // keep updating spawn points every 5 seconds
@@ -219,9 +224,12 @@ export class GameRoomState extends Schema {
         }
 
         if (type === "drop_item") {
-            const item = playerState.getInventoryItemByIndex(data);
+            let slot = data.slot;
+            let dropAll = data.drop_all ?? false;
+            const item = playerState.getInventoryItemByIndex(slot);
+
             if (item) {
-                playerState.dropItem(item);
+                playerState.dropItem(item, dropAll);
             }
         }
 

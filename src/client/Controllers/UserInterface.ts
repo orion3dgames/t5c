@@ -225,6 +225,7 @@ export class UserInterface {
     }
 
     public refreshEntityUI() {
+        /*
         // hide entity labels if out of distance
         for (let sessionId in this._entities) {
             let entity = this._entities[sessionId];
@@ -233,7 +234,7 @@ export class UserInterface {
             } else {
                 //entity.characterLabel.isVisible = false;
             }
-        }
+        }*/
     }
 
     public createEntityChatLabel(entity) {
