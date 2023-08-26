@@ -166,31 +166,39 @@ export class PlayerSchema extends Entity {
         }
 
         // check
-        let teleports = this._state.roomDetails.dynamic.teleports ?? [];
-        if (teleports.length > 0) {
+        let interactive = this._state.roomDetails.dynamic.interactive ?? [];
+        if (interactive.length > 0) {
             let currentPos = this.getPosition();
-            teleports.forEach((destination) => {
-                let distanceTo = currentPos.distanceTo(destination.from);
-                if (distanceTo < 2 && !this.isTeleporting) {
-                    this.isTeleporting = true;
+            interactive.forEach((element) => {
+                let distanceTo = currentPos.distanceTo(element.from);
+                if (distanceTo < 2) {
+                    if (element.type === "teleport") {
+                        this.x = element.to_vector.x;
+                        this.y = element.to_vector.y;
+                        this.z = element.to_vector.z;
+                    }
 
-                    let client = this._state._gameroom.clients.getById(this.sessionId);
+                    if (element.type == "zone_change" && this.isTeleporting === false) {
+                        this.isTeleporting = true;
 
-                    // update player location in database
-                    let updateObj = {
-                        location: destination.to_map,
-                        x: destination.to_vector.x,
-                        y: destination.to_vector.y,
-                        z: destination.to_vector.z,
-                        rot: 0,
-                    };
-                    this._state._gameroom.database.updateCharacter(this.id, updateObj);
+                        let client = this._state._gameroom.clients.getById(this.sessionId);
 
-                    // update player state on server
-                    this.location = updateObj.location;
+                        // update player location in database
+                        let updateObj = {
+                            location: element.to_map,
+                            x: element.to_vector.x,
+                            y: element.to_vector.y,
+                            z: element.to_vector.z,
+                            rot: 0,
+                        };
+                        this._state._gameroom.database.updateCharacter(this.id, updateObj);
 
-                    // inform client he cand now teleport to new zone
-                    client.send("playerTeleportConfirm", destination.to_map);
+                        // update player state on server
+                        this.location = updateObj.location;
+
+                        // inform client he cand now teleport to new zone
+                        client.send("playerTeleportConfirm", element.to_map);
+                    }
                 }
             });
         }
