@@ -92,10 +92,12 @@ export class GameScene {
         }
 
         // fox
-        scene.fogMode = Scene.FOGMODE_LINEAR;
-        scene.fogStart = 60.0;
-        scene.fogEnd = 120.0;
-        scene.fogColor = new Color3(0.9, 0.9, 0.85);
+        if (location.fog === true) {
+            scene.fogMode = Scene.FOGMODE_LINEAR;
+            scene.fogStart = 60.0;
+            scene.fogEnd = 120.0;
+            scene.fogColor = new Color3(0.9, 0.9, 0.85);
+        }
 
         // shadow light
         var light = new DirectionalLight("DirectionalLight", new Vector3(-1, -2, -1), scene);

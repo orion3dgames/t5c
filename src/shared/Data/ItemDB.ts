@@ -48,6 +48,7 @@ type Item = {
         offset_x?: number;
         offset_y?: number;
         offset_z?: number;
+        scale?: number;
     };
 
     meshData?: {
@@ -129,6 +130,7 @@ let ItemsDB: itemDataMap = {
             offset_x: 0,
             offset_y: 0.575,
             offset_z: 0.055,
+            scale: 1,
         },
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
         benefits: [{ key: PlayerKeys.STRENGTH, type: ItemEffect.ADD, amount: 10 }],

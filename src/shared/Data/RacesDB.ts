@@ -36,7 +36,7 @@ let RacesDB: raceDataMap = {
         title: "Knight",
         description: "The knight is as knight should be, strong and righteous. It has a large health pool and uses stamina to cast its abilities.",
         icon: "ICON_RACE_male_knight",
-        speed: 0.6,
+        speed: 0.7,
         scale: 1,
         rotationFix: Math.PI,
         animationSpeed: 1.3,

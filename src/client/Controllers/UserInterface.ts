@@ -284,6 +284,8 @@ export class UserInterface {
 
     // obsolete, keeping just in case
     public createItemLabel(entity) {
+        console.log(entity);
+        let title = entity.quantity > 1 ? entity.title +" X "+entity.quantity :  entity.title;
         var rect1 = new Rectangle("item_nameplate_" + entity.sessionId);
         rect1.isVisible = false;
         rect1.width = "200px";
@@ -293,7 +295,7 @@ export class UserInterface {
         rect1.linkWithMesh(entity.mesh);
         rect1.linkOffsetY = -30;
         var label = new TextBlock("item_nameplate_text_" + entity.sessionId);
-        label.text = entity.title;
+        label.text = title;
         label.color = "black";
         label.fontWeight = "bold";
         label.fontSize = "14px";

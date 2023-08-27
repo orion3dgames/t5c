@@ -481,13 +481,13 @@ export class Environment {
 
         //Loop through all environment meshes that were imported
         this.allMeshes.forEach((m: Mesh) => {
+
             // default values
             m.checkCollisions = false;
             m.isPickable = false;
             m.receiveShadows = true;
-            m.freezeWorldMatrix();
-            m.doNotSyncBoundingInfo = true;
-
+            
+            /*
             if (m.getClassName() !== "InstancedMesh") {
             }
 
@@ -496,7 +496,7 @@ export class Environment {
             }
 
             if (m.name.includes("castShadows")) {
-                //this._shadow.addShadowCaster(m);
+                this._shadow.addShadowCaster(m);
             }
 
             if (m.name.includes("seafloor")) {
@@ -504,34 +504,7 @@ export class Environment {
                 // Add skybox and ground to the reflection and refraction
                 //water.addToRenderList(m);
             }
-
-            // trigger meshes
-            // trigger event (must have a unique key)
-            if (m.name.includes("trigger")) {
-                /*
-                m.isVisible = false;
-                m.isPickable = false;
-                m.receiveShadows = false;
-                m.unfreezeWorldMatrix();
-                m.doNotSyncBoundingInfo = false;
-
-                Tags.EnableFor(m);
-
-                if (m.name === "teleport_lh_dungeon_01 trigger") {
-                    m.checkCollisions = true;
-                    m.metadata.action = "teleport";
-                    m.metadata.location = "lh_dungeon_01";
-                    m.addTags("teleport");
-                }
-
-                if (m.name === "teleport_lh_town trigger") {
-                    m.checkCollisions = true;
-                    m.metadata.action = "teleport";
-                    m.metadata.location = "lh_town";
-                    m.addTags("teleport");
-                }
-                */
-            }
+            */
         });
     }
 }
