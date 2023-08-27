@@ -84,6 +84,11 @@ export class GameRoom extends Room<GameRoomState> {
                             this.database.saveAbilities(playerClient.auth.id, player.player_data.abilities);
                         }
 
+                        // update player equipment
+                        if (player.equipment && player.equipment.size > 0) {
+                            this.database.saveEquipment(playerClient.auth.id, player.equipment);
+                        }
+
                         Logger.info("[gameroom][onCreate] player " + entity.name + " saved to database.");
                     }
                 });

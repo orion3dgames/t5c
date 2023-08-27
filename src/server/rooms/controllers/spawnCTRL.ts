@@ -12,18 +12,13 @@ export class spawnCTRL {
     private _room: GameRoom;
     private _location;
 
-    private spawnsAmount: {} = {
-        area: 0,
-        global: 0,
-        path: 0,
-    };
+    private spawnsAmount = [];
 
     constructor(state: GameRoomState) {
         this._state = state;
         this._room = state._gameroom;
         this._location = dataDB.get("location", this._room.metadata.location);
         this.process();
-        this.processStatic();
 
         for (let i = 0; i < 25; i++) {
             this.createItem();
@@ -38,42 +33,21 @@ export class spawnCTRL {
         //Logger.info("[gameroom][state][spawning] spawnController: " + this._location.key);
         let dynamic = this._location.dynamic;
         let spawns = dynamic.spawns ?? [];
-        spawns.forEach((spawnInfo) => {
-            if (spawnInfo.type === "global") {
-                this.spawn(spawnInfo);
+        spawns.forEach((spawnInfo, index) => {
+            spawnInfo.spawnIndex = "_" + index;
+            if (!this.spawnsAmount[spawnInfo.spawnIndex]) {
+                this.spawnsAmount[spawnInfo.spawnIndex] = 0;
             }
-            if (spawnInfo.type === "area") {
-                this.spawn(spawnInfo);
-            }
-            if (spawnInfo.type === "path") {
-                this.spawn(spawnInfo);
-            }
-        });
-    }
-
-    public processStatic() {
-        let dynamic = this._location.dynamic;
-        let spawns = dynamic.spawns ?? [];
-        spawns.forEach((spawnInfo) => {
-            if (spawnInfo.type === "static") {
-                this.spawnStatic(spawnInfo);
-            }
+            this.spawn(spawnInfo);
         });
     }
 
     private spawn(e) {
         for (let i = 0; i < e.amount; i++) {
-            if (this.spawnsAmount[e.type] < e.amount) {
+            if (this.spawnsAmount[e.spawnIndex] < e.amount) {
                 this.createEntity(e);
             }
         }
-    }
-
-    private spawnStatic(e) {
-        e.x = e.points[0].x;
-        e.y = e.points[0].y;
-        e.z = e.points[0].z;
-        this.createEntity(e);
     }
 
     public createItem(sender?) {
@@ -81,9 +55,10 @@ export class spawnCTRL {
         let sessionId = nanoid(10);
 
         // monster pool to chose from
-        let randTypes = ["sword_01", "amulet_01", "potion_heal", "shield_01", "shield_01_gold"];
-        let randResult = randTypes[Math.floor(Math.random() * randTypes.length)];
-        let randData = dataDB.get("item", randResult);
+        let Items = dataDB.load("items");
+        let keys = Object.keys(Items);
+        let rand = keys[Math.floor(Math.random() * keys.length)];
+        let randData = Items[rand];
 
         //
         let randomRegion = this._room.navMesh.getRandomRegion();
@@ -116,6 +91,8 @@ export class spawnCTRL {
         let raceData = dataDB.get("race", spawnInfo.race);
         let position = spawnInfo.points[Math.floor(Math.random() * spawnInfo.points.length)];
 
+        let health = spawnInfo.baseHealth ?? raceData.baseHealth;
+
         // create entity
         let data = {
             sessionId: sessionId,
@@ -127,9 +104,9 @@ export class spawnCTRL {
             y: position.y ?? 0,
             z: position.z ?? 0,
             rot: randomNumberInRange(0, Math.PI),
-            health: raceData.baseHealth,
+            health: health,
             mana: raceData.baseMana,
-            maxHealth: raceData.baseHealth,
+            maxHealth: health,
             maxMana: raceData.baseMana,
             level: 1,
             state: EntityState.IDLE,
@@ -138,7 +115,7 @@ export class spawnCTRL {
         };
 
         //
-        this.spawnsAmount[spawnInfo.type]++;
+        this.spawnsAmount[spawnInfo.spawnIndex]++;
 
         // add to manager
         this._state.entityCTRL.add(new BrainSchema(this._state, data));
@@ -148,7 +125,9 @@ export class spawnCTRL {
     }
 
     removeEntity(entity) {
-        this.spawnsAmount[entity.AI_SPAWN_INFO.type]--;
+        console.log(this.spawnsAmount, entity.AI_SPAWN_INFO.spawnIndex);
+
+        this.spawnsAmount[entity.AI_SPAWN_INFO.spawnIndex]--;
 
         this._state.entities.delete(entity.sessionId);
     }

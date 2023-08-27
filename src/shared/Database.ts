@@ -8,6 +8,7 @@ import { dataDB } from "./Data/dataDB";
 import { Item } from "./Entities/Item";
 import { InventorySchema } from "../server/rooms/schema/player/InventorySchema";
 import { AbilitySchema } from "../server/rooms/schema/player/AbilitySchema";
+import { EquipmentSchema } from "src/server/rooms/schema";
 
 class Database {
     private db;
@@ -64,6 +65,13 @@ class Database {
             "key" TEXT
         )`;
 
+        const playerEquipmentSql = `CREATE TABLE IF NOT EXISTS "character_equipment" (
+            "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+            "owner_id" INTEGER,
+            "slot" INTEGER,
+            "key" TEXT
+        )`;
+
         /*
         const abilitiesSql = `CREATE TABLE IF NOT EXISTS "abilities" (
             "id" INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -98,6 +106,7 @@ class Database {
             this.run(playersSql);
             this.run(playerInventorySql);
             this.run(playerAbilitySql);
+            this.run(playerEquipmentSql);
 
             /*
             // insert some items
@@ -264,18 +273,20 @@ class Database {
         let character = await this.get(`SELECT * FROM characters WHERE id=?;`, [id]);
         character.abilities = await this.all(`SELECT CA.* FROM character_abilities CA WHERE CA.owner_id=? ORDER BY CA.digit ASC;`, [id]);
         character.inventory = await this.all(`SELECT CI.* FROM character_inventory CI WHERE CI.owner_id=?;`, [id]);
+        character.equipment = await this.all(`SELECT CI.* FROM character_equipment CI WHERE CI.owner_id=?;`, [id]);
         return character;
     }
 
-    async createCharacter(token, name, race) {
+    async createCharacter(token, name, race, race_color) {
         // create a character
         let raceData = dataDB.get("race", race);
         let user = await this.getUserByToken(token);
         let defaultLocation = dataDB.get("location", Config.initialLocation);
-        const sql = `INSERT INTO characters ("user_id", "name", "race", "location","x","y","z","rot","level","experience","health", "mana") VALUES (
+        const sql = `INSERT INTO characters ("user_id", "name", "race", "race_color", "location","x","y","z","rot","level","experience","health", "mana") VALUES (
             "${user.id}",
             "${name}",
             "${race}",
+            "${race_color}",
             "${defaultLocation.key}",
             "${defaultLocation.spawnPoint.x}",
             "${defaultLocation.spawnPoint.y}",
@@ -292,8 +303,8 @@ class Database {
         let abilities = [
             { digit: 1, key: "base_attack" },
             { digit: 2, key: "fireball" },
-            //{ digit: 3, key: "poisonball" },
-            //{ digit: 4, key: "heal" },
+            { digit: 3, key: "poisonball" },
+            { digit: 4, key: "heal" },
         ];
         abilities.forEach((ability) => {
             const sql_abilities = `INSERT INTO character_abilities ("owner_id", "digit", "key") VALUES ("${c.id}", "${ability.digit}", "${ability.key}")`;
@@ -301,7 +312,7 @@ class Database {
         });
 
         // add default items
-        let items = [{ qty: 1, key: "apple" }];
+        let items = [{ qty: 1, key: "potion_small_red" }];
         items.forEach((item) => {
             const sql = `INSERT INTO character_inventory ("owner_id", "qty", "key") VALUES ("${c.id}", "${item.qty}", "${item.key}")`;
             this.run(sql);
@@ -341,7 +352,7 @@ class Database {
         }
         sql = sql.slice(0, -1);
         sql += " WHERE id= " + character_id;
-        console.log(sql);
+        //console.log(sql);
         return this.run(sql, []);
     }
 
@@ -369,6 +380,19 @@ class Database {
         });
         sqlItems = sqlItems.slice(0, -1);
         return await this.run(sqlItems);
+    }
+
+    // removes and saves character abilities
+    // terrible way to do it
+    async saveEquipment(character_id: number, equipments: []) {
+        const sql = `DELETE FROM character_equipment WHERE owner_id=?;`;
+        await this.run(sql, [character_id]);
+        let sqlString = `INSERT INTO character_equipment (owner_id, key, slot) VALUES `;
+        equipments.forEach((element: EquipmentSchema) => {
+            sqlString += ` ('${character_id}', '${element.key}', '${element.slot}'),`;
+        });
+        sqlString = sqlString.slice(0, -1);
+        return await this.run(sqlString);
     }
 
     async toggleOnlineStatus(character_id: number, online: number) {

@@ -187,8 +187,8 @@ export class abilitiesCTRL {
         }
 
         // only cast ability if enought mana is available
-        let manaNeeded = ability.casterPropertyAffected["mana"] ? ability.casterPropertyAffected["mana"] : 0;
-        if (manaNeeded > 0 && this._owner.mana < manaNeeded) {
+        let prop = ability.casterPropertyAffected.find((prop) => prop.key === "mana");
+        if (prop && prop.min > 0 && this._owner.mana < prop.min) {
             Logger.warning(`[canEntityCastAbility] not enough mana available`, this._owner.mana);
             return false;
         }

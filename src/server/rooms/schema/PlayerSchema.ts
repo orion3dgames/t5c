@@ -80,6 +80,9 @@ export class PlayerSchema extends Entity {
     public abilitiesCTRL: abilitiesCTRL;
     public moveCTRL: moveCTRL;
 
+    // TIMER
+    public spawnTimer: number = 0;
+
     ////////////////////////////
     public AI_TARGET = null;
     public AI_TARGET_POSITION = null;
@@ -101,17 +104,25 @@ export class PlayerSchema extends Entity {
         Object.assign(this, data);
         Object.assign(this, dataDB.get("race", this.race));
 
-        // data
-        console.log(data);
+        // add learned abilities
         data.initial_abilities.forEach((element) => {
             this.player_data.abilities.set(element.key, new AbilitySchema(element));
         });
+
+        // add equipment
+        data.initial_equipment.forEach((element) => {
+            this.equipment.set(element.key, new EquipmentSchema(element));
+        });
+
+        // add inventory items
         let i = 0;
         data.initial_inventory.forEach((element) => {
             element.i = "" + i;
             this.player_data.inventory.set("" + i, new InventorySchema(element));
             i++;
         });
+
+        // add default player data
         Object.entries(data.initial_player_data).forEach(([k, v]) => {
             this.player_data[k] = v;
         });
@@ -155,32 +166,39 @@ export class PlayerSchema extends Entity {
         }
 
         // check
-        let teleports = this._state.roomDetails.dynamic.teleports ?? [];
-        if(teleports.length > 0){
+        let interactive = this._state.roomDetails.dynamic.interactive ?? [];
+        if (interactive.length > 0) {
             let currentPos = this.getPosition();
-            teleports.forEach(destination => {
-                let distanceTo = currentPos.distanceTo(destination.from);
-                if(distanceTo < 2 && !this.isTeleporting){
+            interactive.forEach((element) => {
+                let distanceTo = currentPos.distanceTo(element.from);
+                if (distanceTo < 2) {
+                    if (element.type === "teleport") {
+                        this.x = element.to_vector.x;
+                        this.y = element.to_vector.y;
+                        this.z = element.to_vector.z;
+                    }
 
-                    this.isTeleporting = true;
+                    if (element.type == "zone_change" && this.isTeleporting === false) {
+                        this.isTeleporting = true;
 
-                    let client = this._state._gameroom.clients.getById(this.sessionId);
-            
-                    // update player location in database 
-                    let updateObj = {
-                        location: destination.to_map,
-                        x: destination.to_vector.x,
-                        y: destination.to_vector.y,
-                        z: destination.to_vector.z,
-                        rot: 0,
-                    };
-                    this._state._gameroom.database.updateCharacter(this.id, updateObj);
+                        let client = this._state._gameroom.clients.getById(this.sessionId);
 
-                    // update player state on server
-                    this.location = updateObj.location;
+                        // update player location in database
+                        let updateObj = {
+                            location: element.to_map,
+                            x: element.to_vector.x,
+                            y: element.to_vector.y,
+                            z: element.to_vector.z,
+                            rot: 0,
+                        };
+                        this._state._gameroom.database.updateCharacter(this.id, updateObj);
 
-                    // inform client he cand now teleport to new zone
-                    client.send("playerTeleportConfirm", destination.to_map);
+                        // update player state on server
+                        this.location = updateObj.location;
+
+                        // inform client he cand now teleport to new zone
+                        client.send("playerTeleportConfirm", element.to_map);
+                    }
                 }
             });
         }
@@ -229,19 +247,26 @@ export class PlayerSchema extends Entity {
         return available;
     }
 
-    dropItem(inventoryItem) {
+    dropItem(inventoryItem, dropAll = false) {
+        let newQuantity = dropAll ? inventoryItem.qty : inventoryItem.qty - 1;
         let data = {
             key: inventoryItem.key,
             sessionId: nanoid(10),
             x: this.x,
             y: this.y,
             z: this.z,
-            quantity: inventoryItem.qty,
+            quantity: newQuantity,
         };
         let entity = new LootSchema(this, data);
         this._state.entityCTRL.add(entity);
 
-        this.player_data.inventory.delete("" + inventoryItem.i);
+        if (dropAll) {
+            this.player_data.inventory.delete("" + inventoryItem.i);
+        } else {
+            inventoryItem.qty -= 1;
+        }
+
+        console.log("dropItem", dropAll, newQuantity, inventoryItem.qty);
     }
 
     pickupItem(loot: LootSchema) {

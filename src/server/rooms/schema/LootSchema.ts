@@ -13,6 +13,7 @@ export class LootSchema extends Entity {
     @type("string") public key: string = "";
     @type("int16") public quantity: number = 0;
 
+    public spawnTimer: number = 0;
     public name: string = "";
     public description: string = "";
 
@@ -31,7 +32,9 @@ export class LootSchema extends Entity {
     }
 
     // entity update
-    public update() {}
+    public update(delta) {
+        this.spawnTimer += delta;
+    }
 
     getPosition() {
         return new Vector3(this.x, this.y, this.z);

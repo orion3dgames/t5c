@@ -143,7 +143,7 @@ export class Panel_Character extends Panel {
         panel.addControl(rightPanel);
         this.rightPanel = rightPanel;
 
-        // right panel
+        // bottom panel
         let slotPanel = new Rectangle("slotPanel");
         slotPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         slotPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
@@ -212,7 +212,7 @@ export class Panel_Character extends Panel {
             valueText.left = "-5px";
             valueText.fontSize = "14px;";
             valueText.resizeToFit = true;
-            valueText.text = line.value;
+            valueText.text = this._currentPlayer[key] ?? "ERROR";
             valueText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
             valueText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
             valueText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;

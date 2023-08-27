@@ -38,7 +38,7 @@ export class BrainSchema extends Entity {
     @type("number") public ai_state: AI_STATE = 0;
 
     @type([EquipmentSchema]) equipment = new ArraySchema<EquipmentSchema>();
-    
+
     // PARENTS
     public _navMesh;
     public _state;
@@ -60,6 +60,7 @@ export class BrainSchema extends Entity {
     public default_abilities;
 
     // TIMERS
+    public spawnTimer: number = 0;
     public IDLE_TIMER = 0;
     public IDLE_TIMER_LENGTH = 0;
     public CHASE_TIMER = 0;
@@ -181,7 +182,7 @@ export class BrainSchema extends Entity {
             // get next waypoint
             let destinationOnPath = this.AI_TARGET_WAYPOINTS[0];
             //destinationOnPath.y = 0;
-  
+
             // calculate next position towards destination
             let updatedPos = this.moveTo(currentPos, destinationOnPath, this.speed);
             this.setPosition(updatedPos);
@@ -208,7 +209,6 @@ export class BrainSchema extends Entity {
      * @returns {Vector3} new position
      */
     moveTo(source: Vector3, destination: Vector3, speed: number): Vector3 {
-
         let currentX = source.x;
         let currentZ = source.z;
 
@@ -243,11 +243,11 @@ export class BrainSchema extends Entity {
         }
 
         // adjust height of the entity according to the ground
-        let currentRegion = this._navMesh.getRegionForPoint( newPos, 5);
-        if(currentRegion){
-            let distance = currentRegion.plane.distanceToPoint( newPos);
+        let currentRegion = this._navMesh.getRegionForPoint(newPos, 5);
+        if (currentRegion) {
+            let distance = currentRegion.plane.distanceToPoint(newPos);
             newPos.y -= distance;
-        } ;
+        }
 
         return newPos;
     }

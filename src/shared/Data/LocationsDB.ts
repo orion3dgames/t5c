@@ -16,11 +16,17 @@ let LocationsDB = {
         waterPlane: true,
         skyColor: 255,
         dynamic: {
-            teleports: [
+            interactive: [
                 {
+                    type: "zone_change",
                     from: new Vector3(13.87, 0, -29.84),
                     to_map: "lh_dungeon_01",
                     to_vector: new Vector3(11, 0, -3),
+                },
+                {
+                    type: "teleport",
+                    from: new Vector3(-21, 0, -36.92),
+                    to_vector: new Vector3(27.76, 5.76, -24.45),
                 },
             ],
             spawns: [
@@ -79,12 +85,24 @@ let LocationsDB = {
                     type: "static",
                     behaviour: "idle",
                     aggressive: false,
-                    canAttack: false,
+                    canAttack: true,
                     points: [new Vector3(9.67, 0, -28.58)],
                     radius: 0,
                     amount: 1,
                     race: "male_mage",
                     name: "Priestess",
+                },
+                {
+                    type: "static",
+                    behaviour: "idle",
+                    aggressive: false,
+                    canAttack: true,
+                    points: [new Vector3(13.1, 0, -13.7)],
+                    radius: 0,
+                    amount: 1,
+                    race: "male_mage",
+                    name: "Dummy",
+                    baseHealth: 50000,
                 },
             ],
         },
@@ -104,12 +122,13 @@ let LocationsDB = {
         waterPlane: false,
         skyColor: 0,
         dynamic: {
-            teleports: [
+            interactive: [
                 {
-                    from: new Vector3(11.7, 2, -8.29),
-                    to_map: "lh_town",
-                    to_vector: new Vector3(13.87, 0, -26.84),
-                }
+                    type: "zone_change",
+                    from: new Vector3(13.87, 0, -29.84),
+                    to_map: "lh_dungeon_01",
+                    to_vector: new Vector3(11, 0, -3),
+                },
             ],
             spawns: [
                 {

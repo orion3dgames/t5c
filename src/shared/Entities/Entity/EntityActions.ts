@@ -51,6 +51,10 @@ export class EntityActions {
             start = data.targetPos;
         }
 
+        // correct height
+        start.y += 1;
+        end.y += 1;
+
         if (ability.effect.type === "self") {
             start = data.fromPos;
             end = data.fromPos;
@@ -77,17 +81,18 @@ export class EntityActions {
         particleSystem.color2 = Color4.FromColor3(this.colors[color][1]);
         particleSystem.colorDead = new Color4(0, 0, 0, 0.0);
         // Size of each particle (random between...
-        particleSystem.minSize = 0.5;
-        particleSystem.maxSize = 0.9;
+        particleSystem.minSize = 0.3;
+        particleSystem.maxSize = 0.6;
         // Life time of each particle (random between...
         particleSystem.minLifeTime = 0.2;
-        particleSystem.maxLifeTime = 0.6;
+        particleSystem.maxLifeTime = 1.5;
+        particleSystem.targetStopDuration = 1.5;
         // Emission rate
-        particleSystem.emitRate = 100;
+        particleSystem.emitRate = 1000;
         particleSystem.createSphereEmitter(1);
         // Speed
-        particleSystem.minEmitPower = 2;
-        particleSystem.maxEmitPower = 5;
+        particleSystem.minEmitPower = 0.5;
+        particleSystem.maxEmitPower = 1.5;
         particleSystem.updateSpeed = 0.1;
         // Start the particle system
         particleSystem.start();
@@ -95,7 +100,7 @@ export class EntityActions {
 
         setTimeout(() => {
             particleSystem.dispose(true);
-        }, 500);
+        }, 1000);
 
         //
     }
@@ -115,8 +120,32 @@ export class EntityActions {
         projectile.rotation.y = Math.PI / 2 - angle;
 
         //////////////////////////////////////////////
-        // create a particle system
-        var particleSystem = new ParticleSystem("particles", 2000, this._scene);
+        // create particule trail
+        var particleSystemTrail = new ParticleSystem("particles", 200, this._scene);
+        particleSystemTrail.particleTexture = this.particleTxt_01.clone();
+        particleSystemTrail.emitter = projectile; // the starting location
+        // Colors of all particles
+        particleSystemTrail.color1 = Color4.FromColor3(this.colors[color][0]);
+        particleSystemTrail.color2 = Color4.FromColor3(this.colors[color][1]);
+        particleSystemTrail.colorDead = new Color4(0, 0, 0, 0.0);
+        // Size of each particle (random between...
+        particleSystemTrail.minSize = 0.4;
+        particleSystemTrail.maxSize = 0.6;
+        // Life time of each particle (random between...
+        particleSystemTrail.minLifeTime = 0.05;
+        particleSystemTrail.maxLifeTime = 0.1;
+        // Emission rate
+        particleSystemTrail.emitRate = 1000;
+        particleSystemTrail.createPointEmitter(new Vector3(-1, 0, -0), new Vector3(0, 0, 0));
+        // Speed
+        particleSystemTrail.minEmitPower = 1;
+        particleSystemTrail.maxEmitPower = 2;
+        //particleSystem.updateSpeed = 0.01;
+        // Start the particle system
+        particleSystemTrail.start();
+
+        // create particule spray
+        var particleSystem = new ParticleSystem("particles", 200, this._scene);
         particleSystem.particleTexture = this.particleTxt_01.clone();
         particleSystem.emitter = projectile; // the starting location
         // Colors of all particles
@@ -124,20 +153,18 @@ export class EntityActions {
         particleSystem.color2 = Color4.FromColor3(this.colors[color][1]);
         particleSystem.colorDead = new Color4(0, 0, 0, 0.0);
         // Size of each particle (random between...
-        particleSystem.minSize = 0.2;
-        particleSystem.maxSize = 0.4;
+        particleSystem.minSize = 0.1;
+        particleSystem.maxSize = 0.3;
         // Life time of each particle (random between...
-        particleSystem.minLifeTime = 0.05;
+        particleSystem.minLifeTime = 0.1;
         particleSystem.maxLifeTime = 0.3;
         // Emission rate
-        particleSystem.emitRate = 1000;
+        particleSystem.emitRate = 50;
         particleSystem.createSphereEmitter(1);
-        // Speed
-        particleSystem.minEmitPower = 1;
-        particleSystem.maxEmitPower = 5;
-        particleSystem.updateSpeed = 0.01;
+
         // Start the particle system
         particleSystem.start();
+
         //////////////////////////////////////////////
 
         var endVector = projectile.calcMovePOV(0, 0, 72).addInPlace(projectile.position);
@@ -147,12 +174,13 @@ export class EntityActions {
         var loop = this._scene.onBeforeRenderObservable.add(() => {
             if (i < 1) {
                 projectile.position = path.getPointAt(i);
-                i += 5e-3;
+                i += 0.0035;
             }
-            if (projectile.intersectsMesh(mesh) || i > 1) {
+            if (projectile.intersectsMesh(mesh, true) || i > 1) {
                 this.particule_heal(mesh, color);
                 projectile.dispose(true, true);
                 particleSystem.dispose(true);
+                particleSystemTrail.dispose(true);
                 this._scene.onBeforeRenderObservable.remove(loop);
             }
         });

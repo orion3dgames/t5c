@@ -59,7 +59,6 @@ class AuthController {
             });
             //set character
             this.setCharacter(character);
-            console.log("FORCE LOGIN", character)
         }
     }
 

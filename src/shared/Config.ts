@@ -18,7 +18,7 @@ let Config = {
 
     // game settings
     PLAYER_NAMEPLATE_TIMEOUT: 15000, // 15 seconds
-    PLAYER_VIEW_DISTANCE: 50,
+    PLAYER_VIEW_DISTANCE: 26,
     PLAYER_LOSE_FOCUS_DISTANCE: 22,
     PLAYER_GRACE_PERIOD: 0,
 
@@ -30,13 +30,14 @@ let Config = {
     // UI SETTINGS
     UI_CENTER_PANEL_WIDTH: 0.6,
     UI_CENTER_PANEL_BG: "rgba(0,0,0,.5)",
+    UI_SIDEBAR_WIDTH: "320px;",
 
     // basic locations
     initialLocation: "lh_town",
 
     // default scene
     //defaultScene: isLocal() ? State.GAME : State.LOGIN,
-    defaultScene: State.LOGIN,
+    defaultScene: State.GAME,
 };
 
 export default Config;

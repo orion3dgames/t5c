@@ -191,8 +191,9 @@ class GameServer {
             const token: string = (req.query.token as string) ?? "";
             const name: string = (req.query.name as string) ?? "";
             const race: string = (req.query.race as string) ?? "";
+            const race_color: string = (req.query.color as string) ?? "";
             if (token !== "") {
-                database.createCharacter(token, name, race).then((character) => {
+                database.createCharacter(token, name, race, race_color).then((character) => {
                     if (!character) {
                         return res.status(400).send({
                             message: "Create Failed",
@@ -229,10 +230,9 @@ class GameServer {
 
         app.get("/register", function (req, res) {});
 
-        
         app.get("/returnRandomUser", function (req, res) {
             database.saveUser(generateRandomPlayerName(), generateRandomPlayerName()).then((user) => {
-                database.createCharacter(user.token, generateRandomPlayerName(), "male_knight").then((character) => {
+                database.createCharacter(user.token, generateRandomPlayerName(), "male_knight", "knight_texture.png").then((character) => {
                     character.user_id = user.id;
                     character.token = user.token;
                     character.password = user.password;
@@ -254,8 +254,7 @@ class GameServer {
                     });
                 });
             });
-        });
-        */
+        });*/
 
         app.get("/getHelpPage", function (req, res) {
             let page = req.query.page;

@@ -72,11 +72,21 @@ export class InventoryDropdown {
             });
         }
         actions.push({
-            title: "Drop Item",
+            title: "Drop Item(s)",
             click: () => {
-                this._gameRoom.send("drop_item", inventory.i);
+                this._gameRoom.send("drop_item", { slot: inventory.i, drop_all: true });
             },
         });
+
+        if (inventory.qty > 1) {
+            actions.push({
+                title: "Drop One",
+                click: () => {
+                    this._gameRoom.send("drop_item", { slot: inventory.i });
+                },
+            });
+        }
+
         actions.push({
             title: "Cancel",
             click: () => {

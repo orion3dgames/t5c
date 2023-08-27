@@ -12,6 +12,7 @@ const createButton = function (name, text, width, height, icon?: string, size: s
 
     if (icon) {
         let image = new Image("img" + name, "images/icons/" + icon + ".png");
+        image.stretch = Image.STRETCH_UNIFORM;
         result.addControl(image);
     }
 
@@ -75,4 +76,8 @@ const getPadding = function (multiplier = 1) {
     return multiplier * 5;
 };
 
-export { applyFont, getBg, getPadding, generatePanel, applyTheme, createButton };
+const getSidebarWidth = function () {
+    return 320;
+};
+
+export { applyFont, getBg, getPadding, generatePanel, applyTheme, createButton, getSidebarWidth };

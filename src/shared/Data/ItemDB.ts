@@ -45,6 +45,9 @@ type Item = {
         mesh?: string;
         material?: string;
         rotation?: number;
+        offset_x?: number;
+        offset_y?: number;
+        offset_z?: number;
     };
 
     meshData?: {
@@ -94,14 +97,46 @@ let ItemsDB: itemDataMap = {
             slot: PlayerSlots.WEAPON,
             mesh: "sword_01",
             material: "sword_material_01",
+            offset_x: -0.7,
+            offset_z: 0,
         },
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
         benefits: [{ key: PlayerKeys.STRENGTH, type: ItemEffect.ADD, amount: 10 }],
         meshData: {
-            scale: 1.2,
-            width: 1,
+            scale: 1.3,
+            width: 1.5,
             height: 0.2,
             depth: 0.2,
+        },
+    },
+
+    helm_01: {
+        key: "helm_01",
+        title: "Helm",
+        description: "Description.",
+        icon: "ICON_ITEM_helm_01",
+        class: ItemClass.ARMOR,
+        value: 2000,
+        destroyable: false,
+        sellable: true,
+        tradable: true,
+        stackable: false,
+        rarity: ItemRarity.NORMAL,
+        equippable: {
+            slot: PlayerSlots.HEAD,
+            mesh: "helm_01",
+            material: "helm_material_01",
+            offset_x: 0,
+            offset_y: 0.575,
+            offset_z: 0.055,
+        },
+        requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
+        benefits: [{ key: PlayerKeys.STRENGTH, type: ItemEffect.ADD, amount: 10 }],
+        meshData: {
+            scale: 0.8,
+            width: 1,
+            height: 1,
+            depth: 1,
         },
     },
 
@@ -188,67 +223,47 @@ let ItemsDB: itemDataMap = {
         meshData: {
             scale: 0.25,
             width: 0.5,
-            height: 0.5,
+            height: 0.25,
             depth: 0.5,
         },
     },
 
-    apple: {
-        key: "apple",
-        title: "Apple",
-        description: "A delicious apple.",
-        icon: "ICON_ITEM_apple",
-        class: ItemClass.CONSUMABLE,
-        value: 54,
-        destroyable: false,
-        sellable: true,
-        tradable: true,
-        stackable: true,
-        benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 5 }],
-        meshData: {
-            scale: 0.25,
-            width: 0.4,
-            height: 0.5,
-            depth: 0.4,
-        },
-    },
-
-    pear: {
-        key: "pear",
-        title: "Pear",
-        description: "A delicious pear.",
-        icon: "ICON_ITEM_pear",
-        class: ItemClass.CONSUMABLE,
-        value: 200,
-        destroyable: false,
-        sellable: true,
-        tradable: true,
-        stackable: true,
-        benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 20 }],
-        meshData: {
-            scale: 0.2,
-            width: 0.4,
-            height: 0.5,
-            depth: 0.4,
-        },
-    },
-
-    potion_heal: {
-        key: "potion_heal",
-        title: "Heal Potion",
-        description: "A very useful potion that restores up to 50 health..",
-        icon: "ICON_ITEM_potion_heal",
+    potion_small_red: {
+        key: "potion_small_red",
+        title: "Small Health Potion",
+        description: "A very useful potion that restores up to 25 health..",
+        icon: "ICON_ITEM_potion_small_red",
         class: ItemClass.CONSUMABLE,
         value: 150,
         destroyable: false,
         sellable: true,
         tradable: true,
         stackable: true,
-        benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 50 }],
+        benefits: [{ key: PlayerKeys.HEALTH, type: ItemEffect.ADD, amount: 25 }],
         meshData: {
-            scale: 1,
+            scale: 1.5,
             width: 0.4,
-            height: 0.5,
+            height: 0.7,
+            depth: 0.4,
+        },
+    },
+
+    potion_small_blue: {
+        key: "potion_small_blue",
+        title: "Small Mana Potion",
+        description: "A very useful potion that restores up to 25 mana..",
+        icon: "ICON_ITEM_potion_small_blue",
+        class: ItemClass.CONSUMABLE,
+        value: 150,
+        destroyable: false,
+        sellable: true,
+        tradable: true,
+        stackable: true,
+        benefits: [{ key: PlayerKeys.MANA, type: ItemEffect.ADD, amount: 25 }],
+        meshData: {
+            scale: 1.5,
+            width: 0.4,
+            height: 0.7,
             depth: 0.4,
         },
     },
