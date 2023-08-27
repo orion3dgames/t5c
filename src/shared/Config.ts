@@ -33,7 +33,7 @@ let Config = {
     UI_SIDEBAR_WIDTH: "320px;",
 
     // basic locations
-    initialLocation: "lh_dungeon_01",
+    initialLocation: "lh_town",
 
     // default scene
     //defaultScene: isLocal() ? State.GAME : State.LOGIN,
