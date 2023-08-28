@@ -284,8 +284,7 @@ export class UserInterface {
 
     // obsolete, keeping just in case
     public createItemLabel(entity) {
-        console.log(entity);
-        let title = entity.quantity > 1 ? entity.title +" X "+entity.quantity :  entity.title;
+        let title = entity.quantity > 1 ? entity.title + " X " + entity.quantity : entity.title;
         var rect1 = new Rectangle("item_nameplate_" + entity.sessionId);
         rect1.isVisible = false;
         rect1.width = "200px";
