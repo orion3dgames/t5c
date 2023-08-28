@@ -40,14 +40,12 @@ export class EntityActions {
             let sound = new Sound("sound_"+ability.key, soundData, this._scene, function(){ sound.play(); }, {
                 volume: 0.3
             });
-        }*/
-
-        // get target mesh
+        }
+        */
         let mesh = this._scene.getMeshByName(data.targetId);
-        console.log();
-
         let bone = player.playerSkeleton.bones[12];
         data.fromPos = bone.getPosition(Space.WORLD, player.playerMesh);
+        data.fromPos.y -= 0.8;
 
         // set start and end pos
         let start = data.fromPos;
