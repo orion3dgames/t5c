@@ -43,6 +43,7 @@ export class Entity {
     // entity
     public mesh: AbstractMesh; //outer collisionbox of player
     public playerMesh: AbstractMesh; //outer collisionbox of player
+    public playerSkeleton;
     public debugMesh: Mesh;
     public selectedMesh: Mesh;
     public characterChatLabel: Rectangle;
@@ -117,6 +118,7 @@ export class Entity {
         this.playerMesh = this.meshController.playerMesh;
         this.debugMesh = this.meshController.debugMesh;
         this.selectedMesh = this.meshController.selectedMesh;
+        this.playerSkeleton = this.meshController.skeleton;
 
         // add mesh to shadow generator
         this._shadow.addShadowCaster(this.meshController.mesh, true);

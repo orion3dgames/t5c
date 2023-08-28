@@ -47,6 +47,8 @@ let RacesDB: raceDataMap = {
             ATTACK: 1,
             DEATH: 23,
             DAMAGE: 34,
+            CASTING: 63,
+            CAST: 62, //
         },
         bones: {
             WEAPON: 12,

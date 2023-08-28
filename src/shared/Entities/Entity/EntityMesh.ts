@@ -19,7 +19,7 @@ export class EntityMesh {
     private _loadedAssets;
     private _room;
     private _animationGroups: AnimationGroup[];
-    private _skeleton: Skeleton;
+    public skeleton: Skeleton;
     public mesh: Mesh;
     public playerMesh;
     public isCurrentPlayer: boolean;
@@ -102,7 +102,7 @@ export class EntityMesh {
         });
         const playerMesh = result.rootNodes[0];
         this._animationGroups = result.animationGroups;
-        this._skeleton = result.skeletons[0];
+        this.skeleton = result.skeletons[0];
 
         // set initial player scale & rotation
         //playerMesh.name = this._entity.sessionId + "_mesh";
@@ -206,7 +206,7 @@ export class EntityMesh {
                 // if mesh needs to be added
                 if (equipOptions.mesh) {
                     let boneId = this._entity.bones[key];
-                    let bone = this._skeleton.bones[boneId];
+                    let bone = this.skeleton.bones[boneId];
                     const weapon = this._loadedAssets["ITEM_" + e.key].instantiateModelsToScene((name) => "player_" + e.key);
                     const weaponMesh = weapon.rootNodes[0];
                     weaponMesh.parent = this.playerMesh;

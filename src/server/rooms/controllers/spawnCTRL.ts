@@ -90,7 +90,7 @@ export class spawnCTRL {
         // monster pool to chose from
         let raceData = dataDB.get("race", spawnInfo.race);
         let position = spawnInfo.points[Math.floor(Math.random() * spawnInfo.points.length)];
-        
+
         let health = spawnInfo.baseHealth ?? raceData.baseHealth;
 
         // create entity
@@ -109,7 +109,7 @@ export class spawnCTRL {
             maxHealth: health,
             maxMana: raceData.baseMana,
             level: 1,
-            state: EntityState.IDLE,
+            anim_state: EntityState.IDLE,
             toRegion: false,
             AI_SPAWN_INFO: spawnInfo,
         };

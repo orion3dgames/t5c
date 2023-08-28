@@ -1,3 +1,5 @@
+import { EntityState } from "../Entities/Entity/EntityState";
+
 type Ability = {
     // unique key
     key: string;
@@ -34,6 +36,9 @@ type Ability = {
 
     // min range target must be (if entity is further, prevent casting)
     minRange: number;
+
+    // animation to play
+    animation: EntityState;
 
     // the effect that will happen when the ability is played
     effect: {
@@ -85,6 +90,7 @@ let AbilitiesDB: abilityMap = {
         repeatInterval: 0,
         range: 0,
         minRange: 3,
+        animation: EntityState.ATTACK,
         effect: {
             type: "target",
             particule: "damage",
@@ -104,12 +110,13 @@ let AbilitiesDB: abilityMap = {
         sound: "fire_attack_2",
         description: "Hurls a massive fiery ball that explodes on contact with target.",
         castSelf: false,
-        castTime: 0,
+        castTime: 1000,
         cooldown: 1000,
         repeat: 0,
         repeatInterval: 0,
         range: 0,
         minRange: 0,
+        animation: EntityState.SPELL_CAST,
         effect: {
             type: "travel",
             particule: "fireball",
@@ -130,11 +137,12 @@ let AbilitiesDB: abilityMap = {
         description: "Trow a bottle of viscous poisonous liquid onto target that will damage target overtime.",
         castSelf: false,
         castTime: 0,
-        cooldown: 5000,
+        cooldown: 10000,
         repeat: 5,
         repeatInterval: 1000,
         range: 0,
         minRange: 0,
+        animation: EntityState.SPELL_CAST,
         effect: {
             type: "travel",
             particule: "fireball",
@@ -155,12 +163,13 @@ let AbilitiesDB: abilityMap = {
         sound: "heal_1",
         description: "A spell from ancient times that will leave target feeling fresh & revigorated.",
         castSelf: true,
-        castTime: 0,
+        castTime: 2000,
         cooldown: 2000,
         repeat: 0,
         repeatInterval: 0,
         range: 0,
         minRange: 0,
+        animation: EntityState.SPELL_CAST,
         effect: {
             type: "self",
             particule: "heal",

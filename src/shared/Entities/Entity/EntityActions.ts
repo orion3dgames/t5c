@@ -10,6 +10,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import State from "../../../client/Screens/Screens";
 import { Sound } from "@babylonjs/core/Audio/sound";
 import { dataDB } from "../../Data/dataDB";
+import { Space } from "@babylonjs/core/Maths/math.axis";
 
 export class EntityActions {
     private _scene: Scene;
@@ -30,7 +31,7 @@ export class EntityActions {
 
     public playSound() {}
 
-    public process(data, ability) {
+    public process(player, data, ability) {
         /*
         let soundToPlay = this._scene.getSoundByName("sound_"+ability.key);
         if(!soundToPlay){
@@ -43,6 +44,10 @@ export class EntityActions {
 
         // get target mesh
         let mesh = this._scene.getMeshByName(data.targetId);
+        console.log();
+
+        let bone = player.playerSkeleton.bones[12];
+        data.fromPos = bone.getPosition(Space.WORLD, player.playerMesh);
 
         // set start and end pos
         let start = data.fromPos;

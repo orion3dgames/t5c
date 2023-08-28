@@ -12,6 +12,8 @@ export class EntityAnimator {
     private _attack: AnimationGroup;
     private _death: AnimationGroup;
     private _damage: AnimationGroup;
+    private _casting: AnimationGroup;
+    private _cast: AnimationGroup;
 
     // current anim status
     private _currentAnim: AnimationGroup = null;
@@ -31,6 +33,8 @@ export class EntityAnimator {
         let attackAnimationNumber = this._entity.animations["ATTACK"];
         let deathAnimationNumber = this._entity.animations["DEATH"];
         let takingDamageAnimationNumber = this._entity.animations["DAMAGE"];
+        let castingAnimationNumber = this._entity.animations["CASTING"] ?? 0;
+        let castingShootAnimationNumber = this._entity.animations["CAST"] ?? 0;
 
         // set animations
         this._idle = this._playerAnimations[idleAnimationNumber];
@@ -38,6 +42,8 @@ export class EntityAnimator {
         this._attack = this._playerAnimations[attackAnimationNumber];
         this._death = this._playerAnimations[deathAnimationNumber];
         this._damage = this._playerAnimations[takingDamageAnimationNumber];
+        this._casting = this._playerAnimations[castingAnimationNumber];
+        this._cast = this._playerAnimations[castingShootAnimationNumber];
 
         // stop all animations
         this._playerAnimations[0].stop();
@@ -48,9 +54,13 @@ export class EntityAnimator {
         this._attack.loopAnimation = true;
         this._death.loopAnimation = false;
         this._damage.loopAnimation = true;
+        this._casting.loopAnimation = true;
+        this._cast.loopAnimation = false;
 
         // set animation speed
         this._walk.speedRatio = this._entity.animationSpeed;
+        this._attack.speedRatio = 1.1;
+        this._cast.speedRatio = 2;
 
         //initialize current and previous
         this._currentAnim = this._idle;
@@ -66,6 +76,7 @@ export class EntityAnimator {
     // todo: to be improved so we can better control the states... have no idea how yet
     public animate(player, currentPos, nextPos): void {
         // if position has changed
+
         if (this.checkIfPlayerIsMoving(currentPos, nextPos)) {
             //if (player.state === EntityCurrentState.WALKING) {
             this._currentAnim = this._walk;
@@ -81,6 +92,15 @@ export class EntityAnimator {
             // if player is being attacked
         } else if (player.anim_state === EntityState.TAKING_DAMAGE) {
             this._currentAnim = this._damage;
+
+            // if player is being attacked
+        } else if (player.anim_state === EntityState.SPELL_CASTING) {
+            // if player is castin
+            this._currentAnim = this._casting;
+
+            // if player launched a spell
+        } else if (player.anim_state === EntityState.SPELL_CAST) {
+            this._currentAnim = this._cast;
 
             // all other cases, should be idle
         } else {

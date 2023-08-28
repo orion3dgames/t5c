@@ -1,3 +1,5 @@
+import { EntityState } from "../Entity/EntityState";
+
 export class Ability {
     // unique key
     public key: string;
@@ -34,6 +36,9 @@ export class Ability {
 
     // min range target must be (if entity is further, prevent casting)
     public minRange: number = 0;
+
+    // animation to play
+    animation: EntityState;
 
     // the effect that will happen when the ability is played
     public effect: {

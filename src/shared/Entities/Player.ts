@@ -272,7 +272,7 @@ export class Player extends Entity {
                 }
 
                 // action ability
-                this.actionsController.process(data, ability);
+                this.actionsController.process(this, data, ability);
             }
         });
     }

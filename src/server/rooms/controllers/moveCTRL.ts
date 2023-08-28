@@ -75,13 +75,15 @@ export class moveCTRL {
      */
     processPlayerInput(playerInput: PlayerInputs) {
         if (this._owner.blocked && !this._owner.isDead) {
-            this._owner.state = EntityState.IDLE;
+            //this._owner.state = EntityState.IDLE;
             Logger.warning("Player " + this._owner.name + " is blocked, no movement will be processed");
             return false;
         }
 
         // cancel any auto attack
         this._owner.abilitiesCTRL.cancelAutoAttack(this._owner);
+
+        this._owner.state = EntityState.WALKING;
 
         let speed = this._owner.speed;
 
@@ -116,7 +118,6 @@ export class moveCTRL {
             this._owner.rot = newRot;
             this._owner.sequence = playerInput.seq;
             this._owner.isMoving = true;
-            this._owner.state = EntityState.WALKING;
 
             /*
             Logger.info(
@@ -139,8 +140,6 @@ export class moveCTRL {
             this._owner.z = oldZ;
             this._owner.rot = oldRot;
             this._owner.sequence = playerInput.seq;
-            this._owner.state = EntityState.IDLE;
-
             /*
             Logger.warning(
                 "Invalid position for " +
