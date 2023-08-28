@@ -21,7 +21,7 @@ export class moveCTRL {
         if (this._owner.hasTarget()) {
             // if close enough
             let distance = this._owner.AI_TARGET_DISTANCE;
-            if (distance < 3) {
+            if (distance < 2.5) {
                 let ability = this._owner.AI_ABILITY;
                 let target = this._owner.AI_TARGET;
                 if (target instanceof BrainSchema) {
@@ -82,9 +82,7 @@ export class moveCTRL {
 
         // cancel any auto attack
         this._owner.abilitiesCTRL.cancelAutoAttack(this._owner);
-
-        this._owner.state = EntityState.WALKING;
-
+        this._owner.isMoving = true;
         let speed = this._owner.speed;
 
         // save current position
@@ -117,22 +115,6 @@ export class moveCTRL {
             this._owner.z = newZ;
             this._owner.rot = newRot;
             this._owner.sequence = playerInput.seq;
-            this._owner.isMoving = true;
-
-            /*
-            Logger.info(
-                "Valid position for " +
-                    this._owner.name +
-                    ": ( x: " +
-                    this._owner.x +
-                    ", y: " +
-                    this._owner.y +
-                    ", z: " +
-                    this._owner.z +
-                    ", rot: " +
-                    this._owner.rot
-            );
-            */
         } else {
             // collision detected, return player old position
             this._owner.x = oldX;
@@ -140,19 +122,6 @@ export class moveCTRL {
             this._owner.z = oldZ;
             this._owner.rot = oldRot;
             this._owner.sequence = playerInput.seq;
-            /*
-            Logger.warning(
-                "Invalid position for " +
-                    this._owner.name +
-                    ": ( x: " +
-                    this._owner.x +
-                    ", y: " +
-                    this._owner.y +
-                    ", z: " +
-                    this._owner.z +
-                    ", rot: " +
-                    this._owner.rot
-            );*/
         }
     }
 

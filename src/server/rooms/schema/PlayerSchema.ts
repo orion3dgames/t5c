@@ -3,6 +3,7 @@ import { Schema, MapSchema, ArraySchema, type, filter } from "@colyseus/schema";
 import Config from "../../../shared/Config";
 import { GameRoom } from "../GameRoom";
 import { abilitiesCTRL } from "../controllers/abilityCTRL";
+import { animationCTRL } from "../controllers/animationCTRL";
 import { moveCTRL } from "../controllers/moveCTRL";
 import { dataDB } from "../../../shared/Data/dataDB";
 import { NavMesh, Vector3 } from "../../../shared/yuka-min";
@@ -79,6 +80,7 @@ export class PlayerSchema extends Entity {
     public client;
     public abilitiesCTRL: abilitiesCTRL;
     public moveCTRL: moveCTRL;
+    public animationCTRL: animationCTRL;
 
     // TIMER
     public spawnTimer: number = 0;
@@ -130,6 +132,7 @@ export class PlayerSchema extends Entity {
         // set controllers
         this.abilitiesCTRL = new abilitiesCTRL(this, data);
         this.moveCTRL = new moveCTRL(this);
+        this.animationCTRL = new animationCTRL(this);
 
         //
         this.start();
@@ -145,7 +148,9 @@ export class PlayerSchema extends Entity {
 
     // runs on every server iteration
     update() {
-        this.isMoving = false;
+        if (this.isMoving === true) {
+            this.isMoving = false;
+        }
 
         // always check if player is dead ??
         if (this.isEntityDead() && !this.isDead) {

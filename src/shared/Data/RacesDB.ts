@@ -11,16 +11,15 @@ type Race = {
     animationSpeed: number;
     meshIndex: number;
     animations: {
-        [key: string]: number;
+        [key: string]: {};
     };
     bones?: { [key: string]: number };
     baseHealth: number;
     baseMana: number;
     healthRegen: number;
     manaRegen: number;
-    experienceGain: {};
-    goldGain: {};
-    damage_multiplier: number;
+    experienceGain?: {};
+    goldGain?: {};
     drops?: ILootTableEntry[];
     default_abilities?: string[];
     materials?;
@@ -42,13 +41,13 @@ let RacesDB: raceDataMap = {
         animationSpeed: 1.3,
         meshIndex: 1,
         animations: {
-            IDLE: 36,
-            WALK: 72,
-            ATTACK: 1,
-            DEATH: 23,
-            DAMAGE: 34,
-            CASTING: 63,
-            CAST: 62, //
+            IDLE: { animation_id: 36, duration: 1000, speed: 1 },
+            WALK: { animation_id: 72, duration: 1000, speed: 1.3 },
+            ATTACK: { animation_id: 1, duration: 1000, speed: 1 },
+            DEATH: { animation_id: 23, duration: 1000, speed: 1 },
+            DAMAGE: { animation_id: 34, duration: 1000, speed: 1 },
+            CASTING: { animation_id: 63, duration: 1000, speed: 1 },
+            CAST: { animation_id: 62, duration: 1000, speed: 1 },
         },
         bones: {
             WEAPON: 12,
@@ -61,7 +60,6 @@ let RacesDB: raceDataMap = {
         manaRegen: 0.4, // per second
         experienceGain: {},
         goldGain: {},
-        damage_multiplier: 0,
         drops: [],
         default_abilities: ["base_attack"],
         materials: [
@@ -83,11 +81,13 @@ let RacesDB: raceDataMap = {
         animationSpeed: 1.3,
         meshIndex: 1,
         animations: {
-            IDLE: 36,
-            WALK: 72,
-            ATTACK: 1,
-            DEATH: 23,
-            DAMAGE: 34,
+            IDLE: { animation_id: 36, duration: 1000, speed: 1 },
+            WALK: { animation_id: 72, duration: 1000, speed: 1.3 },
+            ATTACK: { animation_id: 1, duration: 1000, speed: 1 },
+            DEATH: { animation_id: 23, duration: 1000, speed: 1 },
+            DAMAGE: { animation_id: 34, duration: 1000, speed: 1 },
+            CASTING: { animation_id: 63, duration: 1000, speed: 1 },
+            CAST: { animation_id: 62, duration: 1000, speed: 1 },
         },
         bones: {
             WEAPON: 12,
@@ -97,10 +97,7 @@ let RacesDB: raceDataMap = {
         baseHealth: 50,
         baseMana: 50,
         healthRegen: 0.2,
-        manaRegen: 0.4, // per second
-        experienceGain: {},
-        goldGain: {},
-        damage_multiplier: 0,
+        manaRegen: 0.4,
         drops: [],
         default_abilities: ["base_attack"],
         materials: [
@@ -120,11 +117,13 @@ let RacesDB: raceDataMap = {
         animationSpeed: 1.3,
         meshIndex: 1,
         animations: {
-            IDLE: 36,
-            WALK: 72,
-            ATTACK: 1,
-            DEATH: 23,
-            DAMAGE: 34,
+            IDLE: { animation_id: 36, duration: 1000, speed: 1 },
+            WALK: { animation_id: 72, duration: 1000, speed: 1.3 },
+            ATTACK: { animation_id: 1, duration: 1000, speed: 1 },
+            DEATH: { animation_id: 23, duration: 1000, speed: 1 },
+            DAMAGE: { animation_id: 34, duration: 1000, speed: 1 },
+            CASTING: { animation_id: 63, duration: 1000, speed: 1 },
+            CAST: { animation_id: 62, duration: 1000, speed: 1 },
         },
         bones: {
             WEAPON: 12,
@@ -137,7 +136,6 @@ let RacesDB: raceDataMap = {
         manaRegen: 0.4, // per second
         experienceGain: { min: 2000, max: 4000 },
         goldGain: { min: 120, max: 250 },
-        damage_multiplier: 0,
         drops: [
             LootTableEntry("sword_01", 10, 1, 1, 1, 1),
             LootTableEntry("potion_small_blue", 40, 1, 1, 1, 1),

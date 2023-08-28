@@ -28,13 +28,22 @@ export class EntityAnimator {
 
     private _build(): void {
         // find animations
-        let idleAnimationNumber = this._entity.animations["IDLE"];
-        let walkAnimationNumber = this._entity.animations["WALK"];
-        let attackAnimationNumber = this._entity.animations["ATTACK"];
-        let deathAnimationNumber = this._entity.animations["DEATH"];
-        let takingDamageAnimationNumber = this._entity.animations["DAMAGE"];
-        let castingAnimationNumber = this._entity.animations["CASTING"] ?? 0;
-        let castingShootAnimationNumber = this._entity.animations["CAST"] ?? 0;
+        let idleAnimation = this._entity.animations["IDLE"];
+        let walkAnimation = this._entity.animations["WALK"];
+        let attackAnimation = this._entity.animations["ATTACK"];
+        let deathAnimation = this._entity.animations["DEATH"];
+        let takingDamageAnimation = this._entity.animations["DAMAGE"];
+        let castingAnimation = this._entity.animations["CASTING"] ?? 0;
+        let castingShootAnimation = this._entity.animations["CAST"] ?? 0;
+
+        // find animations
+        let idleAnimationNumber = idleAnimation.animation_id;
+        let walkAnimationNumber = walkAnimation.animation_id;
+        let attackAnimationNumber = attackAnimation.animation_id;
+        let deathAnimationNumber = deathAnimation.animation_id;
+        let takingDamageAnimationNumber = takingDamageAnimation.animation_id;
+        let castingAnimationNumber = castingAnimation.animation_id;
+        let castingShootAnimationNumber = castingShootAnimation.animation_id;
 
         // set animations
         this._idle = this._playerAnimations[idleAnimationNumber];
@@ -58,7 +67,7 @@ export class EntityAnimator {
         this._cast.loopAnimation = false;
 
         // set animation speed
-        this._walk.speedRatio = this._entity.animationSpeed;
+        this._walk.speedRatio = 1.5;
         this._attack.speedRatio = 1.1;
         this._cast.speedRatio = 2;
 

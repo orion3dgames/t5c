@@ -91,7 +91,7 @@ export class abilitiesCTRL {
         this.cancelAutoAttack(owner);
 
         // make sure player can cast this ability
-        if (!this.canEntityCastAbility(target, ability, digit)) {
+        if (!this.canEntityCastAbility(owner, target, ability, digit)) {
             return false;
         }
 
@@ -110,7 +110,9 @@ export class abilitiesCTRL {
             client.send("ability_start_casting", {
                 digit: data.digit,
             });
-            owner.anim_state = EntityState.SPELL_CASTING;
+
+            // play animation
+            owner.animationCTRL.playAnim(owner, EntityState.SPELL_CASTING, true);
 
             // start a timer
             this.player_casting_timer = setTimeout(() => {
@@ -144,7 +146,13 @@ export class abilitiesCTRL {
      * @param ability_no
      * @returns boolean
      */
-    canEntityCastAbility(target, ability, digit) {
+    canEntityCastAbility(owner, target, ability, digit) {
+        // if target is not already dead
+        if (owner.isMoving) {
+            Logger.warning(`[canEntityCastAbility] target is moving, cannot cast an ability`, this._owner.isMoving);
+            return false;
+        }
+
         // if target is not already dead
         if (target.AI_SPAWN_INFO && target.AI_SPAWN_INFO.canAttack === false) {
             Logger.warning(`[canEntityCastAbility] target is not attackable`, target.health);
@@ -316,16 +324,8 @@ export class abilitiesCTRL {
             this.player_casting_timer = false;
         }
 
-        //
-        console.log("SERVER SET SPELL_CAST");
-        owner.anim_state = ability.animation;
-
-        if (ability.animation === EntityState.SPELL_CAST) {
-            setTimeout(() => {
-                console.log("SERVER SET IDLE");
-                owner.anim_state = EntityState.IDLE;
-            }, 1000);
-        }
+        // play animation
+        owner.animationCTRL.playAnim(owner, ability.animation);
 
         // if target is dead, process target death
         if (target.isEntityDead()) {
@@ -387,10 +387,24 @@ export class abilitiesCTRL {
     }
 
     cancelAutoAttack(owner) {
+        // remove target
         owner.AI_TARGET = null;
         owner.AI_ABILITY = null;
-        owner.anim_state = EntityState.IDLE;
-        clearInterval(this.attackTimer);
+
+        // reset animation
+        owner.animationCTRL.playAnim(owner, EntityState.IDLE);
+
+        // remove attack timer
+        if (this.attackTimer) {
+            clearInterval(this.attackTimer);
+        }
+
+        // remove casting timer
+        if (this.player_casting_timer) {
+            clearInterval(this.player_casting_timer);
+            this.player_casting_timer = false;
+            owner._state._gameroom.broadcast("ability_cancel_casting");
+        }
     }
 
     //////////////////////////////////////////////

@@ -235,6 +235,15 @@ export class Player extends Entity {
         }
     }
 
+    // player cancel casting
+    public stopCasting(data) {
+        this.isCasting = false;
+        this.castingElapsed = 0;
+        this.castingTarget = 0;
+        this.castingDigit = 0;
+        this.ui._CastingBar.close();
+    }
+
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
@@ -254,6 +263,10 @@ export class Player extends Entity {
         // server confirm player can start casting
         this._room.onMessage("ability_start_casting", (data) => {
             this.startCasting(data);
+        });
+
+        this._room.onMessage("ability_cancel_casting", (data) => {
+            this.stopCasting(data);
         });
 
         // server confirms ability can be cast
