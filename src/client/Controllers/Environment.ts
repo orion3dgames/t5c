@@ -481,12 +481,13 @@ export class Environment {
 
         //Loop through all environment meshes that were imported
         this.allMeshes.forEach((m: Mesh) => {
-
             // default values
             m.checkCollisions = false;
             m.isPickable = false;
             m.receiveShadows = true;
-            
+            m.unfreezeWorldMatrix();
+            m.doNotSyncBoundingInfo = true;
+
             /*
             if (m.getClassName() !== "InstancedMesh") {
             }
