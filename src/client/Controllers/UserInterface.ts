@@ -240,7 +240,7 @@ export class UserInterface {
     public createEntityChatLabel(entity) {
         var rect1 = new Rectangle("player_chat_" + entity.sessionId);
         rect1.isVisible = false;
-        rect1.width = "100px";
+        rect1.width = "175px";
         rect1.adaptHeightToChildren = true;
         rect1.thickness = 1;
         rect1.cornerRadius = 5;
@@ -268,7 +268,7 @@ export class UserInterface {
     public createEntityLabel(entity) {
         var rect1 = new Rectangle("player_nameplate_" + entity.sessionId);
         rect1.isVisible = false;
-        rect1.width = "200px";
+        rect1.width = "300px";
         rect1.height = "40px";
         rect1.thickness = 0;
         rect1.zIndex = this._namesUI.addControl(rect1);
@@ -276,8 +276,10 @@ export class UserInterface {
         rect1.linkOffsetY = -100;
         var label = new TextBlock("player_nameplate_text_" + entity.sessionId);
         label.text = entity.name;
-        label.color = "blue";
+        label.color = "black";
         label.fontWeight = "bold";
+        label.outlineWidth = 5;
+        label.outlineColor = "white";
         rect1.addControl(label);
         return rect1;
     }
@@ -298,6 +300,8 @@ export class UserInterface {
         label.color = "black";
         label.fontWeight = "bold";
         label.fontSize = "14px";
+        label.outlineWidth = 3;
+        label.outlineColor = "white";
         rect1.addControl(label);
         return rect1;
     }
