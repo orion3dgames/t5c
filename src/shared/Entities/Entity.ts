@@ -201,6 +201,8 @@ export class Entity {
         return new Vector3(this.x, this.y, this.z);
     }
 
+    public updateSlowRate() {}
+
     public updateServerRate(delta) {}
 
     // basic performance (only enable entities in a range around the player)

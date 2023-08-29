@@ -20,6 +20,7 @@ import { dataDB } from "../Data/dataDB";
 import { SceneController } from "../../client/Controllers/Scene";
 import { Ability } from "../Data/AbilitiesDB";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
 export class Player extends Entity {
     public input;
@@ -143,6 +144,8 @@ export class Player extends Entity {
         });
     }
 
+    public updateSlowRate() {}
+
     // update at engine rate
     public update(delta) {
         if (this && this.moveController) {
@@ -156,6 +159,21 @@ export class Player extends Entity {
 
     // update at server rate
     public updateServerRate(delta) {
+        /*
+        // only show meshes close to us
+        let currentPos = this.getPosition();
+        let key = "ENV_" + this._auth.currentLocation.mesh;
+        let allMeshes = this._loadedAssets[key].loadedMeshes;
+        allMeshes.forEach((element) => {
+            let distanceTo = Vector3.Distance(element.position, currentPos);
+            console.log(element, element.name, distanceTo);
+            if (distanceTo > 5) {
+                element.isVisible = false;
+            } else {
+                element.isVisible = true;
+            }
+        });*/
+
         // if digit pressed
         if (this._input.digit_pressed > 0 && !this.isCasting) {
             // get all necessary vars

@@ -79,7 +79,7 @@ export class Item {
             },
             this._scene
         );
-        box.visibility = 0;
+        box.visibility = 1;
 
         // set collision mesh
         this.mesh = box;
@@ -196,6 +196,7 @@ export class Item {
 
     public update(delta) {}
     public updateServerRate(delta) {}
+    public updateSlowRate(delta) {}
 
     // basic performance (only enable entities in a range around the player)
     public lod(_currentPlayer) {

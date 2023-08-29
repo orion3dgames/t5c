@@ -257,6 +257,12 @@ export class GameScene {
                 // every 5 seconds
                 this.room.send("ping", { date: Date.now() });
 
+                for (let sessionId in this._entities) {
+                    const entity = this._entities[sessionId];
+                    if (entity && entity.type === "player") {
+                        entity.updateSlowRate(Config.updateRate);
+                    }
+                }
                 // reset timer
                 timeServerSlow = timeNow;
             }

@@ -120,7 +120,7 @@ let LocationsDB = {
         key: "lh_dungeon_01",
         mesh: "lh_dungeon_01",
         sun: false,
-        sunIntensity: 0.1,
+        sunIntensity: 1,
         fog: false,
         spawnPoint: {
             x: 0,
@@ -134,7 +134,7 @@ let LocationsDB = {
             interactive: [
                 {
                     type: "zone_change",
-                    from: new Vector3(1.3,0.5, -3.3),
+                    from: new Vector3(1.3, 0.5, -3.3),
                     to_map: "lh_town",
                     to_vector: new Vector3(13, 0, -25.7),
                 },

@@ -450,6 +450,7 @@ export class Environment {
     //What we do once the environment assets have been imported
     //handles setting the necessary flags for collision and trigger meshes,
     public async prepareAssets() {
+        /*
         if (this._auth.currentLocation.waterPlane) {
             // Water
             var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 32 }, this._scene);
@@ -466,7 +467,7 @@ export class Environment {
             water.waterColor = Color3.FromInts(0, 157, 255);
             water.colorBlendFactor = 0.5;
             waterMesh.material = water;
-        }
+        }*/
 
         // start  music
         /*
@@ -485,8 +486,8 @@ export class Environment {
             m.checkCollisions = false;
             m.isPickable = false;
             m.receiveShadows = true;
-            m.unfreezeWorldMatrix();
-            m.doNotSyncBoundingInfo = true;
+            //m.unfreezeWorldMatrix();
+            //m.doNotSyncBoundingInfo = true;
 
             /*
             if (m.getClassName() !== "InstancedMesh") {
