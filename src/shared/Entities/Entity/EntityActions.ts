@@ -73,29 +73,27 @@ export class EntityActions {
         }
     }
 
-    public particule_heal(mesh, color) {
+    public particule_impact(mesh, color) {
         //////////////////////////////////////////////
         // create a particle system
-        var particleSystem = new ParticleSystem("particles", 2000, this._scene);
+        var particleSystem = new ParticleSystem("particles", 1000, this._scene);
         particleSystem.particleTexture = this.particleTxt_01.clone();
         particleSystem.emitter = mesh; // the starting location
         // Colors of all particles
         particleSystem.color1 = Color4.FromColor3(this.colors[color][0]);
         particleSystem.color2 = Color4.FromColor3(this.colors[color][1]);
-        particleSystem.colorDead = new Color4(0, 0, 0, 0.0);
+        particleSystem.colorDead = new Color4(0, 0, 0, 1);
         // Size of each particle (random between...
         particleSystem.minSize = 0.3;
         particleSystem.maxSize = 0.6;
         // Life time of each particle (random between...
-        particleSystem.minLifeTime = 0.2;
-        particleSystem.maxLifeTime = 1.5;
-        particleSystem.targetStopDuration = 1.5;
+        particleSystem.minLifeTime = 1;
+        particleSystem.maxLifeTime = 1.25;
+        particleSystem.targetStopDuration = 1.25;
         // Emission rate
         particleSystem.emitRate = 1000;
         particleSystem.createSphereEmitter(1);
-        // Speed
-        particleSystem.minEmitPower = 0.5;
-        particleSystem.maxEmitPower = 1.5;
+
         particleSystem.updateSpeed = 0.1;
         // Start the particle system
         particleSystem.start();
@@ -104,7 +102,48 @@ export class EntityActions {
         setTimeout(() => {
             particleSystem.dispose(true);
         }, 1000);
+        //
+    }
 
+    public particule_heal(mesh, color) {
+        //////////////////////////////////////////////
+        // create a particle system
+        var particleSystem = new ParticleSystem("particles", 1000, this._scene);
+        particleSystem.particleTexture = this.particleTxt_01.clone();
+        particleSystem.emitter = mesh; // the starting location
+        // Colors of all particles
+        particleSystem.color1 = Color4.FromColor3(this.colors[color][0]);
+        particleSystem.color2 = Color4.FromColor3(this.colors[color][1]);
+        particleSystem.colorDead = new Color4(0, 0, 0, 1);
+        // Size of each particle (random between...
+        particleSystem.minSize = 0.3;
+        particleSystem.maxSize = 0.5;
+        // Life time of each particle (random between...
+        particleSystem.minLifeTime = 2;
+        particleSystem.maxLifeTime = 2;
+        particleSystem.targetStopDuration = 2;
+
+        // Emission rate
+        particleSystem.emitRate = 500;
+        particleSystem.createCylinderEmitter(1);
+
+        /**
+         * Adds a new life time gradient
+         * @param gradient defines the gradient to use (between 0 and 1)
+         * @param factor defines the life time factor to affect to the specified gradient
+         * @param factor2 defines an additional factor used to define a range ([factor, factor2]) with main value to pick the final value from
+         * @returns the current particle system
+         */
+        particleSystem.addVelocityGradient(1, 1, 1); //start size at start of particle system
+
+        particleSystem.updateSpeed = 0.1;
+        // Start the particle system
+        particleSystem.start();
+        //////////////////////////////////////////////
+
+        setTimeout(() => {
+            //particleSystem.dispose(true);
+        }, 1000);
         //
     }
 
@@ -180,7 +219,7 @@ export class EntityActions {
                 i += 0.0035;
             }
             if (projectile.intersectsMesh(mesh, true) || i > 1) {
-                this.particule_heal(mesh, color);
+                this.particule_impact(mesh, color);
                 projectile.dispose(true, true);
                 particleSystem.dispose(true);
                 particleSystemTrail.dispose(true);
