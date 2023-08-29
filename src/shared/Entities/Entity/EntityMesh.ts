@@ -207,7 +207,9 @@ export class EntityMesh {
                 if (equipOptions.mesh) {
                     let boneId = this._entity.bones[key];
                     let bone = this.skeleton.bones[boneId];
-                    const weapon = this._loadedAssets["ITEM_" + e.key].instantiateModelsToScene((name) => "player_" + e.key);
+                    const weapon = this._loadedAssets["ITEM_" + e.key].instantiateModelsToScene((name) => "player_" + e.key, false, {
+                        doNotInstantiate: false,
+                    });
                     const weaponMesh = weapon.rootNodes[0];
                     weaponMesh.parent = this.playerMesh;
                     weaponMesh.attachToBone(bone, this.playerMesh);
