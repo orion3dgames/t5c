@@ -27,6 +27,8 @@ export class DamageText {
     }
 
     public addDamage(entity, amount) {
+        let color = amount < 0 ? "red" : "green";
+        let amountText = amount > 0 ? "+" + amount : "" + amount;
         let key = this.damageText.length;
         var rect1 = new Rectangle("damage_" + key + "_" + entity.sessionId);
         rect1.isVisible = true;
@@ -38,14 +40,13 @@ export class DamageText {
         rect1.linkOffsetY = -50;
         rect1.metadata = { offset: randomNumberInRange(-1, 1) };
         var label = new TextBlock("text_" + entity.sessionId);
-        label.text = amount;
-        label.color = "red";
+        label.text = amountText;
+        label.color = color;
         label.fontWeight = "bold";
         label.fontSize = "18px";
         label.outlineWidth = 3;
-        label.outlineColor = "yellow";
+        label.outlineColor = "black";
         rect1.addControl(label);
-
         this.damageText.push(rect1);
     }
 

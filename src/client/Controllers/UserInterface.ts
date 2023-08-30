@@ -78,6 +78,9 @@ export class UserInterface {
     // tooltip
     public _UITooltip;
 
+    // labels
+    public showingLabels: boolean = false;
+
     _isDragging;
     _pointerDownPosition;
 
@@ -213,7 +216,7 @@ export class UserInterface {
 
         // some ui must be constantly refreshed as things change
         this._scene.registerBeforeRender(() => {
-            this.refreshEntityUI();
+            this.update();
             this.dragging();
         });
 
@@ -229,7 +232,22 @@ export class UserInterface {
         }
     }
 
-    public refreshEntityUI() {
+    public update() {
+        //
+        if (this._currentPlayer._input.left_alt_pressed === true && this.showingLabels === false) {
+            for (let sessionId in this._entities) {
+                this._entities[sessionId].characterLabel.isVisible = true;
+            }
+            this.showingLabels = true;
+        }
+
+        if (this._currentPlayer._input.left_alt_pressed === false && this.showingLabels === true) {
+            for (let sessionId in this._entities) {
+                this._entities[sessionId].characterLabel.isVisible = false;
+            }
+            this.showingLabels = false;
+        }
+
         /*
         // hide entity labels if out of distance
         for (let sessionId in this._entities) {
@@ -282,10 +300,10 @@ export class UserInterface {
         rect1.linkOffsetY = -100;
         var label = new TextBlock("player_nameplate_text_" + entity.sessionId);
         label.text = entity.name;
-        label.color = "black";
-        label.fontWeight = "bold";
+        label.color = "white";
+        label.fontWeight = "light";
         label.outlineWidth = 5;
-        label.outlineColor = "white";
+        label.outlineColor = "black";
         rect1.addControl(label);
         return rect1;
     }

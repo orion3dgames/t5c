@@ -88,7 +88,6 @@ export class PlayerInput {
         this._scene.onKeyboardObservable.add((kbInfo) => {
             switch (kbInfo.type) {
                 case KeyboardEventTypes.KEYDOWN:
-                    console.log(kbInfo.event.code);
                     if (kbInfo.event.code === "Digit1") {
                         this.digit_pressed = 1;
                     }
@@ -116,13 +115,13 @@ export class PlayerInput {
                     if (kbInfo.event.code === "Digit9") {
                         this.digit_pressed = 9;
                     }
-                    if (kbInfo.event.code === "AltLeft") {
+                    if (kbInfo.event.code === "ControlLeft") {
                         this.left_alt_pressed = true;
                     }
                     break;
 
                 case KeyboardEventTypes.KEYUP:
-                    if (kbInfo.event.code === "AltLeft") {
+                    if (kbInfo.event.code === "ControlLeft") {
                         this.left_alt_pressed = false;
                     }
                     break;

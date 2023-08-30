@@ -135,10 +135,12 @@ export class Entity {
             // make sure players are always visible
             this.mesh.isVisible = true;
 
-            if (this.health > this.entity.health) {
-                let healthLoss = this.health - this.entity.health;
-                //console.log("[SERVER] entity loses health: ", healthLoss);
-                this.ui._DamageText.addDamage(this, healthLoss);
+            if (this.health !== this.entity.health) {
+                let healthChange = this.entity.health - this.health;
+                if (healthChange < 0 || healthChange > 1) {
+                    console.log("[SERVER] entity health change: ", healthChange);
+                    this.ui._DamageText.addDamage(this, healthChange);
+                }
             }
 
             // update player data from server data
