@@ -19,6 +19,7 @@ import {
     ExperienceBar,
     MainMenu,
     RessurectBox,
+    DamageText,
     Panel_Abilities,
     Panel_Character,
     Panel_Help,
@@ -65,6 +66,7 @@ export class UserInterface {
     public _RessurectBox: RessurectBox;
     private _ExperienceBar: ExperienceBar;
     private _InventoryDropdown: InventoryDropdown;
+    public _DamageText: DamageText;
 
     // openable panels
     private _panels: Panel[];
@@ -146,6 +148,9 @@ export class UserInterface {
 
         // create chat ui + events
         this._ChatBox = new ChatBox(this._playerUI, this._chatRoom, currentPlayer, this._entities);
+
+        // create chat ui + events
+        this._DamageText = new DamageText(this._namesUI, this._scene, this._entities);
 
         // create selected entity panel
         this._targetEntitySelectedBar = new EntitySelectedBar(this._playerUI, this._loadedAssets, this._scene, {
@@ -230,13 +235,14 @@ export class UserInterface {
         for (let sessionId in this._entities) {
             let entity = this._entities[sessionId];
             if (entity && entity.mesh && entity.mesh.isEnabled()) {
-                //entity.characterLabel.isVisible = true;
+                entity.characterLabel.isVisible = true;
             } else {
-                //entity.characterLabel.isVisible = false;
+                entity.characterLabel.isVisible = false;
             }
         }*/
     }
 
+    // chatbox label
     public createEntityChatLabel(entity) {
         var rect1 = new Rectangle("player_chat_" + entity.sessionId);
         rect1.isVisible = false;
@@ -264,7 +270,7 @@ export class UserInterface {
         return rect1;
     }
 
-    // obsolete, keeping just in case
+    // entity label
     public createEntityLabel(entity) {
         var rect1 = new Rectangle("player_nameplate_" + entity.sessionId);
         rect1.isVisible = false;
@@ -284,7 +290,7 @@ export class UserInterface {
         return rect1;
     }
 
-    // obsolete, keeping just in case
+    // item label
     public createItemLabel(entity) {
         let title = entity.quantity > 1 ? entity.title + " X " + entity.quantity : entity.title;
         var rect1 = new Rectangle("item_nameplate_" + entity.sessionId);

@@ -110,7 +110,7 @@ let LocationsDB = {
                     amount: 1,
                     race: "male_mage",
                     name: "Dummy",
-                    baseHealth: 50000,
+                    baseHealth: 5000,
                 },
             ],
         },

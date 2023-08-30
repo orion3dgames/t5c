@@ -79,7 +79,7 @@ export class Item {
             },
             this._scene
         );
-        box.visibility = 1;
+        box.visibility = 0;
 
         // set collision mesh
         this.mesh = box;
