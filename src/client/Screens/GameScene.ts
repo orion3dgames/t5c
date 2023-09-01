@@ -144,12 +144,9 @@ export class GameScene {
                 root.rootNodes[0].name = modelToLoadKey;
                 this._loadedAssets[modelToLoadKey] = mergeMesh(root.rootNodes[0]);
                 this._loadedAssets[modelToLoadKey].visibility = 0;
-                //this._loadedAssets[modelToLoadKey] = root.rootNodes[0];
                 root.rootNodes[0].dispose();
-                console.log("FINISH LOADING MODEL", v);
             }
         }
-        console.log("FINISH INSTANTIATING", this._loadedAssets);
     }
 
     private async _initNetwork(): Promise<void> {

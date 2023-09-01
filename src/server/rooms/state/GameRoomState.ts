@@ -75,7 +75,7 @@ export class GameRoomState extends Schema {
 
             // remove loot that's been on the ground over 5 minutes
             if (entity.type === "item" && entity.spawnTimer > 1000 * 60 * 5) {
-                this.deleteEntity(entity.sessionId);
+                //this.deleteEntity(entity.sessionId);
             }
         });
 

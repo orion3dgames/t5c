@@ -87,10 +87,13 @@ export class Item extends TransformNode {
             this._loadedAssets["ROOT_ITEM_" + entity.key].setParent(null);
         } else if (mode === "clone") {
             // clone
-            this.mesh = this._loadedAssets["ROOT_ITEM_" + entity.key].clone("TEST_" + entity.sessionId);
-            this.mesh.isEnabled(true);
-            this.mesh.visibility = 1;
-
+            if(this._loadedAssets["ROOT_ITEM_" + entity.key]){
+                this.mesh = this._loadedAssets["ROOT_ITEM_" + entity.key].clone("TEST_" + entity.sessionId);
+                this.mesh.visibility = 1;
+            }else{
+                console.error("Could not find key: ROOT_ITEM_" + entity.key, this._loadedAssets);
+            }
+            
             // import normal
         } else {
             const result = await this._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene((name) => "instance_" + this.entity.sessionId, false, {
@@ -109,6 +112,7 @@ export class Item extends TransformNode {
         this.mesh.isVisible = true;
         this.mesh.checkCollisions = false;
         this.mesh.showBoundingBox = false;
+        this.mesh.receiveShadows = true;
 
         // offset mesh from the ground
         let meshSize = this.mesh.getBoundingInfo().boundingBox.extendSize;

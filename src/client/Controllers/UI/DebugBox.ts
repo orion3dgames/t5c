@@ -39,7 +39,7 @@ export class DebugBox {
     }
 
     _createUI() {
-        const debugPanel = generatePanel("debugPanel", "120px;", "140px", "0px", "-15px");
+        const debugPanel = generatePanel("debugPanel", "140px;", "140px", "0px", "-15px");
         debugPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
         debugPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         this._playerUI.addControl(debugPanel);
@@ -47,14 +47,14 @@ export class DebugBox {
         const debugText = new TextBlock("debugText");
         debugText.color = "#FFF";
         debugText.top = "5px";
-        debugText.left = "5px";
+        debugText.left = "-5px";
         debugText.fontSize = "12px;";
         debugText.resizeToFit = true;
         debugText.text = "TEXT";
         debugText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         debugText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         debugText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        debugText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        debugText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         debugPanel.addControl(debugText);
         this._debugTextUI = debugText;
 
@@ -76,8 +76,8 @@ export class DebugBox {
         }
 
         let locationText = "";
-        locationText += "Total Entities: " + entityCount + " \n";
-        locationText += "Visible Entities: " + count + " \n";
+        locationText += "Total Nodes: " + entityCount + " \n";
+        locationText += "Visible Nodes: " + count + " \n";
         locationText += "FPS: " + roundTo(this._engine.getFps(), 0) + " \n";
         locationText += "Ping: " + this.ping + "ms\n";
         locationText += "X: " + roundTo(this._currentPlayer.x, 2) + "\n";
