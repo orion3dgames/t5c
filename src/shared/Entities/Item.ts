@@ -32,6 +32,7 @@ export class Item extends TransformNode {
     public entity;
     public sessionId;
     public mesh;
+    public overlay_mesh;
     public characterLabel: Rectangle;
     public type: string = "";
 
@@ -79,7 +80,7 @@ export class Item extends TransformNode {
         this.spawn(entity);
     }
 
-    public async spawn(entity, mode = "clone") {
+    public async spawn(entity, mode = "instance") {
         // load item mesh
         if (mode === "instance") {
             // instance
@@ -111,7 +112,7 @@ export class Item extends TransformNode {
         this.mesh.isPickable = true;
         this.mesh.isVisible = true;
         this.mesh.checkCollisions = false;
-        this.mesh.showBoundingBox = false;
+        this.mesh.showBoundingBox = true;
         this.mesh.receiveShadows = true;
 
         // offset mesh from the ground
@@ -136,8 +137,7 @@ export class Item extends TransformNode {
         // entity network event
         // colyseus automatically sends entity updates, so let's listen to those changes
         this.entity.onChange(() => {
-            // make sure players are always visible
-            this.mesh.isVisible = true;
+          
             // update player data from server data
             Object.assign(this, this.entity);
 
@@ -151,17 +151,36 @@ export class Item extends TransformNode {
         // register hover over player
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
+                console.log(ev);
+                /*
                 let mesh = ev.meshUnderPointer as InstancedMesh;
                 mesh.overlayColor = Color3.White();
                 mesh.renderOverlay = true;
+                */
+
+                this.overlay_mesh = this._loadedAssets["ROOT_ITEM_" + entity.key].clone("OVERLAY_" + entity.sessionId);
+                this.overlay_mesh.position.set(this.mesh.position);
+                this.overlay_mesh.rotation = this.mesh.position;
+                this.overlay_mesh.scaling = this.mesh.scaling;
+                this.overlay_mesh.overlayColor = Color3.White();
+                this.overlay_mesh.renderOverlay = true;
+
+
+                this.mesh.isVisible = false;
+                
             })
         );
 
         // register hover out player
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
+                console.log(ev);
+                /*
                 let mesh = ev.meshUnderPointer as InstancedMesh;
                 mesh.renderOverlay = false;
+                */
+                this.mesh.isVisible = true;
+                this.overlay_mesh.dispose();
             })
         );
 
