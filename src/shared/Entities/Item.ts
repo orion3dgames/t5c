@@ -106,7 +106,7 @@ export class Item extends TransformNode {
         // set collision mesh
         this.mesh.name = entity.key + "_box";
         this.mesh.isPickable = true;
-        this.mesh.isVisible = false;
+        this.mesh.isVisible = true;
         this.mesh.checkCollisions = false;
         this.mesh.showBoundingBox = false;
 
@@ -117,6 +117,7 @@ export class Item extends TransformNode {
         this.mesh.rotation = new Vector3(0, randomNumberInRange(0, 360), 0);
         this.mesh.scaling = new Vector3(this.meshData.scale, this.meshData.scale, this.meshData.scale);
 
+        // set mesh metadata
         this.mesh.metadata = {
             sessionId: this.entity.sessionId,
             type: "item",
@@ -125,7 +126,6 @@ export class Item extends TransformNode {
         };
 
         // add mesh to shadow generator
-        //this._shadow.addShadowCaster(this.mesh, true);
         this.setPosition();
 
         //////////////////////////////////////////////
@@ -150,7 +150,6 @@ export class Item extends TransformNode {
                 let mesh = ev.meshUnderPointer as InstancedMesh;
                 mesh.overlayColor = Color3.White();
                 mesh.renderOverlay = true;
-                console.log(mesh.renderOverlay, mesh.overlayAlpha);
             })
         );
 
@@ -159,20 +158,8 @@ export class Item extends TransformNode {
             new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
                 let mesh = ev.meshUnderPointer as InstancedMesh;
                 mesh.renderOverlay = false;
-                console.log(mesh.renderOverlay, mesh.overlayAlpha);
             })
         );
-
-        /*
-        // register hover out player
-        this.mesh.actionManager.registerAction(
-            new ExecuteCodeAction(ActionManager.OnLeftPickTrigger, (ev) => {
-                let item = ev.meshUnderPointer.metadata;
-                this._room.send("pickup_item", {
-                    sessionId: item.sessionId,
-                });
-            })
-        );*/
 
         //////////////////////////////////////////////////////////////////////////
         // misc
