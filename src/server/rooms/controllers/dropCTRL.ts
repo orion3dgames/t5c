@@ -68,7 +68,6 @@ export class dropCTRL {
     public dropItems(target) {
         let loot = GetLoot(target.drops);
         loot.forEach((drop) => {
-            console.log(drop);
             // drop item on the ground
             let sessionId = nanoid(10);
             let currentPosition = target.getPosition();
@@ -81,7 +80,7 @@ export class dropCTRL {
                 x: currentPosition.x,
                 y: 0.25,
                 z: currentPosition.z,
-                quantity: drop.quantity,
+                qty: drop.quantity,
             };
             let entity = new LootSchema(this, data);
             this._owner._state.entities.set(sessionId, entity);

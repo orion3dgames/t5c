@@ -234,20 +234,24 @@ export class UserInterface {
 
     public update() {
         //
+        /*
         if (this._currentPlayer._input.left_alt_pressed === true && this.showingLabels === false) {
             for (let sessionId in this._entities) {
-                this._entities[sessionId].characterLabel.isVisible = true;
+                if (this._entities[sessionId].characterLabel) {
+                    this._entities[sessionId].characterLabel.isVisible = true;
+                }
             }
             this.showingLabels = true;
         }
 
         if (this._currentPlayer._input.left_alt_pressed === false && this.showingLabels === true) {
             for (let sessionId in this._entities) {
-                this._entities[sessionId].characterLabel.isVisible = false;
+                if (this._entities[sessionId].characterLabel) {
+                    this._entities[sessionId].characterLabel.isVisible = false;
+                }
             }
             this.showingLabels = false;
-        }
-
+        }*/
         /*
         // hide entity labels if out of distance
         for (let sessionId in this._entities) {
@@ -310,7 +314,7 @@ export class UserInterface {
 
     // item label
     public createItemLabel(entity) {
-        let title = entity.quantity > 1 ? entity.title + " X " + entity.quantity : entity.title;
+        let title = entity.qty > 1 ? entity.title + " X " + entity.qty : entity.title;
         var rect1 = new Rectangle("item_nameplate_" + entity.sessionId);
         rect1.isVisible = false;
         rect1.width = "200px";

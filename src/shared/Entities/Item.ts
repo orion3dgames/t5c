@@ -17,19 +17,21 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { randomNumberInRange } from "../Utils";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { mergeMesh } from "./Common/MeshHelper";
+import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 
-export class Item {
+export class Item extends TransformNode {
     public _scene: Scene;
     public _room: Room;
-    public ui: UserInterface;
+    public _ui: UserInterface;
     public _input: PlayerInput;
-    public _shadow;
     public _loadedAssets;
 
     // entity
     public entity;
     public sessionId;
-    public mesh: AbstractMesh;
+    public mesh;
     public characterLabel: Rectangle;
     public type: string = "";
 
@@ -39,7 +41,7 @@ export class Item {
     public y: number;
     public z: number;
     public rot: number;
-    public quantity: number;
+    public qty: number;
 
     //
     public meshData;
@@ -47,16 +49,18 @@ export class Item {
     // flags
     public blocked: boolean = false; // if true, player will not moved
 
-    constructor(entity, room: Room, scene: Scene, ui: UserInterface, shadow: CascadedShadowGenerator, _loadedAssets: AssetContainer[]) {
+    constructor(name, scene: Scene, entity, room: Room, ui: UserInterface, _loadedAssets: AssetContainer[]) {
+        super(name, scene);
+
         // setup class variables
         this._scene = scene;
         this._room = room;
         this._loadedAssets = _loadedAssets;
-        this.ui = ui;
-        this._shadow = shadow;
-        this.sessionId = entity.sessionId;
+        this._ui = ui;
+
+        // add entity data
+        this.name = entity.key + "_node";
         this.entity = entity;
-        this.type = "item";
 
         // update player data from server data
         Object.assign(this, dataDB.get("item", entity.key));
@@ -64,41 +68,54 @@ export class Item {
         // update player data from server data
         Object.assign(this, this.entity);
 
-        // spawn player
-        this.spawn(entity);
-    }
-
-    public async spawn(entity) {
-        //
-        const box = MeshBuilder.CreateBox(
-            this.entity.sessionId,
-            {
-                width: this.meshData.width ?? 1,
-                height: this.meshData.height ?? 1,
-                depth: this.meshData.depth ?? 1,
-            },
-            this._scene
-        );
-        box.visibility = 0;
-
-        // set collision mesh
-        this.mesh = box;
-        this.mesh.name = entity.key + "_box";
-        this.mesh.isPickable = true;
-        this.mesh.isVisible = true;
-        this.mesh.checkCollisions = false;
-        this.mesh.showBoundingBox = true;
-        this.mesh.position = new Vector3(this.entity.x, this.entity.y, this.entity.z);
-
-        this.mesh.metadata = {
+        // set parent metadata
+        this.metadata = {
             sessionId: entity.sessionId,
             type: entity.type,
             name: entity.name,
         };
 
+        // spawn item
+        this.spawn(entity);
+    }
+
+    public async spawn(entity, mode = "clone") {
+        // load item mesh
+        if (mode === "instance") {
+            // instance
+            this.mesh = this._loadedAssets["ROOT_ITEM_" + entity.key].createInstance("TEST_" + entity.sessionId);
+            this._loadedAssets["ROOT_ITEM_" + entity.key].setParent(null);
+        } else if (mode === "clone") {
+            // clone
+            this.mesh = this._loadedAssets["ROOT_ITEM_" + entity.key].clone("TEST_" + entity.sessionId);
+            this.mesh.isEnabled(true);
+            this.mesh.visibility = 1;
+
+            // import normal
+        } else {
+            const result = await this._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene((name) => "instance_" + this.entity.sessionId, false, {
+                doNotInstantiate: false,
+            });
+            this.mesh = result.rootNodes[0];
+        }
+
+        // set initial player scale & rotation
+        //this.mesh = result.rootNodes[0];
+        this.mesh.parent = this;
+
+        // set collision mesh
+        this.mesh.name = entity.key + "_box";
+        this.mesh.isPickable = true;
+        this.mesh.isVisible = false;
+        this.mesh.checkCollisions = false;
+        this.mesh.showBoundingBox = false;
+
         // offset mesh from the ground
-        this.y = this.y + this.meshData.height / 2;
+        let meshSize = this.mesh.getBoundingInfo().boundingBox.extendSize;
+        this.mesh.position.y = this.mesh.position.y + meshSize.y;
+        this.mesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
         this.mesh.rotation = new Vector3(0, randomNumberInRange(0, 360), 0);
+        this.mesh.scaling = new Vector3(this.meshData.scale, this.meshData.scale, this.meshData.scale);
 
         this.mesh.metadata = {
             sessionId: this.entity.sessionId,
@@ -106,27 +123,6 @@ export class Item {
             key: this.key,
             name: this.entity.name,
         };
-
-        // load player mesh
-        const result = await this._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene((name) => "instance_" + this.entity.sessionId, false, {
-            doNotInstantiate: true,
-        });
-        const root = result.rootNodes[0];
-        let playerMesh = root;
-        /////////////////
-        /*
-        let modelToLoadKey = "LOADED_ITEM_" + this.key;
-        console.log(this._loadedAssets);
-        const playerMesh = this._loadedAssets[modelToLoadKey].createInstance("item_" + this.key);
-        */
-
-        // set initial player scale & rotation
-        playerMesh.name = entity.key + "_mesh";
-        playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
-        playerMesh.scaling = new Vector3(this.meshData.scale, this.meshData.scale, this.meshData.scale);
-        playerMesh.isPickable = false;
-        playerMesh.checkCollisions = false;
-        playerMesh.parent = this.mesh;
 
         // add mesh to shadow generator
         //this._shadow.addShadowCaster(this.mesh, true);
@@ -151,25 +147,23 @@ export class Item {
         // register hover over player
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
-                let mesh = ev.meshUnderPointer;
-                for (const childMesh of mesh.getChildMeshes()) {
-                    childMesh.overlayColor = new Color3(1, 1, 1);
-                    childMesh.overlayAlpha = 0.3;
-                    childMesh.renderOverlay = true;
-                }
+                let mesh = ev.meshUnderPointer as InstancedMesh;
+                mesh.overlayColor = Color3.White();
+                mesh.renderOverlay = true;
+                console.log(mesh.renderOverlay, mesh.overlayAlpha);
             })
         );
 
         // register hover out player
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
-                let mesh = ev.meshUnderPointer;
-                for (const childMesh of mesh.getChildMeshes()) {
-                    childMesh.renderOverlay = false;
-                }
+                let mesh = ev.meshUnderPointer as InstancedMesh;
+                mesh.renderOverlay = false;
+                console.log(mesh.renderOverlay, mesh.overlayAlpha);
             })
         );
 
+        /*
         // register hover out player
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnLeftPickTrigger, (ev) => {
@@ -178,20 +172,11 @@ export class Item {
                     sessionId: item.sessionId,
                 });
             })
-        );
+        );*/
 
         //////////////////////////////////////////////////////////////////////////
         // misc
-        this.characterLabel = this.ui.createItemLabel(this);
-    }
-
-    public mergeMesh(key, mesh) {
-        const allChildMeshes = mesh.getChildMeshes();
-        const merged = Mesh.MergeMeshes(allChildMeshes, false, true, undefined, undefined, true);
-        if (merged) {
-            merged.name = key + "_merged";
-        }
-        return merged;
+        this.characterLabel = this._ui.createItemLabel(this);
     }
 
     public update(delta) {}
@@ -200,22 +185,23 @@ export class Item {
 
     // basic performance (only enable entities in a range around the player)
     public lod(_currentPlayer) {
+        /*
         this.mesh.setEnabled(false);
         this.mesh.freezeWorldMatrix();
-        let entityPos = this.position();
+        let entityPos = this.getPosition();
         let playerPos = _currentPlayer.position();
         let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
         if (distanceFromPlayer < Config.PLAYER_VIEW_DISTANCE) {
             this.mesh.unfreezeWorldMatrix();
             this.mesh.setEnabled(true);
-        }
+        }*/
     }
 
     public setPosition() {
-        this.mesh.position = this.position();
+        this.position = this.getPosition();
     }
 
-    public position() {
+    public getPosition() {
         return new Vector3(this.x, this.y, this.z);
     }
 

@@ -121,7 +121,7 @@ export class GameScene {
         await this._environment.loadAssets();
         //let navMeshGroup = createConvexRegionHelper(this._navMesh, this._scene)
 
-        //await this._instantiate();
+        await this._instantiate();
 
         // load the rest
         this._app.engine.displayLoadingUI();
@@ -133,19 +133,23 @@ export class GameScene {
         for (let k in this._loadedAssets) {
             if (k.includes("ITEM_") && this._loadedAssets[k] instanceof AssetContainer) {
                 let v = this._loadedAssets[k] as AssetContainer;
-                let modelToLoadKey = "LOADED_" + k;
-                let options = { doNotInstantiate: false };
+                let modelToLoadKey = "ROOT_" + k;
                 const root = v.instantiateModelsToScene(
                     function () {
                         return modelToLoadKey;
                     },
                     false,
-                    { doNotInstantiate: false }
+                    { doNotInstantiate: true }
                 );
+                root.rootNodes[0].name = modelToLoadKey;
                 this._loadedAssets[modelToLoadKey] = mergeMesh(root.rootNodes[0]);
+                this._loadedAssets[modelToLoadKey].visibility = 0;
+                //this._loadedAssets[modelToLoadKey] = root.rootNodes[0];
+                root.rootNodes[0].dispose();
+                console.log("FINISH LOADING MODEL", v);
             }
         }
-        console.log("FINISH INSTANTIATE", this._loadedAssets);
+        console.log("FINISH INSTANTIATING", this._loadedAssets);
     }
 
     private async _initNetwork(): Promise<void> {
@@ -213,7 +217,7 @@ export class GameScene {
 
             // if item
             if (entity.type === "item") {
-                this._entities[sessionId] = new Item(entity, this.room, this._scene, this._ui, this._shadow, this._loadedAssets);
+                this._entities[sessionId] = new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._loadedAssets);
             }
         });
 

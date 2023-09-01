@@ -79,22 +79,7 @@ export class Player extends Entity {
         this._scene.onPointerObservable.add((pointerInfo: any) => {
             // on left mouse click
             if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 0) {
-                /////////////////////////////////////////////////////////////////////
-                // if click on entity
-                if (
-                    pointerInfo._pickInfo.pickedMesh &&
-                    pointerInfo._pickInfo.pickedMesh.metadata &&
-                    pointerInfo._pickInfo.pickedMesh.metadata !== null &&
-                    pointerInfo._pickInfo.pickedMesh.metadata.race
-                ) {
-                    let metadata = pointerInfo._pickInfo.pickedMesh.metadata;
-                    let targetSessionId = metadata.sessionId;
-                    let target = this.ui._entities[targetSessionId];
-                    if (metadata.type === "player" && targetSessionId === this.sessionId) {
-                        target = this;
-                    }
-                    global.T5C.selectedEntity = target;
-                }
+                this.leftClick(pointerInfo);
             }
 
             // on right mouse click
@@ -142,6 +127,34 @@ export class Player extends Entity {
             // move camera as player moves
             this.cameraController.follow(this.mesh.position, this.mesh.rotation.y);
         });
+    }
+
+    public leftClick(pointerInfo) {
+        if (!pointerInfo._pickInfo.pickedMesh) return false;
+
+        if (!pointerInfo._pickInfo.pickedMesh.metadata) return false;
+
+        if (pointerInfo._pickInfo.pickedMesh.metadata === null) return false;
+
+        let metadata = pointerInfo._pickInfo.pickedMesh.metadata;
+        console.log(metadata, pointerInfo._pickInfo);
+
+        // select entity
+        if (metadata.type === "player" || metadata.type === "entity") {
+            let targetSessionId = metadata.sessionId;
+            let target = this.ui._entities[targetSessionId];
+            global.T5C.selectedEntity = target;
+        }
+
+        // pick up item
+        if (metadata.type === "item") {
+            this._room.send("pickup_item", metadata.sessionId);
+        }
+
+        // move to
+        if (metadata.type === "environment") {
+            //this._room.send("move_to", pointerInfo);
+        }
     }
 
     public updateSlowRate() {}

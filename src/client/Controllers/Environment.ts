@@ -486,6 +486,10 @@ export class Environment {
             m.checkCollisions = false;
             m.isPickable = false;
             m.receiveShadows = true;
+
+            m.metadata = {
+                type: "environment",
+            };
             //m.unfreezeWorldMatrix();
             //m.doNotSyncBoundingInfo = true;
 

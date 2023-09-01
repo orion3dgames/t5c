@@ -11,7 +11,7 @@ export class LootSchema extends Entity {
     @type("number") public z: number = 0;
     @type("number") public rot: number = 0;
     @type("string") public key: string = "";
-    @type("int16") public quantity: number = 0;
+    @type("int16") public qty: number = 0;
 
     public spawnTimer: number = 0;
     public name: string = "";

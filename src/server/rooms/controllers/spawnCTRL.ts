@@ -20,7 +20,7 @@ export class spawnCTRL {
         this._location = dataDB.get("location", this._room.metadata.location);
         this.process();
 
-        for (let i = 0; i < 25; i++) {
+        for (let i = 0; i < 1000; i++) {
             this.createItem();
         }
     }
@@ -75,7 +75,7 @@ export class spawnCTRL {
             x: currentPosition.x,
             y: currentPosition.y,
             z: currentPosition.z,
-            quantity: 1,
+            qty: 1,
         };
         let entity = new LootSchema(this, data);
         this._state.entityCTRL.add(entity);

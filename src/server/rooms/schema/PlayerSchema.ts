@@ -260,7 +260,7 @@ export class PlayerSchema extends Entity {
             x: this.x,
             y: this.y,
             z: this.z,
-            quantity: newQuantity,
+            qty: newQuantity,
         };
         let entity = new LootSchema(this, data);
         this._state.entityCTRL.add(entity);
@@ -277,7 +277,7 @@ export class PlayerSchema extends Entity {
     pickupItem(loot: LootSchema) {
         let data = {
             key: loot.key,
-            qty: loot.quantity,
+            qty: loot.qty,
             i: "" + 0,
         };
 
@@ -359,7 +359,7 @@ export class PlayerSchema extends Entity {
         this.pickupItem(
             new LootSchema(key, {
                 key: key,
-                quantity: 1,
+                qty: 1,
             })
         );
     }

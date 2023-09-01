@@ -217,7 +217,7 @@ export class GameRoomState extends Schema {
         /////////////////////////////////////
         // on player ressurect
         if (type === "pickup_item") {
-            const itemState = this.getEntity(data.sessionId);
+            const itemState = this.getEntity(data);
             if (itemState) {
                 playerState.setTarget(itemState);
             }
