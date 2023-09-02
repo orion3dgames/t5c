@@ -12,13 +12,13 @@ export class PlayerCamera {
     public cameraPos;
     private _postProcess: BlackAndWhitePostProcess; //
 
-    constructor(scene: Scene, input) {
-        this._scene = scene;
-        this._input = input;
-        this._build();
+    constructor(player) {
+        this._scene = player._scene;
+        this._input = player._input;
+        this._build(player);
     }
 
-    private _build() {
+    private _build(player) {
         // root camera parent that handles positioning of the camera to follow the player
         this._camRoot = new TransformNode("root");
         this._camRoot.position = new Vector3(0, 1.5, 0); //initialized at (0,0,0)
@@ -60,9 +60,8 @@ export class PlayerCamera {
 
     public follow(playerPosition, rotationY): void {
         // camera must follow player
-        let centerPlayer = playerPosition.y;
-        this._camRoot.position = Vector3.Lerp(this._camRoot.position, new Vector3(playerPosition.x, centerPlayer, playerPosition.z), 0.9);
-        //this._camRoot.position = new Vector3(playerPosition.x, playerPosition.y, playerPosition.z);
+        //this._camRoot.position = Vector3.Lerp(this._camRoot.position, new Vector3(playerPosition.x, centerPlayer, playerPosition.z), 0.9);
+        this._camRoot.position = new Vector3(playerPosition.x, playerPosition.y, playerPosition.z);
 
         // to implement when the direction of the player depends on the mouse position clicked on the terrain and not on the screen
         // this._camRoot.rotation = new Vector3(this._camRoot.rotation.x, rotationY, 0);

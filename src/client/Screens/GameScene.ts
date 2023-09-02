@@ -143,7 +143,8 @@ export class GameScene {
                 );
                 root.rootNodes[0].name = modelToLoadKey;
                 this._loadedAssets[modelToLoadKey] = mergeMesh(root.rootNodes[0]);
-                this._loadedAssets[modelToLoadKey].visibility = 1;
+                //this._loadedAssets[modelToLoadKey].visibility = 1;
+                this._loadedAssets[modelToLoadKey].isVisible = false;
                 root.rootNodes[0].dispose();
             }
         }

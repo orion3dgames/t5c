@@ -88,13 +88,13 @@ export class Item extends TransformNode {
             this._loadedAssets["ROOT_ITEM_" + entity.key].setParent(null);
         } else if (mode === "clone") {
             // clone
-            if(this._loadedAssets["ROOT_ITEM_" + entity.key]){
+            if (this._loadedAssets["ROOT_ITEM_" + entity.key]) {
                 this.mesh = this._loadedAssets["ROOT_ITEM_" + entity.key].clone("TEST_" + entity.sessionId);
                 this.mesh.visibility = 1;
-            }else{
+            } else {
                 console.error("Could not find key: ROOT_ITEM_" + entity.key, this._loadedAssets);
             }
-            
+
             // import normal
         } else {
             const result = await this._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene((name) => "instance_" + this.entity.sessionId, false, {
@@ -112,8 +112,8 @@ export class Item extends TransformNode {
         this.mesh.isPickable = true;
         this.mesh.isVisible = true;
         this.mesh.checkCollisions = false;
-        this.mesh.showBoundingBox = true;
-        this.mesh.receiveShadows = true;
+        this.mesh.showBoundingBox = false;
+        // this.mesh.receiveShadows = true;
 
         // offset mesh from the ground
         let meshSize = this.mesh.getBoundingInfo().boundingBox.extendSize;
@@ -137,7 +137,6 @@ export class Item extends TransformNode {
         // entity network event
         // colyseus automatically sends entity updates, so let's listen to those changes
         this.entity.onChange(() => {
-          
             // update player data from server data
             Object.assign(this, this.entity);
 
@@ -151,36 +150,35 @@ export class Item extends TransformNode {
         // register hover over player
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
-                console.log(ev);
-                /*
-                let mesh = ev.meshUnderPointer as InstancedMesh;
-                mesh.overlayColor = Color3.White();
-                mesh.renderOverlay = true;
-                */
+                // remove any previous overlay
+                if (this.overlay_mesh) {
+                    this.overlay_mesh.dispose();
+                }
 
+                // hide original mesh
+                this.mesh.isVisible = false;
+
+                // clone mesh from memory
                 this.overlay_mesh = this._loadedAssets["ROOT_ITEM_" + entity.key].clone("OVERLAY_" + entity.sessionId);
-                this.overlay_mesh.position.set(this.mesh.position);
-                this.overlay_mesh.rotation = this.mesh.position;
+                this.overlay_mesh.metadata = this.mesh.metadata;
+                this.overlay_mesh.position = this.getPosition();
+                this.overlay_mesh.position.y += this.mesh.position.y;
+                this.overlay_mesh.rotation = this.mesh.rotation;
                 this.overlay_mesh.scaling = this.mesh.scaling;
                 this.overlay_mesh.overlayColor = Color3.White();
                 this.overlay_mesh.renderOverlay = true;
+                this.overlay_mesh.isVisible = true;
 
-
-                this.mesh.isVisible = false;
-                
-            })
-        );
-
-        // register hover out player
-        this.mesh.actionManager.registerAction(
-            new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
-                console.log(ev);
-                /*
-                let mesh = ev.meshUnderPointer as InstancedMesh;
-                mesh.renderOverlay = false;
-                */
-                this.mesh.isVisible = true;
-                this.overlay_mesh.dispose();
+                // register hover out item
+                this.overlay_mesh.actionManager = new ActionManager(this._scene);
+                this.overlay_mesh.actionManager.registerAction(
+                    new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
+                        //
+                        this.overlay_mesh.dispose();
+                        //
+                        this.mesh.isVisible = true;
+                    })
+                );
             })
         );
 

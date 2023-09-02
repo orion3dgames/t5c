@@ -31,7 +31,7 @@ export class ChatBox {
 
         this._colors = {
             event: "orange",
-            system: "darkgray",
+            system: "green",
             chat: "white",
         };
 

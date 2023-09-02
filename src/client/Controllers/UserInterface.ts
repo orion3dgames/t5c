@@ -234,7 +234,7 @@ export class UserInterface {
 
     public update() {
         //
-        /*
+
         if (this._currentPlayer._input.left_alt_pressed === true && this.showingLabels === false) {
             for (let sessionId in this._entities) {
                 if (this._entities[sessionId].characterLabel) {
@@ -251,7 +251,8 @@ export class UserInterface {
                 }
             }
             this.showingLabels = false;
-        }*/
+        }
+
         /*
         // hide entity labels if out of distance
         for (let sessionId in this._entities) {

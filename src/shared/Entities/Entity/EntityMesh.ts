@@ -208,8 +208,8 @@ export class EntityMesh {
                     let boneId = this._entity.bones[key];
                     let bone = this.skeleton.bones[boneId];
 
-                    const weaponMesh = this._loadedAssets["ROOT_ITEM_" + e.key].clone("player_" + e.key);
-                    weaponMesh.visibility = 1;
+                    const weaponMesh = this._loadedAssets["ROOT_ITEM_" + e.key].createInstance("player_" + e.key);
+                    weaponMesh.isVisible = true;
                     //const weapon = this._loadedAssets["ITEM_" + e.key].instantiateModelsToScene((name) => "player_" + e.key, true);
                     //const weaponMesh = weapon.rootNodes[0];
                     weaponMesh.parent = this.playerMesh;

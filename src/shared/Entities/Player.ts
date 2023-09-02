@@ -62,7 +62,7 @@ export class Player extends Entity {
     private async spawnPlayer(input) {
         //spawn
         this.utilsController = new EntityUtils(this._scene, this._room);
-        this.cameraController = new PlayerCamera(this._scene, this._input);
+        this.cameraController = new PlayerCamera(this);
         this.actionsController = new EntityActions(this._scene, this._loadedAssets);
 
         // add mesh to shadow generator
