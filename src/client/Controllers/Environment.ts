@@ -484,7 +484,7 @@ export class Environment {
         this.allMeshes.forEach((m: Mesh) => {
             // default values
             m.checkCollisions = false;
-            m.isPickable = false;
+            m.isPickable = true;
             m.receiveShadows = true;
 
             m.metadata = {

@@ -9,7 +9,7 @@ import { gameDataCTRL } from "../controllers/gameDataCTRL";
 
 import { GameRoom } from "../GameRoom";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
-import { NavMesh } from "../../../shared/yuka-min";
+import { NavMesh, Vector3 } from "../../../shared/yuka-min";
 
 import { nanoid } from "nanoid";
 import Logger from "../../../shared/Logger";
@@ -212,6 +212,9 @@ export class GameRoomState extends Schema {
         if (type === "playerInput") {
             let playerInputs = data as PlayerInputs;
             playerState.moveCTRL.processPlayerInput(playerInputs);
+        }
+        if (type === "move_to") {
+            playerState.moveCTRL.moveToPosition(new Vector3(data.x, data.y, data.z));
         }
 
         /////////////////////////////////////

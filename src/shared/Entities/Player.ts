@@ -153,7 +153,12 @@ export class Player extends Entity {
 
         // move to
         if (metadata.type === "environment") {
-            //this._room.send("move_to", pointerInfo);
+            let destination = pointerInfo._pickInfo.pickedPoint;
+            this._room.send("move_to", {
+                x: destination._x,
+                y: destination._y,
+                z: destination._z,
+            });
         }
     }
 
