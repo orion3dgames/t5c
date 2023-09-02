@@ -61,8 +61,8 @@ export class PlayerCamera {
     public follow(playerPosition, rotationY): void {
         // camera must follow player
         let centerPlayer = playerPosition.y;
-        //this._camRoot.position = Vector3.Lerp(this._camRoot.position, new Vector3(playerPosition.x, centerPlayer, playerPosition.z), 0.4);
-        this._camRoot.position = new Vector3(playerPosition.x, playerPosition.y, playerPosition.z);
+        this._camRoot.position = Vector3.Lerp(this._camRoot.position, new Vector3(playerPosition.x, centerPlayer, playerPosition.z), 0.9);
+        //this._camRoot.position = new Vector3(playerPosition.x, playerPosition.y, playerPosition.z);
 
         // to implement when the direction of the player depends on the mouse position clicked on the terrain and not on the screen
         // this._camRoot.rotation = new Vector3(this._camRoot.rotation.x, rotationY, 0);
