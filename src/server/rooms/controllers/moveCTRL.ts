@@ -12,11 +12,6 @@ export class moveCTRL {
     }
 
     public update() {
-        // if player has a target, monitor it's position.
-        if (this._owner.hasTarget() || this._owner.AI_TARGET_POSITION) {
-            //this._owner.monitorTarget();
-        }
-
         // if player has a target
         if (this._owner.hasTarget()) {
             // monitor player's target position

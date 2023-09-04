@@ -215,6 +215,7 @@ export class GameRoomState extends Schema {
             playerState.moveCTRL.processPlayerInput(playerInputs);
         }
         if (type === "move_to") {
+            playerState.abilitiesCTRL.cancelAutoAttack(playerState);
             playerState.moveCTRL.setTargetDestination(new Vector3(data.x, data.y, data.z));
         }
 
