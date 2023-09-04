@@ -20,7 +20,7 @@ export class spawnCTRL {
         this._location = dataDB.get("location", this._room.metadata.location);
         this.process();
 
-        for (let i = 0; i < 1000; i++) {
+        for (let i = 0; i < 100; i++) {
             this.createItem();
         }
     }
