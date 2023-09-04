@@ -211,10 +211,11 @@ export class GameRoomState extends Schema {
         // on player input
         if (type === "playerInput") {
             let playerInputs = data as PlayerInputs;
+            console.log(playerInputs);
             playerState.moveCTRL.processPlayerInput(playerInputs);
         }
         if (type === "move_to") {
-            playerState.moveCTRL.moveToPosition(new Vector3(data.x, data.y, data.z));
+            playerState.moveCTRL.setTargetDestination(new Vector3(data.x, data.y, data.z));
         }
 
         /////////////////////////////////////

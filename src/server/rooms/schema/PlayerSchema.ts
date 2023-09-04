@@ -86,9 +86,11 @@ export class PlayerSchema extends Entity {
     public spawnTimer: number = 0;
 
     ////////////////////////////
-    public AI_TARGET = null;
+    public AI_TARGET = null; // AI_TARGET will always represent an entity
     public AI_TARGET_POSITION = null;
     public AI_TARGET_DISTANCE = null;
+    public AI_TARGET_WAYPOINTS = [];
+    public AI_ABILITY = null;
 
     // inventory
     public INVENTORY_LENGTH = 25;
@@ -430,21 +432,13 @@ export class PlayerSchema extends Entity {
         this.AI_TARGET = target;
     }
 
-    /**
-     * monitor a target
-     */
     monitorTarget() {
-        if (this.AI_TARGET !== null && this.AI_TARGET !== undefined && this.AI_TARGET.sessionId) {
+        if (this.AI_TARGET !== null && this.AI_TARGET !== undefined) {
             let targetPos = this.AI_TARGET.getPosition();
             let entityPos = this.getPosition();
             let distanceBetween = entityPos.distanceTo(targetPos);
             this.AI_TARGET_POSITION = targetPos;
             this.AI_TARGET_DISTANCE = distanceBetween;
-        } else {
-            // else entity has no target
-            this.AI_TARGET = null;
-            this.AI_TARGET_POSITION = null;
-            this.AI_TARGET_DISTANCE = 0;
         }
     }
 }

@@ -2,10 +2,10 @@ import Logger from "../../../shared/Logger";
 import { Vector3 } from "../../../shared/yuka-min";
 import { PlayerInputs } from "../../../shared/types";
 import { EntityState } from "../../../shared/Entities/Entity/EntityState";
-import { BrainSchema, LootSchema } from "../schema";
+import { BrainSchema, LootSchema, PlayerSchema } from "../schema";
 
 export class moveCTRL {
-    private _owner;
+    private _owner: PlayerSchema;
 
     constructor(owner) {
         this._owner = owner;
@@ -13,15 +13,24 @@ export class moveCTRL {
 
     public update() {
         // if player has a target, monitor it's position.
-        this._owner.monitorTarget();
+        if (this._owner.hasTarget() || this._owner.AI_TARGET_POSITION) {
+            //this._owner.monitorTarget();
+        }
 
-        // if player has a target, start heading towards it.
-        // once you get to it start auto attacking
-        // autoattack stop if casting, moving, dying
+        // if player has a target
         if (this._owner.hasTarget()) {
-            // if close enough
+            // monitor player's target position
+            this._owner.monitorTarget();
+
+            // find the path to target position
+            if (this._owner.AI_TARGET_WAYPOINTS.length < 1) {
+                this.setTargetDestination(this._owner.AI_TARGET_POSITION);
+            }
+
+            // check distance to target
             let distance = this._owner.AI_TARGET_DISTANCE;
             if (distance < 2.5) {
+                // do pickup / attack
                 let ability = this._owner.AI_ABILITY;
                 let target = this._owner.AI_TARGET;
                 if (target instanceof BrainSchema) {
@@ -30,15 +39,52 @@ export class moveCTRL {
                 if (target instanceof LootSchema) {
                     this._owner.pickupItem(target);
                 }
-                this._owner.AI_ARGET = null;
+                // reset
+                this._owner.AI_TARGET_WAYPOINTS = [];
+                this._owner.AI_TARGET = null;
+                this._owner.AI_TARGET_DISTANCE = 0;
+                this._owner.AI_TARGET_POSITION = null;
                 this._owner.AI_ABILITY = null;
-            } else {
-                // move player
-                let start = this._owner.getPosition();
-                let destination = this._owner.AI_TARGET.getPosition();
-                this._owner.rot = this.calculateRotation(start, destination);
-                this.setPosition(this.moveTo(start, destination, this._owner.speed));
             }
+        }
+
+        // head towards next waypoint
+        if (this._owner.AI_TARGET_WAYPOINTS && this._owner.AI_TARGET_WAYPOINTS.length > 0) {
+            this.moveTowards();
+        }
+    }
+
+    setTargetDestination(targetPos: Vector3): void {
+        console.log("[setTargetDestination]", targetPos);
+        this._owner.AI_TARGET_WAYPOINTS = this._owner._navMesh.findPath(this._owner.getPosition(), targetPos);
+        if (this._owner.AI_TARGET_WAYPOINTS.length === 0) {
+            this._owner.AI_TARGET_WAYPOINTS = [];
+        }
+    }
+
+    moveTowards(type: string = "seek") {
+        // move entity
+        if (this._owner.AI_TARGET_WAYPOINTS.length > 0) {
+            let currentPos = this._owner.getPosition();
+
+            // get next waypoint
+            let destinationOnPath = this._owner.AI_TARGET_WAYPOINTS[0];
+
+            // calculate next position towards destination
+            let updatedPos = this.moveTo(currentPos, destinationOnPath, this._owner.speed);
+            this.setPosition(updatedPos);
+
+            // calculate rotation
+            this._owner.rot = this.calculateRotation(currentPos, updatedPos);
+
+            // check if arrived at waypoint
+            if (destinationOnPath.distanceTo(updatedPos) < 1) {
+                this._owner.AI_TARGET_WAYPOINTS.shift();
+            }
+        } else {
+            console.error("moveTowards failed");
+            // something is wrong, let's look for a new destination
+            //this.resetDestination();
         }
     }
 
@@ -59,16 +105,6 @@ export class moveCTRL {
     }
 
     /**
-     * Check if player can move from sourcePos to newPos
-     * @param {Vector3} sourcePos source position
-     * @param {Vector3} newPos destination position
-     * @returns boolean
-     */
-    canMoveTo(sourcePos: Vector3, newPos: Vector3): boolean {
-        return this._owner._gameroom._navMesh.checkPath(sourcePos, newPos);
-    }
-
-    /**
      * Calculate next forward position on the navmesh based on playerInput forces
      * @param {PlayerInputs} playerInput
      * @returns
@@ -78,6 +114,11 @@ export class moveCTRL {
             //this._owner.state = EntityState.IDLE;
             Logger.warning("Player " + this._owner.name + " is blocked, no movement will be processed");
             return false;
+        }
+
+        if (this._owner.AI_TARGET_WAYPOINTS.length > 0) {
+            this._owner.AI_TARGET = null;
+            this._owner.AI_TARGET_WAYPOINTS = [];
         }
 
         // cancel any auto attack
@@ -165,6 +206,13 @@ export class moveCTRL {
             if (newPos.z > targetZ) {
                 newPos.z = targetZ;
             }
+        }
+
+        // adjust y position of the player according to the navmesh
+        let currentRegion = this._owner._navMesh.getRegionForPoint(newPos, 0.5);
+        if (currentRegion && currentRegion.plane) {
+            const distance = currentRegion.plane.distanceToPoint(newPos);
+            newPos.y -= distance; // smooth transition*/
         }
 
         return newPos;

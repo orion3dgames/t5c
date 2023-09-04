@@ -80,6 +80,7 @@ export class Environment {
 
             // textures
             { name: "TXT_selected_circle_green", filename: "selected_circle_green.png", extension: "png", type: "texture" },
+            { name: "TXT_decal_target", filename: "decal_target.png", extension: "png", type: "texture" },
             { name: "TXT_particle_01", filename: "particle_01.png", extension: "png", type: "texture" },
 
             // environment
@@ -229,6 +230,14 @@ export class Environment {
         var material = new StandardMaterial("entity_selected");
         material.diffuseTexture = texture;
         material.useAlphaFromDiffuseTexture = true;
+
+        // entity selected circle
+        var texture = this._loadedAssets["TXT_decal_target"];
+        texture.hasAlpha = true;
+        var material = new StandardMaterial("decal_target");
+        material.diffuseTexture = texture;
+        material.useAlphaFromDiffuseTexture = true;
+        material.zOffset = -2;
     }
 
     public async preloadAssets() {

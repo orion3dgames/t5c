@@ -21,6 +21,9 @@ import { SceneController } from "../../client/Controllers/Scene";
 import { Ability } from "../Data/AbilitiesDB";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 
 export class Player extends Entity {
     public input;
@@ -35,6 +38,7 @@ export class Player extends Entity {
     public ability_in_cooldown;
 
     public player_data;
+    public moveDecal;
 
     constructor(
         entity: PlayerSchema,
@@ -151,9 +155,22 @@ export class Player extends Entity {
             this._room.send("pickup_item", metadata.sessionId);
         }
 
-        // move to
+        // move to clicked point
         if (metadata.type === "environment") {
             let destination = pointerInfo._pickInfo.pickedPoint;
+            let pickedMesh = pointerInfo._pickInfo.pickedMesh;
+
+            // remove decal if already exist
+            if (this.moveDecal) {
+                this.moveDecal.dispose();
+            }
+
+            // add decal to show destination
+            var decalMaterial = this._scene.getMaterialByName("decal_target");
+            this.moveDecal = MeshBuilder.CreateDecal("decal", pickedMesh, { position: destination });
+            this.moveDecal.material = decalMaterial;
+
+            // send to server
             this._room.send("move_to", {
                 x: destination._x,
                 y: destination._y,
