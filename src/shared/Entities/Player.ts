@@ -160,22 +160,25 @@ export class Player extends Entity {
             let destination = pointerInfo._pickInfo.pickedPoint;
             let pickedMesh = pointerInfo._pickInfo.pickedMesh;
 
-            // remove decal if already exist
-            if (this.moveDecal) {
-                this.moveDecal.dispose();
+            const foundPath: any = this._navMesh.checkPath(this.getPosition(), destination);
+            if (foundPath) {
+                // remove decal if already exist
+                if (this.moveDecal) {
+                    this.moveDecal.dispose();
+                }
+
+                // add decal to show destination
+                var decalMaterial = this._scene.getMaterialByName("decal_target");
+                this.moveDecal = MeshBuilder.CreateDecal("decal", pickedMesh, { position: destination });
+                this.moveDecal.material = decalMaterial;
+
+                // send to server
+                this._room.send("move_to", {
+                    x: destination._x,
+                    y: destination._y,
+                    z: destination._z,
+                });
             }
-
-            // add decal to show destination
-            var decalMaterial = this._scene.getMaterialByName("decal_target");
-            this.moveDecal = MeshBuilder.CreateDecal("decal", pickedMesh, { position: destination });
-            this.moveDecal.material = decalMaterial;
-
-            // send to server
-            this._room.send("move_to", {
-                x: destination._x,
-                y: destination._y,
-                z: destination._z,
-            });
         }
     }
 
