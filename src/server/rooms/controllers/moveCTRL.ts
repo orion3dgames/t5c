@@ -59,6 +59,7 @@ export class moveCTRL {
         const foundPath: any = this._owner._navMesh.checkPath(this._owner.getPosition(), targetPos);
         if (foundPath) {
             this._owner.AI_TARGET_WAYPOINTS = this._owner._navMesh.findPath(this._owner.getPosition(), targetPos);
+            this._owner.AI_TARGET_WAYPOINTS.push(targetPos);
             if (this._owner.AI_TARGET_WAYPOINTS.length === 0) {
                 this._owner.AI_TARGET_WAYPOINTS = [];
             }
