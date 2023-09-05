@@ -51,14 +51,17 @@ export class GameRoomState extends Schema {
         this._gameroom = gameroom;
         this.navMesh = _navMesh;
 
+        this.start();
+    }
+
+    public async start() {
         // load game data
         // in the future, it'll be in the database
-        this.gameDataCTRL = new gameDataCTRL({
-            items: dataDB.load("items"),
-            abilities: dataDB.load("abilities"),
-            locations: dataDB.load("locations"),
-            races: dataDB.load("races"),
-        });
+        /*
+        this.gameDataCTRL = new gameDataCTRL();
+        await this.gameDataCTRL.initialize();
+        console.log("GAME DATA LOADED", this.gameDataCTRL);
+        */
 
         //
         this.roomDetails = dataDB.get("location", this._gameroom.metadata.location);
