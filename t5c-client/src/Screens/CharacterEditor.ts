@@ -37,7 +37,7 @@ export class CharacterEditor {
     private leftStackPanel: StackPanel;
     private rightStackPanel: StackPanel;
 
-    private all_races: [] = [];
+    private all_races: Race[] = [];
 
     private selected_mesh;
     private selected_animations;

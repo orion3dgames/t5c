@@ -1,5 +1,3 @@
-import { EntityState } from "../../../t5c-shared";
-
 type Ability = {
     // unique key
     key: string;

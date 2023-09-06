@@ -1,4 +1,60 @@
-import { EntityState } from "./EntityState";
+export type PlayerUser = {
+    id: number;
+    username: string;
+    password: string;
+    token: string;
+    characters?: PlayerCharacter[];
+};
+
+export type PlayerMessage = {
+    type: string;
+    senderID: string;
+    name: string;
+    message: string;
+    timestamp: number;
+    createdAt: string;
+    color: string;
+};
+
+export type PlayerInputs = {
+    seq: number;
+    h: number;
+    v: number;
+};
+
+export type PlayerCharacter = {
+    id: number;
+    user_id: number;
+    name: string;
+    location: string;
+    x: number;
+    y: number;
+    z: number;
+    rot: number;
+    online: number;
+    health: number;
+    mana: number;
+    level: number;
+    experience: number;
+};
+
+export enum EntityState {
+    IDLE = 0,
+    WALKING = 1,
+    RUNNING = 2,
+    ATTACK = 3,
+    TAKING_DAMAGE = 4,
+    DEAD = 5,
+    SPELL_CASTING = 6,
+    SPELL_CAST = 7,
+}
+
+export enum AI_STATE {
+    IDLE = 0,
+    WANDER = 1,
+    SEEKING = 2,
+    ATTACKING = 3,
+}
 
 export class Ability {
     // unique key

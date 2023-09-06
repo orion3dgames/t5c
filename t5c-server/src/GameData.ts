@@ -1,7 +1,7 @@
-import { AbilitiesDB, Ability } from "./data/AbilitiesDB";
-import { Race, RacesDB } from "./data/RacesDB";
+import { AbilitiesDB } from "./data/AbilitiesDB";
+import { RacesDB } from "./data/RacesDB";
 import { LocationsDB } from "./data/LocationsDB";
-import { Item, ItemsDB } from "./data/ItemDB";
+import { ItemsDB } from "./data/ItemDB";
 
 export class GameData {
     public static get(type, key) {
