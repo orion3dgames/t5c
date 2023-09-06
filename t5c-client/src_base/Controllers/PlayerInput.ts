@@ -1,12 +1,14 @@
 import { Scene } from "@babylonjs/core/scene";
 import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 import { KeyboardEventTypes } from "@babylonjs/core/Events/keyboardEvents";
+import { Room } from "colyseus.js";
+import { UserInterface } from "./UserInterface";
 
 export class PlayerInput {
     public inputMap: {};
     private _scene: Scene;
     private _gameroom;
-    private _ui;
+    private _ui: UserInterface;
 
     //simple movement
     public horizontal: number = 0;

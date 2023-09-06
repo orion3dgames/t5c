@@ -1,3 +1,5 @@
+import State from "./t5c-client/src/Screens/Screens";
+
 export class Config {
     // general settings
     title = "T5C";
@@ -35,5 +37,5 @@ export class Config {
 
     // default scene
     //defaultScene= isLocal() ? State.GAME = State.LOGIN,
-    defaultScene = "GAME";
+    defaultScene = State.LOGIN;
 }

@@ -2,33 +2,23 @@
   "compileOnSave": true,
   "compilerOptions": {
     "target": "ES6",
-    "module": "CommonJS",
-    "sourceMap": true,
-    "outDir": "./dist/server",
+    "module": "commonjs",
+    "lib": ["es6", "dom"],
     "strict": false,
     "experimentalDecorators": true,
     "esModuleInterop": true,
     "allowJs": true,
     "moduleResolution": "node",
-    "types": [
-      "node",
-    ],
-    "typeRoots": [
-      "node_modules/@types"
-    ],
     "baseUrl": ".", 
     "paths": {
-			"@shared/*": ["../shared/*"],
-		}
-  },
+      //"@utils/*": ["src/utils/*"]
+    },
+    "skipLibCheck": true,
+  }, 
   "include": [
-    "src/server/*",
-    "src/**/*.d.ts",
-    "src/shared/**/*.ts",
-    "src/shared/**/*.js", 
+    "src"
   ],
   "exclude": [
     "node_modules",
-    "**/*.spec.js"
   ]
 }

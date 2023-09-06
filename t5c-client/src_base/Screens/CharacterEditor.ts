@@ -6,27 +6,33 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { InputText } from "@babylonjs/gui/2D/controls/inputText";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { Control } from "@babylonjs/gui/2D/controls/control";
+import { Image } from "@babylonjs/gui/2D/controls/image";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
+import { ContainerAssetTask, MeshAssetTask } from "@babylonjs/core/Misc/assetsManager";
+import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
+
 import { Environment } from "../Controllers/Environment";
+import { SceneController } from "../Controllers/Scene";
+import { AuthController } from "../Controllers/AuthController";
 import State from "./Screens";
-import { apiUrl, generateRandomPlayerName } from "../Utils";
+import { request, apiUrl, generateRandomPlayerName } from "../../shared/Utils";
+import { dataDB } from "../../shared/Data/dataDB";
+import { FollowCamera } from "@babylonjs/core/Cameras/followCamera";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
+import { reloadFromCache } from "@colyseus/core/build/utils/DevMode";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
-import { GameController } from "../Controllers/GameController";
-import axios from "axios";
+import { RacesDB, Race } from "../../shared/Data/RacesDB";
 
 export class CharacterEditor {
-    public _app;
     public _scene: Scene;
-    public _game: GameController;
-    public _engine;
+    private _auth: AuthController;
     public _environment;
     public _newState: State;
     public _button: Button;
@@ -37,7 +43,7 @@ export class CharacterEditor {
     private leftStackPanel: StackPanel;
     private rightStackPanel: StackPanel;
 
-    private all_races: [] = [];
+    private all_races: Race[] = [];
 
     private selected_mesh;
     private selected_animations;
@@ -51,9 +57,8 @@ export class CharacterEditor {
     }
 
     public async createScene(app) {
-        this._app = app;
-        this._game = app.game;
-        this._engine = app.engine;
+        // auth controller
+        this._auth = AuthController.getInstance();
 
         let scene = new Scene(app.engine);
         scene.clearColor = new Color4(0.1, 0.1, 0.1, 1);
@@ -98,15 +103,15 @@ export class CharacterEditor {
 
         // if no user logged in, force a auto login
         // to be remove later or
-        if (!this._game.isLoggedIn()) {
-            await this._game.forceLogin();
+        if (!this._auth.currentUser) {
+            await this._auth.forceLogin();
         }
 
         // check if user token is valid
-        let user = await this._game.isValidLogin();
+        let user = await this._auth.loggedIn();
         if (!user) {
             // if token not valid, send back to login screen
-            this._game.setScene(State.LOGIN);
+            SceneController.goToScene(State.LOGIN);
         }
 
         /////////////////////////////////////////////////////////
@@ -175,7 +180,7 @@ export class CharacterEditor {
         /////////////////////////////////////////////////////////
 
         let choices = ["male_knight", "male_mage"];
-        let races = this._game.loadGameData("races");
+        let races = dataDB.load("races");
 
         for (let race in races) {
             if (choices.includes(race)) {
@@ -397,10 +402,10 @@ export class CharacterEditor {
         centerColumnRect.addControl(playBtn);
         playBtn.onPointerDownObservable.add(() => {
             // create new character via database
-            this.createCharacter(this._game.currentUser.token, usernameInput.text).then((char) => {
+            this.createCharacter(this._auth.currentUser.token, usernameInput.text).then((char) => {
                 // login as this character
-                this._game.setCharacter(char);
-                this._game.setScene(State.CHARACTER_SELECTION);
+                this._auth.setCharacter(char);
+                SceneController.goToScene(State.CHARACTER_SELECTION);
                 // reset text
                 usernameInput.text = "";
             });
@@ -418,7 +423,7 @@ export class CharacterEditor {
         backBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         centerColumnRect.addControl(backBtn);
         backBtn.onPointerDownObservable.add(() => {
-            this._game.setScene(State.CHARACTER_SELECTION);
+            SceneController.goToScene(State.CHARACTER_SELECTION);
         });
     }
 
@@ -435,15 +440,11 @@ export class CharacterEditor {
         }
 
         // check user exists else send back to login
-        const req = await axios.request({
-            method: "POST",
-            params: {
-                token: token,
-                name: name,
-                race: this.selected_race.key,
-                color: this.selected_variant.material,
-            },
-            url: apiUrl() + "/create_character",
+        let req = await request("post", apiUrl() + "/create_character", {
+            token: token,
+            name: name,
+            race: this.selected_race.key,
+            color: this.selected_variant.material,
         });
 
         // check req status

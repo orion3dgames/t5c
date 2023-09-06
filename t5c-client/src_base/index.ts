@@ -17,16 +17,16 @@ import { Scene } from "@babylonjs/core/scene";
 
 // IMPORT SCREEN
 import State from "./Screens/Screens";
+import { GameScene } from "./Screens/GameScene";
 import { LoginScene } from "./Screens/LoginScene";
 import { CharacterSelectionScene } from "./Screens/CharacterSelection";
+import { CharacterEditor } from "./Screens/CharacterEditor";
+import { DebugScene } from "./Screens/DebugScene";
 
 import { Config } from "../../Config";
 import { Network } from "./Controllers/Network";
 import { Loading } from "./Controllers/Loading";
 import { isLocal } from "./Utils";
-
-import { Environment } from "./Controllers/Environment";
-import { GameController } from "./Controllers/GameController";
 
 // App class is our entire game application
 class App {
@@ -36,16 +36,25 @@ class App {
     public client: Network;
     public scene: Scene;
     public config: Config;
-    public _environment;
-    public _loadedAssets = null;
 
     // scene management
     public state: number = 0;
     public currentScene;
     public nextScene;
 
-    //
-    public game: GameController;
+    // custom data
+    public metaData: {
+        nextScene: State;
+        currentRoomID: string;
+        currentSessionID: string;
+        currentLocation;
+        currentUser;
+        currentCharacter;
+        selectedEntity;
+        locale: "en";
+        currentMs: number;
+        camY: number;
+    };
 
     constructor() {
         // create canvas
@@ -56,6 +65,13 @@ class App {
 
         // initialize babylon scene and engine
         this._init();
+
+        // setup default values
+        global.T5C = {
+            nextScene: this.config.defaultScene,
+            currentMs: 0,
+            camY: 0,
+        };
     }
 
     private async _init(): Promise<void> {
@@ -64,15 +80,6 @@ class App {
             adaptToDeviceRatio: true,
             antialias: true,
         });
-
-        // preload game data
-        this.game = new GameController(this);
-
-        // load game data
-        await this.game.initializeGameData();
-
-        // set default scene
-        this.game.setScene(this.config.defaultScene);
 
         // loading
         var loadingScreen = new Loading("Loading Assets...");
@@ -113,6 +120,36 @@ class App {
                     this.state = State.NULL;
                     break;
 
+                ///////////////////////////////////////
+                // CHARACTER EDITOR SCENE
+                case State.CHARACTER_EDITOR:
+                    this.clearScene();
+                    this.currentScene = new CharacterEditor();
+                    this.currentScene.createScene(this);
+                    this.scene = this.currentScene._scene;
+                    this.state = State.NULL;
+                    break;
+
+                ///////////////////////////////////////
+                // GAME SCENE
+                case State.GAME:
+                    this.clearScene();
+                    this.currentScene = new GameScene();
+                    this.currentScene.createScene(this);
+                    this.scene = this.currentScene._scene;
+                    this.state = State.NULL;
+                    break;
+
+                ///////////////////////////////////////
+                // DEBUG SCENE
+                case State.DEBUG_SCENE:
+                    this.clearScene();
+                    this.currentScene = new DebugScene();
+                    this.currentScene.createScene(this);
+                    this.scene = this.currentScene._scene;
+                    this.state = State.NULL;
+                    break;
+
                 default:
                     break;
             }
@@ -145,9 +182,9 @@ class App {
     }
 
     private checkForSceneChange() {
-        let currentScene = this.nextScene;
-        if (this.nextScene != State.NULL) {
-            this.nextScene = State.NULL;
+        let currentScene = global.T5C.nextScene;
+        if (global.T5C.nextScene != State.NULL) {
+            global.T5C.nextScene = State.NULL;
             return currentScene;
         }
     }

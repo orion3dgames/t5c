@@ -58,8 +58,8 @@ let RacesDB: raceDataMap = {
         baseMana: 50,
         healthRegen: 0.2,
         manaRegen: 0.4, // per second
-        experienceGain: {},
-        goldGain: {},
+        experienceGain: { min: 0, max: 0 },
+        goldGain: { min: 0, max: 0 },
         drops: [],
         default_abilities: ["base_attack"],
         materials: [
@@ -98,6 +98,8 @@ let RacesDB: raceDataMap = {
         baseMana: 50,
         healthRegen: 0.2,
         manaRegen: 0.4,
+        experienceGain: { min: 0, max: 0 },
+        goldGain: { min: 0, max: 0 },
         drops: [],
         default_abilities: ["base_attack"],
         materials: [

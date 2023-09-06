@@ -22,7 +22,6 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Tags } from "@babylonjs/core/Misc/tags";
 import { AuthController } from "./AuthController";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { GameData } from "../../../t5c-server/src/GameData";
 
 type Asset = {
     name: string;
@@ -93,7 +92,7 @@ export class Environment {
         ];
 
         // add abilities (icons)
-        let abilities = GameData.load("abilities");
+        let abilities = dataDB.load("abilities");
         if (abilities) {
             for (let key in abilities) {
                 let el = abilities[key];
@@ -102,7 +101,7 @@ export class Environment {
         }
 
         // add items (icons & mesh)
-        let items = GameData.load("items");
+        let items = dataDB.load("items");
         if (items) {
             for (let key in items) {
                 let el = items[key];
@@ -112,7 +111,7 @@ export class Environment {
         }
 
         // add races (mesh)
-        let races = GameData.load("races");
+        let races = dataDB.load("races");
         if (races) {
             for (let key in races) {
                 let el = races[key];
@@ -258,7 +257,7 @@ export class Environment {
         ];
 
         // add locations
-        let locations = GameData.load("locations");
+        let locations = dataDB.load("locations");
         if (locations) {
             for (let key in locations) {
                 let el = locations[key];
@@ -267,7 +266,7 @@ export class Environment {
         }
 
         // add abilities (icons)
-        let abilities = GameData.load("abilities");
+        let abilities = dataDB.load("abilities");
         if (abilities) {
             for (let key in abilities) {
                 let el = abilities[key];
@@ -276,7 +275,7 @@ export class Environment {
         }
 
         // add items (icons & mesh)
-        let items = GameData.load("items");
+        let items = dataDB.load("items");
         if (items) {
             for (let key in items) {
                 let el = items[key];
@@ -286,7 +285,7 @@ export class Environment {
         }
 
         // add races (mesh)
-        let races = GameData.load("races");
+        let races = dataDB.load("races");
         if (races) {
             for (let key in races) {
                 let el = races[key];
@@ -409,7 +408,7 @@ export class Environment {
     public async loadCharacterEditor() {
         let assetsToLoad: any = [];
 
-        let races = GameData.load("races");
+        let races = dataDB.load("races");
         if (races) {
             for (let key in races) {
                 let el = races[key];

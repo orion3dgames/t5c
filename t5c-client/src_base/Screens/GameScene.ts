@@ -39,6 +39,8 @@ export class GameScene {
     private _currentPlayer: Player;
     private _loadedAssets: AssetContainer[] = [];
 
+    public gameData;
+
     // networked entities
     private entities: Entity[] = [];
     private players: Player[] = [];
@@ -121,13 +123,20 @@ export class GameScene {
         await this._environment.loadAssets();
         //let navMeshGroup = createConvexRegionHelper(this._navMesh, this._scene)
 
+        // instancite items so we can use them later as instances
         await this._instantiate();
 
+        // instancite items so we can use them later as instances
+        this.gameData = await this._loadGameData();
+
+        /*
         // load the rest
         this._app.engine.displayLoadingUI();
         await this._environment.prepareAssets();
-        await this._initNetwork();
+        await this._initNetwork();*/
     }
+
+    private async _loadGameData(): Promise<void> {}
 
     private async _instantiate(): Promise<void> {
         for (let k in this._loadedAssets) {

@@ -12,8 +12,10 @@ import { InputText } from "@babylonjs/gui/2D/controls/inputText";
 import { InputPassword } from "@babylonjs/gui/2D/controls/inputPassword";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 
+import Config from "../../shared/Config";
 import State from "./Screens";
-import { GameController } from "../Controllers/GameController";
+import { SceneController } from "../Controllers/Scene";
+import { AuthController } from "../Controllers/AuthController";
 import { Environment } from "../Controllers/Environment";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
@@ -21,7 +23,6 @@ import { AssetContainer } from "@babylonjs/core/assetContainer";
 
 export class LoginScene {
     private _app;
-    private _game;
     public _scene: Scene;
     public _newState: State;
     public _button: Button;
@@ -37,7 +38,6 @@ export class LoginScene {
     async createScene(app): Promise<void> {
         // app
         this._app = app;
-        this._game = app.game;
 
         // create scene
         let scene = new Scene(app.engine);
@@ -50,9 +50,9 @@ export class LoginScene {
 
         // preload assets
         /*
-        this._environment = new Environment(this._scene, this._loadedAssets);
+        this._environment = new Environment(scene, this._shadow, this._loadedAssets);
         await this._environment.preloadAssets();
-        app._loadedAssets = this._loadedAssets;*/
+        app.engine.hideLoadingUI();*/
 
         //creates and positions a free camera
         let camera = new FreeCamera("camera1", new Vector3(0, 0, 0), this._scene);
@@ -66,7 +66,7 @@ export class LoginScene {
     create(guiMenu) {
         // middle columm
         const columnRect = new Rectangle("column");
-        columnRect.width = this._app.config.UI_SIDEBAR_WIDTH;
+        columnRect.width = Config.UI_SIDEBAR_WIDTH;
         columnRect.height = 1;
         columnRect.background = "#000000";
         columnRect.thickness = 0;
@@ -83,7 +83,7 @@ export class LoginScene {
         columnRect.addControl(imgLogo);
 
         // welcome text
-        const welcomeText = new TextBlock("infotext", this._app.config.version);
+        const welcomeText = new TextBlock("infotext", Config.version);
         welcomeText.width = 0.8;
         welcomeText.height = "40px";
         welcomeText.color = "white";
@@ -174,7 +174,7 @@ export class LoginScene {
         joinGuestBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         formContainer.addControl(joinGuestBtn);
         joinGuestBtn.onPointerDownObservable.add(async () => {
-            this._game.setScene(State.CHARACTER_SELECTION);
+            SceneController.goToScene(State.CHARACTER_SELECTION);
         });
 
         // load scene
@@ -182,9 +182,10 @@ export class LoginScene {
     }
 
     async login(username, password) {
-        let loginResult = await this._game.login(username, password);
+        const Auth = AuthController.getInstance();
+        let loginResult = await Auth.login(username, password);
         if (loginResult) {
-            this._game.setScene(State.CHARACTER_SELECTION);
+            SceneController.goToScene(State.CHARACTER_SELECTION);
         }
     }
 }

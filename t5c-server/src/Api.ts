@@ -24,12 +24,12 @@ class Api {
         //////////////////////////////////////////////////
         ///////////// ESPRESS MINI API ///////////////////
         //////////////////////////////////////////////////
-        app.get("/login", (req, res) => {
+        app.post("/login", (req, res) => {
             const username: string = (req.query.username as string) ?? "";
             const password: string = (req.query.password as string) ?? "";
             if (username && password) {
                 Logger.info("[api][/login] checking password.");
-                app.database
+                database
                     .getUser(username, password)
                     .then((user) => {
                         if (!user) {
@@ -144,7 +144,7 @@ class Api {
 
         app.get("/register", (req, res) => {});
 
-        app.get("/returnRandomUser", (req, res) => {
+        app.post("/returnRandomUser", (req, res) => {
             database.saveUser(generateRandomPlayerName(), generateRandomPlayerName()).then((user) => {
                 database.createCharacter(user.token, generateRandomPlayerName(), "male_knight", "knight_texture.png").then((character) => {
                     character.user_id = user.id;

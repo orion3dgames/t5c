@@ -1,7 +1,5 @@
-import { dataDB } from "../../shared/Data/dataDB";
-import { PlayerCharacter } from "../../shared/types";
-import { apiUrl } from "../../shared/Utils";
-import request from "../../shared/Utils/requests";
+import { apiUrl } from "../Utils";
+import request from "../Utils/requests";
 import State from "../Screens/Screens";
 import { SceneController } from "./Scene";
 
@@ -10,8 +8,6 @@ class AuthController {
 
     private _currentUser;
     private _currentCharacter;
-    private _currentLocationKey;
-    private _currentLocation;
 
     /**
      * The Singleton's constructor should always be private to prevent direct
@@ -34,10 +30,6 @@ class AuthController {
 
     public get currentUser() {
         return this._currentUser;
-    }
-
-    public get currentLocation() {
-        return this._currentLocation;
     }
 
     public get currentCharacter() {
@@ -119,24 +111,14 @@ class AuthController {
     }
 
     // set character
-    public setCharacter(character: PlayerCharacter) {
+    public setCharacter(character) {
         this._currentCharacter = character;
-        this._currentLocationKey = character.location;
-        this._currentLocation = dataDB.get("location", character.location);
-    }
-
-    // set location
-    public setLocation(location) {
-        this._currentLocationKey = location;
-        this._currentLocation = dataDB.get("location", location);
     }
 
     // logout
     public logout() {
         this._currentUser = null;
         this._currentCharacter = null;
-        this._currentLocationKey = null;
-        this._currentLocation = null;
         SceneController.goToScene(State.LOGIN);
     }
 }
