@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/Logger.ts"],
+  "sourcesContent": ["//\n// Abstract logging adaptor\n//\nexport class Logger {\n  debug(...args) {\n    logger.debug(...args);\n  }\n\n  error(...args) {\n    logger.error(...args);\n  }\n\n  info(...args) {\n    logger.info(...args);\n  }\n\n  trace(...args) {\n    logger.trace(...args);\n  }\n\n  warn(...args) {\n    logger.warn(...args);\n  }\n}\n\nexport let logger: Logger = console;\n\nexport function setLogger(instance: Logger) {\n  logger = instance;\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAGO,MAAM,OAAO;AAAA,EAClB,SAAS,MAAM;AACb,WAAO,MAAM,GAAG,IAAI;AAAA,EACtB;AAAA,EAEA,SAAS,MAAM;AACb,WAAO,MAAM,GAAG,IAAI;AAAA,EACtB;AAAA,EAEA,QAAQ,MAAM;AACZ,WAAO,KAAK,GAAG,IAAI;AAAA,EACrB;AAAA,EAEA,SAAS,MAAM;AACb,WAAO,MAAM,GAAG,IAAI;AAAA,EACtB;AAAA,EAEA,QAAQ,MAAM;AACZ,WAAO,KAAK,GAAG,IAAI;AAAA,EACrB;AACF;AAEO,IAAI,SAAiB;AAErB,SAAS,UAAU,UAAkB;AAC1C,WAAS;AACX;",
+  "names": []
+}

@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/index.ts"],
+  "sourcesContent": ["export * from \"@colyseus/core\";\n\n//\n// 0.14.x compatibility:\n// each \"presence\", \"transport\", and \"driver\" implementation have been extracted from the core.\n//\nimport { Server } from '@colyseus/core';\nimport { WebSocketTransport } from '@colyseus/ws-transport';\nServer.prototype['getDefaultTransport'] = function(options: any) {\n    return new WebSocketTransport(options);\n}\nexport { RedisPresence } from '@colyseus/redis-presence';\nexport { RedisDriver } from '@colyseus/redis-driver';\n"],
+  "mappings": "AAAA,cAAc;AAMd,SAAS,cAAc;AACvB,SAAS,0BAA0B;AACnC,OAAO,UAAU,yBAAyB,SAAS,SAAc;AAC7D,SAAO,IAAI,mBAAmB,OAAO;AACzC;AACA,SAAS,qBAAqB;AAC9B,SAAS,mBAAmB;",
+  "names": []
+}

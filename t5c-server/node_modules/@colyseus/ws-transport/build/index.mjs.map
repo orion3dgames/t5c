@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/index.ts"],
+  "sourcesContent": ["export { WebSocketClient } from \"./WebSocketClient\";\nexport { WebSocketTransport, TransportOptions } from \"./WebSocketTransport\";"],
+  "mappings": "AAAA,SAAS,uBAAuB;AAChC,SAAS,oBAAoB,wBAAwB;",
+  "names": []
+}

@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/Debug.ts"],
+  "sourcesContent": ["import debug from 'debug';\nimport { logger } from './Logger';\nimport { ServerError } from './errors/ServerError';\n\nexport const debugConnection = debug('colyseus:connection');\nexport const debugDriver = debug('colyseus:driver');\nexport const debugError = debug('colyseus:errors');\nexport const debugMatchMaking = debug('colyseus:matchmaking');\nexport const debugMessage = debug('colyseus:message');\nexport const debugPatch = debug('colyseus:patch');\nexport const debugPresence = debug('colyseus:presence');\n\nexport const debugAndPrintError = (e: Error | string) => {\n  const message = (e instanceof Error) ? e.stack : e;\n\n  if (!(e instanceof ServerError)) {\n    logger.error(message);\n  }\n\n  debugError.call(debugError, message);\n};\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,mBAAkB;AAClB,oBAAuB;AACvB,yBAA4B;AAErB,MAAM,sBAAkB,aAAAA,SAAM,qBAAqB;AACnD,MAAM,kBAAc,aAAAA,SAAM,iBAAiB;AAC3C,MAAM,iBAAa,aAAAA,SAAM,iBAAiB;AAC1C,MAAM,uBAAmB,aAAAA,SAAM,sBAAsB;AACrD,MAAM,mBAAe,aAAAA,SAAM,kBAAkB;AAC7C,MAAM,iBAAa,aAAAA,SAAM,gBAAgB;AACzC,MAAM,oBAAgB,aAAAA,SAAM,mBAAmB;AAE/C,MAAM,qBAAqB,CAAC,MAAsB;AACvD,QAAM,UAAW,aAAa,QAAS,EAAE,QAAQ;AAEjD,MAAI,EAAE,aAAa,iCAAc;AAC/B,yBAAO,MAAM,OAAO;AAAA,EACtB;AAEA,aAAW,KAAK,YAAY,OAAO;AACrC;",
+  "names": ["debug"]
+}
