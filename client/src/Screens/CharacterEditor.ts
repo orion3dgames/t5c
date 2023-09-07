@@ -218,8 +218,6 @@ export class CharacterEditor {
             { doNotInstantiate: true }
         );
 
-        console.log(result);
-
         if (result.rootNodes.length > 0) {
             this.selected_mesh = result.rootNodes[0];
             this.selected_animations = result.animationGroups;

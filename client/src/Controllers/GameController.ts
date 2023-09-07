@@ -3,6 +3,7 @@ import axios from "axios";
 import { apiUrl } from "../Utils";
 import { Network } from "./Network";
 import { AssetsController } from "./AssetsController";
+import { AssetContainer } from "@babylonjs/core/assetContainer";
 
 export class GameController {
     // core
@@ -20,6 +21,7 @@ export class GameController {
     public currentRoomID: string;
     public currentSessionID: string;
     public currentLocation;
+    public currentLocationKey;
     public _currentUser;
     public _currentCharacter;
     public selectedEntity;
@@ -29,7 +31,7 @@ export class GameController {
 
     // all preloaded assets
     public _assetsCtrl: AssetsController;
-    public _loadedAssets = [];
+    public _loadedAssets: AssetContainer[] = [];
 
     // all game data
     private _gameData = {
@@ -227,6 +229,8 @@ export class GameController {
     // set character
     public setCharacter(character) {
         this._currentCharacter = character;
+        this.currentLocationKey = character.location;
+        this.currentLocation = this.getGameData("location", character.location);
     }
 
     // logout

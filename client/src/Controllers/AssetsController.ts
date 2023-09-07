@@ -56,13 +56,14 @@ export class AssetsController {
         ];
 
         // add locations
+        /*
         let locations = this._game.loadGameData("locations");
         if (locations) {
             for (let key in locations) {
                 let el = locations[key];
                 this.assetDatabase.push({ name: "ENV_" + el.key, filename: "environment/" + el.mesh + ".glb", extension: "glb", type: "mesh" });
             }
-        }
+        }*/
 
         // add abilities (icons)
         let abilities = this._game.loadGameData("abilities");
@@ -107,6 +108,12 @@ export class AssetsController {
         return navmesh;
     }
 
+    public async loadLevel(key) {
+        this.assetToPreload = this.assetDatabase;
+        this.assetToPreload.push({ name: "ENV_" + key, filename: "environment/" + key + ".glb", extension: "glb", type: "mesh" });
+        await this.preloadAssets();
+    }
+
     public async fetchAsset(key) {
         // is asset is database
         let exists = false;
@@ -123,7 +130,7 @@ export class AssetsController {
 
         // if asset already load, return immediately
         if (this._game._loadedAssets[key]) {
-            console.log("Asset already loaded", key);
+            //console.log("Asset already loaded", key);
             return this._game._loadedAssets[key];
         }
 

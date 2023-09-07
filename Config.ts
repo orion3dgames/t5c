@@ -37,5 +37,5 @@ export class Config {
 
     // default scene
     //defaultScene= isLocal() ? State.GAME = State.LOGIN,
-    defaultScene = State.LOGIN;
+    defaultScene = State.GAME;
 }

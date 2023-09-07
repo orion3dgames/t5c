@@ -38,7 +38,7 @@ export class abilitiesCTRL {
             const digit = i;
             const skill = this.abilitiesDB[element.key];
             skill.digit = digit;
-            this.abilities.push(new Ability(skill));
+            this.abilities.push(skill);
             element.digit = digit;
             i++;
         });

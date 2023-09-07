@@ -20,6 +20,7 @@ import State from "./Screens/Screens";
 import { LoginScene } from "./Screens/LoginScene";
 import { CharacterSelectionScene } from "./Screens/CharacterSelection";
 import { CharacterEditor } from "./Screens/CharacterEditor";
+import { GameScene } from "./Screens/GameScene";
 
 import { Config } from "../../Config";
 import { Network } from "./Controllers/Network";
@@ -102,6 +103,16 @@ class App {
                 case State.CHARACTER_EDITOR:
                     this.clearScene();
                     this.game.currentScene = new CharacterEditor();
+                    this.game.currentScene.createScene(this.game);
+                    this.game.scene = this.game.currentScene._scene;
+                    this.game.state = State.NULL;
+                    break;
+
+                ///////////////////////////////////////
+                // GAME
+                case State.GAME:
+                    this.clearScene();
+                    this.game.currentScene = new GameScene();
                     this.game.currentScene.createScene(this.game);
                     this.game.scene = this.game.currentScene._scene;
                     this.game.state = State.NULL;
