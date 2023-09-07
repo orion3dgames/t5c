@@ -1,4 +1,4 @@
-import State from "./t5c-client/src/Screens/Screens";
+import State from "./client/src/Screens/Screens";
 
 export class Config {
     // general settings

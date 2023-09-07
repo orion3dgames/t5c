@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../src/errors/SeatReservationError.ts"],
-  "sourcesContent": ["export class SeatReservationError extends Error {\n  constructor(message: string) {\n    super(message);\n  }\n}\n"],
-  "mappings": "AAAO,MAAM,6BAA6B,MAAM;AAAA,EAC9C,YAAY,SAAiB;AAC3B,UAAM,OAAO;AAAA,EACf;AACF;",
-  "names": []
-}

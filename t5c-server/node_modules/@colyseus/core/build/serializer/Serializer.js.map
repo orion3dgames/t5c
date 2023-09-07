@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../src/serializer/Serializer.ts"],
-  "sourcesContent": ["import { Client } from '..';\n\nexport interface Serializer<T> {\n  id: string;\n  reset(data: any): void;\n  getFullState(client?: Client): any;\n  applyPatches(clients: Client[], state: T): boolean;\n  handshake?(): number[];\n}\n"],
-  "mappings": ";;;;;;;;;;;;;AAAA;AAAA;",
-  "names": []
-}
