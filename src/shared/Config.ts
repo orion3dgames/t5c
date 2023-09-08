@@ -1,6 +1,6 @@
 import State from "../client/Screens/Screens";
 
-export class Config {
+class Config {
     // general settings
     title = "T5C";
     version = "Version 0.2.3";
@@ -39,3 +39,5 @@ export class Config {
     //defaultScene= isLocal() ? State.GAME = State.LOGIN,
     defaultScene = State.GAME;
 }
+
+export { Config };
