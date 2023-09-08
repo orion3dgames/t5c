@@ -1,19 +1,13 @@
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
-import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
-import { Control } from "@babylonjs/gui/2D/controls/control";
-import { Image } from "@babylonjs/gui/2D/controls/image";
-import { Engine } from "@babylonjs/core/Engines/engine";
+import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Scene } from "@babylonjs/core/scene";
-import Config from "../../../shared/Config";
-import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
-import { generatePanel } from "./Theme";
-import { randomNumberInRange } from "../../../../src/shared/Utils";
+import { randomNumberInRange } from "../../../shared/Utils";
 
 export class DamageText {
     private _ui;
     private _scene: Scene;
 
-    private damageText = [];
+    private damageText: Rectangle[] = [];
 
     constructor(ui, scene, entities) {
         this._ui = ui;
@@ -52,7 +46,7 @@ export class DamageText {
 
     private _update() {
         let alphaIncrement = 0.05;
-        this.damageText.forEach((v, k) => {
+        this.damageText.forEach((v: Rectangle, k) => {
             v.linkOffsetYInPixels -= 2;
             v.linkOffsetXInPixels -= v.metadata.offset;
             if (v.linkOffsetYInPixels < -130 && v.alpha >= alphaIncrement) {

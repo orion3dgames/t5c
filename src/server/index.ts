@@ -2,8 +2,6 @@
 import { createServer } from "http";
 import express from "express";
 import cors from "cors";
-import path from "path";
-import fs from "fs";
 
 import { Server, matchMaker } from "@colyseus/core";
 import { monitor } from "@colyseus/monitor";
@@ -13,12 +11,11 @@ import { WebSocketTransport } from "@colyseus/ws-transport";
 import { GameRoom } from "./rooms/GameRoom";
 import { ChatRoom } from "./rooms/ChatRoom";
 
-import { apiInstance } from "./api";
-import databaseInstance from "../shared/Database";
-import { PlayerUser } from "../shared/types";
-import Logger from "../shared/Logger";
-import Config from "../shared/Config";
-import { generateRandomPlayerName } from "../shared/Utils";
+import { Api } from "./Api";
+import { Database } from "./Database";
+
+import Logger from "./utils/Logger";
+import { Config } from "../shared/Config";
 
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
@@ -37,15 +34,16 @@ if (fs.existsSync(Config.databaseLocation)) {
 class GameServer {
     public api;
     public database;
+    public config: Config;
 
     constructor() {
+        this.config = new Config();
         this.init();
     }
 
     async init() {
         // start db
-        this.database = new databaseInstance();
-
+        this.database = new Database(this.config);
         await this.database.initDatabase();
         await this.database.createDatabase();
 
@@ -53,7 +51,7 @@ class GameServer {
         ///////////// COLYSEUS GAME SERVER ///////////////
         //////////////////////////////////////////////////
 
-        const port = Config.port;
+        const port = this.config.port;
         const app = express();
         app.use(cors());
         //app.use(express.json());
@@ -90,17 +88,16 @@ class GameServer {
         // start dev routes
         if (process.env.NODE_ENV !== "production") {
             // start monitor
-            app.use("/colyseus", monitor());
-
+            //app.use("/colyseus", monitor());
             // bind it as an express middleware
             //app.use("/playground", playground);
         }
 
         //////////////////////////////////////////////////
         //// SERVING CLIENT DIST FOLDER TO EXPRESS ///////
-        //////////////////////////////////////////////////
+        /////////////////////////////////////////////////
 
-        this.api = new apiInstance(app, this.database);
+        this.api = new Api(app, this.database);
     }
 }
 

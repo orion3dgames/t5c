@@ -2,9 +2,6 @@ import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Control } from "@babylonjs/gui/2D/controls/control";
-import { Grid } from "@babylonjs/gui/2D/controls/grid";
-import { dataDB } from "../../../../shared/Data/dataDB";
-import { Item } from "../../../../shared/Data/ItemDB";
 import { Panel } from "./Panel";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Button } from "@babylonjs/gui/2D/controls/button";
@@ -73,7 +70,7 @@ export class Panel_Abilities extends Panel {
     }
 
     addAbilities(skillsPanelStack) {
-        let Abilities = dataDB.load("abilities");
+        let Abilities = this._game.loadGameData("abilities");
         for (let key in Abilities) {
             // get ability details
             let ability = Abilities[key];

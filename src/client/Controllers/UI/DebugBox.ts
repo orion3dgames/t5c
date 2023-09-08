@@ -59,9 +59,10 @@ export class DebugBox {
         this._debugTextUI = debugText;
 
         debugPanel.onPointerClickObservable.add(() => {
-            navigator.clipboard.writeText(`new Vector3(${roundTo(this._currentPlayer.x, 2)}, ${roundTo(this._currentPlayer.y, 2)}, ${roundTo(this._currentPlayer.z, 2)})`);
+            navigator.clipboard.writeText(
+                `new Vector3(${roundTo(this._currentPlayer.x, 2)}, ${roundTo(this._currentPlayer.y, 2)}, ${roundTo(this._currentPlayer.z, 2)})`
+            );
         });
-
     }
 
     // debug panel refresh

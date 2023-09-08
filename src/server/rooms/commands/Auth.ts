@@ -1,4 +1,4 @@
-import Logger from "../../../shared/Logger";
+import Logger from "../../utils/Logger";
 
 class Auth {
     static async check(db, authData) {

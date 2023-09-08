@@ -9,17 +9,16 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { BakedVertexAnimationManager } from "@babylonjs/core/BakedVertexAnimation/bakedVertexAnimationManager";
 import { VertexAnimationBaker } from "@babylonjs/core/BakedVertexAnimation/vertexAnimationBaker";
 import { Engine } from "@babylonjs/core/Engines/engine";
-import { randomNumberInRange, request } from "../../shared/Utils";
+import { randomNumberInRange } from "../../shared/Utils";
 
 import State from "./Screens";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
-import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 
-import { mergeMesh, calculateRanges, bakeVertexData, setAnimationParameters, mergeMeshAndSkeleton } from "../../shared/Entities/Common/VatHelper";
-import AnimationHelper from "../../shared/Entities/Common/AnimationHelper";
+import { mergeMesh, calculateRanges, bakeVertexData, setAnimationParameters, mergeMeshAndSkeleton } from "../Entities/Common/VatHelper";
+import AnimationHelper from "../Entities/Common/AnimationHelper";
 import { Skeleton } from "@babylonjs/core/Bones/skeleton";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
@@ -54,10 +53,10 @@ export class DebugScene {
 
     public results;
 
-    public PLANE_SIZE = 20;
+    public PLANE_SIZE = 10;
     public INST_COUNT = 100;
-    public PICKED_ANIMS = ["Idle", "Roll", `Run`, "Walk", "Wave"];
-    public URL_MESH = "male_adventurer.glb";
+    public PICKED_ANIMS = ["Idle", "Walking_A"];
+    public URL_MESH = "male_rogue";
 
     public models = [];
     public vatManager;
@@ -92,7 +91,7 @@ export class DebugScene {
         light.specular = Color3.Black();
 
         // Built-in 'ground' shape.
-        const ground = MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, scene);
+        const ground = MeshBuilder.CreateGround("ground", { width: this.PLANE_SIZE, height: this.PLANE_SIZE }, scene);
 
         // load scene
         this._scene = scene;
@@ -124,16 +123,15 @@ export class DebugScene {
 
         //////////////////////////////////////////////////////////
         // load mesh
-        //await this.loadMesh("male_enemy");
-        await this.loadMesh("male_adventurer");
+        await this.loadMesh(this.URL_MESH);
 
         ///
         const createInst = (id, animIndex) => {
             const playerInstance = this.playerMesh.createInstance("player_" + id);
             playerInstance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
             setAnimationParameters(playerInstance.instancedBuffers.bakedVertexAnimationSettingsInstanced, animIndex, this.animationRanges);
-            playerInstance.position.x = randomNumberInRange(-3, 3);
-            playerInstance.position.z = randomNumberInRange(-3, 3);
+            playerInstance.position.x = randomNumberInRange(-this.PLANE_SIZE, this.PLANE_SIZE);
+            playerInstance.position.z = randomNumberInRange(-this.PLANE_SIZE, this.PLANE_SIZE);
             playerInstance.rotation.y = 0;
             this.createLabel(playerInstance, id);
 
@@ -141,13 +139,12 @@ export class DebugScene {
             if (weaponMeshMerged) {
                 const weapon = weaponMeshMerged.createInstance("player_" + id + "_sword");
                 const skeletonAnim = this.skeletonForAnim[animIndex];
-                let bone = skeletonAnim.bones[37];
+                let bone = skeletonAnim.bones[12];
                 weapon.attachToBone(bone, playerInstance);
             }
         };
 
         for (let i = 0; i < this.INST_COUNT; i++) {
-            console.log("CREATE INSTANCE ID: " + i);
             createInst(i + "", Math.floor(Math.random() * this.selectedAnimationGroups.length));
         }
 
@@ -180,6 +177,8 @@ export class DebugScene {
     async loadMesh(key) {
         const { meshes, animationGroups, skeletons } = await SceneLoader.ImportMeshAsync("", "./models/races/", key + ".glb", this._scene);
 
+        console.log(animationGroups);
+
         animationGroups.forEach((ag) => ag.stop());
 
         this.animationGroups = animationGroups;
@@ -200,6 +199,8 @@ export class DebugScene {
                 this.rootForAnim.push(rootAnim);
             }
         });
+
+        console.log(this.skeletonForAnim);
 
         // reset position & rotation
         // not sure why?

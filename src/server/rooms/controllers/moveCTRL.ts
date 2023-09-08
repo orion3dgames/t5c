@@ -1,7 +1,6 @@
-import Logger from "../../../shared/Logger";
-import { Vector3 } from "../../../shared/yuka-min";
+import Logger from "../../utils/Logger";
+import { Vector3 } from "../../../shared/Libs/yuka-min";
 import { PlayerInputs } from "../../../shared/types";
-import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { BrainSchema, LootSchema, PlayerSchema } from "../schema";
 
 export class moveCTRL {
@@ -54,7 +53,6 @@ export class moveCTRL {
         if (foundPath) {
             this._owner.AI_TARGET_WAYPOINTS = this._owner._navMesh.findPath(this._owner.getPosition(), targetPos);
             this._owner.AI_TARGET_WAYPOINTS.push(targetPos);
-            console.log("[setTargetDestination] path found ", targetPos);
         }
     }
 

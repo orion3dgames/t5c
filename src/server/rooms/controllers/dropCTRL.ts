@@ -1,7 +1,7 @@
-import Logger from "../../../shared/Logger";
-import { Leveling } from "../../../shared/Entities/Player/Leveling";
+import Logger from "../../utils/Logger";
+import { Leveling } from "../../../shared/Class/Leveling";
 import { randomNumberInRange } from "../../../shared/Utils";
-import { GetLoot } from "../../../shared/Entities/Player/LootTable";
+import { GetLoot } from "../../../shared/Class/LootTable";
 import { nanoid } from "nanoid";
 import { LootSchema } from "../schema/LootSchema";
 import { PlayerSchema } from "../schema";
@@ -82,7 +82,7 @@ export class dropCTRL {
                 z: currentPosition.z,
                 qty: drop.quantity,
             };
-            let entity = new LootSchema(this, data);
+            let entity = new LootSchema(this._owner._state, data);
             this._owner._state.entities.set(sessionId, entity);
         });
     }

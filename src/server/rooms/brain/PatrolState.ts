@@ -1,8 +1,7 @@
-import Config from "../../../shared/Config";
-import { EntityState } from "../../../shared/Entities/Entity/EntityState";
-import { Vector3 } from "../../../shared/yuka-min";
+import { EntityState, AI_STATE } from "../../../shared/types";
+import { Vector3 } from "../../../shared/Libs/yuka-min";
 import { State } from "../brain/StateManager";
-import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
+import { BrainSchema } from "../schema";
 
 /**
  * type: global, area, path, point
@@ -10,7 +9,8 @@ import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
  */
 
 function getRandomPoint(positions: Array<Vector3>) {
-    return positions[Math.floor(Math.random() * positions.length)];
+    let randPos = positions[Math.floor(Math.random() * positions.length)];
+    return new Vector3(randPos.x, randPos.y, randPos.z);
 }
 
 function createRandomPath(positions: Array<Vector3>) {
@@ -20,20 +20,21 @@ function createRandomPath(positions: Array<Vector3>) {
 function createPath(owner, positions: Array<Vector3>) {
     let startPos = owner.getPosition();
     let path = [];
-    positions.forEach((position) => {
-        let waypoints = owner._state.navMesh.findPath(startPos, position);
+    positions.forEach((pos: Vector3) => {
+        let destPos = new Vector3(pos.x, pos.y, pos.z);
+        let waypoints = owner._state.navMesh.findPath(startPos, destPos);
         if (waypoints.length > 0) {
             waypoints.forEach((w) => {
-                path.push(w);
+                path.push(new Vector3(w.x, w.y, w.z));
             });
         }
-        startPos = position;
+        startPos = destPos;
     });
     return path;
 }
 
 class PatrolState extends State {
-    enter(owner) {
+    enter(owner: BrainSchema) {
         //console.log("[PatrolState] ----------------------------------");
 
         // cancel any targets
@@ -56,7 +57,7 @@ class PatrolState extends State {
         owner.ai_state = AI_STATE.WANDER;
     }
 
-    execute(owner) {
+    execute(owner: BrainSchema) {
         // set animation state
         // todo: not sure if I actually need this
         owner.anim_state = EntityState.WALKING;

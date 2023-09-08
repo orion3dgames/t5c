@@ -1,17 +1,13 @@
 import { type, ArraySchema } from "@colyseus/schema";
-import { EntityState } from "../../../shared/Entities/Entity/EntityState";
+import { EntityState, AI_STATE } from "../../../shared/types";
 import { Entity } from "./Entity";
 import { abilitiesCTRL } from "../controllers/abilityCTRL";
 import { AbilitySchema } from "../schema/player/AbilitySchema";
-import { dataDB } from "../../../shared/Data/dataDB";
 import { IdleState, PatrolState, ChaseState, AttackState, DeadState } from "../brain";
 import { StateManager } from "../brain/StateManager";
-import { Vector3 } from "../../../shared/yuka-min";
-import Config from "../../../shared/Config";
+import { Vector3 } from "../../../shared/Libs/yuka-min";
 import { randomNumberInRange } from "../../../shared/Utils";
 import { EquipmentSchema } from "./player/EquipmentSchema";
-import { PlayerSlots } from "../../../shared/Data/ItemDB";
-import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 
 export class BrainSchema extends Entity {
     /////////////////////////////////////////////////////////////
@@ -84,7 +80,7 @@ export class BrainSchema extends Entity {
 
         // assign data
         Object.assign(this, data);
-        Object.assign(this, dataDB.get("race", this.race));
+        Object.assign(this, this._state.gameData.get("race", this.race));
 
         // abilities
         // future
@@ -120,7 +116,7 @@ export class BrainSchema extends Entity {
     }
 
     isAnyPlayerInAggroRange() {
-        if (this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE < Config.MONSTER_AGGRO_DISTANCE) {
+        if (this.AI_CLOSEST_PLAYER_DISTANCE != null && this.AI_CLOSEST_PLAYER_DISTANCE < this._state.config.MONSTER_AGGRO_DISTANCE) {
             return true;
         }
         return false;
@@ -177,11 +173,12 @@ export class BrainSchema extends Entity {
         this.anim_state = EntityState.WALKING;
         // move entity
         if (this.AI_TARGET_WAYPOINTS.length > 0) {
+            // todo: fix a bug here
+            //if (this.AI_TARGET_WAYPOINTS[0] instanceof Vector3) {
             let currentPos = this.getPosition();
 
             // get next waypoint
             let destinationOnPath = this.AI_TARGET_WAYPOINTS[0];
-            //destinationOnPath.y = 0;
 
             // calculate next position towards destination
             let updatedPos = this.moveTo(currentPos, destinationOnPath, this.speed);
@@ -194,6 +191,7 @@ export class BrainSchema extends Entity {
             if (destinationOnPath.distanceTo(updatedPos) < 1) {
                 this.AI_TARGET_WAYPOINTS.shift();
             }
+            //}
         } else {
             console.error("moveTowards failed");
             // something is wrong, let's look for a new destination

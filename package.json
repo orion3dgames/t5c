@@ -1,71 +1,77 @@
 {
-  "name": "t5c",
-  "version": "0.2.4",
-  "repository": {
-    "url": "git+https://github.com/oriongunning/t5c.git"
-  },
-  "description": "Building a basic multiplayer 3d top down rpg using babylon.js and colyseus",
-  "main": "./dist/client/index.html",
-  "scripts": {
-    "client-dev": "webpack serve --open --config webpack.dev.js",
-    "client-start": "webpack serve --open --config webpack.dev.js",
-    "client-build": "webpack --config webpack.prod.js",
-    "server-dev": "ts-node-dev --respawn --transpile-only src/server/index.ts",
-    "server-start": "ts-node --transpile-only src/server/index.ts",
-    "server-build": "tsc && cp -r public dist",
-    "loadtest": "npx tsx loadtest/test.ts --room game_room --numClients 10 --endpoint ws://localhost:3000"
-  },
-  "author": "Orion",
-  "license": "GPL-3.0",
-  "devDependencies": {
-    "@babylonjs/gui-editor": "^6.18.0",
-    "@babylonjs/inspector": "^6.18.0",
-    "@babylonjs/materials": "^6.18.0",
-    "@colyseus/core": "^0.15.6",
-    "@colyseus/loadtest": "^0.15.2",
-    "@colyseus/monitor": "^0.15.1",
-    "@colyseus/playground": "^0.15.4",
-    "@colyseus/schema": "^2.0.11",
-    "@colyseus/ws-transport": "^0.15.1",
-    "@types/node": "^20.3.1",
-    "@types/react": "^16.7.3",
-    "@types/react-dom": "^16.0.9",
-    "copy-webpack-plugin": "^11.0.0",
-    "ts-loader": "^9.2.6",
-    "ts-node": "^10.9.1",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.0.4",
-    "webpack": "^5.88.2",
-    "webpack-bundle-analyzer": "^4.9.0",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1",
-    "webpack-merge": "^5.9.0"
-  },
-  "dependencies": {
-    "@babylonjs/core": "^6.18.0",
-    "@babylonjs/gui": "^6.18.0",
-    "@babylonjs/loaders": "^6.18.0",
-    "@babylonjs/serializers": "^6.18.0",
-    "babylonjs-gltf2interface": "^6.18.0",
-    "colyseus": "^0.15.5",
-    "colyseus.js": "^0.15.10",
-    "cors": "^2.8.5",
-    "dotenv-webpack": "^8.0.1",
-    "express": "^4.18.2",
-    "fs-extra": "^11.1.0",
-    "nanoid": "^3.0.0",
-    "sqlite3": "^5.1.2",
-    "winston": "^3.8.2"
-  },
-  "peerDependencies": {},
-  "browserslist": {
-    "production": [
-      "> 4%"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "name": "t5c",
+    "version": "0.2.4",
+    "repository": {
+      "url": "git+https://github.com/oriongunning/t5c.git"
+    },
+    "description": "Building a basic multiplayer 3d top down rpg using babylon.js and colyseus",
+    "main": "./dist/client/index.html",
+    "scripts": {
+      "client-dev": "webpack serve --open --config webpack.dev.js",
+      "client-start": "webpack serve --open --config webpack.dev.js",
+      "client-build": "webpack --config webpack.prod.js",
+      "server-dev": "ts-node-dev --respawn --transpile-only src/server/index.ts",
+      "server-start": "ts-node --transpile-only src/server/index.ts",
+      "server-build": "tsc && cp -r public dist",
+      "loadtest": "npx tsx loadtest/test.ts --room game_room --numClients 10 --endpoint ws://localhost:3000"
+    },
+    "author": "Orion",
+    "license": "GPL-3.0",
+    "devDependencies": {
+      "@babylonjs/gui-editor": "^6.20.0",
+      "@babylonjs/inspector": "^6.20.0",
+      "@babylonjs/materials": "^6.20.0",
+
+      "@colyseus/core": "^0.15.6",
+      "@colyseus/loadtest": "^0.15.2",
+      "@colyseus/monitor": "^0.15.1",
+      "@colyseus/playground": "^0.15.4",
+      "@colyseus/schema": "^2.0.15",
+      "@colyseus/ws-transport": "^0.15.1",
+
+      "@types/node": "^20.3.1",
+      "@types/react": "^16.7.3",
+      "@types/react-dom": "^16.0.9",
+      "copy-webpack-plugin": "^11.0.0",
+      "ts-loader": "^9.2.6",
+      "ts-node": "^10.9.1",
+      "ts-node-dev": "^2.0.0",
+      "typescript": "^5.0.4",
+      "webpack": "^5.88.2",
+      "webpack-bundle-analyzer": "^4.9.0",
+      "webpack-cli": "^5.1.4",
+      "webpack-dev-server": "^4.15.1",
+      "webpack-merge": "^5.9.0",
+      "axios": "^1.5.0"
+    },
+    "dependencies": {
+
+      "@babylonjs/core": "^6.20.0",
+      "@babylonjs/gui": "^6.20.0",
+      "@babylonjs/loaders": "^6.20.0",
+      "@babylonjs/serializers": "^6.20.0",
+      "babylonjs-gltf2interface": "^6.20.0",
+
+      "colyseus": "^0.15.7",
+      "colyseus.js": "^0.15.13",
+
+      "cors": "^2.8.5",
+      "dotenv-webpack": "^8.0.1",
+      "express": "^4.18.2",
+      "fs-extra": "^11.1.0",
+      "nanoid": "^3.0.0",
+      "sqlite3": "^5.1.2",
+      "winston": "^3.8.2"
+    },
+    "peerDependencies": {},
+    "browserslist": {
+      "production": [
+        "> 10%"
+      ],
+      "development": [
+        "last 1 chrome version",
+        "last 1 firefox version",
+        "last 1 safari version"
+      ]
+    }
   }
-}

@@ -1,17 +1,14 @@
 import { Client } from "@colyseus/core";
 import { Schema, MapSchema, ArraySchema, type, filter } from "@colyseus/schema";
-import Config from "../../../shared/Config";
 import { GameRoom } from "../GameRoom";
 import { abilitiesCTRL } from "../controllers/abilityCTRL";
 import { animationCTRL } from "../controllers/animationCTRL";
 import { moveCTRL } from "../controllers/moveCTRL";
-import { dataDB } from "../../../shared/Data/dataDB";
-import { NavMesh, Vector3 } from "../../../shared/yuka-min";
+import { NavMesh, Vector3 } from "../../../shared/Libs/yuka-min";
 import { InventorySchema, EquipmentSchema, AbilitySchema, LootSchema } from "../schema";
-import { EntityState } from "../../../shared/Entities/Entity/EntityState";
 import { GameRoomState } from "../state/GameRoomState";
 import { Entity } from "../schema/Entity";
-import { Item, ItemClass, PlayerSlots, PlayerKeys, ItemEffect } from "../../../shared/Data/ItemDB";
+import { EntityState, ItemClass, PlayerSlots, PlayerKeys, CalculationTypes } from "../../../shared/types";
 import { nanoid } from "nanoid";
 
 export class PlayerData extends Schema {
@@ -106,7 +103,7 @@ export class PlayerSchema extends Entity {
         // add player data
         // assign player data
         Object.assign(this, data);
-        Object.assign(this, dataDB.get("race", this.race));
+        Object.assign(this, this._state.gameData.get("race", this.race));
 
         // add learned abilities
         data.initial_abilities.forEach((element) => {
@@ -145,7 +142,7 @@ export class PlayerSchema extends Entity {
         // add a 5 second grace period where the player can not be targeted by the ennemies
         setTimeout(() => {
             this.gracePeriod = false;
-        }, Config.PLAYER_GRACE_PERIOD);
+        }, this._state.config.PLAYER_GRACE_PERIOD);
     }
 
     // runs on every server iteration
@@ -264,7 +261,7 @@ export class PlayerSchema extends Entity {
             z: this.z,
             qty: newQuantity,
         };
-        let entity = new LootSchema(this, data);
+        let entity = new LootSchema(this._state, data);
         this._state.entityCTRL.add(entity);
 
         if (dropAll) {
@@ -284,7 +281,7 @@ export class PlayerSchema extends Entity {
         };
 
         //
-        let item = dataDB.get("item", loot.key);
+        let item = this._state.gameData.get("item", loot.key);
 
         // is item already inventory
         let inventoryItem = this.getInventoryItem(loot.key, "key");
@@ -311,10 +308,10 @@ export class PlayerSchema extends Entity {
     consumeItem(item) {
         item.benefits.forEach((element) => {
             let key = element.key;
-            if (ItemEffect.ADD === element.type) {
+            if (CalculationTypes.ADD === element.type) {
                 this[key] += element.amount;
             }
-            if (ItemEffect.REMOVE === element.type) {
+            if (CalculationTypes.REMOVE === element.type) {
                 this[key] -= element.amount;
             }
         });
@@ -359,7 +356,7 @@ export class PlayerSchema extends Entity {
 
         // equip
         this.pickupItem(
-            new LootSchema(key, {
+            new LootSchema(this._state, {
                 key: key,
                 qty: 1,
             })
@@ -390,7 +387,7 @@ export class PlayerSchema extends Entity {
         this.gracePeriod = true;
         setTimeout(() => {
             this.gracePeriod = false;
-        }, Config.PLAYER_GRACE_PERIOD);
+        }, this._state.config.PLAYER_GRACE_PERIOD);
     }
 
     /**

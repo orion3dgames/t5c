@@ -1,13 +1,6 @@
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Control } from "@babylonjs/gui/2D/controls/control";
-import { countPlayers, roundTo } from "../../../shared/Utils";
-import { Engine } from "@babylonjs/core/Engines/engine";
-import { Scene } from "@babylonjs/core/scene";
-import { generatePanel, getBg } from "./Theme";
-import { Grid } from "@babylonjs/gui/2D/controls/grid";
-import { Button } from "@babylonjs/gui/2D/controls/button";
-import State from "../../Screens/Screens";
-import { SceneController } from "../../Controllers/Scene";
+import { getBg } from "./Theme";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 
 export class CastingBar {

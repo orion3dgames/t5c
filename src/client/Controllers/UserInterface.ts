@@ -26,28 +26,24 @@ import {
 } from "./UI";
 
 import { Room } from "colyseus.js";
-import State from "../Screens/Screens";
-import { SceneController } from "../Controllers/Scene";
-import Config from "../../shared/Config";
-import { Leveling } from "../../shared/Entities/Player/Leveling";
 
-import { Entity } from "../../shared/Entities/Entity";
-import { Player } from "../../shared/Entities/Player";
-import { Item } from "../../shared/Entities/Item";
+import { Entity } from "../Entities/Entity";
+import { Player } from "../Entities/Player";
+import { Item } from "../Entities/Item";
 
-import { generatePanel, getBg } from "./UI/Theme";
-import { Grid } from "@babylonjs/gui";
 import { HighlightLayer } from "@babylonjs/core/Layers/highlightLayer";
 import { Panel } from "./UI/Panels/Panel";
+import { GameController } from "./GameController";
 
 export class UserInterface {
-    private _scene: Scene;
+    public _game: GameController;
+    public _scene: Scene;
     private _engine: Engine;
     private _gameRoom: Room;
     private _chatRoom: Room;
     public _entities: (Entity | Player | Item)[];
     private _currentPlayer;
-    private _loadedAssets;
+    public _loadedAssets;
 
     //UI Elements
     public _playerUI;
@@ -60,20 +56,20 @@ export class UserInterface {
     private _AbilityBar: AbilityBar;
     private _targetEntitySelectedBar: EntitySelectedBar;
     private _playerEntitySelectedBar: EntitySelectedBar;
-    private _Tooltip: Tooltip;
+    public _Tooltip: Tooltip;
     private _MainMenu: MainMenu;
     public _CastingBar: CastingBar;
     public _RessurectBox: RessurectBox;
     private _ExperienceBar: ExperienceBar;
-    private _InventoryDropdown: InventoryDropdown;
+    public _InventoryDropdown: InventoryDropdown;
     public _DamageText: DamageText;
 
     // openable panels
     private _panels: Panel[];
-    private panelInventory: Panel_Inventory;
-    private panelAbilities: Panel_Abilities;
-    private panelCharacter: Panel_Character;
-    private panelHelp: Panel_Help;
+    public panelInventory: Panel_Inventory;
+    public panelAbilities: Panel_Abilities;
+    public panelCharacter: Panel_Character;
+    public panelHelp: Panel_Help;
 
     // tooltip
     public _UITooltip;
@@ -84,15 +80,16 @@ export class UserInterface {
     _isDragging;
     _pointerDownPosition;
 
-    constructor(scene: Scene, engine: Engine, gameRoom: Room, chatRoom: Room, entities: (Entity | Player | Item)[], currentPlayer, _loadedAssets) {
+    constructor(game: GameController, gameRoom: Room, chatRoom: Room, entities: (Entity | Player | Item)[], currentPlayer) {
         // set var we will be needing
-        this._scene = scene;
-        this._engine = engine;
+        this._game = game;
+        this._scene = game.scene;
+        this._engine = game.engine;
         this._gameRoom = gameRoom;
         this._chatRoom = chatRoom;
         this._entities = entities;
         this._currentPlayer = currentPlayer;
-        this._loadedAssets = _loadedAssets;
+        this._loadedAssets = this._game._loadedAssets;
 
         // create ui
         const _namesUI = AdvancedDynamicTexture.CreateFullscreenUI("UI_Names", true, this._scene);
@@ -156,11 +153,11 @@ export class UserInterface {
         this._DamageText = new DamageText(this._namesUI, this._scene, this._entities);
 
         // create selected entity panel
-        this._targetEntitySelectedBar = new EntitySelectedBar(this._playerUI, this._loadedAssets, this._scene, {
+        this._targetEntitySelectedBar = new EntitySelectedBar(this, {
             panelName: "target",
             currentPlayer: false,
         });
-        this._playerEntitySelectedBar = new EntitySelectedBar(this._playerUI, this._loadedAssets, this._scene, {
+        this._playerEntitySelectedBar = new EntitySelectedBar(this, {
             panelName: "player",
             currentPlayer: currentPlayer,
         });

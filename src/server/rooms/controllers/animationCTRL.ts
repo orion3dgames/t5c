@@ -1,4 +1,4 @@
-import { EntityState } from "../../../shared/Entities/Entity/EntityState";
+import { EntityState } from "../../../shared/types";
 import { GameRoomState } from "../state/GameRoomState";
 
 export class animationCTRL {

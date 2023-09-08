@@ -4,12 +4,13 @@ import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
-import Config from "../../../shared/Config";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { generatePanel } from "./Theme";
+import { GameController } from "../GameController";
 
 export class Tooltip {
     private _playerUI;
+    private _game: GameController;
     private _currentPlayer;
     private _loadedAssets;
     private _scene: Scene;
@@ -26,6 +27,7 @@ export class Tooltip {
     private vertical = "top";
 
     constructor(_UI, _currentPlayer) {
+        this._game = _UI._game;
         this._playerUI = _UI._playerUI;
         this._loadedAssets = _UI._loadedAssets;
         this._engine = _UI._engine;
@@ -70,7 +72,7 @@ export class Tooltip {
         tooltipImage.width = "25px";
         tooltipImage.height = "25px";
         tooltipImage.thickness = 0;
-        tooltipImage.background = Config.UI_CENTER_PANEL_BG;
+        tooltipImage.background = this._game.config.UI_CENTER_PANEL_BG;
         tooltipImage.isVisible = true;
         tooltipImage.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         tooltipImage.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;

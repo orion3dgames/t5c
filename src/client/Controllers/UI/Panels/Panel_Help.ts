@@ -1,12 +1,6 @@
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import { Panel } from "./Panel";
-import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
-import { Control } from "@babylonjs/gui/2D/controls/control";
-import { applyTheme, createButton } from "../Theme";
-import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
-import { request } from "../../../../shared/Utils";
-import { apiUrl } from "../../../../shared/Utils";
 
 export class Panel_Help extends Panel {
     // inventory tab
@@ -40,8 +34,10 @@ export class Panel_Help extends Panel {
     private async createContent() {
         let panel: Rectangle = this._panelContent;
 
+        /*
         let req = await request("get", apiUrl() + "/getHelpPage/?page=index");
         await this.renderHtmlToSvg(req.data);
+        */
     }
 
     async renderHtmlToSvg(html) {

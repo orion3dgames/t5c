@@ -1,7 +1,6 @@
-import Config from "../../../shared/Config";
 import { randomNumberInRange } from "../../../shared/Utils";
 import { State } from "../brain/StateManager";
-import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
+import { AI_STATE } from "../../../shared/types";
 
 class IdleState extends State {
     private _rotationTimer: number = 0;
@@ -34,7 +33,7 @@ class IdleState extends State {
         }
 
         // keep track of idling time
-        owner.IDLE_TIMER += Config.updateRate;
+        owner.IDLE_TIMER += owner._state.config.updateRate;
         if (owner.IDLE_TIMER > owner.IDLE_TIMER_LENGTH) {
             owner._stateMachine.changeTo("PATROL");
             return false;

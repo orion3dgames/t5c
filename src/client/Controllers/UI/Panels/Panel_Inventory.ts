@@ -3,8 +3,7 @@ import { Image } from "@babylonjs/gui/2D/controls/image";
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Grid } from "@babylonjs/gui/2D/controls/grid";
-import { dataDB } from "../../../../shared/Data/dataDB";
-import { Item, ItemClass } from "../../../../shared/Data/ItemDB";
+import { Item } from "../../../../shared/types";
 import { Panel } from "./Panel";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { createButton } from "../Theme";
@@ -181,7 +180,7 @@ export class Panel_Inventory extends Panel {
         this._currentPlayer.player_data.inventory.forEach((element) => {
             let index = element.i;
             let child = this._inventoryGrid[index];
-            let item = dataDB.get("item", element.key) as Item;
+            let item = this._game.getGameData("item", element.key) as Item;
 
             // dispose
             child.getDescendants().forEach((el) => {

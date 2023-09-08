@@ -1,10 +1,9 @@
 import { BrainSchema, LootSchema } from "../schema";
 import { GameRoom } from "../GameRoom";
-import { EntityState } from "../../../shared/Entities/Entity/EntityState";
+import { EntityState } from "../../../shared/types";
 import { nanoid } from "nanoid";
-import Logger from "../../../shared/Logger";
+import Logger from "../../utils/Logger";
 import { randomNumberInRange } from "../../../shared/Utils";
-import { dataDB } from "../../../shared/Data/dataDB";
 import { GameRoomState } from "../state/GameRoomState";
 
 export class spawnCTRL {
@@ -17,7 +16,7 @@ export class spawnCTRL {
     constructor(state: GameRoomState) {
         this._state = state;
         this._room = state._gameroom;
-        this._location = dataDB.get("location", this._room.metadata.location);
+        this._location = this._state.gameData.get("location", this._room.metadata.location);
         this.process();
 
         for (let i = 0; i < 100; i++) {
@@ -55,7 +54,7 @@ export class spawnCTRL {
         let sessionId = nanoid(10);
 
         // monster pool to chose from
-        let Items = dataDB.load("items");
+        let Items = this._state.gameData.load("items");
         let keys = Object.keys(Items);
         let rand = keys[Math.floor(Math.random() * keys.length)];
         let randData = Items[rand];
@@ -77,7 +76,7 @@ export class spawnCTRL {
             z: currentPosition.z,
             qty: 1,
         };
-        let entity = new LootSchema(this, data);
+        let entity = new LootSchema(this._state, data);
         this._state.entityCTRL.add(entity);
 
         Logger.info("[gameroom][state][createEntity] created new item " + data.key + ": " + sessionId);
@@ -88,7 +87,7 @@ export class spawnCTRL {
         let sessionId = nanoid(10);
 
         // monster pool to chose from
-        let raceData = dataDB.get("race", spawnInfo.race);
+        let raceData = this._state.gameData.get("race", spawnInfo.race);
         let position = spawnInfo.points[Math.floor(Math.random() * spawnInfo.points.length)];
 
         let health = spawnInfo.baseHealth ?? raceData.baseHealth;

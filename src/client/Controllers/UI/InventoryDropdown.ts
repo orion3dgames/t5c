@@ -1,10 +1,8 @@
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
-import { Item, ItemClass } from "../../../shared/Data/ItemDB";
-import { createButton } from "./Theme";
+import { ItemClass } from "../../../shared/types";
 import { Button } from "@babylonjs/gui/2D/controls/button";
-import { dataDB } from "../../../shared/Data/dataDB";
 
 export class InventoryDropdown {
     private _UI;
@@ -28,7 +26,6 @@ export class InventoryDropdown {
         if (this.dropdown) {
             this._selected.background = "rgba(255,255,255,.1)";
             this.dropdown.dispose();
-            this.dropdown = null;
         }
     }
 

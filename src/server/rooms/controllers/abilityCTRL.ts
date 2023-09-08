@@ -1,10 +1,7 @@
-import Logger from "../../../shared/Logger";
-import { EntityState } from "../../../shared/Entities/Entity/EntityState";
+import Logger from "../../utils/Logger";
+import { EntityState, Ability, CalculationTypes } from "../../../shared/types";
 import { dropCTRL } from "./dropCTRL";
-import { dataDB } from "../../../shared/Data/dataDB";
 import { AbilitySchema } from "../schema/player/AbilitySchema";
-import { Ability } from "../../../shared/Entities/Common/Ability";
-import { CALC } from "../../../shared/Data/AbilitiesDB";
 import { randomNumberInRange } from "../../../shared/Utils";
 
 export class abilitiesCTRL {
@@ -24,7 +21,7 @@ export class abilitiesCTRL {
 
     constructor(owner, data) {
         this._owner = owner;
-        this.abilitiesDB = dataDB.load("abilities");
+        this.abilitiesDB = this._owner._state.gameData.load("abilities");
         this.refreshAbilities();
     }
 
@@ -41,7 +38,7 @@ export class abilitiesCTRL {
             const digit = i;
             const skill = this.abilitiesDB[element.key];
             skill.digit = digit;
-            this.abilities.push(new Ability(skill));
+            this.abilities.push(skill);
             element.digit = digit;
             i++;
         });
@@ -209,13 +206,13 @@ export class abilitiesCTRL {
 
     affect(type, start, amount) {
         switch (type) {
-            case CALC.ADD:
+            case CalculationTypes.ADD:
                 start += amount;
                 break;
-            case CALC.REMOVE:
+            case CalculationTypes.REMOVE:
                 start -= amount;
                 break;
-            case CALC.MULTIPLY:
+            case CalculationTypes.MULTIPLY:
                 start *= amount;
                 break;
         }

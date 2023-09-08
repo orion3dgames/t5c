@@ -1,16 +1,15 @@
 // colyseus
 import { Client, Room } from "colyseus.js";
-import { isLocal } from "../../shared/Utils";
-import Config from "../../shared/Config";
+import { isLocal } from "../Utils";
 
 export class Network {
     public _client;
 
-    constructor() {
+    constructor(port) {
         // create colyseus client
         let url = "wss://" + window.location.hostname;
         if (isLocal()) {
-            url = "ws://localhost:" + Config.port;
+            url = "ws://localhost:" + port;
         }
         this._client = new Client(url);
     }

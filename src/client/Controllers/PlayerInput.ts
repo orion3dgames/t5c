@@ -1,14 +1,14 @@
 import { Scene } from "@babylonjs/core/scene";
 import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 import { KeyboardEventTypes } from "@babylonjs/core/Events/keyboardEvents";
-import { Room } from "colyseus.js";
-import { UserInterface } from "./UserInterface";
+import { GameController } from "./GameController";
 
 export class PlayerInput {
     public inputMap: {};
     private _scene: Scene;
+    private _game: GameController;
     private _gameroom;
-    private _ui: UserInterface;
+    private _ui;
 
     //simple movement
     public horizontal: number = 0;
@@ -30,8 +30,8 @@ export class PlayerInput {
     public movementX: number = 0;
     public movementY: number = 0;
 
-    constructor(scene, gameroom, ui) {
-        this._scene = scene;
+    constructor(game: GameController, scene, gameroom, ui) {
+        (this._game = game), (this._scene = scene);
         this._gameroom = gameroom;
         this._ui = ui;
 
@@ -143,8 +143,8 @@ export class PlayerInput {
 
         //forward - backwards movement
         if (this.inputMap["rotY"] !== null) {
-            this.vertical = -Math.cos(this.inputMap["rotY"] + Math.PI - global.T5C.camY);
-            this.horizontal = Math.sin(this.inputMap["rotY"] + Math.PI - global.T5C.camY);
+            this.vertical = -Math.cos(this.inputMap["rotY"] + Math.PI - this._game.camY);
+            this.horizontal = Math.sin(this.inputMap["rotY"] + Math.PI - this._game.camY);
         }
     }
 }

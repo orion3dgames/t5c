@@ -5,14 +5,16 @@ import { getBg, createButton, applyTheme } from "./Theme";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Image } from "@babylonjs/gui/2D/controls/image";
+import { UserInterface } from "../UserInterface";
 import State from "../../Screens/Screens";
-import { SceneController } from "../../Controllers/Scene";
+import { GameController } from "../GameController";
 
 export class MainMenu {
-    private _UI;
+    private _UI: UserInterface;
     private _playerUI;
     private _engine: Engine;
     private _scene: Scene;
+    private _game: GameController;
     private _gameRoom;
     private _currentPlayer;
 
@@ -24,6 +26,7 @@ export class MainMenu {
         this._scene = _UI._scene;
         this._currentPlayer = _currentPlayer;
         this._gameRoom = _UI._gameRoom;
+        this._game = _UI._game;
 
         // mainmenu panel
         let mainmenuPanel = new Rectangle("mainmenuPanel");
@@ -56,7 +59,7 @@ export class MainMenu {
                     menuTitle: "Quit",
                     click: () => {
                         this._gameRoom.leave();
-                        SceneController.goToScene(State.CHARACTER_SELECTION);
+                        this._game.setScene(State.CHARACTER_SELECTION);
                     },
                 },
             },

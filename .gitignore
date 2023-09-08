@@ -16,7 +16,8 @@ tmp
 .github
 
 # Build
-dist/
+*.db
+*.db-journal
 
 # Coverage reports
 coverage
@@ -42,13 +43,3 @@ dist/**/*
 # ignore yarn.lock
 yarn.lock
 .log
-
-# 
-firebase-admin-servicekey.json
-database.db
-
-!public/**/*.obj
-database.db-journal
-
-public/models/Spider/*
-*.bkp

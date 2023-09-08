@@ -1,6 +1,6 @@
 import { Room, Client } from "@colyseus/core";
 import { ChatSchema } from "./schema/ChatSchema";
-import Logger from "../../shared/Logger";
+import Logger from "../utils/Logger";
 
 export class ChatRoom extends Room {
     public maxClients = 64;

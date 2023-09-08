@@ -1,5 +1,5 @@
 import { Schema, type } from "@colyseus/schema";
-import { dataDB } from "../../../../shared/Data/dataDB";
+import { GameData } from "../../../GameData";
 
 export class AbilitySchema extends Schema {
     // networked player specific
@@ -8,6 +8,6 @@ export class AbilitySchema extends Schema {
     constructor(data) {
         super(data);
         Object.assign(this, data);
-        Object.assign(this, dataDB.get("ability", this.key));
+        Object.assign(this, GameData.get("ability", this.key));
     }
 }

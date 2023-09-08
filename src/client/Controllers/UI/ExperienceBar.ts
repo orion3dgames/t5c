@@ -4,7 +4,7 @@ import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { getBg } from "./Theme";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
-import { Leveling } from "../../../shared/Entities/Player/Leveling";
+import { Leveling } from "../../../shared/Class/Leveling";
 
 export class ExperienceBar {
     private _UI;

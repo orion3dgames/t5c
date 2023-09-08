@@ -8,29 +8,25 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 
 import State from "./Screens";
 import { PlayerInput } from "../Controllers/PlayerInput";
-import { Environment } from "../Controllers/Environment";
 import { UserInterface } from "../Controllers/UserInterface";
-import { Player } from "../../shared/Entities/Player";
-import { Entity } from "../../shared/Entities/Entity";
-import { Item } from "../../shared/Entities/Item";
-import Config from "../../shared/Config";
+import { Player } from "../Entities/Player";
+import { Entity } from "../Entities/Entity";
+import { Item } from "../Entities/Item";
 import { Room } from "colyseus.js";
-import { PlayerInputs } from "../../shared/types";
-import { NavMesh } from "../../shared/yuka-min";
-import { SceneController } from "../Controllers/Scene";
-import { AuthController } from "../Controllers/AuthController";
+import { NavMesh } from "../../shared/Libs/yuka-min";
 
-import { createConvexRegionHelper } from "../../shared/Utils/navMeshHelper";
-import { mergeMesh } from "../../shared/Entities/Common/MeshHelper";
+import { createConvexRegionHelper } from "../Utils/navMeshHelper";
+import { mergeMesh } from "../Entities/Common/MeshHelper";
+import { GameController } from "../Controllers/GameController";
+import loadNavMeshFromString from "../Utils/loadNavMeshFromString";
+import { PlayerInputs } from "../../shared/types";
 
 export class GameScene {
-    private _app;
-    private _auth: AuthController;
+    private _game: GameController;
     private _scene: Scene;
     private _input: PlayerInput;
     private _ui;
     private _shadow: CascadedShadowGenerator;
-    private _environment: Environment;
     private _navMesh: NavMesh;
 
     private _roomId: string;
@@ -39,46 +35,40 @@ export class GameScene {
     private _currentPlayer: Player;
     private _loadedAssets: AssetContainer[] = [];
 
-    // networked entities
-    private entities: Entity[] = [];
-    private players: Player[] = [];
-    private items: Item[] = [];
+    public gameData;
 
     private _entities: (Player | Entity | Item)[] = [];
 
     constructor() {}
 
-    async createScene(app): Promise<void> {
+    async createScene(game): Promise<void> {
         // app
-        this._app = app;
-
-        // auth controller
-        this._auth = AuthController.getInstance();
+        this._game = game;
 
         // show loading screen
-        this._app.engine.displayLoadingUI();
+        this._game.engine.displayLoadingUI();
 
         // create scene
-        let scene = new Scene(app.engine);
+        let scene = new Scene(this._game.engine);
 
         // set scene
         this._scene = scene;
 
         // if no user logged in, force a auto login
         // to be remove later or
-        if (!this._auth.currentUser) {
-            await this._auth.forceLogin();
+        if (!this._game.isLoggedIn()) {
+            await this._game.forceLogin();
         }
 
         // check if user token is valid
-        let user = await this._auth.loggedIn();
+        let user = await this._game.isValidLogin();
         if (!user) {
             // if token not valid, send back to login screen
-            SceneController.goToScene(State.LOGIN);
+            this._game.setScene(State.LOGIN);
         }
 
-        //
-        let location = this._auth.currentLocation;
+        // get location details
+        let location = this._game.currentLocation;
 
         // black background
         scene.clearColor = new Color4(location.skyColor, location.skyColor, location.skyColor, 1);
@@ -116,23 +106,28 @@ export class GameScene {
         this._shadow.depthClamp = true;
 
         // load assets and remove them all from scene
-        this._environment = new Environment(this._scene, this._shadow, this._loadedAssets);
-        this._navMesh = await this._environment.loadNavMesh();
-        await this._environment.loadAssets();
+        this._navMesh = await this.loadNavMesh(location.key);
         //let navMeshGroup = createConvexRegionHelper(this._navMesh, this._scene)
 
+        // initialize assets controller
+        this._game.initializeAssetController();
+        await this._game._assetsCtrl.loadLevel(location.key);
+
+        // load the rest
+        this._game.engine.displayLoadingUI();
+
+        // instancite items so we can use them later as instances
         await this._instantiate();
 
         // load the rest
-        this._app.engine.displayLoadingUI();
-        await this._environment.prepareAssets();
+        //await this._environment.prepareAssets();
         await this._initNetwork();
     }
 
     private async _instantiate(): Promise<void> {
-        for (let k in this._loadedAssets) {
-            if (k.includes("ITEM_") && this._loadedAssets[k] instanceof AssetContainer) {
-                let v = this._loadedAssets[k] as AssetContainer;
+        for (let k in this._game._loadedAssets) {
+            if (k.includes("ITEM_") && this._game._loadedAssets[k] instanceof AssetContainer) {
+                let v = this._game._loadedAssets[k] as AssetContainer;
                 let modelToLoadKey = "ROOT_" + k;
                 const root = v.instantiateModelsToScene(
                     function () {
@@ -142,25 +137,29 @@ export class GameScene {
                     { doNotInstantiate: true }
                 );
                 root.rootNodes[0].name = modelToLoadKey;
-                this._loadedAssets[modelToLoadKey] = mergeMesh(root.rootNodes[0]);
+                this._game._loadedAssets[modelToLoadKey] = mergeMesh(root.rootNodes[0]);
                 //this._loadedAssets[modelToLoadKey].visibility = 1;
-                this._loadedAssets[modelToLoadKey].isVisible = false;
+                this._game._loadedAssets[modelToLoadKey].isVisible = false;
                 root.rootNodes[0].dispose();
             }
         }
     }
 
+    public async loadNavMesh(key) {
+        return await loadNavMeshFromString(key);
+    }
+
     private async _initNetwork(): Promise<void> {
-        let character = this._auth.currentCharacter;
+        let character = this._game.currentCharacter;
         let currentLocationKey = character.location;
-        let room = await this._app.client.findCurrentRoom(currentLocationKey);
+        let room = await this._game.client.findCurrentRoom(currentLocationKey);
 
         if (room) {
             // join game room
-            this.room = await this._app.client.joinRoom(room.roomId, this._auth.currentUser.token, character.id);
+            this.room = await this._game.client.joinRoom(room.roomId, this._game.currentUser.token, character.id);
 
             // join global chat room (match sessionId to gameRoom)
-            this.chatRoom = await this._app.client.joinChatRoom({ sessionId: this.room.sessionId });
+            this.chatRoom = await this._game.client.joinChatRoom({ sessionId: this.room.sessionId });
 
             // set global vars
             this._roomId = this.room.roomId;
@@ -172,10 +171,10 @@ export class GameScene {
 
     private async _initEvents() {
         // setup hud
-        this._ui = new UserInterface(this._scene, this._app.engine, this.room, this.chatRoom, this._entities, this._currentPlayer, this._loadedAssets);
+        this._ui = new UserInterface(this._game, this.room, this.chatRoom, this._entities, this._currentPlayer);
 
         // setup input Controller
-        this._input = new PlayerInput(this._scene, this.room, this._ui);
+        this._input = new PlayerInput(this._game, this._scene, this.room, this._ui);
 
         ////////////////////////////////////////////////////
         //  when a entity joins the room event
@@ -187,7 +186,7 @@ export class GameScene {
                 // if player type
                 if (isCurrentPlayer) {
                     // create player entity
-                    let _player = new Player(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._loadedAssets, this._input);
+                    let _player = new Player(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._game, this._input);
 
                     // set currentPlayer
                     this._currentPlayer = _player;
@@ -199,23 +198,23 @@ export class GameScene {
                     this._entities[sessionId] = _player;
 
                     // player is loaded, let's hide the loading gui
-                    this._app.engine.hideLoadingUI();
+                    this._game.engine.hideLoadingUI();
 
                     //////////////////
                     // else must be another player
                 } else {
-                    this._entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._loadedAssets);
+                    this._entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._game);
                 }
             }
 
             // if entity
             if (entity.type === "entity") {
-                this._entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._loadedAssets);
+                this._entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._game);
             }
 
             // if item
             if (entity.type === "item") {
-                this._entities[sessionId] = new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._loadedAssets);
+                this._entities[sessionId] = new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._game);
             }
         });
 
@@ -240,7 +239,7 @@ export class GameScene {
         let sequence = 0;
         let latestInput: PlayerInputs;
         this._scene.registerBeforeRender(() => {
-            let delta = this._app.engine.getFps();
+            let delta = this._game.engine.getFps();
             let timeNow = Date.now();
 
             // entities update 60fps
@@ -262,7 +261,7 @@ export class GameScene {
                 for (let sessionId in this._entities) {
                     const entity = this._entities[sessionId];
                     if (entity && entity.type === "player") {
-                        entity.updateSlowRate(Config.updateRate);
+                        entity.updateSlowRate(this._game.config.updateRate);
                     }
                 }
                 // reset timer
@@ -273,13 +272,13 @@ export class GameScene {
             // server update rate
             // every 100ms loop
             let timePassed = (timeNow - timeServer) / 1000;
-            let updateRate = Config.updateRate / 1000; // game is networked update every 100ms
+            let updateRate = this._game.config.updateRate / 1000; // game is networked update every 100ms
             if (timePassed >= updateRate) {
                 // player uppdate at server rate
                 for (let sessionId in this._entities) {
                     const entity = this._entities[sessionId];
                     if (entity && entity.type === "player") {
-                        entity.updateServerRate(Config.updateRate);
+                        entity.updateServerRate(this._game.config.updateRate);
                     }
                 }
 

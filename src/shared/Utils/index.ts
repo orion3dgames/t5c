@@ -1,6 +1,3 @@
-import request from "./requests";
-import Config from "../Config";
-
 const countPlayers = function (object) {
     var length = 0;
     for (var key in object) {
@@ -27,24 +24,12 @@ const roundTo = function (num: number, decimal: number = 2) {
     return 0;
 };
 
-const apiUrl = function () {
-    let url = "https://" + window.location.hostname;
-    if (isLocal()) {
-        url = "http://localhost:" + Config.port;
-    }
-    return url;
-};
-
 const bytesToSize = function (bytes) {
     const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
     if (bytes === 0) return "n/a";
     const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), sizes.length - 1);
     if (i === 0) return `${bytes} ${sizes[i]}`;
     return `${(bytes / 1024 ** i).toFixed(1)} ${sizes[i]}`;
-};
-
-const isLocal = function () {
-    return window.location.host === "localhost:8080";
 };
 
 var nameList = [
@@ -251,17 +236,4 @@ const getHealthColorFromValue = function (value) {
     return `#${rHexString}${gHexString}00`; // composing both in a color code
 };
 
-export {
-    request,
-    generateRandomPlayerName,
-    apiUrl,
-    roundToTwo,
-    roundTo,
-    countPlayers,
-    isLocal,
-    clamp,
-    randomNumberInRange,
-    distanceBetween,
-    getHealthColorFromValue,
-    bytesToSize,
-};
+export { generateRandomPlayerName, roundToTwo, roundTo, countPlayers, clamp, randomNumberInRange, distanceBetween, getHealthColorFromValue, bytesToSize };

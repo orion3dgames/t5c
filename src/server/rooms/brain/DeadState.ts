@@ -1,7 +1,5 @@
-import Config from "../../../shared/Config";
-import { EntityState } from "../../../shared/Entities/Entity/EntityState";
+import { EntityState, AI_STATE } from "../../../shared/types";
 import { State } from "../brain/StateManager";
-import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
 
 class DeadState extends State {
     enter(owner) {

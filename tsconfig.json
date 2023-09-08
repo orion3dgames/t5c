@@ -1,34 +1,34 @@
 {
-  "compileOnSave": true,
-  "compilerOptions": {
-    "target": "ES6",
-    "module": "CommonJS",
-    "sourceMap": true,
-    "outDir": "./dist/server",
-    "strict": false,
-    "experimentalDecorators": true,
-    "esModuleInterop": true,
-    "allowJs": true,
-    "moduleResolution": "node",
-    "types": [
-      "node",
+    "compileOnSave": true,
+    "compilerOptions": {
+      "target": "ES6",
+      "module": "CommonJS",
+      "sourceMap": true,
+      "outDir": "./dist/server",
+      "strict": false,
+      "experimentalDecorators": true,
+      "esModuleInterop": true,
+      "allowJs": true,
+      "moduleResolution": "node",
+      "types": [
+        "node",
+      ],
+      "typeRoots": [
+        "node_modules/@types"
+      ],
+      "baseUrl": ".", 
+      "paths": {
+              "@shared/*": ["../shared/*"],
+          }
+    },
+    "include": [
+      "src/server/*",
+      "src/**/*.d.ts",
+      "src/shared/**/*.ts",
+      "src/shared/**/*.js", "src/server/utils/Logger.ts", "src/server/utils/loadNavMeshFromFile.ts", 
     ],
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "baseUrl": ".", 
-    "paths": {
-			"@shared/*": ["../shared/*"],
-		}
-  },
-  "include": [
-    "src/server/*",
-    "src/**/*.d.ts",
-    "src/shared/**/*.ts",
-    "src/shared/**/*.js", 
-  ],
-  "exclude": [
-    "node_modules",
-    "**/*.spec.js"
-  ]
-}
+    "exclude": [
+      "node_modules",
+      "**/*.spec.js"
+    ]
+  }

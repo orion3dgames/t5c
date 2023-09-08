@@ -1,7 +1,7 @@
 import { type } from "@colyseus/schema";
 import { Entity } from "./Entity";
-import { dataDB } from "../../../shared/Data/dataDB";
-import { Vector3 } from "../../../shared/yuka-min";
+import { Vector3 } from "../../../shared/Libs/yuka-min";
+import { GameRoomState } from "../state/GameRoomState";
 
 export class LootSchema extends Entity {
     // networked player specific
@@ -19,16 +19,13 @@ export class LootSchema extends Entity {
 
     public AI_TARGET;
 
-    public _state;
+    public _state: GameRoomState;
 
     constructor(state, data, ...args: any[]) {
         super();
-
-        this._state = state;
-
         // assign data
         Object.assign(this, data);
-        Object.assign(this, dataDB.get("item", this.key));
+        Object.assign(this, state.gameData.get("item", this.key));
     }
 
     // entity update

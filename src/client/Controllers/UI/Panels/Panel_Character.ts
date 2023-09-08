@@ -5,8 +5,6 @@ import { Control } from "@babylonjs/gui/2D/controls/control";
 import { applyTheme, createButton } from "../Theme";
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Image } from "@babylonjs/gui/2D/controls/image";
-import { PlayerSlots } from "../../../../shared/Data/ItemDB";
-import { dataDB } from "../../../../shared/Data/dataDB";
 
 export class Panel_Character extends Panel {
     // inventory tab
@@ -341,7 +339,7 @@ export class Panel_Character extends Panel {
         let item_key = data.key;
         let slotPanel = panel.getChildByName("slot_" + slot_id) as Rectangle;
         let slotImage = slotPanel.getChildByName("slot_image_" + slot_id) as Image;
-        let item = dataDB.get("item", item_key);
+        let item = this._game.getGameData("item", item_key);
 
         // equip item
         if (type === "ADD") {

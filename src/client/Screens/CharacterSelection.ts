@@ -11,20 +11,15 @@ import { Image } from "@babylonjs/gui/2D/controls/image";
 import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
 
 import State from "./Screens";
-import { PlayerCharacter } from "../../shared/types";
-import { SceneController } from "../Controllers/Scene";
-import { AuthController } from "../Controllers/AuthController";
-import { Grid } from "@babylonjs/gui/2D/controls/grid";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
-import { dataDB } from "../../shared/Data/dataDB";
-import Config from "../../shared/Config";
 import { Engine } from "@babylonjs/core/Engines/engine";
+import { GameController } from "../Controllers/GameController";
 
 export class CharacterSelectionScene {
+    public _game: GameController;
     public _scene: Scene;
     public _engine: Engine;
     private _ui: AdvancedDynamicTexture;
-    private _auth: AuthController;
     public _button: Button;
     private leftColumnRect;
     private rightColumnRect;
@@ -36,14 +31,12 @@ export class CharacterSelectionScene {
 
     public sceneRendered = false;
 
-    public async createScene(app) {
-        this._engine = app.engine;
-
-        // auth controller
-        this._auth = AuthController.getInstance();
+    public async createScene(game) {
+        this._game = game;
+        this._engine = game.engine;
 
         // create scene
-        let scene = new Scene(app.engine);
+        let scene = new Scene(this._engine);
 
         // set color
         scene.clearColor = new Color4(0.1, 0.1, 0.1, 1);
@@ -62,15 +55,15 @@ export class CharacterSelectionScene {
 
         // if no user logged in, force a auto login
         // to be remove later or
-        if (!this._auth.currentUser) {
-            await this._auth.forceLogin();
+        if (!this._game.isLoggedIn()) {
+            await this._game.forceLogin();
         }
 
         // check if user token is valid
-        let user = await this._auth.loggedIn();
+        let user = await this._game.isValidLogin();
         if (!user) {
             // if token not valid, send back to login screen
-            SceneController.goToScene(State.LOGIN);
+            this._game.setScene(State.LOGIN);
         }
 
         this.generateleftPanel();
@@ -108,7 +101,7 @@ export class CharacterSelectionScene {
         this.leftColumnRect = leftColumnRectPad;
 
         // welcome text
-        const welcomeText = new TextBlock("infotext", "Welcome " + this._auth.currentUser.username);
+        const welcomeText = new TextBlock("infotext", "Welcome " + this._game.currentUser.username);
         welcomeText.width = 1;
         welcomeText.height = "100px;";
         welcomeText.color = "white";
@@ -138,7 +131,7 @@ export class CharacterSelectionScene {
         logoutBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         leftColumnBottomActions.addControl(logoutBtn);
         logoutBtn.onPointerDownObservable.add(() => {
-            this._auth.logout();
+            this._game.logout();
         });
 
         const characterEditorBtn = Button.CreateSimpleButton("characterEditorBtn", "CREATE NEW CHARACTER");
@@ -153,7 +146,7 @@ export class CharacterSelectionScene {
         leftColumnBottomActions.addControl(characterEditorBtn);
 
         characterEditorBtn.onPointerDownObservable.add(() => {
-            SceneController.goToScene(State.CHARACTER_EDITOR);
+            this._game.setScene(State.CHARACTER_EDITOR);
         });
 
         this.generateCharacters();
@@ -187,13 +180,13 @@ export class CharacterSelectionScene {
         scrollViewerBloc.addControl(rightStackPanel);
         this.characterPanel = rightStackPanel;
 
-        let user = this._auth.currentUser;
+        let user = this._game.currentUser;
         let bgColor = "#222222";
 
         if (user.characters.length > 0) {
             let i = 0;
             user.characters.forEach((char, k) => {
-                let race = dataDB.get("race", char.race);
+                let race = this._game.getGameData("race", char.race);
 
                 const characterBloc = new Rectangle("characterBloc" + char.id);
                 characterBloc.width = 1;
@@ -348,8 +341,8 @@ export class CharacterSelectionScene {
             this.rightColumnRect.addControl(createBtn);
 
             createBtn.onPointerDownObservable.add(() => {
-                this._auth.setCharacter(char);
-                SceneController.goToScene(State.GAME);
+                this._game.setCharacter(char);
+                this._game.setScene(State.GAME);
             });
         }
     }

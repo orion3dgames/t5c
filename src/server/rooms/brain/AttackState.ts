@@ -1,6 +1,4 @@
-import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
-import Config from "../../../shared/Config";
-import { EntityState } from "../../../shared/Entities/Entity/EntityState";
+import { EntityState, AI_STATE } from "../../../shared/types";
 import { State } from "../brain/StateManager";
 
 class AttackState extends State {
@@ -20,7 +18,7 @@ class AttackState extends State {
         }
 
         // if target is escaping, go back to searching
-        if (owner.AI_TARGET_DISTANCE > Config.MONSTER_ATTACK_DISTANCE) {
+        if (owner.AI_TARGET_DISTANCE > owner._state.config.MONSTER_ATTACK_DISTANCE) {
             //console.log("[AttackState] target is escaping, go back to searching");
             owner.AI_TARGET_WAYPOINTS = [];
             owner._stateMachine.changeTo("CHASE");
@@ -36,7 +34,7 @@ class AttackState extends State {
         }
 
         // increment attack timer
-        owner.ATTACK_TIMER += Config.updateRate;
+        owner.ATTACK_TIMER += owner._state.config.updateRate;
 
         // set state and anim state
         owner.anim_state = EntityState.ATTACK;

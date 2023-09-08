@@ -7,9 +7,12 @@ import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Tooltip } from "../Tooltip";
 import { applyTheme, getBg } from "../Theme";
 import { Scene } from "@babylonjs/core/scene";
+import { GameController } from "../../GameController";
+import { UserInterface } from "../../UserInterface";
 
 export class Panel {
-    public _UI;
+    public _UI: UserInterface;
+    public _game: GameController;
     public _playerUI;
     public _gameRoom;
     private _UITooltip: Tooltip;
@@ -30,6 +33,7 @@ export class Panel {
     constructor(_UI, _currentPlayer, options) {
         //
         this._UI = _UI;
+        this._game = _UI._game;
         this._playerUI = _UI._playerUI;
         this._UITooltip = _UI._UITooltip;
         this._gameRoom = _UI._gameRoom;

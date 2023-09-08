@@ -1,24 +1,16 @@
-import { Schema, type, MapSchema, filterChildren } from "@colyseus/schema";
 import { Client } from "colyseus";
+import { Schema, type, MapSchema, filterChildren } from "@colyseus/schema";
 import { BrainSchema, Entity, EquipmentSchema, LootSchema, PlayerSchema } from "../schema";
 
-import { PlayerInputs } from "../../../shared/types";
 import { spawnCTRL } from "../controllers/spawnCTRL";
 import { entityCTRL } from "../controllers/entityCTRL";
 import { gameDataCTRL } from "../controllers/gameDataCTRL";
 
 import { GameRoom } from "../GameRoom";
-import { EntityState } from "../../../shared/Entities/Entity/EntityState";
-import { NavMesh, Vector3 } from "../../../shared/yuka-min";
 
-import { nanoid } from "nanoid";
-import Logger from "../../../shared/Logger";
-import { randomNumberInRange } from "../../../shared/Utils";
-import { dataDB } from "../../../shared/Data/dataDB";
-
-import { GetLoot, LootTableEntry } from "../../../shared/Entities/Player/LootTable";
-import Config from "../../../shared/Config";
-import { Item, ItemClass, PlayerSlots } from "../../../shared/Data/ItemDB";
+import { NavMesh, Vector3 } from "../../../shared/Libs/yuka-min";
+import Logger from "../../utils/Logger";
+import { ItemClass } from "../../../shared/types";
 
 export class GameRoomState extends Schema {
     // networked variables
@@ -40,7 +32,9 @@ export class GameRoomState extends Schema {
     public spawnCTRL: spawnCTRL;
     public navMesh: NavMesh = null;
     public entityCTRL: entityCTRL;
-    public gameDataCTRL: gameDataCTRL;
+    public gameData: gameDataCTRL;
+
+    public config;
     public roomDetails;
 
     private spawnTimer = 0;
@@ -49,22 +43,20 @@ export class GameRoomState extends Schema {
     constructor(gameroom: GameRoom, _navMesh: NavMesh, ...args: any[]) {
         super(...args);
         this._gameroom = gameroom;
+        this.config = gameroom.config;
         this.navMesh = _navMesh;
 
         this.start();
     }
 
     public async start() {
+        console.log("START");
         // load game data
         // in the future, it'll be in the database
-        /*
-        this.gameDataCTRL = new gameDataCTRL();
-        await this.gameDataCTRL.initialize();
-        console.log("GAME DATA LOADED", this.gameDataCTRL);
-        */
+        this.gameData = new gameDataCTRL();
+        await this.gameData.initialize();
 
-        //
-        this.roomDetails = dataDB.get("location", this._gameroom.metadata.location);
+        this.roomDetails = this.gameData.get("location", this._gameroom.metadata.location);
 
         // load controllers
         this.entityCTRL = new entityCTRL(this);
@@ -147,7 +139,6 @@ export class GameRoomState extends Schema {
             location: data.location,
             sequence: 0,
             blocked: false,
-            state: EntityState.IDLE,
 
             initial_player_data: player_data,
             initial_abilities: data.abilities ?? [],
@@ -195,7 +186,7 @@ export class GameRoomState extends Schema {
         /////////////////////////////////////
         // on player learn skill
         if (type === "learn_skill") {
-            const ability = dataDB.get("ability", data);
+            const ability = this.gameData.get("ability", data);
             if (ability) {
                 playerState.abilitiesCTRL.learnAbility(ability);
             }
@@ -213,8 +204,7 @@ export class GameRoomState extends Schema {
         /////////////////////////////////////
         // on player input
         if (type === "playerInput") {
-            let playerInputs = data as PlayerInputs;
-            console.log(playerInputs);
+            let playerInputs = data;
             playerState.moveCTRL.processPlayerInput(playerInputs);
         }
         if (type === "move_to") {
@@ -258,7 +248,7 @@ export class GameRoomState extends Schema {
         /////////////////////////////////////
         // on player unequip
         if (type === "unequip_item") {
-            const item = dataDB.get("item", data);
+            const item = this.gameData.get("item", data);
             // does item exist in database
             if (item) {
                 playerState.unequipItem(item.key, item.slot);
@@ -273,16 +263,6 @@ export class GameRoomState extends Schema {
 
             if (data.digit === 5) {
                 this.spawnCTRL.createItem(playerState);
-                return false;
-            }
-
-            if (data.digit === 6) {
-                let key = "sword_01";
-                if (playerState.equipment.size > 0) {
-                    playerState.unequipItem(key, PlayerSlots.WEAPON);
-                } else {
-                    playerState.equipItem(key);
-                }
                 return false;
             }
 

@@ -1,17 +1,13 @@
 import http from "http";
 import { Room, Client, Delayed } from "@colyseus/core";
 import { GameRoomState } from "./state/GameRoomState";
-import databaseInstance from "../../shared/Database";
-import Config from "../../shared/Config";
-import Logger from "../../shared/Logger";
-import loadNavMeshFromFile from "../../shared/Utils/loadNavMeshFromFile";
-import { PlayerInputs } from "../../shared/types";
-import { NavMesh } from "../../shared/yuka-min";
-import { dataDB } from "../../shared/Data/dataDB";
-
+import loadNavMeshFromFile from "../utils/loadNavMeshFromFile";
+import Logger from "../utils/Logger";
+import { NavMesh } from "../../shared/Libs/yuka-min";
 import { Auth } from "./commands";
-import { Entity, EquipmentSchema, PlayerSchema } from "./schema";
-import { PlayerSlots } from "../../shared/Data/ItemDB";
+import { PlayerSchema } from "./schema";
+import { Database } from "../Database";
+import { Config } from "../../shared/Config";
 
 export class GameRoom extends Room<GameRoomState> {
     public maxClients = 64;
@@ -19,6 +15,7 @@ export class GameRoom extends Room<GameRoomState> {
     public database: any;
     public delayedInterval!: Delayed;
     public navMesh: NavMesh;
+    public config;
 
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
@@ -28,6 +25,8 @@ export class GameRoom extends Room<GameRoomState> {
         Logger.info("[gameroom][onCreate] game room created: " + this.roomId, options);
 
         this.setMetadata(options);
+
+        this.config = new Config();
 
         // initialize navmesh
         const navMesh = await loadNavMeshFromFile(options.location);
@@ -42,29 +41,30 @@ export class GameRoom extends Room<GameRoomState> {
 
         // Set the frequency of the patch rate
         // let's make it the same as our game loop
-        this.setPatchRate(Config.updateRate);
+        this.setPatchRate(this.config.updateRate);
 
         // Set the simulation interval callback
         // use to check stuff on the server at regular interval
         this.setSimulationInterval((dt) => {
             this.state.update(dt);
-        }, Config.updateRate);
+        }, this.config.updateRate);
 
         // set max clients
-        this.maxClients = Config.maxClients;
+        this.maxClients = this.config.maxClients;
 
         // initialize database
-        this.database = new databaseInstance();
+        this.database = new Database(this.config);
         await this.database.initDatabase();
 
         ///////////////////////////////////////////////////////////////////////////
         // if players are in a room, make sure we save any changes to the database.
+        /*
         let saveTimer = 0;
         let saveInterval = 5000;
         this.delayedInterval = this.clock.setInterval(() => {
-            saveTimer += Config.databaseUpdateRate;
+            saveTimer += this.config.databaseUpdateRate;
             // only save if there is any players
-            if (this.state.entityCTRL.hasEntities()) {
+            if (this.state.entities && this.state.entities.size > 0) {
                 //Logger.info("[gameroom][onCreate] Saving data for room " + options.location + " with " + this.state.players.size + " players");
                 this.state.entityCTRL.all.forEach((entity) => {
                     if (entity.type === "player") {
@@ -93,7 +93,8 @@ export class GameRoom extends Room<GameRoomState> {
                     }
                 });
             }
-        }, Config.databaseUpdateRate);
+        }, this.config.databaseUpdateRate);
+        */
     }
 
     //////////////////////////////////////////////////////////////////////////

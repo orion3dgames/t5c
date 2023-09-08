@@ -2,17 +2,16 @@ import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Image } from "@babylonjs/gui/2D/controls/image";
-import Config from "../../../shared/Config";
-import { dataDB } from "../../../shared/Data/dataDB";
-import { Player } from "../../../shared/Entities/Player";
-import { Ability } from "../../../shared/Data/AbilitiesDB";
+import { Player } from "../../Entities/Player";
 import { generatePanel, getBg, getPadding } from "./Theme";
+import { GameController } from "../GameController";
 
 export class AbilityBar {
     private _playerUI;
     private _abilityUI;
     private _UI;
     private _gameRoom;
+    private _game: GameController;
     private _loadedAssets;
     private _currentPlayer: Player;
     private _UITooltip;
@@ -23,6 +22,7 @@ export class AbilityBar {
         this._currentPlayer = _currentPlayer;
         this._gameRoom = _UI._gameRoom;
         this._loadedAssets = _UI._loadedAssets;
+        this._game = _UI._game;
         this._UI = _UI;
         // create ui
         this._createUI();
@@ -88,7 +88,7 @@ export class AbilityBar {
         // add learned abilities
         if (this._currentPlayer.entity.player_data.abilities) {
             this._currentPlayer.entity.player_data.abilities.forEach((data) => {
-                let ability = dataDB.get("ability", data.key);
+                let ability = this._game.getGameData("ability", data.key);
                 if (ability) {
                     this.addAbilityIcon(data.digit, ability, abilityRect[data.digit]);
                 }
@@ -111,7 +111,7 @@ export class AbilityBar {
         });
 
         headlineRect.onPointerClickObservable.add(() => {
-            let entity = global.T5C.selectedEntity;
+            let entity = this._game.selectedEntity;
             if (entity && !this._currentPlayer.isCasting) {
                 this._gameRoom.send("entity_ability_key", {
                     senderId: this._gameRoom.sessionId,

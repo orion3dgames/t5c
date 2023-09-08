@@ -3,11 +3,14 @@ import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { generatePanel, getPadding } from "./Theme";
-import { roundTo } from "../../../shared/Utils";
+import { roundTo } from "../../../shared/Utils/index";
+import { GameController } from "../GameController";
+import { UserInterface } from "../UserInterface";
 
 export class EntitySelectedBar {
     private _playerUI;
     private _scene;
+    private _game: GameController;
     private _loadedAssets;
     private _options;
 
@@ -23,11 +26,12 @@ export class EntitySelectedBar {
     private _manaBarInside;
     private _manaBarText;
 
-    constructor(_playerUI, loadedAssets, _scene, options = { panelName: "", currentPlayer: false }) {
-        this._playerUI = _playerUI;
-        this._scene = _scene;
+    constructor(_UI: UserInterface, options = { panelName: "", currentPlayer: false }) {
+        this._playerUI = _UI._playerUI;
+        this._scene = _UI._scene;
+        this._game = _UI._game;
         this._options = options;
-        this._loadedAssets = loadedAssets; 
+        this._loadedAssets = _UI._loadedAssets;
 
         this._createUI();
 
@@ -73,14 +77,13 @@ export class EntitySelectedBar {
         paddingPanel.addControl(imgPanel);
 
         if (this._options.currentPlayer !== false) {
-            
             let entity = this._options.currentPlayer;
             var imageData = this._loadedAssets[entity.icon];
             var img = new Image("itemImage_" + entity.key, imageData);
             img.stretch = Image.STRETCH_FILL;
             imgPanel.addControl(img);
         }
-        
+
         ////////////////////////////////////
         //////////////////// health bar
 
@@ -197,7 +200,7 @@ export class EntitySelectedBar {
     private _update() {
         this._selectedEntityBar.isVisible = false;
 
-        let entity = global.T5C.selectedEntity ? global.T5C.selectedEntity : false;
+        let entity = this._game.selectedEntity ? this._game.selectedEntity : false;
         if (this._options.currentPlayer !== false) {
             entity = this._options.currentPlayer;
         }

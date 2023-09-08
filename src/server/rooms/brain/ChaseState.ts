@@ -1,5 +1,4 @@
-import { AI_STATE } from "../../../shared/Entities/Entity/AIState";
-import Config from "../../../shared/Config";
+import { AI_STATE } from "../../../shared/types";
 import { State } from "../brain/StateManager";
 
 class ChaseState extends State {
@@ -24,24 +23,24 @@ class ChaseState extends State {
         }
 
         // iterate searching timer
-        owner.CHASE_TIMER += Config.updateRate;
+        owner.CHASE_TIMER += owner._state.config.updateRate;
 
         // if entity is close enough to player, start attacking it
-        if (owner.AI_TARGET_DISTANCE < Config.MONSTER_ATTACK_DISTANCE) {
+        if (owner.AI_TARGET_DISTANCE < owner._state.config.MONSTER_ATTACK_DISTANCE) {
             owner._stateMachine.changeTo("ATTACK");
             //console.log("[ChaseState] target found and is close enough");
             return false;
         }
 
         // if entity has been chasing for longer than Config.MONSTER_SEARCHING_PERIOD
-        if (owner.CHASE_TIMER > Config.MONSTER_CHASE_PERIOD) {
+        if (owner.CHASE_TIMER > owner._state.config.MONSTER_CHASE_PERIOD) {
             //console.log("[ChaseState] target lost");
             owner._stateMachine.changeTo("PATROL");
             return false;
         }
 
         // if player come back into range, reset chase timer
-        if (owner.AI_TARGET_DISTANCE < Config.MONSTER_AGGRO_DISTANCE) {
+        if (owner.AI_TARGET_DISTANCE < owner._state.config.MONSTER_AGGRO_DISTANCE) {
             owner.CHASE_TIMER = 0;
             //console.log("[ChaseState] target back in range");
         }
