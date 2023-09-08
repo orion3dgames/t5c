@@ -16,8 +16,8 @@ tmp
 .github
 
 # Build
-.db
-database.db
+*.db
+*.db-journal
 
 # Coverage reports
 coverage
