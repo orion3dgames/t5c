@@ -345,18 +345,13 @@ export class Player extends Entity {
     // to refactor
 
     public async teleport(location) {
-        /*
-        // Removes onMessage, onStateChange, onLeave and onError listeners.
-
         // leave colyseus room
         await this._room.leave();
 
         // update auth data
-        let character = this._auth.currentCharacter;
-        character.location = location;
-        this._auth.setCharacter(character);
+        this._game.setLocation(location);
 
         // switch scene
-        SceneController.goToScene(State.GAME);*/
+        this._game.setScene(State.GAME);
     }
 }

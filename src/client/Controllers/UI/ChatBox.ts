@@ -205,7 +205,6 @@ export class ChatBox {
 
     // chat refresh
     private _refreshChatBox() {
-        console.log("_refreshChatBox", this._chatUI);
         // remove all chat and refresh
         let elements = this._chatUI.getDescendants();
         elements.forEach((element) => {

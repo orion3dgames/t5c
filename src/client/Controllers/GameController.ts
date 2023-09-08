@@ -233,6 +233,13 @@ export class GameController {
         this.currentLocation = this.getGameData("location", character.location);
     }
 
+    // set character
+    public setLocation(location) {
+        this.currentLocationKey = location;
+        this.currentLocation = this.getGameData("location", location);
+        this._currentCharacter.location = location;
+    }
+
     // logout
     public logout() {
         this._currentUser = null;
