@@ -16,11 +16,6 @@ tmp
 .github
 
 # Build
-client/dist/
-client/node_modules/
-
-server/dist/
-server/node_modules/
 .db
 
 # Coverage reports
