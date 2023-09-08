@@ -13,13 +13,14 @@ import { randomNumberInRange } from "../../shared/Utils";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { mergeMesh } from "./Common/MeshHelper";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import { GameController } from "../Controllers/GameController";
 
 export class Item extends TransformNode {
+    public _game: GameController;
     public _scene: Scene;
     public _room: Room;
     public _ui: UserInterface;
     public _input: PlayerInput;
-    public _loadedAssets;
 
     // entity
     public entity;
@@ -43,13 +44,13 @@ export class Item extends TransformNode {
     // flags
     public blocked: boolean = false; // if true, player will not moved
 
-    constructor(name, scene: Scene, entity, room: Room, ui: UserInterface, _loadedAssets: AssetContainer[]) {
+    constructor(name, scene: Scene, entity, room: Room, ui: UserInterface, game: GameController) {
         super(name, scene);
 
         // setup class variables
         this._scene = scene;
+        this._game = game;
         this._room = room;
-        this._loadedAssets = _loadedAssets;
         this._ui = ui;
 
         // add entity data
@@ -57,7 +58,7 @@ export class Item extends TransformNode {
         this.entity = entity;
 
         // update player data from server data
-        //Object.assign(this, dataDB.get("item", entity.key));
+        Object.assign(this, this._game.getGameData("item", entity.key));
 
         // update player data from server data
         Object.assign(this, this.entity);
@@ -77,20 +78,20 @@ export class Item extends TransformNode {
         // load item mesh
         if (mode === "instance") {
             // instance
-            this.mesh = this._loadedAssets["ROOT_ITEM_" + entity.key].createInstance("TEST_" + entity.sessionId);
-            this._loadedAssets["ROOT_ITEM_" + entity.key].setParent(null);
+            this.mesh = this._game._loadedAssets["ROOT_ITEM_" + entity.key].createInstance("TEST_" + entity.sessionId);
+            this._game._loadedAssets["ROOT_ITEM_" + entity.key].setParent(null);
         } else if (mode === "clone") {
             // clone
-            if (this._loadedAssets["ROOT_ITEM_" + entity.key]) {
-                this.mesh = this._loadedAssets["ROOT_ITEM_" + entity.key].clone("TEST_" + entity.sessionId);
+            if (this._game._loadedAssets["ROOT_ITEM_" + entity.key]) {
+                this.mesh = this._game._loadedAssets["ROOT_ITEM_" + entity.key].clone("TEST_" + entity.sessionId);
                 this.mesh.visibility = 1;
             } else {
-                console.error("Could not find key: ROOT_ITEM_" + entity.key, this._loadedAssets);
+                console.error("Could not find key: ROOT_ITEM_" + entity.key, this._game._loadedAssets);
             }
 
             // import normal
         } else {
-            const result = await this._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene((name) => "instance_" + this.entity.sessionId, false, {
+            const result = await this._game._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene((name) => "instance_" + this.entity.sessionId, false, {
                 doNotInstantiate: false,
             });
             this.mesh = result.rootNodes[0];
@@ -152,7 +153,7 @@ export class Item extends TransformNode {
                 this.mesh.isVisible = false;
 
                 // clone mesh from memory
-                this.overlay_mesh = this._loadedAssets["ROOT_ITEM_" + entity.key].clone("OVERLAY_" + entity.sessionId);
+                this.overlay_mesh = this._game._loadedAssets["ROOT_ITEM_" + entity.key].clone("OVERLAY_" + entity.sessionId);
                 this.overlay_mesh.metadata = this.mesh.metadata;
                 this.overlay_mesh.position = this.getPosition();
                 this.overlay_mesh.position.y += this.mesh.position.y;

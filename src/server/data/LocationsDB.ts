@@ -39,17 +39,6 @@ let LocationsDB = {
             ],
             spawns: [
                 {
-                    type: "global",
-                    behaviour: "patrol",
-                    aggressive: false,
-                    canAttack: true,
-                    points: [new Vector3(0, 0, 0)],
-                    radius: 0,
-                    amount: 0,
-                    race: "male_rogue",
-                    name: "Roaming Rogue",
-                },
-                {
                     type: "area",
                     behaviour: "patrol",
                     aggressive: true,

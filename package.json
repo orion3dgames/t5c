@@ -18,15 +18,17 @@
     "author": "Orion",
     "license": "GPL-3.0",
     "devDependencies": {
-      "@babylonjs/gui-editor": "^6.18.0",
-      "@babylonjs/inspector": "^6.18.0",
-      "@babylonjs/materials": "^6.18.0",
+      "@babylonjs/gui-editor": "^6.20.0",
+      "@babylonjs/inspector": "^6.20.0",
+      "@babylonjs/materials": "^6.20.0",
+
       "@colyseus/core": "^0.15.6",
       "@colyseus/loadtest": "^0.15.2",
       "@colyseus/monitor": "^0.15.1",
       "@colyseus/playground": "^0.15.4",
-      "@colyseus/schema": "^2.0.11",
+      "@colyseus/schema": "^2.0.15",
       "@colyseus/ws-transport": "^0.15.1",
+
       "@types/node": "^20.3.1",
       "@types/react": "^16.7.3",
       "@types/react-dom": "^16.0.9",
@@ -43,13 +45,16 @@
       "axios": "^1.5.0"
     },
     "dependencies": {
-      "@babylonjs/core": "^6.18.0",
-      "@babylonjs/gui": "^6.18.0",
-      "@babylonjs/loaders": "^6.18.0",
-      "@babylonjs/serializers": "^6.18.0",
-      "babylonjs-gltf2interface": "^6.18.0",
-      "colyseus": "^0.15.5",
-      "colyseus.js": "^0.15.10",
+
+      "@babylonjs/core": "^6.20.0",
+      "@babylonjs/gui": "^6.20.0",
+      "@babylonjs/loaders": "^6.20.0",
+      "@babylonjs/serializers": "^6.20.0",
+      "babylonjs-gltf2interface": "^6.20.0",
+
+      "colyseus": "^0.15.7",
+      "colyseus.js": "^0.15.13",
+
       "cors": "^2.8.5",
       "dotenv-webpack": "^8.0.1",
       "express": "^4.18.2",
@@ -61,7 +66,7 @@
     "peerDependencies": {},
     "browserslist": {
       "production": [
-        "> 4%"
+        "> 10%"
       ],
       "development": [
         "last 1 chrome version",

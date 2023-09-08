@@ -113,12 +113,36 @@ export class GameScene {
         this._game.initializeAssetController();
         await this._game._assetsCtrl.loadLevel(location.key);
 
+        // load the rest
+        this._game.engine.displayLoadingUI();
+
         // instancite items so we can use them later as instances
-        //await this._instantiate();
+        await this._instantiate();
 
         // load the rest
         //await this._environment.prepareAssets();
         await this._initNetwork();
+    }
+
+    private async _instantiate(): Promise<void> {
+        for (let k in this._game._loadedAssets) {
+            if (k.includes("ITEM_") && this._game._loadedAssets[k] instanceof AssetContainer) {
+                let v = this._game._loadedAssets[k] as AssetContainer;
+                let modelToLoadKey = "ROOT_" + k;
+                const root = v.instantiateModelsToScene(
+                    function () {
+                        return modelToLoadKey;
+                    },
+                    false,
+                    { doNotInstantiate: true }
+                );
+                root.rootNodes[0].name = modelToLoadKey;
+                this._game._loadedAssets[modelToLoadKey] = mergeMesh(root.rootNodes[0]);
+                //this._loadedAssets[modelToLoadKey].visibility = 1;
+                this._game._loadedAssets[modelToLoadKey].isVisible = false;
+                root.rootNodes[0].dispose();
+            }
+        }
     }
 
     public async loadNavMesh(key) {
@@ -144,28 +168,6 @@ export class GameScene {
         } else {
         }
     }
-
-    /*
-    private async _instantiate(): Promise<void> {
-        for (let k in this._loadedAssets) {
-            if (k.includes("ITEM_") && this._loadedAssets[k] instanceof AssetContainer) {
-                let v = this._loadedAssets[k] as AssetContainer;
-                let modelToLoadKey = "ROOT_" + k;
-                const root = v.instantiateModelsToScene(
-                    function () {
-                        return modelToLoadKey;
-                    },
-                    false,
-                    { doNotInstantiate: true }
-                );
-                root.rootNodes[0].name = modelToLoadKey;
-                this._loadedAssets[modelToLoadKey] = mergeMesh(root.rootNodes[0]);
-                //this._loadedAssets[modelToLoadKey].visibility = 1;
-                this._loadedAssets[modelToLoadKey].isVisible = false;
-                root.rootNodes[0].dispose();
-            }
-        }
-    }*/
 
     private async _initEvents() {
         // setup hud
@@ -212,7 +214,7 @@ export class GameScene {
 
             // if item
             if (entity.type === "item") {
-                this._entities[sessionId] = new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._loadedAssets);
+                this._entities[sessionId] = new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._game);
             }
         });
 

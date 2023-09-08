@@ -19,7 +19,7 @@ export class spawnCTRL {
         this._location = this._state.gameData.get("location", this._room.metadata.location);
         this.process();
 
-        for (let i = 0; i < 0; i++) {
+        for (let i = 0; i < 100; i++) {
             this.createItem();
         }
     }

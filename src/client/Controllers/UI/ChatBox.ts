@@ -31,7 +31,7 @@ export class ChatBox {
 
         this._colors = {
             event: "orange",
-            system: "green",
+            system: "white",
             chat: "white",
         };
 
@@ -111,11 +111,7 @@ export class ChatBox {
         chatInput.focus();
 
         // add default chat message
-        this.addNotificationMessage(
-            "system",
-            "Welcome to T5C, you can move around by left clicking and dragging the mouse around. Use ability by selecting a target an then typing the appropriate digits on the keyboard.",
-            new Date()
-        );
+        this.addNotificationMessage("system", this._currentPlayer.name + " has joined.", new Date());
 
         // intial refresh chatbox
         this._refreshChatBox();
@@ -198,7 +194,7 @@ export class ChatBox {
         });
         this._chatInput.text = "";
         this._chatInput.focus();
-        this._refreshChatBox();
+        //this._refreshChatBox();
     }
 
     // chat refresh
@@ -209,6 +205,7 @@ export class ChatBox {
 
     // chat refresh
     private _refreshChatBox() {
+        console.log("_refreshChatBox", this._chatUI);
         // remove all chat and refresh
         let elements = this._chatUI.getDescendants();
         elements.forEach((element) => {
@@ -225,6 +222,7 @@ export class ChatBox {
             headlineRect.paddingBottom = "1px";
             headlineRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             headlineRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            headlineRect.height = "50px;";
             headlineRect.adaptHeightToChildren = true;
             this._chatUI.addControl(headlineRect);
 

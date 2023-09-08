@@ -53,7 +53,6 @@ export class moveCTRL {
         if (foundPath) {
             this._owner.AI_TARGET_WAYPOINTS = this._owner._navMesh.findPath(this._owner.getPosition(), targetPos);
             this._owner.AI_TARGET_WAYPOINTS.push(targetPos);
-            console.log("[setTargetDestination] path found ", targetPos);
         }
     }
 

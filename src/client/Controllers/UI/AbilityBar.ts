@@ -111,7 +111,7 @@ export class AbilityBar {
         });
 
         headlineRect.onPointerClickObservable.add(() => {
-            let entity = global.T5C.selectedEntity;
+            let entity = this._game.selectedEntity;
             if (entity && !this._currentPlayer.isCasting) {
                 this._gameRoom.send("entity_ability_key", {
                     senderId: this._gameRoom.sessionId,

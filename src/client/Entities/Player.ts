@@ -160,6 +160,11 @@ export class Player extends Entity {
                 this.moveDecal = MeshBuilder.CreateDecal("decal", pickedMesh, { position: destination });
                 this.moveDecal.material = decalMaterial;
 
+                // remove decal after 1 second
+                setTimeout(() => {
+                    this.moveDecal.dispose();
+                }, 1000);
+
                 // send to server
                 this._room.send("move_to", {
                     x: destination._x,

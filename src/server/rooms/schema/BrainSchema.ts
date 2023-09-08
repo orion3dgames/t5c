@@ -174,24 +174,24 @@ export class BrainSchema extends Entity {
         // move entity
         if (this.AI_TARGET_WAYPOINTS.length > 0) {
             // todo: fix a bug here
-            if (this.AI_TARGET_WAYPOINTS[0] instanceof Vector3) {
-                let currentPos = this.getPosition();
+            //if (this.AI_TARGET_WAYPOINTS[0] instanceof Vector3) {
+            let currentPos = this.getPosition();
 
-                // get next waypoint
-                let destinationOnPath = this.AI_TARGET_WAYPOINTS[0];
+            // get next waypoint
+            let destinationOnPath = this.AI_TARGET_WAYPOINTS[0];
 
-                // calculate next position towards destination
-                let updatedPos = this.moveTo(currentPos, destinationOnPath, this.speed);
-                this.setPosition(updatedPos);
+            // calculate next position towards destination
+            let updatedPos = this.moveTo(currentPos, destinationOnPath, this.speed);
+            this.setPosition(updatedPos);
 
-                // calculate rotation
-                this.rot = this.rotateTowards(currentPos, updatedPos);
+            // calculate rotation
+            this.rot = this.rotateTowards(currentPos, updatedPos);
 
-                // check if arrived at waypoint
-                if (destinationOnPath.distanceTo(updatedPos) < 1) {
-                    this.AI_TARGET_WAYPOINTS.shift();
-                }
+            // check if arrived at waypoint
+            if (destinationOnPath.distanceTo(updatedPos) < 1) {
+                this.AI_TARGET_WAYPOINTS.shift();
             }
+            //}
         } else {
             console.error("moveTowards failed");
             // something is wrong, let's look for a new destination

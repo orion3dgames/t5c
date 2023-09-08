@@ -19,13 +19,23 @@ import {
     TextureAssetTask,
 } from "@babylonjs/core/Misc/assetsManager";
 import { GameController } from "./GameController";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+
+type AssetEntry = {
+    name: string;
+    filename: string;
+    extension: string;
+    type: string;
+    instantiate?: boolean;
+};
 
 export class AssetsController {
     private _game: GameController;
     private _assetsManager: AssetsManager;
 
-    private assetDatabase = [];
-    private assetToPreload = [];
+    private assetDatabase: AssetEntry[] = [];
+    private assetToPreload: AssetEntry[] = [];
 
     public allMeshes;
     private _loadingTxt;
@@ -52,7 +62,8 @@ export class AssetsController {
 
             // textures
             { name: "TXT_selected_circle_green", filename: "selected_circle_green.png", extension: "png", type: "texture" },
-            { name: "TXT_particle_01", filename: "particle_01.png", extension: "png", type: "texture", instantiate: false },
+            { name: "TXT_decal_target", filename: "decal_target.png", extension: "png", type: "texture" },
+            { name: "TXT_particle_01", filename: "particle_01.png", extension: "png", type: "texture" },
         ];
 
         // add locations
@@ -112,18 +123,20 @@ export class AssetsController {
         this.assetToPreload = this.assetDatabase;
         this.assetToPreload.push({ name: "ENV_" + key, filename: "environment/" + key + ".glb", extension: "glb", type: "mesh" });
         await this.preloadAssets();
+        await this.prepareLevel(key);
+        await this.prepareTextures();
     }
 
     public async fetchAsset(key) {
         // is asset is database
-        let exists = false;
-        this.assetDatabase.forEach((element) => {
-            if (element.name === key) {
-                exists = element;
+        let entry = this.assetDatabase.find((el: AssetEntry) => {
+            if (el.name === key) {
+                return true;
             }
+            return false;
         });
 
-        if (!exists) {
+        if (!entry) {
             console.error("Asset not found", key);
             return false;
         }
@@ -135,12 +148,12 @@ export class AssetsController {
         }
 
         // preload asset
-        this.assetToPreload.push(exists);
+        this.assetToPreload.push(entry);
         await this.preloadAssets();
     }
 
     public async preloadAssets() {
-        let assetLoaded = [];
+        let assetLoaded: any[] = [];
         this.assetToPreload.forEach((obj) => {
             let assetTask;
             switch (obj.extension) {
@@ -232,24 +245,50 @@ export class AssetsController {
             for (let i in assetLoaded) {
                 this._game._loadedAssets[i] = assetLoaded[i];
             }
-
             this.showLoadingMessage("100%");
         };
 
         await this._assetsManager.loadAsync();
     }
 
+    public prepareTextures() {
+        // debug circle inaactive
+        var material = new StandardMaterial("debug_entity_neutral");
+        material.diffuseColor = new Color3(0, 1, 0);
+        material.alpha = 0.1;
+
+        // debug circle active
+        var material = new StandardMaterial("debug_entity_active");
+        material.diffuseColor = new Color3(1.0, 0, 0);
+        material.alpha = 0.1;
+
+        // entity selected circle
+        var texture = this._game._loadedAssets["TXT_selected_circle_green"];
+        texture.hasAlpha = true;
+        var material = new StandardMaterial("entity_selected");
+        material.diffuseTexture = texture;
+        material.useAlphaFromDiffuseTexture = true;
+
+        // entity selected circle
+        var texture = this._game._loadedAssets["TXT_decal_target"];
+        texture.hasAlpha = true;
+        var material = new StandardMaterial("decal_target");
+        material.diffuseTexture = texture;
+        material.useAlphaFromDiffuseTexture = true;
+        material.zOffset = -2;
+    }
+
     //What we do once the environment assets have been imported
     //handles setting the necessary flags for collision and trigger meshes,
-    public async prepareAssets() {
+    public async prepareLevel(key) {
         /*
-        if (this._auth.currentLocation.waterPlane) {
+        if (this._game.currentLocation.waterPlane) {
             // Water
-            var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 32 }, this._scene);
+            var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 32 }, this._game.scene);
             waterMesh.position = new Vector3(0, -4, 0);
 
-            var water = new WaterMaterial("water", this._scene);
-            water.bumpTexture = new Texture("textures/waterbump.jpg", this._scene);
+            var water = new WaterMaterial("water", this._game.scene);
+            water.bumpTexture = new Texture("textures/waterbump.jpg", this._game.scene);
 
             // Water properties
             water.backFaceCulling = true;
@@ -259,7 +298,8 @@ export class AssetsController {
             water.waterColor = Color3.FromInts(0, 157, 255);
             water.colorBlendFactor = 0.5;
             waterMesh.material = water;
-        }*/
+        }
+
         // start  music
         /*
         let soundData = this._loadedAssets['music'];
@@ -267,9 +307,9 @@ export class AssetsController {
             volume: 0.3
         });*/
         // instantiate the scene
-        /*
-        let key = "ENV_" + this._auth.currentLocation.mesh;
-        this.allMeshes = this._loadedAssets[key].loadedMeshes;
+
+        let assetKey = "ENV_" + key;
+        this.allMeshes = this._game._loadedAssets[assetKey].loadedMeshes;
 
         //Loop through all environment meshes that were imported
         this.allMeshes.forEach((m: Mesh) => {
@@ -277,32 +317,9 @@ export class AssetsController {
             m.checkCollisions = false;
             m.isPickable = true;
             m.receiveShadows = true;
-
             m.metadata = {
                 type: "environment",
             };
-            //m.unfreezeWorldMatrix();
-            //m.doNotSyncBoundingInfo = true;
-
-            /*
-            if (m.getClassName() !== "InstancedMesh") {
-            }
-
-            if (m.name.includes("Preview")) {
-                m.dispose();
-            }
-
-            if (m.name.includes("castShadows")) {
-                this._shadow.addShadowCaster(m);
-            }
-
-            if (m.name.includes("seafloor")) {
-                //m.receiveShadows = true;
-                // Add skybox and ground to the reflection and refraction
-                //water.addToRenderList(m);
-            }
-            
         });
-        */
     }
 }

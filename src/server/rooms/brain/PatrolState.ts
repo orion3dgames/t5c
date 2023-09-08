@@ -9,7 +9,8 @@ import { BrainSchema } from "../schema";
  */
 
 function getRandomPoint(positions: Array<Vector3>) {
-    return positions[Math.floor(Math.random() * positions.length)];
+    let randPos = positions[Math.floor(Math.random() * positions.length)];
+    return new Vector3(randPos.x, randPos.y, randPos.z);
 }
 
 function createRandomPath(positions: Array<Vector3>) {
@@ -19,14 +20,15 @@ function createRandomPath(positions: Array<Vector3>) {
 function createPath(owner, positions: Array<Vector3>) {
     let startPos = owner.getPosition();
     let path = [];
-    positions.forEach((position) => {
-        let waypoints = owner._state.navMesh.findPath(startPos, position);
+    positions.forEach((pos: Vector3) => {
+        let destPos = new Vector3(pos.x, pos.y, pos.z);
+        let waypoints = owner._state.navMesh.findPath(startPos, destPos);
         if (waypoints.length > 0) {
             waypoints.forEach((w) => {
                 path.push(new Vector3(w.x, w.y, w.z));
             });
         }
-        startPos = position;
+        startPos = destPos;
     });
     return path;
 }

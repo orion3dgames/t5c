@@ -17,6 +17,7 @@ tmp
 
 # Build
 .db
+database.db
 
 # Coverage reports
 coverage

@@ -66,10 +66,10 @@ export class UserInterface {
 
     // openable panels
     private _panels: Panel[];
-    private panelInventory: Panel_Inventory;
-    private panelAbilities: Panel_Abilities;
-    private panelCharacter: Panel_Character;
-    private panelHelp: Panel_Help;
+    public panelInventory: Panel_Inventory;
+    public panelAbilities: Panel_Abilities;
+    public panelCharacter: Panel_Character;
+    public panelHelp: Panel_Help;
 
     // tooltip
     public _UITooltip;
