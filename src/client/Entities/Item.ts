@@ -84,6 +84,7 @@ export class Item extends TransformNode {
         } else if (mode === "clone") {
             // clone
             if (this._game._loadedAssets["ROOT_ITEM_" + entity.key]) {
+
                 this.mesh = this._game._loadedAssets["ROOT_ITEM_" + entity.key].clone("TEST_" + entity.sessionId);
 
             } else {
@@ -109,7 +110,7 @@ export class Item extends TransformNode {
         this.mesh.isVisible = true;
         this.mesh.checkCollisions = false;
         this.mesh.showBoundingBox = false;
-        //this.mesh.receiveShadows = true;
+        this.mesh.receiveShadows = false;
 
         // offset mesh from the ground
         let meshSize = this.mesh.getBoundingInfo().boundingBox.extendSize;
@@ -152,11 +153,6 @@ export class Item extends TransformNode {
                     mesh.overlayColor = new Color3(1, 1, 1);
                     mesh.overlayAlpha = 0.3;
                     mesh.renderOverlay = true;
-                    for (const childMesh of mesh.getChildMeshes()) {
-                        childMesh.overlayColor = new Color3(1, 1, 1);
-                        childMesh.overlayAlpha = 0.3;
-                        childMesh.renderOverlay = true;
-                    }
                 }   
             })
         );
@@ -167,9 +163,6 @@ export class Item extends TransformNode {
                 let mesh = ev.meshUnderPointer;
                 if(mesh){
                     mesh.renderOverlay = false;
-                    for (const childMesh of mesh.getChildMeshes()) {
-                        childMesh.renderOverlay = false;
-                    }
                 }
             })
         );

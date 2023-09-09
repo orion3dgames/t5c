@@ -20,6 +20,9 @@ import { mergeMesh } from "../Entities/Common/MeshHelper";
 import { GameController } from "../Controllers/GameController";
 import loadNavMeshFromString from "../Utils/loadNavMeshFromString";
 import { PlayerInputs } from "../../shared/types";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
 export class GameScene {
     private _game: GameController;
@@ -133,13 +136,24 @@ export class GameScene {
                     function () {
                         return modelToLoadKey;
                     },
-                    false,
+                    true,
                     { doNotInstantiate: true }
                 );
+             
                 root.rootNodes[0].name = modelToLoadKey;
-                this._game._loadedAssets[modelToLoadKey] = mergeMesh(root.rootNodes[0]);
-                //this._loadedAssets[modelToLoadKey].visibility = 1;
-                this._game._loadedAssets[modelToLoadKey].isVisible = false;
+                let mergedMesh = mergeMesh(root.rootNodes[0]);
+                if(mergedMesh){
+                    /*
+                    let texture = this._scene.getTextureByName("knight_texture (Base Color)");
+                    console.log(texture);
+                    let material = new StandardMaterial(k);
+                    material.diffuseTexture = texture;
+                    material.backFaceCulling = false;
+                    mergedMesh.material = material;
+                    */
+                    this._game._loadedAssets[modelToLoadKey] = mergedMesh;
+                    this._game._loadedAssets[modelToLoadKey].isVisible = false;
+                }
                 root.rootNodes[0].dispose();
             }
         }

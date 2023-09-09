@@ -219,6 +219,7 @@ export class GameRoomState extends Schema {
         /////////////////////////////////////
         // on player ressurect
         if (type === "pickup_item") {
+            playerState.abilitiesCTRL.cancelAutoAttack(playerState);
             const itemState = this.getEntity(data);
             if (itemState) {
                 playerState.setTarget(itemState);

@@ -106,7 +106,7 @@ export class EntityMesh {
         let key = "RACE_" + this._entity.race;
         const result = this._loadedAssets[key].instantiateModelsToScene(() => {
             return key;
-        }, true);
+        }, false);
         const playerMesh = result.rootNodes[0];
         
         this._animationGroups = result.animationGroups;
@@ -228,12 +228,16 @@ export class EntityMesh {
                 let key = PlayerSlots[e.slot];
 
                 // if mesh needs to be added
-                if (equipOptions.mesh) {
+                if (equipOptions.mesh ) {
+                
                     let boneId = this._entity.bones[key];
                     let bone = this.skeleton.bones[boneId];
 
-                    const weaponMesh = this._loadedAssets["ROOT_ITEM_" + e.key].clone("player_" + e.key) as Mesh;
+                    const weaponMesh = this._loadedAssets["ROOT_ITEM_" + e.key].clone("player_" + e.key);
                     weaponMesh.isVisible = true;
+                    weaponMesh.isPickable = true;
+                    weaponMesh.checkCollisions = false;
+                    weaponMesh.receiveShadows = false;
                     weaponMesh.attachToBone(bone, this.playerMesh);
 
                     // if mesh offset required
@@ -258,6 +262,7 @@ export class EntityMesh {
                     }
 
                     this.equipments.push(weaponMesh);
+                    
                 }
             }
         });

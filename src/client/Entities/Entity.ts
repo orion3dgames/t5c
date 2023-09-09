@@ -143,6 +143,10 @@ export class Entity {
                 }
             }
 
+            if(this.type === 'player' && this.anim_state !== this.entity.anim_state){
+                console.log("[SERVER] anim_state state has changed ", EntityState[this.entity.anim_state]);
+            }
+
             // update player data from server data
             Object.assign(this, this.entity);
 
@@ -181,7 +185,8 @@ export class Entity {
         this.characterChatLabel = this.ui.createEntityChatLabel(this);
     }
 
-    public update(delta) {
+    public update(delta):any {
+
         if (this.ai_state === AI_STATE.SEEKING || this.ai_state === AI_STATE.ATTACKING) {
             this.debugMesh.material = this._scene.getMaterialByName("debug_entity_active");
         }
@@ -201,6 +206,10 @@ export class Entity {
             }
         }
 
+        if(this.isDead){
+            return false;
+        }
+
         // tween entity
         if (this && this.moveController) {
             this.moveController.tween();
@@ -217,6 +226,7 @@ export class Entity {
 
     // basic performance (only enable entities in a range around the player)
     public lod(_currentPlayer) {
+        /*
         this.mesh.setEnabled(false);
         this.mesh.freezeWorldMatrix();
         let entityPos = this.position();
@@ -225,7 +235,7 @@ export class Entity {
         if (distanceFromPlayer < this._game.config.PLAYER_VIEW_DISTANCE) {
             this.mesh.unfreezeWorldMatrix();
             this.mesh.setEnabled(true);
-        }
+        }*/
     }
 
     public position() {

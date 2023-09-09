@@ -23,7 +23,7 @@ let AbilitiesDB: abilityMap = {
 
         affinity: "strength",
         casterPropertyAffected: [],
-        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 1, max: 2 }],
+        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 3, max: 6 }],
         requiredToLearn: [],
     },
 
@@ -49,7 +49,7 @@ let AbilitiesDB: abilityMap = {
 
         affinity: "intelligence",
         casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 10, max: 10 }],
-        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 2, max: 4 }],
+        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 5, max: 10 }],
         requiredToLearn: [{ key: "level", amount: 2 }],
     },
 
@@ -74,7 +74,7 @@ let AbilitiesDB: abilityMap = {
         },
         affinity: "intelligence",
         casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 15, max: 15 }],
-        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 3, max: 6 }],
+        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 2, max: 4 }],
         requiredToLearn: [
             { key: "level", amount: 3 },
             { key: "intelligence", amount: 25 },
@@ -101,7 +101,7 @@ let AbilitiesDB: abilityMap = {
         },
         affinity: "wisdom",
         casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 10, max: 10 }],
-        targetPropertyAffected: [{ key: "health", type: CalculationTypes.ADD, min: 10, max: 20 }],
+        targetPropertyAffected: [{ key: "health", type: CalculationTypes.ADD, min: 20, max: 30 }],
         requiredToLearn: [
             { key: "level", amount: 5 },
             { key: "intelligence", amount: 25 },

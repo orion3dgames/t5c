@@ -26,12 +26,15 @@ export class moveCTRL {
             let distance = this._owner.AI_TARGET_DISTANCE;
 
             if (distance < 2.5) {
+
+                console.log('CLOSE, START AUTO ATTACK');
                 
                 // do pickup / attack
                 let ability = this._owner.AI_ABILITY;
                 let target = this._owner.AI_TARGET;
                 if (target instanceof BrainSchema) {
                     this._owner.abilitiesCTRL.startAutoAttack(this._owner, target, ability);
+                    this._owner.AI_TARGET = null;
                 }
                 if (target instanceof LootSchema) {
                     this._owner.pickupItem(target);
@@ -50,6 +53,7 @@ export class moveCTRL {
 
             // if already found and target escapes
             if(distance > 2.5 && this._owner.AI_TARGET_FOUND){
+                console.log('LOST, CANCEL AUTO ATTACK');
                 this._owner.abilitiesCTRL.cancelAutoAttack(this._owner);
                 this._owner.AI_TARGET = null;
                 this._owner.AI_TARGET_FOUND = false;
@@ -124,6 +128,7 @@ export class moveCTRL {
             return false;
         }
 
+        // make not already moving somewhere
         if (this._owner.AI_TARGET_WAYPOINTS.length > 0) {
             this._owner.AI_TARGET = null;
             this._owner.AI_TARGET_WAYPOINTS = [];

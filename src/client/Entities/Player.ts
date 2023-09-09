@@ -144,7 +144,7 @@ export class Player extends Entity {
         }
 
         // move to clicked point
-        if (metadata.type === "environment") {
+        if (metadata.type === "environment" && !this.isDead) {
             let destination = pointerInfo._pickInfo.pickedPoint;
             let pickedMesh = pointerInfo._pickInfo.pickedMesh;
 
@@ -179,6 +179,9 @@ export class Player extends Entity {
 
     // update at engine rate
     public update(delta) {
+
+        super.update(delta);
+
         if (this && this.moveController) {
             // global camera rotation
             this._game.camY = this.cameraController._camRoot.rotation.y;

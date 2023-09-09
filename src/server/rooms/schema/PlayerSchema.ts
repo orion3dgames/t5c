@@ -171,48 +171,44 @@ export class PlayerSchema extends Entity {
             if (this.health < this.maxHealth) {
                 this.health += this.healthRegen;
             }
+
+            // check
+            let interactive = this._state.roomDetails.dynamic.interactive ?? [];
+            if (interactive.length > 0) {
+                let currentPos = this.getPosition();
+                interactive.forEach((element) => {
+                    let distanceTo = currentPos.distanceTo(element.from);
+                    if (distanceTo < 2) {
+                        if (element.type === "teleport") {
+                            this.x = element.to_vector.x;
+                            this.y = element.to_vector.y;
+                            this.z = element.to_vector.z;
+                        }
+
+                        if (element.type == "zone_change" && this.isTeleporting === false) {
+                            this.isTeleporting = true;
+
+                            let client = this._state._gameroom.clients.getById(this.sessionId);
+
+                            // update player location in database
+                            this.location = element.to_map;
+                            this.x = element.to_vector.x,
+                            this.y = element.to_vector.y,
+                            this.z = element.to_vector.z,
+                            this.rot = 0,
+                            this._state._gameroom.database.updateCharacter(this.id, this);
+
+                            // inform client he cand now teleport to new zone
+                            client.send("playerTeleportConfirm", element.to_map);
+                        }
+                    }
+                });
+            }
+
+            // move player
+            this.moveCTRL.update();
         }
 
-        // check
-        let interactive = this._state.roomDetails.dynamic.interactive ?? [];
-        if (interactive.length > 0) {
-            let currentPos = this.getPosition();
-            interactive.forEach((element) => {
-                let distanceTo = currentPos.distanceTo(element.from);
-                if (distanceTo < 2) {
-                    if (element.type === "teleport") {
-                        this.x = element.to_vector.x;
-                        this.y = element.to_vector.y;
-                        this.z = element.to_vector.z;
-                    }
-
-                    if (element.type == "zone_change" && this.isTeleporting === false) {
-                        this.isTeleporting = true;
-
-                        let client = this._state._gameroom.clients.getById(this.sessionId);
-
-                        // update player location in database
-                        let updateObj = {
-                            location: element.to_map,
-                            x: element.to_vector.x,
-                            y: element.to_vector.y,
-                            z: element.to_vector.z,
-                            rot: 0,
-                        };
-                        this._state._gameroom.database.updateCharacter(this.id, updateObj);
-
-                        // update player state on server
-                        this.location = updateObj.location;
-
-                        // inform client he cand now teleport to new zone
-                        client.send("playerTeleportConfirm", element.to_map);
-                    }
-                }
-            });
-        }
-
-        // move player
-        this.moveCTRL.update();
     }
 
     public getClient() {
@@ -399,6 +395,7 @@ export class PlayerSchema extends Entity {
     }
 
     setAsDead() {
+        this.AI_TARGET = null;
         this.abilitiesCTRL.cancelAutoAttack(this);
         this.isDead = true;
         this.health = 0;

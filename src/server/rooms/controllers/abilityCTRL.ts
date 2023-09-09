@@ -369,6 +369,7 @@ export class abilitiesCTRL {
         if (!owner || !target || !ability) {
             return false;
         }
+        console.log('START AUTO ATTACK');
         this.doAutoAttack(owner, target, ability);
         this.attackTimer = setInterval(() => {
             this.doAutoAttack(owner, target, ability);
@@ -376,6 +377,7 @@ export class abilitiesCTRL {
     }
 
     doAutoAttack(owner, target, ability) {
+        console.log('AUTO ATTACK');
         // only auto attack if entity has a target
         if (target !== null) {
             owner.anim_state = EntityState.ATTACK;
@@ -384,6 +386,7 @@ export class abilitiesCTRL {
     }
 
     cancelAutoAttack(owner) {
+        console.log('CANCEL AUTO ATTACK');
         // remove target
         owner.AI_TARGET = null;
         owner.AI_ABILITY = null;
