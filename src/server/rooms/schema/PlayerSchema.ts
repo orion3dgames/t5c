@@ -10,6 +10,8 @@ import { GameRoomState } from "../state/GameRoomState";
 import { Entity } from "../schema/Entity";
 import { EntityState, ItemClass, PlayerSlots, PlayerKeys, CalculationTypes } from "../../../shared/types";
 import { nanoid } from "nanoid";
+import { Database } from "../../Database";
+import Logger from "../../utils/Logger";
 
 export class PlayerData extends Schema {
     @type({ map: InventorySchema }) inventory = new MapSchema<InventorySchema>();
@@ -213,6 +215,31 @@ export class PlayerSchema extends Entity {
 
     public getClient() {
         return this._state._gameroom.clients.getById(this.sessionId);
+    }
+
+    save(db:Database){
+
+        let client = this.getClient();
+        let character = client.auth;
+
+        db.updateCharacter(client.auth.id, this);
+
+        // update player items
+        if (this.player_data.inventory && this.player_data.inventory.size > 0) {
+            db.saveItems(character.id, this.player_data.inventory);
+        }
+
+        // update player abilities
+        if (this.player_data.abilities && this.player_data.abilities.size > 0) {
+            db.saveAbilities(character.id, this.player_data.abilities);
+        }
+
+        // update player equipment
+        if (this.equipment && this.equipment.size > 0) {
+            db.saveEquipment(character.id, this.equipment);
+        }
+
+        Logger.info("[gameroom][onCreate] player " + this.name + " saved to database.");
     }
 
     getInventoryItem(value, key = "index"): InventorySchema {

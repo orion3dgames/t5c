@@ -58,7 +58,7 @@ export class GameRoom extends Room<GameRoomState> {
 
         ///////////////////////////////////////////////////////////////////////////
         // if players are in a room, make sure we save any changes to the database.
-        /*
+        
         let saveTimer = 0;
         let saveInterval = 5000;
         this.delayedInterval = this.clock.setInterval(() => {
@@ -67,35 +67,16 @@ export class GameRoom extends Room<GameRoomState> {
             if (this.state.entities && this.state.entities.size > 0) {
                 //Logger.info("[gameroom][onCreate] Saving data for room " + options.location + " with " + this.state.players.size + " players");
                 this.state.entityCTRL.all.forEach((entity) => {
-                    if (entity.type === "player") {
-                        let player = entity as PlayerSchema;
-                        // update player every second...
-                        let playerClient = this.clients.getById(entity.sessionId);
-
-                        this.database.updateCharacter(playerClient.auth.id, entity);
-
-                        // update player items
-                        if (player.player_data.inventory && player.player_data.inventory.size > 0) {
-                            this.database.saveItems(playerClient.auth.id, player.player_data.inventory);
-                        }
-
-                        // update player abilities
-                        if (player.player_data.abilities && player.player_data.abilities.size > 0) {
-                            this.database.saveAbilities(playerClient.auth.id, player.player_data.abilities);
-                        }
-
-                        // update player equipment
-                        if (player.equipment && player.equipment.size > 0) {
-                            this.database.saveEquipment(playerClient.auth.id, player.equipment);
-                        }
-
-                        Logger.info("[gameroom][onCreate] player " + entity.name + " saved to database.");
+                    if (entity instanceof PlayerSchema) {
+                        entity.save(this.database);
                     }
                 });
             }
         }, this.config.databaseUpdateRate);
-        */
+        
     }
+
+
 
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////

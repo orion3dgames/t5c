@@ -108,13 +108,14 @@ export class GameRoomState extends Schema {
         let data = client.auth;
 
         let player_data = {
-            strength: 15,
-            endurance: 16,
-            agility: 15,
-            intelligence: 20,
-            wisdom: 20,
+            strength: data.strength ?? 0,
+            endurance: data.endurance ?? 0,
+            agility: data.agility ?? 0,
+            intelligence: data.intelligence ?? 0,
+            wisdom: data.wisdom ?? 0,
             experience: data.experience ?? 0,
             gold: data.gold ?? 0,
+            points: data.points ?? 0,
         };
 
         let player = {
@@ -145,6 +146,8 @@ export class GameRoomState extends Schema {
             initial_inventory: data.inventory ?? [],
             initial_equipment: data.equipment ?? [],
         };
+
+        console.log(player);
 
         this.entityCTRL.add(new PlayerSchema(this, player));
 

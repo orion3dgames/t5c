@@ -5,7 +5,8 @@ import { PlayerCharacter, PlayerUser } from "../shared/types";
 import { ParsedQs } from "qs";
 import { InventorySchema } from "./rooms/schema/player/InventorySchema";
 import { AbilitySchema } from "./rooms/schema/player/AbilitySchema";
-import { EquipmentSchema } from "./rooms/schema";
+import { EquipmentSchema, PlayerSchema } from "./rooms/schema";
+import { MapSchema } from "@colyseus/schema/lib/types/MapSchema";
 
 class Database {
     private db;
@@ -45,8 +46,14 @@ class Database {
             "y"	REAL DEFAULT 0.0,
             "z"	REAL DEFAULT 0.0, 
             "rot" REAL DEFAULT 0.0,
-            "gold" INTEGER,
-            "online" INTEGER
+            "gold" INTEGER DEFAULT 0,
+            "strength" INTEGER DEFAULT 0,
+            "endurance" INTEGER DEFAULT 0,
+            "agility" INTEGER DEFAULT 0,
+            "intelligence" INTEGER DEFAULT 0,
+            "wisdom" INTEGER DEFAULT 0,
+            "points" INTEGER DEFAULT 0,
+            "online" INTEGER DEFAULT 0
         );`;
 
         const playerInventorySql = `CREATE TABLE IF NOT EXISTS "character_inventory" (
@@ -328,18 +335,21 @@ class Database {
         if (data.level) {
             p["level"] = data.level;
         }
-        if (data.experience) {
-            p["experience"] = data.experience;
-        }
         if (data.maxHealth) {
             p["health"] = data.maxHealth;
         }
         if (data.maxMana) {
             p["mana"] = data.maxMana;
         }
-        if (data.gold) {
-            p["gold"] = data.gold;
-        }
+
+        p["gold"] = data.player_data.gold;
+        p["experience"] = data.player_data.experience;
+        p["points"] = data.player_data.points;
+        p["strength"] = data.player_data.strength; 
+        p["endurance"] = data.player_data.endurance; 
+        p["agility"] = data.player_data.agility; 
+        p["intelligence"] = data.player_data.intelligence; 
+        p["wisdom"] = data.player_data.wisdom; 
 
         let sql = "UPDATE characters SET ";
 
@@ -349,13 +359,13 @@ class Database {
         }
         sql = sql.slice(0, -1);
         sql += " WHERE id= " + character_id;
-        //console.log(sql);
+        console.log(sql);
         return this.run(sql, []);
     }
 
     // removes and saves character items
     // terrible way to do it
-    async saveItems(character_id: number, items: []) {
+    async saveItems(character_id: number, items: MapSchema<InventorySchema, string>) {
         const sql = `DELETE FROM character_inventory WHERE owner_id=?;`;
         await this.run(sql, [character_id]);
         let sqlItems = `INSERT INTO character_inventory (owner_id, qty, key) VALUES `;
@@ -368,7 +378,7 @@ class Database {
 
     // removes and saves character abilities
     // terrible way to do it
-    async saveAbilities(character_id: number, abilities: []) {
+    async saveAbilities(character_id: number, abilities: MapSchema<AbilitySchema, string>) {
         const sql = `DELETE FROM character_abilities WHERE owner_id=?;`;
         await this.run(sql, [character_id]);
         let sqlItems = `INSERT INTO character_abilities (owner_id, digit, key) VALUES `;
@@ -381,7 +391,7 @@ class Database {
 
     // removes and saves character abilities
     // terrible way to do it
-    async saveEquipment(character_id: number, equipments: []) {
+    async saveEquipment(character_id: number, equipments: MapSchema<EquipmentSchema, string>) {
         const sql = `DELETE FROM character_equipment WHERE owner_id=?;`;
         await this.run(sql, [character_id]);
         let sqlString = `INSERT INTO character_equipment (owner_id, key, slot) VALUES `;
