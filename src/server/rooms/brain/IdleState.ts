@@ -8,9 +8,7 @@ class IdleState extends State {
 
     enter(owner) {
         owner.IDLE_TIMER = 0;
-        owner.IDLE_TIMER_LENGTH = randomNumberInRange(2000, 6000);
-        this._rotationTimer = 0;
-        this._rotationTimerTimeout = randomNumberInRange(2000, 5000);
+        owner.IDLE_TIMER_LENGTH = randomNumberInRange(1000, 4000);
         owner.ai_state = AI_STATE.IDLE;
     }
 

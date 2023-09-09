@@ -20,6 +20,7 @@ let RacesDB: raceDataMap = {
             DAMAGE: { animation_id: 34, duration: 1000, speed: 1 },
             CASTING: { animation_id: 63, duration: 1000, speed: 1 },
             CAST: { animation_id: 62, duration: 1000, speed: 1 },
+            PICKUP: { animation_id: 47, duration: 1000, speed: 1 },
         },
         bones: {
             WEAPON: 12,
@@ -60,6 +61,7 @@ let RacesDB: raceDataMap = {
             DAMAGE: { animation_id: 34, duration: 1000, speed: 1 },
             CASTING: { animation_id: 63, duration: 1000, speed: 1 },
             CAST: { animation_id: 62, duration: 1000, speed: 1 },
+            PICKUP: { animation_id: 47, duration: 1000, speed: 1 },
         },
         bones: {
             WEAPON: 12,
@@ -98,6 +100,7 @@ let RacesDB: raceDataMap = {
             DAMAGE: { animation_id: 34, duration: 1000, speed: 1 },
             CASTING: { animation_id: 63, duration: 1000, speed: 1 },
             CAST: { animation_id: 62, duration: 1000, speed: 1 },
+            PICKUP: { animation_id: 47, duration: 1000, speed: 1 },
         },
         bones: {
             WEAPON: 12,

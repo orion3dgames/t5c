@@ -46,11 +46,16 @@ let LocationsDB = {
                     canAttack: true,
                     points: [
                         new Vector3(-7, 0, -19),
+                        new Vector3(-10.42, 0.01, -27.33),
                         new Vector3(-18, 0, -27),
                         new Vector3(-12, 0, -34),
                         new Vector3(-9.8, 0, -27),
                         new Vector3(-6, 0, -23),
                         new Vector3(-18, 0, -18),
+                        new Vector3(-22.33, 0.01, -21.03),
+                        new Vector3(-8.8, 0.01, -22.39),
+                        new Vector3(-8.51, 0.01, -14.93)
+
                     ],
                     radius: 0,
                     amount: 5,

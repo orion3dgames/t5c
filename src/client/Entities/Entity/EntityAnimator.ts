@@ -14,6 +14,7 @@ export class EntityAnimator {
     private _damage: AnimationGroup;
     private _casting: AnimationGroup;
     private _cast: AnimationGroup;
+    private _pickup: AnimationGroup;
 
     // current anim status
     private _currentAnim: AnimationGroup;
@@ -35,6 +36,7 @@ export class EntityAnimator {
         let takingDamageAnimation = this._entity.animations["DAMAGE"];
         let castingAnimation = this._entity.animations["CASTING"] ?? 0;
         let castingShootAnimation = this._entity.animations["CAST"] ?? 0;
+        let pickupAnimation = this._entity.animations["PICKUP"] ?? 0;
 
         // find animations
         let idleAnimationNumber = idleAnimation.animation_id;
@@ -44,6 +46,7 @@ export class EntityAnimator {
         let takingDamageAnimationNumber = takingDamageAnimation.animation_id;
         let castingAnimationNumber = castingAnimation.animation_id;
         let castingShootAnimationNumber = castingShootAnimation.animation_id;
+        let pickupAnimationNumber = pickupAnimation.animation_id;
 
         // set animations
         this._idle = this._playerAnimations[idleAnimationNumber];
@@ -53,6 +56,7 @@ export class EntityAnimator {
         this._damage = this._playerAnimations[takingDamageAnimationNumber];
         this._casting = this._playerAnimations[castingAnimationNumber];
         this._cast = this._playerAnimations[castingShootAnimationNumber];
+        this._pickup = this._playerAnimations[pickupAnimationNumber];
 
         // stop all animations
         this._playerAnimations[0].stop();
@@ -65,11 +69,13 @@ export class EntityAnimator {
         this._damage.loopAnimation = true;
         this._casting.loopAnimation = true;
         this._cast.loopAnimation = false;
+        this._pickup.loopAnimation = false;
 
         // set animation speed
         this._walk.speedRatio = 1.5;
         this._attack.speedRatio = 1.1;
         this._cast.speedRatio = 2;
+        this._pickup.speedRatio = 2;
 
         //initialize current and previous
         this._currentAnim = this._idle;
@@ -110,6 +116,10 @@ export class EntityAnimator {
             // if player launched a spell
         } else if (player.anim_state === EntityState.SPELL_CAST) {
             this._currentAnim = this._cast;
+
+        // if player pickup
+        } else if (player.anim_state === EntityState.PICKUP) {
+            this._currentAnim = this._pickup;
 
             // all other cases, should be idle
         } else {

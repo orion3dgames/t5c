@@ -7,13 +7,23 @@ export class animationCTRL {
         this._state = state;
     }
 
-    public playAnim(owner, anim_state: EntityState): void {
+    public playAnim(owner, anim_state: EntityState, callback: ()=> void): void {
         owner.anim_state = anim_state;
 
         // if spellcast, only play once
         if (anim_state === EntityState.SPELL_CAST) {
             setTimeout(() => {
                 owner.anim_state = EntityState.IDLE;
+            }, 900);
+        }
+
+        // if spellcast, only play once
+        if (anim_state === EntityState.PICKUP ) {
+            setTimeout(() => {
+                owner.anim_state = EntityState.IDLE;
+                if(callback){
+                    callback();
+                }
             }, 900);
         }
     }

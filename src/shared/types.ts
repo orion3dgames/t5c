@@ -47,6 +47,7 @@ export enum EntityState {
     DEAD = 5,
     SPELL_CASTING = 6,
     SPELL_CAST = 7,
+    PICKUP = 8,
 }
 
 export enum AI_STATE {
