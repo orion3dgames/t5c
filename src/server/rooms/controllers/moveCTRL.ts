@@ -11,6 +11,7 @@ export class moveCTRL {
     }
 
     public update() {
+
         // if player has a target
         if (this._owner.hasTarget()) {
             // monitor player's target position
@@ -23,7 +24,9 @@ export class moveCTRL {
 
             // check distance to target
             let distance = this._owner.AI_TARGET_DISTANCE;
+
             if (distance < 2.5) {
+                
                 // do pickup / attack
                 let ability = this._owner.AI_ABILITY;
                 let target = this._owner.AI_TARGET;
@@ -32,13 +35,24 @@ export class moveCTRL {
                 }
                 if (target instanceof LootSchema) {
                     this._owner.pickupItem(target);
+                    this._owner.AI_TARGET = null;
+                }
+                if(target instanceof PlayerSchema){
+                    this._owner.abilitiesCTRL.startAutoAttack(this._owner, target, ability);
+                    this._owner.AI_TARGET_FOUND = true;
                 }
                 // reset
                 this._owner.AI_TARGET_WAYPOINTS = [];
-                this._owner.AI_TARGET = null;
                 this._owner.AI_TARGET_DISTANCE = 0;
                 this._owner.AI_TARGET_POSITION = null;
                 this._owner.AI_ABILITY = null;
+            }
+
+            // if already found and target escapes
+            if(distance > 2.5 && this._owner.AI_TARGET_FOUND){
+                this._owner.abilitiesCTRL.cancelAutoAttack(this._owner);
+                this._owner.AI_TARGET = null;
+                this._owner.AI_TARGET_FOUND = false;
             }
         }
 
