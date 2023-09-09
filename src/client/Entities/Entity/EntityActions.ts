@@ -9,6 +9,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import State from "../../../client/Screens/Screens";
 import { Sound } from "@babylonjs/core/Audio/sound";
 import { Space } from "@babylonjs/core/Maths/math.axis";
+import { Tools } from "@babylonjs/core/Misc/tools";
 
 export class EntityActions {
     private _scene: Scene;
@@ -44,6 +45,8 @@ export class EntityActions {
         let bone = player.playerSkeleton.bones[12];
         data.fromPos = bone.getPosition(Space.WORLD, player.playerMesh);
         data.fromPos.y -= 0.8;
+
+        console.log("[ENTITY ACTION] ability effet", data,);
 
         // set start and end pos
         let start = data.fromPos;
@@ -206,6 +209,9 @@ export class EntityActions {
         particleSystem.start();
 
         //////////////////////////////////////////////
+        var distance = Vector3.Distance(start, end);
+        projectile.lookAt(end);
+        projectile.rotate(new Vector3(0, 1 ,0), Tools.ToRadians(180));
 
         var endVector = projectile.calcMovePOV(0, 0, 72).addInPlace(projectile.position);
         var points = [start, endVector];
@@ -214,7 +220,7 @@ export class EntityActions {
         var loop = this._scene.onBeforeRenderObservable.add(() => {
             if (i < 1) {
                 projectile.position = path.getPointAt(i);
-                i += 0.0035;
+                i += 0.005;
             }
             if (projectile.intersectsMesh(mesh, true) || i > 1) {
                 this.particule_impact(mesh, color);

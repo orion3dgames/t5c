@@ -134,10 +134,10 @@ export class Entity {
             // make sure players are always visible
             this.mesh.isVisible = true;
 
+            // if taking damage, show damage bubble
             if (this.health !== this.entity.health) {
                 let healthChange = this.entity.health - this.health;
                 if (healthChange < 0 || healthChange > 1) {
-                    console.log("[SERVER] entity health change: ", healthChange);
                     this.ui._DamageText.addDamage(this, healthChange);
                 }
             }
