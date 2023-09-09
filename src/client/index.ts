@@ -136,7 +136,7 @@ class App {
             this._process();
         });
 
-        if (isLocal()) {
+      
             //**for development: make inspector visible/invisible
             window.addEventListener("keydown", (ev) => {
                 //Shift+Ctrl+Alt+I
@@ -148,7 +148,7 @@ class App {
                     }
                 }
             });
-        }
+        
 
         //resize if the screen is resized/rotated
         window.addEventListener("resize", () => {
