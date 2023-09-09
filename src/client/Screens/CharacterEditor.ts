@@ -183,6 +183,8 @@ export class CharacterEditor {
         this.selected_race = races[defaultRace];
         this.selected_variant = defaultVariant;
 
+        console.log(this.selected_race, this.selected_variant);
+
         // initialize assets controller
         this._game.initializeAssetController();
 
@@ -190,15 +192,20 @@ export class CharacterEditor {
         await this.loadCharacter(this.selected_race);
     }
 
-    async loadCharacter(choice) {
-        // dispose on previous model, textures & animations
-        let material = this._scene.getMaterialByName(choice.material) as PBRMaterial;
-        if (material) {
-            if (material.albedoTexture) {
-                material.albedoTexture.dispose();
+    cleanup(previousChoice){
+        previousChoice.materials.forEach(element => {
+            let material = this._scene.getMaterialByName(previousChoice.key) as PBRMaterial;
+            if (material) { 
+                if (material.albedoTexture) {
+                    material.albedoTexture.dispose();
+                }
+                material.dispose();
             }
-            material.dispose();
-        }
+        });
+    }
+
+    async loadCharacter(choice) {
+    
         if (this.selected_mesh) {
             this.selected_mesh.dispose();
         }
@@ -292,6 +299,7 @@ export class CharacterEditor {
             }
 
             btnChoice.onPointerDownObservable.add(() => {
+                this.cleanup(this.selected_race);
                 this.selected_race = choice;
                 this.selected_variant = choice.materials[0];
                 this.loadCharacter(choice);
@@ -354,6 +362,7 @@ export class CharacterEditor {
                 this.selected_variant = color;
                 if (selectedMaterial) {
                     if (selectedMaterial.albedoTexture) {
+                        selectedMaterial.albedoTexture.dispose();
                         selectedMaterial.albedoTexture = new Texture("./models/races/materials/" + color.material, this._scene, { invertY: false });
                     }
                 }
