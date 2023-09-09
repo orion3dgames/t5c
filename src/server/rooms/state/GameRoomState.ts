@@ -136,6 +136,7 @@ export class GameRoomState extends Schema {
             name: data.name,
             type: "player",
             race: data.race,
+            material: data.material,
 
             location: data.location,
             sequence: 0,

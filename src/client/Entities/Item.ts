@@ -14,6 +14,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { mergeMesh } from "./Common/MeshHelper";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { GameController } from "../Controllers/GameController";
+import { Mesh } from "@babylonjs/core";
 
 export class Item extends TransformNode {
     public _game: GameController;
@@ -54,7 +55,7 @@ export class Item extends TransformNode {
         this._ui = ui;
 
         // add entity data
-        this.name = entity.key + "_node";
+        this.name = entity.key + "_"+entity.sessionId;
         this.entity = entity;
 
         // update player data from server data
@@ -66,7 +67,7 @@ export class Item extends TransformNode {
         // set parent metadata
         this.metadata = {
             sessionId: entity.sessionId,
-            type: entity.type,
+            type: "item",
             name: entity.name,
         };
 
@@ -74,7 +75,7 @@ export class Item extends TransformNode {
         this.spawn(entity);
     }
 
-    public async spawn(entity, mode = "instance") {
+    public async spawn(entity, mode = "clone") {
         // load item mesh
         if (mode === "instance") {
             // instance
@@ -91,14 +92,15 @@ export class Item extends TransformNode {
 
             // import normal
         } else {
-            const result = await this._game._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene((name) => "instance_" + this.entity.sessionId, false, {
+            const result = await this._game._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene(
+                (name) => "instance_" + this.entity.sessionId, 
+                false, {
                 doNotInstantiate: false,
             });
-            this.mesh = result.rootNodes[0];
+            this.mesh = result.rootNodes[0] as Mesh; 
         }
 
         // set initial player scale & rotation
-        //this.mesh = result.rootNodes[0];
         this.mesh.parent = this;
 
         // set collision mesh
@@ -106,12 +108,13 @@ export class Item extends TransformNode {
         this.mesh.isPickable = true;
         this.mesh.isVisible = true;
         this.mesh.checkCollisions = false;
-        this.mesh.showBoundingBox = false;
-        // this.mesh.receiveShadows = true;
+        this.mesh.showBoundingBox = true;
+        //this.mesh.receiveShadows = true;
 
         // offset mesh from the ground
+        console.log(this.mesh.getBoundingInfo());
         let meshSize = this.mesh.getBoundingInfo().boundingBox.extendSize;
-        this.mesh.position.y = this.mesh.position.y + meshSize.y;
+        this.mesh.position.y += meshSize.y * this.meshData.scale;
         this.mesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
         this.mesh.rotation = new Vector3(0, randomNumberInRange(0, 360), 0);
         this.mesh.scaling = new Vector3(this.meshData.scale, this.meshData.scale, this.meshData.scale);
@@ -144,6 +147,50 @@ export class Item extends TransformNode {
         // register hover over player
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
+                let mesh = ev.meshUnderPointer;
+                console.log(mesh);
+                if(mesh){
+                    mesh.overlayColor = new Color3(1, 1, 1);
+                    mesh.overlayAlpha = 0.3;
+                    mesh.renderOverlay = true;
+                    for (const childMesh of mesh.getChildMeshes()) {
+                        childMesh.overlayColor = new Color3(1, 1, 1);
+                        childMesh.overlayAlpha = 0.3;
+                        childMesh.renderOverlay = true;
+                    }
+                }   
+            })
+        );
+
+        // register hover out player
+        this.mesh.actionManager.registerAction(
+            new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
+                let mesh = ev.meshUnderPointer;
+                if(mesh){
+                    mesh.renderOverlay = false;
+                    for (const childMesh of mesh.getChildMeshes()) {
+                        childMesh.renderOverlay = false;
+                    }
+                }
+            })
+        );
+
+        // register hover out player
+        this.mesh.actionManager.registerAction(
+            new ExecuteCodeAction(ActionManager.OnLeftPickTrigger, (ev) => {
+                if(ev.meshUnderPointer){
+                    let item = ev.meshUnderPointer.metadata;
+                    this._room.send("pickup_item", {
+                        sessionId: item.sessionId,
+                    });
+                }
+                
+            })
+        );
+
+        /*
+        this.mesh.actionManager.registerAction(
+            new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
                 // remove any previous overlay
                 if (this.overlay_mesh) {
                     this.overlay_mesh.dispose();
@@ -174,7 +221,7 @@ export class Item extends TransformNode {
                     })
                 );
             })
-        );
+        );*/
 
         //////////////////////////////////////////////////////////////////////////
         // misc

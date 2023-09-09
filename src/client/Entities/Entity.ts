@@ -54,6 +54,7 @@ export class Entity {
     // character
     public type: string = "";
     public race: string = "";
+    public material: number = 0;
     public name: string = "";
     public speed: string = "";
     public x: number;
@@ -81,7 +82,7 @@ export class Entity {
     public scale;
     public animationSpeed;
     public bones;
-    public raceData;
+    public materials;
 
     // flags
     public blocked: boolean = false; // if true, player will not moved

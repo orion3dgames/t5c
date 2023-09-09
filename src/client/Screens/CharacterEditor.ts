@@ -342,7 +342,7 @@ export class CharacterEditor {
         sectionTitle.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         this.leftStackPanel.addControl(sectionTitle);
 
-        selectedChoices.forEach((color) => {
+        selectedChoices.forEach((color, key) => {
             const btnChoice = Button.CreateSimpleButton("btnChoice", color.title);
             btnChoice.top = "0px";
             btnChoice.width = 1;
@@ -359,6 +359,7 @@ export class CharacterEditor {
             }
 
             btnChoice.onPointerDownObservable.add(() => {
+                color.index = key;
                 this.selected_variant = color;
                 if (selectedMaterial) {
                     if (selectedMaterial.albedoTexture) {
@@ -453,7 +454,7 @@ export class CharacterEditor {
                 token: token,
                 name: name,
                 race: this.selected_race.key,
-                color: this.selected_variant.material,
+                material: this.selected_variant.index,
             },
             url: apiUrl(this._game.config.port) + "/create_character",
         });

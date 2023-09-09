@@ -42,7 +42,8 @@ export class PlayerSchema extends Entity {
 
     @type("string") public name: string = "";
     @type("string") public type: string = "player";
-    @type("string") public race: string = "player_hobbit";
+    @type("string") public race: string = "male_knight";
+    @type("int8") public material: number = 0;
 
     @type("string") public location: string = "";
     @type("number") public sequence: number = 0; // latest input sequence

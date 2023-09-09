@@ -25,9 +25,6 @@ let ItemsDB: itemDataMap = {
         benefits: [{ key: PlayerKeys.STRENGTH, type: CalculationTypes.ADD, amount: 10 }],
         meshData: {
             scale: 1.3,
-            width: 1.5,
-            height: 0.4,
-            depth: 0.4,
         },
     },
 
@@ -54,9 +51,6 @@ let ItemsDB: itemDataMap = {
         benefits: [{ key: PlayerKeys.STRENGTH, type: CalculationTypes.ADD, amount: 10 }],
         meshData: {
             scale: 1.4,
-            width: 1,
-            height: 0.4,
-            depth: 1,
         },
     },
 
@@ -85,9 +79,6 @@ let ItemsDB: itemDataMap = {
         benefits: [{ key: PlayerKeys.STRENGTH, type: CalculationTypes.ADD, amount: 10 }],
         meshData: {
             scale: 0.8,
-            width: 1,
-            height: 1,
-            depth: 1,
         },
     },
 
@@ -116,10 +107,7 @@ let ItemsDB: itemDataMap = {
             { key: PlayerKeys.WISDOM, type: CalculationTypes.REMOVE, amount: 2 },
         ],
         meshData: {
-            scale: 0.25,
-            width: 0.5,
-            height: 0.25,
-            depth: 0.5,
+            scale: 1,
         },
     },
 
@@ -137,9 +125,6 @@ let ItemsDB: itemDataMap = {
         benefits: [{ key: PlayerKeys.HEALTH, type: CalculationTypes.ADD, amount: 25 }],
         meshData: {
             scale: 1.5,
-            width: 0.4,
-            height: 0.7,
-            depth: 0.4,
         },
     },
 
@@ -157,9 +142,6 @@ let ItemsDB: itemDataMap = {
         benefits: [{ key: PlayerKeys.MANA, type: CalculationTypes.ADD, amount: 25 }],
         meshData: {
             scale: 1.5,
-            width: 0.4,
-            height: 0.7,
-            depth: 0.4,
         },
     },
 };

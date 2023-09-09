@@ -36,7 +36,7 @@ class Database {
             "user_id" INTEGER,
             "name" TEXT,
             "race" TEXT,
-            "race_color" TEXT,
+            "material" INTEGER DEFAULT 0,
             "location" TEXT,
             "level" int,
             "experience" int,
@@ -284,13 +284,13 @@ class Database {
         return character;
     }
 
-    async createCharacter(token, name, race, race_color) {
+    async createCharacter(token, name, race, material) {
         let user = await this.getUserByToken(token);
-        const sql = `INSERT INTO characters ("user_id", "name", "race", "race_color", "location","x","y","z","rot","level","experience","health", "mana") VALUES (
+        const sql = `INSERT INTO characters ("user_id", "name", "race", "material", "location","x","y","z","rot","level","experience","health", "mana") VALUES (
             "${user.id}",
             "${name}",
             "${race}",
-            "${race_color}",
+            "${material}",
             "lh_town",
             "0",
             "0",
@@ -301,6 +301,7 @@ class Database {
             "50",
             "50"
         );`;
+        console.log(sql);
         let c = await (<any>this.run(sql));
 
         // add default abilities

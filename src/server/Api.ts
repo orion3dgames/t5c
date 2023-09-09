@@ -3,9 +3,10 @@ import path from "path";
 import Logger from "./utils/Logger";
 import { generateRandomPlayerName } from "../shared/Utils";
 import { GameData } from "./GameData";
+import { Database } from "./Database";
 
 class Api {
-    constructor(app, database) {
+    constructor(app, database:Database) {
         // default to built client index.html
         let indexPath = "dist/client/";
         let clientFile = "index.html";
@@ -101,9 +102,9 @@ class Api {
             const token: string = (req.query.token as string) ?? "";
             const name: string = (req.query.name as string) ?? "";
             const race: string = (req.query.race as string) ?? "";
-            const race_color: string = (req.query.color as string) ?? "";
+            const material: string = (req.query.material as string) ?? "";
             if (token !== "") {
-                database.createCharacter(token, name, race, race_color).then((character) => {
+                database.createCharacter(token, name, race, material).then((character) => {
                     if (!character) {
                         return res.status(400).send({
                             message: "Create Failed",
@@ -142,7 +143,7 @@ class Api {
 
         app.post("/returnRandomUser", (req, res) => {
             database.saveUser(generateRandomPlayerName(), generateRandomPlayerName()).then((user) => {
-                database.createCharacter(user.token, generateRandomPlayerName(), "male_knight", "knight_texture.png").then((character) => {
+                database.createCharacter(user.token, generateRandomPlayerName(), "male_knight", 3).then((character) => {
                     character.user_id = user.id;
                     character.token = user.token;
                     character.password = user.password;
