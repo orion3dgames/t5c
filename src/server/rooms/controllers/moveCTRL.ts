@@ -24,31 +24,35 @@ export class moveCTRL {
 
             // check distance to target
             let distance = this._owner.AI_TARGET_DISTANCE;
+            let target = this._owner.AI_TARGET;
+            let ability = this._owner.AI_ABILITY;
 
-            if (distance < 2.5) {
 
-                console.log('CLOSE, START AUTO ATTACK');
-                
-                // do pickup / attack
-                let ability = this._owner.AI_ABILITY;
-                let target = this._owner.AI_TARGET;
-                if (target instanceof BrainSchema) {
-                    this._owner.abilitiesCTRL.startAutoAttack(this._owner, target, ability);
+            // do pickup / attack
+            if (distance < 1 && target instanceof LootSchema) {
+                this._owner.pickupItem(target);
+                this._owner.AI_TARGET = null;
+                this.cancelTargetDestination()
+            }
+            
+            // do auto attack 
+            if (distance < ability.minRange && (
+                target instanceof BrainSchema || 
+                target instanceof PlayerSchema 
+            ) ) {
+
+                // start auto attack
+                this._owner.abilitiesCTRL.startAutoAttack(this._owner, target, ability);
+
+                if(target instanceof BrainSchema){
                     this._owner.AI_TARGET = null;
                 }
-                if (target instanceof LootSchema) {
-                    this._owner.pickupItem(target);
-                    this._owner.AI_TARGET = null;
-                }
+
                 if(target instanceof PlayerSchema){
-                    this._owner.abilitiesCTRL.startAutoAttack(this._owner, target, ability);
                     this._owner.AI_TARGET_FOUND = true;
                 }
-                // reset
-                this._owner.AI_TARGET_WAYPOINTS = [];
-                this._owner.AI_TARGET_DISTANCE = 0;
-                this._owner.AI_TARGET_POSITION = null;
-                this._owner.AI_ABILITY = null;
+                
+                this.cancelTargetDestination()
             }
 
             // if already found and target escapes
@@ -64,6 +68,14 @@ export class moveCTRL {
         if (this._owner.AI_TARGET_WAYPOINTS && this._owner.AI_TARGET_WAYPOINTS.length > 0) {
             this.moveTowards();
         }
+    }
+
+    cancelTargetDestination(){
+        
+        this._owner.AI_TARGET_WAYPOINTS = [];
+        this._owner.AI_TARGET_DISTANCE = 0;
+        this._owner.AI_TARGET_POSITION = null;
+        this._owner.AI_ABILITY = null;
     }
 
     setTargetDestination(targetPos: Vector3): void {
