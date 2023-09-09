@@ -11,6 +11,7 @@ import { Skeleton } from "@babylonjs/core/Bones/skeleton";
 import { PlayerSlots } from "../../../shared/types";
 import { GameController } from "../../Controllers/GameController";
 import { EquipmentSchema } from "../../../server/rooms/schema";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 
 export class EntityMesh {
     private _entity: Entity;
@@ -105,13 +106,13 @@ export class EntityMesh {
         let key = "RACE_" + this._entity.race;
         const result = this._loadedAssets[key].instantiateModelsToScene(() => {
             return key;
-        });
+        }, true);
         const playerMesh = result.rootNodes[0];
+        
         this._animationGroups = result.animationGroups;
         this.skeleton = result.skeletons[0];
 
         // set initial player scale & rotation
-        //playerMesh.name = this._entity.sessionId + "_mesh";
         playerMesh.parent = box;
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
         if (this._entity.rotationFix) {
@@ -122,6 +123,19 @@ export class EntityMesh {
         playerMesh.checkCollisions = false;
         playerMesh.position = new Vector3(0, -1, 0);
         this.playerMesh = playerMesh;
+
+        // change player texture
+        if(this._entity.type === 'player'){
+            const allChildMeshes = this.playerMesh.getChildTransformNodes(true)[0].getChildMeshes(false);
+            const selectedMaterial = allChildMeshes[0].material ?? false;
+            const materialIndex = this._entity.material;
+            if(selectedMaterial){
+                if (selectedMaterial.albedoTexture) {
+                    selectedMaterial.albedoTexture.dispose();
+                    selectedMaterial.albedoTexture = new Texture("./models/races/materials/" + this._entity.materials[materialIndex].material, this._scene, { invertY: false });
+                }
+            }
+        }
 
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);
@@ -218,11 +232,11 @@ export class EntityMesh {
                     let boneId = this._entity.bones[key];
                     let bone = this.skeleton.bones[boneId];
 
-                    const weaponMesh = this._loadedAssets["ROOT_ITEM_" + e.key].createInstance("player_" + e.key);
+                    const weaponMesh = this._loadedAssets["ROOT_ITEM_" + e.key].clone("player_" + e.key);
                     weaponMesh.isVisible = true;
                     //const weapon = this._loadedAssets["ITEM_" + e.key].instantiateModelsToScene((name) => "player_" + e.key, true);
                     //const weaponMesh = weapon.rootNodes[0];
-                    weaponMesh.parent = this.playerMesh;
+                    //weaponMesh.parent = this.playerMesh;
                     weaponMesh.attachToBone(bone, this.playerMesh);
 
                     // if mesh offset required
