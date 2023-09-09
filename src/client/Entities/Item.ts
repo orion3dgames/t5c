@@ -85,7 +85,7 @@ export class Item extends TransformNode {
             // clone
             if (this._game._loadedAssets["ROOT_ITEM_" + entity.key]) {
                 this.mesh = this._game._loadedAssets["ROOT_ITEM_" + entity.key].clone("TEST_" + entity.sessionId);
-                this.mesh.visibility = 1;
+
             } else {
                 console.error("Could not find key: ROOT_ITEM_" + entity.key, this._game._loadedAssets);
             }
@@ -108,11 +108,10 @@ export class Item extends TransformNode {
         this.mesh.isPickable = true;
         this.mesh.isVisible = true;
         this.mesh.checkCollisions = false;
-        this.mesh.showBoundingBox = true;
+        this.mesh.showBoundingBox = false;
         //this.mesh.receiveShadows = true;
 
         // offset mesh from the ground
-        console.log(this.mesh.getBoundingInfo());
         let meshSize = this.mesh.getBoundingInfo().boundingBox.extendSize;
         this.mesh.position.y += meshSize.y * this.meshData.scale;
         this.mesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.

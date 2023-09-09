@@ -1,4 +1,4 @@
-import { type, ArraySchema } from "@colyseus/schema";
+import { type, ArraySchema, MapSchema } from "@colyseus/schema";
 import { EntityState, AI_STATE } from "../../../shared/types";
 import { Entity } from "./Entity";
 import { abilitiesCTRL } from "../controllers/abilityCTRL";
@@ -26,6 +26,7 @@ export class BrainSchema extends Entity {
     @type("string") public type: string = "";
     @type("string") public name: string = "";
     @type("string") public race: string = "";
+    @type("int8") public material: number = 0;
 
     @type("string") public location: string = "";
     @type("number") public sequence: number = 0; // latest input sequence
@@ -33,7 +34,7 @@ export class BrainSchema extends Entity {
     @type("int8") public anim_state: EntityState = EntityState.IDLE;
     @type("number") public ai_state: AI_STATE = 0;
 
-    @type([EquipmentSchema]) equipment = new ArraySchema<EquipmentSchema>();
+    @type({ map: EquipmentSchema }) equipment = new MapSchema<EquipmentSchema>();
 
     // PARENTS
     public _navMesh;
@@ -82,8 +83,13 @@ export class BrainSchema extends Entity {
         Object.assign(this, data);
         Object.assign(this, this._state.gameData.get("race", this.race));
 
-        // abilities
-        // future
+        // add equipment
+        if(data.initial_equipment && data.initial_equipment.length > 0){
+            data.initial_equipment.forEach((element) => {
+                this.equipment.set(element.key, new EquipmentSchema(element));
+            });
+        }
+        
 
         // initialize state machine
         this._stateMachine = new StateManager(this);

@@ -125,7 +125,7 @@ export class EntityMesh {
         this.playerMesh = playerMesh;
 
         // change player texture
-        if(this._entity.type === 'player'){
+        if(this._entity.material){
             const allChildMeshes = this.playerMesh.getChildTransformNodes(true)[0].getChildMeshes(false);
             const selectedMaterial = allChildMeshes[0].material ?? false;
             const materialIndex = this._entity.material;
@@ -232,11 +232,8 @@ export class EntityMesh {
                     let boneId = this._entity.bones[key];
                     let bone = this.skeleton.bones[boneId];
 
-                    const weaponMesh = this._loadedAssets["ROOT_ITEM_" + e.key].clone("player_" + e.key);
+                    const weaponMesh = this._loadedAssets["ROOT_ITEM_" + e.key].clone("player_" + e.key) as Mesh;
                     weaponMesh.isVisible = true;
-                    //const weapon = this._loadedAssets["ITEM_" + e.key].instantiateModelsToScene((name) => "player_" + e.key, true);
-                    //const weaponMesh = weapon.rootNodes[0];
-                    //weaponMesh.parent = this.playerMesh;
                     weaponMesh.attachToBone(bone, this.playerMesh);
 
                     // if mesh offset required

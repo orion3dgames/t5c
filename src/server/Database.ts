@@ -301,7 +301,6 @@ class Database {
             "50",
             "50"
         );`;
-        console.log(sql);
         let c = await (<any>this.run(sql));
 
         // add default abilities

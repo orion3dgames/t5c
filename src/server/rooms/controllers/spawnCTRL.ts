@@ -97,6 +97,7 @@ export class spawnCTRL {
             sessionId: sessionId,
             type: "entity",
             race: raceData.key,
+            material: spawnInfo.material,
             name: spawnInfo.name,
             location: this._room.metadata.location,
             x: position.x ?? 0,
@@ -111,6 +112,7 @@ export class spawnCTRL {
             anim_state: EntityState.IDLE,
             toRegion: false,
             AI_SPAWN_INFO: spawnInfo,
+            initial_equipment: spawnInfo.equipment
         };
 
         //

@@ -1,3 +1,4 @@
+import { PlayerSlots } from "../../shared/types";
 import { Vector3 } from "../../shared/Libs/yuka-min";
 
 let LocationsDB = {
@@ -54,7 +55,18 @@ let LocationsDB = {
                     radius: 0,
                     amount: 5,
                     race: "male_rogue",
+                    material: 0,
                     name: "Rogue",
+                    equipment: [{
+                        slot: PlayerSlots.WEAPON,
+                        key: "sword_01"
+                    },{
+                        slot: PlayerSlots.HEAD,
+                        key: "helm_01"
+                    },{
+                        slot: PlayerSlots.OFF_HAND,
+                        key: "shield_01"
+                    }]
                 },
                 {
                     type: "path",
@@ -65,7 +77,8 @@ let LocationsDB = {
                     radius: 0,
                     amount: 1,
                     race: "male_rogue",
-                    name: "Rogue",
+                    material: 0,
+                    name: "Rogue"
                 },
                 {
                     type: "static",
@@ -76,6 +89,7 @@ let LocationsDB = {
                     radius: 0,
                     amount: 1,
                     race: "male_knight",
+                    material: 3,
                     name: "Alexander The Righteous",
                 },
                 {
@@ -87,6 +101,7 @@ let LocationsDB = {
                     radius: 0,
                     amount: 1,
                     race: "male_mage",
+                    material: 2,
                     name: "Priestess",
                 },
                 {
@@ -95,11 +110,12 @@ let LocationsDB = {
                     aggressive: false,
                     canAttack: true,
                     points: [new Vector3(13.1, 0, -13.7)],
-                    radius: 0,
+                    radius: 0, 
                     amount: 1,
                     race: "male_mage",
+                    material: 1,
                     name: "Harmless Dummy",
-                    baseHealth: 5000,
+                    baseHealth: 5000
                 },
             ],
         },
@@ -145,6 +161,7 @@ let LocationsDB = {
                     radius: 0,
                     amount: 6,
                     race: "male_rogue",
+                    material: 0,
                     name: "Roaming Rogue",
                 },
             ],

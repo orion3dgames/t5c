@@ -88,7 +88,7 @@ class GameServer {
         // start dev routes
         if (process.env.NODE_ENV !== "production") {
             // start monitor
-            //app.use("/colyseus", monitor());
+            app.use("/colyseus", monitor());
             // bind it as an express middleware
             //app.use("/playground", playground);
         }

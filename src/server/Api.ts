@@ -143,7 +143,7 @@ class Api {
 
         app.post("/returnRandomUser", (req, res) => {
             database.saveUser(generateRandomPlayerName(), generateRandomPlayerName()).then((user) => {
-                database.createCharacter(user.token, generateRandomPlayerName(), "male_knight", 3).then((character) => {
+                database.createCharacter(user.token, generateRandomPlayerName(), "male_knight", 0).then((character) => {
                     character.user_id = user.id;
                     character.token = user.token;
                     character.password = user.password;
