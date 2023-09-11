@@ -139,10 +139,10 @@ export class GameScene {
                     true,
                     { doNotInstantiate: true }
                 );
-             
+
                 root.rootNodes[0].name = modelToLoadKey;
                 let mergedMesh = mergeMesh(root.rootNodes[0]);
-                if(mergedMesh){
+                if (mergedMesh) {
                     /*
                     let texture = this._scene.getTextureByName("knight_texture (Base Color)");
                     console.log(texture);
@@ -172,19 +172,31 @@ export class GameScene {
             // join game room
             this.room = await this._game.client.joinRoom(room.roomId, this._game.currentUser.token, character.id);
 
+            // set room onError evenmt
+            this.room.onError((code, message) => {
+                this._game.setErrorCode("Something went wrong with the server (" + code + ": " + message + "), please try again later.");
+                this._game.setScene(State.LOGIN);
+            });
+
+            // set room onLeave event
+            this.room.onLeave((code) => {
+                if (code === 1006) {
+                    this._game.setErrorCode("Something went wrong with the server (" + code + "), please try again later.");
+                    this._game.setScene(State.LOGIN);
+                }
+            });
+
             // join global chat room (match sessionId to gameRoom)
             this.chatRoom = await this._game.client.joinChatRoom({ sessionId: this.room.sessionId });
 
-            // set global vars
-            this._roomId = this.room.roomId;
-
-            await this._initEvents();
+            // initialize game
+            await this._initGame();
         } else {
         }
     }
 
-    private async _initEvents() {
-        // setup hud
+    private async _initGame() {
+        // setup interface
         this._ui = new UserInterface(this._game, this.room, this.chatRoom, this._entities, this._currentPlayer);
 
         // setup input Controller
@@ -233,7 +245,7 @@ export class GameScene {
         });
 
         // when an entity is removed
-        this.room.state.entities.onRemove((player, sessionId) => {
+        this.room.state.entities.onRemove((entity, sessionId) => {
             if (this._entities[sessionId]) {
                 this._entities[sessionId].remove();
                 delete this._entities[sessionId];
@@ -241,13 +253,7 @@ export class GameScene {
         });
 
         ////////////////////////////////////////////////////
-
-        // ping server every 5 seconds to get ping
-        this.room.send("ping", { date: Date.now() });
-
-        ////////////////////////////////////////////////////
         // main game loop
-
         let timeServer = Date.now();
         let timeServerSlow = Date.now();
         let sequence = 0;
@@ -272,12 +278,14 @@ export class GameScene {
                 // every 5 seconds
                 this.room.send("ping", { date: Date.now() });
 
+                // update entities
                 for (let sessionId in this._entities) {
                     const entity = this._entities[sessionId];
                     if (entity && entity.type === "player") {
                         entity.updateSlowRate(this._game.config.updateRate);
                     }
                 }
+
                 // reset timer
                 timeServerSlow = timeNow;
             }

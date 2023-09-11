@@ -28,6 +28,7 @@ export class GameController {
     public locale: "en";
     public currentMs: number;
     public camY: number;
+    public latestError: string;
 
     // all preloaded assets
     public _assetsCtrl: AssetsController;
@@ -52,6 +53,11 @@ export class GameController {
         this.client = new Network(app.config.port);
     }
 
+    setErrorCode(message: string): void {
+        console.error(message);
+        this.latestError = message;
+    }
+
     /////////////////////////////////////////
     //////////// SCENE MANAGEMENT ///////////
     /////////////////////////////////////////
@@ -73,7 +79,7 @@ export class GameController {
     async initializeGameData() {
         const result = await axios.request({
             method: "GET",
-            url: apiUrl(this.config.port)+"/load_game_data",
+            url: apiUrl(this.config.port) + "/load_game_data",
         });
         this._gameData = result.data.data;
     }
