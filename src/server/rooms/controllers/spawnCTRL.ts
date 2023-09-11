@@ -112,7 +112,7 @@ export class spawnCTRL {
             anim_state: EntityState.IDLE,
             toRegion: false,
             AI_SPAWN_INFO: spawnInfo,
-            initial_equipment: spawnInfo.equipment
+            initial_equipment: spawnInfo.equipment,
         };
 
         //

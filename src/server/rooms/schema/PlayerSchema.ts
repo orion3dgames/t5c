@@ -151,10 +151,6 @@ export class PlayerSchema extends Entity {
 
     // runs on every server iteration
     update() {
-        if (this.isMoving === true) {
-            this.isMoving = false;
-        }
-
         // always check if player is dead ??
         if (this.isEntityDead() && !this.isDead) {
             this.setAsDead();
@@ -192,11 +188,11 @@ export class PlayerSchema extends Entity {
 
                             // update player location in database
                             this.location = element.to_map;
-                            this.x = element.to_vector.x,
-                            this.y = element.to_vector.y,
-                            this.z = element.to_vector.z,
-                            this.rot = 0,
-                            this._state._gameroom.database.updateCharacter(this.id, this);
+                            (this.x = element.to_vector.x),
+                                (this.y = element.to_vector.y),
+                                (this.z = element.to_vector.z),
+                                (this.rot = 0),
+                                this._state._gameroom.database.updateCharacter(this.id, this);
 
                             // inform client he cand now teleport to new zone
                             client.send("playerTeleportConfirm", element.to_map);
@@ -208,15 +204,13 @@ export class PlayerSchema extends Entity {
             // move player
             this.moveCTRL.update();
         }
-
     }
 
     public getClient() {
         return this._state._gameroom.clients.getById(this.sessionId);
     }
 
-    save(db:Database){
-
+    save(db: Database) {
         let client = this.getClient();
         let character = client.auth;
 
@@ -299,10 +293,8 @@ export class PlayerSchema extends Entity {
     }
 
     pickupItem(loot: LootSchema) {
-        
         // play animation
-        this.animationCTRL.playAnim(this, EntityState.PICKUP, ()=>{
-
+        this.animationCTRL.playAnim(this, EntityState.PICKUP, () => {
             let data = {
                 key: loot.key,
                 qty: loot.qty,
@@ -332,7 +324,6 @@ export class PlayerSchema extends Entity {
 
             // stop chasing target
             this.AI_TARGET = null;
-
         });
     }
 

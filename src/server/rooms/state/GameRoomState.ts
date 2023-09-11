@@ -65,14 +65,16 @@ export class GameRoomState extends Schema {
 
     public update(deltaTime: number) {
         // updating entities
-        this.entityCTRL.all.forEach((entity) => {
-            entity.update(deltaTime);
+        if (this.entityCTRL.hasEntities()) {
+            this.entityCTRL.all.forEach((entity) => {
+                entity.update(deltaTime);
 
-            // remove loot that's been on the ground over 5 minutes
-            if (entity.type === "item" && entity.spawnTimer > 1000 * 60 * 5) {
-                //this.deleteEntity(entity.sessionId);
-            }
-        });
+                // remove loot that's been on the ground over 5 minutes
+                if (entity.type === "item" && entity.spawnTimer > 1000 * 60 * 5) {
+                    //this.deleteEntity(entity.sessionId);
+                }
+            });
+        }
 
         // keep updating spawn points every 5 seconds
         this.spawnTimer += deltaTime;

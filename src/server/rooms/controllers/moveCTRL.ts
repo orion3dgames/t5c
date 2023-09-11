@@ -11,7 +11,6 @@ export class moveCTRL {
     }
 
     public update() {
-
         // if player has a target
         if (this._owner.hasTarget()) {
             // monitor player's target position
@@ -27,37 +26,33 @@ export class moveCTRL {
             let target = this._owner.AI_TARGET;
             let ability = this._owner.AI_ABILITY;
 
-
-            // do pickup / attack
+            // do pickup item if close enough
             if (distance < 1 && target instanceof LootSchema) {
                 this._owner.pickupItem(target);
                 this._owner.AI_TARGET = null;
-                this.cancelTargetDestination()
+                this.cancelTargetDestination();
             }
-            
-            // do auto attack 
-            if (distance < ability.minRange && (
-                target instanceof BrainSchema || 
-                target instanceof PlayerSchema 
-            ) ) {
 
+            // do auto attack
+            if (distance < 2.5 && (target instanceof BrainSchema || target instanceof PlayerSchema)) {
                 // start auto attack
                 this._owner.abilitiesCTRL.startAutoAttack(this._owner, target, ability);
 
-                if(target instanceof BrainSchema){
+                // if ai entity
+                if (target instanceof BrainSchema) {
                     this._owner.AI_TARGET = null;
                 }
 
-                if(target instanceof PlayerSchema){
+                // if player entity
+                if (target instanceof PlayerSchema) {
                     this._owner.AI_TARGET_FOUND = true;
                 }
-                
-                this.cancelTargetDestination()
+
+                this.cancelTargetDestination();
             }
 
             // if already found and target escapes
-            if(distance > 2.5 && this._owner.AI_TARGET_FOUND){
-                console.log('LOST, CANCEL AUTO ATTACK');
+            if (distance > 2.5 && this._owner.AI_TARGET_FOUND) {
                 this._owner.abilitiesCTRL.cancelAutoAttack(this._owner);
                 this._owner.AI_TARGET = null;
                 this._owner.AI_TARGET_FOUND = false;
@@ -70,8 +65,7 @@ export class moveCTRL {
         }
     }
 
-    cancelTargetDestination(){
-        
+    cancelTargetDestination() {
         this._owner.AI_TARGET_WAYPOINTS = [];
         this._owner.AI_TARGET_DISTANCE = 0;
         this._owner.AI_TARGET_POSITION = null;
@@ -148,7 +142,6 @@ export class moveCTRL {
 
         // cancel any auto attack
         this._owner.abilitiesCTRL.cancelAutoAttack(this._owner);
-        this._owner.isMoving = true;
         let speed = this._owner.speed;
 
         // save current position

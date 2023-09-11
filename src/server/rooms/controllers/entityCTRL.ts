@@ -8,7 +8,7 @@ export class entityCTRL {
     }
 
     hasEntities() {
-        return this._state.entities.size > 0;
+        return this._state.entities && this._state.entities.size > 0;
     }
 
     length() {
