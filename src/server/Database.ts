@@ -342,14 +342,16 @@ class Database {
             p["mana"] = data.maxMana;
         }
 
-        p["gold"] = data.player_data.gold ?? 0;
-        p["experience"] = data.player_data.experience ?? 0;
-        p["points"] = data.player_data.points ?? 0;
-        p["strength"] = data.player_data.strength ?? 0; 
-        p["endurance"] = data.player_data.endurance ?? 0; 
-        p["agility"] = data.player_data.agility ?? 0; 
-        p["intelligence"] = data.player_data.intelligence ?? 0; 
-        p["wisdom"] = data.player_data.wisdom ?? 0; 
+        if (data.player_data) {
+            p["gold"] = data.player_data.gold ?? 0;
+            p["experience"] = data.player_data.experience ?? 0;
+            p["points"] = data.player_data.points ?? 0;
+            p["strength"] = data.player_data.strength ?? 0;
+            p["endurance"] = data.player_data.endurance ?? 0;
+            p["agility"] = data.player_data.agility ?? 0;
+            p["intelligence"] = data.player_data.intelligence ?? 0;
+            p["wisdom"] = data.player_data.wisdom ?? 0;
+        }
 
         let sql = "UPDATE characters SET ";
 
