@@ -84,6 +84,10 @@ export class Entity {
     public bones;
     public materials;
 
+    // state
+    public debugMaterialActive;
+    public debugMaterialNeutral;
+
     // flags
     public blocked: boolean = false; // if true, player will not moved
 
@@ -105,6 +109,10 @@ export class Entity {
 
         // set entity
         Object.assign(this, this.entity);
+
+        // get material
+        this.debugMaterialActive = this._scene.getMaterialByName("debug_entity_active");
+        this.debugMaterialNeutral = this._scene.getMaterialByName("debug_entity_neutral");
 
         // spawn player
         this.spawn(entity);
@@ -143,7 +151,7 @@ export class Entity {
                 }
             }
 
-            if(this.type === 'player' && this.anim_state !== this.entity.anim_state){
+            if (this.type === "player" && this.anim_state !== this.entity.anim_state) {
                 console.log("[SERVER] anim_state state has changed ", EntityState[this.entity.anim_state]);
             }
 
@@ -185,14 +193,13 @@ export class Entity {
         this.characterChatLabel = this.ui.createEntityChatLabel(this);
     }
 
-    public update(delta):any {
-
+    public update(delta): any {
         if (this.ai_state === AI_STATE.SEEKING || this.ai_state === AI_STATE.ATTACKING) {
-            this.debugMesh.material = this._scene.getMaterialByName("debug_entity_active");
+            this.debugMesh.material = this.debugMaterialActive;
         }
 
         if (this.ai_state === AI_STATE.WANDER) {
-            this.debugMesh.material = this._scene.getMaterialByName("debug_entity_neutral");
+            this.debugMesh.material = this.debugMaterialNeutral;
         }
 
         // what to do when an entity dies
@@ -206,7 +213,7 @@ export class Entity {
             }
         }
 
-        if(this.isDead){
+        if (this.isDead) {
             return false;
         }
 
@@ -250,8 +257,7 @@ export class Entity {
         // delete mesh, including equipment
         this.meshController.deleteMeshes();
 
-        // unselect ?
-        // todo: what is this for? it looks wrong.
+        // if was selected, make sure to unselect it
         if (this._game.selectedEntity && this._game.selectedEntity.sessionId === this.sessionId) {
             this._game.selectedEntity = false;
         }
