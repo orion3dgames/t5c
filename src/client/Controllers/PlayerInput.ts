@@ -4,15 +4,23 @@ import { KeyboardEventTypes } from "@babylonjs/core/Events/keyboardEvents";
 import { GameController } from "./GameController";
 
 export class PlayerInput {
-    public inputMap: {};
     private _scene: Scene;
     private _game: GameController;
     private _gameroom;
     private _ui;
 
     //simple movement
+    public x: number = 0;
+    public y: number = 0;
+    public angle: number = 0;
     public horizontal: number = 0;
     public vertical: number = 0;
+
+    // keyboard
+    public top_arrow: boolean = false;
+    public down_arrow: boolean = false;
+    public left_arrow: boolean = false;
+    public right_arrow: boolean = false;
 
     // moving
     public left_click: boolean;
@@ -38,30 +46,41 @@ export class PlayerInput {
         // detect mouse movement
         this._scene.onPointerObservable.add((pointerInfo) => {
             if (pointerInfo.type === PointerEventTypes.POINTERDOWN) {
+                // left click
                 if (pointerInfo.event.button == 0) {
                     this.left_click = true;
                 }
+
+                // middle click
                 if (pointerInfo.event.button == 1) {
                     this.middle_click = true;
                 }
+
+                // right click
                 if (pointerInfo.event.button == 2) {
                     this.right_click = true;
                 }
             }
 
             if (pointerInfo.type === PointerEventTypes.POINTERUP) {
+                // left click
                 if (pointerInfo.event.button == 0) {
                     this.left_click = false;
-                    this.inputMap = { rotY: null };
+                    this.angle = 0;
                     this.vertical = 0;
                     this.horizontal = 0;
                 }
+
+                // middle click
                 if (pointerInfo.event.button == 1) {
                     this.middle_click = false;
                 }
+
+                // right click
                 if (pointerInfo.event.button == 2) {
                     this.right_click = false;
                 }
+
                 this.player_can_move = false;
                 this.mouse_moving = false;
             }
@@ -69,11 +88,13 @@ export class PlayerInput {
             if (pointerInfo.type === PointerEventTypes.POINTERMOVE) {
                 if (this.left_click) {
                     this.player_can_move = true;
-                    const x = (pointerInfo.event.clientX / pointerInfo.event.target.width) * 2 - 1;
-                    const y = (pointerInfo.event.clientY / pointerInfo.event.target.height) * 2 - 1;
-                    this.inputMap = { rotY: Math.atan2(x, y) };
-                    this._updateFromMouse(pointerInfo);
+                    this.x = (pointerInfo.event.clientX / pointerInfo.event.target.width) * 2 - 1;
+                    this.y = (pointerInfo.event.clientY / pointerInfo.event.target.height) * 2 - 1;
+                    this.angle = Math.atan2(this.x, this.y);
+                    console.log("MOUSE", this.x, this.y, this.angle);
+                    this.calculateVelocityForces();
                 }
+
                 if (this.right_click) {
                     this.mouse_moving = true;
                 }
@@ -88,6 +109,40 @@ export class PlayerInput {
         this._scene.onKeyboardObservable.add((kbInfo) => {
             switch (kbInfo.type) {
                 case KeyboardEventTypes.KEYDOWN:
+                    if (kbInfo.event.code === "ArrowUp") {
+                        this.left_arrow = true;
+                    }
+                    if (kbInfo.event.code === "ArrowDown") {
+                        this.down_arrow = true;
+                    }
+                    if (kbInfo.event.code === "ArrowLeft") {
+                        this.left_arrow = true;
+                    }
+                    if (kbInfo.event.code === "ArrowRight") {
+                        this.right_arrow = true;
+                    }
+
+                    // working on keyboard movement
+                    if (this.left_arrow || this.down_arrow || this.left_arrow || this.right_arrow) {
+                        if (kbInfo.event.code === "ArrowUp") {
+                            this.y = 1;
+                        }
+                        if (kbInfo.event.code === "ArrowDown") {
+                            this.y = -1;
+                        }
+                        if (kbInfo.event.code === "ArrowLeft") {
+                            this.x = 1;
+                        }
+                        if (kbInfo.event.code === "ArrowRight") {
+                            this.x = -1;
+                        }
+                        this.angle = Math.atan2(this.x, this.y);
+                        console.log("KEYBOARD", this.x, this.y, this.angle);
+                        this.calculateVelocityForces();
+                        this.player_can_move = true;
+                    }
+
+                    // abilities
                     if (kbInfo.event.code === "Digit1") {
                         this.digit_pressed = 1;
                     }
@@ -115,12 +170,26 @@ export class PlayerInput {
                     if (kbInfo.event.code === "Digit9") {
                         this.digit_pressed = 9;
                     }
+
+                    // show items toggle
                     if (kbInfo.event.code === "ControlLeft") {
                         this.left_alt_pressed = true;
                     }
                     break;
 
                 case KeyboardEventTypes.KEYUP:
+                    if (
+                        kbInfo.event.code === "ArrowUp" ||
+                        kbInfo.event.code === "ArrowLeft" ||
+                        kbInfo.event.code === "ArrowRight" ||
+                        kbInfo.event.code === "ArrowDown"
+                    ) {
+                        this.player_can_move = false;
+                        this.vertical = 0;
+                        this.horizontal = 0;
+                        this.angle = 0;
+                    }
+
                     if (kbInfo.event.code === "ControlLeft") {
                         this.left_alt_pressed = false;
                     }
@@ -129,22 +198,10 @@ export class PlayerInput {
         });
     }
 
-    //handles what is done when mouse is pressed or moved
-    private _updateFromMouse(pointerInfo): void {
-        /*
-        // prevent player moving while hovering an entity
-        if (pointerInfo._pickInfo.pickedMesh && 
-            pointerInfo._pickInfo.pickedMesh.metadata && 
-            pointerInfo._pickInfo.pickedMesh.metadata !== null && 
-            pointerInfo._pickInfo.pickedMesh.metadata.type && 
-            pointerInfo._pickInfo.pickedMesh.metadata.type === 'entity'){
-            this.player_can_move = false;
-        }*/
-
-        //forward - backwards movement
-        if (this.inputMap["rotY"] !== null) {
-            this.vertical = -Math.cos(this.inputMap["rotY"] + Math.PI - this._game.camY);
-            this.horizontal = Math.sin(this.inputMap["rotY"] + Math.PI - this._game.camY);
+    private calculateVelocityForces() {
+        if (this.angle !== 0) {
+            this.vertical = -Math.cos(this.angle + Math.PI - this._game.camY);
+            this.horizontal = Math.sin(this.angle + Math.PI - this._game.camY);
         }
     }
 }

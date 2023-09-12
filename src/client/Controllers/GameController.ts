@@ -49,7 +49,6 @@ export class GameController {
         this.scene = app.scene;
 
         // create colyseus client
-        // this should use environement values
         this.client = new Network(app.config.port);
     }
 
@@ -70,23 +69,12 @@ export class GameController {
     //////////// GAME DATA /////////////////
     /////////////////////////////////////////
 
-    async fetchAsset(key) {
-        if (this._loadedAssets[key]) {
-            return this._loadedAssets[key];
-        }
-    }
-
     async initializeGameData() {
         const result = await axios.request({
             method: "GET",
             url: apiUrl(this.config.port) + "/load_game_data",
         });
         this._gameData = result.data.data;
-    }
-
-    async initializeAssetController() {
-        this._loadedAssets = [];
-        this._assetsCtrl = new AssetsController(this);
     }
 
     public getGameData(type, key) {
@@ -132,6 +120,21 @@ export class GameController {
         }
 
         return returnData;
+    }
+
+    /////////////////////////////////////////
+    //////////// ASSETS DATA /////////////////
+    /////////////////////////////////////////
+
+    async fetchAsset(key) {
+        if (this._loadedAssets[key]) {
+            return this._loadedAssets[key];
+        }
+    }
+
+    async initializeAssetController() {
+        this._loadedAssets = [];
+        this._assetsCtrl = new AssetsController(this);
     }
 
     /////////////////////////////////////////
