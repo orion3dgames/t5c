@@ -21,7 +21,7 @@ export class PlayerCamera {
         this._build(player);
     }
 
-    private _build(player) {
+    private _build(player: Player) {
         // root camera parent that handles positioning of the camera to follow the player
         this._camRoot = new TransformNode("root");
         this._camRoot.position = new Vector3(0, 1.5, 0); //initialized at (0,0,0)
@@ -49,27 +49,13 @@ export class PlayerCamera {
         this.cameraPos = this.camera.position;
     }
 
-    // post processing effect black and white
-    // used when current player dies and click ressurects
-    public bw(activate: boolean) {
-        if (activate === true && !this._postProcess) {
-            this._postProcess = new BlackAndWhitePostProcess("bandw", 1.0, this.camera);
-        }
-        if (activate === false && this._postProcess) {
-            this._postProcess.dispose();
-        }
-    }
-
-    public follow(playerPosition): void {
-        // camera must follow player
-        this._camRoot.position = Vector3.Lerp(this._camRoot.position, new Vector3(playerPosition.x, playerPosition.y, playerPosition.z), 1);
-
-        // to implement when the direction of the player depends on the mouse position clicked on the terrain and not on the screen
-        // this._camRoot.rotation = new Vector3(this._camRoot.rotation.x, rotationY, 0);
+    public follow(): void {
+        // camera must follow player mesh (the local one, else it will be laggy has the camera tries to catch up with server position)
+        this._camRoot.position = Vector3.Lerp(this._camRoot.position, this.player.moveController.getNextPosition(), 0.1);
+        //this._camRoot.position = new Vector3(playerPosition.x, playerPosition.y, playerPosition.z);
 
         // rotate camera around the Y position if right click is true
         if (this._input.middle_click) {
-            // ddaydd to implement
             const rotationX =
                 Math.abs(this._camRoot.rotation.x + this._input.movementY) < 0.5 ? this._camRoot.rotation.x + this._input.movementY : this._camRoot.rotation.x;
             const rotationY = this._camRoot.rotation.y + this._input.movementX;
@@ -81,5 +67,16 @@ export class PlayerCamera {
         // zoom in/out
         if (deltaY > 0 && this.camera.position.z > -50) this.camera.position.z -= 2;
         if (deltaY < 0 && this.camera.position.z < -20) this.camera.position.z += 2;
+    }
+
+    // post processing effect black and white
+    // used when current player dies and click ressurects
+    public bw(activate: boolean) {
+        if (activate === true && !this._postProcess) {
+            this._postProcess = new BlackAndWhitePostProcess("bandw", 1.0, this.camera);
+        }
+        if (activate === false && this._postProcess) {
+            this._postProcess.dispose();
+        }
     }
 }

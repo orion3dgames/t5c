@@ -115,9 +115,9 @@ export class Player extends Entity {
 
         //////////////////////////////////////////////////////////////////////////
         // player before render loop
-        this._scene.registerBeforeRender(() => {
+        this._scene.onBeforeCameraRenderObservable.add(() => {
             // move camera as player moves
-            this.cameraController.follow(this.getPosition());
+            this.cameraController.follow();
         });
     }
 
