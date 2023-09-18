@@ -224,7 +224,7 @@ export class Entity {
     }
 
     public getPosition() {
-        return new Vector3(this.x, this.y, this.z);
+        return new Vector3(this.mesh.position.x, this.mesh.position.y, this.mesh.position.z);
     }
 
     public updateSlowRate() {}
