@@ -187,7 +187,7 @@ export class GameScene {
             });
 
             // join global chat room (match sessionId to gameRoom)
-            this.chatRoom = await this._game.client.joinChatRoom({ sessionId: this.room.sessionId });
+            this.chatRoom = await this._game.client.joinChatRoom({ name: character.name, sessionId: this.room.sessionId });
 
             // initialize game
             await this._initGame();

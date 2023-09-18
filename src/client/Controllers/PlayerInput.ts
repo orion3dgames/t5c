@@ -91,7 +91,7 @@ export class PlayerInput {
                     this.x = (pointerInfo.event.clientX / pointerInfo.event.target.width) * 2 - 1;
                     this.y = (pointerInfo.event.clientY / pointerInfo.event.target.height) * 2 - 1;
                     this.angle = Math.atan2(this.x, this.y);
-                    console.log("MOUSE", this.x, this.y, this.angle);
+                    //console.log("MOUSE", this.x, this.y, this.angle);
                     this.calculateVelocityForces();
                 }
 
@@ -109,6 +109,7 @@ export class PlayerInput {
         this._scene.onKeyboardObservable.add((kbInfo) => {
             switch (kbInfo.type) {
                 case KeyboardEventTypes.KEYDOWN:
+                    /*
                     if (kbInfo.event.code === "ArrowUp") {
                         this.left_arrow = true;
                     }
@@ -140,7 +141,7 @@ export class PlayerInput {
                         console.log("KEYBOARD", this.x, this.y, this.angle);
                         this.calculateVelocityForces();
                         this.player_can_move = true;
-                    }
+                    }*/
 
                     // abilities
                     if (kbInfo.event.code === "Digit1") {

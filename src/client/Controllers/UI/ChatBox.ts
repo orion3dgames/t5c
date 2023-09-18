@@ -111,7 +111,7 @@ export class ChatBox {
         chatInput.focus();
 
         // add default chat message
-        this.addNotificationMessage("system", this._currentPlayer.name + " has joined.", new Date());
+        //this.addNotificationMessage("system", this._currentPlayer.name + " has joined.", new Date());
 
         // intial refresh chatbox
         this._refreshChatBox();
@@ -132,9 +132,15 @@ export class ChatBox {
 
         // receive message event
         this._chatRoom.onMessage("messages", (message: PlayerMessage) => {
-            message.type = "chat";
-            message.color = this._colors["chat"];
-            this.processMessage(message);
+            if (!message.type) {
+                message.type = "chat";
+                message.color = this._colors["chat"];
+            }
+            if (message.type === "system") {
+                this.addNotificationMessage("system", message.message, new Date());
+            } else {
+                this.processMessage(message);
+            }
         });
     }
 
@@ -175,7 +181,9 @@ export class ChatBox {
         if (msg.senderID === this._currentPlayer.sessionId) {
             player = this._currentPlayer;
         }
-        clearInterval(player.showTimer);
+        if (player.showTimer) {
+            clearInterval(player.showTimer);
+        }
         if (player && player.characterLabel) {
             let el = player.characterLabel;
             player.characterChatLabel.isVisible = true;

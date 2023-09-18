@@ -19,7 +19,7 @@ export class spawnCTRL {
         this._location = this._state.gameData.get("location", this._room.metadata.location);
         this.process();
 
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 5; i++) {
             this.createItem();
         }
     }
@@ -79,7 +79,7 @@ export class spawnCTRL {
         let entity = new LootSchema(this._state, data);
         this._state.entityCTRL.add(entity);
 
-        Logger.info("[gameroom][state][createEntity] created new item " + data.key + ": " + sessionId);
+        //Logger.info("[gameroom][state][createEntity] created new item " + data.key + ": " + sessionId);
     }
 
     public createEntity(spawnInfo) {
@@ -122,11 +122,11 @@ export class spawnCTRL {
         this._state.entityCTRL.add(new BrainSchema(this._state, data));
 
         // log
-        Logger.info("[gameroom][state][createEntity] created new entity " + raceData.key + ": " + sessionId, spawnInfo);
+        //Logger.info("[gameroom][state][createEntity] created new entity " + raceData.key + ": " + sessionId, spawnInfo);
     }
 
     removeEntity(entity) {
-        console.log(this.spawnsAmount, entity.AI_SPAWN_INFO.spawnIndex);
+        //console.log(this.spawnsAmount, entity.AI_SPAWN_INFO.spawnIndex);
 
         this.spawnsAmount[entity.AI_SPAWN_INFO.spawnIndex]--;
 

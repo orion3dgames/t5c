@@ -24,7 +24,14 @@ export class ChatRoom extends Room {
 
         Logger.info("[chat_room][message] client joined " + client.sessionId, options);
 
-        //this.broadcast("messages", this.generateMessage(client.sessionId, client.sessionId+" has joined the room."));
+        this.broadcast(
+            "messages",
+            this.generateMessage(options.sessionId, {
+                type: "system",
+                name: options.name,
+                message: options.name + " has joined the room.",
+            })
+        );
     }
 
     // When a client leaves the room
@@ -37,6 +44,7 @@ export class ChatRoom extends Room {
 
     // prepare chat message to be sent
     generateMessage(sessionId: string, incomingMsg: any) {
+        console.log(incomingMsg);
         let msg = new ChatSchema();
         msg.senderID = sessionId;
         msg.name = incomingMsg.name;

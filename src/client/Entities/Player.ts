@@ -129,7 +129,7 @@ export class Player extends Entity {
         if (pointerInfo._pickInfo.pickedMesh.metadata === null) return false;
 
         let metadata = pointerInfo._pickInfo.pickedMesh.metadata;
-        console.log(metadata, pointerInfo._pickInfo);
+        //console.log(metadata, pointerInfo._pickInfo);
 
         // select entity
         if (metadata.type === "player" || metadata.type === "entity") {
@@ -179,7 +179,6 @@ export class Player extends Entity {
 
     // update at engine rate
     public update(delta) {
-
         super.update(delta);
 
         if (this && this.moveController) {

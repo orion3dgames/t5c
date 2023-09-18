@@ -386,24 +386,27 @@ export class abilitiesCTRL {
     }
 
     cancelAutoAttack(owner) {
-        console.log("CANCEL AUTO ATTACK");
-        // remove target
-        owner.AI_TARGET = null;
-        owner.AI_ABILITY = null;
+        if (owner.AI_TARGET || this.attackTimer || this.player_casting_timer) {
+            console.log("CANCEL AUTO ATTACK");
 
-        // reset animation
-        owner.animationCTRL.playAnim(owner, EntityState.IDLE);
+            // remove target
+            owner.AI_TARGET = null;
+            owner.AI_ABILITY = null;
 
-        // remove attack timer
-        if (this.attackTimer) {
-            clearInterval(this.attackTimer);
-        }
+            // reset animation
+            owner.animationCTRL.playAnim(owner, EntityState.IDLE);
 
-        // remove casting timer
-        if (this.player_casting_timer) {
-            clearInterval(this.player_casting_timer);
-            this.player_casting_timer = false;
-            owner._state._gameroom.broadcast("ability_cancel_casting");
+            // remove attack timer
+            if (this.attackTimer) {
+                clearInterval(this.attackTimer);
+            }
+
+            // remove casting timer
+            if (this.player_casting_timer) {
+                clearInterval(this.player_casting_timer);
+                this.player_casting_timer = false;
+                owner._state._gameroom.broadcast("ability_cancel_casting");
+            }
         }
     }
 

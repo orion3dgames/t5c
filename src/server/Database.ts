@@ -169,7 +169,7 @@ class Database {
                     reject(err);
                 } else {
                     if (this.debug) {
-                        console.log("sql: " + sql, params);
+                        //console.log("sql: " + sql, params);
                     }
                     resolve(result);
                 }
@@ -186,7 +186,7 @@ class Database {
                     reject(err);
                 } else {
                     if (this.debug) {
-                        console.log("sql: " + sql, params);
+                        //console.log("sql: " + sql, params);
                     }
                     resolve(rows);
                 }
@@ -361,7 +361,7 @@ class Database {
         }
         sql = sql.slice(0, -1);
         sql += " WHERE id= " + character_id;
-        console.log(sql);
+        //console.log(sql);
         return this.run(sql, []);
     }
 

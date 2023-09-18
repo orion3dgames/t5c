@@ -150,7 +150,7 @@ export class GameRoomState extends Schema {
             initial_equipment: data.equipment ?? [],
         };
 
-        console.log(player);
+        //console.log(player);
 
         this.entityCTRL.add(new PlayerSchema(this, player));
 

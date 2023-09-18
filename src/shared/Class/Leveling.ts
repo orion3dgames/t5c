@@ -12,6 +12,7 @@ const LEVEL_EXPERIENCE = [
     137420, // Level 8
     193690, // Level 9
     262440, // Level 10
+    355720, // Level 11
 ];
 
 export class Leveling {
