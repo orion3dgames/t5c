@@ -15,7 +15,7 @@ let RacesDB: raceDataMap = {
             IDLE: { animation_id: 36, duration: 1000, speed: 1 },
             WALK: { animation_id: 72, duration: 1000, speed: 1.3 },
             ATTACK: { animation_id: 1, duration: 1000, speed: 1 },
-            DEATH: { animation_id: 24, duration: 1000, speed: 1 },
+            DEATH: { animation_id: 24, duration: 1000, speed: 1 }, // 24 for knight, 23 for rogue and mage
             DAMAGE: { animation_id: 34, duration: 1000, speed: 1 },
             CASTING: { animation_id: 63, duration: 1000, speed: 1 },
             CAST: { animation_id: 62, duration: 1000, speed: 1 },
@@ -55,7 +55,7 @@ let RacesDB: raceDataMap = {
             IDLE: { animation_id: 36, duration: 1000, speed: 1 },
             WALK: { animation_id: 72, duration: 1000, speed: 1.3 },
             ATTACK: { animation_id: 1, duration: 1000, speed: 1 },
-            DEATH: { animation_id: 23, duration: 1000, speed: 1 },
+            DEATH: { animation_id: 23, duration: 1000, speed: 1 }, // 24 for knight, 23 for rogue and mage
             DAMAGE: { animation_id: 34, duration: 1000, speed: 1 },
             CASTING: { animation_id: 63, duration: 1000, speed: 1 },
             CAST: { animation_id: 62, duration: 1000, speed: 1 },
@@ -93,7 +93,7 @@ let RacesDB: raceDataMap = {
             IDLE: { animation_id: 36, duration: 1000, speed: 1 },
             WALK: { animation_id: 72, duration: 1000, speed: 1.3 },
             ATTACK: { animation_id: 1, duration: 1000, speed: 1 },
-            DEATH: { animation_id: 23, duration: 1000, speed: 1 },
+            DEATH: { animation_id: 23, duration: 1000, speed: 1 }, // 24 for knight, 23 for rogue and mage
             DAMAGE: { animation_id: 34, duration: 1000, speed: 1 },
             CASTING: { animation_id: 63, duration: 1000, speed: 1 },
             CAST: { animation_id: 62, duration: 1000, speed: 1 },
