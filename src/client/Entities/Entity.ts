@@ -151,7 +151,7 @@ export class Entity {
                 }
             }
 
-            if (this.type === "entity" && this.anim_state !== this.entity.anim_state) {
+            if (this.type === "player" && this.anim_state !== this.entity.anim_state) {
                 console.log("[SERVER] anim_state state has changed ", EntityState[this.entity.anim_state]);
             }
 

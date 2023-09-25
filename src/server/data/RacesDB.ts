@@ -10,13 +10,12 @@ let RacesDB: raceDataMap = {
         speed: 0.7,
         scale: 1,
         rotationFix: Math.PI,
-        animationSpeed: 1.3,
         meshIndex: 1,
         animations: {
             IDLE: { animation_id: 36, duration: 1000, speed: 1 },
             WALK: { animation_id: 72, duration: 1000, speed: 1.3 },
             ATTACK: { animation_id: 1, duration: 1000, speed: 1 },
-            DEATH: { animation_id: 23, duration: 1000, speed: 1 },
+            DEATH: { animation_id: 24, duration: 1000, speed: 1 },
             DAMAGE: { animation_id: 34, duration: 1000, speed: 1 },
             CASTING: { animation_id: 63, duration: 1000, speed: 1 },
             CAST: { animation_id: 62, duration: 1000, speed: 1 },
@@ -51,7 +50,6 @@ let RacesDB: raceDataMap = {
         speed: 0.7,
         scale: 1,
         rotationFix: Math.PI,
-        animationSpeed: 1.3,
         meshIndex: 1,
         animations: {
             IDLE: { animation_id: 36, duration: 1000, speed: 1 },
@@ -90,7 +88,6 @@ let RacesDB: raceDataMap = {
         speed: 0.4,
         scale: 1,
         rotationFix: Math.PI,
-        animationSpeed: 1.3,
         meshIndex: 1,
         animations: {
             IDLE: { animation_id: 36, duration: 1000, speed: 1 },

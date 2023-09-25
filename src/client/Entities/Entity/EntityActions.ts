@@ -46,7 +46,7 @@ export class EntityActions {
         data.fromPos = bone.getPosition(Space.WORLD, player.playerMesh);
         data.fromPos.y -= 0.8;
 
-        console.log("[ENTITY ACTION] ability effet", data,);
+        //console.log("[ENTITY ACTION] ability effet", data,);
 
         // set start and end pos
         let start = data.fromPos;
@@ -211,7 +211,7 @@ export class EntityActions {
         //////////////////////////////////////////////
         var distance = Vector3.Distance(start, end);
         projectile.lookAt(end);
-        projectile.rotate(new Vector3(0, 1 ,0), Tools.ToRadians(180));
+        projectile.rotate(new Vector3(0, 1, 0), Tools.ToRadians(180));
 
         var endVector = projectile.calcMovePOV(0, 0, 72).addInPlace(projectile.position);
         var points = [start, endVector];

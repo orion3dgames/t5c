@@ -84,12 +84,11 @@ export class BrainSchema extends Entity {
         Object.assign(this, this._state.gameData.get("race", this.race));
 
         // add equipment
-        if(data.initial_equipment && data.initial_equipment.length > 0){
+        if (data.initial_equipment && data.initial_equipment.length > 0) {
             data.initial_equipment.forEach((element) => {
                 this.equipment.set(element.key, new EquipmentSchema(element));
             });
         }
-        
 
         // initialize state machine
         this._stateMachine = new StateManager(this);
@@ -331,6 +330,7 @@ export class BrainSchema extends Entity {
     }
 
     setAsDead() {
+        //console.log("setAsDead", "SET AS DEAD");
         this._stateMachine.changeTo("DEAD");
     }
 

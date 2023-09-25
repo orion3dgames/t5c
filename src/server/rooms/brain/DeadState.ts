@@ -6,6 +6,7 @@ class DeadState extends State {
     enter(owner: BrainSchema) {
         //console.log("[DeadState] ----------------------------------");
         owner.health = 0;
+        owner.mana = 0;
         owner.blocked = true;
         owner.anim_state = EntityState.DEAD;
         owner.ai_state = AI_STATE.IDLE;
@@ -14,7 +15,7 @@ class DeadState extends State {
     }
 
     execute(owner: BrainSchema) {
-        console.log("[DeadState]");
+        //console.log("[DeadState]");
 
         owner.DEAD_TIMER += 100;
 

@@ -91,13 +91,9 @@ export class EntityAnimator {
     ///////////////////////////
     // todo: to be improved so we can better control the states... have no idea how yet
     public animate(player, currentPos, nextPos): void {
-        // if position has changed
-        if (player.type === "entity") {
-            console.log("animate", player, player.sessionId, EntityState[player.anim_state]);
-        }
-
-        if (this.checkIfPlayerIsMoving(currentPos, nextPos)) {
-            //if (player.state === EntityCurrentState.WALKING) {
+        // if player is moving
+        // note to myself: when a players dies, the below still considers the player is moving... to be improved.
+        if (this.checkIfPlayerIsMoving(currentPos, nextPos) && player.health > 0) {
             this._currentAnim = this._walk;
 
             // if player has died

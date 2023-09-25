@@ -225,7 +225,6 @@ export type Race = {
     speed: number;
     scale: number;
     rotationFix: number;
-    animationSpeed: number;
     meshIndex: number;
     animations: {
         [key: string]: {};

@@ -16,9 +16,15 @@ class ChaseState extends State {
 
     execute(owner) {
         // if target is dead or invalid
-        if (owner.AI_TARGET === null || owner.AI_TARGET === undefined || owner.AI_TARGET === false || owner.AI_TARGET.isEntityDead()) {
+        if (owner.AI_TARGET === null || owner.AI_TARGET === undefined || owner.AI_TARGET === false) {
             //console.log("[ChaseState] invalid target");
             owner._stateMachine.changeTo("PATROL");
+            return false;
+        }
+
+        // if target is dead or invalid
+        if (owner.AI_TARGET.isEntityDead()) {
+            owner._stateMachine.changeTo("DEAD");
             return false;
         }
 

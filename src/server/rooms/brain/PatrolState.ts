@@ -62,6 +62,11 @@ class PatrolState extends State {
         // todo: not sure if I actually need this
         owner.anim_state = EntityState.WALKING;
 
+        // if entity is dead
+        if (owner.isEntityDead()) {
+            owner.setAsDead();
+        }
+
         // once arrive at destination, stay idle a while
         if (owner.AI_TARGET_WAYPOINTS.length < 1) {
             owner._stateMachine.changeTo("IDLE");
@@ -80,7 +85,7 @@ class PatrolState extends State {
         }
 
         // add 10% chance of AI of breaking patrol and slacking off :)
-        
+
         if (Math.random() > 0.99) {
             owner._stateMachine.changeTo("IDLE");
             return false;
