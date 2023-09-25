@@ -27,6 +27,8 @@ export class Player extends Entity {
     public castingTarget: number = 0;
     public ability_in_cooldown;
 
+    public onPointerObservable;
+
     public player_data;
     public moveDecal;
 
@@ -68,7 +70,7 @@ export class Player extends Entity {
         this.registerServerMessages();
 
         // mouse events
-        this._scene.onPointerObservable.add((pointerInfo: any) => {
+        this.onPointerObservable = this._scene.onPointerObservable.add((pointerInfo: any) => {
             // on left mouse click
             if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 0) {
                 this.leftClick(pointerInfo);
@@ -111,13 +113,6 @@ export class Player extends Entity {
                     this._game.selectedEntity = null;
                 }
             }
-        });
-
-        //////////////////////////////////////////////////////////////////////////
-        // player before render loop
-        this._scene.onBeforeCameraRenderObservable.add(() => {
-            // move camera as player moves
-            this.cameraController.follow();
         });
     }
 
@@ -180,6 +175,9 @@ export class Player extends Entity {
     // update at engine rate
     public update(delta) {
         super.update(delta);
+
+        // move camera as player moves
+        this.cameraController.follow();
 
         if (this && this.moveController) {
             // global camera rotation
@@ -339,6 +337,15 @@ export class Player extends Entity {
                 this.actionsController.process(this, data, ability);
             }
         });
+    }
+
+    public async remove() {
+        super.remove();
+
+        // remove any pointer event
+        if (this.onPointerObservable && this._scene.onPointerObservable.hasObservers()) {
+            this._scene.onBeforeRenderObservable.remove(this.onPointerObservable);
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////

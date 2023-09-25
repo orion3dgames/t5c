@@ -151,7 +151,7 @@ export class Entity {
                 }
             }
 
-            if (this.type === "player" && this.anim_state !== this.entity.anim_state) {
+            if (this.type === "entity" && this.anim_state !== this.entity.anim_state) {
                 console.log("[SERVER] anim_state state has changed ", EntityState[this.entity.anim_state]);
             }
 
@@ -168,40 +168,12 @@ export class Entity {
         });
 
         //////////////////////////////////////////////////////////////////////////
-        // entity register event
-
-        //////////////////////////////////////////////////////////////////////////
-        // player render loop
-        this._scene.registerBeforeRender(() => {
-            // animate player continuously
-            this.animatorController.animate(this, this.mesh.position, this.moveController.getNextPosition());
-
-            // if entity is selected, show
-            if (this.selectedMesh && this.selectedMesh.visibility) {
-                if (this._game.selectedEntity && this._game.selectedEntity.sessionId === this.sessionId) {
-                    this.selectedMesh.isVisible = true;
-                    this.selectedMesh.rotate(new Vector3(0, 0.1, 0), 0.01);
-                } else {
-                    this.selectedMesh.isVisible = false;
-                }
-            }
-        });
-
-        //////////////////////////////////////////////////////////////////////////
         // misc
         this.characterLabel = this.ui.createEntityLabel(this);
         this.characterChatLabel = this.ui.createEntityChatLabel(this);
     }
 
     public update(delta): any {
-        if (this.ai_state === AI_STATE.SEEKING || this.ai_state === AI_STATE.ATTACKING) {
-            this.debugMesh.material = this.debugMaterialActive;
-        }
-
-        if (this.ai_state === AI_STATE.WANDER) {
-            this.debugMesh.material = this.debugMaterialNeutral;
-        }
-
         // what to do when an entity dies
         if (this.health < 1 && !this.isDead) {
             this.isDead = true;
@@ -213,14 +185,36 @@ export class Entity {
             }
         }
 
-        if (this.isDead) {
-            return false;
+        // only do the below if entity is not dead
+        if (!this.isDead) {
+            // if entity is selected, show
+            if (this.selectedMesh && this.selectedMesh.visibility) {
+                if (this._game.selectedEntity && this._game.selectedEntity.sessionId === this.sessionId) {
+                    this.selectedMesh.isVisible = true;
+                    this.selectedMesh.rotate(new Vector3(0, 0.1, 0), 0.01);
+                } else {
+                    this.selectedMesh.isVisible = false;
+                }
+            }
+
+            // if entity has aggro
+            if (this.ai_state === AI_STATE.SEEKING || this.ai_state === AI_STATE.ATTACKING) {
+                this.debugMesh.material = this.debugMaterialActive;
+            }
+
+            // if entity lose aggro
+            if (this.ai_state === AI_STATE.WANDER) {
+                this.debugMesh.material = this.debugMaterialNeutral;
+            }
+
+            // tween entity
+            if (this && this.moveController) {
+                this.moveController.tween();
+            }
         }
 
-        // tween entity
-        if (this && this.moveController) {
-            this.moveController.tween();
-        }
+        // animate player continuously
+        this.animatorController.animate(this, this.mesh.position, this.moveController.getNextPosition());
     }
 
     public getPosition() {
@@ -257,9 +251,18 @@ export class Entity {
         // delete mesh, including equipment
         this.meshController.deleteMeshes();
 
+        // delete any action manager
+        if (this.meshController.mesh.actionManager) {
+            this.meshController.mesh.actionManager.dispose();
+            this.meshController.mesh.actionManager = null;
+        }
+
         // if was selected, make sure to unselect it
         if (this._game.selectedEntity && this._game.selectedEntity.sessionId === this.sessionId) {
             this._game.selectedEntity = false;
         }
+
+        // remove selected mesh
+        this.meshController.selectedMesh.isVisible = false;
     }
 }

@@ -29,10 +29,10 @@ export class EntityAnimator {
 
     private _build(): void {
         // find animations
-        let idleAnimation = this._entity.animations["IDLE"];
-        let walkAnimation = this._entity.animations["WALK"];
-        let attackAnimation = this._entity.animations["ATTACK"];
-        let deathAnimation = this._entity.animations["DEATH"];
+        let idleAnimation = this._entity.animations["IDLE"] ?? 0;
+        let walkAnimation = this._entity.animations["WALK"] ?? 0;
+        let attackAnimation = this._entity.animations["ATTACK"] ?? 0;
+        let deathAnimation = this._entity.animations["DEATH"] ?? 0;
         let takingDamageAnimation = this._entity.animations["DAMAGE"];
         let castingAnimation = this._entity.animations["CASTING"] ?? 0;
         let castingShootAnimation = this._entity.animations["CAST"] ?? 0;
@@ -76,6 +76,7 @@ export class EntityAnimator {
         this._attack.speedRatio = 1.1;
         this._cast.speedRatio = 2;
         this._pickup.speedRatio = 2;
+        this._death.speedRatio = 1;
 
         //initialize current and previous
         this._currentAnim = this._idle;
@@ -91,6 +92,9 @@ export class EntityAnimator {
     // todo: to be improved so we can better control the states... have no idea how yet
     public animate(player, currentPos, nextPos): void {
         // if position has changed
+        if (player.type === "entity") {
+            console.log("animate", player, player.sessionId, EntityState[player.anim_state]);
+        }
 
         if (this.checkIfPlayerIsMoving(currentPos, nextPos)) {
             //if (player.state === EntityCurrentState.WALKING) {
@@ -117,7 +121,7 @@ export class EntityAnimator {
         } else if (player.anim_state === EntityState.SPELL_CAST) {
             this._currentAnim = this._cast;
 
-        // if player pickup
+            // if player pickup
         } else if (player.anim_state === EntityState.PICKUP) {
             this._currentAnim = this._pickup;
 
