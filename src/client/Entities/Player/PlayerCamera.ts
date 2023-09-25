@@ -4,12 +4,13 @@ import { UniversalCamera } from "@babylonjs/core/Cameras/universalCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { BlackAndWhitePostProcess } from "@babylonjs/core/PostProcesses/blackAndWhitePostProcess";
 import { Player } from "../Player";
+import { PlayerInput } from "../../Controllers/PlayerInput";
 
 export class PlayerCamera {
     private player: Player;
     public camera;
     private _scene: Scene;
-    private _input;
+    private _input: PlayerInput;
     public _camRoot;
     public cameraPos;
     private _postProcess: BlackAndWhitePostProcess; //
@@ -50,9 +51,12 @@ export class PlayerCamera {
     }
 
     public follow(): void {
-        // camera must follow player mesh (the local one, else it will be laggy has the camera tries to catch up with server position)
-        this._camRoot.position = Vector3.Lerp(this._camRoot.position, this.player.moveController.getNextPosition(), 0.1);
-        //this._camRoot.position = new Vector3(playerPosition.x, playerPosition.y, playerPosition.z);
+        // debug: testing online camera lag
+        if (this._input.keyboard_c === false) {
+            // camera must follow player mesh (the local one, else it will be laggy has the camera tries to catch up with server position)
+            this._camRoot.position = Vector3.Lerp(this._camRoot.position, this.player.moveController.getNextPosition(), 0.1);
+            //this._camRoot.position = new Vector3(playerPosition.x, playerPosition.y, playerPosition.z);
+        }
 
         // rotate camera around the Y position if right click is true
         if (this._input.middle_click) {

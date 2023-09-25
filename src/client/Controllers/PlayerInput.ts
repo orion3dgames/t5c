@@ -28,6 +28,7 @@ export class PlayerInput {
     public middle_click: boolean;
     public mouse_moving: boolean = false;
     public left_alt_pressed: boolean = false;
+    public keyboard_c: boolean = false;
 
     // moving
     public player_can_move: boolean = false;
@@ -109,6 +110,7 @@ export class PlayerInput {
         this._scene.onKeyboardObservable.add((kbInfo) => {
             switch (kbInfo.type) {
                 case KeyboardEventTypes.KEYDOWN:
+                    console.log(kbInfo.event.code);
                     /*
                     if (kbInfo.event.code === "ArrowUp") {
                         this.left_arrow = true;
@@ -172,6 +174,11 @@ export class PlayerInput {
                         this.digit_pressed = 9;
                     }
 
+                    // characters
+                    if (kbInfo.event.code === "KeyC") {
+                        this.keyboard_c = true;
+                    }
+
                     // show items toggle
                     if (kbInfo.event.code === "ControlLeft") {
                         this.left_alt_pressed = true;
@@ -189,6 +196,11 @@ export class PlayerInput {
                         this.vertical = 0;
                         this.horizontal = 0;
                         this.angle = 0;
+                    }
+
+                    // characters
+                    if (kbInfo.event.code === "KeyC") {
+                        this.keyboard_c = false;
                     }
 
                     if (kbInfo.event.code === "ControlLeft") {
