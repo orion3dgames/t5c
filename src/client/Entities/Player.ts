@@ -176,9 +176,6 @@ export class Player extends Entity {
     public update(delta) {
         super.update(delta);
 
-        // move camera as player moves
-        this.cameraController.follow();
-
         if (this && this.moveController) {
             // global camera rotation
             this._game.camY = this.cameraController._camRoot.rotation.y;
@@ -186,6 +183,9 @@ export class Player extends Entity {
             // tween entity
             this.moveController.tween();
         }
+
+        // move camera as player moves
+        this.cameraController.follow();
     }
 
     // update at server rate

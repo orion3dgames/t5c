@@ -70,7 +70,7 @@ export class EntityMove {
 
     public tween() {
         // continuously lerp between current position and next position
-        this._mesh.position = Vector3.Lerp(this._mesh.position, this.nextPosition, 0.1);
+        this._mesh.position = Vector3.Lerp(this._mesh.position, this.nextPosition, 0.06);
 
         // rotation
         // TODO DAYD : make it better
