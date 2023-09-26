@@ -79,34 +79,6 @@ class Database {
             "key" TEXT
         )`;
 
-        /*
-        const abilitiesSql = `CREATE TABLE IF NOT EXISTS "abilities" (
-            "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-            "key" TEXT NOT NULL UNIQUE,
-            "label" TEXT NOT NULL,
-            "description" TEXT NOT NULL,
-            "icon" TEXT NOT NULL,
-            "sound" TEXT NOT NULL,
-            "castSelf" numeric DEFAULT 0,
-            "castTime" numeric DEFAULT 0, 
-            "cooldown" numeric DEFAULT 0,
-            "repeat" numeric DEFAULT 0,
-            "repeatInterval" numeric DEFAULT 0,
-            "range" numeric DEFAULT 0, 
-            "minRange" numeric DEFAULT 0,
-            "effect" TEXT DEFAULT '{}',
-            "casterPropertyAffected" TEXT DEFAULT '{}',
-            "targetPropertyAffected" TEXT DEFAULT '{}',
-            "requiredToLearn" TEXT DEFAULT '{}'
-        )`;
-
-        const itemsSql = `CREATE TABLE IF NOT EXISTS "items" (
-            "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-            "key" TEXT NOT NULL UNIQUE,
-            "label" TEXT NOT NULL,
-            "description" TEXT NOT NULL
-        )`;*/
-
         this.db.serialize(() => {
             Logger.info("[database] Creating default database structure.");
             this.run(usersSql);
@@ -194,7 +166,7 @@ class Database {
         });
     }
 
-    run(sql: string, params = []) {
+    async run(sql: string, params = []) {
         return new Promise((resolve, reject) => {
             this.db.run(sql, params, function (err: any) {
                 if (err) {
@@ -263,12 +235,7 @@ class Database {
     }
 
     async saveUser(username: string, password: string, token: string = nanoid()) {
-        const sql = `INSERT INTO users ("username","password", "token") VALUES (
-        "${username}", 
-        "${password}", 
-        "${token}" 
-      );`;
-        let c = await (<any>this.run(sql));
+        let c = (await this.run(`INSERT INTO users (username, password, token) VALUES (?,?,?)`, [username, password, token])) as any;
         return await this.getUserById(c.id);
     }
 
@@ -287,10 +254,10 @@ class Database {
     async createCharacter(token, name, race, material) {
         let user = await this.getUserByToken(token);
         const sql = `INSERT INTO characters ("user_id", "name", "race", "material", "location","x","y","z","rot","level","experience","health", "mana") VALUES (
-            "${user.id}",
-            "${name}",
-            "${race}",
-            "${material}",
+            ?,
+            ?,
+            ?,
+            ?,
             "lh_town",
             "0",
             "0",
@@ -301,7 +268,7 @@ class Database {
             "50",
             "50"
         );`;
-        let c = await (<any>this.run(sql));
+        let c = await (<any>this.run(sql, [user.id, name, race, material]));
 
         // add default abilities
         let abilities = [
@@ -391,7 +358,7 @@ class Database {
         return await this.run(sqlItems);
     }
 
-    // removes and saves character abilities
+    // removes and saves character equipment
     // terrible way to do it
     async saveEquipment(character_id: number, equipments: MapSchema<EquipmentSchema, string>) {
         const sql = `DELETE FROM character_equipment WHERE owner_id=?;`;
@@ -410,7 +377,6 @@ class Database {
     }
 
     ////////////////// DEBUG ONLY
-
     async returnRandomUserAndChar() {
         const sql = `SELECT C.*, U.token, U.username, U.password from characters C 
                         LEFT JOIN users U ON U.id=C.user_id 
