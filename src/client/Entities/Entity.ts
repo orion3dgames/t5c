@@ -227,7 +227,6 @@ export class Entity {
 
     // basic performance (only enable entities in a range around the player)
     public lod(_currentPlayer) {
-        /*
         this.mesh.setEnabled(false);
         this.mesh.freezeWorldMatrix();
         let entityPos = this.position();
@@ -236,7 +235,7 @@ export class Entity {
         if (distanceFromPlayer < this._game.config.PLAYER_VIEW_DISTANCE) {
             this.mesh.unfreezeWorldMatrix();
             this.mesh.setEnabled(true);
-        }*/
+        }
     }
 
     public position() {
