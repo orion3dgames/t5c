@@ -53,8 +53,6 @@ export class PlayerCamera {
     public follow(): void {
         // debug: testing online camera lag
         if (this._input.keyboard_c === false) {
-            // camera must follow player mesh (the local one, else it will be laggy has the camera tries to catch up with server position)
-            //this._camRoot.position = Vector3.Lerp(this._camRoot.position, this.player.getPosition(), 0.5);
             this._camRoot.position = this.player.getPosition();
         }
 
