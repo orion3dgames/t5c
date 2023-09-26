@@ -39,6 +39,11 @@ export class PlayerInput {
     public movementX: number = 0;
     public movementY: number = 0;
 
+    // timers
+    public movementTimer;
+    public movementTimerNow: number = 0;
+    public movementTimerDelay: number = 200;
+
     constructor(game: GameController, scene, gameroom, ui) {
         (this._game = game), (this._scene = scene);
         this._gameroom = gameroom;
@@ -50,6 +55,7 @@ export class PlayerInput {
                 // left click
                 if (pointerInfo.event.button == 0) {
                     this.left_click = true;
+                    this.startMovementTimer();
                 }
 
                 // middle click
@@ -70,6 +76,12 @@ export class PlayerInput {
                     this.angle = 0;
                     this.vertical = 0;
                     this.horizontal = 0;
+                    this.player_can_move = false;
+
+                    if (this.movementTimer) {
+                        this.movementTimerNow = 0;
+                        clearInterval(this.movementTimer);
+                    }
                 }
 
                 // middle click
@@ -82,17 +94,14 @@ export class PlayerInput {
                     this.right_click = false;
                 }
 
-                this.player_can_move = false;
                 this.mouse_moving = false;
             }
 
             if (pointerInfo.type === PointerEventTypes.POINTERMOVE) {
-                if (this.left_click) {
-                    this.player_can_move = true;
+                if (this.left_click && this.player_can_move === true) {
                     this.x = (pointerInfo.event.clientX / pointerInfo.event.target.width) * 2 - 1;
                     this.y = (pointerInfo.event.clientY / pointerInfo.event.target.height) * 2 - 1;
                     this.angle = Math.atan2(this.x, this.y);
-                    //console.log("MOUSE", this.x, this.y, this.angle);
                     this.calculateVelocityForces();
                 }
 
@@ -209,6 +218,18 @@ export class PlayerInput {
                     break;
             }
         });
+    }
+
+    private startMovementTimer() {
+        let amount = 100;
+        this.movementTimer = setInterval(() => {
+            this.movementTimerNow += amount;
+            if (this.movementTimerNow >= this.movementTimerDelay) {
+                this.player_can_move = true;
+                this.movementTimerNow = 0;
+                clearInterval(this.movementTimer);
+            }
+        }, 100);
     }
 
     private calculateVelocityForces() {
