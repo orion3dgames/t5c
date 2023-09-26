@@ -73,18 +73,18 @@ export class GameScene {
         // get location details
         let location = this._game.currentLocation;
 
-        // black background
+        // add background  color
         scene.clearColor = new Color4(location.skyColor, location.skyColor, location.skyColor, 1);
 
+        // add sun
         if (location.sun) {
-            // ambient light
             var ambientLight = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
-            ambientLight.intensity = 1;
+            ambientLight.intensity = location.sunIntensity;
             ambientLight.groundColor = new Color3(0.13, 0.13, 0.13);
             ambientLight.specular = Color3.Black();
         }
 
-        // fox
+        // add fog
         if (location.fog === true) {
             scene.fogMode = Scene.FOGMODE_LINEAR;
             scene.fogStart = 60.0;
@@ -108,22 +108,20 @@ export class GameScene {
         this._shadow.stabilizeCascades = false;
         this._shadow.depthClamp = true;
 
-        // load assets and remove them all from scene
+        // load navmesh
         this._navMesh = await this.loadNavMesh(location.key);
-        //let navMeshGroup = createConvexRegionHelper(this._navMesh, this._scene)
+        //let navMeshGroup = createConvexRegionHelper(this._navMesh, this._scene) // function to show the navmesh as a mesh in-game
 
-        // initialize assets controller
+        // initialize assets controller & load level
         this._game.initializeAssetController();
         await this._game._assetsCtrl.loadLevel(location.key);
-
-        // load the rest
         this._game.engine.displayLoadingUI();
 
-        // instancite items so we can use them later as instances
+        // instanciate items so we can use them later as instances/clones
+        // todo: this is probably a terrible way to do this...
         await this._instantiate();
 
-        // load the rest
-        //await this._environment.prepareAssets();
+        // init network
         await this._initNetwork();
     }
 
@@ -143,14 +141,6 @@ export class GameScene {
                 root.rootNodes[0].name = modelToLoadKey;
                 let mergedMesh = mergeMesh(root.rootNodes[0]);
                 if (mergedMesh) {
-                    /*
-                    let texture = this._scene.getTextureByName("knight_texture (Base Color)");
-                    console.log(texture);
-                    let material = new StandardMaterial(k);
-                    material.diffuseTexture = texture;
-                    material.backFaceCulling = false;
-                    mergedMesh.material = material;
-                    */
                     this._game._loadedAssets[modelToLoadKey] = mergedMesh;
                     this._game._loadedAssets[modelToLoadKey].isVisible = false;
                 }
@@ -275,14 +265,14 @@ export class GameScene {
             let timePassedSlow = (timeNow - timeServerSlow) / 1000;
             let updateSlow = 5000 / 1000; // game is networked update every 100ms
             if (timePassedSlow >= updateSlow) {
-                // every 5 seconds
+                // send ping to server
                 this.room.send("ping", { date: Date.now() });
 
                 // update entities
                 for (let sessionId in this._entities) {
                     const entity = this._entities[sessionId];
                     if (entity && entity.type === "player") {
-                        entity.updateSlowRate(this._game.config.updateRate);
+                        entity.updateSlowRate(5000);
                     }
                 }
 
