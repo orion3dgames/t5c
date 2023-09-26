@@ -29,6 +29,7 @@ export class GameController {
     public currentMs: number;
     public camY: number;
     public latestError: string;
+    public isMobile: boolean = false;
 
     // all preloaded assets
     public _assetsCtrl: AssetsController;
@@ -50,6 +51,11 @@ export class GameController {
 
         // create colyseus client
         this.client = new Network(app.config.port);
+
+        // check if on mobile
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            this.isMobile = true;
+        }
     }
 
     setErrorCode(message: string): void {
