@@ -59,13 +59,9 @@ export class GameRoom extends Room<GameRoomState> {
 
         ///////////////////////////////////////////////////////////////////////////
         // if players are in a room, make sure we save any changes to the database.
-        let saveTimer = 0;
-        let saveInterval = 5000;
+        // only save if there is any players
         this.delayedInterval = this.clock.setInterval(() => {
-            saveTimer += this.config.databaseUpdateRate;
-            // only save if there is any players
             if (this.state.entities && this.state.entities.size > 0) {
-                //Logger.info("[gameroom][onCreate] Saving data for room " + options.location + " with " + this.state.players.size + " players");
                 this.state.entityCTRL.all.forEach((entity) => {
                     if (entity instanceof PlayerSchema) {
                         entity.save(this.database);
@@ -132,7 +128,9 @@ export class GameRoom extends Room<GameRoomState> {
     //////////////////////////////////////////////////////////////////////////
     // cleanup callback, called after there are no more clients in the room. (see `autoDispose`)
     onDispose() {
-        //log
+        // probably should save some information to database here that could be restored on creation
+
+        //
         Logger.warning(`[onDispose] game room removed. `);
     }
 }

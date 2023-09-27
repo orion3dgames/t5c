@@ -8,6 +8,7 @@ import { StateManager } from "../brain/StateManager";
 import { Vector3 } from "../../../shared/Libs/yuka-min";
 import { randomNumberInRange } from "../../../shared/Utils";
 import { EquipmentSchema } from "./player/EquipmentSchema";
+import { GameRoomState } from "../state/GameRoomState";
 
 export class BrainSchema extends Entity {
     /////////////////////////////////////////////////////////////
@@ -38,7 +39,7 @@ export class BrainSchema extends Entity {
 
     // PARENTS
     public _navMesh;
-    public _state;
+    public _state: GameRoomState;
     public _stateMachine: StateManager;
 
     // LOCAL VARS
