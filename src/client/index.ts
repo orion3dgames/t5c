@@ -1,4 +1,3 @@
-
 if (process.env.NODE_ENV !== "production") {
     import("@babylonjs/core/Debug/debugLayer");
     import("@babylonjs/inspector");
@@ -14,7 +13,6 @@ import "@babylonjs/core/Rendering/depthRendererSceneComponent";
 import "@babylonjs/core/Rendering/outlineRenderer";
 
 import { Engine } from "@babylonjs/core/Engines/engine";
-import { Scene } from "@babylonjs/core/scene";
 
 // IMPORT SCREEN
 import State from "./Screens/Screens";
@@ -29,7 +27,6 @@ import { Loading } from "./Controllers/Loading";
 import { isLocal } from "./Utils";
 
 import { GameController } from "./Controllers/GameController";
-import axios from "axios";
 
 // App class is our entire game application
 class App {
@@ -66,7 +63,8 @@ class App {
         await this.game.initializeGameData();
 
         // set default scene
-        this.game.setScene(this.config.defaultScene);
+        let defaultScene = isLocal() ? State.GAME : State.LOGIN;
+        this.game.setScene(defaultScene);
 
         // main render loop & state machine
         await this._render();
@@ -84,9 +82,7 @@ class App {
                 case State.LOGIN:
                     this.clearScene();
                     this.game.currentScene = new LoginScene();
-                    this.game.currentScene.createScene(this.game);
-                    this.game.scene = this.game.currentScene._scene;
-                    this.game.state = State.NULL;
+                    this.createScene();
                     break;
 
                 ///////////////////////////////////////
@@ -94,9 +90,7 @@ class App {
                 case State.CHARACTER_SELECTION:
                     this.clearScene();
                     this.game.currentScene = new CharacterSelectionScene();
-                    this.game.currentScene.createScene(this.game);
-                    this.game.scene = this.game.currentScene._scene;
-                    this.game.state = State.NULL;
+                    this.createScene();
                     break;
 
                 ///////////////////////////////////////
@@ -104,9 +98,7 @@ class App {
                 case State.CHARACTER_EDITOR:
                     this.clearScene();
                     this.game.currentScene = new CharacterEditor();
-                    this.game.currentScene.createScene(this.game);
-                    this.game.scene = this.game.currentScene._scene;
-                    this.game.state = State.NULL;
+                    this.createScene();
                     break;
 
                 ///////////////////////////////////////
@@ -114,9 +106,7 @@ class App {
                 case State.GAME:
                     this.clearScene();
                     this.game.currentScene = new GameScene();
-                    this.game.currentScene.createScene(this.game);
-                    this.game.scene = this.game.currentScene._scene;
-                    this.game.state = State.NULL;
+                    this.createScene();
                     break;
 
                 ///////////////////////////////////////
@@ -124,9 +114,7 @@ class App {
                 case State.DEBUG_SCENE:
                     this.clearScene();
                     this.game.currentScene = new DebugScene();
-                    this.game.currentScene.createScene(this.game);
-                    this.game.scene = this.game.currentScene._scene;
-                    this.game.state = State.NULL;
+                    this.createScene();
                     break;
 
                 default:
@@ -137,9 +125,8 @@ class App {
             this._process();
         });
 
-      
+        //for development: make inspector visible/invisible
         if (isLocal()) {
-            //**for development: make inspector visible/invisible
             window.addEventListener("keydown", (ev) => {
                 //Shift+Ctrl+Alt+I
                 if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.keyCode === 73) {
@@ -151,7 +138,7 @@ class App {
                 }
             });
         }
-        
+
         //resize if the screen is resized/rotated
         window.addEventListener("resize", () => {
             this.engine.resize();
@@ -159,6 +146,12 @@ class App {
                 this.game.currentScene.resize();
             }
         });
+    }
+
+    private createScene() {
+        this.game.currentScene.createScene(this.game);
+        this.game.scene = this.game.currentScene._scene;
+        this.game.state = State.NULL;
     }
 
     private checkForSceneChange() {

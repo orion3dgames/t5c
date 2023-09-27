@@ -1,8 +1,8 @@
 {
     "name": "t5c",
-    "version": "0.2.4",
+    "version": "0.3.1",
     "repository": {
-      "url": "git+https://github.com/oriongunning/t5c.git"
+      "url": "git+https://github.com/orion3dgames/t5c.git"
     },
     "description": "Building a basic multiplayer 3d top down rpg using babylon.js and colyseus",
     "main": "./dist/client/index.html",
@@ -15,7 +15,7 @@
       "server-build": "tsc && cp -r public dist",
       "loadtest": "npx tsx loadtest/test.ts --room game_room --numClients 10 --endpoint ws://localhost:3000"
     },
-    "author": "Orion",
+    "author": "Orion3d",
     "license": "GPL-3.0",
     "devDependencies": {
       "@babylonjs/gui-editor": "^6.20.0",

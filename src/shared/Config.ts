@@ -3,7 +3,7 @@ import State from "../client/Screens/Screens";
 class Config {
     // general settings
     title = "T5C";
-    version = "Version 0.2.3";
+    version = "Version 0.3.1";
     lang = "en";
 
     // server settings
@@ -34,10 +34,6 @@ class Config {
 
     // basic locations
     initialLocation = "lh_town";
-
-    // default scene
-    //defaultScene= isLocal() ? State.GAME = State.LOGIN,
-    defaultScene = State.GAME;
 }
 
 export { Config };
