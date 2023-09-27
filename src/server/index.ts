@@ -21,16 +21,6 @@ import { Config } from "../shared/Config";
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 
-/*
-if (fs.existsSync(Config.databaseLocation)) {
-    fs.unlink(Config.databaseLocation, (err) => {
-        if (err) {
-            Logger.error("Could not delete the file: " + Config.databaseLocation, err);
-        }
-        Logger.info("File is deleted: " + Config.databaseLocation);
-    });
-}*/
-
 class GameServer {
     public api;
     public database;
@@ -50,11 +40,9 @@ class GameServer {
         //////////////////////////////////////////////////
         ///////////// COLYSEUS GAME SERVER ///////////////
         //////////////////////////////////////////////////
-
         const port = this.config.port;
         const app = express();
         app.use(cors());
-        //app.use(express.json());
 
         // create colyseus server
         const gameServer = new Server({
@@ -69,7 +57,7 @@ class GameServer {
 
         // on localhost, simulate bad latency
         if (process.env.NODE_ENV !== "production") {
-            Logger.info("[gameserver] Simulating 500ms of latency.");
+            Logger.info("[gameserver] Simulating 200ms of latency.");
             gameServer.simulateLatency(200);
         }
 

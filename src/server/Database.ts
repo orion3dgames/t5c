@@ -283,7 +283,7 @@ class Database {
         });
 
         // add default items
-        let items = [{ qty: 1, key: "potion_small_red" }];
+        let items = [{ qty: 10, key: "potion_small_red" }];
         items.forEach((item) => {
             const sql = `INSERT INTO character_inventory ("owner_id", "qty", "key") VALUES ("${c.id}", "${item.qty}", "${item.key}")`;
             this.run(sql);
@@ -374,15 +374,6 @@ class Database {
     async toggleOnlineStatus(character_id: number, online: number) {
         const sql = `UPDATE characters SET online=? WHERE id=? ;`;
         return this.run(sql, [online, character_id]);
-    }
-
-    ////////////////// DEBUG ONLY
-    async returnRandomUserAndChar() {
-        const sql = `SELECT C.*, U.token, U.username, U.password from characters C 
-                        LEFT JOIN users U ON U.id=C.user_id 
-                        WHERE online='0' 
-                        ORDER BY random() LIMIT 1;`;
-        return this.get(sql, []);
     }
 }
 

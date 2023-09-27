@@ -55,7 +55,7 @@ export class PlayerInput {
                 // left click
                 if (pointerInfo.event.button == 0) {
                     this.left_click = true;
-                    this.startMovementTimer();
+                    //this.startMovementTimer();
                 }
 
                 // middle click
@@ -78,10 +78,11 @@ export class PlayerInput {
                     this.horizontal = 0;
                     this.player_can_move = false;
 
+                    /*
                     if (this.movementTimer) {
                         this.movementTimerNow = 0;
                         clearInterval(this.movementTimer);
-                    }
+                    }*/
                 }
 
                 // middle click
@@ -98,7 +99,8 @@ export class PlayerInput {
             }
 
             if (pointerInfo.type === PointerEventTypes.POINTERMOVE) {
-                if (this.left_click && this.player_can_move === true) {
+                if (this.left_click) {
+                    this.player_can_move = true;
                     this.x = (pointerInfo.event.clientX / pointerInfo.event.target.width) * 2 - 1;
                     this.y = (pointerInfo.event.clientY / pointerInfo.event.target.height) * 2 - 1;
                     this.angle = Math.atan2(this.x, this.y);
@@ -220,6 +222,7 @@ export class PlayerInput {
         });
     }
 
+    /*
     private startMovementTimer() {
         let amount = 100;
         this.movementTimer = setInterval(() => {
@@ -231,6 +234,7 @@ export class PlayerInput {
             }
         }, 100);
     }
+    */
 
     private calculateVelocityForces() {
         if (this.angle !== 0) {

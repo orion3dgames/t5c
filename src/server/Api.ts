@@ -6,7 +6,7 @@ import { GameData } from "./GameData";
 import { Database } from "./Database";
 
 class Api {
-    constructor(app, database:Database) {
+    constructor(app, database: Database) {
         // default to built client index.html
         let indexPath = "dist/client/";
         let clientFile = "index.html";
