@@ -2,19 +2,23 @@
 Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 
 ## Current progress:
+- can support up to 20 people per map (depends on server of course)
 - fully player authorative movement with client side prediction and server reconciliation
-- Simple scene management & switching
+  - diablo like movement using the mouse with the ability to click to move
+- scene management (login, register, character selection, etc...)
+- map management (ability to teleport to a different map (ex: a dungeon) )
 - multiplayer animated characters
-- zoning system (ability to teleport to a different room (eg: a dungeon for example) )
 - global chat (works accross zones)
-- server controlled collisions (via a navmesh)
+- uses a navmesh for collision detection
 - persistence with mysql lite
+- basic enemies with simple AI behaviour (IDLE, PATROL, CHASE, ATTACK, DEAD)
+- enemies can drop items (based on a loot table)
 - 4 abilities ( basic attack, fireball, dot, heal )
-- patrolling monsters (with basic FSM states: IDLE, PATROL, CHASE, ATTACK, DEAD)
-- selecting characters and monsters
-- monsters have a loot table and can drop items
+- ability to target players and enemies
 - ability to pick up items and see them in your inventory
-- standard UI (experience bar, abilities bar, panels, etc...)
+- ability to equip items and see them on your character
+- basic player levelling with experience and ability points
+- fully functional UI (experience bar, abilities bar, draggable panels, etc...)
 - and more... 
 
 ## Roadmap
@@ -41,7 +45,3 @@ The WebSocket server should be available locally at `ws://localhost:3000`, and [
 
 ## Load testing
 - Run `npx tsx ./loadtest/test.ts --room game_room --numClients 1 --endpoint ws://localhost:3000`
-
-## License
-Everything under ./src is licensed under the GNU license except for the yuka library who is MIT license.
-All models under the ./public/races/models folder does not fall under the GNU license and cannot be used commercially.
