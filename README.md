@@ -24,7 +24,7 @@ Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 ## Links
 Follow the progress on the official babylon.js forum: [https://forum.babylonjs.com/t/multiplayer-top-down-rpg-babylon-js-colyseus/35733](https://forum.babylonjs.com/t/multiplayer-top-down-rpg-babylon-js-colyseus/35733)
 
-Check out my devlogs on [[https://dev.to/orion3d](https://dev.to/orion3d)
+Check out my devlogs on [https://dev.to/orion3d](https://dev.to/orion3d)
 
 ## Requirements
 - Download and install [Node.js LTS](https://nodejs.org/en/download/)
