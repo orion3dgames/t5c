@@ -38,4 +38,32 @@ export class Network {
             resolve(false);
         });
     }
+
+    public async joinOrCreateRoom(location, token, character_id): Promise<any> {
+        // find all exisiting rooms
+        let rooms = await this._client.getAvailableRooms("game_room");
+
+        // rooms exists
+        if (rooms.length > 0) {
+            // do we already have a room for the specified location
+            let roomIdFound = false;
+            rooms.forEach((room) => {
+                if (room.metadata.location === location) {
+                    roomIdFound = room.roomId;
+                }
+            });
+
+            // if so, let's join it
+            if (roomIdFound) {
+                return await this.joinRoom(roomIdFound, token, character_id);
+            }
+        }
+
+        // else create a new room for that location
+        return await this._client.joinOrCreate("game_room", {
+            location: location,
+            token: token,
+            character_id: character_id,
+        });
+    }
 }

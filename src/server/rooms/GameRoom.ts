@@ -17,6 +17,8 @@ export class GameRoom extends Room<GameRoomState> {
     public navMesh: NavMesh;
     public config;
 
+    public disposeTimer;
+
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
@@ -39,18 +41,17 @@ export class GameRoom extends Room<GameRoomState> {
         // Register message handlers for messages from the client
         this.registerMessageHandlers();
 
-        // Set the frequency of the patch rate
-        // let's make it the same as our game loop
+        //Set frequency the patched state should be sent to all clients
         this.setPatchRate(this.config.updateRate);
 
-        // Set the simulation interval callback
-        // use to check stuff on the server at regular interval
+        //Set a simulation interval that can change the state of the game
         this.setSimulationInterval((dt) => {
             this.state.update(dt);
         }, this.config.updateRate);
 
         // set max clients
         this.maxClients = this.config.maxClients;
+        this.autoDispose = true;
 
         // initialize database
         this.database = new Database(this.config);
@@ -58,7 +59,6 @@ export class GameRoom extends Room<GameRoomState> {
 
         ///////////////////////////////////////////////////////////////////////////
         // if players are in a room, make sure we save any changes to the database.
-        
         let saveTimer = 0;
         let saveInterval = 5000;
         this.delayedInterval = this.clock.setInterval(() => {
@@ -73,10 +73,7 @@ export class GameRoom extends Room<GameRoomState> {
                 });
             }
         }, this.config.databaseUpdateRate);
-        
     }
-
-
 
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////

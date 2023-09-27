@@ -156,11 +156,12 @@ export class GameScene {
     private async _initNetwork(): Promise<void> {
         let character = this._game.currentCharacter;
         let currentLocationKey = character.location;
-        let room = await this._game.client.findCurrentRoom(currentLocationKey);
 
-        if (room) {
+        this.room = await this._game.client.joinOrCreateRoom(currentLocationKey, this._game._currentUser.token, this._game._currentCharacter.id);
+
+        if (this.room) {
             // join game room
-            this.room = await this._game.client.joinRoom(room.roomId, this._game.currentUser.token, character.id);
+            //this.room = await this._game.client.joinRoom(room.roomId, this._game.currentUser.token, character.id);
 
             // set room onError evenmt
             this.room.onError((code, message) => {
