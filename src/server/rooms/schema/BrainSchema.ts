@@ -262,7 +262,7 @@ export class BrainSchema extends Entity {
      */
     findClosestPlayer() {
         let closestDistance = 1000000;
-        this._state.entities.forEach((entity) => {
+        this._state.entities.forEach((entity: any) => {
             if (this.type === "entity" && entity.type === "player" && !entity.gracePeriod && !entity.isDead) {
                 let playerPos = entity.getPosition();
                 let entityPos = this.getPosition();
