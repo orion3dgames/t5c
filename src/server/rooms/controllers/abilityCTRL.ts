@@ -6,7 +6,6 @@ import { randomNumberInRange } from "../../../shared/Utils";
 
 export class abilitiesCTRL {
     private _owner;
-    private _schema;
     public abilitiesOwned;
     public abilitiesDB;
     public abilities: Ability[] = [];
