@@ -203,7 +203,7 @@ export class GameScene {
                 // if player type
                 if (isCurrentPlayer) {
                     // create player entity
-                    let _player = new Player(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._game, this._input);
+                    let _player = new Player(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._game, this._input, this._entities);
 
                     // set currentPlayer
                     this._currentPlayer = _player;

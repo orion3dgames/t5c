@@ -18,6 +18,7 @@ import { GameController } from "../Controllers/GameController";
 
 export class Player extends Entity {
     public game;
+    public entities;
     public interval;
 
     public isCasting: boolean = false;
@@ -40,9 +41,12 @@ export class Player extends Entity {
         shadow: CascadedShadowGenerator,
         navMesh: NavMesh,
         game: GameController,
-        input: PlayerInput
+        input: PlayerInput,
+        entities
     ) {
         super(entity, room, scene, ui, shadow, navMesh, game);
+
+        this.entities = entities;
 
         this._input = input;
 
@@ -57,7 +61,7 @@ export class Player extends Entity {
         //spawn
         this.utilsController = new EntityUtils(this._scene, this._room);
         this.cameraController = new PlayerCamera(this);
-        this.actionsController = new EntityActions(this._scene, this._game._loadedAssets);
+        this.actionsController = new EntityActions(this._scene, this._game._loadedAssets, this.entities);
 
         // add mesh to shadow generator
         this._shadow.addShadowCaster(this.meshController.playerMesh, true);
@@ -124,7 +128,7 @@ export class Player extends Entity {
         if (pointerInfo._pickInfo.pickedMesh.metadata === null) return false;
 
         let metadata = pointerInfo._pickInfo.pickedMesh.metadata;
-        //console.log(metadata, pointerInfo._pickInfo);
+        console.log(metadata, pointerInfo._pickInfo);
 
         // select entity
         if (metadata.type === "player" || metadata.type === "entity") {

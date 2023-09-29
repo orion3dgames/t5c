@@ -185,6 +185,10 @@ export class Entity {
             }
         }
 
+        if (this.health > 0) {
+            this.isDead = false;
+        }
+
         // only do the below if entity is not dead
         if (!this.isDead) {
             // if entity is selected, show
