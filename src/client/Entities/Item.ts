@@ -55,7 +55,7 @@ export class Item extends TransformNode {
         this._ui = ui;
 
         // add entity data
-        this.name = entity.key + "_"+entity.sessionId;
+        this.name = entity.key + "_" + entity.sessionId;
         this.entity = entity;
 
         // update player data from server data
@@ -84,21 +84,17 @@ export class Item extends TransformNode {
         } else if (mode === "clone") {
             // clone
             if (this._game._loadedAssets["ROOT_ITEM_" + entity.key]) {
-
                 this.mesh = this._game._loadedAssets["ROOT_ITEM_" + entity.key].clone("TEST_" + entity.sessionId);
-
             } else {
                 console.error("Could not find key: ROOT_ITEM_" + entity.key, this._game._loadedAssets);
             }
 
             // import normal
         } else {
-            const result = await this._game._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene(
-                (name) => "instance_" + this.entity.sessionId, 
-                false, {
+            const result = await this._game._loadedAssets["ITEM_" + entity.key].instantiateModelsToScene((name) => "instance_" + this.entity.sessionId, false, {
                 doNotInstantiate: false,
             });
-            this.mesh = result.rootNodes[0] as Mesh; 
+            this.mesh = result.rootNodes[0] as Mesh;
         }
 
         // set initial player scale & rotation
@@ -149,11 +145,11 @@ export class Item extends TransformNode {
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
                 let mesh = ev.meshUnderPointer;
                 console.log(mesh);
-                if(mesh){
+                if (mesh) {
                     mesh.overlayColor = new Color3(1, 1, 1);
                     mesh.overlayAlpha = 0.3;
                     mesh.renderOverlay = true;
-                }   
+                }
             })
         );
 
@@ -161,59 +157,11 @@ export class Item extends TransformNode {
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
                 let mesh = ev.meshUnderPointer;
-                if(mesh){
+                if (mesh) {
                     mesh.renderOverlay = false;
                 }
             })
         );
-
-        // register hover out player
-        this.mesh.actionManager.registerAction(
-            new ExecuteCodeAction(ActionManager.OnLeftPickTrigger, (ev) => {
-                if(ev.meshUnderPointer){
-                    let item = ev.meshUnderPointer.metadata;
-                    this._room.send("pickup_item", {
-                        sessionId: item.sessionId,
-                    });
-                }
-                
-            })
-        );
-
-        /*
-        this.mesh.actionManager.registerAction(
-            new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
-                // remove any previous overlay
-                if (this.overlay_mesh) {
-                    this.overlay_mesh.dispose();
-                }
-
-                // hide original mesh
-                this.mesh.isVisible = false;
-
-                // clone mesh from memory
-                this.overlay_mesh = this._game._loadedAssets["ROOT_ITEM_" + entity.key].clone("OVERLAY_" + entity.sessionId);
-                this.overlay_mesh.metadata = this.mesh.metadata;
-                this.overlay_mesh.position = this.getPosition();
-                this.overlay_mesh.position.y += this.mesh.position.y;
-                this.overlay_mesh.rotation = this.mesh.rotation;
-                this.overlay_mesh.scaling = this.mesh.scaling;
-                this.overlay_mesh.overlayColor = Color3.White();
-                this.overlay_mesh.renderOverlay = true;
-                this.overlay_mesh.isVisible = true;
-
-                // register hover out item
-                this.overlay_mesh.actionManager = new ActionManager(this._scene);
-                this.overlay_mesh.actionManager.registerAction(
-                    new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
-                        //
-                        this.overlay_mesh.dispose();
-                        //
-                        this.mesh.isVisible = true;
-                    })
-                );
-            })
-        );*/
 
         //////////////////////////////////////////////////////////////////////////
         // misc
@@ -223,20 +171,6 @@ export class Item extends TransformNode {
     public update(delta) {}
     public updateServerRate(delta) {}
     public updateSlowRate(delta) {}
-
-    // basic performance (only enable entities in a range around the player)
-    public lod(_currentPlayer) {
-        /*
-        this.mesh.setEnabled(false);
-        this.mesh.freezeWorldMatrix();
-        let entityPos = this.getPosition();
-        let playerPos = _currentPlayer.position();
-        let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
-        if (distanceFromPlayer < Config.PLAYER_VIEW_DISTANCE) {
-            this.mesh.unfreezeWorldMatrix();
-            this.mesh.setEnabled(true);
-        }*/
-    }
 
     public setPosition() {
         this.position = this.getPosition();

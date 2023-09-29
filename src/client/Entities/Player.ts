@@ -1,6 +1,10 @@
 import { Scene } from "@babylonjs/core/scene";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
-import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
+import { PointerEventTypes, PointerInfo } from "@babylonjs/core/Events/pointerEvents";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+
+import { GameController } from "../Controllers/GameController";
 import { NavMesh } from "../../shared/Libs/yuka-min";
 import { Room } from "colyseus.js";
 import { PlayerSchema } from "../../server/rooms/schema/PlayerSchema";
@@ -12,9 +16,6 @@ import { PlayerInput } from "../../client/Controllers/PlayerInput";
 import { UserInterface } from "../../client/Controllers/UserInterface";
 import State from "../../client/Screens/Screens";
 import { Ability } from "../../shared/types";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { GameController } from "../Controllers/GameController";
 
 export class Player extends Entity {
     public game;
@@ -58,22 +59,15 @@ export class Player extends Entity {
     }
 
     private async spawnPlayer(input) {
-        //spawn
+        // add player controllers
         this.utilsController = new EntityUtils(this._scene, this._room);
         this.cameraController = new PlayerCamera(this);
         this.actionsController = new EntityActions(this._scene, this._game._loadedAssets, this.entities);
 
-        // add mesh to shadow generator
-        this._shadow.addShadowCaster(this.meshController.playerMesh, true);
-
-        ///////////////////////////////////////////////////////////
-        // entity network event
-        // colyseus automatically sends entity updates, so let's listen to those changes
-
-        // register server messages
+        // register player server messages
         this.registerServerMessages();
 
-        // mouse events
+        // player mouse events
         this.onPointerObservable = this._scene.onPointerObservable.add((pointerInfo: any) => {
             // on left mouse click
             if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 0) {
@@ -82,22 +76,7 @@ export class Player extends Entity {
 
             // on right mouse click
             if (pointerInfo.type === PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 2) {
-                /////////////////////////////////////////////////////////////////////
-                // display nameplate for a certain time for any entity right clicked
-                if (
-                    pointerInfo._pickInfo.pickedMesh &&
-                    pointerInfo._pickInfo.pickedMesh.metadata &&
-                    pointerInfo._pickInfo.pickedMesh.metadata.sessionId &&
-                    pointerInfo._pickInfo.pickedMesh.metadata.sessionId != this._room.sessionId
-                ) {
-                    let targetMesh = pointerInfo._pickInfo.pickedMesh;
-                    let targetData = targetMesh.metadata;
-                    let target = this.ui._entities[targetData.sessionId];
-                    target.characterLabel.isVisible = true;
-                    setTimeout(function () {
-                        target.characterLabel.isVisible = false;
-                    }, this._game.config.PLAYER_NAMEPLATE_TIMEOUT);
-                }
+                this.rightClick(pointerInfo);
             }
 
             // on wheel mouse
@@ -120,20 +99,45 @@ export class Player extends Entity {
         });
     }
 
-    public leftClick(pointerInfo) {
+    getMeshMetadata(pointerInfo) {
         if (!pointerInfo._pickInfo.pickedMesh) return false;
 
         if (!pointerInfo._pickInfo.pickedMesh.metadata) return false;
 
         if (pointerInfo._pickInfo.pickedMesh.metadata === null) return false;
 
-        let metadata = pointerInfo._pickInfo.pickedMesh.metadata;
-        console.log(metadata, pointerInfo._pickInfo);
+        return pointerInfo._pickInfo.pickedMesh.metadata;
+    }
+
+    // display nameplate for a certain time for any entity right clicked
+    public rightClick(pointerInfo) {
+        let metadata = this.getMeshMetadata(pointerInfo);
+
+        if (!metadata) return false;
+
+        let target = this.entities[metadata.sessionId];
+
+        if (target) {
+            // show entity label
+            target.characterLabel.isVisible = true;
+
+            // hide it automatically after PLAYER_NAMEPLATE_TIMEOUT
+            setTimeout(function () {
+                target.characterLabel.isVisible = false;
+            }, this._game.config.PLAYER_NAMEPLATE_TIMEOUT);
+        }
+    }
+
+    // process left click for player
+    public leftClick(pointerInfo) {
+        let metadata = this.getMeshMetadata(pointerInfo);
+
+        if (!metadata) return false;
 
         // select entity
         if (metadata.type === "player" || metadata.type === "entity") {
             let targetSessionId = metadata.sessionId;
-            let target = this.ui._entities[targetSessionId];
+            let target = this.entities[targetSessionId];
             this._game.selectedEntity = target;
         }
 
@@ -176,7 +180,7 @@ export class Player extends Entity {
 
     public updateSlowRate() {}
 
-    // update at engine rate
+    // update at engine rate 60fps
     public update(delta) {
         super.update(delta);
 
@@ -194,20 +198,18 @@ export class Player extends Entity {
 
     // update at server rate
     public updateServerRate(delta) {
-        /*
         // only show meshes close to us
         let currentPos = this.getPosition();
-        let key = "ENV_" + this._auth.currentLocation.mesh;
-        let allMeshes = this._loadedAssets[key].loadedMeshes;
+        let key = "ENV_" + this._game.currentLocation.mesh;
+        let allMeshes = this._game._loadedAssets[key].loadedMeshes;
         allMeshes.forEach((element) => {
-            let distanceTo = Vector3.Distance(element.position, currentPos);
-            console.log(element, element.name, distanceTo);
+            let distanceTo = Vector3.Distance(element.getAbsolutePosition(), currentPos);
             if (distanceTo > 5) {
                 element.isVisible = false;
             } else {
                 element.isVisible = true;
             }
-        });*/
+        });
 
         // if digit pressed
         if (this._input.digit_pressed > 0 && !this.isCasting) {
@@ -254,14 +256,12 @@ export class Player extends Entity {
             this.ui._RessurectBox.open();
             this.cameraController.bw(true);
             this.isDeadUI = true;
-            console.log("DEAD");
         }
 
-        if (this.isDeadUI && this.health > 1) {
+        if (this.isDeadUI && this.health > 0) {
             this.cameraController.bw(false);
             this.ui._RessurectBox.close();
             this.isDeadUI = false;
-            console.log("ALIVE");
         }
     }
 
