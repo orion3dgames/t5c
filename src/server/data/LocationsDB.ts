@@ -54,24 +54,26 @@ let LocationsDB = {
                         new Vector3(-18, 0, -18),
                         new Vector3(-22.33, 0.01, -21.03),
                         new Vector3(-8.8, 0.01, -22.39),
-                        new Vector3(-8.51, 0.01, -14.93)
-
+                        new Vector3(-8.51, 0.01, -14.93),
                     ],
-                    radius: 0,
                     amount: 5,
                     race: "male_rogue",
                     material: 0,
                     name: "Rogue",
-                    equipment: [{
-                        slot: PlayerSlots.WEAPON,
-                        key: "sword_01"
-                    },{
-                        slot: PlayerSlots.HEAD,
-                        key: "helm_01"
-                    },{
-                        slot: PlayerSlots.OFF_HAND,
-                        key: "shield_01"
-                    }]
+                    equipment: [
+                        {
+                            slot: PlayerSlots.WEAPON,
+                            key: "sword_01",
+                        },
+                        {
+                            slot: PlayerSlots.HEAD,
+                            key: "helm_01",
+                        },
+                        {
+                            slot: PlayerSlots.OFF_HAND,
+                            key: "shield_01",
+                        },
+                    ],
                 },
                 {
                     type: "path",
@@ -79,11 +81,10 @@ let LocationsDB = {
                     aggressive: true,
                     canAttack: true,
                     points: [new Vector3(17.47, 0.04, 2.55), new Vector3(31.77, 3.54, 2.56), new Vector3(32.46, 3.54, -11.21), new Vector3(16.87, 0.04, -8.92)],
-                    radius: 0,
                     amount: 1,
                     race: "male_rogue",
                     material: 0,
-                    name: "Rogue"
+                    name: "Rogue",
                 },
                 {
                     type: "static",
@@ -91,7 +92,6 @@ let LocationsDB = {
                     aggressive: false,
                     canAttack: false,
                     points: [new Vector3(38.7, 3.51, -11.81)],
-                    radius: 0,
                     amount: 1,
                     race: "male_knight",
                     material: 3,
@@ -103,11 +103,37 @@ let LocationsDB = {
                     aggressive: false,
                     canAttack: true,
                     points: [new Vector3(9.67, 0, -28.58)],
-                    radius: 0,
                     amount: 1,
                     race: "male_mage",
                     material: 2,
-                    name: "Priestess",
+                    name: "Alice",
+                    interactable: {
+                        distance: 2,
+                        dialog: [
+                            {
+                                text: "Hi, I'm Alice, welcome @PlayerName ",
+                            },
+                            {
+                                text: "Are you in search of healing?",
+                                isQuestion: true,
+                                buttons: [
+                                    { label: "Yes", goToDialog: 2 },
+                                    { label: "No", goToDialog: 3 },
+                                ],
+                            },
+                            {
+                                text: "Ok, please do not move while I heal you!",
+                                isEndOfDialog: true,
+                                triggeredByClosing: (owner) => {
+                                    owner.heal();
+                                },
+                            },
+                            {
+                                text: "Ok, please come back later if you're in need of healing.",
+                                isEndOfDialog: true,
+                            },
+                        ],
+                    },
                 },
                 {
                     type: "static",
@@ -115,12 +141,12 @@ let LocationsDB = {
                     aggressive: false,
                     canAttack: true,
                     points: [new Vector3(13.1, 0, -13.7)],
-                    radius: 0, 
+                    radius: 0,
                     amount: 1,
                     race: "male_mage",
                     material: 1,
                     name: "Harmless Dummy",
-                    baseHealth: 5000
+                    baseHealth: 5000,
                 },
             ],
         },
