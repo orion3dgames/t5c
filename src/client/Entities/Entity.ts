@@ -229,16 +229,27 @@ export class Entity {
 
     public updateServerRate(delta) {}
 
-    // basic performance (only enable entities in a range around the player)
+    // basic performance LOD logic
     public lod(_currentPlayer) {
+        // hide everything
         this.mesh.setEnabled(false);
         this.mesh.freezeWorldMatrix();
+        this.meshController.equipments?.forEach((equipment) => {
+            equipment.setEnabled(false);
+            equipment.freezeWorldMatrix();
+        });
+
+        // only enable if close enough to local player
         let entityPos = this.position();
         let playerPos = _currentPlayer.position();
         let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
         if (distanceFromPlayer < this._game.config.PLAYER_VIEW_DISTANCE) {
             this.mesh.unfreezeWorldMatrix();
             this.mesh.setEnabled(true);
+            this.meshController.equipments?.forEach((equipment) => {
+                equipment.unfreezeWorldMatrix();
+                equipment.setEnabled(true);
+            });
         }
     }
 

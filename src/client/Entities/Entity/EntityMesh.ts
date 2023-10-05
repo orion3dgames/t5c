@@ -108,7 +108,7 @@ export class EntityMesh {
             return key;
         }, false);
         const playerMesh = result.rootNodes[0];
-        
+
         this._animationGroups = result.animationGroups;
         this.skeleton = result.skeletons[0];
 
@@ -125,14 +125,16 @@ export class EntityMesh {
         this.playerMesh = playerMesh;
 
         // change player texture
-        if(this._entity.material){
+        if (this._entity.material) {
             const allChildMeshes = this.playerMesh.getChildTransformNodes(true)[0].getChildMeshes(false);
             const selectedMaterial = allChildMeshes[0].material ?? false;
             const materialIndex = this._entity.material;
-            if(selectedMaterial){
+            if (selectedMaterial) {
                 if (selectedMaterial.albedoTexture) {
                     selectedMaterial.albedoTexture.dispose();
-                    selectedMaterial.albedoTexture = new Texture("./models/races/materials/" + this._entity.materials[materialIndex].material, this._scene, { invertY: false });
+                    selectedMaterial.albedoTexture = new Texture("./models/races/materials/" + this._entity.materials[materialIndex].material, this._scene, {
+                        invertY: false,
+                    });
                 }
             }
         }
@@ -193,6 +195,34 @@ export class EntityMesh {
         return merged;
     }
 
+    public freezeMeshes() {
+        // hide entity mesh
+        this.mesh.setEnabled(false);
+        this.mesh.freezeWorldMatrix();
+
+        // hide equipment mesh
+        if (this.equipments.length > 0) {
+            this.equipments.forEach((equipment) => {
+                equipment.setEnabled(false);
+                equipment.freezeWorldMatrix();
+            });
+        }
+    }
+
+    public unfreezeMeshes() {
+        // hide entity mesh
+        this.mesh.unfreezeWorldMatrix();
+        this.mesh.setEnabled(true);
+
+        // hide equipment mesh
+        if (this.equipments.length > 0) {
+            this.equipments.forEach((equipment) => {
+                equipment.unfreezeWorldMatrix();
+                equipment.setEnabled(true);
+            });
+        }
+    }
+
     public deleteMeshes() {
         // remove player mesh
         this.mesh.dispose();
@@ -204,6 +234,10 @@ export class EntityMesh {
             });
         }
     }
+
+    ////////////////////////////////////////////////////
+    ///////////// EQUIPMENT ////////////////////
+    ////////////////////////////////////////////////////
 
     public refreshMeshes(e) {
         if (!this._entity.bones) {
@@ -228,8 +262,7 @@ export class EntityMesh {
                 let key = PlayerSlots[e.slot];
 
                 // if mesh needs to be added
-                if (equipOptions.mesh ) {
-                
+                if (equipOptions.mesh) {
                     let boneId = this._entity.bones[key];
                     let bone = this.skeleton.bones[boneId];
 
@@ -262,7 +295,6 @@ export class EntityMesh {
                     }
 
                     this.equipments.push(weaponMesh);
-                    
                 }
             }
         });

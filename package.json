@@ -16,16 +16,15 @@
       "loadtest": "npx tsx loadtest/test.ts --room game_room --numClients 10 --endpoint ws://localhost:3000"
     },
     "author": "Orion3d",
-    "license": "GPL-3.0",
+    "license": "MIT",
     "devDependencies": {
-      "@babylonjs/gui-editor": "^6.20.0",
-      "@babylonjs/inspector": "^6.20.0",
-      "@babylonjs/materials": "^6.20.0",
+      "@babylonjs/gui-editor": "^6.22.0",
+      "@babylonjs/inspector": "^6.22.0",
+      "@babylonjs/materials": "^6.22.0",
 
       "@colyseus/core": "^0.15.6",
       "@colyseus/loadtest": "^0.15.2",
       "@colyseus/monitor": "^0.15.1",
-      "@colyseus/playground": "^0.15.4",
       "@colyseus/schema": "^2.0.15",
       "@colyseus/ws-transport": "^0.15.1",
 
@@ -46,11 +45,11 @@
     },
     "dependencies": {
 
-      "@babylonjs/core": "^6.20.0",
-      "@babylonjs/gui": "^6.20.0",
-      "@babylonjs/loaders": "^6.20.0",
-      "@babylonjs/serializers": "^6.20.0",
-      "babylonjs-gltf2interface": "^6.20.0",
+      "@babylonjs/core": "^6.22.0",
+      "@babylonjs/gui": "^6.22.0",
+      "@babylonjs/loaders": "^6.22.0",
+      "@babylonjs/serializers": "^6.22.0",
+      "babylonjs-gltf2interface": "^6.22.0",
 
       "colyseus": "^0.15.7",
       "colyseus.js": "^0.15.13",

@@ -39,7 +39,6 @@ module.exports = {
         new CopyPlugin({
             patterns: [{ from: "public/", to: "./" }],
         }),
-        //new BundleAnalyzerPlugin()
     ],
     mode: "development",
 };

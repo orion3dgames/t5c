@@ -5,7 +5,6 @@ import cors from "cors";
 
 import { Server, matchMaker } from "@colyseus/core";
 import { monitor } from "@colyseus/monitor";
-import { playground } from "@colyseus/playground";
 
 import { WebSocketTransport } from "@colyseus/ws-transport";
 import { GameRoom } from "./rooms/GameRoom";

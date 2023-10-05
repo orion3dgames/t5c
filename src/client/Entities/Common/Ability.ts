@@ -1,4 +1,4 @@
-import { EntityState } from "../Entity/EntityState";
+import { EntityState } from "../../../shared/types";
 
 export class Ability {
     // unique key

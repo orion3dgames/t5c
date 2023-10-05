@@ -168,6 +168,8 @@ export class Item extends TransformNode {
         this.characterLabel = this._ui.createItemLabel(this);
     }
 
+    public lod(delta) {}
+
     public update(delta) {}
     public updateServerRate(delta) {}
     public updateSlowRate(delta) {}
