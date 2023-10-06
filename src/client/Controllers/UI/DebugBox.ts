@@ -4,6 +4,7 @@ import { countPlayers, roundTo } from "../../../shared/Utils";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { generatePanel } from "./Theme";
+import { ServerMsg } from "../../../shared/types";
 
 export class DebugBox {
     private _playerUI;
@@ -31,8 +32,8 @@ export class DebugBox {
             this._update();
         });
 
-        // on teleport confirmation
-        this._gameRoom.onMessage("pong", (data) => {
+        // on pong
+        this._gameRoom.onMessage(ServerMsg.PONG, (data) => {
             let dateNow = Date.now();
             this.ping = dateNow - data.date;
         });

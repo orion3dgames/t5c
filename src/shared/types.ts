@@ -57,6 +57,29 @@ export enum AI_STATE {
     ATTACKING = 3,
 }
 
+export enum ServerMsg {
+    PING = 1,
+    PONG,
+    CHAT_MESSAGE,
+    SERVER_MESSAGE,
+    PLAYER_SEND_MESSAGE,
+    PLAYER_RESET_POSITION,
+    PLAYER_RESSURECT,
+    PLAYER_LEARN_SKILL,
+    PLAYER_ADD_STAT_POINT,
+    PLAYER_MOVE,
+    PLAYER_MOVE_TO,
+    PLAYER_PICKUP,
+    PLAYER_DROP_ITEM,
+    PLAYER_USE_ITEM,
+    PLAYER_UNEQUIP_ITEM,
+    PLAYER_ABILITY_PRESSED,
+    PLAYER_ABILITY_CAST,
+    PLAYER_CASTING_START,
+    PLAYER_CASTING_CANCEL,
+    PLAYER_TELEPORT,
+}
+
 //////////////////////////////////////////////////////////////
 ///////////////// ABILITIES /////////////////////
 //////////////////////////////////////////////////////////////

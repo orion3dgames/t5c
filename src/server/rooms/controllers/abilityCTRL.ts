@@ -1,5 +1,5 @@
 import Logger from "../../utils/Logger";
-import { EntityState, Ability, CalculationTypes } from "../../../shared/types";
+import { EntityState, Ability, CalculationTypes, ServerMsg } from "../../../shared/types";
 import { dropCTRL } from "./dropCTRL";
 import { AbilitySchema } from "../schema/player/AbilitySchema";
 import { randomNumberInRange } from "../../../shared/Utils";
@@ -103,7 +103,7 @@ export class abilitiesCTRL {
         if (ability.castTime > 0) {
             // inform player he can start casting
             let client = this._owner.getClient();
-            client.send("ability_start_casting", {
+            client.send(ServerMsg.PLAYER_CASTING_START, {
                 digit: data.digit,
             });
 
@@ -306,7 +306,7 @@ export class abilitiesCTRL {
         target.normalizeStats();
 
         // send to clients
-        owner._state._gameroom.broadcast("entity_ability_cast", {
+        owner._state._gameroom.broadcast(ServerMsg.PLAYER_ABILITY_CAST, {
             key: ability.key,
             digit: digit,
             fromId: owner.sessionId,
@@ -346,7 +346,7 @@ export class abilitiesCTRL {
         // update caster rewards
         if (client) {
             // send notif to player
-            client.send("notification", {
+            client.send(ServerMsg.SERVER_MESSAGE, {
                 type: "event",
                 message: "You've killed " + target.name + ".",
                 date: new Date(),
@@ -404,7 +404,7 @@ export class abilitiesCTRL {
             if (this.player_casting_timer) {
                 clearInterval(this.player_casting_timer);
                 this.player_casting_timer = false;
-                owner._state._gameroom.broadcast("ability_cancel_casting");
+                owner._state._gameroom.broadcast(ServerMsg.PLAYER_CASTING_CANCEL);
             }
         }
     }

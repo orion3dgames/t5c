@@ -7,6 +7,7 @@ import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { applyTheme } from "../Theme";
 import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
+import { ServerMsg } from "../../../../shared/types";
 
 export class Panel_Abilities extends Panel {
     // inventory tab
@@ -155,7 +156,7 @@ export class Panel_Abilities extends Panel {
                 abilityLearn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
                 skillsPanel.addControl(abilityLearn);
                 abilityLearn.onPointerDownObservable.add(() => {
-                    this._gameRoom.send("learn_skill", ability.key);
+                    this._gameRoom.send(ServerMsg.PLAYER_LEARN_SKILL, ability.key);
                 });
             } else {
                 const abilityLearn = Button.CreateSimpleButton("abilityLearn" + ability.key, "Learn");
@@ -170,7 +171,7 @@ export class Panel_Abilities extends Panel {
                 abilityLearn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
                 skillsPanel.addControl(abilityLearn);
                 abilityLearn.onPointerDownObservable.add(() => {
-                    this._gameRoom.send("learn_skill", ability.key);
+                    this._gameRoom.send(ServerMsg.PLAYER_LEARN_SKILL, ability.key);
                 });
             }
         }

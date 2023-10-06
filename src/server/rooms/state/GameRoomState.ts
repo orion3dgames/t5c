@@ -10,7 +10,7 @@ import { GameRoom } from "../GameRoom";
 
 import { NavMesh, Vector3 } from "../../../shared/Libs/yuka-min";
 import Logger from "../../utils/Logger";
-import { ItemClass } from "../../../shared/types";
+import { ItemClass, ServerMsg } from "../../../shared/types";
 
 export class GameRoomState extends Schema {
     // networked variables
@@ -165,8 +165,9 @@ export class GameRoomState extends Schema {
         ////////////////////////////////////
         ////////// SERVER EVENTS ///////////
         ////////////////////////////////////
-        if (type === "ping") {
-            client.send("pong", data);
+
+        if (type === ServerMsg.PING) {
+            client.send(ServerMsg.PONG, data);
         }
 
         ////////////////////////////////////
@@ -179,19 +180,19 @@ export class GameRoomState extends Schema {
 
         /////////////////////////////////////
         // on player reset position
-        if (type === "reset_position") {
+        if (type === ServerMsg.PLAYER_RESET_POSITION) {
             playerState.resetPosition();
         }
 
         /////////////////////////////////////
         // on player ressurect
-        if (type === "revive_pressed") {
+        if (type === ServerMsg.PLAYER_RESSURECT) {
             playerState.ressurect();
         }
 
         /////////////////////////////////////
         // on player learn skill
-        if (type === "learn_skill") {
+        if (type === ServerMsg.PLAYER_LEARN_SKILL) {
             const ability = this.gameData.get("ability", data);
             if (ability) {
                 playerState.abilitiesCTRL.learnAbility(ability);
@@ -200,7 +201,7 @@ export class GameRoomState extends Schema {
 
         /////////////////////////////////////
         // on player add stat point
-        if (type === "add_stats_point") {
+        if (type === ServerMsg.PLAYER_ADD_STAT_POINT) {
             if (playerState.player_data.points > 0) {
                 playerState.player_data[data] += 1;
                 playerState.player_data.points -= 1;
@@ -209,18 +210,18 @@ export class GameRoomState extends Schema {
 
         /////////////////////////////////////
         // on player input
-        if (type === "playerInput") {
+        if (type === ServerMsg.PLAYER_MOVE) {
             let playerInputs = data;
             playerState.moveCTRL.processPlayerInput(playerInputs);
         }
-        if (type === "move_to") {
+        if (type === ServerMsg.PLAYER_MOVE_TO) {
             playerState.abilitiesCTRL.cancelAutoAttack(playerState);
             playerState.moveCTRL.setTargetDestination(new Vector3(data.x, data.y, data.z));
         }
 
         /////////////////////////////////////
         // on player ressurect
-        if (type === "pickup_item") {
+        if (type === ServerMsg.PLAYER_PICKUP) {
             playerState.abilitiesCTRL.cancelAutoAttack(playerState);
             const itemState = this.getEntity(data);
             if (itemState) {
@@ -228,7 +229,7 @@ export class GameRoomState extends Schema {
             }
         }
 
-        if (type === "drop_item") {
+        if (type === ServerMsg.PLAYER_DROP_ITEM) {
             let slot = data.slot;
             let dropAll = data.drop_all ?? false;
             const item = playerState.getInventoryItemByIndex(slot);
@@ -241,7 +242,7 @@ export class GameRoomState extends Schema {
         /////////////////////////////////////
         // on player equip
         // data will equal the inventory index of the clicked item
-        if (type === "use_item") {
+        if (type === ServerMsg.PLAYER_USE_ITEM) {
             const item = playerState.getInventoryItemByIndex(data);
             if (item) {
                 if (item.class === ItemClass.CONSUMABLE) {
@@ -254,7 +255,7 @@ export class GameRoomState extends Schema {
 
         /////////////////////////////////////
         // on player unequip
-        if (type === "unequip_item") {
+        if (type === ServerMsg.PLAYER_UNEQUIP_ITEM) {
             const item = this.gameData.get("item", data);
             // does item exist in database
             if (item) {
@@ -264,7 +265,7 @@ export class GameRoomState extends Schema {
 
         /////////////////////////////////////
         // player entity_attack
-        if (type === "entity_ability_key") {
+        if (type === ServerMsg.PLAYER_ABILITY_PRESSED) {
             // get players involved
             let targetState = this.getEntity(data.targetId) as Entity;
 

@@ -5,6 +5,7 @@ import { Image } from "@babylonjs/gui/2D/controls/image";
 import { Player } from "../../Entities/Player";
 import { generatePanel, getBg, getPadding } from "./Theme";
 import { GameController } from "../GameController";
+import { ServerMsg } from "../../../shared/types";
 
 export class AbilityBar {
     private _playerUI;
@@ -113,7 +114,7 @@ export class AbilityBar {
         headlineRect.onPointerClickObservable.add(() => {
             let entity = this._game.selectedEntity;
             if (entity && !this._currentPlayer.isCasting) {
-                this._gameRoom.send("entity_ability_key", {
+                this._gameRoom.send(ServerMsg.PLAYER_ABILITY_PRESSED, {
                     senderId: this._gameRoom.sessionId,
                     targetId: entity.sessionId,
                     digit: digit,

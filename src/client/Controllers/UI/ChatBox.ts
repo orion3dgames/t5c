@@ -5,7 +5,7 @@ import { Control } from "@babylonjs/gui/2D/controls/control";
 import { InputText } from "@babylonjs/gui/2D/controls/inputText";
 import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
-import { PlayerMessage } from "../../../shared/types";
+import { PlayerMessage, ServerMsg } from "../../../shared/types";
 import { generatePanel, getBg, getPadding } from "./Theme";
 
 export class ChatBox {
@@ -131,7 +131,7 @@ export class ChatBox {
         });
 
         // receive message event
-        this._chatRoom.onMessage("messages", (message: PlayerMessage) => {
+        this._chatRoom.onMessage(ServerMsg.CHAT_MESSAGE, (message: PlayerMessage) => {
             if (!message.type) {
                 message.type = "chat";
                 message.color = this._colors["chat"];
@@ -196,7 +196,7 @@ export class ChatBox {
 
     // send message to server
     private sendMessage() {
-        this._chatRoom.send("message", {
+        this._chatRoom.send(ServerMsg.PLAYER_SEND_MESSAGE, {
             name: this._currentPlayer.name,
             message: this._chatInput.text,
         });

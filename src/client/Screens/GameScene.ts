@@ -19,7 +19,7 @@ import { createConvexRegionHelper } from "../Utils/navMeshHelper";
 import { mergeMesh } from "../Entities/Common/MeshHelper";
 import { GameController } from "../Controllers/GameController";
 import loadNavMeshFromString from "../Utils/loadNavMeshFromString";
-import { PlayerInputs } from "../../shared/types";
+import { PlayerInputs, ServerMsg } from "../../shared/types";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -267,7 +267,7 @@ export class GameScene {
             let updateSlow = 5000 / 1000; // game is networked update every 100ms
             if (timePassedSlow >= updateSlow) {
                 // send ping to server
-                this.room.send("ping", { date: Date.now() });
+                this.room.send(ServerMsg.PING, { date: Date.now() });
 
                 // update entities
                 for (let sessionId in this._entities) {
@@ -308,7 +308,7 @@ export class GameScene {
                     };
 
                     // sent current input to server for processing
-                    this.room.send("playerInput", latestInput);
+                    this.room.send(ServerMsg.PLAYER_MOVE, latestInput);
 
                     // do client side prediction
                     this._currentPlayer.moveController.predictionMove(latestInput);

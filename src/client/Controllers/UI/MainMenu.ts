@@ -8,6 +8,7 @@ import { Image } from "@babylonjs/gui/2D/controls/image";
 import { UserInterface } from "../UserInterface";
 import State from "../../Screens/Screens";
 import { GameController } from "../GameController";
+import { ServerMsg } from "../../../shared/types";
 
 export class MainMenu {
     private _UI: UserInterface;
@@ -52,7 +53,7 @@ export class MainMenu {
                 reset: {
                     menuTitle: "Stuck?",
                     click: () => {
-                        this._gameRoom.send("reset_position");
+                        this._gameRoom.send(ServerMsg.PLAYER_RESET_POSITION);
                     },
                 },
                 quit: {

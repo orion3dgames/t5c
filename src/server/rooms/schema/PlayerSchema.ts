@@ -8,7 +8,7 @@ import { NavMesh, Vector3 } from "../../../shared/Libs/yuka-min";
 import { InventorySchema, EquipmentSchema, AbilitySchema, LootSchema } from "../schema";
 import { GameRoomState } from "../state/GameRoomState";
 import { Entity } from "../schema/Entity";
-import { EntityState, ItemClass, PlayerSlots, PlayerKeys, CalculationTypes } from "../../../shared/types";
+import { EntityState, ItemClass, PlayerSlots, PlayerKeys, CalculationTypes, ServerMsg } from "../../../shared/types";
 import { nanoid } from "nanoid";
 import { Database } from "../../Database";
 import Logger from "../../utils/Logger";
@@ -195,7 +195,7 @@ export class PlayerSchema extends Entity {
                                 this._state._gameroom.database.updateCharacter(this.id, this);
 
                             // inform client he cand now teleport to new zone
-                            client.send("playerTeleportConfirm", element.to_map);
+                            client.send(ServerMsg.PLAYER_TELEPORT, element.to_map);
                         }
                     }
                 });

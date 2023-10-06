@@ -1,6 +1,7 @@
 import { Room, Client } from "@colyseus/core";
 import { ChatSchema } from "./schema/ChatSchema";
 import Logger from "../utils/Logger";
+import { ServerMsg } from "../../shared/types";
 
 export class ChatRoom extends Room {
     public maxClients = 64;
@@ -11,10 +12,10 @@ export class ChatRoom extends Room {
         Logger.info("[chat_room][onCreate] room created.", options);
 
         //For chat
-        this.onMessage("message", (client, message) => {
+        this.onMessage(ServerMsg.PLAYER_SEND_MESSAGE, (client, message) => {
             Logger.info("[chat_room][message] message received from " + client.sessionId, message);
 
-            this.broadcast("messages", this.generateMessage(client.sessionId, message));
+            this.broadcast(ServerMsg.CHAT_MESSAGE, this.generateMessage(client.sessionId, message));
         });
     }
 
@@ -25,7 +26,7 @@ export class ChatRoom extends Room {
         Logger.info("[chat_room][message] client joined " + client.sessionId, options);
 
         this.broadcast(
-            "messages",
+            ServerMsg.CHAT_MESSAGE,
             this.generateMessage(options.sessionId, {
                 type: "system",
                 name: options.name,

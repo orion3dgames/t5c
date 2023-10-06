@@ -4,6 +4,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { generatePanel, getBg } from "./Theme";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
+import { ServerMsg } from "../../../shared/types";
 
 export class RessurectBox {
     private _UI;
@@ -64,7 +65,7 @@ export class RessurectBox {
         revivePanel.addControl(reviveButton);
 
         reviveButton.onPointerDownObservable.add(() => {
-            this._gameRoom.send("revive_pressed");
+            this._gameRoom.send(ServerMsg.PLAYER_RESSURECT);
         });
     }
 

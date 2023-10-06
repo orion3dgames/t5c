@@ -1,7 +1,7 @@
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
-import { ItemClass } from "../../../shared/types";
+import { ItemClass, ServerMsg } from "../../../shared/types";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 
 export class InventoryDropdown {
@@ -51,12 +51,12 @@ export class InventoryDropdown {
         this._UI._playerUI.addControl(rect);
         this.dropdown = rect;
 
-        let actions = [];
+        let actions: any = [];
         if (item.class === ItemClass.ARMOR || item.class === ItemClass.WEAPON) {
             actions.push({
                 title: "Equip Item",
                 click: () => {
-                    this._gameRoom.send("use_item", inventory.i);
+                    this._gameRoom.send(ServerMsg.PLAYER_USE_ITEM, inventory.i);
                 },
             });
         }
@@ -64,14 +64,14 @@ export class InventoryDropdown {
             actions.push({
                 title: "Use Item",
                 click: () => {
-                    this._gameRoom.send("use_item", inventory.i);
+                    this._gameRoom.send(ServerMsg.PLAYER_USE_ITEM, inventory.i);
                 },
             });
         }
         actions.push({
             title: "Drop Item(s)",
             click: () => {
-                this._gameRoom.send("drop_item", { slot: inventory.i, drop_all: true });
+                this._gameRoom.send(ServerMsg.PLAYER_DROP_ITEM, { slot: inventory.i, drop_all: true });
             },
         });
 
@@ -79,7 +79,7 @@ export class InventoryDropdown {
             actions.push({
                 title: "Drop One",
                 click: () => {
-                    this._gameRoom.send("drop_item", { slot: inventory.i });
+                    this._gameRoom.send(ServerMsg.PLAYER_DROP_ITEM, { slot: inventory.i });
                 },
             });
         }
@@ -101,9 +101,7 @@ export class InventoryDropdown {
             button.thickness = 0;
             button.textBlock.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             button.textBlock.fontSize = "12px";
-
             rect.addControl(button);
-
             button.onPointerDownObservable.add(() => {
                 action.click();
                 this.hideDropdown();

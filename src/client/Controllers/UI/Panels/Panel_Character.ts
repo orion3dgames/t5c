@@ -5,6 +5,7 @@ import { Control } from "@babylonjs/gui/2D/controls/control";
 import { applyTheme, createButton } from "../Theme";
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Image } from "@babylonjs/gui/2D/controls/image";
+import { ServerMsg } from "../../../../shared/types";
 
 export class Panel_Character extends Panel {
     // inventory tab
@@ -285,7 +286,7 @@ export class Panel_Character extends Panel {
                 button.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
                 panelRectangle.addControl(button);
                 button.onPointerDownObservable.add(() => {
-                    this._gameRoom.send("add_stats_point", key);
+                    this._gameRoom.send(ServerMsg.PLAYER_ADD_STAT_POINT, key);
                 });
 
                 // push the value text to the left
@@ -348,7 +349,7 @@ export class Panel_Character extends Panel {
 
             slotPanel.onPointerClickObservable.add((e) => {
                 if (e.buttonIndex === 2) {
-                    this._gameRoom.send("unequip_item", item.key);
+                    this._gameRoom.send(ServerMsg.PLAYER_UNEQUIP_ITEM, item.key);
                 }
             });
 

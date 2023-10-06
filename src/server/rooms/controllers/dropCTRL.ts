@@ -5,6 +5,7 @@ import { GetLoot } from "../../../shared/Class/LootTable";
 import { nanoid } from "nanoid";
 import { LootSchema } from "../schema/LootSchema";
 import { PlayerSchema } from "../schema";
+import { ServerMsg } from "../../../shared/types";
 
 export class dropCTRL {
     private _owner: PlayerSchema;
@@ -40,7 +41,7 @@ export class dropCTRL {
             this._owner.player_data.points += 5;
 
             // inform player
-            this._client.send("notification", {
+            this._client.send(ServerMsg.SERVER_MESSAGE, {
                 type: "event",
                 message: "You've gained knowledge and are now level " + this._owner.level + ".",
                 date: new Date(),
@@ -57,7 +58,7 @@ export class dropCTRL {
             Logger.info(`[gameroom][addGold] player has gained ${gold} gold, total: ${this._owner.player_data.gold}`);
 
             // inform player
-            this._client.send("notification", {
+            this._client.send(ServerMsg.SERVER_MESSAGE, {
                 type: "event",
                 message: "You pick up " + gold + " worth of gold.",
                 date: new Date(),

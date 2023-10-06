@@ -15,7 +15,7 @@ import { Entity } from "./Entity";
 import { PlayerInput } from "../../client/Controllers/PlayerInput";
 import { UserInterface } from "../../client/Controllers/UserInterface";
 import State from "../../client/Screens/Screens";
-import { Ability } from "../../shared/types";
+import { Ability, ServerMsg } from "../../shared/types";
 
 export class Player extends Entity {
     public game;
@@ -143,7 +143,7 @@ export class Player extends Entity {
 
         // pick up item
         if (metadata.type === "item") {
-            this._room.send("pickup_item", metadata.sessionId);
+            this._room.send(ServerMsg.PLAYER_PICKUP, metadata.sessionId);
         }
 
         // move to clicked point
@@ -169,7 +169,7 @@ export class Player extends Entity {
                 }, 1000);
 
                 // send to server
-                this._room.send("move_to", {
+                this._room.send(ServerMsg.PLAYER_MOVE_TO, {
                     x: destination._x,
                     y: destination._y,
                     z: destination._z,
@@ -219,7 +219,7 @@ export class Player extends Entity {
             let target = this._game.selectedEntity;
 
             // send to server
-            this._room.send("entity_ability_key", {
+            this._room.send(ServerMsg.PLAYER_ABILITY_PRESSED, {
                 senderId: this._room.sessionId,
                 targetId: target ? target.sessionId : false,
                 digit: digit,
@@ -304,27 +304,27 @@ export class Player extends Entity {
     // server message handler
 
     public registerServerMessages() {
-        this._room.onMessage("notification", (data) => {
+        this._room.onMessage(ServerMsg.SERVER_MESSAGE, (data) => {
             this.ui._ChatBox.addNotificationMessage(data.type, data.message, data.message);
         });
 
         // on teleport confirmation
-        this._room.onMessage("playerTeleportConfirm", (location) => {
+        this._room.onMessage(ServerMsg.PLAYER_TELEPORT, (location) => {
             console.log(location);
             this.teleport(location);
         });
 
         // server confirm player can start casting
-        this._room.onMessage("ability_start_casting", (data) => {
+        this._room.onMessage(ServerMsg.PLAYER_CASTING_START, (data) => {
             this.startCasting(data);
         });
 
-        this._room.onMessage("ability_cancel_casting", (data) => {
+        this._room.onMessage(ServerMsg.PLAYER_CASTING_CANCEL, (data) => {
             this.stopCasting(data);
         });
 
         // server confirms ability can be cast
-        this._room.onMessage("entity_ability_cast", (data) => {
+        this._room.onMessage(ServerMsg.PLAYER_ABILITY_CAST, (data) => {
             let digit = data.digit;
             let ability = this.getAbilityByDigit(digit) as Ability;
             if (ability) {
