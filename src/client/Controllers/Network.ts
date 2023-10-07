@@ -39,7 +39,7 @@ export class Network {
         });
     }
 
-    public async joinOrCreateRoom(location, token, character_id): Promise<any> {
+    public async joinOrCreateRoom(location, token, character_id, sessionId): Promise<any> {
         // find all exisiting rooms
         let rooms = await this._client.getAvailableRooms("game_room");
 
@@ -64,6 +64,7 @@ export class Network {
             location: location,
             token: token,
             character_id: character_id,
+            sessionId: sessionId,
         });
     }
 }

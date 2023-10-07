@@ -80,13 +80,13 @@ export class UserInterface {
     _isDragging;
     _pointerDownPosition;
 
-    constructor(game: GameController, gameRoom: Room, chatRoom: Room, entities: (Entity | Player | Item)[], currentPlayer) {
+    constructor(game: GameController, entities: (Entity | Player | Item)[], currentPlayer) {
         // set var we will be needing
         this._game = game;
         this._scene = game.scene;
         this._engine = game.engine;
-        this._gameRoom = gameRoom;
-        this._chatRoom = chatRoom;
+        this._gameRoom = game.currentRoom;
+        this._chatRoom = game.currentChat;
         this._entities = entities;
         this._currentPlayer = currentPlayer;
         this._loadedAssets = this._game._loadedAssets;

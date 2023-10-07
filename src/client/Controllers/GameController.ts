@@ -4,6 +4,7 @@ import { apiUrl } from "../Utils/index";
 import { Network } from "./Network";
 import { AssetsController } from "./AssetsController";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
+import { Room } from "colyseus.js";
 
 export class GameController {
     // core
@@ -18,8 +19,11 @@ export class GameController {
     public nextScene;
 
     // all user data
-    public currentRoomID: string;
     public currentSessionID: string;
+    public currentChat: Room;
+    public currentRoom: Room;
+
+    // all user data
     public currentLocation;
     public currentLocationKey;
     public _currentUser;

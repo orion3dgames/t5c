@@ -106,7 +106,6 @@ export class GameRoomState extends Schema {
      */
     addPlayer(client: Client): void {
         // prepare player data
-
         let data = client.auth;
 
         let player_data = {
