@@ -102,7 +102,7 @@ class Api {
             const token: string = (req.query.token as string) ?? "";
             const name: string = (req.query.name as string) ?? "";
             const race: string = (req.query.race as string) ?? "";
-            const material: string = (req.query.material as string) ?? "";
+            const material: number = (req.query.material as number) ?? 0;
             if (token !== "") {
                 database.createCharacter(token, name, race, material).then((character) => {
                     if (!character) {
