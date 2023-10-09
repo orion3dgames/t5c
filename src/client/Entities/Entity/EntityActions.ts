@@ -225,9 +225,6 @@ export class EntityActions {
         projectile.rotate(new Vector3(0, 1, 0), Tools.ToRadians(180));
 
         var endVector = projectile.calcMovePOV(0, 0, 72).addInPlace(projectile.position);
-
-        console.log(start, endVector);
-
         var points = [start, endVector];
         var path = new Path3D(points);
         var i = 0;

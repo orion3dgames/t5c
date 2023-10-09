@@ -157,18 +157,14 @@ export class GameScene {
         // join global chat room if not already connected
         if (!this._game.currentChat) {
             this._game.currentChat = await this._game.client.joinChatRoom({ name: this._game._currentCharacter.name });
-            this._game.currentSessionID = this._game.currentChat.sessionId;
         }
 
         // join the game room and use chat room session ID
         this.room = await this._game.client.joinOrCreateRoom(
             this._game._currentCharacter.location,
             this._game._currentUser.token,
-            this._game._currentCharacter.id,
-            this._game.currentSessionID
+            this._game._currentCharacter.id
         );
-
-        this.room.sessionId = this._game.currentSessionID;
         this._game.currentRoom = this.room;
 
         if (this.room) {
@@ -204,7 +200,6 @@ export class GameScene {
         this.room.state.entities.onAdd((entity, sessionId) => {
             // if player
             if (entity.type === "player") {
-                console.log("TEST", this.room.sessionId, sessionId);
                 var isCurrentPlayer = sessionId === this.room.sessionId;
                 //////////////////
                 // if player type

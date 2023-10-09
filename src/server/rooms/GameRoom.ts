@@ -77,7 +77,6 @@ export class GameRoom extends Room<GameRoomState> {
     // authorize client based on provided options before WebSocket handshake is complete
     async onAuth(client: Client, authData: any, request: http.IncomingMessage) {
         let character = await Auth.check(this.database, authData);
-        character.sessionId = authData.sessionId;
         console.log("[onAuth]", authData);
         return character;
     }
@@ -87,7 +86,6 @@ export class GameRoom extends Room<GameRoomState> {
     //////////////////////////////////////////////////////////////////////////
     // on client join
     async onJoin(client: Client, options: any) {
-        client.sessionId = client.auth.sessionId;
         this.state.addPlayer(client);
     }
 

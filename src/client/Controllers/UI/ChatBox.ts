@@ -110,9 +110,6 @@ export class ChatBox {
         // focus chat
         chatInput.focus();
 
-        // add default chat message
-        //this.addNotificationMessage("system", this._currentPlayer.name + " has joined.", new Date());
-
         // intial refresh chatbox
         this._refreshChatBox();
     }
@@ -130,17 +127,15 @@ export class ChatBox {
             }
         });
 
+        this._chatRoom.onMessage(ServerMsg.SERVER_MESSAGE, (message: PlayerMessage) => {
+            message.color = this._colors["chat"];
+            this.addNotificationMessage("system", message.message, new Date());
+        });
+
         // receive message event
         this._chatRoom.onMessage(ServerMsg.CHAT_MESSAGE, (message: PlayerMessage) => {
-            if (!message.type) {
-                message.type = "chat";
-                message.color = this._colors["chat"];
-            }
-            if (message.type === "system") {
-                this.addNotificationMessage("system", message.message, new Date());
-            } else {
-                this.processMessage(message);
-            }
+            message.color = this._colors["chat"];
+            this.processMessage(message);
         });
     }
 
@@ -199,10 +194,10 @@ export class ChatBox {
         this._chatRoom.send(ServerMsg.PLAYER_SEND_MESSAGE, {
             name: this._currentPlayer.name,
             message: this._chatInput.text,
+            senderId: this._currentPlayer.sessionId,
         });
         this._chatInput.text = "";
         this._chatInput.focus();
-        //this._refreshChatBox();
     }
 
     // chat refresh

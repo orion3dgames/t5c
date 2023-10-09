@@ -121,7 +121,7 @@ export class PlayerInput {
         this._scene.onKeyboardObservable.add((kbInfo) => {
             switch (kbInfo.type) {
                 case KeyboardEventTypes.KEYDOWN:
-                    console.log(kbInfo.event.code);
+                    //console.log(kbInfo.event.code);
                     /*
                     if (kbInfo.event.code === "ArrowUp") {
                         this.left_arrow = true;
