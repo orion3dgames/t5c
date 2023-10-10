@@ -147,7 +147,7 @@ export class UserInterface {
         this._AbilityBar = new AbilityBar(this, currentPlayer);
 
         // create chat ui + events
-        this._ChatBox = new ChatBox(this._playerUI, this._chatRoom, currentPlayer, this._entities);
+        this._ChatBox = new ChatBox(this._playerUI, this._chatRoom, currentPlayer, this._entities, this._game);
 
         // create chat ui + events
         this._DamageText = new DamageText(this._namesUI, this._scene, this._entities);

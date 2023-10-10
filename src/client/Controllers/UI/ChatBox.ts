@@ -13,6 +13,7 @@ export class ChatBox {
     private _chatUI: StackPanel;
     private _chatUIScroll: ScrollViewer;
     private _chatRoom;
+    private _game;
     private _currentPlayer;
     private _entities;
     private _colors;
@@ -23,9 +24,10 @@ export class ChatBox {
 
     public messages: PlayerMessage[] = [];
 
-    constructor(_playerUI, _chatRoom, _currentPlayer, _entities) {
+    constructor(_playerUI, _chatRoom, _currentPlayer, _entities, _game) {
         this._playerUI = _playerUI;
         this._chatRoom = _chatRoom;
+        this._game = _game;
         this._currentPlayer = _currentPlayer;
         this._entities = _entities;
 
@@ -146,7 +148,7 @@ export class ChatBox {
 
     // process incoming messages
     public processMessage(message) {
-        this.messages.push(message);
+        this._game.currentChats.push(message);
         this._refreshChatBox();
         this.showChatMessage(message);
     }
@@ -166,7 +168,7 @@ export class ChatBox {
 
     // process incoming messages
     public processNotificationMessage(message) {
-        this.messages.push(message);
+        this._game.currentChats.push(message);
         this._refreshChatBox();
     }
 
@@ -216,7 +218,7 @@ export class ChatBox {
 
         this._chatUIScroll.verticalBar.value = 1;
 
-        this.messages.slice().forEach((msg: PlayerMessage) => {
+        this._game.currentChats.slice().forEach((msg: PlayerMessage) => {
             // container
             var headlineRect = new Rectangle("chatMsgRect_" + msg.createdAt);
             headlineRect.width = "100%";

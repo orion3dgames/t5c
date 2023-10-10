@@ -361,6 +361,7 @@ export class Player extends Entity {
     public async teleport(location) {
         // leave colyseus room
         await this._room.leave();
+        await this._game.currentChat.leave();
 
         // update auth data
         this._game.setLocation(location);

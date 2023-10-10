@@ -34,6 +34,7 @@ export class GameController {
     public camY: number;
     public latestError: string;
     public isMobile: boolean = false;
+    public currentChats = [];
 
     // all preloaded assets
     public _assetsCtrl: AssetsController;

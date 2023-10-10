@@ -155,9 +155,7 @@ export class GameScene {
 
     private async _initNetwork(): Promise<void> {
         // join global chat room if not already connected
-        if (!this._game.currentChat) {
-            this._game.currentChat = await this._game.client.joinChatRoom({ name: this._game._currentCharacter.name });
-        }
+        this._game.currentChat = await this._game.client.joinChatRoom({ name: this._game._currentCharacter.name });
 
         // join the game room and use chat room session ID
         this.room = await this._game.client.joinOrCreateRoom(
