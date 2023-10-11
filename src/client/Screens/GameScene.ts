@@ -155,7 +155,9 @@ export class GameScene {
 
     private async _initNetwork(): Promise<void> {
         // join global chat room if not already connected
-        this._game.currentChat = await this._game.client.joinChatRoom({ name: this._game._currentCharacter.name });
+        if (!this._game.currentChat) {
+            this._game.currentChat = await this._game.client.joinChatRoom({ name: this._game._currentCharacter.name });
+        }
 
         // join the game room and use chat room session ID
         this.room = await this._game.client.joinOrCreateRoom(
@@ -168,14 +170,12 @@ export class GameScene {
         if (this.room) {
             // set room onError evenmt
             this.room.onError((code, message) => {
-                this._game.setErrorCode("Something went wrong with the server (" + code + ": " + message + "), please try again later.");
                 this._game.setScene(State.LOGIN);
             });
 
             // set room onLeave event
             this.room.onLeave((code) => {
                 if (code === 1006) {
-                    this._game.setErrorCode("Something went wrong with the server (" + code + "), please try again later.");
                     this._game.setScene(State.LOGIN);
                 }
             });

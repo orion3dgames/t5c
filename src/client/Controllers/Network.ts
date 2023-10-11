@@ -3,7 +3,7 @@ import { Client, Room } from "colyseus.js";
 import { isLocal } from "../Utils";
 
 export class Network {
-    public _client;
+    public _client: Client;
 
     constructor(port) {
         // create colyseus client
@@ -39,14 +39,14 @@ export class Network {
         });
     }
 
-    public async joinOrCreateRoom(location, token, character_id, sessionId): Promise<any> {
+    public async joinOrCreateRoom(location, token, character_id): Promise<any> {
         // find all exisiting rooms
         let rooms = await this._client.getAvailableRooms("game_room");
 
         // rooms exists
         if (rooms.length > 0) {
             // do we already have a room for the specified location
-            let roomIdFound = false;
+            let roomIdFound: boolean | string = false;
             rooms.forEach((room) => {
                 if (room.metadata.location === location) {
                     roomIdFound = room.roomId;
@@ -64,7 +64,6 @@ export class Network {
             location: location,
             token: token,
             character_id: character_id,
-            sessionId: sessionId,
         });
     }
 }

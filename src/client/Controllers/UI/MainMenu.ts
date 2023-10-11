@@ -59,8 +59,7 @@ export class MainMenu {
                 quit: {
                     menuTitle: "Quit",
                     click: () => {
-                        this._gameRoom.leave();
-                        this._game.setScene(State.CHARACTER_SELECTION);
+                        this._currentPlayer.quit();
                     },
                 },
             },

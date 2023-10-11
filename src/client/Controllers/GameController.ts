@@ -10,7 +10,7 @@ export class GameController {
     // core
     public engine;
     public scene;
-    public client;
+    public client: Network;
     public config;
 
     // scene management

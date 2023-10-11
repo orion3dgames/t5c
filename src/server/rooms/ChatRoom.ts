@@ -4,7 +4,7 @@ import Logger from "../utils/Logger";
 import { ServerMsg } from "../../shared/types";
 
 export class ChatRoom extends Room {
-    public maxClients = 64;
+    public maxClients = 1000;
     public autoDispose = true;
 
     // When room is initialized
