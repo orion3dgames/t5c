@@ -70,12 +70,17 @@ export class Entity {
     public ai_state: number = 0;
     public isDead: boolean = false;
     public isDeadUI: boolean = false;
+    public spawn_id: string = "";
 
     //
     public abilities = [];
     public inventory = [];
     public equipment = [];
 
+    // interactable
+    public spwanInfo;
+    public interactableButtons;
+    
     // raceData
     public rotationFix;
     public meshIndex;
@@ -109,6 +114,9 @@ export class Entity {
 
         // set entity
         Object.assign(this, this.entity);
+
+        // get spawnInfo
+        this.spwanInfo = this._game.currentLocation.dynamic.spawns[this.spawn_id] ?? null;
 
         // get material
         this.debugMaterialActive = this._scene.getMaterialByName("debug_entity_active");
@@ -171,6 +179,7 @@ export class Entity {
         // misc
         this.characterLabel = this.ui.createEntityLabel(this);
         this.characterChatLabel = this.ui.createEntityChatLabel(this);
+        this.interactableButtons = this.ui.createInteractableButtons(this)
     }
 
     public update(delta): any {

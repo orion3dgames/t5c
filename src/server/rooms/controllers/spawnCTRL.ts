@@ -34,6 +34,7 @@ export class spawnCTRL {
         let spawns = dynamic.spawns ?? [];
         spawns.forEach((spawnInfo, index) => {
             spawnInfo.spawnIndex = "_" + index;
+            spawnInfo.index = index;
             if (!this.spawnsAmount[spawnInfo.spawnIndex]) {
                 this.spawnsAmount[spawnInfo.spawnIndex] = 0;
             }
@@ -112,6 +113,7 @@ export class spawnCTRL {
             anim_state: EntityState.IDLE,
             toRegion: false,
             AI_SPAWN_INFO: spawnInfo,
+            spawn_id: spawnInfo.index,
             initial_equipment: spawnInfo.equipment,
         };
 

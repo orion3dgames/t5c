@@ -34,6 +34,7 @@ export class BrainSchema extends Entity {
     @type("boolean") public blocked: boolean = false; // if true, used to block player and to prevent movement
     @type("int8") public anim_state: EntityState = EntityState.IDLE;
     @type("number") public ai_state: AI_STATE = 0;
+    @type("number") public spawn_id = 0;
 
     @type({ map: EquipmentSchema }) equipment = new MapSchema<EquipmentSchema>();
 

@@ -40,6 +40,7 @@ let LocationsDB = {
             ],
             spawns: [
                 {
+                    id: "spawn_01",
                     type: "area",
                     behaviour: "patrol",
                     aggressive: true,
@@ -76,6 +77,7 @@ let LocationsDB = {
                     ],
                 },
                 {
+                    id: "spawn_02",
                     type: "path",
                     behaviour: "patrol",
                     aggressive: true,
@@ -87,6 +89,7 @@ let LocationsDB = {
                     name: "Rogue",
                 },
                 {
+                    id: "spawn_03",
                     type: "static",
                     behaviour: "idle",
                     aggressive: false,
@@ -98,6 +101,7 @@ let LocationsDB = {
                     name: "Alexander The Righteous",
                 },
                 {
+                    id: "spawn_04",
                     type: "static",
                     behaviour: "idle",
                     aggressive: false,
@@ -107,8 +111,14 @@ let LocationsDB = {
                     race: "male_mage",
                     material: 2,
                     name: "Alice",
+                    interactable: {
+                        'heal': {
+
+                        }
+                    }
                 },
                 {
+                    id: "spawn_05",
                     type: "static",
                     behaviour: "idle",
                     aggressive: false,
@@ -121,32 +131,35 @@ let LocationsDB = {
                     name: "Harmless Dummy",
                     baseHealth: 5000,
                     interactable: {
-                        distance: 2,
-                        type: "dialog",
-                        data: [
-                            {
-                                text: "Hi, I'm a target practise dummy, welcome @PlayerName ",
-                                buttons: [{ label: "Welcome", goToDialog: 1 }],
-                            },
-                            {
-                                text: "Are you in search of healing?",
-                                buttons: [
-                                    { label: "Yes", goToDialog: 2 },
-                                    { label: "No", goToDialog: 3 },
-                                ],
-                            },
-                            {
-                                text: "Ok, please do not move while I heal you!",
-                                isEndOfDialog: true,
-                                triggeredByClosing: (owner) => {
-                                    owner.heal();
+                        'talk': {
+                            data: [
+                                {
+                                    text: "Hi, I'm a target practise dummy, welcome @PlayerName ",
+                                    buttons: [{ label: "Welcome", goToDialog: 1 }],
                                 },
-                            },
-                            {
-                                text: "Oh!, Do come back when you're in need.",
-                                isEndOfDialog: true,
-                            },
-                        ],
+                                {
+                                    text: "Are you in search of healing?",
+                                    buttons: [
+                                        { label: "Yes", goToDialog: 2 },
+                                        { label: "No", goToDialog: 3 },
+                                    ],
+                                },
+                                {
+                                    text: "Ok, please do not move while I heal you!",
+                                    isEndOfDialog: true,
+                                    triggeredByClosing: (owner) => {
+                                        owner.heal();
+                                    },
+                                },
+                                {
+                                    text: "Oh!, Do come back when you're in need.",
+                                    isEndOfDialog: true,
+                                },
+                            ]
+                        },
+                        'shop': {
+                            
+                        }
                     },
                 },
             ],

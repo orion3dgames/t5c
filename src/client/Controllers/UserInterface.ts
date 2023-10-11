@@ -34,6 +34,8 @@ import { Item } from "../Entities/Item";
 import { HighlightLayer } from "@babylonjs/core/Layers/highlightLayer";
 import { Panel } from "./UI/Panels/Panel";
 import { GameController } from "./GameController";
+import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
+import { ServerMsg } from "../../shared/types";
 
 export class UserInterface {
     public _game: GameController;
@@ -299,7 +301,7 @@ export class UserInterface {
         rect1.thickness = 0;
         rect1.zIndex = this._namesUI.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
-        rect1.linkOffsetY = -100;
+        rect1.linkOffsetY = -80;
         var label = new TextBlock("player_nameplate_text_" + entity.sessionId);
         label.text = entity.name;
         label.color = "white";
@@ -329,6 +331,59 @@ export class UserInterface {
         label.outlineWidth = 3;
         label.outlineColor = "white";
         rect1.addControl(label);
+        return rect1;
+    }
+    
+    public createInteractableButtons(entity){
+
+        if(!entity.spwanInfo) return false;
+
+        if(!entity.spwanInfo.interactable) return false;
+
+        var rect1 = new Rectangle("entity_buttons_" + entity.sessionId);
+        rect1.isVisible = false;
+        rect1.width = "100px";
+        rect1.height = "200px";
+        rect1.thickness = 0;
+        rect1.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        rect1.zIndex = this._namesUI.addControl(rect1);
+        rect1.linkWithMesh(entity.mesh);
+        rect1.linkOffsetY = -200;
+        
+        const rightStackPanel = new StackPanel("rightStackPanel");
+        rightStackPanel.left = 0;
+        rightStackPanel.top = 0;
+        rightStackPanel.width = 1;
+        rightStackPanel.height = 1;
+        rightStackPanel.spacing = 5;
+        rightStackPanel.adaptHeightToChildren = true;
+        rightStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        rightStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        rightStackPanel.setPaddingInPixels(5, 5, 5, 5);
+        rightStackPanel.isVertical = true;
+        rect1.addControl(rightStackPanel);
+
+        for(let type in entity.spwanInfo.interactable){
+            const createBtn = Button.CreateSimpleButton("characterBtn", type);
+            createBtn.left = "0px;";
+            createBtn.top = "0px";
+            createBtn.width = 1;
+            createBtn.height = "30px";
+            createBtn.background = "orange";
+            createBtn.color = "white";
+            createBtn.thickness = 1;
+            createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+            rightStackPanel.addControl(createBtn);
+
+            createBtn.onPointerDownObservable.add(() => {
+                this._gameRoom.send(ServerMsg.ENTITY_INTERACT_START, {
+                    type: type,
+                    target: entity.sessionId,
+                });
+            });
+        }
+        
         return rect1;
     }
 }

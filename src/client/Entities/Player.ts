@@ -34,6 +34,9 @@ export class Player extends Entity {
     public player_data;
     public moveDecal;
 
+    public closestEntity;
+    public closestEntityDistance;
+
     constructor(
         entity: PlayerSchema,
         room: Room,
@@ -117,7 +120,7 @@ export class Player extends Entity {
         let target = this.entities[metadata.sessionId];
 
         if (target) {
-            this._room.send(ServerMsg.ENTITY_INTERACT, target.sessionId);
+            this._room.send(ServerMsg.ENTITY_INTERACT_START, target.sessionId);
         }
     }
 
@@ -181,8 +184,6 @@ export class Player extends Entity {
         }
     }
 
-    public updateSlowRate() {}
-
     // update at engine rate 60fps
     public update(delta) {
         super.update(delta);
@@ -199,8 +200,38 @@ export class Player extends Entity {
         this.cameraController.follow();
     }
 
+    public findCloseToInteractableEntity(){
+        let closestDistance = 1000000;
+        for(let sessionId in this.entities){
+            let entity = this.entities[sessionId];
+            if (entity.type === "entity" && entity.interactableButtons) {
+                entity.interactableButtons.isVisible = false;
+                let playerPos = this.getPosition();
+                let entityPos = entity.getPosition();
+                let distanceBetween = Vector3.Distance(playerPos, entityPos);
+                if (distanceBetween < closestDistance) {
+                    closestDistance = distanceBetween;
+                    this.closestEntity = entity;
+                    this.closestEntityDistance = closestDistance;
+                }
+            }
+        };
+        if(this.closestEntity){
+            console.log('Closest Entity', this.closestEntity.name, closestDistance);
+        }
+    }
+
     // update at server rate
     public updateServerRate(delta) {
+
+        // look for any close entities.
+        this.findCloseToInteractableEntity();
+        
+        // 
+        if(this.closestEntityDistance < 5 && this.closestEntity.interactableButtons){
+            this.closestEntity.interactableButtons.isVisible = true;
+        }
+
         // only show meshes close to us
         let currentPos = this.getPosition();
         let key = "ENV_" + this._game.currentLocation.mesh;

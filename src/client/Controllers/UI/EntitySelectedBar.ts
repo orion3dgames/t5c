@@ -44,14 +44,14 @@ export class EntitySelectedBar {
 
     _createUI() {
         let alignHoriz = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        let panelWidth = 260;
-        let barWidth = 198;
+        let panelWidth = 250;
+        let barWidth = 188;
 
         let leftMargin = 15;
         let topMargin = 15;
         if (this._options.panelName === "target") {
-            leftMargin = 80;
-            topMargin = 90;
+            leftMargin = 275;
+            topMargin = 15;
         }
         ////////////////////////////////////
         //////////////////// panel

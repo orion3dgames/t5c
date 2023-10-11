@@ -28,8 +28,8 @@ let RacesDB: raceDataMap = {
         },
         baseHealth: 50,
         baseMana: 50,
-        healthRegen: 0.2,
-        manaRegen: 0.4, // per second
+        healthRegen: 0.1,
+        manaRegen: 0.1, // per second
         experienceGain: { min: 0, max: 0 },
         goldGain: { min: 0, max: 0 },
         drops: [],
