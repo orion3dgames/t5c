@@ -107,33 +107,6 @@ let LocationsDB = {
                     race: "male_mage",
                     material: 2,
                     name: "Alice",
-                    interactable: {
-                        distance: 2,
-                        dialog: [
-                            {
-                                text: "Hi, I'm Alice, welcome @PlayerName ",
-                            },
-                            {
-                                text: "Are you in search of healing?",
-                                isQuestion: true,
-                                buttons: [
-                                    { label: "Yes", goToDialog: 2 },
-                                    { label: "No", goToDialog: 3 },
-                                ],
-                            },
-                            {
-                                text: "Ok, please do not move while I heal you!",
-                                isEndOfDialog: true,
-                                triggeredByClosing: (owner) => {
-                                    owner.heal();
-                                },
-                            },
-                            {
-                                text: "Ok, please come back later if you're in need of healing.",
-                                isEndOfDialog: true,
-                            },
-                        ],
-                    },
                 },
                 {
                     type: "static",
@@ -147,6 +120,34 @@ let LocationsDB = {
                     material: 1,
                     name: "Harmless Dummy",
                     baseHealth: 5000,
+                    interactable: {
+                        distance: 2,
+                        type: "dialog",
+                        data: [
+                            {
+                                text: "Hi, I'm a target practise dummy, welcome @PlayerName ",
+                                buttons: [{ label: "Welcome", goToDialog: 1 }],
+                            },
+                            {
+                                text: "Are you in search of healing?",
+                                buttons: [
+                                    { label: "Yes", goToDialog: 2 },
+                                    { label: "No", goToDialog: 3 },
+                                ],
+                            },
+                            {
+                                text: "Ok, please do not move while I heal you!",
+                                isEndOfDialog: true,
+                                triggeredByClosing: (owner) => {
+                                    owner.heal();
+                                },
+                            },
+                            {
+                                text: "Oh!, Do come back when you're in need.",
+                                isEndOfDialog: true,
+                            },
+                        ],
+                    },
                 },
             ],
         },

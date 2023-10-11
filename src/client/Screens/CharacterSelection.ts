@@ -188,7 +188,7 @@ export class CharacterSelectionScene {
 
                 const characterBloc = new Rectangle("characterBloc" + char.id);
                 characterBloc.width = 1;
-                characterBloc.height = "70px;";
+                characterBloc.height = "100px;";
                 characterBloc.background = bgColor;
                 characterBloc.thickness = 1;
                 characterBloc.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
@@ -205,9 +205,10 @@ export class CharacterSelectionScene {
                 img.width = "40px;";
                 img.height = "40px;";
                 img.left = "20px";
+                img.top = "20px";
                 img.stretch = Image.STRETCH_FILL;
                 img.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-                img.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+                img.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
                 characterBloc.addControl(img);
 
                 const characterName = new TextBlock("characterName", char.name);
@@ -234,8 +235,21 @@ export class CharacterSelectionScene {
                 characterDetails.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
                 characterBloc.addControl(characterDetails);
 
-                characterBloc.onPointerDownObservable.add(() => {
-                    this.selectCharacter(k, char);
+                const createBtn = Button.CreateSimpleButton("characterBtn-" + char.id, "PLAY");
+                createBtn.left = "80px;";
+                createBtn.top = "60px";
+                createBtn.width = "100px";
+                createBtn.height = "30px";
+                createBtn.background = "orange";
+                createBtn.color = "white";
+                createBtn.thickness = 1;
+                createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+                createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+                characterBloc.addControl(createBtn);
+
+                createBtn.onPointerDownObservable.add(() => {
+                    this._game.setCharacter(char);
+                    this._game.setScene(State.GAME);
                 });
 
                 i++;

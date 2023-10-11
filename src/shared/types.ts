@@ -78,6 +78,9 @@ export enum ServerMsg {
     PLAYER_CASTING_START,
     PLAYER_CASTING_CANCEL,
     PLAYER_TELEPORT,
+    ENTITY_INTERACT,
+    ENTITY_INTERACT_NEXT,
+    ENTITY_INTERACT_END,
 }
 
 //////////////////////////////////////////////////////////////

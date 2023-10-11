@@ -50,7 +50,6 @@ export class GameRoomState extends Schema {
     }
 
     public async start() {
-        console.log("START");
         // load game data
         // in the future, it'll be in the database
         this.gameData = new gameDataCTRL();
@@ -260,6 +259,12 @@ export class GameRoomState extends Schema {
             if (item) {
                 playerState.unequipItem(item.key, item.slot);
             }
+        }
+
+        /////////////////////////////////////
+        // on player unequip
+        if (type === ServerMsg.ENTITY_INTERACT) {
+            playerState.interact(data);
         }
 
         /////////////////////////////////////

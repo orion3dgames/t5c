@@ -109,7 +109,6 @@ export class Player extends Entity {
         return pointerInfo._pickInfo.pickedMesh.metadata;
     }
 
-    // display nameplate for a certain time for any entity right clicked
     public rightClick(pointerInfo) {
         let metadata = this.getMeshMetadata(pointerInfo);
 
@@ -118,13 +117,7 @@ export class Player extends Entity {
         let target = this.entities[metadata.sessionId];
 
         if (target) {
-            // show entity label
-            target.characterLabel.isVisible = true;
-
-            // hide it automatically after PLAYER_NAMEPLATE_TIMEOUT
-            setTimeout(function () {
-                target.characterLabel.isVisible = false;
-            }, this._game.config.PLAYER_NAMEPLATE_TIMEOUT);
+            this._room.send(ServerMsg.ENTITY_INTERACT, target.sessionId);
         }
     }
 
@@ -139,6 +132,16 @@ export class Player extends Entity {
             let targetSessionId = metadata.sessionId;
             let target = this.entities[targetSessionId];
             this._game.selectedEntity = target;
+
+            // display nameplate for a certain time for any entity right clicked
+            // show entity label
+            target.characterLabel.isVisible = true;
+
+            // hide it automatically after PLAYER_NAMEPLATE_TIMEOUT
+            setTimeout(function () {
+                target.characterLabel.isVisible = false;
+            }, this._game.config.PLAYER_NAMEPLATE_TIMEOUT);
+            /////////////////////////
         }
 
         // pick up item
@@ -321,6 +324,13 @@ export class Player extends Entity {
 
         this._room.onMessage(ServerMsg.PLAYER_CASTING_CANCEL, (data) => {
             this.stopCasting(data);
+        });
+
+        this._room.onMessage(ServerMsg.ENTITY_INTERACT_NEXT, (data) => {
+            console.log("ENTITY_INTERACT_NEXT", data);
+        });
+        this._room.onMessage(ServerMsg.ENTITY_INTERACT_END, (data) => {
+            console.log("ENTITY_INTERACT_END", data);
         });
 
         // server confirms ability can be cast

@@ -63,7 +63,7 @@ class App {
         await this.game.initializeGameData();
 
         // set default scene
-        let defaultScene = isLocal() ? State.CHARACTER_SELECTION : State.LOGIN;
+        let defaultScene = isLocal() ? State.GAME : State.LOGIN;
         this.game.setScene(defaultScene);
 
         // main render loop & state machine

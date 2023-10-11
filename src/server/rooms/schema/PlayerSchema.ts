@@ -4,8 +4,9 @@ import { GameRoom } from "../GameRoom";
 import { abilitiesCTRL } from "../controllers/abilityCTRL";
 import { animationCTRL } from "../controllers/animationCTRL";
 import { moveCTRL } from "../controllers/moveCTRL";
+import { dynamicCTRL } from "../controllers/dynamicCTRL";
 import { NavMesh, Vector3 } from "../../../shared/Libs/yuka-min";
-import { InventorySchema, EquipmentSchema, AbilitySchema, LootSchema } from "../schema";
+import { InventorySchema, EquipmentSchema, AbilitySchema, LootSchema, BrainSchema } from "../schema";
 import { GameRoomState } from "../state/GameRoomState";
 import { Entity } from "../schema/Entity";
 import { EntityState, ItemClass, PlayerSlots, PlayerKeys, CalculationTypes, ServerMsg } from "../../../shared/types";
@@ -73,6 +74,9 @@ export class PlayerSchema extends Entity {
     public isMoving: boolean = false;
     public isDead: boolean = false;
     public isTeleporting: boolean = false;
+    public isInteracting;
+    public interactingStep: number = 0;
+    public interactingTarget: BrainSchema;
 
     // controllers
     public _navMesh: NavMesh;
@@ -81,6 +85,7 @@ export class PlayerSchema extends Entity {
     public abilitiesCTRL: abilitiesCTRL;
     public moveCTRL: moveCTRL;
     public animationCTRL: animationCTRL;
+    public dynamicCTRL: dynamicCTRL;
 
     // TIMER
     public spawnTimer: number = 0;
@@ -136,6 +141,7 @@ export class PlayerSchema extends Entity {
         this.abilitiesCTRL = new abilitiesCTRL(this, data);
         this.moveCTRL = new moveCTRL(this);
         this.animationCTRL = new animationCTRL(this);
+        this.dynamicCTRL = new dynamicCTRL(this);
 
         //
         this.start();
@@ -168,38 +174,8 @@ export class PlayerSchema extends Entity {
                 this.health += this.healthRegen;
             }
 
-            // check
-            let interactive = this._state.roomDetails.dynamic.interactive ?? [];
-            if (interactive.length > 0) {
-                let currentPos = this.getPosition();
-                interactive.forEach((element) => {
-                    let distanceTo = currentPos.distanceTo(element.from);
-                    if (distanceTo < 2) {
-                        if (element.type === "teleport") {
-                            this.x = element.to_vector.x;
-                            this.y = element.to_vector.y;
-                            this.z = element.to_vector.z;
-                        }
-
-                        if (element.type == "zone_change" && this.isTeleporting === false) {
-                            this.isTeleporting = true;
-
-                            let client = this._state._gameroom.clients.getById(this.sessionId);
-
-                            // update player location in database
-                            this.location = element.to_map;
-                            (this.x = element.to_vector.x),
-                                (this.y = element.to_vector.y),
-                                (this.z = element.to_vector.z),
-                                (this.rot = 0),
-                                this._state._gameroom.database.updateCharacter(this.id, this);
-
-                            // inform client he cand now teleport to new zone
-                            client.send(ServerMsg.PLAYER_TELEPORT, element.to_map);
-                        }
-                    }
-                });
-            }
+            // update dynamic stuuf
+            this.dynamicCTRL.update();
 
             // move player
             this.moveCTRL.update();
@@ -460,5 +436,9 @@ export class PlayerSchema extends Entity {
             this.AI_TARGET_POSITION = targetPos;
             this.AI_TARGET_DISTANCE = distanceBetween;
         }
+    }
+
+    interact(sessionId: string) {
+        this.dynamicCTRL.process(sessionId);
     }
 }
