@@ -67,14 +67,12 @@ export class CharacterSelectionScene {
         }
 
         this.generateleftPanel();
-        this.generateRightPanel();
+        //this.generateRightPanel();
 
         if (user.characters.length > 0) {
             let index = user.characters.length - 1;
             this.selectCharacter(index, user.characters[index]);
         }
-
-        this.resize();
     }
 
     generateleftPanel() {
@@ -86,7 +84,7 @@ export class CharacterSelectionScene {
         leftColumnRect.height = 1;
         leftColumnRect.background = "#000000";
         leftColumnRect.thickness = 0;
-        leftColumnRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        leftColumnRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         leftColumnRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         this._ui.addControl(leftColumnRect);
 
@@ -255,95 +253,5 @@ export class CharacterSelectionScene {
 
         // set current selected
         this.charactersUI[index].background = "green";
-
-        // update right panel
-        this.generateCharacterPanel();
-    }
-
-    resize() {
-        this.generateRightPanel();
-        this.generateCharacterPanel();
-
-        //
-        let totalHeight = this._engine.getRenderHeight();
-        this.scrollViewerBloc.height = totalHeight - 185 + "px";
-
-        let totalWidth = this._engine.getRenderWidth();
-        this.rightColumnRect.width = totalWidth - 320 + "px";
-    }
-
-    generateRightPanel() {
-        if (this.rightColumnRect) {
-            this.rightColumnRect.dispose();
-        }
-
-        let totalWidth = this._engine.getRenderWidth();
-
-        // right columm
-        const rightColumnRect = new Rectangle("rightColumnRect");
-        rightColumnRect.top = 0;
-        rightColumnRect.left = "320px;";
-        rightColumnRect.width = totalWidth - 320 + "px";
-        rightColumnRect.height = 1;
-        rightColumnRect.background = "rgba(255,255,255,.1)";
-        rightColumnRect.thickness = 0;
-        rightColumnRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        rightColumnRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        this._ui.addControl(rightColumnRect);
-        this.rightColumnRect = rightColumnRect;
-    }
-
-    generateCharacterPanel() {
-        if (this.selectedCharacter) {
-            if (this.rightColumnRect) {
-                this.rightColumnRect.getDescendants().forEach((el) => {
-                    el.dispose();
-                });
-            }
-
-            let char = this.selectedCharacter;
-
-            const characterName = new TextBlock("characterName", char.name);
-            characterName.width = 1;
-            characterName.height = "30px";
-            characterName.color = "white";
-            characterName.left = "00px";
-            characterName.top = "40px";
-            characterName.fontSize = "32px";
-            characterName.fontWeight = "bold";
-            characterName.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-            characterName.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-            characterName.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-            this.rightColumnRect.addControl(characterName);
-
-            const characterDetails = new TextBlock("characterDetails", "Level: " + char.level);
-            characterDetails.width = 1;
-            characterDetails.height = "40px";
-            characterDetails.color = "white";
-            characterDetails.left = "0px";
-            characterDetails.top = "90px";
-            characterDetails.fontSize = "20px";
-            characterDetails.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-            characterDetails.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-            characterDetails.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-            this.rightColumnRect.addControl(characterDetails);
-
-            const createBtn = Button.CreateSimpleButton("characterBtn-" + char.id, "PLAY CHARACTER");
-            createBtn.left = "0px;";
-            createBtn.top = "-70px";
-            createBtn.width = "200px";
-            createBtn.height = "30px";
-            createBtn.background = "orange";
-            createBtn.color = "white";
-            createBtn.thickness = 1;
-            createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-            createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-            this.rightColumnRect.addControl(createBtn);
-
-            createBtn.onPointerDownObservable.add(() => {
-                this._game.setCharacter(char);
-                this._game.setScene(State.GAME);
-            });
-        }
     }
 }
