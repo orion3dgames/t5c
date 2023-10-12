@@ -145,8 +145,10 @@ let LocationsDB = {
                                 {
                                     text: "Ok, please do not move while I heal you!",
                                     isEndOfDialog: true,
-                                    triggeredByClosing: (owner) => {
-                                        owner.heal();
+                                    triggeredByClosing: {
+                                        type: "cast_ability",
+                                        ability: "heal",
+                                        target: "target"
                                     },
                                 },
                                 {

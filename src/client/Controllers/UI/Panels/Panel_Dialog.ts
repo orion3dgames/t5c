@@ -37,6 +37,9 @@ export class Panel_Dialog extends Panel {
             this.currentEntity = entity;
             this.currentDialog = entity.spwanInfo.interactable[type].data;
             this.currentDialogStep = 0;
+
+            this._panelTitle.text = entity.name;
+
             this.nextStep(this.currentDialogStep);
         }
     }
@@ -50,7 +53,11 @@ export class Panel_Dialog extends Panel {
 
         let currentDialog = this.currentDialog[step];
 
-        this.dialogText.text = currentDialog.text;
+        // replace keywords
+        let dialogText = currentDialog.text;
+        dialogText = dialogText.replace("@PlayerName", this._currentPlayer.name);
+
+        this.dialogText.text = dialogText;
 
         console.log("currentDialog", currentDialog);
 
@@ -75,6 +82,12 @@ export class Panel_Dialog extends Panel {
             createBtn.onPointerDownObservable.add(() => {
                 this.close();
             });
+
+            // if event
+            if(currentDialog.triggeredByClosing){
+                this.processEvent(currentDialog.triggeredByClosing);
+            }
+
         } else if (currentDialog.buttons) {
             // create buttons
             let left = 0;
@@ -97,6 +110,25 @@ export class Panel_Dialog extends Panel {
 
                 left += 110;
             });
+        }
+    }
+
+    public processEvent(event){
+        
+        if(event.type === 'cast_ability'){
+
+            this._currentPlayer.actionsController.process(
+                this._currentPlayer, 
+                {
+                    key: event.ability,
+                    fromId: this.currentEntity.sessionId,
+                    fromPos: this.currentEntity.getPosition(),
+                    targetId: this._currentPlayer.sessionId,
+                    targetPos: this._currentPlayer.getPosition(),
+                }, 
+                this._game.getGameData("ability", event.ability)
+            );
+
         }
     }
 
