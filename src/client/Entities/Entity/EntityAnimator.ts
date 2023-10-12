@@ -91,10 +91,13 @@ export class EntityAnimator {
     ///////////////////////////
     // todo: to be improved so we can better control the states... have no idea how yet
     public animate(player, currentPos, nextPos): void {
+        player.isMoving = false;
+
         // if player is moving
         // note to myself: when a players dies, the below still considers the player is moving... to be improved.
         if (this.checkIfPlayerIsMoving(currentPos, nextPos) && player.health > 0) {
             this._currentAnim = this._walk;
+            player.isMoving = true;
 
             // if player has died
         } else if (player.anim_state === EntityState.DEAD) {

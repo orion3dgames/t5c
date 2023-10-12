@@ -19,10 +19,11 @@ export class Panel {
     public _scene: Scene;
     public _currentPlayer;
     public _loadedAssets;
-    private _options;
+    public _options;
 
     // panel stuff
-    private _panel;
+    public _panel;
+    public _panelTitle;
     public _panelContent;
 
     // drag stuff
@@ -50,6 +51,7 @@ export class Panel {
             height: options.height ?? 1,
             top: options.top ?? "0px",
             left: options.left ?? "0px",
+            stayOpen: options.stayOpen ?? false,
         };
 
         //
@@ -92,7 +94,7 @@ export class Panel {
         panelContent.top = "30px;";
         panelContent.left = 0;
         panelContent.width = 1;
-        panelContent.height = 1;
+        panelContent.height = 0.9;
         panelContent.thickness = 0;
         panelContent.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         panelContent.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
@@ -126,6 +128,7 @@ export class Panel {
         panelTitle.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         panelTitle.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         panelHeader.addControl(panelTitle);
+        this._panelTitle = panelTitle;
 
         // close button
         const mainPanelClose = Button.CreateSimpleButton("mainPanelClose", "X");
@@ -154,7 +157,13 @@ export class Panel {
     }
 
     // open panel
-    public open() {
+    public open(): void {
+        if (!this._options.stayOpen) {
+            this._UI.panelAbilities._panel.isVisible = false;
+            this._UI.panelCharacter._panel.isVisible = false;
+            this._UI.panelHelp._panel.isVisible = false;
+        }
+
         // if already open, close panel
         if (this._panel.isVisible) {
             this._panel.isVisible = false;

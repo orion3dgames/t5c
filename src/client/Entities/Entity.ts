@@ -70,6 +70,7 @@ export class Entity {
     public ai_state: number = 0;
     public isDead: boolean = false;
     public isDeadUI: boolean = false;
+    public isMoving: boolean = false;
     public spawn_id: string = "";
 
     //
@@ -80,7 +81,7 @@ export class Entity {
     // interactable
     public spwanInfo;
     public interactableButtons;
-    
+
     // raceData
     public rotationFix;
     public meshIndex;
@@ -179,7 +180,7 @@ export class Entity {
         // misc
         this.characterLabel = this.ui.createEntityLabel(this);
         this.characterChatLabel = this.ui.createEntityChatLabel(this);
-        this.interactableButtons = this.ui.createInteractableButtons(this)
+        this.interactableButtons = this.ui.createInteractableButtons(this);
     }
 
     public update(delta): any {

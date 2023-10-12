@@ -73,7 +73,6 @@ export class Panel_Inventory extends Panel {
 
         // if already exists
         panel.children.forEach((el) => {
-            console.log(el.name);
             el.dispose();
         });
 

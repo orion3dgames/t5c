@@ -200,9 +200,9 @@ export class Player extends Entity {
         this.cameraController.follow();
     }
 
-    public findCloseToInteractableEntity(){
+    public findCloseToInteractableEntity() {
         let closestDistance = 1000000;
-        for(let sessionId in this.entities){
+        for (let sessionId in this.entities) {
             let entity = this.entities[sessionId];
             if (entity.type === "entity" && entity.interactableButtons) {
                 entity.interactableButtons.isVisible = false;
@@ -215,23 +215,32 @@ export class Player extends Entity {
                     this.closestEntityDistance = closestDistance;
                 }
             }
-        };
-        if(this.closestEntity){
-            console.log('Closest Entity', this.closestEntity.name, closestDistance);
+        }
+        if (this.closestEntity) {
+            console.log("Closest Entity", this.closestEntity.name, closestDistance);
         }
     }
 
     // update at server rate
     public updateServerRate(delta) {
+        ///////////// DIALOG ///////////////////////////
+        // if moving, look for the closest interactable entities.
+        if (this.isMoving) {
+            // look for
+            this.findCloseToInteractableEntity();
 
-        // look for any close entities.
-        this.findCloseToInteractableEntity();
-        
-        // 
-        if(this.closestEntityDistance < 5 && this.closestEntity.interactableButtons){
-            this.closestEntity.interactableButtons.isVisible = true;
+            // if close enough, show interactable button
+            if (this.closestEntityDistance < 5 && this.closestEntity.interactableButtons) {
+                this.closestEntity.interactableButtons.isVisible = true;
+            }
+
+            // if far enough, hide interactable button & any open dialog
+            if (this.closestEntityDistance > 5 && this.closestEntity.interactableButtons) {
+                this.ui.panelDialog.close();
+            }
         }
 
+        ///////////// ENVIRONMENT LOD ///////////////////////////
         // only show meshes close to us
         let currentPos = this.getPosition();
         let key = "ENV_" + this._game.currentLocation.mesh;
@@ -246,6 +255,7 @@ export class Player extends Entity {
             }
         });
 
+        ///////////// ABILITY & CASTING EVENTS ///////////////////////////
         // if digit pressed
         if (this._input.digit_pressed > 0 && !this.isCasting) {
             // get all necessary vars
@@ -287,12 +297,15 @@ export class Player extends Entity {
             }
         });
 
+        ///////////// RESSURECT EVENTS ///////////////////////////
+        // if dead
         if (!this.isDeadUI && this.health < 1) {
             this.ui._RessurectBox.open();
             this.cameraController.bw(true);
             this.isDeadUI = true;
         }
 
+        // if ressurect
         if (this.isDeadUI && this.health > 0) {
             this.cameraController.bw(false);
             this.ui._RessurectBox.close();

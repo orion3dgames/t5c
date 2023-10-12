@@ -112,10 +112,8 @@ let LocationsDB = {
                     material: 2,
                     name: "Alice",
                     interactable: {
-                        'heal': {
-
-                        }
-                    }
+                        Talk: {},
+                    },
                 },
                 {
                     id: "spawn_05",
@@ -131,7 +129,7 @@ let LocationsDB = {
                     name: "Harmless Dummy",
                     baseHealth: 5000,
                     interactable: {
-                        'talk': {
+                        Talk: {
                             data: [
                                 {
                                     text: "Hi, I'm a target practise dummy, welcome @PlayerName ",
@@ -155,11 +153,8 @@ let LocationsDB = {
                                     text: "Oh!, Do come back when you're in need.",
                                     isEndOfDialog: true,
                                 },
-                            ]
+                            ],
                         },
-                        'shop': {
-                            
-                        }
                     },
                 },
             ],

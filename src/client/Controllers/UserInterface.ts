@@ -23,6 +23,7 @@ import {
     Panel_Abilities,
     Panel_Character,
     Panel_Help,
+    Panel_Dialog,
 } from "./UI";
 
 import { Room } from "colyseus.js";
@@ -72,6 +73,7 @@ export class UserInterface {
     public panelAbilities: Panel_Abilities;
     public panelCharacter: Panel_Character;
     public panelHelp: Panel_Help;
+    public panelDialog: Panel_Dialog;
 
     // tooltip
     public _UITooltip;
@@ -167,6 +169,7 @@ export class UserInterface {
         // create panel
         this.panelInventory = new Panel_Inventory(this, currentPlayer, {
             name: "Inventory",
+            stayOpen: true,
             width: "246px;",
             height: "300px;",
             top: "-30px;",
@@ -174,7 +177,6 @@ export class UserInterface {
             horizontal_position: Control.HORIZONTAL_ALIGNMENT_RIGHT,
             vertical_position: Control.VERTICAL_ALIGNMENT_BOTTOM,
         });
-        this.panelInventory.open();
         this._InventoryDropdown = new InventoryDropdown(this);
 
         // create panel
@@ -182,10 +184,10 @@ export class UserInterface {
             name: "Abilities",
             width: "500px;",
             height: "400px;",
-            top: "0px;",
-            left: "5px;",
-            horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
-            vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
+            top: "100px;",
+            left: "15px;",
+            horizontal_position: Control.HORIZONTAL_ALIGNMENT_LEFT,
+            vertical_position: Control.VERTICAL_ALIGNMENT_TOP,
         });
 
         // create panel
@@ -193,10 +195,10 @@ export class UserInterface {
             name: "Character",
             width: "500px;",
             height: "300px;",
-            top: "30px;",
-            left: "30px;",
-            horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
-            vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
+            top: "100px;",
+            left: "15px;",
+            horizontal_position: Control.HORIZONTAL_ALIGNMENT_LEFT,
+            vertical_position: Control.VERTICAL_ALIGNMENT_TOP,
         });
 
         // create help panel
@@ -204,11 +206,25 @@ export class UserInterface {
             name: "Help",
             width: "500px;",
             height: "300px;",
-            top: "30px;",
-            left: "30px;",
-            horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
-            vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
+            top: "100px;",
+            left: "15px;",
+            horizontal_position: Control.HORIZONTAL_ALIGNMENT_LEFT,
+            vertical_position: Control.VERTICAL_ALIGNMENT_TOP,
         });
+
+        // create dialog panel
+        this.panelDialog = new Panel_Dialog(this, currentPlayer, {
+            name: "Dialog Panel",
+            width: "300px;",
+            height: "300px;",
+            top: "100px;",
+            left: "15px;",
+            horizontal_position: Control.HORIZONTAL_ALIGNMENT_LEFT,
+            vertical_position: Control.VERTICAL_ALIGNMENT_TOP,
+        });
+
+        // open inventory by default
+        this.panelInventory.open();
 
         // create tooltip
         this._Tooltip = new Tooltip(this, currentPlayer);
@@ -333,12 +349,11 @@ export class UserInterface {
         rect1.addControl(label);
         return rect1;
     }
-    
-    public createInteractableButtons(entity){
 
-        if(!entity.spwanInfo) return false;
+    public createInteractableButtons(entity) {
+        if (!entity.spwanInfo) return false;
 
-        if(!entity.spwanInfo.interactable) return false;
+        if (!entity.spwanInfo.interactable) return false;
 
         var rect1 = new Rectangle("entity_buttons_" + entity.sessionId);
         rect1.isVisible = false;
@@ -349,7 +364,7 @@ export class UserInterface {
         rect1.zIndex = this._namesUI.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
         rect1.linkOffsetY = -200;
-        
+
         const rightStackPanel = new StackPanel("rightStackPanel");
         rightStackPanel.left = 0;
         rightStackPanel.top = 0;
@@ -363,7 +378,9 @@ export class UserInterface {
         rightStackPanel.isVertical = true;
         rect1.addControl(rightStackPanel);
 
-        for(let type in entity.spwanInfo.interactable){
+        for (let type in entity.spwanInfo.interactable) {
+            let interactable = entity.spwanInfo.interactable[type];
+
             const createBtn = Button.CreateSimpleButton("characterBtn", type);
             createBtn.left = "0px;";
             createBtn.top = "0px";
@@ -377,13 +394,18 @@ export class UserInterface {
             rightStackPanel.addControl(createBtn);
 
             createBtn.onPointerDownObservable.add(() => {
+                console.log(interactable);
+
+                this.panelDialog.open(type, entity);
+
+                /*
                 this._gameRoom.send(ServerMsg.ENTITY_INTERACT_START, {
                     type: type,
                     target: entity.sessionId,
-                });
+                });*/
             });
         }
-        
+
         return rect1;
     }
 }

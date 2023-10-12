@@ -15,6 +15,7 @@ import { Panel_Inventory } from "./Panels/Panel_Inventory";
 import { Panel_Abilities } from "./Panels/Panel_Abilities";
 import { Panel_Character } from "./Panels/Panel_Character";
 import { Panel_Help } from "./Panels/Panel_Help";
+import { Panel_Dialog } from "./Panels/Panel_Dialog";
 
 export {
     ChatBox,
@@ -32,4 +33,5 @@ export {
     Panel_Abilities,
     Panel_Character,
     Panel_Help,
+    Panel_Dialog,
 };
