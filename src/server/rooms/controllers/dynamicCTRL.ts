@@ -38,7 +38,7 @@ export class dynamicCTRL {
                         this._player.y = element.to_vector.y;
                         this._player.z = element.to_vector.z;
                         this._player.rot = 0;
-                        this._state._gameroom.database.updateCharacter(this._player.id, this);
+                        this._state._gameroom.database.updateCharacter(this._player.id, this._player);
 
                         // inform client he cand now teleport to new zone
                         client.send(ServerMsg.PLAYER_TELEPORT, element.to_map);

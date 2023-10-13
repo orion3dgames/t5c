@@ -121,10 +121,10 @@ export class GameRoomState extends Schema {
         let player = {
             id: data.id,
 
-            x: data.x,
-            y: data.y,
-            z: data.z,
-            rot: data.rot,
+            x: data.x ?? 0,
+            y: data.y ?? 0,
+            z: data.z ?? 0,
+            rot: data.rot ?? 0,
 
             health: data.health,
             maxHealth: data.health,
@@ -148,7 +148,7 @@ export class GameRoomState extends Schema {
             initial_equipment: data.equipment ?? [],
         };
 
-        //console.log(player);
+        console.log(player);
 
         this.entityCTRL.add(new PlayerSchema(this, player));
 
@@ -264,7 +264,7 @@ export class GameRoomState extends Schema {
         /////////////////////////////////////
         // on player unequip
         if (type === ServerMsg.ENTITY_INTERACT_START) {
-            console.log('ENTITY_INTERACT_START', data);
+            console.log("ENTITY_INTERACT_START", data);
             //playerState.interact(data);
         }
 
