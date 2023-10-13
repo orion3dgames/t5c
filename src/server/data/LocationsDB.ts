@@ -39,7 +39,8 @@ let LocationsDB = {
                 },
             ],
             quests: {
-                TEMPLE_KILL_RATS: {
+                LH_TEMPLE_KILL_RATS: {
+                    id: "LH_TEMPLE_KILL_RATS", // unique id
                     objective: "KILL_AMOUNT",
                     location: "lh_dungeon_01",
                     spawn_type: "spawn_03",
@@ -109,6 +110,16 @@ let LocationsDB = {
                     race: "male_knight",
                     material: 3,
                     name: "Alexander The Righteous",
+                    interactable: {
+                        Talk: {
+                            data: [
+                                {
+                                    text: "Greetings, noble traveler! I am Sir Alexander, a humble knight on a quest to vanquish the forces of darkness and bring peace to this enchanted realm. How may I be of service to you today?",
+                                    isEndOfDialog: true,
+                                },
+                            ],
+                        },
+                    },
                 },
                 {
                     id: "spawn_04",
@@ -125,15 +136,15 @@ let LocationsDB = {
                         Talk: {
                             data: [
                                 {
-                                    text: "Hi @PlayerName, I'm Alice! \n\nI look after this temple in the name of our goddess Athlea.\n\nRecently, I've been having recurring rat infestation in the temple basement, if only I knew a brave and courageous adventurer that could help me... ",
+                                    text: "Greetings, dear one! I am Priestess Alice, a devoted servant of the benevolent Goddess Athlea. May her light shine upon you. It warms my heart to receive a friendly greeting. If you have a moment, I must confess our temple is currently plagued by a rat infestation in the basement. Perhaps you could offer some assistance or guidance in this matter?",
                                     buttons: [
-                                        { label: "I could help you!", goToDialog: 1 },
-                                        { label: "I need healing.", goToDialog: 2 },
-                                        { label: "I'm sorry, I'm busy adventuring.", goToDialog: 3 },
+                                        { label: "Sure, I can help.", goToDialog: 1 },
+                                        { label: "Can you heal me?", goToDialog: 2 },
+                                        { label: "Sorry, I'm busy adventuring.", goToDialog: 3 },
                                     ],
                                 },
                                 {
-                                    text: "Oh!, that's great, please head downstairs and eliminate 10 rats please.",
+                                    text: "Blessings upon you for your willingness to aid us, noble soul! 10 rats should suffice! Please be cautious as you venture into the temple's basement, and may the light of the Goddess Athlea guide and protect you",
                                     buttonName: "Consider it done!",
                                     triggeredByOpening: {
                                         action: "START_QUEST",
@@ -142,7 +153,7 @@ let LocationsDB = {
                                     isEndOfDialog: true,
                                 },
                                 {
-                                    text: "There you are, you should be feeling restored now! ",
+                                    text: "Praise be to the Goddess Athlea for her benevolent grace! I am but her humble vessel, and it is her divine power that has allowed me to aid in your healing. Please take a moment to rest and recover. If you have any questions or seek further guidance, do not hesitate to ask. The goddess's blessings are with you, and I am here to support you in your time of need.",
                                     isEndOfDialog: true,
                                     triggeredByClosing: {
                                         type: "cast_ability",
@@ -151,7 +162,7 @@ let LocationsDB = {
                                     },
                                 },
                                 {
-                                    text: "Oh ok! Please let me know if you find anyone that can help me...",
+                                    text: "Very well, may the goddess watch over your chosen path.",
                                     buttonName: "Thank you",
                                     isEndOfDialog: true,
                                 },
