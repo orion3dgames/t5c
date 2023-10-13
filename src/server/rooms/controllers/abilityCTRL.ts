@@ -334,6 +334,10 @@ export class abilitiesCTRL {
             return false;
         }
 
+        if (owner.isDead) {
+            return false;
+        }
+
         // cancel auto attack timer
         this.cancelAutoAttack(owner);
 

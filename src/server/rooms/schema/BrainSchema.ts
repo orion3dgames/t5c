@@ -108,6 +108,9 @@ export class BrainSchema extends Entity {
     public update(delta) {
         /////////////////////////////////////////////////////////////////
         // if players are connected, start monitoring them
+        if (this.isEntityDead() && !this.isDead) {
+            this.setAsDead();
+        }
 
         // if does not have a target, keep monitoring the closest player
         if (this.AI_TARGET === null || this.AI_TARGET === undefined) {
