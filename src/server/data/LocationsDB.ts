@@ -136,7 +136,7 @@ let LocationsDB = {
                         Talk: {
                             data: [
                                 {
-                                    text: "Greetings, dear one! I am Priestess Alice, a devoted servant of the benevolent Goddess Athlea. May her light shine upon you. It warms my heart to receive a friendly greeting. If you have a moment, I must confess our temple is currently plagued by a rat infestation in the basement. Perhaps you could offer some assistance or guidance in this matter?",
+                                    text: " Ah, noble adventurer, your arrival is most fortuitous. The temple of Athlea is plagued by a rat infestation that has eluded our efforts to resolve. The rodents seem to have a supernatural tenacity. Would you consider helping us in our time of need?",
                                     buttons: [
                                         { label: "Sure, I can help.", goToDialog: 1 },
                                         { label: "Can you heal me?", goToDialog: 2 },
