@@ -38,6 +38,16 @@ let LocationsDB = {
                     to_vector: new Vector3(-22, 0, -37.8),
                 },
             ],
+            quests: {
+                TEMPLE_KILL_RATS: {
+                    objective: "KILL_AMOUNT",
+                    location: "lh_dungeon_01",
+                    spawn_type: "spawn_03",
+                    quantity: 10,
+                    experienceOnCompletion: 1000,
+                    isRepeatable: true,
+                },
+            },
             spawns: [
                 {
                     id: "spawn_01",
@@ -116,6 +126,33 @@ let LocationsDB = {
                             data: [
                                 {
                                     text: "Hi @PlayerName, I'm Alice! \n\nI look after this temple in the name of our goddess Athlea.\n\nRecently, I've been having recurring rat infestation in the temple basement, if only I knew a brave and courageous adventurer that could help me... ",
+                                    buttons: [
+                                        { label: "I could help you!", goToDialog: 1 },
+                                        { label: "I need healing.", goToDialog: 2 },
+                                        { label: "I'm sorry, I'm busy adventuring.", goToDialog: 3 },
+                                    ],
+                                },
+                                {
+                                    text: "Oh!, that's great, please head downstairs and eliminate 10 rats please.",
+                                    buttonName: "Consider it done!",
+                                    triggeredByOpening: {
+                                        action: "START_QUEST",
+                                        quest: "TEMPLE_KILL_RATS",
+                                    },
+                                    isEndOfDialog: true,
+                                },
+                                {
+                                    text: "There you are, you should be feeling restored now! ",
+                                    isEndOfDialog: true,
+                                    triggeredByClosing: {
+                                        type: "cast_ability",
+                                        ability: "heal",
+                                        target: "target",
+                                    },
+                                },
+                                {
+                                    text: "Oh ok! Please let me know if you find anyone that can help me...",
+                                    buttonName: "Thank you",
                                     isEndOfDialog: true,
                                 },
                             ],
@@ -139,28 +176,7 @@ let LocationsDB = {
                         Talk: {
                             data: [
                                 {
-                                    text: "Hi, I'm a target practise dummy, welcome @PlayerName ",
-                                    buttons: [{ label: "Welcome", goToDialog: 1 }],
-                                },
-                                {
-                                    text: "Are you in search of healing?",
-                                    buttons: [
-                                        { label: "Yes, please!", goToDialog: 2 },
-                                        { label: "No, I do not need your help.", goToDialog: 3 },
-                                    ],
-                                },
-                                {
-                                    text: "There you are, you should be feeling restored now! ",
-                                    isEndOfDialog: true,
-                                    triggeredByClosing: {
-                                        type: "cast_ability",
-                                        ability: "heal",
-                                        target: "target",
-                                    },
-                                },
-                                {
-                                    text: "Oh!, please do come back when you're in need.",
-                                    buttonName: "Thank you",
+                                    text: "Hi @PlayerName, if you want to practice your spells or fighting skills, please do not hesitate to use myself as a target practise!",
                                     isEndOfDialog: true,
                                 },
                             ],

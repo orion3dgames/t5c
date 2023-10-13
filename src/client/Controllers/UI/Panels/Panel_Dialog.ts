@@ -169,7 +169,7 @@ export class Panel_Dialog extends Panel {
         chatStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         chatStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         chatStackPanel.paddingTop = "5px;";
-        chatStackPanel.spacing = 10;
+        chatStackPanel.spacing = 5;
         dialogPanel.addControl(chatStackPanel);
         this.dialogStackPanel = chatStackPanel;
     }
