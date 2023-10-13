@@ -54,13 +54,13 @@ export class Network {
             });
 
             // if so, let's join it
-            if (roomIdFound) {
+            if (roomIdFound !== false) {
                 return await this.joinRoom(roomIdFound, token, character_id);
             }
         }
 
         // else create a new room for that location
-        return await this._client.joinOrCreate("game_room", {
+        return await this._client.create("game_room", {
             location: location,
             token: token,
             character_id: character_id,

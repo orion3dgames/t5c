@@ -216,9 +216,6 @@ export class Player extends Entity {
                 }
             }
         }
-        if (this.closestEntity) {
-            console.log("Closest Entity", this.closestEntity.name, closestDistance);
-        }
     }
 
     // update at server rate
