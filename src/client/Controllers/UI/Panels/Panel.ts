@@ -14,7 +14,7 @@ export class Panel {
     public _UI: UserInterface;
     public _game: GameController;
     public _playerUI;
-    public _gameRoom;
+    public _room;
     private _UITooltip: Tooltip;
     public _scene: Scene;
     public _currentPlayer;
@@ -37,7 +37,7 @@ export class Panel {
         this._game = _UI._game;
         this._playerUI = _UI._playerUI;
         this._UITooltip = _UI._UITooltip;
-        this._gameRoom = _UI._gameRoom;
+        this._room = _UI._room;
         this._scene = _UI._scene;
         this._currentPlayer = _currentPlayer;
         this._loadedAssets = _UI._loadedAssets;

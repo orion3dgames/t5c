@@ -6,7 +6,7 @@ import { GameController } from "./GameController";
 export class PlayerInput {
     private _scene: Scene;
     private _game: GameController;
-    private _gameroom;
+    private _room;
     private _ui;
 
     //simple movement
@@ -44,9 +44,9 @@ export class PlayerInput {
     public movementTimerNow: number = 0;
     public movementTimerDelay: number = 200;
 
-    constructor(game: GameController, scene, gameroom, ui) {
+    constructor(game: GameController, scene, room, ui) {
         (this._game = game), (this._scene = scene);
-        this._gameroom = gameroom;
+        this._room = room;
         this._ui = ui;
 
         // detect mouse movement

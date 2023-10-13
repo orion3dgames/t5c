@@ -3,16 +3,17 @@ import { Control } from "@babylonjs/gui/2D/controls/control";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { ItemClass, ServerMsg } from "../../../shared/types";
 import { Button } from "@babylonjs/gui/2D/controls/button";
+import { UserInterface } from "../UserInterface";
 
 export class InventoryDropdown {
     private _UI;
     private _selected;
-    private _gameRoom;
+    private _room;
     private dropdown: StackPanel;
     private _bgColor = "rgba(255,255,255,0.7";
-    constructor(_UI) {
+    constructor(_UI: UserInterface) {
         this._UI = _UI;
-        this._gameRoom = _UI._gameRoom;
+        this._room = _UI._room;
     }
 
     public refresh() {
@@ -56,7 +57,7 @@ export class InventoryDropdown {
             actions.push({
                 title: "Equip Item",
                 click: () => {
-                    this._gameRoom.send(ServerMsg.PLAYER_USE_ITEM, inventory.i);
+                    this._room.send(ServerMsg.PLAYER_USE_ITEM, inventory.i);
                 },
             });
         }
@@ -64,14 +65,14 @@ export class InventoryDropdown {
             actions.push({
                 title: "Use Item",
                 click: () => {
-                    this._gameRoom.send(ServerMsg.PLAYER_USE_ITEM, inventory.i);
+                    this._room.send(ServerMsg.PLAYER_USE_ITEM, inventory.i);
                 },
             });
         }
         actions.push({
             title: "Drop Item(s)",
             click: () => {
-                this._gameRoom.send(ServerMsg.PLAYER_DROP_ITEM, { slot: inventory.i, drop_all: true });
+                this._room.send(ServerMsg.PLAYER_DROP_ITEM, { slot: inventory.i, drop_all: true });
             },
         });
 
@@ -79,7 +80,7 @@ export class InventoryDropdown {
             actions.push({
                 title: "Drop One",
                 click: () => {
-                    this._gameRoom.send(ServerMsg.PLAYER_DROP_ITEM, { slot: inventory.i });
+                    this._room.send(ServerMsg.PLAYER_DROP_ITEM, { slot: inventory.i });
                 },
             });
         }

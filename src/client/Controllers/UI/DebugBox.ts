@@ -10,17 +10,17 @@ export class DebugBox {
     private _playerUI;
     private _engine: Engine;
     private _scene: Scene;
-    private _gameRoom;
+    private _room;
     private _currentPlayer;
     private _entities;
     private ping: number = 0;
     private _debugTextUI;
 
-    constructor(_playerUI, _engine: Engine, _scene: Scene, _gameRoom, _currentPlayer, _entities) {
+    constructor(_playerUI, _engine: Engine, _scene: Scene, _room, _currentPlayer, _entities) {
         this._playerUI = _playerUI;
         this._engine = _engine;
         this._scene = _scene;
-        this._gameRoom = _gameRoom;
+        this._room = _room;
         this._currentPlayer = _currentPlayer;
         this._entities = _entities;
 
@@ -33,7 +33,7 @@ export class DebugBox {
         });
 
         // on pong
-        this._gameRoom.onMessage(ServerMsg.PONG, (data) => {
+        this._room.onMessage(ServerMsg.PONG, (data) => {
             let dateNow = Date.now();
             this.ping = dateNow - data.date;
         });

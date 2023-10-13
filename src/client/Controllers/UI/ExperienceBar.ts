@@ -11,7 +11,7 @@ export class ExperienceBar {
     private _playerUI;
     private _engine: Engine;
     private _scene: Scene;
-    private _gameRoom;
+    private _room;
     private _currentPlayer;
 
     // experience bar

@@ -5,21 +5,22 @@ import { generatePanel, getBg } from "./Theme";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { ServerMsg } from "../../../shared/types";
+import { UserInterface } from "../UserInterface";
 
 export class RessurectBox {
     private _UI;
     private _playerUI;
     private _scene: Scene;
-    private _gameRoom;
+    private _room;
     private _currentPlayer;
 
     // revive panel
     public revivePanel;
 
-    constructor(_UI, _currentPlayer) {
+    constructor(_UI: UserInterface, _currentPlayer) {
         this._UI = _UI;
         this._playerUI = _UI._playerUI;
-        this._gameRoom = _UI._gameRoom;
+        this._room = _UI._room;
         this._currentPlayer = _currentPlayer;
         this._createUI();
     }
@@ -65,7 +66,7 @@ export class RessurectBox {
         revivePanel.addControl(reviveButton);
 
         reviveButton.onPointerDownObservable.add(() => {
-            this._gameRoom.send(ServerMsg.PLAYER_RESSURECT);
+            this._room.send(ServerMsg.PLAYER_RESSURECT);
         });
     }
 

@@ -42,7 +42,7 @@ export class UserInterface {
     public _game: GameController;
     public _scene: Scene;
     private _engine: Engine;
-    private _room: Room;
+    public _room: Room;
     private _chatRoom: Room;
     public _entities: (Entity | Player | Item)[];
     private _currentPlayer;
@@ -241,9 +241,13 @@ export class UserInterface {
 
     public resize() {
         if (this._engine.getRenderWidth() < 1100) {
-            this._ChatBox.chatPanel.top = "-115px;";
+            if (this._ChatBox) {
+                this._ChatBox.chatPanel.top = "-115px;";
+            }
         } else {
-            this._ChatBox.chatPanel.top = "-30px;";
+            if (this._ChatBox) {
+                this._ChatBox.chatPanel.top = "-30px;";
+            }
         }
     }
 
@@ -394,15 +398,7 @@ export class UserInterface {
             rightStackPanel.addControl(createBtn);
 
             createBtn.onPointerDownObservable.add(() => {
-                console.log(interactable);
-
                 this.panelDialog.open(type, entity);
-
-                /*
-                this._gameRoom.send(ServerMsg.ENTITY_INTERACT_START, {
-                    type: type,
-                    target: entity.sessionId,
-                });*/
             });
         }
 

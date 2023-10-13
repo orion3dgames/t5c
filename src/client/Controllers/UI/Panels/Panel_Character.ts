@@ -286,7 +286,7 @@ export class Panel_Character extends Panel {
                 button.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
                 panelRectangle.addControl(button);
                 button.onPointerDownObservable.add(() => {
-                    this._gameRoom.send(ServerMsg.PLAYER_ADD_STAT_POINT, key);
+                    this._room.send(ServerMsg.PLAYER_ADD_STAT_POINT, key);
                 });
 
                 // push the value text to the left
@@ -349,7 +349,7 @@ export class Panel_Character extends Panel {
 
             slotPanel.onPointerClickObservable.add((e) => {
                 if (e.buttonIndex === 2) {
-                    this._gameRoom.send(ServerMsg.PLAYER_UNEQUIP_ITEM, item.key);
+                    this._room.send(ServerMsg.PLAYER_UNEQUIP_ITEM, item.key);
                 }
             });
 

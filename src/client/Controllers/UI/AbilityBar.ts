@@ -6,22 +6,24 @@ import { Player } from "../../Entities/Player";
 import { generatePanel, getBg, getPadding } from "./Theme";
 import { GameController } from "../GameController";
 import { ServerMsg } from "../../../shared/types";
+import { Room } from "colyseus.js";
+import { UserInterface } from "../UserInterface";
 
 export class AbilityBar {
     private _playerUI;
     private _abilityUI;
-    private _UI;
-    private _gameRoom;
+    private _UI: UserInterface;
+    private _room;
     private _game: GameController;
     private _loadedAssets;
     private _currentPlayer: Player;
     private _UITooltip;
     private abylity_number: number = 9;
 
-    constructor(_UI, _currentPlayer) {
+    constructor(_UI: UserInterface, _currentPlayer) {
         this._playerUI = _UI._playerUI;
         this._currentPlayer = _currentPlayer;
-        this._gameRoom = _UI._gameRoom;
+        this._room = _UI._room;
         this._loadedAssets = _UI._loadedAssets;
         this._game = _UI._game;
         this._UI = _UI;
@@ -114,8 +116,8 @@ export class AbilityBar {
         headlineRect.onPointerClickObservable.add(() => {
             let entity = this._game.selectedEntity;
             if (entity && !this._currentPlayer.isCasting) {
-                this._gameRoom.send(ServerMsg.PLAYER_ABILITY_PRESSED, {
-                    senderId: this._gameRoom.sessionId,
+                this._room.send(ServerMsg.PLAYER_ABILITY_PRESSED, {
+                    senderId: this._room.sessionId,
                     targetId: entity.sessionId,
                     digit: digit,
                 });

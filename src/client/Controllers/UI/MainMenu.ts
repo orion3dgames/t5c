@@ -16,17 +16,17 @@ export class MainMenu {
     private _engine: Engine;
     private _scene: Scene;
     private _game: GameController;
-    private _gameRoom;
+    private _room;
     private _currentPlayer;
 
     private _mainPanel: Rectangle;
 
-    constructor(_UI, _currentPlayer) {
+    constructor(_UI: UserInterface, _currentPlayer) {
         this._UI = _UI;
         this._playerUI = _UI._playerUI;
         this._scene = _UI._scene;
         this._currentPlayer = _currentPlayer;
-        this._gameRoom = _UI._gameRoom;
+        this._room = _UI._room;
         this._game = _UI._game;
 
         // mainmenu panel
@@ -53,7 +53,7 @@ export class MainMenu {
                 reset: {
                     menuTitle: "Stuck?",
                     click: () => {
-                        this._gameRoom.send(ServerMsg.PLAYER_RESET_POSITION);
+                        this._room.send(ServerMsg.PLAYER_RESET_POSITION);
                     },
                 },
                 quit: {

@@ -156,7 +156,7 @@ export class Panel_Abilities extends Panel {
                 abilityLearn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
                 skillsPanel.addControl(abilityLearn);
                 abilityLearn.onPointerDownObservable.add(() => {
-                    this._gameRoom.send(ServerMsg.PLAYER_LEARN_SKILL, ability.key);
+                    this._room.send(ServerMsg.PLAYER_LEARN_SKILL, ability.key);
                 });
             } else {
                 const abilityLearn = Button.CreateSimpleButton("abilityLearn" + ability.key, "Learn");
@@ -171,7 +171,7 @@ export class Panel_Abilities extends Panel {
                 abilityLearn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
                 skillsPanel.addControl(abilityLearn);
                 abilityLearn.onPointerDownObservable.add(() => {
-                    this._gameRoom.send(ServerMsg.PLAYER_LEARN_SKILL, ability.key);
+                    this._room.send(ServerMsg.PLAYER_LEARN_SKILL, ability.key);
                 });
             }
         }
