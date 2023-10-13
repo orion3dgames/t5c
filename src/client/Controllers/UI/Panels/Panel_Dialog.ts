@@ -5,6 +5,7 @@ import { Control } from "@babylonjs/gui/2D/controls/control";
 import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { Button } from "@babylonjs/gui/2D/controls/button";
+import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 
 export class Panel_Dialog extends Panel {
     // inventory tab
@@ -19,6 +20,7 @@ export class Panel_Dialog extends Panel {
 
     public dialogText: TextBlock;
     public dialogButtonsPanel: Rectangle;
+    public dialogStackPanel: StackPanel;
 
     public currentEntity;
     public currentDialog;
@@ -44,10 +46,18 @@ export class Panel_Dialog extends Panel {
         }
     }
 
+    clear() {
+        this.dialogStackPanel.getDescendants().forEach((el) => {
+            el.dispose();
+        });
+    }
+
     public nextStep(step) {
         if (!this.currentDialog[step]) {
             this.close();
         }
+
+        this.clear();
 
         console.log("nextStep", step);
 
@@ -57,78 +67,81 @@ export class Panel_Dialog extends Panel {
         let dialogText = currentDialog.text;
         dialogText = dialogText.replace("@PlayerName", this._currentPlayer.name);
 
-        this.dialogText.text = dialogText;
+        let dialogTextBlock = new TextBlock("dialogText");
+        dialogTextBlock.text = dialogText;
+        dialogTextBlock.textHorizontalAlignment = 0;
+        dialogTextBlock.fontSize = "14px";
+        dialogTextBlock.color = "white";
+        dialogTextBlock.textWrapping = TextWrapping.WordWrap;
+        dialogTextBlock.resizeToFit = true;
+        dialogTextBlock.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        dialogTextBlock.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        this.dialogStackPanel.addControl(dialogTextBlock);
 
         console.log("currentDialog", currentDialog);
 
-        //
-        this.dialogButtonsPanel.children.forEach((el) => {
-            el.dispose();
-        });
-
+        // conditions
         if (currentDialog.isEndOfDialog) {
-            const createBtn = Button.CreateSimpleButton("characterBtn", "Bye");
+            let buttonName = currentDialog.buttonName ?? "Bye";
+
+            const createBtn = Button.CreateSimpleButton("characterBtn", buttonName);
             createBtn.left = "0px;";
             createBtn.top = "0px";
-            createBtn.width = "100px";
-            createBtn.height = "30px";
-            createBtn.background = "orange";
+            createBtn.width = 1;
+            createBtn.height = "24px";
+            createBtn.background = "black";
             createBtn.color = "white";
-            createBtn.thickness = 1;
+            createBtn.thickness = 0;
             createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-            this.dialogButtonsPanel.addControl(createBtn);
+            this.dialogStackPanel.addControl(createBtn);
 
             createBtn.onPointerDownObservable.add(() => {
                 this.close();
             });
 
             // if event
-            if(currentDialog.triggeredByClosing){
+            if (currentDialog.triggeredByClosing) {
                 this.processEvent(currentDialog.triggeredByClosing);
             }
-
         } else if (currentDialog.buttons) {
             // create buttons
-            let left = 0;
+            let i = 1;
             currentDialog.buttons.forEach((btn: any) => {
-                const createBtn = Button.CreateSimpleButton("characterBtn-" + left, btn.label);
-                createBtn.left = left + "px;";
+                const createBtn = Button.CreateSimpleButton("characterBtn-" + i, btn.label);
+                createBtn.left = "0px;";
                 createBtn.top = "0px";
-                createBtn.width = "100px";
-                createBtn.height = "30px";
-                createBtn.background = "orange";
+                createBtn.width = 1;
+                createBtn.height = "24px";
+                createBtn.background = "black";
                 createBtn.color = "white";
-                createBtn.thickness = 1;
+                createBtn.thickness = 0;
                 createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
                 createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-                this.dialogButtonsPanel.addControl(createBtn);
+                this.dialogStackPanel.addControl(createBtn);
 
                 createBtn.onPointerDownObservable.add(() => {
                     this.nextStep(btn.goToDialog);
                 });
 
-                left += 110;
+                i++;
             });
         }
     }
 
-    public processEvent(event){
-        
-        if(event.type === 'cast_ability'){
-
+    public processEvent(event) {
+        if (event.type === "cast_ability") {
             this._currentPlayer.actionsController.process(
-                this._currentPlayer, 
+                this._currentPlayer,
                 {
                     key: event.ability,
                     fromId: this.currentEntity.sessionId,
                     fromPos: this.currentEntity.getPosition(),
                     targetId: this._currentPlayer.sessionId,
                     targetPos: this._currentPlayer.getPosition(),
-                }, 
+                },
                 this._game.getGameData("ability", event.ability)
             );
-
         }
     }
 
@@ -146,42 +159,18 @@ export class Panel_Dialog extends Panel {
         dialogPanel.height = 0.85;
         dialogPanel.thickness = 0;
         dialogPanel.setPadding(5, 5, 5, 5);
+        dialogPanel.adaptHeightToChildren = true;
         dialogPanel.background = "rgba(255,255,255,.1)";
         panel.addControl(dialogPanel);
 
         // add scrollable container
-        const dialogScrollViewer = new ScrollViewer("dialogScrollViewer");
-        dialogScrollViewer.width = 1;
-        dialogScrollViewer.height = 1;
-        dialogScrollViewer.thickness = 0;
-        dialogScrollViewer.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        dialogScrollViewer.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        dialogPanel.addControl(dialogScrollViewer);
-
-        var dialogText = new TextBlock("dialogText");
-        dialogText.text = "Dialog Content";
-        dialogText.textHorizontalAlignment = 0;
-        dialogText.fontSize = "14px";
-        dialogText.color = "white";
-        dialogText.textWrapping = TextWrapping.WordWrap;
-        dialogText.resizeToFit = true;
-        dialogText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        dialogText.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        dialogScrollViewer.addControl(dialogText);
-        this.dialogText = dialogText;
-
-        // buttons panel
-        let dialogButtons = new Rectangle("dialogButtons");
-        dialogButtons.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        dialogButtons.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        dialogButtons.top = "0";
-        dialogButtons.left = "0px;";
-        dialogButtons.width = 1;
-        dialogButtons.height = "45px;";
-        dialogButtons.thickness = 0;
-        dialogButtons.setPadding(5, 5, 5, 5);
-        dialogButtons.background = "rgba(255,255,255,.1)";
-        panel.addControl(dialogButtons);
-        this.dialogButtonsPanel = dialogButtons;
+        const chatStackPanel = new StackPanel("chatStackPanel");
+        chatStackPanel.width = "100%";
+        chatStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        chatStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        chatStackPanel.paddingTop = "5px;";
+        chatStackPanel.spacing = 10;
+        dialogPanel.addControl(chatStackPanel);
+        this.dialogStackPanel = chatStackPanel;
     }
 }

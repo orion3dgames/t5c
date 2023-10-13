@@ -42,7 +42,7 @@ export class UserInterface {
     public _game: GameController;
     public _scene: Scene;
     private _engine: Engine;
-    private _gameRoom: Room;
+    private _room: Room;
     private _chatRoom: Room;
     public _entities: (Entity | Player | Item)[];
     private _currentPlayer;
@@ -89,7 +89,7 @@ export class UserInterface {
         this._game = game;
         this._scene = game.scene;
         this._engine = game.engine;
-        this._gameRoom = game.currentRoom;
+        this._room = game.currentRoom;
         this._chatRoom = game.currentChat;
         this._entities = entities;
         this._currentPlayer = currentPlayer;
@@ -139,7 +139,7 @@ export class UserInterface {
         this._currentPlayer = currentPlayer;
 
         // create debug ui + events
-        this._DebugBox = new DebugBox(this._playerUI, this._engine, this._scene, this._gameRoom, this._currentPlayer, this._entities);
+        this._DebugBox = new DebugBox(this._playerUI, this._engine, this._scene, this._room, this._currentPlayer, this._entities);
 
         // create main interface elements
         this._MainMenu = new MainMenu(this, currentPlayer);
@@ -217,10 +217,10 @@ export class UserInterface {
             name: "Dialog Panel",
             width: "300px;",
             height: "300px;",
-            top: "100px;",
-            left: "15px;",
-            horizontal_position: Control.HORIZONTAL_ALIGNMENT_LEFT,
-            vertical_position: Control.VERTICAL_ALIGNMENT_TOP,
+            top: "-100px;",
+            left: "-250px;",
+            horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
+            vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
         });
 
         // open inventory by default

@@ -112,7 +112,14 @@ let LocationsDB = {
                     material: 2,
                     name: "Alice",
                     interactable: {
-                        Talk: {},
+                        Talk: {
+                            data: [
+                                {
+                                    text: "Hi @PlayerName, I'm Alice! \n\nI look after this temple in the name of our goddess Athlea.\n\nRecently, I've been having recurring rat infestation in the temple basement, if only I knew a brave and courageous adventurer that could help me... ",
+                                    isEndOfDialog: true,
+                                },
+                            ],
+                        },
                     },
                 },
                 {
@@ -138,21 +145,22 @@ let LocationsDB = {
                                 {
                                     text: "Are you in search of healing?",
                                     buttons: [
-                                        { label: "Yes", goToDialog: 2 },
-                                        { label: "No", goToDialog: 3 },
+                                        { label: "Yes, please!", goToDialog: 2 },
+                                        { label: "No, I do not need your help.", goToDialog: 3 },
                                     ],
                                 },
                                 {
-                                    text: "Ok, please do not move while I heal you!",
+                                    text: "There you are, you should be feeling restored now! ",
                                     isEndOfDialog: true,
                                     triggeredByClosing: {
                                         type: "cast_ability",
                                         ability: "heal",
-                                        target: "target"
+                                        target: "target",
                                     },
                                 },
                                 {
-                                    text: "Oh!, Do come back when you're in need.",
+                                    text: "Oh!, please do come back when you're in need.",
+                                    buttonName: "Thank you",
                                     isEndOfDialog: true,
                                 },
                             ],
