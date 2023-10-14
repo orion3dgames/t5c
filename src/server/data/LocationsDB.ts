@@ -3,7 +3,7 @@ import { Vector3 } from "../../shared/Libs/yuka-min";
 
 let LocationsDB = {
     lh_town: {
-        title: "Town",
+        title: "Lighthaven",
         key: "lh_town",
         mesh: "lh_town",
         sun: true,
@@ -39,11 +39,15 @@ let LocationsDB = {
                 },
             ],
             quests: {
-                LH_TEMPLE_KILL_RATS: {
-                    id: "LH_TEMPLE_KILL_RATS", // unique id
-                    objective: "KILL_AMOUNT",
-                    location: "lh_dungeon_01",
-                    spawn_type: "spawn_03",
+                LH_DANGEROUS_ERRANDS_01: {
+                    id: "LH_DANGEROUS_ERRANDS_01", // unique id
+                    title: "Dangerous Errands",
+                    description:
+                        "If you have a moment, I must confess our temple is currently plagued by a bandit plague. They're roaming outside the temple creating havoc. Perhaps you could offer some assistance in this matter?",
+                    objective: "@NpcName in @LocationName wants you to kill @KillAmount @KillName found a little to the east of lighthaven temple.",
+                    type: "KILL_AMOUNT",
+                    location: "lh_town",
+                    spawn_type: "lh_town_bandits",
                     quantity: 10,
                     experienceOnCompletion: 1000,
                     isRepeatable: true,
@@ -51,7 +55,7 @@ let LocationsDB = {
             },
             spawns: [
                 {
-                    id: "spawn_01",
+                    id: "lh_town_bandits",
                     type: "area",
                     behaviour: "patrol",
                     aggressive: true,
@@ -71,7 +75,7 @@ let LocationsDB = {
                     amount: 5,
                     race: "male_rogue",
                     material: 0,
-                    name: "Rogue",
+                    name: "Bandit",
                     equipment: [
                         {
                             slot: PlayerSlots.WEAPON,
@@ -136,23 +140,30 @@ let LocationsDB = {
                         Talk: {
                             data: [
                                 {
-                                    text: " Ah, noble adventurer, your arrival is most fortuitous. The temple of Athlea is plagued by a rat infestation that has eluded our efforts to resolve. The rodents seem to have a supernatural tenacity. Would you consider helping us in our time of need?",
+                                    type: "text",
+                                    text: "Greetings, dear one! I am Priestess Alice, a devoted servant of the benevolent Goddess Athlea. May her light shine upon you.",
                                     buttons: [
-                                        { label: "Sure, I can help.", goToDialog: 1 },
-                                        { label: "Can you heal me?", goToDialog: 2 },
-                                        { label: "Sorry, I'm busy adventuring.", goToDialog: 3 },
+                                        { label: "Can I help you?", isQuest: true, goToDialog: 1 },
+                                        { label: "Can you heal me?", goToDialog: 3 },
+                                        { label: "Sorry, I'm busy adventuring.", goToDialog: 4 },
                                     ],
                                 },
                                 {
-                                    text: "Blessings upon you for your willingness to aid us, noble soul! 10 rats should suffice! Please be cautious as you venture into the temple's basement, and may the light of the Goddess Athlea guide and protect you",
+                                    type: "quest",
+                                    quest: "LH_DANGEROUS_ERRANDS_01",
+                                    buttons: [
+                                        { label: "Accept", value: true, goToDialog: 2 },
+                                        { label: "Decline.", value: false, goToDialog: 4 },
+                                    ],
+                                },
+                                {
+                                    type: "text",
+                                    text: "Blessings upon you for your willingness to aid us. Please be cautious, and may the light of the Goddess Athlea guide and protect you",
                                     buttonName: "Consider it done!",
-                                    triggeredByOpening: {
-                                        action: "START_QUEST",
-                                        quest: "TEMPLE_KILL_RATS",
-                                    },
                                     isEndOfDialog: true,
                                 },
                                 {
+                                    type: "text",
                                     text: "Praise be to the Goddess Athlea for her benevolent grace! I am but her humble vessel, and it is her divine power that has allowed me to aid in your healing. Please take a moment to rest and recover. If you have any questions or seek further guidance, do not hesitate to ask. The goddess's blessings are with you, and I am here to support you in your time of need.",
                                     isEndOfDialog: true,
                                     triggeredByClosing: {
@@ -162,6 +173,7 @@ let LocationsDB = {
                                     },
                                 },
                                 {
+                                    type: "text",
                                     text: "Very well, may the goddess watch over your chosen path.",
                                     buttonName: "Thank you",
                                     isEndOfDialog: true,

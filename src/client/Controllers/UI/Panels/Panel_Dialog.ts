@@ -6,6 +6,7 @@ import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollVie
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
+import { UserInterface } from "../../UserInterface";
 
 export class Panel_Dialog extends Panel {
     // inventory tab
@@ -24,9 +25,10 @@ export class Panel_Dialog extends Panel {
 
     public currentEntity;
     public currentDialog;
+    public currentQuest;
     public currentDialogStep: number = -1;
 
-    constructor(_UI, _currentPlayer, options) {
+    constructor(_UI: UserInterface, _currentPlayer, options) {
         super(_UI, _currentPlayer, options);
 
         this.createContent();
@@ -52,20 +54,40 @@ export class Panel_Dialog extends Panel {
         });
     }
 
+    public replaceKeywords(text) {
+        text = text.replace("@NpcName", this.currentEntity.name);
+        text = text.replace("@LocationName", this._game.currentLocation.title);
+        text = text.replace("@PlayerName", this._currentPlayer.name);
+        if (this.currentQuest) {
+            text = text.replace("@KillAmount", this.currentQuest.quantity);
+            text = text.replace("@KillName", this.currentQuest.spawn_type);
+        }
+        return text;
+    }
+
     public nextStep(step) {
         if (!this.currentDialog[step]) {
             this.close();
         }
 
+        // clear dialog
         this.clear();
 
-        console.log("nextStep", step);
-
+        // get vars
         let currentDialog = this.currentDialog[step];
+        this.currentQuest = this._game.currentLocation.dynamic.quests[currentDialog.quest] ?? false;
 
-        // replace keywords
-        let dialogText = currentDialog.text;
-        dialogText = dialogText.replace("@PlayerName", this._currentPlayer.name);
+        console.log("currentDialog", currentDialog, this.currentQuest);
+
+        // add main text to dialog
+        let dialogText = "";
+        if (currentDialog.type === "text") {
+            dialogText = currentDialog.text;
+        }
+        if (currentDialog.type === "quest") {
+            dialogText = this.currentQuest.description;
+        }
+        dialogText = this.replaceKeywords(dialogText);
 
         let dialogTextBlock = new TextBlock("dialogText");
         dialogTextBlock.text = dialogText;
@@ -78,7 +100,20 @@ export class Panel_Dialog extends Panel {
         dialogTextBlock.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         this.dialogStackPanel.addControl(dialogTextBlock);
 
-        console.log("currentDialog", currentDialog);
+        // if quest has an objective
+        // probably always have, we will see later
+        if (this.currentQuest && this.currentQuest.objective) {
+            let dialogObjective = new TextBlock("dialogObjective");
+            dialogObjective.text = this.replaceKeywords(this.currentQuest.objective);
+            dialogObjective.textHorizontalAlignment = 0;
+            dialogObjective.fontSize = "14px";
+            dialogObjective.color = "orange";
+            dialogObjective.textWrapping = TextWrapping.WordWrap;
+            dialogObjective.resizeToFit = true;
+            dialogObjective.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            dialogObjective.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            this.dialogStackPanel.addControl(dialogObjective);
+        }
 
         // conditions
         if (currentDialog.isEndOfDialog) {
@@ -108,6 +143,11 @@ export class Panel_Dialog extends Panel {
             // create buttons
             let i = 1;
             currentDialog.buttons.forEach((btn: any) => {
+                let label = btn.label;
+                if (btn.isQuest) {
+                    label = label + "(QUEST)";
+                }
+
                 const createBtn = Button.CreateSimpleButton("characterBtn-" + i, btn.label);
                 createBtn.left = "0px;";
                 createBtn.top = "0px";
