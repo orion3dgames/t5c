@@ -32,12 +32,12 @@ export class Panel_Dialog extends Panel {
         this.createContent();
     }
 
-    public open(type?: any, entity?: any) {
+    public open(entity?: any) {
         super.open();
 
         if (entity) {
             this.currentEntity = entity;
-            this.currentDialog = entity.spwanInfo.interactable[type];
+            this.currentDialog = entity.spwanInfo.interactable.data;
             this.currentDialogStep = 0;
 
             this._panelTitle.text = entity.name;
@@ -73,9 +73,7 @@ export class Panel_Dialog extends Panel {
 
         // get vars
         let currentDialog = this.currentDialog[step];
-        this.currentQuest = this._game.currentLocation.dynamic.quests[currentDialog.quest] ?? false;
-
-        console.log("currentDialog", currentDialog, this.currentQuest);
+        this.currentQuest = this._game.currentLocation.dynamic.quests[currentDialog.quest_id] ?? false;
 
         // add main text to dialog
         let dialogText = "";
@@ -114,6 +112,8 @@ export class Panel_Dialog extends Panel {
         }
 
         // conditions
+
+        // if last dialog in array, show close button
         if (currentDialog.isEndOfDialog) {
             let buttonName = currentDialog.buttonName ?? "Bye";
 
@@ -137,16 +137,42 @@ export class Panel_Dialog extends Panel {
             if (currentDialog.triggeredByClosing) {
                 this.processEvent(currentDialog.triggeredByClosing);
             }
+
+            // if dialog is quest, show accept and decline buttons
+        } else if (currentDialog.type === "quest") {
+            const dialogBtnAccept = Button.CreateSimpleButton("dialogBtnAccept", "Accept");
+            dialogBtnAccept.width = 1;
+            dialogBtnAccept.height = "24px";
+            dialogBtnAccept.background = "black";
+            dialogBtnAccept.color = "white";
+            dialogBtnAccept.thickness = 0;
+            this.dialogStackPanel.addControl(dialogBtnAccept);
+            dialogBtnAccept.onPointerDownObservable.add(() => {
+                this.nextStep(currentDialog.quest.accepted);
+            });
+
+            const dialogBtnDecline = Button.CreateSimpleButton("dialogBtnDecline", "Decline");
+            dialogBtnDecline.width = 1;
+            dialogBtnDecline.height = "24px";
+            dialogBtnDecline.background = "black";
+            dialogBtnDecline.color = "white";
+            dialogBtnDecline.thickness = 0;
+            this.dialogStackPanel.addControl(dialogBtnDecline);
+            dialogBtnDecline.onPointerDownObservable.add(() => {
+                this.nextStep(currentDialog.quest.declined);
+            });
+
+            // if buttons specified
         } else if (currentDialog.buttons) {
             // create buttons
             let i = 1;
             currentDialog.buttons.forEach((btn: any) => {
                 let label = btn.label;
                 if (btn.isQuest) {
-                    label = label + "(QUEST)";
+                    label = label + " (QUEST)";
                 }
 
-                const createBtn = Button.CreateSimpleButton("characterBtn-" + i, btn.label);
+                const createBtn = Button.CreateSimpleButton("characterBtn-" + i, label);
                 createBtn.left = "0px;";
                 createBtn.top = "0px";
                 createBtn.width = 1;

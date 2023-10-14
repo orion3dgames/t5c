@@ -382,25 +382,23 @@ export class UserInterface {
         rightStackPanel.isVertical = true;
         rect1.addControl(rightStackPanel);
 
-        for (let type in entity.spwanInfo.interactable) {
-            let interactable = entity.spwanInfo.interactable[type];
+        let interactable = entity.spwanInfo.interactable;
 
-            const createBtn = Button.CreateSimpleButton("characterBtn", type);
-            createBtn.left = "0px;";
-            createBtn.top = "0px";
-            createBtn.width = 1;
-            createBtn.height = "30px";
-            createBtn.background = "orange";
-            createBtn.color = "white";
-            createBtn.thickness = 1;
-            createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-            createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-            rightStackPanel.addControl(createBtn);
+        const createBtn = Button.CreateSimpleButton("characterBtn", interactable.title);
+        createBtn.left = "0px;";
+        createBtn.top = "0px";
+        createBtn.width = 1;
+        createBtn.height = "30px";
+        createBtn.background = "orange";
+        createBtn.color = "white";
+        createBtn.thickness = 1;
+        createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        rightStackPanel.addControl(createBtn);
 
-            createBtn.onPointerDownObservable.add(() => {
-                this.panelDialog.open(type, entity);
-            });
-        }
+        createBtn.onPointerDownObservable.add(() => {
+            this.panelDialog.open(entity);
+        });
 
         return rect1;
     }

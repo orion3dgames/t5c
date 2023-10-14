@@ -154,6 +154,9 @@ export class Player extends Entity {
 
         // move to clicked point
         if (metadata.type === "environment" && !this.isDead) {
+            /*
+            // removed click to move
+            // todo: add client prediction.
             let destination = pointerInfo._pickInfo.pickedPoint;
             let pickedMesh = pointerInfo._pickInfo.pickedMesh;
 
@@ -181,6 +184,7 @@ export class Player extends Entity {
                     z: destination._z,
                 });
             }
+            */
         }
     }
 

@@ -38,7 +38,7 @@ export class GameRoomState extends Schema {
     public roomDetails;
 
     private spawnTimer = 0;
-    private spawnInterval = 10000;
+    private spawnInterval = 60000;
 
     constructor(gameroom: GameRoom, _navMesh: NavMesh, ...args: any[]) {
         super(...args);

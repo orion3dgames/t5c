@@ -115,7 +115,8 @@ let LocationsDB = {
                     material: 3,
                     name: "Alexander The Righteous",
                     interactable: {
-                        Talk: [
+                        title: "Talk",
+                        data: [
                             {
                                 type: "text",
                                 text: "Greetings, noble traveler! I am Sir Alexander, a humble knight on a quest to vanquish the forces of darkness and bring peace to this enchanted realm. How may I be of service to you today?",
@@ -136,7 +137,8 @@ let LocationsDB = {
                     material: 2,
                     name: "Alice",
                     interactable: {
-                        Talk: [
+                        title: "Talk",
+                        data: [
                             {
                                 type: "text",
                                 text: "Greetings, dear one! I am Priestess Alice, a devoted servant of the benevolent Goddess Athlea. May her light shine upon you.",
@@ -148,11 +150,11 @@ let LocationsDB = {
                             },
                             {
                                 type: "quest",
-                                quest: "LH_DANGEROUS_ERRANDS_01",
-                                buttons: [
-                                    { label: "Accept", value: true, goToDialog: 2 },
-                                    { label: "Decline.", value: false, goToDialog: 4 },
-                                ],
+                                quest_id: "LH_DANGEROUS_ERRANDS_01",
+                                quest: {
+                                    accepted: 2,
+                                    declined: 4,
+                                },
                             },
                             {
                                 type: "text",
@@ -193,7 +195,8 @@ let LocationsDB = {
                     name: "Harmless Dummy",
                     baseHealth: 5000,
                     interactable: {
-                        Talk: [
+                        title: "Talk",
+                        data: [
                             {
                                 type: "text",
                                 text: "Hi @PlayerName, if you want to practice your spells or fighting skills, please do not hesitate to use myself as a target practise!",
