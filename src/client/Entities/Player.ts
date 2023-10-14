@@ -118,10 +118,6 @@ export class Player extends Entity {
         if (!metadata) return false;
 
         let target = this.entities[metadata.sessionId];
-
-        if (target) {
-            this._room.send(ServerMsg.ENTITY_INTERACT_START, target.sessionId);
-        }
     }
 
     // process left click for player
@@ -369,13 +365,6 @@ export class Player extends Entity {
 
         this._room.onMessage(ServerMsg.PLAYER_CASTING_CANCEL, (data) => {
             this.stopCasting(data);
-        });
-
-        this._room.onMessage(ServerMsg.ENTITY_INTERACT_NEXT, (data) => {
-            console.log("ENTITY_INTERACT_NEXT", data);
-        });
-        this._room.onMessage(ServerMsg.ENTITY_INTERACT_END, (data) => {
-            console.log("ENTITY_INTERACT_END", data);
         });
 
         // server confirms ability can be cast

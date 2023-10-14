@@ -7,12 +7,13 @@ import { applyTheme } from "../Theme";
 import { Scene } from "@babylonjs/core/scene";
 import { GameController } from "../../GameController";
 import { UserInterface } from "../../UserInterface";
+import { Room } from "colyseus.js";
 
 export class Panel {
     public _UI: UserInterface;
     public _game: GameController;
     public _playerUI;
-    public _room;
+    public _room: Room;
     private _UITooltip: Tooltip;
     public _scene: Scene;
     public _currentPlayer;

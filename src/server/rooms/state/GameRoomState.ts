@@ -263,8 +263,8 @@ export class GameRoomState extends Schema {
 
         /////////////////////////////////////
         // on player unequip
-        if (type === ServerMsg.ENTITY_INTERACT_START) {
-            console.log("ENTITY_INTERACT_START", data);
+        if (type === ServerMsg.PLAYER_QUEST_UPDATE) {
+            console.log("PLAYER_QUEST_UPDATE", data);
             //playerState.interact(data);
         }
 

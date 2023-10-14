@@ -62,8 +62,6 @@ export class dynamicCTRL {
         this._player.interactingTarget = null;
         this._player.isInteracting = null;
         let client = this._player.getClient();
-        client.send(ServerMsg.ENTITY_INTERACT_END);
-        console.log("--------------- DIALOG ENDED --------------------");
     }
 
     public process(sessionId) {
@@ -104,10 +102,6 @@ export class dynamicCTRL {
 
                     // send event to player
                     let client = this._player.getClient();
-                    client.send(ServerMsg.ENTITY_INTERACT_NEXT, {
-                        text: dialogText,
-                        buttons: dialogData.buttons ?? [],
-                    });
                 }
             }
         }

@@ -5,6 +5,7 @@ import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { UserInterface } from "../../UserInterface";
+import { QuestStatus, ServerMsg } from "../../../../shared/types";
 
 export class Panel_Dialog extends Panel {
     // inventory tab
@@ -73,7 +74,7 @@ export class Panel_Dialog extends Panel {
 
         // get vars
         let currentDialog = this.currentDialog[step];
-        this.currentQuest = this._game.currentLocation.dynamic.quests[currentDialog.quest_id] ?? false;
+        this.currentQuest = this._game.getGameData("quest", currentDialog.quest_id);
 
         // add main text to dialog
         let dialogText = "";
@@ -148,6 +149,10 @@ export class Panel_Dialog extends Panel {
             dialogBtnAccept.thickness = 0;
             this.dialogStackPanel.addControl(dialogBtnAccept);
             dialogBtnAccept.onPointerDownObservable.add(() => {
+                this._room.send(ServerMsg.PLAYER_QUEST_UPDATE, {
+                    id: currentDialog.quest_id,
+                    status: QuestStatus.ACCEPTED,
+                });
                 this.nextStep(currentDialog.quest.accepted);
             });
 

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { Ability, Race, Item } from "../../../shared/types";
+import { Ability, Race, Item, Quest } from "../../../shared/types";
 
 export class gameDataCTRL {
     private _gameData = {
@@ -8,6 +8,7 @@ export class gameDataCTRL {
         abilities: [],
         locations: [],
         races: [],
+        quests: [],
     };
 
     constructor() {}
@@ -41,6 +42,9 @@ export class gameDataCTRL {
             case "item":
                 returnData = (this._gameData.items[key] as Item) ?? false;
                 break;
+            case "quest":
+                returnData = (this._gameData.quests[key] as Quest) ?? false;
+                break;
             case "":
                 returnData = false;
                 break;
@@ -62,6 +66,9 @@ export class gameDataCTRL {
                 break;
             case "items":
                 returnData = this._gameData.items ?? false;
+                break;
+            case "quests":
+                returnData = this._gameData.quests ?? false;
                 break;
             case "":
                 returnData = false;

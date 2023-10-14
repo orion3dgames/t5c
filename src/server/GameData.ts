@@ -2,8 +2,9 @@ import { AbilitiesDB } from "./data/AbilitiesDB";
 import { RacesDB } from "./data/RacesDB";
 import { LocationsDB } from "./data/LocationsDB";
 import { ItemsDB } from "./data/ItemDB";
+import { QuestsDB } from "./data/QuestsDB";
 
-import { Ability, Race, Item } from "../shared/types";
+import { Ability, Race, Item, Quest } from "../shared/types";
 
 export class GameData {
     public static get(type, key) {
@@ -20,6 +21,9 @@ export class GameData {
                 break;
             case "item":
                 returnData = (ItemsDB[key] as Item) ?? false;
+                break;
+            case "quest":
+                returnData = (QuestsDB[key] as Quest) ?? false;
                 break;
             case "":
                 returnData = false;
@@ -42,6 +46,9 @@ export class GameData {
                 break;
             case "items":
                 returnData = ItemsDB ?? false;
+                break;
+            case "quests":
+                returnData = QuestsDB ?? false;
                 break;
             case "":
                 returnData = false;

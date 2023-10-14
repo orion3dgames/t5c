@@ -169,6 +169,7 @@ class Api {
                     abilities: GameData.load("abilities"),
                     locations: GameData.load("locations"),
                     races: GameData.load("races"),
+                    quests: GameData.load("quests"),
                 },
             });
         });

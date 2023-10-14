@@ -78,10 +78,34 @@ export enum ServerMsg {
     PLAYER_CASTING_START,
     PLAYER_CASTING_CANCEL,
     PLAYER_TELEPORT,
-    ENTITY_INTERACT_SHOW,
-    ENTITY_INTERACT_START,
-    ENTITY_INTERACT_NEXT,
-    ENTITY_INTERACT_END,
+    PLAYER_QUEST_UPDATE,
+}
+
+//////////////////////////////////////////////////////////////
+///////////////// QUESTS /////////////////////
+//////////////////////////////////////////////////////////////
+
+export type Quest = {
+    key: string;
+    title: string;
+    description: string;
+    objective: QuestObjective;
+    type: string;
+    location: string;
+    spawn_type: string;
+    quantity: number;
+    experienceOnCompletion: number;
+    isRepeatable: boolean;
+};
+
+export enum QuestObjective {
+    KILL_AMOUNT = 1,
+}
+
+export enum QuestStatus {
+    ACCEPTED = 1,
+    OBJECTIVE_UPDATE = 2,
+    COMPLETED = 3,
 }
 
 //////////////////////////////////////////////////////////////

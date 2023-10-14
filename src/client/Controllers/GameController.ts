@@ -46,6 +46,7 @@ export class GameController {
         abilities: [],
         locations: [],
         races: [],
+        quests: [],
     };
 
     constructor(app) {
@@ -103,6 +104,9 @@ export class GameController {
             case "item":
                 returnData = this._gameData.items[key] ?? false;
                 break;
+            case "quest":
+                returnData = this._gameData.quests[key] ?? false;
+                break;
             case "":
                 returnData = false;
                 break;
@@ -124,6 +128,9 @@ export class GameController {
                 break;
             case "items":
                 returnData = this._gameData.items ?? false;
+                break;
+            case "quests":
+                returnData = this._gameData.quests ?? false;
                 break;
             case "":
                 returnData = false;

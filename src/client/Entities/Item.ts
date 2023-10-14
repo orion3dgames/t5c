@@ -133,6 +133,7 @@ export class Item extends TransformNode {
             // update player data from server data
             Object.assign(this, this.entity);
 
+            // set item position
             this.setPosition();
         });
 
@@ -144,7 +145,6 @@ export class Item extends TransformNode {
         this.mesh.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
                 let mesh = ev.meshUnderPointer;
-                console.log(mesh);
                 if (mesh) {
                     mesh.overlayColor = new Color3(1, 1, 1);
                     mesh.overlayAlpha = 0.3;
