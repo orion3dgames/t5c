@@ -1,11 +1,9 @@
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
-import { Image } from "@babylonjs/gui/2D/controls/image";
-import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
+import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Button } from "@babylonjs/gui/2D/controls/button";
-import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Tooltip } from "../Tooltip";
-import { applyTheme, getBg } from "../Theme";
+import { applyTheme } from "../Theme";
 import { Scene } from "@babylonjs/core/scene";
 import { GameController } from "../../GameController";
 import { UserInterface } from "../../UserInterface";

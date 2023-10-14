@@ -1,8 +1,6 @@
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
-import { Image } from "@babylonjs/gui/2D/controls/image";
 import { Panel } from "./Panel";
 import { Control } from "@babylonjs/gui/2D/controls/control";
-import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
@@ -39,7 +37,7 @@ export class Panel_Dialog extends Panel {
 
         if (entity) {
             this.currentEntity = entity;
-            this.currentDialog = entity.spwanInfo.interactable[type].data;
+            this.currentDialog = entity.spwanInfo.interactable[type];
             this.currentDialogStep = 0;
 
             this._panelTitle.text = entity.name;

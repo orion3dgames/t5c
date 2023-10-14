@@ -115,14 +115,13 @@ let LocationsDB = {
                     material: 3,
                     name: "Alexander The Righteous",
                     interactable: {
-                        Talk: {
-                            data: [
-                                {
-                                    text: "Greetings, noble traveler! I am Sir Alexander, a humble knight on a quest to vanquish the forces of darkness and bring peace to this enchanted realm. How may I be of service to you today?",
-                                    isEndOfDialog: true,
-                                },
-                            ],
-                        },
+                        Talk: [
+                            {
+                                type: "text",
+                                text: "Greetings, noble traveler! I am Sir Alexander, a humble knight on a quest to vanquish the forces of darkness and bring peace to this enchanted realm. How may I be of service to you today?",
+                                isEndOfDialog: true,
+                            },
+                        ],
                     },
                 },
                 {
@@ -137,49 +136,47 @@ let LocationsDB = {
                     material: 2,
                     name: "Alice",
                     interactable: {
-                        Talk: {
-                            data: [
-                                {
-                                    type: "text",
-                                    text: "Greetings, dear one! I am Priestess Alice, a devoted servant of the benevolent Goddess Athlea. May her light shine upon you.",
-                                    buttons: [
-                                        { label: "Can I help you?", isQuest: true, goToDialog: 1 },
-                                        { label: "Can you heal me?", goToDialog: 3 },
-                                        { label: "Sorry, I'm busy adventuring.", goToDialog: 4 },
-                                    ],
+                        Talk: [
+                            {
+                                type: "text",
+                                text: "Greetings, dear one! I am Priestess Alice, a devoted servant of the benevolent Goddess Athlea. May her light shine upon you.",
+                                buttons: [
+                                    { label: "Can I help you?", isQuest: true, goToDialog: 1 },
+                                    { label: "Can you heal me?", goToDialog: 3 },
+                                    { label: "Sorry, I'm busy adventuring.", goToDialog: 4 },
+                                ],
+                            },
+                            {
+                                type: "quest",
+                                quest: "LH_DANGEROUS_ERRANDS_01",
+                                buttons: [
+                                    { label: "Accept", value: true, goToDialog: 2 },
+                                    { label: "Decline.", value: false, goToDialog: 4 },
+                                ],
+                            },
+                            {
+                                type: "text",
+                                text: "Blessings upon you for your willingness to aid us. Please be cautious, and may the light of the Goddess Athlea guide and protect you",
+                                buttonName: "Consider it done!",
+                                isEndOfDialog: true,
+                            },
+                            {
+                                type: "text",
+                                text: "Praise be to the Goddess Athlea for her benevolent grace! I am but her humble vessel, and it is her divine power that has allowed me to aid in your healing. Please take a moment to rest and recover. If you have any questions or seek further guidance, do not hesitate to ask. The goddess's blessings are with you, and I am here to support you in your time of need.",
+                                isEndOfDialog: true,
+                                triggeredByClosing: {
+                                    type: "cast_ability",
+                                    ability: "heal",
+                                    target: "target",
                                 },
-                                {
-                                    type: "quest",
-                                    quest: "LH_DANGEROUS_ERRANDS_01",
-                                    buttons: [
-                                        { label: "Accept", value: true, goToDialog: 2 },
-                                        { label: "Decline.", value: false, goToDialog: 4 },
-                                    ],
-                                },
-                                {
-                                    type: "text",
-                                    text: "Blessings upon you for your willingness to aid us. Please be cautious, and may the light of the Goddess Athlea guide and protect you",
-                                    buttonName: "Consider it done!",
-                                    isEndOfDialog: true,
-                                },
-                                {
-                                    type: "text",
-                                    text: "Praise be to the Goddess Athlea for her benevolent grace! I am but her humble vessel, and it is her divine power that has allowed me to aid in your healing. Please take a moment to rest and recover. If you have any questions or seek further guidance, do not hesitate to ask. The goddess's blessings are with you, and I am here to support you in your time of need.",
-                                    isEndOfDialog: true,
-                                    triggeredByClosing: {
-                                        type: "cast_ability",
-                                        ability: "heal",
-                                        target: "target",
-                                    },
-                                },
-                                {
-                                    type: "text",
-                                    text: "Very well, may the goddess watch over your chosen path.",
-                                    buttonName: "Thank you",
-                                    isEndOfDialog: true,
-                                },
-                            ],
-                        },
+                            },
+                            {
+                                type: "text",
+                                text: "Very well, may the goddess watch over your chosen path.",
+                                buttonName: "Thank you",
+                                isEndOfDialog: true,
+                            },
+                        ],
                     },
                 },
                 {
@@ -196,14 +193,13 @@ let LocationsDB = {
                     name: "Harmless Dummy",
                     baseHealth: 5000,
                     interactable: {
-                        Talk: {
-                            data: [
-                                {
-                                    text: "Hi @PlayerName, if you want to practice your spells or fighting skills, please do not hesitate to use myself as a target practise!",
-                                    isEndOfDialog: true,
-                                },
-                            ],
-                        },
+                        Talk: [
+                            {
+                                type: "text",
+                                text: "Hi @PlayerName, if you want to practice your spells or fighting skills, please do not hesitate to use myself as a target practise!",
+                                isEndOfDialog: true,
+                            },
+                        ],
                     },
                 },
             ],
