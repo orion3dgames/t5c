@@ -217,32 +217,6 @@ export class Panel_Dialog extends Panel {
             }
         }
 
-        // if last dialog in array, show close button
-        if (currentDialog.isEndOfDialog) {
-            let buttonName = currentDialog.buttonName ?? "Bye";
-
-            const createBtn = Button.CreateSimpleButton("characterBtn", buttonName);
-            createBtn.left = "0px;";
-            createBtn.top = "0px";
-            createBtn.width = 1;
-            createBtn.height = "24px";
-            createBtn.background = "black";
-            createBtn.color = "white";
-            createBtn.thickness = 0;
-            createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-            createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-            this.dialogStackPanel.addControl(createBtn);
-
-            createBtn.onPointerDownObservable.add(() => {
-                this.close();
-            });
-
-            // if event
-            if (currentDialog.triggeredByClosing) {
-                this.processEvent(currentDialog.triggeredByClosing);
-            }
-        }
-
         // create buttons
         if (currentDialog.quests) {
             let q = 1;
@@ -295,6 +269,32 @@ export class Panel_Dialog extends Panel {
 
                 i++;
             });
+        }
+
+        // if last dialog in array, show close button
+        if (currentDialog.isEndOfDialog) {
+            let buttonName = currentDialog.buttonName ?? "Bye";
+
+            const createBtn = Button.CreateSimpleButton("characterBtn", buttonName);
+            createBtn.left = "0px;";
+            createBtn.top = "0px";
+            createBtn.width = 1;
+            createBtn.height = "24px";
+            createBtn.background = "black";
+            createBtn.color = "white";
+            createBtn.thickness = 0;
+            createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+            this.dialogStackPanel.addControl(createBtn);
+
+            createBtn.onPointerDownObservable.add(() => {
+                this.close();
+            });
+
+            // if event
+            if (currentDialog.triggeredByClosing) {
+                this.processEvent(currentDialog.triggeredByClosing);
+            }
         }
     }
 

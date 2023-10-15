@@ -77,7 +77,7 @@ let LocationsDB = {
                     ],
                 },
                 {
-                    key: "spawn_02",
+                    key: "lh_town_thief",
                     type: "path",
                     behaviour: "patrol",
                     aggressive: true,
@@ -86,7 +86,7 @@ let LocationsDB = {
                     amount: 1,
                     race: "male_rogue",
                     material: 0,
-                    name: "Rogue",
+                    name: "Thief",
                 },
                 {
                     key: "spawn_03",
@@ -185,6 +185,27 @@ let LocationsDB = {
                             {
                                 type: "text",
                                 text: "Hi @PlayerName, if you want to practice your spells or fighting skills, please do not hesitate to use myself as a target practise!",
+                                quests: [{ key: "LH_DANGEROUS_ERRANDS_02", goToDialog: 1 }],
+                                isEndOfDialog: true,
+                            },
+                            {
+                                type: "quest",
+                                quest_id: "LH_DANGEROUS_ERRANDS_02",
+                                quest: {
+                                    accepted: 2,
+                                    declined: 3,
+                                },
+                            },
+                            {
+                                type: "text",
+                                text: "Blessings upon you for your willingness to aid us. Please be cautious, and may the light of the Goddess Athlea guide and protect you",
+                                buttonName: "Consider it done!",
+                                isEndOfDialog: true,
+                            },
+                            {
+                                type: "text",
+                                text: "Very well, may the goddess watch over your chosen path.",
+                                buttonName: "Thank you",
                                 isEndOfDialog: true,
                             },
                         ],
