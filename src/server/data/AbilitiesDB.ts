@@ -20,7 +20,6 @@ let AbilitiesDB: abilityMap = {
             particule: "damage",
             color: "white",
         },
-
         affinity: "strength",
         casterPropertyAffected: [],
         targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 4, max: 8 }],
@@ -48,8 +47,8 @@ let AbilitiesDB: abilityMap = {
         },
 
         affinity: "intelligence",
-        casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 10, max: 15 }],
-        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 5, max: 10 }],
+        casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 15, max: 15 }],
+        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 10, max: 20 }],
         requiredToLearn: [{ key: "level", amount: 2 }],
     },
 

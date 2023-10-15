@@ -1,4 +1,7 @@
+import { PlayerSchema } from "./../../server/rooms/schema";
 import { roundTo } from "../Utils";
+import { ServerMsg } from "../types";
+import Logger from "../../server/utils/Logger";
 
 // level progression
 const LEVEL_EXPERIENCE = [
@@ -66,5 +69,35 @@ export class Leveling {
         let xpEarnedThisLevel = experience - LEVEL_EXPERIENCE[currentLevel - 1];
         let xpThisLevel = LEVEL_EXPERIENCE[currentLevel] - LEVEL_EXPERIENCE[currentLevel - 1];
         return roundTo((xpEarnedThisLevel / xpThisLevel) * 100, 0);
+    }
+
+    public static addExperience(owner: PlayerSchema, amount) {
+        // does player level up?
+        let doesLevelUp = false;
+        if (Leveling.doesPlayerlevelUp(owner.level, owner.player_data.experience, amount)) {
+            doesLevelUp = true;
+        }
+
+        // add experience to player
+        owner.player_data.experience += amount;
+        owner.level = Leveling.convertXpToLevel(owner.player_data.experience);
+        console.log(`[gameroom][addExperience] player has gained ${amount} experience`);
+
+        if (doesLevelUp) {
+            console.log(`[gameroom][addExperience] player has gained a level and is now level ${owner.level}`);
+            owner.maxMana = owner.maxMana + 50;
+            owner.maxHealth = owner.maxHealth + 50;
+            owner.health = owner.maxHealth;
+            owner.mana = owner.maxMana;
+            owner.player_data.points += 5;
+
+            // inform player
+            let client = owner.getClient();
+            client.send(ServerMsg.SERVER_MESSAGE, {
+                type: "event",
+                message: "You've gained knowledge and are now level " + owner.level + ".",
+                date: new Date(),
+            });
+        }
     }
 }

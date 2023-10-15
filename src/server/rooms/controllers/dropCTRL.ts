@@ -20,33 +20,7 @@ export class dropCTRL {
         // calculate experience total
         let exp = target.experienceGain;
         let amount = Math.floor(randomNumberInRange(exp.min, exp.max));
-
-        // does player level up?
-        let doesLevelUp = false;
-        if (Leveling.doesPlayerlevelUp(this._owner.level, this._owner.player_data.experience, amount)) {
-            doesLevelUp = true;
-        }
-
-        // add experience to player
-        this._owner.player_data.experience += amount;
-        this._owner.level = Leveling.convertXpToLevel(this._owner.player_data.experience);
-        Logger.info(`[gameroom][addExperience] player has gained ${amount} experience`);
-
-        if (doesLevelUp) {
-            Logger.info(`[gameroom][addExperience] player has gained a level and is now level ${this._owner.level}`);
-            this._owner.maxMana = this._owner.maxMana + 50;
-            this._owner.maxHealth = this._owner.maxHealth + 50;
-            this._owner.health = this._owner.maxHealth;
-            this._owner.mana = this._owner.maxMana;
-            this._owner.player_data.points += 5;
-
-            // inform player
-            this._client.send(ServerMsg.SERVER_MESSAGE, {
-                type: "event",
-                message: "You've gained knowledge and are now level " + this._owner.level + ".",
-                date: new Date(),
-            });
-        }
+        Leveling.addExperience(this._owner, amount);
     }
 
     public addGold(target) {

@@ -6,17 +6,30 @@ import { animationCTRL } from "../controllers/animationCTRL";
 import { moveCTRL } from "../controllers/moveCTRL";
 import { dynamicCTRL } from "../controllers/dynamicCTRL";
 import { NavMesh, Vector3 } from "../../../shared/Libs/yuka-min";
-import { InventorySchema, EquipmentSchema, AbilitySchema, LootSchema, BrainSchema } from "../schema";
+import { InventorySchema, EquipmentSchema, AbilitySchema, LootSchema, BrainSchema, QuestSchema } from "../schema";
 import { GameRoomState } from "../state/GameRoomState";
 import { Entity } from "../schema/Entity";
-import { EntityState, ItemClass, PlayerSlots, PlayerKeys, CalculationTypes, ServerMsg } from "../../../shared/types";
+import {
+    EntityState,
+    ItemClass,
+    PlayerSlots,
+    PlayerKeys,
+    CalculationTypes,
+    ServerMsg,
+    QuestUpdate,
+    QuestStatus,
+    Quest,
+    QuestObjective,
+} from "../../../shared/types";
 import { nanoid } from "nanoid";
 import { Database } from "../../Database";
 import Logger from "../../utils/Logger";
+import { Leveling } from "../../../shared/Class/Leveling";
 
 export class PlayerData extends Schema {
     @type({ map: InventorySchema }) inventory = new MapSchema<InventorySchema>();
     @type({ map: AbilitySchema }) abilities = new MapSchema<AbilitySchema>();
+    @type({ map: QuestSchema }) quests = new MapSchema<QuestSchema>();
     @type("uint32") public gold: number = 0;
     @type("uint8") public strength: number = 0;
     @type("uint8") public endurance: number = 0;
@@ -114,7 +127,7 @@ export class PlayerSchema extends Entity {
         Object.assign(this, data);
         Object.assign(this, this._state.gameData.get("race", this.race));
 
-        // add learned abilities
+        // add abilities
         data.initial_abilities.forEach((element) => {
             this.player_data.abilities.set(element.key, new AbilitySchema(element));
         });
@@ -122,6 +135,11 @@ export class PlayerSchema extends Entity {
         // add equipment
         data.initial_equipment.forEach((element) => {
             this.equipment.set(element.key, new EquipmentSchema(element));
+        });
+
+        // add quests
+        data.initial_quests.forEach((element) => {
+            this.player_data.quests.set(element.key, new QuestSchema(element));
         });
 
         // add inventory items
@@ -205,6 +223,11 @@ export class PlayerSchema extends Entity {
         // update player equipment
         if (this.equipment && this.equipment.size > 0) {
             db.saveEquipment(character.id, this.equipment);
+        }
+
+        // update player quests
+        if (this.player_data.quests && this.player_data.quests.size > 0) {
+            db.saveQuests(character.id, this.player_data.quests);
         }
 
         Logger.info("[gameroom][onCreate] player " + this.name + " saved to database.");
@@ -438,7 +461,46 @@ export class PlayerSchema extends Entity {
         }
     }
 
-    interact(sessionId: string) {
-        this.dynamicCTRL.process(sessionId);
+    checkQuestUpdate(type, target: BrainSchema) {
+        console.log("checkQuestUpdate", type);
+        if (type === "kill") {
+            console.log("kill");
+            this.player_data.quests.forEach((element: QuestSchema) => {
+                console.log("kill", element.type, element.spawn_type, target.AI_SPAWN_INFO.key);
+                if (element.type === QuestObjective.KILL_AMOUNT && element.spawn_type === target.AI_SPAWN_INFO.key) {
+                    element.qty++;
+                }
+            });
+        }
+    }
+
+    questUpdate(data: QuestUpdate) {
+        console.log("questUpdate", data);
+
+        let quest = this._state.gameData.get("quest", data.id) as Quest;
+
+        if (!quest) {
+            return false;
+        }
+
+        if (data.status === QuestStatus.ACCEPTED) {
+            this.player_data.quests.set(quest.key, new QuestSchema(quest));
+        }
+
+        if (data.status === QuestStatus.READY_TO_COMPLETE) {
+            let experienceReward = quest.reward.experience ?? 0;
+            if (experienceReward) {
+                Leveling.addExperience(this, experienceReward);
+            }
+
+            let goldReward = quest.reward.gold ?? 0;
+            if (goldReward) {
+                this.player_data.gold += goldReward;
+            }
+
+            // remove quest as it is completed
+            // later on we will save a history, not necessary yet..
+            this.player_data.quests.delete(quest.key);
+        }
     }
 }

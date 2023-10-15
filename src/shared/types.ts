@@ -89,23 +89,36 @@ export type Quest = {
     key: string;
     title: string;
     description: string;
-    objective: QuestObjective;
-    type: string;
+    descriptionOngoing: string;
+    descriptionReward: string;
+    descriptionCompleted: string;
+    objective: string;
+    type: QuestObjective.KILL_AMOUNT;
     location: string;
     spawn_type: string;
     quantity: number;
-    experienceOnCompletion: number;
     isRepeatable: boolean;
+    reward: {
+        experience: number;
+        gold: number;
+        items: [];
+    };
 };
 
 export enum QuestObjective {
     KILL_AMOUNT = 1,
 }
 
+export type QuestUpdate = {
+    id: string;
+    status: QuestStatus;
+};
+
 export enum QuestStatus {
     ACCEPTED = 1,
-    OBJECTIVE_UPDATE = 2,
-    COMPLETED = 3,
+    OBJECTIVE_UPDATE,
+    READY_TO_COMPLETE,
+    COMPLETED,
 }
 
 //////////////////////////////////////////////////////////////

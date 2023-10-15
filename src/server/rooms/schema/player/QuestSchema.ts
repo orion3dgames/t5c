@@ -1,14 +1,21 @@
 import { Schema, type } from "@colyseus/schema";
 import { GameData } from "../../../GameData";
+import { QuestObjective } from "../../../../shared/types";
 
 export class QuestSchema extends Schema {
     // networked player specific
     @type("string") public key: string = "";
+    @type("int8") public status: number = 0;
     @type("int16") public qty: number = 0;
-    @type("string") public i: string = "0";
 
-    public equippable;
-    public class;
+    title: string;
+    description: string;
+    objective: string;
+    type: QuestObjective;
+    location: string;
+    spawn_type: string;
+    experienceOnCompletion: number;
+    isRepeatable: boolean;
 
     constructor(data) {
         super(data);

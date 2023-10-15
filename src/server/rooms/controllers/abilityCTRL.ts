@@ -338,6 +338,9 @@ export class abilitiesCTRL {
             return false;
         }
 
+        // check if quest update
+        owner.checkQuestUpdate("kill", target);
+
         // cancel auto attack timer
         this.cancelAutoAttack(owner);
 

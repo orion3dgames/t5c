@@ -40,7 +40,7 @@ let LocationsDB = {
             ],
             spawns: [
                 {
-                    id: "lh_town_bandits",
+                    key: "lh_town_bandits",
                     type: "area",
                     behaviour: "patrol",
                     aggressive: true,
@@ -77,7 +77,7 @@ let LocationsDB = {
                     ],
                 },
                 {
-                    id: "spawn_02",
+                    key: "spawn_02",
                     type: "path",
                     behaviour: "patrol",
                     aggressive: true,
@@ -89,7 +89,7 @@ let LocationsDB = {
                     name: "Rogue",
                 },
                 {
-                    id: "spawn_03",
+                    key: "spawn_03",
                     type: "static",
                     behaviour: "idle",
                     aggressive: false,
@@ -111,7 +111,7 @@ let LocationsDB = {
                     },
                 },
                 {
-                    id: "spawn_04",
+                    key: "spawn_04",
                     type: "static",
                     behaviour: "idle",
                     aggressive: false,
@@ -127,8 +127,8 @@ let LocationsDB = {
                             {
                                 type: "text",
                                 text: "Greetings, dear one! I am Priestess Alice, a devoted servant of the benevolent Goddess Athlea. May her light shine upon you.",
+                                quests: [{ key: "LH_DANGEROUS_ERRANDS_01", goToDialog: 1 }],
                                 buttons: [
-                                    { label: "Can I help you?", isQuest: true, goToDialog: 1 },
                                     { label: "Can you heal me?", goToDialog: 3 },
                                     { label: "Sorry, I'm busy adventuring.", goToDialog: 4 },
                                 ],
@@ -167,7 +167,7 @@ let LocationsDB = {
                     },
                 },
                 {
-                    id: "spawn_05",
+                    key: "spawn_05",
                     type: "static",
                     behaviour: "idle",
                     aggressive: false,
@@ -219,6 +219,7 @@ let LocationsDB = {
             ],
             spawns: [
                 {
+                    key: "spawn_01",
                     type: "global",
                     behaviour: "patrol",
                     aggressive: true,

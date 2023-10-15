@@ -146,6 +146,7 @@ export class GameRoomState extends Schema {
             initial_abilities: data.abilities ?? [],
             initial_inventory: data.inventory ?? [],
             initial_equipment: data.equipment ?? [],
+            initial_quests: data.quests ?? [],
         };
 
         console.log(player);
@@ -264,8 +265,7 @@ export class GameRoomState extends Schema {
         /////////////////////////////////////
         // on player unequip
         if (type === ServerMsg.PLAYER_QUEST_UPDATE) {
-            console.log("PLAYER_QUEST_UPDATE", data);
-            //playerState.interact(data);
+            playerState.questUpdate(data);
         }
 
         /////////////////////////////////////

@@ -5,7 +5,7 @@ import { PlayerCharacter, PlayerUser } from "../shared/types";
 import { ParsedQs } from "qs";
 import { InventorySchema } from "./rooms/schema/player/InventorySchema";
 import { AbilitySchema } from "./rooms/schema/player/AbilitySchema";
-import { EquipmentSchema, PlayerSchema } from "./rooms/schema";
+import { EquipmentSchema, PlayerSchema, QuestSchema } from "./rooms/schema";
 import { MapSchema } from "@colyseus/schema/lib/types/MapSchema";
 
 class Database {
@@ -79,6 +79,16 @@ class Database {
             "key" TEXT
         )`;
 
+        const playerQuestsSql = `CREATE TABLE IF NOT EXISTS "character_quests" (
+            "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+            "owner_id" INTEGER,
+            "key" TEXT,
+            "status" INTEGER DEFAULT 0,
+            "qty" INTEGER DEFAULT 0, 
+            UNIQUE("owner_id","key"),
+            UNIQUE("id")
+        );`;
+
         this.db.serialize(() => {
             Logger.info("[database] Creating default database structure.");
             this.run(usersSql);
@@ -86,35 +96,7 @@ class Database {
             this.run(playerInventorySql);
             this.run(playerAbilitySql);
             this.run(playerEquipmentSql);
-
-            /*
-            // insert some items
-            this.run(`DELETE FROM "items" where id > 0`);
-            this.run(`INSERT INTO items ("key","label","description") VALUES ("pear","Pear","A delicious golden fruit.")`);
-            this.run(`INSERT INTO items ("key","label","description") VALUES ("apple","Apple","One of the juciest fruit in the 5th continent.")`);
-
-
-            // insert some abilities
-            this.run(`DELETE FROM "abilities" where id > 0`);
-            for (let i in AbilitiesDB) {
-                let ability = AbilitiesDB[i];
-                let sql = `INSERT INTO abilities (`;
-                for (let a in ability) {
-                    sql += `"${a}",`;
-                }
-                sql = sql.slice(0, -1);
-                sql += `) VALUES (`;
-                for (let a in ability) {
-                    let el = ability[a];
-                    if (typeof el === "object") {
-                        el = encodeURI(JSON.stringify(el));
-                    }
-                    sql += `"${el}",`;
-                }
-                sql = sql.slice(0, -1);
-                sql += `)`;
-                this.run(sql);
-            }*/
+            this.run(playerQuestsSql);
 
             Logger.info("[database] Reset all characters to offline. ");
             this.run(`UPDATE characters SET online=0 ;`);
@@ -248,6 +230,7 @@ class Database {
         character.abilities = await this.all(`SELECT CA.* FROM character_abilities CA WHERE CA.owner_id=? ORDER BY CA.digit ASC;`, [id]);
         character.inventory = await this.all(`SELECT CI.* FROM character_inventory CI WHERE CI.owner_id=?;`, [id]);
         character.equipment = await this.all(`SELECT CI.* FROM character_equipment CI WHERE CI.owner_id=?;`, [id]);
+        character.quests = await this.all(`SELECT CI.* FROM character_quests CI WHERE CI.owner_id=? AND CI.status=?;`, [id, 0]);
         return character;
     }
 
@@ -258,7 +241,7 @@ class Database {
             ?,
             ?,
             ?,
-            "lh_town",
+            "lh_town", 
             "4.20",
             "0",
             "-23.26",
@@ -281,6 +264,10 @@ class Database {
             const sql_abilities = `INSERT INTO character_abilities ("owner_id", "digit", "key") VALUES ("${c.id}", "${ability.digit}", "${ability.key}")`;
             this.run(sql_abilities);
         });
+
+        //
+        const sql_quests = `INSERT INTO character_quests ("owner_id", "key", "status", "qty") VALUES ("${c.id}", "LH_DANGEROUS_ERRANDS_01", "0", "0")`;
+        //this.run(sql_quests);
 
         // add default items
         let items = [{ qty: 1, key: "potion_small_red" }];
@@ -366,6 +353,19 @@ class Database {
         let sqlString = `INSERT INTO character_equipment (owner_id, key, slot) VALUES `;
         equipments.forEach((element: EquipmentSchema) => {
             sqlString += ` ('${character_id}', '${element.key}', '${element.slot}'),`;
+        });
+        sqlString = sqlString.slice(0, -1);
+        return await this.run(sqlString);
+    }
+
+    // removes and saves quests
+    // terrible way to do it
+    async saveQuests(character_id: number, quests: MapSchema<QuestSchema, string>) {
+        const sql = `DELETE FROM character_quests WHERE owner_id=?;`;
+        await this.run(sql, [character_id]);
+        let sqlString = `INSERT INTO character_quests (owner_id, key, status, qty) VALUES `;
+        quests.forEach((element: QuestSchema) => {
+            sqlString += ` ('${character_id}', '${element.key}', '${element.status}', '${element.qty}'),`;
         });
         sqlString = sqlString.slice(0, -1);
         return await this.run(sqlString);

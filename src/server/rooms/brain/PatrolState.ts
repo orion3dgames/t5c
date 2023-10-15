@@ -74,7 +74,7 @@ class PatrolState extends State {
         }
 
         // if there is a closest player, and in aggro range
-        if (owner.isAnyPlayerInAggroRange()) {
+        if (owner.isAnyPlayerInAggroRange() && owner.AI_SPAWN_INFO.aggressive === true) {
             owner.setPlayerTarget(owner.AI_CLOSEST_PLAYER);
         }
 
@@ -85,7 +85,6 @@ class PatrolState extends State {
         }
 
         // add 10% chance of AI of breaking patrol and slacking off :)
-
         if (Math.random() > 0.99) {
             owner._stateMachine.changeTo("IDLE");
             return false;
