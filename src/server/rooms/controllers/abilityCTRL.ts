@@ -350,7 +350,7 @@ export class abilitiesCTRL {
         // get player
         let client = owner.getClient();
 
-        // update caster rewards
+        // update owner rewards
         if (client) {
             // send notif to player
             client.send(ServerMsg.SERVER_MESSAGE, {

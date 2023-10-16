@@ -265,7 +265,7 @@ export class GameRoomState extends Schema {
         /////////////////////////////////////
         // on player unequip
         if (type === ServerMsg.PLAYER_QUEST_UPDATE) {
-            playerState.questUpdate(data);
+            playerState.dynamicCTRL.questUpdate(data);
         }
 
         /////////////////////////////////////

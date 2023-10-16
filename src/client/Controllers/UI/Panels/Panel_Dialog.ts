@@ -75,7 +75,7 @@ export class Panel_Dialog extends Panel {
 
     public isQuestReadyToComplete() {
         if (this.playerQuest && this.currentQuest) {
-            if (this.currentQuest.type === QuestObjective.KILL_AMOUNT && this.playerQuest.qty === this.currentQuest.quantity && this.playerQuest.status === 0) {
+            if (this.currentQuest.type === QuestObjective.KILL_AMOUNT && this.playerQuest.qty >= this.currentQuest.quantity && this.playerQuest.status === 0) {
                 return true;
             }
         }

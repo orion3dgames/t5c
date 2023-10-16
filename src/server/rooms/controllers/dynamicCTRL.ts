@@ -1,5 +1,6 @@
-import { ServerMsg } from "../../../shared/types";
-import { BrainSchema, PlayerSchema } from "../schema";
+import { Leveling } from "src/shared/Class/Leveling";
+import { Quest, QuestObjective, QuestStatus, QuestUpdate, ServerMsg } from "../../../shared/types";
+import { BrainSchema, LootSchema, PlayerSchema, QuestSchema } from "../schema";
 import { GameRoomState } from "../state/GameRoomState";
 
 export class dynamicCTRL {
@@ -46,92 +47,73 @@ export class dynamicCTRL {
                 }
             });
         }
-
-        //
-        if (this._player.interactingTarget) {
-            // check distance
-            let distance = this._player.getPosition().distanceTo(this._player.interactingTarget.getPosition());
-            if (distance > 5) {
-                this.endInteraction();
-            }
-        }
     }
 
-    public endInteraction() {
-        this._player.interactingStep = 0;
-        this._player.interactingTarget = null;
-        this._player.isInteracting = null;
-        let client = this._player.getClient();
-    }
+    ////////////////////////////////
+    //////////// QUESTS /////////////
+    ////////////////////////////////
 
-    public process(sessionId) {
-        console.log("Player " + this._player.name + " has clicked on ", sessionId);
-
-        let target: BrainSchema = this._state.entityCTRL.get(sessionId) as BrainSchema;
-        this._player.interactingTarget = target;
-
-        if (target) {
-            // nothing happens when you click on yourself
-            if (target.sessionId === this._player.sessionId) return false;
-
-            // only continue if you click on a entity (not player or item)
-            if (target.type !== "entity") return false;
-
-            // only proceed if interactable is set
-            if (!target.AI_SPAWN_INFO.interactable) return false;
-
-            // check distance
-            let distance = this._player.getPosition().distanceTo(target.getPosition());
-            if (distance > 5) return false;
-
-            // get details
-            let interactable = target.AI_SPAWN_INFO.interactable;
-            if (interactable) {
-                if (interactable.type === "dialog") {
-                    //
-                    console.log("--------------- DIALOG STARTED --------------------");
-
-                    // start dialog
-                    this._player.interactingStep = 0;
-                    let dialogData = interactable.data[this._player.interactingStep];
-                    this._player.isInteracting = dialogData;
-
-                    // replace keywords
-                    let dialogText = dialogData.text;
-                    dialogText = dialogText.replace("@PlayerName", this._player.name);
-
-                    // send event to player
-                    let client = this._player.getClient();
+    // check quest update
+    // note: currently called from abilityCtrl when a entity dies
+    checkQuestUpdate(type, target: BrainSchema) {
+        if (type === "kill") {
+            this._player.player_data.quests.forEach((element: QuestSchema) => {
+                if (element.type === QuestObjective.KILL_AMOUNT && element.spawn_type === target.AI_SPAWN_INFO.key) {
+                    element.qty++;
                 }
+            });
+        }
+    }
+
+    isQuestReadyToComplete(quest: Quest) {
+        let pQuest = this._player.player_data.quests[quest.key];
+        if (quest && pQuest) {
+            if (quest.type === QuestObjective.KILL_AMOUNT && pQuest.qty >= quest.quantity && pQuest.status === 0) {
+                return true;
             }
         }
+        return false;
+    }
 
-        /*
-        distance: 2,
-        type: "dialog",
-        data: [
-            {
-                text: "Hi, I'm a target practise dummy, welcome @PlayerName ",
-                buttons: [{ label: "Welcome", goToDialog: 1 }],
-            },
-            {
-                text: "Are you in search of healing?",
-                buttons: [
-                    { label: "Yes", goToDialog: 2 },
-                    { label: "No", goToDialog: 3 },
-                ],
-            },
-            {
-                text: "Ok, please do not move while I heal you!",
-                isEndOfDialog: true,
-                triggeredByClosing: (owner) => {
-                    owner.heal();
-                },
-            },
-            {
-                text: "Oh!, Do come back when you're in need.",
-                isEndOfDialog: true,
-            },
-        ],*/
+    questUpdate(data: QuestUpdate) {
+        let quest = this._state.gameData.get("quest", data.id) as Quest;
+
+        if (!quest) {
+            return false;
+        }
+
+        if (data.status === QuestStatus.OBJECTIVE_UPDATE) {
+        }
+
+        if (data.status === QuestStatus.ACCEPTED) {
+            this._player.player_data.quests.set(quest.key, new QuestSchema(quest));
+        }
+
+        if (data.status === QuestStatus.READY_TO_COMPLETE) {
+            // check is quest in complete
+            if (!this.isQuestReadyToComplete(quest)) return false;
+
+            // experience
+            let experienceReward = quest.rewards.experience ?? 0;
+            if (experienceReward) {
+                Leveling.addExperience(this._player, experienceReward);
+            }
+
+            // gold
+            let goldReward = quest.rewards.gold ?? 0;
+            if (goldReward) {
+                this._player.player_data.gold += goldReward;
+            }
+
+            // add items
+            let items = quest.rewards.items ?? [];
+            items.forEach((item) => {
+                this._player.pickupItem(new LootSchema(this._state, item));
+            });
+
+            // remove quest as it is completed
+            // later on we will save a history, not necessary yet..
+            this._player.player_data.quests.delete(quest.key);
+        }
     }
 }
