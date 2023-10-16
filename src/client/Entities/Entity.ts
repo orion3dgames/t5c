@@ -184,21 +184,38 @@ export class Entity {
     }
 
     public update(delta): any {
+        ////////////////////////////////////
         // what to do when an entity dies
         if (this.health < 1 && !this.isDead) {
             this.isDead = true;
+
+            // remove from player selection
             this._game.selectedEntity = null;
+
+            // remove selected mesh
             this.meshController.selectedMesh.isVisible = false;
+
+            // remove any action managers
             if (this.meshController.mesh.actionManager) {
                 this.meshController.mesh.actionManager.dispose();
                 this.meshController.mesh.actionManager = null;
             }
+
+            // hide interactable button
+            this.interactableButtons.isVisible = false;
+            // hide any dialog this entity could be linked too
+            if (this.ui.panelDialog.currentEntity.sessionId === this.sessionId) {
+                this.ui.panelDialog.clear();
+                this.ui.panelDialog.close();
+            }
         }
 
+        ////////////////////////////////////
         if (this.health > 0) {
             this.isDead = false;
         }
 
+        ////////////////////////////////////
         // only do the below if entity is not dead
         if (!this.isDead) {
             // if entity is selected, show
@@ -227,6 +244,7 @@ export class Entity {
             }
         }
 
+        ////////////////////////////////////
         // animate player continuously
         this.animatorController.animate(this, this.mesh.position, this.moveController.getNextPosition());
     }
@@ -271,6 +289,7 @@ export class Entity {
         // delete any ui linked to entity
         this.characterLabel.dispose();
         this.characterChatLabel.dispose();
+        this.interactableButtons.dispose();
 
         // delete mesh, including equipment
         this.meshController.deleteMeshes();

@@ -204,7 +204,7 @@ export class Player extends Entity {
         let closestDistance = 1000000;
         for (let sessionId in this.entities) {
             let entity = this.entities[sessionId];
-            if (entity.type === "entity" && entity.interactableButtons) {
+            if (entity.type === "entity" && entity.interactableButtons && entity.health > 0) {
                 entity.interactableButtons.isVisible = false;
                 let playerPos = this.getPosition();
                 let entityPos = entity.getPosition();
