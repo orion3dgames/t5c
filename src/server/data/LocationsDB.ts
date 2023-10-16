@@ -136,10 +136,6 @@ let LocationsDB = {
                             {
                                 type: "quest",
                                 quest_id: "LH_DANGEROUS_ERRANDS_01",
-                                quest: {
-                                    accepted: 2,
-                                    declined: 4,
-                                },
                             },
                             {
                                 type: "text",

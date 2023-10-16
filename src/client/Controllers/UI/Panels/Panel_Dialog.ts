@@ -92,10 +92,16 @@ export class Panel_Dialog extends Panel {
 
         // get vars
         let currentDialog = this.currentDialog[step];
-        this.playerQuest = this._currentPlayer.player_data.quests[currentDialog.quest_id];
-        this.currentQuest = this._game.getGameData("quest", currentDialog.quest_id);
+        let lastDialogIndex = this.currentDialog.length - 1;
         let questCompleted = this.isQuestReadyToComplete();
 
+        // load quest details
+        if (currentDialog.quest_id) {
+            this.playerQuest = this._currentPlayer.player_data.quests[currentDialog.quest_id];
+            this.currentQuest = this._game.getGameData("quest", currentDialog.quest_id);
+        }
+
+        // create main description textblock
         let dialogTextBlock = new TextBlock("dialogText");
         dialogTextBlock.text = "";
         dialogTextBlock.textHorizontalAlignment = 0;
@@ -107,15 +113,17 @@ export class Panel_Dialog extends Panel {
         dialogTextBlock.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         this.dialogStackPanel.addControl(dialogTextBlock);
 
+        // if dialog is type "text"
         if (currentDialog.type === "text") {
             let dialogText = currentDialog.text;
             dialogText = this.replaceKeywords(dialogText);
             dialogTextBlock.text = dialogText;
         }
 
-        // if dialog is quest, show accept and decline buttons
+        //////////////////////////////////
+        // if dialog is type "quest",
         if (currentDialog.type === "quest") {
-            // accepted
+            // quest accepted
             if (this.playerQuest && this.playerQuest.status === 0) {
                 let dialogText = this.currentQuest.descriptionOngoing;
                 dialogText = this.replaceKeywords(dialogText);
@@ -123,7 +131,7 @@ export class Panel_Dialog extends Panel {
                 currentDialog.isEndOfDialog = true;
             }
 
-            // ready to complete
+            // quest ready to complete
             if (questCompleted) {
                 let dialogText = this.currentQuest.descriptionReward;
                 dialogText = this.replaceKeywords(dialogText);
@@ -134,17 +142,15 @@ export class Panel_Dialog extends Panel {
                 let rewardText = "Experience: " + this.currentQuest.reward.experience ?? 0 + "\n\n ";
                 rewardText += "Gold: " + this.currentQuest.reward.gold ?? 0 + "\n\n";
 
-                let dialogObjective = new TextBlock("dialogObjective");
-                dialogObjective.text = rewardText;
-                dialogObjective.fontSize = "14px";
-                dialogObjective.color = "orange";
-                dialogObjective.textWrapping = TextWrapping.WordWrap;
-                dialogObjective.resizeToFit = true;
-                dialogObjective.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-                dialogObjective.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-                this.dialogStackPanel.addControl(dialogObjective);
+                let dialogRewards = new TextBlock("dialogRewards");
+                dialogRewards.text = rewardText;
+                dialogRewards.fontSize = "14px";
+                dialogRewards.color = "orange";
+                dialogRewards.textWrapping = TextWrapping.WordWrap;
+                dialogRewards.resizeToFit = true;
+                this.dialogStackPanel.addControl(dialogRewards);
 
-                // complete button
+                // complete quest button
                 const createBtn = Button.CreateSimpleButton("characterBtn", "Complete Quest");
                 createBtn.left = "0px;";
                 createBtn.top = "0px";
@@ -153,42 +159,42 @@ export class Panel_Dialog extends Panel {
                 createBtn.background = "black";
                 createBtn.color = "white";
                 createBtn.thickness = 0;
-                createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-                createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
                 this.dialogStackPanel.addControl(createBtn);
 
                 createBtn.onPointerDownObservable.add(() => {
+                    // send event to server
                     this._room.send(ServerMsg.PLAYER_QUEST_UPDATE, {
                         id: currentDialog.quest_id,
                         status: QuestStatus.READY_TO_COMPLETE,
                     });
+                    // close dialog
                     this.close();
                 });
             }
 
-            // completed
+            // quest completed
             if (this.playerQuest && this.playerQuest.status === 1) {
                 let dialogText = this.currentQuest.descriptionCompleted;
                 dialogText = this.replaceKeywords(dialogText);
                 dialogTextBlock.text = dialogText;
             }
 
-            // not started
+            // quest not started
             if (!this.playerQuest) {
                 let dialogText = this.currentQuest.description;
                 dialogText = this.replaceKeywords(dialogText);
                 dialogTextBlock.text = dialogText;
 
+                // show quest objective
                 let dialogObjective = new TextBlock("dialogObjective");
                 dialogObjective.text = this.replaceKeywords(this.currentQuest.objective);
                 dialogObjective.fontSize = "14px";
                 dialogObjective.color = "orange";
                 dialogObjective.textWrapping = TextWrapping.WordWrap;
                 dialogObjective.resizeToFit = true;
-                dialogObjective.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-                dialogObjective.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
                 this.dialogStackPanel.addControl(dialogObjective);
 
+                // show accept button
                 const dialogBtnAccept = Button.CreateSimpleButton("dialogBtnAccept", "Accept");
                 dialogBtnAccept.width = 1;
                 dialogBtnAccept.height = "24px";
@@ -197,13 +203,16 @@ export class Panel_Dialog extends Panel {
                 dialogBtnAccept.thickness = 0;
                 this.dialogStackPanel.addControl(dialogBtnAccept);
                 dialogBtnAccept.onPointerDownObservable.add(() => {
+                    // sent event to server
                     this._room.send(ServerMsg.PLAYER_QUEST_UPDATE, {
                         id: currentDialog.quest_id,
                         status: QuestStatus.ACCEPTED,
                     });
-                    this.nextStep(currentDialog.quest.accepted);
+                    // go to end dialog
+                    this.nextStep(lastDialogIndex);
                 });
 
+                // show decline button
                 const dialogBtnDecline = Button.CreateSimpleButton("dialogBtnDecline", "Decline");
                 dialogBtnDecline.width = 1;
                 dialogBtnDecline.height = "24px";
@@ -212,12 +221,13 @@ export class Panel_Dialog extends Panel {
                 dialogBtnDecline.thickness = 0;
                 this.dialogStackPanel.addControl(dialogBtnDecline);
                 dialogBtnDecline.onPointerDownObservable.add(() => {
-                    this.nextStep(currentDialog.quest.declined);
+                    // go back to start
+                    this.nextStep(0);
                 });
             }
         }
 
-        // create buttons
+        // create any quest buttons
         if (currentDialog.quests) {
             let q = 1;
             currentDialog.quests.forEach((btn: any) => {
@@ -230,8 +240,6 @@ export class Panel_Dialog extends Panel {
                 createBtn.background = "orange";
                 createBtn.color = "white";
                 createBtn.thickness = 0;
-                createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-                createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
                 this.dialogStackPanel.addControl(createBtn);
 
                 createBtn.onPointerDownObservable.add(() => {
@@ -242,7 +250,7 @@ export class Panel_Dialog extends Panel {
             });
         }
 
-        // create buttons
+        // create any other buttons
         if (currentDialog.buttons) {
             let i = 1;
             currentDialog.buttons.forEach((btn: any) => {
@@ -259,8 +267,6 @@ export class Panel_Dialog extends Panel {
                 createBtn.background = "black";
                 createBtn.color = "white";
                 createBtn.thickness = 0;
-                createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-                createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
                 this.dialogStackPanel.addControl(createBtn);
 
                 createBtn.onPointerDownObservable.add(() => {
@@ -283,8 +289,6 @@ export class Panel_Dialog extends Panel {
             createBtn.background = "black";
             createBtn.color = "white";
             createBtn.thickness = 0;
-            createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-            createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
             this.dialogStackPanel.addControl(createBtn);
 
             createBtn.onPointerDownObservable.add(() => {
