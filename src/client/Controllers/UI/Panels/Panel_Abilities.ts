@@ -89,7 +89,7 @@ export class Panel_Abilities extends Panel {
             skillsPanel.thickness = 1;
             skillsPanel.paddingLeft = "5px;";
             skillsPanel.paddingBottom = "5px;";
-            skillsPanel = applyTheme(skillsPanel);
+            applyTheme(skillsPanel);
             skillsPanelStack.addControl(skillsPanel);
 
             // add icon

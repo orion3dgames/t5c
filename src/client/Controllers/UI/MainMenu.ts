@@ -83,9 +83,9 @@ export class MainMenu {
         drowpdownMenu.height = "100px";
         drowpdownMenu.isVisible = true;
         drowpdownMenu.adaptHeightToChildren = true;
-        drowpdownMenu = applyTheme(drowpdownMenu);
         drowpdownMenu.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         drowpdownMenu.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        applyTheme(drowpdownMenu);
         this._playerUI.addControl(drowpdownMenu);
 
         const grid = new StackPanel("drowpdownStack");

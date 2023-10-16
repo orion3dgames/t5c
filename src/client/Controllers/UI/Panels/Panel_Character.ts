@@ -146,7 +146,7 @@ export class Panel_Character extends Panel {
         let slotPanel = new Rectangle("slotPanel");
         slotPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         slotPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        slotPanel.top = "-30px";
+        slotPanel.top = "0px";
         slotPanel.left = "0px";
         slotPanel.width = 1;
         slotPanel.adaptHeightToChildren = true;
@@ -189,7 +189,7 @@ export class Panel_Character extends Panel {
             panelRectangle.thickness = 1;
             panelRectangle.paddingLeft = "0px;";
             panelRectangle.paddingBottom = "5px;";
-            panelRectangle = applyTheme(panelRectangle);
+            applyTheme(panelRectangle);
             stackPanel.addControl(panelRectangle);
 
             const tooltipName = new TextBlock("name" + key);
@@ -249,7 +249,7 @@ export class Panel_Character extends Panel {
             panelRectangle.thickness = 1;
             panelRectangle.paddingLeft = "0px;";
             panelRectangle.paddingBottom = "5px;";
-            panelRectangle = applyTheme(panelRectangle);
+            applyTheme(panelRectangle);
             stackPanel.addControl(panelRectangle);
 
             const tooltipName = new TextBlock("name" + key);
@@ -315,7 +315,8 @@ export class Panel_Character extends Panel {
             panelRectangle.left = leftMargin;
             panelRectangle.width = iconWidth + "px";
             panelRectangle.height = iconWidth + "px";
-            panelRectangle = applyTheme(panelRectangle);
+            panelRectangle.thickness = 1;
+            panelRectangle.color = "gray";
             panel.addControl(panelRectangle);
 
             var panelText = new TextBlock("slot_text_" + i);

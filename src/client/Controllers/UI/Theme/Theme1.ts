@@ -8,7 +8,7 @@ const createButton = function (name, text, width, height, icon?: string, size: s
     let result = new Button(name);
     result.width = width;
     result.height = height;
-    result = applyTheme(result);
+    applyTheme(result);
 
     if (icon) {
         let image = new Image("img" + name, "images/icons/" + icon + ".png");
@@ -22,7 +22,7 @@ const createButton = function (name, text, width, height, icon?: string, size: s
     textBlock.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
     textBlock.color = "white";
     textBlock.fontWeight = "bold";
-    textBlock.fontFamily = getFont();
+    //textBlock.fontFamily = getFont();
 
     if (size === "md") {
         textBlock.fontSize = "14px;";
@@ -45,7 +45,7 @@ const generatePanel = function (panelName: string = "Default Name", width = "300
     panel.width = width;
     panel.height = height;
     panel.fontFamily = getFont();
-    panel = applyTheme(panel);
+    applyTheme(panel);
     return panel;
 };
 
@@ -55,13 +55,11 @@ const applyTheme = function (panel) {
     panel.background = getBg();
     panel.color = "rgba(0,0,0,1)";
     panel.fontFamily = getFont();
-    return panel;
 };
 
 const applyFont = function (p: Rectangle, size = "12px") {
     p.fontFamily = getFont();
     p.fontSize = size;
-    return p;
 };
 
 const getFont = function () {

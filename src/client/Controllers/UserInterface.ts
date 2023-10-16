@@ -100,8 +100,12 @@ export class UserInterface {
         this._namesUI = _namesUI;
 
         // create ui
-        const playerUI = AdvancedDynamicTexture.CreateFullscreenUI("UI_Player", true, this._scene);
-        this._playerUI = playerUI;
+        const uiLayer = AdvancedDynamicTexture.CreateFullscreenUI("UI_Player", true, this._scene);
+        /*
+        uiLayer.idealWidth = 1024;
+        uiLayer.idealHeight = 768;
+        uiLayer.useSmallestIdeal = true;*/
+        this._playerUI = uiLayer;
 
         // set highlight layer
         this._hightlight = new HighlightLayer("hl", this._scene);
@@ -217,8 +221,8 @@ export class UserInterface {
             name: "Dialog Panel",
             width: "300px;",
             height: "300px;",
-            top: "-100px;",
-            left: "-250px;",
+            //top: "-100px;",
+            //left: "-250px;",
             horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
             vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
         });
