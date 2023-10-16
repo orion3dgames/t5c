@@ -202,7 +202,10 @@ export class Entity {
             }
 
             // hide interactable button
-            this.interactableButtons.isVisible = false;
+            if (this.interactableButtons) {
+                this.interactableButtons.isVisible = false;
+            }
+
             // hide any dialog this entity could be linked too
             if (this.ui.panelDialog.currentEntity.sessionId === this.sessionId) {
                 this.ui.panelDialog.clear();
@@ -289,8 +292,9 @@ export class Entity {
         // delete any ui linked to entity
         this.characterLabel.dispose();
         this.characterChatLabel.dispose();
-        this.interactableButtons.dispose();
-
+        if (this.interactableButtons) {
+            this.interactableButtons.dispose();
+        }
         // delete mesh, including equipment
         this.meshController.deleteMeshes();
 
