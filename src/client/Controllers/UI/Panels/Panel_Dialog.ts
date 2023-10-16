@@ -121,6 +121,22 @@ export class Panel_Dialog extends Panel {
         }
 
         //////////////////////////////////
+        // if dialog is type "vendor",
+        if (currentDialog.type === "vendor") {
+            let dialogText = "WORK IN PROGRESS \n\n Here you will be buy and sell items in exchange for gold.";
+            dialogTextBlock.text = dialogText;
+            currentDialog.isEndOfDialog = true;
+        }
+
+        //////////////////////////////////
+        // if dialog is type "trainer",
+        if (currentDialog.type === "trainer") {
+            let dialogText = "WORK IN PROGRESS \n\n Here you will be able to learn abilities in exchange for gold.";
+            dialogTextBlock.text = dialogText;
+            currentDialog.isEndOfDialog = true;
+        }
+
+        //////////////////////////////////
         // if dialog is type "quest",
         if (currentDialog.type === "quest") {
             // quest accepted

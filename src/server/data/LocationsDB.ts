@@ -129,8 +129,10 @@ let LocationsDB = {
                                 text: "Greetings, dear one! I am Priestess Alice, a devoted servant of the benevolent Goddess Athlea. May her light shine upon you.",
                                 quests: [{ key: "LH_DANGEROUS_ERRANDS_01", goToDialog: 1 }],
                                 buttons: [
-                                    { label: "Can you heal me?", goToDialog: 3 },
-                                    { label: "Sorry, I'm busy adventuring.", goToDialog: 4 },
+                                    { label: "Can I see your wares?", goToDialog: 2 },
+                                    { label: "Can you train me?", goToDialog: 3 },
+                                    { label: "Can you heal me?", goToDialog: 4 },
+                                    { label: "Sorry, I'm busy adventuring.", goToDialog: 5 },
                                 ],
                             },
                             {
@@ -138,10 +140,29 @@ let LocationsDB = {
                                 quest_id: "LH_DANGEROUS_ERRANDS_01",
                             },
                             {
-                                type: "text",
-                                text: "Blessings upon you for your willingness to aid us. Please be cautious, and may the light of the Goddess Athlea guide and protect you",
-                                buttonName: "Consider it done!",
-                                isEndOfDialog: true,
+                                type: "vendor",
+                                items: [
+                                    {
+                                        key: "sword_01",
+                                        qty: 1,
+                                    },
+                                    {
+                                        key: "potion_small_red",
+                                        qty: 100,
+                                    },
+                                    {
+                                        key: "potion_small_blue",
+                                        qty: 100,
+                                    },
+                                ],
+                            },
+                            {
+                                type: "trainer",
+                                items: [
+                                    {
+                                        key: "fireball",
+                                    },
+                                ],
                             },
                             {
                                 type: "text",
@@ -155,7 +176,7 @@ let LocationsDB = {
                             },
                             {
                                 type: "text",
-                                text: "Very well, may the goddess watch over your chosen path.",
+                                text: "Very well, may the Goddess watch over your chosen path.",
                                 buttonName: "Thank you",
                                 isEndOfDialog: true,
                             },

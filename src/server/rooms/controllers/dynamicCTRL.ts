@@ -1,4 +1,4 @@
-import { Leveling } from "src/shared/Class/Leveling";
+import { Leveling } from "../../../shared/Class/Leveling";
 import { Quest, QuestObjective, QuestStatus, QuestUpdate, ServerMsg } from "../../../shared/types";
 import { BrainSchema, LootSchema, PlayerSchema, QuestSchema } from "../schema";
 import { GameRoomState } from "../state/GameRoomState";
