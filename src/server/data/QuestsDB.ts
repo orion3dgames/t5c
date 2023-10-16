@@ -7,7 +7,6 @@ let QuestsDB = {
         description:
             "If you have a moment, our temple is currently plagued by a bandit invasion and they're roaming outside the temple creating havoc. Perhaps you could offer some assistance in this matter?",
         descriptionOngoing: "Come back to me when you have killed @KillRemaining more bandits.",
-        descriptionAccepted: "Blessings upon you for your willingness to aid us and may the light of the Goddess Athlea guide and protect you",
         descriptionReward: "Thank you so much looking after my bandits problem.  Please accept this small token of my appreciation.",
         descriptionCompleted: "Thank you so much looking after my bandits problem.",
         objective: "@NpcName in @LocationName wants you to kill @KillRequired @KillName found a little to the east of lighthaven temple.",
@@ -40,7 +39,16 @@ let QuestsDB = {
         reward: {
             experience: 1000,
             gold: 250,
-            items: [],
+            items: [
+                {
+                    key: "helm_01",
+                    qty: 1,
+                },
+                {
+                    key: "sword_01",
+                    qty: 1,
+                },
+            ],
         },
     },
 };

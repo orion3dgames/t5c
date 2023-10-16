@@ -292,38 +292,38 @@ export class PlayerSchema extends Entity {
     }
 
     pickupItem(loot: LootSchema) {
-        // play animation
-        this.animationCTRL.playAnim(this, EntityState.PICKUP, () => {
-            let data = {
-                key: loot.key,
-                qty: loot.qty,
-                i: "" + 0,
-            };
+        // play animation // disabled
+        //this.animationCTRL.playAnim(this, EntityState.PICKUP, () => {});
 
-            //
-            let item = this._state.gameData.get("item", loot.key);
+        let data = {
+            key: loot.key,
+            qty: loot.qty,
+            i: "" + 0,
+        };
 
-            // is item already inventory
-            let inventoryItem = this.getInventoryItem(loot.key, "key");
+        //
+        let item = this._state.gameData.get("item", loot.key);
 
-            // is item stackable
-            if (item.stackable && inventoryItem) {
-                // increnent stack
-                inventoryItem.qty += data.qty;
-            } else {
-                // find next available index
-                data.i = this.findNextAvailableInventorySlot();
+        // is item already inventory
+        let inventoryItem = this.getInventoryItem(loot.key, "key");
 
-                // add inventory item
-                this.player_data.inventory.set("" + data.i, new InventorySchema(data));
-            }
+        // is item stackable
+        if (item.stackable && inventoryItem) {
+            // increnent stack
+            inventoryItem.qty += data.qty;
+        } else {
+            // find next available index
+            data.i = this.findNextAvailableInventorySlot();
 
-            // delete loot
-            this._state.entities.delete(loot.sessionId);
+            // add inventory item
+            this.player_data.inventory.set("" + data.i, new InventorySchema(data));
+        }
 
-            // stop chasing target
-            this.AI_TARGET = null;
-        });
+        // delete loot
+        this._state.entities.delete(loot.sessionId);
+
+        // stop chasing target
+        this.AI_TARGET = null;
     }
 
     consumeItem(item) {
@@ -488,15 +488,23 @@ export class PlayerSchema extends Entity {
         }
 
         if (data.status === QuestStatus.READY_TO_COMPLETE) {
+            // experience
             let experienceReward = quest.reward.experience ?? 0;
             if (experienceReward) {
                 Leveling.addExperience(this, experienceReward);
             }
 
+            // gold
             let goldReward = quest.reward.gold ?? 0;
             if (goldReward) {
                 this.player_data.gold += goldReward;
             }
+
+            // add items
+            let items = quest.reward.items ?? [];
+            items.forEach((item) => {
+                this.pickupItem(new LootSchema(this._state, item));
+            });
 
             // remove quest as it is completed
             // later on we will save a history, not necessary yet..
