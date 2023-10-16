@@ -489,19 +489,19 @@ export class PlayerSchema extends Entity {
 
         if (data.status === QuestStatus.READY_TO_COMPLETE) {
             // experience
-            let experienceReward = quest.reward.experience ?? 0;
+            let experienceReward = quest.rewards.experience ?? 0;
             if (experienceReward) {
                 Leveling.addExperience(this, experienceReward);
             }
 
             // gold
-            let goldReward = quest.reward.gold ?? 0;
+            let goldReward = quest.rewards.gold ?? 0;
             if (goldReward) {
                 this.player_data.gold += goldReward;
             }
 
             // add items
-            let items = quest.reward.items ?? [];
+            let items = quest.rewards.items ?? [];
             items.forEach((item) => {
                 this.pickupItem(new LootSchema(this._state, item));
             });

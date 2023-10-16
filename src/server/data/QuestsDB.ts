@@ -16,7 +16,7 @@ let QuestsDB = {
         spawn_name: "Bandit",
         quantity: 5,
         isRepeatable: true,
-        reward: {
+        rewards: {
             experience: 500,
             gold: 50,
             items: [],
@@ -36,14 +36,10 @@ let QuestsDB = {
         spawn_name: "Thief",
         quantity: 1,
         isRepeatable: true,
-        reward: {
+        rewards: {
             experience: 1000,
             gold: 250,
             items: [
-                {
-                    key: "helm_01",
-                    qty: 1,
-                },
                 {
                     key: "sword_01",
                     qty: 1,

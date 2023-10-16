@@ -93,13 +93,13 @@ export class Panel_Dialog extends Panel {
         // get vars
         let currentDialog = this.currentDialog[step];
         let lastDialogIndex = this.currentDialog.length - 1;
-        let questCompleted = this.isQuestReadyToComplete();
 
         // load quest details
         if (currentDialog.quest_id) {
             this.playerQuest = this._currentPlayer.player_data.quests[currentDialog.quest_id];
             this.currentQuest = this._game.getGameData("quest", currentDialog.quest_id);
         }
+        let questCompleted = this.isQuestReadyToComplete();
 
         // create main description textblock
         let dialogTextBlock = new TextBlock("dialogText");
@@ -139,16 +139,7 @@ export class Panel_Dialog extends Panel {
                 currentDialog.isEndOfDialog = false;
 
                 // show rewards
-                let rewardText = "Experience: " + this.currentQuest.reward.experience ?? 0 + "\n\n ";
-                rewardText += "Gold: " + this.currentQuest.reward.gold ?? 0 + "\n\n";
-
-                let dialogRewards = new TextBlock("dialogRewards");
-                dialogRewards.text = rewardText;
-                dialogRewards.fontSize = "14px";
-                dialogRewards.color = "orange";
-                dialogRewards.textWrapping = TextWrapping.WordWrap;
-                dialogRewards.resizeToFit = true;
-                this.dialogStackPanel.addControl(dialogRewards);
+                this.showRewards(this.currentQuest.rewards);
 
                 // complete quest button
                 const createBtn = Button.CreateSimpleButton("characterBtn", "Complete Quest");
@@ -299,6 +290,40 @@ export class Panel_Dialog extends Panel {
             if (currentDialog.triggeredByClosing) {
                 this.processEvent(currentDialog.triggeredByClosing);
             }
+        }
+    }
+
+    public showRewards(rewards) {
+        if (rewards.experience) {
+            let dialogRewards = new TextBlock("dialogRewards-experience");
+            dialogRewards.text = "Experience: " + rewards.experience;
+            dialogRewards.fontSize = "14px";
+            dialogRewards.color = "orange";
+            dialogRewards.resizeToFit = true;
+            dialogRewards.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            this.dialogStackPanel.addControl(dialogRewards);
+        }
+
+        if (rewards.gold) {
+            let dialogRewards = new TextBlock("dialogRewards-gold");
+            dialogRewards.text = "Gold: " + rewards.experience;
+            dialogRewards.fontSize = "14px";
+            dialogRewards.color = "orange";
+            dialogRewards.resizeToFit = true;
+            dialogRewards.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            this.dialogStackPanel.addControl(dialogRewards);
+        }
+
+        if (rewards.items && rewards.items.length > 0) {
+            rewards.items.forEach((item) => {
+                let dialogRewards = new TextBlock("dialogRewards-item-" + item.key);
+                dialogRewards.text = "Item: " + item.key;
+                dialogRewards.fontSize = "14px";
+                dialogRewards.color = "orange";
+                dialogRewards.resizeToFit = true;
+                dialogRewards.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+                this.dialogStackPanel.addControl(dialogRewards);
+            });
         }
     }
 

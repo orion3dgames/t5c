@@ -98,7 +98,7 @@ export type Quest = {
     spawn_type: string;
     quantity: number;
     isRepeatable: boolean;
-    reward: {
+    rewards: {
         experience: number;
         gold: number;
         items: [];

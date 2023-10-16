@@ -32,7 +32,6 @@ export class InventoryDropdown {
 
     public showDropdown(el: Rectangle, item, inventory) {
         if (this.dropdown) {
-            console.log("ALREAYD OPEN, CLOSE");
             this.hideDropdown();
         }
 
