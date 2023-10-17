@@ -181,7 +181,12 @@ export type Ability = {
     targetPropertyAffected: PropertyAffected[];
 
     // what properties a player must have to learn this ability
-    requiredToLearn?;
+    required_level?: number;
+    required_strength?: number;
+    required_endurance?: number;
+    required_agility?: number;
+    required_intelligence?: number;
+    required_wisdom?: number;
 };
 
 export interface abilityMap {

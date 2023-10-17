@@ -93,7 +93,7 @@ export class Panel {
         panelContent.top = "30px;";
         panelContent.left = 0;
         panelContent.width = 1;
-        panelContent.height = 0.9;
+        panelContent.height = 0.91;
         panelContent.thickness = 0;
         panelContent.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         panelContent.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;

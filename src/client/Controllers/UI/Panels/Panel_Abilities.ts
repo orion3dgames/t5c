@@ -76,15 +76,13 @@ export class Panel_Abilities extends Panel {
             // get ability details
             let ability = Abilities[key];
 
-            let hasRequirements = Object.keys(ability.requiredToLearn).length;
-
             let skillsPanel = new Rectangle("abilityCont" + ability.key);
             skillsPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             skillsPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             skillsPanel.top = "0px";
             skillsPanel.left = "0px;";
             skillsPanel.width = 1;
-            skillsPanel.height = "70px";
+            skillsPanel.height = "50px";
             skillsPanel.background = "#CCC";
             skillsPanel.thickness = 1;
             skillsPanel.paddingLeft = "5px;";
@@ -98,8 +96,8 @@ export class Panel_Abilities extends Panel {
             imageBLoc.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             imageBLoc.top = "0px";
             imageBLoc.left = "0px;";
-            imageBLoc.width = "60px;";
-            imageBLoc.height = "60px;";
+            imageBLoc.width = "40px;";
+            imageBLoc.height = "40px;";
             imageBLoc.thickness = 0;
             skillsPanel.addControl(imageBLoc);
             var imageData = this._loadedAssets[ability.icon];
@@ -109,7 +107,7 @@ export class Panel_Abilities extends Panel {
 
             // on hover tooltip
             imageBLoc.onPointerEnterObservable.add(() => {
-                this._UI._Tooltip.refresh("ability", ability, imageBLoc, "left", "center");
+                this._UI._Tooltip.refresh("ability", ability, imageBLoc, "right", "center");
             });
             // on hover tooltip
             imageBLoc.onPointerOutObservable.add(() => {
@@ -119,8 +117,8 @@ export class Panel_Abilities extends Panel {
             const tooltipName = new TextBlock("abilityName" + ability.key);
             tooltipName.color = "#FFF";
             tooltipName.top = "5px";
-            tooltipName.left = "80px";
-            tooltipName.fontSize = "24px;";
+            tooltipName.left = "50px";
+            tooltipName.fontSize = "18px;";
             tooltipName.resizeToFit = true;
             tooltipName.text = ability.title;
             tooltipName.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
@@ -131,19 +129,21 @@ export class Panel_Abilities extends Panel {
 
             const abilityDescr = new TextBlock("abilityDescr" + ability.key);
             abilityDescr.color = "rgba(255,255,255,.6)";
-            abilityDescr.top = "-6px";
-            abilityDescr.left = "80px";
+            abilityDescr.top = "0px";
+            abilityDescr.left = "50px";
             abilityDescr.fontSize = "12px;";
             abilityDescr.resizeToFit = true;
-            abilityDescr.text = hasRequirements ? this.objToString(ability.requiredToLearn) : "Default";
+            abilityDescr.text = ability.description;
             abilityDescr.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             abilityDescr.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
             abilityDescr.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
             abilityDescr.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             skillsPanel.addControl(abilityDescr);
 
+            /*
             let entity = this._currentPlayer.entity;
             if (entity.player_data.abilities[ability.key]) {
+                
                 const abilityLearn = Button.CreateSimpleButton("abilityForget" + ability.key, "Forget");
                 abilityLearn.top = "2px;";
                 abilityLearn.left = "-2px;";
@@ -158,7 +158,9 @@ export class Panel_Abilities extends Panel {
                 abilityLearn.onPointerDownObservable.add(() => {
                     this._room.send(ServerMsg.PLAYER_LEARN_SKILL, ability.key);
                 });
+                
             } else {
+                /*
                 const abilityLearn = Button.CreateSimpleButton("abilityLearn" + ability.key, "Learn");
                 abilityLearn.top = "2px;";
                 abilityLearn.left = "-2px;";
@@ -173,7 +175,9 @@ export class Panel_Abilities extends Panel {
                 abilityLearn.onPointerDownObservable.add(() => {
                     this._room.send(ServerMsg.PLAYER_LEARN_SKILL, ability.key);
                 });
+                
             }
+            */
         }
     }
 

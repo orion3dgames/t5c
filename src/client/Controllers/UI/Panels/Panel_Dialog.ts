@@ -7,6 +7,9 @@ import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { UserInterface } from "../../UserInterface";
 import { QuestObjective, QuestStatus, ServerMsg } from "../../../../shared/types";
 import { QuestSchema } from "../../../../server/rooms/schema";
+import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
+
+import { Trainer } from "./Dialog/Trainer";
 
 export class Panel_Dialog extends Panel {
     // inventory tab
@@ -29,6 +32,9 @@ export class Panel_Dialog extends Panel {
     public currentDialogStep: number = -1;
     public playerQuest: QuestSchema;
 
+    //
+    private trainer: Trainer;
+
     constructor(_UI: UserInterface, _currentPlayer, options) {
         super(_UI, _currentPlayer, options);
 
@@ -50,9 +56,10 @@ export class Panel_Dialog extends Panel {
     }
 
     clear() {
-        this.dialogStackPanel.getDescendants().forEach((el) => {
+        this._panelContent.getDescendants().forEach((el) => {
             el.dispose();
         });
+        this.createContent();
     }
 
     public replaceKeywords(text) {
@@ -123,7 +130,7 @@ export class Panel_Dialog extends Panel {
         //////////////////////////////////
         // if dialog is type "vendor",
         if (currentDialog.type === "vendor") {
-            let dialogText = "WORK IN PROGRESS \n\n Here you will be buy and sell items in exchange for gold.";
+            let dialogText = "WORK IN PROGRESS \n\nHere you will be able to buy and sell items in exchange for gold.";
             dialogTextBlock.text = dialogText;
             currentDialog.isEndOfDialog = true;
         }
@@ -131,9 +138,7 @@ export class Panel_Dialog extends Panel {
         //////////////////////////////////
         // if dialog is type "trainer",
         if (currentDialog.type === "trainer") {
-            let dialogText = "WORK IN PROGRESS \n\n Here you will be able to learn abilities in exchange for gold.";
-            dialogTextBlock.text = dialogText;
-            currentDialog.isEndOfDialog = true;
+            this.trainer = new Trainer(this, currentDialog);
         }
 
         //////////////////////////////////

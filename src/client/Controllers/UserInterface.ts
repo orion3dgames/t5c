@@ -221,12 +221,12 @@ export class UserInterface {
         // create dialog panel
         this.panelDialog = new Panel_Dialog(this, currentPlayer, {
             name: "Dialog Panel",
-            width: "300px;",
-            height: "300px;",
-            //top: "-100px;",
-            //left: "-250px;",
-            horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
-            vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
+            width: "350px;",
+            height: "400px;",
+            top: "100px;",
+            left: "15px;",
+            horizontal_position: Control.HORIZONTAL_ALIGNMENT_LEFT,
+            vertical_position: Control.VERTICAL_ALIGNMENT_TOP,
         });
 
         // create quests panel

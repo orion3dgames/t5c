@@ -31,7 +31,18 @@ export class AbilityBar {
         this._createUI();
 
         // add ui events
-        this._createEvents();
+        let entity = this._currentPlayer.entity;
+        entity.player_data.abilities.onAdd((item, sessionId) => {
+            this._createUI();
+            // todo: could be a performance issue here?
+            // orion to keep an eye on this one
+            item.onChange((item, sessionId) => {
+                this._createUI();
+            });
+            item.onRemove((item, sessionId) => {
+                this._createUI();
+            });
+        });
     }
 
     _createUI() {
@@ -100,10 +111,11 @@ export class AbilityBar {
     }
 
     addAbilityIcon(digit, ability, headlineRect: Rectangle) {
-        var imageData = this._loadedAssets[ability.icon];
-        var img = new Image("ability_image_" + digit, imageData);
+        var imageData = this._game._loadedAssets[ability.icon];
+        var img = new Image("ability_image_" + digit, "./images/icons/" + ability.icon + ".png");
         img.stretch = Image.STRETCH_FILL;
         headlineRect.addControl(img);
+        img._markAsDirty();
 
         headlineRect.onPointerEnterObservable.add(() => {
             this.showTooltip(ability, headlineRect);
@@ -168,17 +180,5 @@ export class AbilityBar {
 
     hideTooltip() {
         this._UI._Tooltip.close();
-    }
-
-    _createEvents() {
-        let entity = this._currentPlayer.entity;
-        if (entity.player_data.abilities) {
-            entity.player_data.abilities.onAdd((item, sessionId) => {
-                this._createUI();
-            });
-            entity.player_data.abilities.onRemove((item, sessionId) => {
-                this._createUI();
-            });
-        }
     }
 }

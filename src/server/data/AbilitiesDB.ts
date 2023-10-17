@@ -23,7 +23,6 @@ let AbilitiesDB: abilityMap = {
         affinity: "strength",
         casterPropertyAffected: [],
         targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 4, max: 8 }],
-        requiredToLearn: [],
     },
 
     fireball: {
@@ -49,7 +48,7 @@ let AbilitiesDB: abilityMap = {
         affinity: "intelligence",
         casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 15, max: 15 }],
         targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 10, max: 20 }],
-        requiredToLearn: [{ key: "level", amount: 2 }],
+        required_level: 1,
     },
 
     poisonball: {
@@ -74,10 +73,9 @@ let AbilitiesDB: abilityMap = {
         affinity: "intelligence",
         casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 5, max: 10 }],
         targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 4, max: 8 }],
-        requiredToLearn: [
-            { key: "level", amount: 3 },
-            { key: "intelligence", amount: 25 },
-        ],
+        required_level: 3,
+        required_intelligence: 25,
+        required_wisdom: 19,
     },
     heal: {
         title: "Heal",
@@ -101,11 +99,9 @@ let AbilitiesDB: abilityMap = {
         affinity: "wisdom",
         casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 10, max: 10 }],
         targetPropertyAffected: [{ key: "health", type: CalculationTypes.ADD, min: 30, max: 50 }],
-        requiredToLearn: [
-            { key: "level", amount: 5 },
-            { key: "intelligence", amount: 25 },
-            { key: "wisdom", amount: 35 },
-        ],
+        required_level: 5,
+        required_intelligence: 20,
+        required_wisdom: 35,
     },
 };
 

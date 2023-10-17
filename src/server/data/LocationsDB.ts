@@ -158,10 +158,19 @@ let LocationsDB = {
                             },
                             {
                                 type: "trainer",
-                                items: [
-                                    {
-                                        key: "fireball",
-                                    },
+                                abilities: [
+                                    { key: "fireball" },
+                                    { key: "poisonball" },
+                                    { key: "heal" },
+                                    { key: "poisonball" },
+                                    { key: "heal" },
+                                    { key: "poisonball" },
+                                    { key: "fireball" },
+                                    { key: "poisonball" },
+                                    { key: "heal" },
+                                    { key: "poisonball" },
+                                    { key: "heal" },
+                                    { key: "poisonball" },
                                 ],
                             },
                             {
