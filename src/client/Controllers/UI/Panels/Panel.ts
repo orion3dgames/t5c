@@ -161,6 +161,7 @@ export class Panel {
             this._UI.panelAbilities._panel.isVisible = false;
             this._UI.panelCharacter._panel.isVisible = false;
             this._UI.panelHelp._panel.isVisible = false;
+            this._UI.panelQuests._panel.isVisible = false;
         }
 
         // if already open, close panel

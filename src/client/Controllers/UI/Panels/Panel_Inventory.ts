@@ -81,7 +81,7 @@ export class Panel_Inventory extends Panel {
         goldTitle.text = "Gold: 0";
         goldTitle.fontSize = "12px";
         goldTitle.color = "rgba(255,255,255,.9)";
-        goldTitle.top = "-33px";
+        goldTitle.top = "-5px";
         goldTitle.left = "5px";
         goldTitle.fontSize = "14px";
         goldTitle.width = 1;

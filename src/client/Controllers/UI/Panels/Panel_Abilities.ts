@@ -20,17 +20,17 @@ export class Panel_Abilities extends Panel {
 
         // dynamic events
         let entity = this._currentPlayer.entity;
-        if (entity) {
-            entity.player_data.abilities.onAdd((item, sessionId) => {
+        entity.player_data.abilities.onAdd((item, sessionId) => {
+            this.refresh();
+            // todo: could be a performance issue here?
+            // orion to keep an eye on this one
+            item.onChange((item, sessionId) => {
                 this.refresh();
             });
-            entity.player_data.abilities.onRemove((item, sessionId) => {
+            item.onRemove((item, sessionId) => {
                 this.refresh();
             });
-            entity.player_data.abilities.onChange((item, sessionId) => {
-                this.refresh();
-            });
-        }
+        });
     }
 
     // open panel

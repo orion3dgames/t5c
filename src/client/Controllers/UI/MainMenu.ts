@@ -127,6 +127,13 @@ export class MainMenu {
                     this.openPanel("inventory");
                 },
             },
+            quests: {
+                menuTitle: "Quests",
+                icon: "ICON_MENU_quest",
+                click: () => {
+                    this.openPanel("quests");
+                },
+            },
             abilities: {
                 menuTitle: "Abilities",
                 icon: "ICON_MENU_abilities",
@@ -206,6 +213,9 @@ export class MainMenu {
                 break;
             case "help":
                 this._UI.panelHelp.open();
+                break;
+            case "quests":
+                this._UI.panelQuests.open();
                 break;
         }
     }

@@ -24,6 +24,7 @@ import {
     Panel_Character,
     Panel_Help,
     Panel_Dialog,
+    Panel_Quests,
 } from "./UI";
 
 import { Room } from "colyseus.js";
@@ -74,6 +75,7 @@ export class UserInterface {
     public panelCharacter: Panel_Character;
     public panelHelp: Panel_Help;
     public panelDialog: Panel_Dialog;
+    public panelQuests: Panel_Quests;
 
     // tooltip
     public _UITooltip;
@@ -225,6 +227,17 @@ export class UserInterface {
             //left: "-250px;",
             horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
             vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
+        });
+
+        // create quests panel
+        this.panelQuests = new Panel_Quests(this, currentPlayer, {
+            name: "Active Quests",
+            width: "300px;",
+            height: "300px;",
+            top: "100px;",
+            left: "15px;",
+            horizontal_position: Control.HORIZONTAL_ALIGNMENT_LEFT,
+            vertical_position: Control.VERTICAL_ALIGNMENT_TOP,
         });
 
         // open inventory by default
