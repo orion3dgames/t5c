@@ -320,7 +320,9 @@ export class PlayerSchema extends Entity {
         }
 
         // delete loot
-        this._state.entities.delete(loot.sessionId);
+        if (this._state.entities.get(loot.sessionId)) {
+            this._state.entities.delete(loot.sessionId);
+        }
 
         // stop chasing target
         this.AI_TARGET = null;

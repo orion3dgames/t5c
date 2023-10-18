@@ -66,7 +66,7 @@ export class Trainer {
         if (ability.required_level && ability.required_level > this.panel._currentPlayer.level) {
             canLearn = false;
         }
-        if (ability.cost && ability.cost > playerData.gold) {
+        if (ability.value && ability.value > playerData.gold) {
             canLearn = false;
         }
         return canLearn;
@@ -123,7 +123,6 @@ export class Trainer {
         if (abilities.length > 0) {
             abilities.forEach((a) => {
                 let ability = this.panel._game.getGameData("ability", a.key);
-                ability.cost = a.cost;
 
                 let blocContainer = new Rectangle("blocContainer");
                 blocContainer.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
@@ -315,8 +314,8 @@ export class Trainer {
 
         // add requirements
         let requirements = "";
-        if (ability.cost) {
-            requirements += "Cost: " + ability.cost + "\n";
+        if (ability.value) {
+            requirements += "Cost: " + ability.value + "\n";
         }
         if (ability.required_level) {
             requirements += "Level Required: " + ability.required_level + "\n";

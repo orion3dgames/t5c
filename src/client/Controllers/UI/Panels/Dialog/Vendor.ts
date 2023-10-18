@@ -90,7 +90,6 @@ export class Vendor {
         if (this.currentDialog.items.length > 0) {
             this.currentDialog.items.forEach((a) => {
                 let item = this.panel._game.getGameData("item", a.key);
-                item.cost = a.cost;
 
                 let blocContainer = new Rectangle("blocContainer");
                 blocContainer.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
@@ -208,7 +207,7 @@ export class Vendor {
                     if (createBtn.textBlock) {
                         createBtn.textBlock.text = "Buy";
                     }
-                }, 500);
+                }, 1000);
             }
         });
 
@@ -259,8 +258,8 @@ export class Vendor {
 
         // add requirements
         let requirements = "";
-        if (item.cost) {
-            requirements += "Cost: " + item.cost + "\n";
+        if (item.value) {
+            requirements += "Cost: " + item.value + "\n";
         }
 
         const requiredBloc = new TextBlock("requiredBloc" + item.key);

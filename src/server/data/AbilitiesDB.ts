@@ -49,7 +49,7 @@ let AbilitiesDB: abilityMap = {
         casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 15, max: 15 }],
         targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 10, max: 20 }],
         required_level: 1,
-        cost: 100,
+        value: 100,
     },
 
     poisonball: {
@@ -77,7 +77,7 @@ let AbilitiesDB: abilityMap = {
         required_level: 3,
         required_intelligence: 25,
         required_wisdom: 19,
-        cost: 500,
+        value: 500,
     },
     heal: {
         title: "Heal",
@@ -104,7 +104,7 @@ let AbilitiesDB: abilityMap = {
         required_level: 5,
         required_intelligence: 20,
         required_wisdom: 35,
-        cost: 1000,
+        value: 1000,
     },
 };
 

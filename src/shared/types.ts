@@ -189,7 +189,7 @@ export type Ability = {
     required_intelligence?: number;
     required_wisdom?: number;
 
-    cost?: number;
+    value?: number;
 };
 
 export interface abilityMap {
