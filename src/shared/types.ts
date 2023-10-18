@@ -79,6 +79,7 @@ export enum ServerMsg {
     PLAYER_CASTING_CANCEL,
     PLAYER_TELEPORT,
     PLAYER_QUEST_UPDATE,
+    PLAYER_BUY_ITEM,
 }
 
 //////////////////////////////////////////////////////////////

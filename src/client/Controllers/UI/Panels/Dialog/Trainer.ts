@@ -81,11 +81,27 @@ export class Trainer {
     }
 
     create(abilities) {
+        const createBtn = Button.CreateSimpleButton("characterBtn", "Back");
+        createBtn.left = "0px;";
+        createBtn.top = "0px";
+        createBtn.width = 1;
+        createBtn.height = "24px";
+        createBtn.background = "black";
+        createBtn.color = "white";
+        createBtn.thickness = 0;
+        createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        this.panel._panelContent.addControl(createBtn);
+
+        createBtn.onPointerDownObservable.add(() => {
+            this.panel.nextStep(0);
+        });
+
         // add scrollable container
         const scrollViewer = new ScrollViewer("scrollViewer");
         scrollViewer.width = 1;
-        scrollViewer.height = 0.6;
-        scrollViewer.top = 0;
+        scrollViewer.height = 0.54;
+        scrollViewer.top = "24px;";
         scrollViewer.thickness = 0;
         scrollViewer.background = this.backgroundColor;
         scrollViewer.setPaddingInPixels(5, 5, 5, 5);

@@ -10,6 +10,7 @@ import { QuestSchema } from "../../../../server/rooms/schema";
 import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
 
 import { Trainer } from "./Dialog/Trainer";
+import { Vendor } from "./Dialog/Vendor";
 
 export class Panel_Dialog extends Panel {
     // inventory tab
@@ -34,6 +35,7 @@ export class Panel_Dialog extends Panel {
 
     //
     private trainer: Trainer;
+    private vendor: Vendor;
 
     constructor(_UI: UserInterface, _currentPlayer, options) {
         super(_UI, _currentPlayer, options);
@@ -130,9 +132,7 @@ export class Panel_Dialog extends Panel {
         //////////////////////////////////
         // if dialog is type "vendor",
         if (currentDialog.type === "vendor") {
-            let dialogText = "WORK IN PROGRESS \n\nHere you will be able to buy and sell items in exchange for gold.";
-            dialogTextBlock.text = dialogText;
-            currentDialog.isEndOfDialog = true;
+            this.vendor = new Vendor(this, currentDialog);
         }
 
         //////////////////////////////////

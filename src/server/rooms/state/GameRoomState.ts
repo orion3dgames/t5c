@@ -238,6 +238,10 @@ export class GameRoomState extends Schema {
             }
         }
 
+        if (type === ServerMsg.PLAYER_BUY_ITEM) {
+            console.log("PLAYER_BUY_ITEM", data);
+        }
+
         /////////////////////////////////////
         // on player equip
         // data will equal the inventory index of the clicked item
