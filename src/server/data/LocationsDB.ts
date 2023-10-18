@@ -142,35 +142,17 @@ let LocationsDB = {
                             {
                                 type: "vendor",
                                 items: [
-                                    {
-                                        key: "sword_01",
-                                        qty: 1,
-                                    },
-                                    {
-                                        key: "potion_small_red",
-                                        qty: 100,
-                                    },
-                                    {
-                                        key: "potion_small_blue",
-                                        qty: 100,
-                                    },
+                                    { key: "sword_01", cost: 1000 },
+                                    { key: "potion_small_red", cost: 50 },
+                                    { key: "potion_small_blue", cost: 75 },
                                 ],
                             },
                             {
                                 type: "trainer",
                                 abilities: [
-                                    { key: "fireball" },
-                                    { key: "poisonball" },
-                                    { key: "heal" },
-                                    { key: "poisonball" },
-                                    { key: "heal" },
-                                    { key: "poisonball" },
-                                    { key: "fireball" },
-                                    { key: "poisonball" },
-                                    { key: "heal" },
-                                    { key: "poisonball" },
-                                    { key: "heal" },
-                                    { key: "poisonball" },
+                                    { key: "fireball", cost: 100 },
+                                    { key: "poisonball", cost: 500 },
+                                    { key: "heal", cost: 1000 },
                                 ],
                             },
                             {

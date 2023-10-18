@@ -7,6 +7,8 @@ import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { Panel_Dialog } from "../..";
 import { Ability, ServerMsg } from "../../../../../shared/types";
 import { Button } from "@babylonjs/gui/2D/controls/button";
+import { CubicEase, EasingFunction } from "@babylonjs/core/Animations/easing";
+import { Animation } from "@babylonjs/core/Animations/animation";
 
 export class Trainer {
     private panel: Panel_Dialog;
@@ -21,7 +23,7 @@ export class Trainer {
     constructor(panel: Panel_Dialog, currentDialog) {
         this.panel = panel;
         this.currentDialog = currentDialog;
-        this.create();
+        this.refresh();
     }
 
     refresh() {
@@ -29,15 +31,23 @@ export class Trainer {
             el.dispose();
         });
 
-        this.create();
+        // only show spells that not already learnt
+        let abilities = this.currentDialog.abilities ?? [];
+        let abilityAvailableToLearn: any[] = [];
+        abilities.forEach((ability) => {
+            if (!this.playerHasAbility(ability)) {
+                abilityAvailableToLearn.push(ability);
+            }
+        });
+        console.log("AVAILABLE TO LEARN", abilityAvailableToLearn);
+
+        // create ui
+        this.create(abilityAvailableToLearn);
     }
 
     canLearn(ability: Ability): boolean {
         let playerData = this.panel._currentPlayer.player_data;
         let canLearn = true;
-        if (ability.required_strength && ability.required_strength > playerData.strength) {
-            canLearn = false;
-        }
         if (ability.required_strength && ability.required_strength > playerData.strength) {
             canLearn = false;
         }
@@ -56,6 +66,9 @@ export class Trainer {
         if (ability.required_level && ability.required_level > this.panel._currentPlayer.level) {
             canLearn = false;
         }
+        if (ability.cost && ability.cost > playerData.gold) {
+            canLearn = false;
+        }
         return canLearn;
     }
 
@@ -67,15 +80,14 @@ export class Trainer {
         return this.panel._currentPlayer.player_data.abilities[ability.key] ? true : false;
     }
 
-    create() {
-        let abilities = this.currentDialog.abilities ?? [];
-
+    create(abilities) {
         // add scrollable container
         const scrollViewer = new ScrollViewer("scrollViewer");
         scrollViewer.width = 1;
         scrollViewer.height = 0.6;
         scrollViewer.top = 0;
         scrollViewer.thickness = 0;
+        scrollViewer.background = this.backgroundColor;
         scrollViewer.setPaddingInPixels(5, 5, 5, 5);
         scrollViewer.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         scrollViewer.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
@@ -92,10 +104,11 @@ export class Trainer {
         scrollViewer.addControl(stackPanel);
         this.stackPanel = stackPanel;
 
-        abilities.forEach((a) => {
-            let ability = this.panel._game.getGameData("ability", a.key);
+        if (abilities.length > 0) {
+            abilities.forEach((a) => {
+                let ability = this.panel._game.getGameData("ability", a.key);
+                ability.cost = a.cost;
 
-            if (!this.playerHasAbility(ability)) {
                 let blocContainer = new Rectangle("blocContainer");
                 blocContainer.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
                 blocContainer.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
@@ -126,20 +139,40 @@ export class Trainer {
                     this.select(blocContainer, blockTitle);
                     this.createDetails(ability);
                 });
-            }
-        });
+            });
 
-        // add details scrollable container
-        const scrollViewerDetails = new ScrollViewer("scrollViewerDetails");
-        scrollViewerDetails.width = 1;
-        scrollViewerDetails.height = 0.4;
-        scrollViewerDetails.top = -0.1;
-        scrollViewerDetails.thickness = 0;
-        scrollViewerDetails.setPaddingInPixels(5, 5, 5, 5);
-        scrollViewerDetails.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        scrollViewerDetails.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        this.panel._panelContent.addControl(scrollViewerDetails);
-        this.panelDetails = scrollViewerDetails;
+            // add details scrollable container
+            const scrollViewerDetails = new ScrollViewer("scrollViewerDetails");
+            scrollViewerDetails.width = 1;
+            scrollViewerDetails.height = 0.4;
+            scrollViewerDetails.top = -0.1;
+            scrollViewerDetails.thickness = 0;
+            scrollViewerDetails.setPaddingInPixels(5, 5, 5, 5);
+            scrollViewerDetails.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            scrollViewerDetails.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+            this.panel._panelContent.addControl(scrollViewerDetails);
+            this.panelDetails = scrollViewerDetails;
+
+            // select first available ability
+            let firstElement = this.stackPanel.children[0] as Rectangle;
+            let ability = this.panel._game.getGameData("ability", abilities[0].key);
+            this.select(this.stackPanel.children[0], firstElement.children[0]);
+            this.createDetails(ability);
+        } else {
+            // nothing available to learn, show empty message
+            const tooltipName = new TextBlock("emptyText");
+            tooltipName.color = "#FFF";
+            tooltipName.top = "5px";
+            tooltipName.left = "5px";
+            tooltipName.resizeToFit = true;
+            tooltipName.text = "Sorry, you've already leant all I had to teach.";
+            tooltipName.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            tooltipName.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+            tooltipName.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            tooltipName.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            tooltipName.textWrapping = TextWrapping.WordWrap;
+            stackPanel.addControl(tooltipName);
+        }
     }
 
     select(blocContainer, blockTitle) {
@@ -192,9 +225,18 @@ export class Trainer {
             createBtn.thickness = 0;
             titleBloc.addControl(createBtn);
 
-            createBtn.onPointerClickObservable.add(() => {
+            let observable = createBtn.onPointerClickObservable.add(() => {
                 this.panel._room.send(ServerMsg.PLAYER_LEARN_SKILL, ability.key);
-                this.refresh();
+                if (createBtn.textBlock) {
+                    createBtn.textBlock.text = "...";
+                }
+                if (observable) {
+                    observable.remove();
+                }
+                // todo: we need some sort of callback here
+                setTimeout(() => {
+                    this.refresh();
+                }, 500);
             });
         } else {
             const createBtn = Button.CreateSimpleButton("learnBTN", "Train");
@@ -257,6 +299,9 @@ export class Trainer {
 
         // add requirements
         let requirements = "";
+        if (ability.cost) {
+            requirements += "Cost: " + ability.cost + "\n";
+        }
         if (ability.required_level) {
             requirements += "Level Required: " + ability.required_level + "\n";
         }

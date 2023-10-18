@@ -121,6 +121,17 @@ export class Panel_Quests extends Panel {
                 questObjective.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
                 questPanel.addControl(questObjective);
             });
+        } else {
+            var noQuests = new TextBlock("noQuests");
+            noQuests.text = "You have no quests. Explore the world & talk to people to discover new quests.";
+            noQuests.fontSize = "14px";
+            noQuests.color = "white";
+            noQuests.textWrapping = TextWrapping.WordWrap;
+            noQuests.resizeToFit = true;
+            noQuests.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            noQuests.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            noQuests.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            stackPanel.addControl(noQuests);
         }
     }
 }

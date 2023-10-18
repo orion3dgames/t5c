@@ -67,8 +67,7 @@ class Database {
         const playerAbilitySql = `CREATE TABLE IF NOT EXISTS "character_abilities" (
             "id" INTEGER PRIMARY KEY AUTOINCREMENT,
             "owner_id" INTEGER,
-            "ability_id" INTEGER,
-            "digit" INTEGER,
+            "digit" INTEGER DEFAULT 0,
             "key" TEXT
         )`;
 
@@ -156,7 +155,7 @@ class Database {
                     console.log(err);
                     reject(err);
                 } else {
-                    //console.log("sql: " + sql, params, data, err);
+                    //console.log("sql: " + sql, params, err);
                     resolve({ id: this.lastID });
                 }
             });
@@ -234,39 +233,78 @@ class Database {
         return character;
     }
 
+    generateStatPoint() {
+        return Math.trunc(70 / 5 + Math.random() * 10);
+    }
+
     async createCharacter(token, name, race, material) {
         let user = await this.getUserByToken(token);
-        const sql = `INSERT INTO characters ("user_id", "name", "race", "material", "location","x","y","z","rot","level","experience","health", "mana") VALUES (
-            ?,
-            ?,
-            ?,
-            ?,
-            "lh_town", 
-            "4.20",
-            "0",
-            "-23.26",
-            "0",
-            "1",
-            "0",
-            "50",
-            "50"
-        );`;
-        let c = await (<any>this.run(sql, [user.id, name, race, material]));
+        const sql = `INSERT INTO characters (
+            "user_id", "name", "race", "material",
+            "strength", "endurance", "agility", "intelligence", "wisdom", 
+            "location","x","y","z","rot","level","experience","health", "mana", "gold", "points") 
+            VALUES (
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                
+                ?,
+                ?,
+                ?,
+                ?
+            );`;
+        let c = await (<any>(
+            this.run(sql, [
+                user.id,
+                name,
+                race,
+                material,
+                this.generateStatPoint(),
+
+                this.generateStatPoint(),
+                this.generateStatPoint(),
+                this.generateStatPoint(),
+                this.generateStatPoint(),
+                "lh_town",
+
+                "4.20",
+                "0",
+                "-23.26",
+                "0",
+                "1",
+                "0",
+
+                "50",
+                "50",
+                "50000",
+                "50",
+            ])
+        ));
 
         // add default abilities
-        let abilities = [
-            { digit: 1, key: "base_attack" },
-            { digit: 2, key: "fireball" },
-            { digit: 3, key: "poisonball" },
-            { digit: 4, key: "heal" },
-        ];
+        let abilities = [{ digit: 1, key: "base_attack" }];
         abilities.forEach((ability) => {
             const sql_abilities = `INSERT INTO character_abilities ("owner_id", "digit", "key") VALUES ("${c.id}", "${ability.digit}", "${ability.key}")`;
             this.run(sql_abilities);
         });
 
         //
-        const sql_quests = `INSERT INTO character_quests ("owner_id", "key", "status", "qty") VALUES ("${c.id}", "LH_DANGEROUS_ERRANDS_01", "0", "0")`;
+        const sql_quests = `INSERT INTO character_quests ("owner_id", "key", "status", "qty") VALUES ("${c.id}", "LH_DANGEROUS_ERRANDS_01", "0", "5")`;
         //this.run(sql_quests);
 
         // add default items

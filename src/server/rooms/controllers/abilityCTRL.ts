@@ -48,11 +48,8 @@ export class abilitiesCTRL {
      * @param ability
      */
     public learnAbility(ability: Ability) {
-        // if ability exists, then delete it
-        if (this._owner.player_data.abilities[ability.key]) {
-            this._owner.player_data.abilities.delete(ability.key);
-        } else {
-            // else let's add it to the player
+        // only proceed if the ability does not already
+        if (!this._owner.player_data.abilities[ability.key]) {
             console.log("learnAbility", "DIGIT", this.abilities.length, this._owner.player_data.abilities.size);
             this._owner.player_data.abilities.set(
                 ability.key,

@@ -187,6 +187,8 @@ export type Ability = {
     required_agility?: number;
     required_intelligence?: number;
     required_wisdom?: number;
+
+    cost?: number;
 };
 
 export interface abilityMap {
