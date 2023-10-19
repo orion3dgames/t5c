@@ -140,6 +140,7 @@ export class Item extends TransformNode {
         ///
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);
+        this.mesh.actionManager.hoverCursor = "url(./images/cursor/hand_hover.png), auto";
 
         // register hover over player
         this.mesh.actionManager.registerAction(

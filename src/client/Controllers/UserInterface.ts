@@ -25,6 +25,7 @@ import {
     Panel_Help,
     Panel_Dialog,
     Panel_Quests,
+    Cursor,
 } from "./UI";
 
 import { Room } from "colyseus.js";
@@ -67,6 +68,7 @@ export class UserInterface {
     private _ExperienceBar: ExperienceBar;
     public _InventoryDropdown: InventoryDropdown;
     public _DamageText: DamageText;
+    public _Cursor: Cursor;
 
     // openable panels
     private _panels: Panel[];
@@ -161,6 +163,10 @@ export class UserInterface {
 
         // create chat ui + events
         this._DamageText = new DamageText(this._namesUI, this._scene, this._entities);
+
+        // cursor
+        this._Cursor = new Cursor(this);
+        this._Cursor.activate("buy");
 
         // create selected entity panel
         this._targetEntitySelectedBar = new EntitySelectedBar(this, {

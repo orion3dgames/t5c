@@ -12,11 +12,12 @@ import { PlayerSlots } from "../../../shared/types";
 import { GameController } from "../../Controllers/GameController";
 import { EquipmentSchema } from "../../../server/rooms/schema";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { UserInterface } from "../../Controllers/UserInterface";
 
 export class EntityMesh {
     private _entity: Entity;
     private _scene: Scene;
-    private _ui;
+    private _ui: UserInterface;
     private _loadedAssets;
     private _room;
     private _game: GameController;
@@ -141,6 +142,7 @@ export class EntityMesh {
 
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);
+        this.mesh.actionManager.hoverCursor = "url(./images/cursor/hand_hover.png), auto";
 
         // register hover over player
         this.mesh.actionManager.registerAction(

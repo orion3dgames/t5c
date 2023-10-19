@@ -18,6 +18,8 @@ import { Panel_Help } from "./Panels/Panel_Help";
 import { Panel_Dialog } from "./Panels/Panel_Dialog";
 import { Panel_Quests } from "./Panels/Panel_Quests";
 
+import { Cursor } from "./Cursor";
+
 export {
     ChatBox,
     AbilityBar,
@@ -36,4 +38,5 @@ export {
     Panel_Help,
     Panel_Dialog,
     Panel_Quests,
+    Cursor,
 };
