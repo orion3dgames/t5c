@@ -233,12 +233,16 @@ export class Entity {
 
             // if entity has aggro
             if (this.ai_state === AI_STATE.SEEKING || this.ai_state === AI_STATE.ATTACKING) {
-                this.debugMesh.material = this.debugMaterialActive;
+                if (this.debugMesh) {
+                    this.debugMesh.material = this.debugMaterialActive;
+                }
             }
 
             // if entity lose aggro
             if (this.ai_state === AI_STATE.WANDER) {
-                this.debugMesh.material = this.debugMaterialNeutral;
+                if (this.debugMesh) {
+                    this.debugMesh.material = this.debugMaterialNeutral;
+                }
             }
 
             // tween entity

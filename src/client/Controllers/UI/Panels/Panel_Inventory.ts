@@ -228,7 +228,7 @@ export class Panel_Inventory extends Panel {
             // on hover tooltip
             child.onPointerClickObservable.clear();
             child.onPointerClickObservable.add((e) => {
-                if (child.metadata.item && e.buttonIndex === 0) {
+                if (child.metadata.item && e.buttonIndex === 2) {
                     this._UI._Tooltip.close();
                     this._UI._InventoryDropdown.showDropdown(child, item, element);
                 }

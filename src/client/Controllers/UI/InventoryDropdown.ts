@@ -10,7 +10,7 @@ export class InventoryDropdown {
     private _selected;
     private _room;
     private dropdown: StackPanel;
-    private _bgColor = "rgba(255,255,255,0.7";
+    private _bgColor = "rgba(0,0,0,1";
     constructor(_UI: UserInterface) {
         this._UI = _UI;
         this._room = _UI._room;
@@ -38,16 +38,17 @@ export class InventoryDropdown {
         this._selected = el;
         this._selected.background = this._bgColor;
 
-        const rect = new StackPanel("mainmenu");
+        const rect = new StackPanel("InventoryDropdown");
         rect.top = el._currentMeasure.top + el.heightInPixels;
         rect.left = el._currentMeasure.left;
         rect.width = "100px";
-        rect.height = "100px";
+        rect.height = "110px";
         rect.background = this._bgColor;
-        rect.spacing = 0;
+        rect.spacing = 2;
         rect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         rect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         rect.isVertical = true;
+        rect.zIndex = 20;
         this._UI._playerUI.addControl(rect);
         this.dropdown = rect;
 
@@ -91,16 +92,20 @@ export class InventoryDropdown {
             },
         });
 
-        rect.height = 22 * actions.length + "px";
+        rect.height = 24 * actions.length + "px";
 
         actions.forEach((action) => {
             const button = Button.CreateSimpleButton("but" + action.title, action.title);
-            button.left = "2.5px";
+            button.left = "0px";
             button.width = "95px";
             button.height = "22px";
             button.thickness = 0;
-            button.textBlock.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-            button.textBlock.fontSize = "12px";
+            button.background = "black";
+            button.color = "white";
+            if (button.textBlock) {
+                button.textBlock.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+                button.textBlock.fontSize = "14px";
+            }
             rect.addControl(button);
             button.onPointerDownObservable.add(() => {
                 action.click();

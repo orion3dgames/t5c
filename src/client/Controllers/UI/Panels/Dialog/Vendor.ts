@@ -9,6 +9,7 @@ import { Ability, ServerMsg } from "../../../../../shared/types";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { CubicEase, EasingFunction } from "@babylonjs/core/Animations/easing";
 import { Animation } from "@babylonjs/core/Animations/animation";
+import { InputText } from "@babylonjs/gui/2D/controls/inputText";
 
 export class Vendor {
     private panel: Panel_Dialog;
@@ -181,36 +182,6 @@ export class Vendor {
         titleBloc.thickness = 0;
         stackPanel.addControl(titleBloc);
 
-        const createBtn = Button.CreateSimpleButton("learnBTN", "Buy");
-        createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        createBtn.left = "-5px;";
-        createBtn.top = "5px";
-        createBtn.width = "50px;";
-        createBtn.height = "20px";
-        createBtn.background = "orange";
-        createBtn.color = "white";
-        createBtn.thickness = 0;
-        titleBloc.addControl(createBtn);
-
-        let clicked = false;
-        let observable = createBtn.onPointerClickObservable.add(() => {
-            if (clicked === false) {
-                clicked = true;
-                this.panel._room.send(ServerMsg.PLAYER_BUY_ITEM, item.key);
-                if (createBtn.textBlock) {
-                    createBtn.textBlock.text = "...";
-                }
-                // todo: we need some sort of callback here
-                setTimeout(() => {
-                    clicked = false;
-                    if (createBtn.textBlock) {
-                        createBtn.textBlock.text = "Buy";
-                    }
-                }, 1000);
-            }
-        });
-
         // add icon + title
         let imageBLoc = new Rectangle("imageBLoc" + item.key);
         imageBLoc.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
@@ -279,5 +250,95 @@ export class Vendor {
         requiredBloc.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         requiredBloc.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         stackPanel.addControl(requiredBloc);
+
+        ////////////////////////////////////////////
+        ////////////////////////////////////////////
+        ////////////////////////////////////////////
+        let totalQuantity = 1;
+
+        let actionBloc = new Rectangle("actionBloc" + item.key);
+        actionBloc.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        actionBloc.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        actionBloc.top = "0px";
+        actionBloc.left = "0px;";
+        actionBloc.width = "140px";
+        actionBloc.height = "35px;";
+        actionBloc.thickness = 0;
+        this.panelDetails.addControl(actionBloc);
+
+        const createBtn = Button.CreateSimpleButton("buyBtn", "Buy " + totalQuantity);
+        createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        createBtn.left = "-29px;";
+        createBtn.top = "0px";
+        createBtn.width = "60px;";
+        createBtn.height = "24px";
+        createBtn.background = "orange";
+        createBtn.color = "white";
+        createBtn.thickness = 0;
+        createBtn.fontSize = "14px";
+        actionBloc.addControl(createBtn);
+
+        const plusBtn = Button.CreateSimpleButton("plusBtn", "+");
+        plusBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        plusBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        plusBtn.left = "0px;";
+        plusBtn.top = "0px";
+        plusBtn.width = "24px;";
+        plusBtn.height = "24px";
+        plusBtn.background = "gray";
+        plusBtn.color = "white";
+        plusBtn.thickness = 0;
+        actionBloc.addControl(plusBtn);
+        plusBtn.onPointerClickObservable.add(() => {
+            totalQuantity++;
+            if (createBtn.textBlock) {
+                createBtn.textBlock.text = "Buy " + totalQuantity;
+            }
+        });
+
+        const minusBtn = Button.CreateSimpleButton("minusBtn", "-");
+        minusBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        minusBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        minusBtn.left = "-95px;";
+        minusBtn.top = "0px";
+        minusBtn.width = "24px;";
+        minusBtn.height = "24px";
+        minusBtn.background = "gray";
+        minusBtn.color = "white";
+        minusBtn.thickness = 0;
+        actionBloc.addControl(minusBtn);
+        minusBtn.onPointerClickObservable.add(() => {
+            totalQuantity--;
+            if (createBtn.textBlock) {
+                createBtn.textBlock.text = "Buy " + totalQuantity;
+            }
+        });
+
+        let clicked = false;
+        let observable = createBtn.onPointerClickObservable.add(() => {
+            if (clicked === false) {
+                clicked = true;
+                this.panel._room.send(ServerMsg.PLAYER_BUY_ITEM, {
+                    key: item.key,
+                    qty: totalQuantity,
+                });
+                if (createBtn.textBlock) {
+                    createBtn.textBlock.text = "...";
+                }
+                // todo: we need some sort of callback here
+                setTimeout(() => {
+                    totalQuantity = 1;
+                    clicked = false;
+                    if (createBtn.textBlock) {
+                        createBtn.textBlock.text = "Buy " + totalQuantity;
+                    }
+                }, 1000);
+            }
+        });
+
+        ////////////////////////////////////////////
+        ////////////////////////////////////////////
+        ////////////////////////////////////////////
     }
 }

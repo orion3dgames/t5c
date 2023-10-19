@@ -62,6 +62,7 @@ export class EntityMesh {
         };
 
         // debug aggro mesh
+        /*
         if (this._entity.type === "entity") {
             var material = this._scene.getMaterialByName("debug_entity_neutral");
             const sphere = MeshBuilder.CreateTorus(
@@ -74,7 +75,7 @@ export class EntityMesh {
             sphere.parent = box;
             sphere.material = material;
             this.debugMesh = sphere;
-        }
+        }*/
 
         // add selected image
         var material = this._scene.getMaterialByName("entity_selected");

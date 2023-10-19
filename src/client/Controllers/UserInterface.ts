@@ -387,8 +387,8 @@ export class UserInterface {
         rect1.width = "100px";
         rect1.height = "200px";
         rect1.thickness = 0;
-        rect1.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        rect1.zIndex = this._namesUI.addControl(rect1);
+        rect1.zIndex = 1;
+        this._playerUI.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
         rect1.linkOffsetY = -200;
 

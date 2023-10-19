@@ -78,6 +78,7 @@ export class Panel {
         panel.color = options.color;
         panel.isPointerBlocker = true;
         panel.isVisible = false;
+        panel.zIndex = 10;
         applyTheme(panel);
         this._playerUI.addControl(panel);
 

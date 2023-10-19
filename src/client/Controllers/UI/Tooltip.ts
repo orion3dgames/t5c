@@ -51,6 +51,7 @@ export class Tooltip {
         tooltipBar.adaptHeightToChildren = true;
         tooltipBar.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         tooltipBar.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        tooltipBar.zIndex = 50;
         this._playerUI.addControl(tooltipBar);
         this.tooltipContainer = tooltipBar;
 
