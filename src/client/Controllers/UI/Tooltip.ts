@@ -81,13 +81,16 @@ export class Tooltip {
 
         // add name
         const tooltipName = new TextBlock("tooltipName");
+        tooltipName.width = 0.8;
         tooltipName.color = "#FFF";
         tooltipName.top = "4px";
         tooltipName.left = "30px";
-        tooltipName.fontSize = "18px;";
+        tooltipName.fontSize = "16px;";
         tooltipName.resizeToFit = true;
         tooltipName.text = "Item Name";
         tooltipName.fontWeight = "bold";
+        tooltipName.lineSpacing = "-2";
+        tooltipName.textWrapping = TextWrapping.WordWrapEllipsis;
         tooltipName.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         tooltipName.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         tooltipName.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;

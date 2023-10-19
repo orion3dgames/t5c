@@ -229,15 +229,18 @@ export class Vendor {
 
         // add title
         const tooltipName = new TextBlock("abilityName" + item.key);
+        tooltipName.width = 0.7;
         tooltipName.color = "#FFF";
-        tooltipName.top = "5px";
+        tooltipName.top = "0px";
         tooltipName.left = "40px";
         tooltipName.fontSize = "18px;";
         tooltipName.resizeToFit = true;
+        tooltipName.textWrapping = TextWrapping.WordWrap;
         tooltipName.text = item.title;
+        tooltipName.lineSpacing = "-4px";
         tooltipName.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         tooltipName.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-        tooltipName.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        tooltipName.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
         tooltipName.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         titleBloc.addControl(tooltipName);
 
