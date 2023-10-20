@@ -158,6 +158,7 @@ export class Panel {
 
     // open panel
     public open(): void {
+        const visible = this._panel.isVisible;
         if (!this._options.stayOpen) {
             this._UI.panelAbilities._panel.isVisible = false;
             this._UI.panelCharacter._panel.isVisible = false;
@@ -166,7 +167,7 @@ export class Panel {
         }
 
         // if already open, close panel
-        if (this._panel.isVisible) {
+        if (visible) {
             this._panel.isVisible = false;
         } else {
             this._panel.isVisible = true;
@@ -179,8 +180,8 @@ export class Panel {
     }
 
     // update panel
-    public update() {}
+    public update() { }
 
     // refresh panel
-    public refresh() {}
+    public refresh() { }
 }
