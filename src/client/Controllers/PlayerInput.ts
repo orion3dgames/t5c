@@ -42,7 +42,7 @@ export class PlayerInput {
     // timers
     public movementTimer;
     public movementTimerNow: number = 0;
-    public movementTimerDelay: number = 200;
+    public movementTimerDelay: number = 100;
 
     constructor(game: GameController, scene, room, ui) {
         (this._game = game), (this._scene = scene);
@@ -55,7 +55,7 @@ export class PlayerInput {
                 // left click
                 if (pointerInfo.event.button == 0) {
                     this.left_click = true;
-                    //this.startMovementTimer();
+                    this.startMovementTimer();
                 }
 
                 // middle click
@@ -78,11 +78,10 @@ export class PlayerInput {
                     this.horizontal = 0;
                     this.player_can_move = false;
 
-                    /*
                     if (this.movementTimer) {
                         this.movementTimerNow = 0;
                         clearInterval(this.movementTimer);
-                    }*/
+                    }
                 }
 
                 // middle click
@@ -98,25 +97,25 @@ export class PlayerInput {
                 this.mouse_moving = false;
             }
 
-            if (pointerInfo.type === PointerEventTypes.POINTERMOVE) {
-                if (this.left_click) {
-                    this.player_can_move = true;
-                    let dpi = window.devicePixelRatio;
-                    this.x = ((pointerInfo.event.clientX * dpi) / pointerInfo.event.target.width) * 2 - 1;
-                    this.y = ((pointerInfo.event.clientY * dpi) / pointerInfo.event.target.height) * 2 - 1;
-                    this.angle = Math.atan2(this.x, this.y);
-                    this.calculateVelocityForces();
-                }
-
-                if (this.right_click) {
-                    this.mouse_moving = true;
-                }
-
-                if (this.middle_click) {
-                    this.movementX = pointerInfo.event.movementX / 100;
-                    this.movementY = pointerInfo.event.movementY / 75;
-                }
+            // if (pointerInfo.type === PointerEventTypes.POINTERMOVE) {
+            if (this.left_click) {
+                // this.player_can_move = true;
+                let dpi = window.devicePixelRatio;
+                this.x = ((pointerInfo.event.clientX * dpi) / pointerInfo.event.target.width) * 2 - 1;
+                this.y = ((pointerInfo.event.clientY * dpi) / pointerInfo.event.target.height) * 2 - 1;
+                this.angle = Math.atan2(this.x, this.y);
+                this.calculateVelocityForces();
             }
+
+            if (this.right_click) {
+                this.mouse_moving = true;
+            }
+
+            if (this.middle_click) {
+                this.movementX = pointerInfo.event.movementX / 100;
+                this.movementY = pointerInfo.event.movementY / 75;
+            }
+            // }
         });
 
         this._scene.onKeyboardObservable.add((kbInfo) => {
@@ -223,7 +222,6 @@ export class PlayerInput {
         });
     }
 
-    /*
     private startMovementTimer() {
         let amount = 100;
         this.movementTimer = setInterval(() => {
@@ -235,7 +233,6 @@ export class PlayerInput {
             }
         }, 100);
     }
-    */
 
     private calculateVelocityForces() {
         if (this.angle !== 0) {
