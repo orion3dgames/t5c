@@ -1,3 +1,8 @@
+@font-face {
+    font-family: gameFont;
+    src: url(./fonts/BreatheFireIii-PKLOB.ttf);
+}
+
 html,
 body{
     padding: 0px;
@@ -9,7 +14,7 @@ body{
 
 html{
     cursor: url(./images/cursor/hand.png), auto;
-    font-family: 'Times New Roman', Times, serif;
+    font-family: 'gameFont', serif;
     font-size: 16px;
     background-color: #222;
 }

@@ -51,6 +51,8 @@ export class UserInterface {
     public _loadedAssets;
 
     //UI Elements
+    public MAIN_ADT: AdvancedDynamicTexture;
+    public NAMES_ADT: AdvancedDynamicTexture;
     public _playerUI;
     private _namesUI;
     public _hightlight;
@@ -100,11 +102,12 @@ export class UserInterface {
         this._loadedAssets = this._game._loadedAssets;
 
         // create ui
-        const _namesUI = AdvancedDynamicTexture.CreateFullscreenUI("UI_Names", true, this._scene);
-        this._namesUI = _namesUI;
+        const namesUI = AdvancedDynamicTexture.CreateFullscreenUI("UI_Names", true, this._scene);
+        this.NAMES_ADT = namesUI;
 
         // create ui
         const uiLayer = AdvancedDynamicTexture.CreateFullscreenUI("UI_Player", true, this._scene);
+        this.MAIN_ADT = uiLayer;
         /*
         uiLayer.idealWidth = 1024;
         uiLayer.idealHeight = 768;
@@ -114,8 +117,8 @@ export class UserInterface {
         uiLayerContainer.width = 1;
         uiLayerContainer.height = 1;
         uiLayerContainer.thickness = 1;
-        uiLayerContainer.fontFamily = "Times New Roman, serif";
-        uiLayerContainer.fontSize = "16px;";
+        uiLayerContainer.fontFamily = "Arial, sans-serif";
+        uiLayerContainer.fontSize = "14px;";
         uiLayer.addControl(uiLayerContainer);
 
         this._playerUI = uiLayerContainer;
@@ -174,7 +177,7 @@ export class UserInterface {
         this._ChatBox = new ChatBox(this._playerUI, this._chatRoom, currentPlayer, this._entities, this._game);
 
         // create chat ui + events
-        this._DamageText = new DamageText(this._namesUI, this._scene, this._entities);
+        this._DamageText = new DamageText(this.NAMES_ADT, this._scene, this._entities);
 
         // create selected entity panel
         this._targetEntitySelectedBar = new EntitySelectedBar(this, {
@@ -325,7 +328,7 @@ export class UserInterface {
         rect1.cornerRadius = 5;
         rect1.background = "rgba(0,0,0,.5)";
         rect1.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        this._namesUI.addControl(rect1);
+        this.NAMES_ADT.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
         rect1.linkOffsetY = -130;
 
@@ -350,9 +353,10 @@ export class UserInterface {
         rect1.width = "300px";
         rect1.height = "40px";
         rect1.thickness = 0;
-        rect1.zIndex = this._namesUI.addControl(rect1);
+        this.NAMES_ADT.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
         rect1.linkOffsetY = -80;
+
         var label = new TextBlock("player_nameplate_text_" + entity.sessionId);
         label.text = entity.name;
         label.color = "white";
@@ -371,9 +375,10 @@ export class UserInterface {
         rect1.width = "200px";
         rect1.height = "40px";
         rect1.thickness = 0;
-        rect1.zIndex = this._namesUI.addControl(rect1);
+        this.NAMES_ADT.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
         rect1.linkOffsetY = -30;
+
         var label = new TextBlock("item_nameplate_text_" + entity.sessionId);
         label.text = title;
         label.color = "black";
@@ -396,7 +401,7 @@ export class UserInterface {
         rect1.height = "200px";
         rect1.thickness = 0;
         rect1.zIndex = 1;
-        this._namesUI.addControl(rect1);
+        this.NAMES_ADT.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
         rect1.linkOffsetY = -200;
 

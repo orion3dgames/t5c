@@ -284,9 +284,9 @@ export class Player extends Entity {
         // check for cooldowns  (estethic only as server really controls cooldowns)
         this.ability_in_cooldown.forEach((cooldown, digit) => {
             if (cooldown > 0) {
-                let cooldownUI = this.ui._playerUI.getControlByName("ability_" + digit + "_cooldown");
+                let cooldownUI = this.ui.MAIN_ADT.getControlByName("ability_" + digit + "_cooldown");
                 let ability = this.getAbilityByDigit(digit) as Ability;
-                if (ability) {
+                if (ability && cooldownUI) {
                     this.ability_in_cooldown[digit] -= delta;
                     let percentage = ((this.ability_in_cooldown[digit] / ability.cooldown) * 100) / 100;
                     cooldownUI.height = percentage;
