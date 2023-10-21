@@ -233,6 +233,10 @@ export class PlayerSchema extends Entity {
         Logger.info("[gameroom][onCreate] player " + this.name + " saved to database.");
     }
 
+    //////////////////////////////////////////////
+    /////////////// INVENTORY ////////////////////
+    //////////////////////////////////////////////
+
     getInventoryItem(value, key = "index"): InventorySchema {
         let found;
         this.player_data.inventory.forEach((el, k) => {
@@ -244,19 +248,20 @@ export class PlayerSchema extends Entity {
         });
         return found;
     }
+
     getInventoryItemByIndex(value): InventorySchema {
         return this.player_data.inventory.get("" + value);
     }
 
-    findNextAvailableInventorySlot() {
+    findNextAvailableInventorySlot(): string | boolean {
         if (this.player_data.inventory.size > 0) {
-            for (let i = 0; i < this.INVENTORY_LENGTH; i++) {
+            for (let i = 0; i < this._state.config.PLAYER_INVENTORY_SPACE; i++) {
                 if (!this.player_data.inventory.get("" + i)) {
                     return "" + i;
                 }
             }
         }
-        return "0";
+        return false;
     }
 
     isEquipementSlotAvailable(slot) {
@@ -267,6 +272,19 @@ export class PlayerSchema extends Entity {
             }
         });
         return available;
+    }
+
+    reduceItemQuantity(inventoryItem, amount = 1) {
+        let quantity = inventoryItem.qty - amount;
+        if (quantity < 1) {
+            this.player_data.inventory.delete("" + inventoryItem.i);
+        } else {
+            inventoryItem.qty -= 1;
+        }
+    }
+
+    increaseItemQuantity(inventoryItem, amount = 1) {
+        inventoryItem.qty += amount;
     }
 
     dropItem(inventoryItem, dropAll = false) {
@@ -291,25 +309,51 @@ export class PlayerSchema extends Entity {
         console.log("dropItem", dropAll, newQuantity, inventoryItem.qty);
     }
 
-    sellItem(inventoryItem) {
-        let newQuantity = inventoryItem.qty - 1;
-        if (newQuantity < 1) {
-            this.player_data.inventory.delete("" + inventoryItem.i);
-        } else {
-            inventoryItem.qty -= 1;
+    buyItem(item, qty) {
+        let availableSlot = this.findNextAvailableInventorySlot();
+
+        if (!availableSlot) {
+            console.error("BUYING", item.key, "QTY: " + qty, "INVENTORY IS FULL (" + availableSlot + ")");
+            return false;
         }
+
+        console.log("BUYING", item.key, "QTY: " + qty, "INVENTORY SLOT: " + availableSlot);
+
+        let loot = new LootSchema(this._state, {
+            key: item.key,
+            qty: qty,
+        });
+        this.pickupItem(loot);
+
+        // remove gold from player
+        this.player_data.gold = this.player_data.gold - item.value * qty;
+    }
+
+    sellItem(inventoryItem) {
+        // reduce inventory qty
+        this.reduceItemQuantity(inventoryItem, 1);
+
         // add gold to player
         this.player_data.gold += inventoryItem.value;
+
+        console.log("SELLING", inventoryItem.key, "QTY: 1");
     }
 
     pickupItem(loot: LootSchema) {
         // play animation // disabled
         //this.animationCTRL.playAnim(this, EntityState.PICKUP, () => {});
 
+        let availableSlot = this.findNextAvailableInventorySlot();
+
+        if (!availableSlot) {
+            console.error("PICK UP", loot.key, "QTY: " + loot.qty, "INVENTORY IS FULL (" + availableSlot + ")");
+            return false;
+        }
+
         let data = {
             key: loot.key,
             qty: loot.qty,
-            i: "" + 0,
+            i: "" + availableSlot,
         };
 
         //
@@ -320,12 +364,9 @@ export class PlayerSchema extends Entity {
 
         // is item stackable
         if (item.stackable && inventoryItem) {
-            // increnent stack
-            inventoryItem.qty += data.qty;
+            // increnent quantity
+            this.increaseItemQuantity(inventoryItem, data.qty);
         } else {
-            // find next available index
-            data.i = this.findNextAvailableInventorySlot();
-
             // add inventory item
             this.player_data.inventory.set("" + data.i, new InventorySchema(data));
         }
@@ -340,6 +381,7 @@ export class PlayerSchema extends Entity {
     }
 
     consumeItem(item) {
+        // process benefits
         item.benefits.forEach((element) => {
             let key = element.key;
             if (CalculationTypes.ADD === element.type) {
@@ -350,12 +392,11 @@ export class PlayerSchema extends Entity {
             }
         });
 
-        this.normalizeStats();
+        // reduce item quantity
+        this.reduceItemQuantity(item, 1);
 
-        item.qty -= 1;
-        if (item.qty < 1) {
-            this.player_data.inventory.delete(item.i);
-        }
+        // make sure not stats are out of bounds
+        this.normalizeStats();
     }
 
     equipItem(item) {
@@ -374,17 +415,22 @@ export class PlayerSchema extends Entity {
         let key = item.key;
 
         if (item && item.qty > 0 && this.isEquipementSlotAvailable(slot) === true) {
-            item.qty -= 1;
-            if (item.qty < 1) {
-                // remove item from inventory
-                this.player_data.inventory.delete(item.i);
-            }
+            // remove from inventory
+            this.reduceItemQuantity(item, 1);
+
             // equip
             this.equipment.set(key, new EquipmentSchema({ key: key, slot: slot }));
         }
     }
 
     unequipItem(key, slot) {
+        let availableSlot = this.findNextAvailableInventorySlot();
+
+        if (!availableSlot) {
+            console.error("UNEQUIP ITEM", key, "SLOT: " + slot, "INVENTORY IS FULL (" + availableSlot + ")");
+            return false;
+        }
+
         // remove item from inventory
         this.equipment.delete(key);
 
@@ -396,6 +442,10 @@ export class PlayerSchema extends Entity {
             })
         );
     }
+
+    ///////////////////////////////////////////////
+    ///////////////////////////////////////////////
+    ///////////////////////////////////////////////
 
     setAsDead() {
         this.AI_TARGET = null;

@@ -106,7 +106,7 @@ export class Panel_Inventory extends Panel {
         panel.addControl(inventoryGrid);
 
         let panelWidth = panel.widthInPixels;
-        let inventorySpace = 25;
+        let inventorySpace = this._game.config.PLAYER_INVENTORY_SPACE;
         let inventorySpaceW = 5;
         let size = panelWidth / 5;
         let inventorySpaceCols = inventorySpaceW;
@@ -134,22 +134,24 @@ export class Panel_Inventory extends Panel {
         let i = 0;
         for (let r = 0; r < inventorySpaceRows; r++) {
             for (let col = 0; col < inventorySpaceCols; col++) {
-                let bgColor = "rgba(255,255,255,.1)";
-                const inventorySpace = new Rectangle("inventorySpace_" + i);
-                inventorySpace.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-                inventorySpace.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-                inventorySpace.top = 0.1;
-                inventorySpace.left = 0.1;
-                inventorySpace.width = 0.9;
-                inventorySpace.height = 0.9;
-                inventorySpace.background = bgColor;
-                inventorySpace.thickness = 0;
-                inventorySpace.cornerRadius = 0;
-                grid.addControl(inventorySpace, r, col);
+                if (i < this._game.config.PLAYER_INVENTORY_SPACE) {
+                    let bgColor = "rgba(255,255,255,.1)";
+                    const inventorySpace = new Rectangle("inventorySpace_" + i);
+                    inventorySpace.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+                    inventorySpace.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+                    inventorySpace.top = 0.1;
+                    inventorySpace.left = 0.1;
+                    inventorySpace.width = 0.9;
+                    inventorySpace.height = 0.9;
+                    inventorySpace.background = bgColor;
+                    inventorySpace.thickness = 0;
+                    inventorySpace.cornerRadius = 0;
+                    grid.addControl(inventorySpace, r, col);
 
-                this._inventoryGrid.push(inventorySpace);
+                    this._inventoryGrid.push(inventorySpace);
 
-                i++;
+                    i++;
+                }
             }
         }
 

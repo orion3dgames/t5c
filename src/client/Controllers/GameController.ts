@@ -5,13 +5,14 @@ import { Network } from "./Network";
 import { AssetsController } from "./AssetsController";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { Room } from "colyseus.js";
+import { Config } from "../../shared/Config";
 
 export class GameController {
     // core
     public engine;
     public scene;
     public client: Network;
-    public config;
+    public config: Config;
 
     // scene management
     public state: number = 0;

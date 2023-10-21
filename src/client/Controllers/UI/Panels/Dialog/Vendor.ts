@@ -265,9 +265,11 @@ export class Vendor {
         minusBtn.thickness = 0;
         actionBloc.addControl(minusBtn);
         minusBtn.onPointerClickObservable.add(() => {
-            totalQuantity--;
-            if (createBtn.textBlock) {
-                createBtn.textBlock.text = "Buy " + totalQuantity;
+            if (totalQuantity > 1) {
+                totalQuantity--;
+                if (createBtn.textBlock) {
+                    createBtn.textBlock.text = "Buy " + totalQuantity;
+                }
             }
         });
 
@@ -290,7 +292,7 @@ export class Vendor {
                     if (createBtn.textBlock) {
                         createBtn.textBlock.text = "Buy " + totalQuantity;
                     }
-                }, 1000);
+                }, 200);
             }
         });
 

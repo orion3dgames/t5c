@@ -240,12 +240,9 @@ export class GameRoomState extends Schema {
 
         if (type === ServerMsg.PLAYER_BUY_ITEM) {
             const item = this.gameData.get("item", data.key);
-            let loot = new LootSchema(this, {
-                key: data.key,
-                qty: data.qty,
-            });
-            playerState.pickupItem(loot);
-            playerState.player_data.gold = playerState.player_data.gold - item.value * data.qty;
+            if (item) {
+                playerState.buyItem(item, data.qty);
+            }
         }
 
         if (type === ServerMsg.PLAYER_SELL_ITEM) {
