@@ -260,8 +260,9 @@ export class PlayerSchema extends Entity {
                     return "" + i;
                 }
             }
+            return false;
         }
-        return false;
+        return "" + 0;
     }
 
     isEquipementSlotAvailable(slot) {
