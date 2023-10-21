@@ -166,7 +166,6 @@ export class EntityMesh {
                 if (mesh) {
                     for (const childMesh of mesh.getChildMeshes()) {
                         childMesh.renderOverlay = false;
-                        this._ui._hightlight.removeMesh(childMesh as Mesh);
                     }
                 }
             })

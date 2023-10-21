@@ -42,7 +42,7 @@ export class PlayerInput {
     // timers
     public movementTimer;
     public movementTimerNow: number = 0;
-    public movementTimerDelay: number = 100;
+    public movementTimerDelay: number = 200;
 
     constructor(game: GameController, scene, room, ui) {
         (this._game = game), (this._scene = scene);
