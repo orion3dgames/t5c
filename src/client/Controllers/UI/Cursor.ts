@@ -15,26 +15,20 @@ export class Cursor {
         };
     }
 
-    activate(type) {
-        // does this type exist
-        if (this.cursors[type]) {
-            return false;
-        }
-
-        // show cursor
-        //document.body.style.cursor = "url(" + type + "), auto";
-        //this._ui._scene.hoverCursor = "url(" + type + "), auto";
-        this._ui._scene.hoverCursor = "url(./images/cursor/talk.png), auto";
+    activate(type?: string) {
+        document.documentElement.style.cursor = this.get(type);
     }
 
-    desactivate() {
-        document.documentElement.style.cursor = "auto";
-    }
-
-    hoverCursor(type) {
+    get(type?: string) {
         if (type === "hover") {
             return "url(./images/cursor/hand_hover.png), auto";
         }
-        return "default";
+        if (type === "buy") {
+            return "url(./images/cursor/buy.png), auto";
+        }
+        if (type === "sell") {
+            return "url(./images/cursor/sell.png), auto";
+        }
+        return "url(./images/cursor/hand.png), auto";
     }
 }

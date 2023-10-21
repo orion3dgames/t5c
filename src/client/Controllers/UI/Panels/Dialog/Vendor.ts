@@ -18,6 +18,8 @@ export class Vendor {
     private stackPanel: StackPanel;
     private selected;
 
+    private sellBtn;
+
     private backgroundColor = "#292929";
     private backgroundSelected = "green";
 
@@ -50,13 +52,14 @@ export class Vendor {
         this.panel._panelContent.addControl(createBtn);
 
         createBtn.onPointerDownObservable.add(() => {
+            this.sellingModeOff();
             this.panel.nextStep(0);
         });
 
         // add scrollable container
         const scrollViewer = new ScrollViewer("scrollViewer");
         scrollViewer.width = 1;
-        scrollViewer.height = 0.63;
+        scrollViewer.height = 0.53;
         scrollViewer.top = "24px;";
         scrollViewer.thickness = 0;
         scrollViewer.background = this.backgroundColor;
@@ -66,16 +69,17 @@ export class Vendor {
         this.panel._panelContent.addControl(scrollViewer);
 
         // add details scrollable container
-        const scrollViewerDetails = new ScrollViewer("scrollViewerDetails");
-        scrollViewerDetails.width = 1;
-        scrollViewerDetails.height = 0.3;
-        scrollViewerDetails.top = -0.1;
-        scrollViewerDetails.thickness = 0;
-        scrollViewerDetails.setPaddingInPixels(5, 5, 5, 5);
-        scrollViewerDetails.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        scrollViewerDetails.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        this.panel._panelContent.addControl(scrollViewerDetails);
-        this.panelDetails = scrollViewerDetails;
+        let ItemDetailsBloc = new Rectangle("ItemDetailsBloc");
+        ItemDetailsBloc.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        ItemDetailsBloc.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        ItemDetailsBloc.width = 1;
+        ItemDetailsBloc.height = 0.4;
+        ItemDetailsBloc.top = -0.1;
+        ItemDetailsBloc.background = "black";
+        ItemDetailsBloc.setPaddingInPixels(5, 5, 5, 5);
+        ItemDetailsBloc.thickness = 0;
+        this.panel._panelContent.addControl(ItemDetailsBloc);
+        this.panelDetails = ItemDetailsBloc;
 
         // add detail window
         const stackPanel = new StackPanel("stackPanel");
@@ -119,6 +123,7 @@ export class Vendor {
 
                 // on hover tooltip
                 blocContainer.onPointerClickObservable.add(() => {
+                    this.sellingModeOff();
                     this.select(blocContainer, blockTitle);
                     this.createDetails(item);
                 });
@@ -157,11 +162,150 @@ export class Vendor {
         blockTitle.color = "white";
     }
 
+    sellingModeOn() {
+        this.panel._game.sellingMode = true;
+        this.panel._UI._Cursor.activate("sell");
+        if (this.sellBtn.textBlock) {
+            this.sellBtn.textBlock.text = "Sell (ON)";
+        }
+    }
+
+    sellingModeOff() {
+        this.panel._game.sellingMode = false;
+        this.panel._UI._Cursor.activate();
+        if (this.sellBtn.textBlock) {
+            this.sellBtn.textBlock.text = "Sell";
+        }
+    }
+
     createDetails(item) {
         // clear previous ability
         this.panelDetails.getDescendants().forEach((el) => {
             el.dispose();
         });
+
+        ////////////////////////////////////////////
+        ////////////////////////////////////////////
+        ////////////////////////////////////////////
+        let totalQuantity = 1;
+
+        let actionBloc = new Rectangle("actionBloc" + item.key);
+        actionBloc.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        actionBloc.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        actionBloc.top = "0px";
+        actionBloc.left = "0px;";
+        actionBloc.width = 1;
+        actionBloc.height = "35px;";
+        actionBloc.thickness = 0;
+        this.panelDetails.addControl(actionBloc);
+
+        const sellBtn = Button.CreateSimpleButton("sellBtn", "Sell");
+        sellBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        sellBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        sellBtn.left = "0px;";
+        sellBtn.top = "0px";
+        sellBtn.width = "100px;";
+        sellBtn.height = "24px";
+        sellBtn.background = "orange";
+        sellBtn.color = "white";
+        sellBtn.thickness = 0;
+        sellBtn.fontSize = "14px";
+        actionBloc.addControl(sellBtn);
+        this.sellBtn = sellBtn;
+
+        sellBtn.onPointerClickObservable.add(() => {
+            if (this.panel._game.sellingMode === false) {
+                this.sellingModeOn();
+            } else {
+                this.sellingModeOff();
+            }
+        });
+
+        const createBtn = Button.CreateSimpleButton("buyBtn", "Buy " + totalQuantity);
+        createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        createBtn.left = "-29px;";
+        createBtn.top = "0px";
+        createBtn.width = "60px;";
+        createBtn.height = "24px";
+        createBtn.background = "orange";
+        createBtn.color = "white";
+        createBtn.thickness = 0;
+        createBtn.fontSize = "14px";
+        createBtn.hoverCursor = this.panel._UI._Cursor.get("buy");
+        actionBloc.addControl(createBtn);
+
+        const plusBtn = Button.CreateSimpleButton("plusBtn", "+");
+        plusBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        plusBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        plusBtn.left = "0px;";
+        plusBtn.top = "0px";
+        plusBtn.width = "24px;";
+        plusBtn.height = "24px";
+        plusBtn.background = "gray";
+        plusBtn.color = "white";
+        plusBtn.thickness = 0;
+        actionBloc.addControl(plusBtn);
+        plusBtn.onPointerClickObservable.add(() => {
+            totalQuantity++;
+            if (createBtn.textBlock) {
+                createBtn.textBlock.text = "Buy " + totalQuantity;
+            }
+        });
+
+        const minusBtn = Button.CreateSimpleButton("minusBtn", "-");
+        minusBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        minusBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        minusBtn.left = "-95px;";
+        minusBtn.top = "0px";
+        minusBtn.width = "24px;";
+        minusBtn.height = "24px";
+        minusBtn.background = "gray";
+        minusBtn.color = "white";
+        minusBtn.thickness = 0;
+        actionBloc.addControl(minusBtn);
+        minusBtn.onPointerClickObservable.add(() => {
+            totalQuantity--;
+            if (createBtn.textBlock) {
+                createBtn.textBlock.text = "Buy " + totalQuantity;
+            }
+        });
+
+        let clicked = false;
+        let observable = createBtn.onPointerClickObservable.add(() => {
+            this.sellingModeOff();
+            if (clicked === false) {
+                clicked = true;
+                this.panel._room.send(ServerMsg.PLAYER_BUY_ITEM, {
+                    key: item.key,
+                    qty: totalQuantity,
+                });
+                if (createBtn.textBlock) {
+                    createBtn.textBlock.text = "...";
+                }
+                // todo: we need some sort of callback here
+                setTimeout(() => {
+                    totalQuantity = 1;
+                    clicked = false;
+                    if (createBtn.textBlock) {
+                        createBtn.textBlock.text = "Buy " + totalQuantity;
+                    }
+                }, 1000);
+            }
+        });
+
+        ////////////////////////////////////////////
+        ////////////////////////////////////////////
+        ////////////////////////////////////////////
+
+        const scrollViewerDetails = new ScrollViewer("scrollViewerDetails");
+        scrollViewerDetails.width = 1;
+        scrollViewerDetails.height = 1;
+        scrollViewerDetails.top = "35px";
+        scrollViewerDetails.thickness = 0;
+        scrollViewerDetails.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        scrollViewerDetails.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        this.panelDetails.addControl(scrollViewerDetails);
 
         const stackPanel = new StackPanel("stackPanel");
         stackPanel.width = 1;
@@ -170,7 +314,7 @@ export class Vendor {
         stackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         stackPanel.spacing = 5;
         stackPanel.adaptHeightToChildren = true;
-        this.panelDetails.addControl(stackPanel);
+        scrollViewerDetails.addControl(stackPanel);
 
         let titleBloc = new Rectangle("titleBloc" + item.key);
         titleBloc.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
@@ -205,6 +349,7 @@ export class Vendor {
         tooltipName.top = "0px";
         tooltipName.left = "40px";
         tooltipName.fontSize = "18px;";
+        tooltipName.fontWeight = "bold;";
         tooltipName.resizeToFit = true;
         tooltipName.textWrapping = TextWrapping.WordWrap;
         tooltipName.text = item.title;
@@ -250,95 +395,5 @@ export class Vendor {
         requiredBloc.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         requiredBloc.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         stackPanel.addControl(requiredBloc);
-
-        ////////////////////////////////////////////
-        ////////////////////////////////////////////
-        ////////////////////////////////////////////
-        let totalQuantity = 1;
-
-        let actionBloc = new Rectangle("actionBloc" + item.key);
-        actionBloc.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        actionBloc.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        actionBloc.top = "0px";
-        actionBloc.left = "0px;";
-        actionBloc.width = "140px";
-        actionBloc.height = "35px;";
-        actionBloc.thickness = 0;
-        this.panelDetails.addControl(actionBloc);
-
-        const createBtn = Button.CreateSimpleButton("buyBtn", "Buy " + totalQuantity);
-        createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        createBtn.left = "-29px;";
-        createBtn.top = "0px";
-        createBtn.width = "60px;";
-        createBtn.height = "24px";
-        createBtn.background = "orange";
-        createBtn.color = "white";
-        createBtn.thickness = 0;
-        createBtn.fontSize = "14px";
-        actionBloc.addControl(createBtn);
-
-        const plusBtn = Button.CreateSimpleButton("plusBtn", "+");
-        plusBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        plusBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        plusBtn.left = "0px;";
-        plusBtn.top = "0px";
-        plusBtn.width = "24px;";
-        plusBtn.height = "24px";
-        plusBtn.background = "gray";
-        plusBtn.color = "white";
-        plusBtn.thickness = 0;
-        actionBloc.addControl(plusBtn);
-        plusBtn.onPointerClickObservable.add(() => {
-            totalQuantity++;
-            if (createBtn.textBlock) {
-                createBtn.textBlock.text = "Buy " + totalQuantity;
-            }
-        });
-
-        const minusBtn = Button.CreateSimpleButton("minusBtn", "-");
-        minusBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        minusBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        minusBtn.left = "-95px;";
-        minusBtn.top = "0px";
-        minusBtn.width = "24px;";
-        minusBtn.height = "24px";
-        minusBtn.background = "gray";
-        minusBtn.color = "white";
-        minusBtn.thickness = 0;
-        actionBloc.addControl(minusBtn);
-        minusBtn.onPointerClickObservable.add(() => {
-            totalQuantity--;
-            if (createBtn.textBlock) {
-                createBtn.textBlock.text = "Buy " + totalQuantity;
-            }
-        });
-
-        let clicked = false;
-        let observable = createBtn.onPointerClickObservable.add(() => {
-            if (clicked === false) {
-                clicked = true;
-                this.panel._room.send(ServerMsg.PLAYER_BUY_ITEM, {
-                    key: item.key,
-                    qty: totalQuantity,
-                });
-                if (createBtn.textBlock) {
-                    createBtn.textBlock.text = "...";
-                }
-                // todo: we need some sort of callback here
-                setTimeout(() => {
-                    totalQuantity = 1;
-                    clicked = false;
-                    if (createBtn.textBlock) {
-                        createBtn.textBlock.text = "Buy " + totalQuantity;
-                    }
-                }, 1000);
-            }
-        });
-
-        ////////////////////////////////////////////
-        ////////////////////////////////////////////
-        ////////////////////////////////////////////
     }
 }

@@ -22,6 +22,7 @@ export class Tooltip {
     private tooltipName;
     private tooltipDescription;
     private tooltipStats;
+    private tooltipValue;
 
     private horizontal = "center";
     private vertical = "top";
@@ -132,11 +133,27 @@ export class Tooltip {
         tooltipDescription.paddingBottom = "5px";
         tooltipBarStack.addControl(tooltipDescription);
         this.tooltipDescription = tooltipDescription;
+
+        // add value
+        const tooltipValue = new TextBlock("tooltipValue");
+        tooltipValue.color = "gray";
+        tooltipValue.top = "0px";
+        tooltipValue.left = "0px";
+        tooltipValue.width = 1;
+        tooltipValue.fontSize = "12px;";
+        tooltipValue.resizeToFit = true;
+        tooltipValue.text = "";
+        tooltipValue.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        tooltipValue.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        tooltipValue.textWrapping = TextWrapping.WordWrap;
+        tooltipBarStack.addControl(tooltipValue);
+        this.tooltipValue = tooltipValue;
     }
 
     private generateItem(data) {
         this.tooltipName.text = data.title;
         this.tooltipDescription.text = data.description;
+        this.tooltipValue.text = "Value: " + data.value;
 
         let stats = "";
         for (let key in data.benefits) {

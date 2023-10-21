@@ -3,7 +3,7 @@ import { Image } from "@babylonjs/gui/2D/controls/image";
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Grid } from "@babylonjs/gui/2D/controls/grid";
-import { Item } from "../../../../shared/types";
+import { Item, ServerMsg } from "../../../../shared/types";
 import { Panel } from "./Panel";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { createButton } from "../Theme";
@@ -228,6 +228,11 @@ export class Panel_Inventory extends Panel {
             // on hover tooltip
             child.onPointerClickObservable.clear();
             child.onPointerClickObservable.add((e) => {
+                if (child.metadata.item && e.buttonIndex === 0) {
+                    if (this._game.sellingMode) {
+                        this._room.send(ServerMsg.PLAYER_SELL_ITEM, element.i);
+                    }
+                }
                 if (child.metadata.item && e.buttonIndex === 2) {
                     this._UI._Tooltip.close();
                     this._UI._InventoryDropdown.showDropdown(child, item, element);

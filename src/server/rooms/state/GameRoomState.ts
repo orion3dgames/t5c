@@ -248,6 +248,13 @@ export class GameRoomState extends Schema {
             playerState.player_data.gold = playerState.player_data.gold - item.value * data.qty;
         }
 
+        if (type === ServerMsg.PLAYER_SELL_ITEM) {
+            const item = playerState.getInventoryItemByIndex(data);
+            if (item) {
+                playerState.sellItem(item);
+            }
+        }
+
         /////////////////////////////////////
         // on player equip
         // data will equal the inventory index of the clicked item

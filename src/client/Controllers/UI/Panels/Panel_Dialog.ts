@@ -33,10 +33,6 @@ export class Panel_Dialog extends Panel {
     public currentDialogStep: number = -1;
     public playerQuest: QuestSchema;
 
-    //
-    private trainer: Trainer;
-    private vendor: Vendor;
-
     constructor(_UI: UserInterface, _currentPlayer, options) {
         super(_UI, _currentPlayer, options);
 

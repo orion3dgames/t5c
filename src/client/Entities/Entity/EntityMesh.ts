@@ -143,7 +143,6 @@ export class EntityMesh {
 
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);
-        this.mesh.actionManager.hoverCursor = "url(./images/cursor/hand_hover.png), auto";
 
         // register hover over player
         this.mesh.actionManager.registerAction(
@@ -156,6 +155,9 @@ export class EntityMesh {
                         childMesh.renderOverlay = true;
                     }
                 }
+                if (this.mesh.actionManager) {
+                    this.mesh.actionManager.hoverCursor = this._ui._Cursor.get("hover");
+                }
             })
         );
 
@@ -167,6 +169,9 @@ export class EntityMesh {
                     for (const childMesh of mesh.getChildMeshes()) {
                         childMesh.renderOverlay = false;
                     }
+                }
+                if (this.mesh.actionManager) {
+                    this.mesh.actionManager.hoverCursor = this._ui._Cursor.get();
                 }
             })
         );

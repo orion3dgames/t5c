@@ -8,6 +8,8 @@ import { Scene } from "@babylonjs/core/scene";
 import { GameController } from "../../GameController";
 import { UserInterface } from "../../UserInterface";
 import { Room } from "colyseus.js";
+import { Trainer } from "./Dialog/Trainer";
+import { Vendor } from "./Dialog/Vendor";
 
 export class Panel {
     public _UI: UserInterface;
@@ -29,6 +31,10 @@ export class Panel {
     public _isPointerDown: boolean = false;
     public _pointerDownPosition;
     public _isDragging: boolean = false;
+
+    //
+    public trainer: Trainer;
+    public vendor: Vendor;
 
     constructor(_UI, _currentPlayer, options) {
         //
@@ -159,6 +165,8 @@ export class Panel {
     // open panel
     public open(): void {
         const visible = this._panel.isVisible;
+
+        // close all panels
         if (!this._options.stayOpen) {
             this._UI.panelAbilities._panel.isVisible = false;
             this._UI.panelCharacter._panel.isVisible = false;
@@ -177,11 +185,15 @@ export class Panel {
     // close panel
     public close() {
         this._panel.isVisible = false;
+
+        if (this.vendor) {
+            this.vendor.sellingModeOff();
+        }
     }
 
     // update panel
-    public update() { }
+    public update() {}
 
     // refresh panel
-    public refresh() { }
+    public refresh() {}
 }

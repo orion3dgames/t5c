@@ -80,6 +80,7 @@ export enum ServerMsg {
     PLAYER_TELEPORT,
     PLAYER_QUEST_UPDATE,
     PLAYER_BUY_ITEM,
+    PLAYER_SELL_ITEM,
 }
 
 //////////////////////////////////////////////////////////////

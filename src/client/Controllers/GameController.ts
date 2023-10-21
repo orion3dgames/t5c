@@ -40,6 +40,9 @@ export class GameController {
     public _assetsCtrl: AssetsController;
     public _loadedAssets: AssetContainer[] = [];
 
+    //
+    public sellingMode: boolean = false;
+
     // all game data
     private _gameData = {
         items: [],

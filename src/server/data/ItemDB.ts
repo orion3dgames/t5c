@@ -114,7 +114,8 @@ let ItemsDB: itemDataMap = {
     potion_small_red: {
         key: "potion_small_red",
         title: "Small Health Potion",
-        description: "A very useful potion that restores up to 25 health..",
+        description:
+            "A very useful potion that restores up to 25 health, A very useful potion that restores up to 25 health, A very useful potion that restores up to 25 health",
         icon: "ICON_ITEM_potion_small_red",
         class: ItemClass.CONSUMABLE,
         value: 150,

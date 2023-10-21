@@ -291,6 +291,17 @@ export class PlayerSchema extends Entity {
         console.log("dropItem", dropAll, newQuantity, inventoryItem.qty);
     }
 
+    sellItem(inventoryItem) {
+        let newQuantity = inventoryItem.qty - 1;
+        if (newQuantity < 1) {
+            this.player_data.inventory.delete("" + inventoryItem.i);
+        } else {
+            inventoryItem.qty -= 1;
+        }
+        // add gold to player
+        this.player_data.gold += inventoryItem.value;
+    }
+
     pickupItem(loot: LootSchema) {
         // play animation // disabled
         //this.animationCTRL.playAnim(this, EntityState.PICKUP, () => {});

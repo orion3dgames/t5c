@@ -109,7 +109,16 @@ export class UserInterface {
         uiLayer.idealWidth = 1024;
         uiLayer.idealHeight = 768;
         uiLayer.useSmallestIdeal = true;*/
-        this._playerUI = uiLayer;
+
+        const uiLayerContainer = new Rectangle("uiLayerContainer");
+        uiLayerContainer.width = 1;
+        uiLayerContainer.height = 1;
+        uiLayerContainer.thickness = 1;
+        uiLayerContainer.fontFamily = "Times New Roman, serif";
+        uiLayerContainer.fontSize = "16px;";
+        uiLayer.addControl(uiLayerContainer);
+
+        this._playerUI = uiLayerContainer;
 
         // set highlight layer
         this._hightlight = new HighlightLayer("hl", this._scene);
@@ -146,6 +155,9 @@ export class UserInterface {
         // set current player
         this._currentPlayer = currentPlayer;
 
+        // cursor
+        this._Cursor = new Cursor(this);
+
         // create debug ui + events
         this._DebugBox = new DebugBox(this._playerUI, this._engine, this._scene, this._room, this._currentPlayer, this._entities);
 
@@ -163,10 +175,6 @@ export class UserInterface {
 
         // create chat ui + events
         this._DamageText = new DamageText(this._namesUI, this._scene, this._entities);
-
-        // cursor
-        this._Cursor = new Cursor(this);
-        this._Cursor.activate("buy");
 
         // create selected entity panel
         this._targetEntitySelectedBar = new EntitySelectedBar(this, {
@@ -388,7 +396,7 @@ export class UserInterface {
         rect1.height = "200px";
         rect1.thickness = 0;
         rect1.zIndex = 1;
-        this._playerUI.addControl(rect1);
+        this._namesUI.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
         rect1.linkOffsetY = -200;
 

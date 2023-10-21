@@ -45,6 +45,7 @@ export class PlayerCamera {
 
         // set as active camera
         this._scene.activeCamera = this.camera;
+        this._scene.cameraToUseForPointers = this.camera; // is this necessary?
 
         //
         this.cameraPos = this.camera.position;
