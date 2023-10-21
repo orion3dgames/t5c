@@ -153,6 +153,8 @@ export class Tooltip {
     private generateItem(data) {
         this.tooltipName.text = data.title;
         this.tooltipDescription.text = data.description;
+
+        this.tooltipValue.isVisible = true;
         this.tooltipValue.text = "Value: " + data.value;
 
         let stats = "";
@@ -169,8 +171,12 @@ export class Tooltip {
         this.tooltipName.text = data.title;
         this.tooltipDescription.text = data.description;
 
-        let stats = "";
+        // hide value
+        this.tooltipValue.text = "0";
+        this.tooltipValue.isVisible = false;
 
+        // generate ability stats
+        let stats = "";
         if (data.casterPropertyAffected.length > 0) {
             data.casterPropertyAffected.forEach((element) => {
                 stats += "Cost: " + element.min + "-" + element.max + " " + element.key.toUpperCase() + "\n";
