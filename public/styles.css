@@ -13,8 +13,8 @@ body{
 }
 
 html{
-    cursor: url(./images/cursor/hand.png), auto;
-    font-family: 'gameFont', serif;
+    cursor: url("./images/cursor/hand.png"), auto;
+    font-family: "Arial", serif;
     font-size: 16px;
     background-color: #222;
 }
