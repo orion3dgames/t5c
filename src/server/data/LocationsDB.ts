@@ -127,17 +127,24 @@ let LocationsDB = {
                             {
                                 type: "text",
                                 text: "Greetings, dear one! I am Priestess Alice, a devoted servant of the benevolent Goddess Athlea. May her light shine upon you.",
-                                quests: [{ key: "LH_DANGEROUS_ERRANDS_01", goToDialog: 1 }],
+                                quests: [
+                                    { key: "LH_DANGEROUS_ERRANDS_01", goToDialog: 1 },
+                                    { key: "LH_KILL_RATS_01", goToDialog: 2 },
+                                ],
                                 buttons: [
-                                    { label: "Can I see your wares?", goToDialog: 2 },
-                                    { label: "Can you train me?", goToDialog: 3 },
-                                    { label: "Can you heal me?", goToDialog: 4 },
-                                    { label: "Sorry, I'm busy adventuring.", goToDialog: 5 },
+                                    { label: "Can I see your wares?", goToDialog: 3 },
+                                    { label: "Can you train me?", goToDialog: 4 },
+                                    { label: "Can you heal me?", goToDialog: 5 },
+                                    { label: "Sorry, I'm busy adventuring.", goToDialog: 6 },
                                 ],
                             },
                             {
                                 type: "quest",
                                 quest_id: "LH_DANGEROUS_ERRANDS_01",
+                            },
+                            {
+                                type: "quest",
+                                quest_id: "LH_KILL_RATS_01",
                             },
                             {
                                 type: "vendor",

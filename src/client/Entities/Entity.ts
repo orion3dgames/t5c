@@ -207,7 +207,7 @@ export class Entity {
             }
 
             // hide any dialog this entity could be linked too
-            if (this.ui.panelDialog.currentEntity.sessionId === this.sessionId) {
+            if (this.ui.panelDialog.currentEntity && this.ui.panelDialog.currentEntity.sessionId === this.sessionId) {
                 this.ui.panelDialog.clear();
                 this.ui.panelDialog.close();
             }

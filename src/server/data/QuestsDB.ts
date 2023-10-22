@@ -1,6 +1,32 @@
 import { QuestObjective } from "../../shared/types";
 
 let QuestsDB = {
+    LH_KILL_RATS_01: {
+        key: "LH_KILL_RATS_01", // unique id
+        title: "Rats Infestation",
+        description:
+            "If you have a moment, our temple is currently plagued by a bandit invasion and they're roaming outside the temple creating havoc. Perhaps you could offer some assistance in this matter?",
+        descriptionOngoing: "Come back to me when you have killed @KillRemaining more bandits.",
+        descriptionReward: "Thank you so much looking after my bandits problem.  Please accept this small token of my appreciation.",
+        descriptionCompleted: "Thank you so much looking after my bandits problem.",
+        objective: "@NpcName in @LocationName wants you to kill @KillRequired @KillName found a little to the east of lighthaven temple.",
+        short_objective: "Kill @KillName @KillCompleted/@KillRequired",
+        type: QuestObjective.KILL_AMOUNT,
+        location: "lh_dungeon_01",
+        spawn_type: "spawn_01",
+        spawn_name: "Rats",
+        quantity: 10,
+        isRepeatable: true,
+        rewards: {
+            experience: 500,
+            gold: 50,
+            items: [],
+        },
+        conditions: {
+            type: "quest",
+            value: "LH_DANGEROUS_ERRANDS_01",
+        },
+    },
     LH_DANGEROUS_ERRANDS_01: {
         key: "LH_DANGEROUS_ERRANDS_01", // unique id
         title: "Dangerous Errands",
@@ -16,7 +42,7 @@ let QuestsDB = {
         spawn_type: "lh_town_bandits",
         spawn_name: "Bandit",
         quantity: 5,
-        isRepeatable: true,
+        isRepeatable: false,
         rewards: {
             experience: 500,
             gold: 50,
