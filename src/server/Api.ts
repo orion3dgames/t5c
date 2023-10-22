@@ -3,7 +3,7 @@ import path from "path";
 import Logger from "./utils/Logger";
 import { generateRandomPlayerName } from "../shared/Utils";
 import { GameData } from "./GameData";
-import { Database } from "./Database";
+import { Database } from "./GameDB";
 
 class Api {
     constructor(app, database: Database) {

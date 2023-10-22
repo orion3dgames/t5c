@@ -22,7 +22,7 @@ import {
     QuestObjective,
 } from "../../../shared/types";
 import { nanoid } from "nanoid";
-import { Database } from "../../Database";
+import { Database } from "../../GameDB";
 import Logger from "../../utils/Logger";
 import { Leveling } from "../../../shared/Class/Leveling";
 

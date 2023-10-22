@@ -1,4 +1,3 @@
-import sqlite3 from "sqlite3";
 import Logger from "./utils/Logger";
 import { nanoid } from "nanoid";
 import { PlayerCharacter, PlayerUser } from "../shared/types";
@@ -8,7 +7,11 @@ import { AbilitySchema } from "./rooms/schema/player/AbilitySchema";
 import { EquipmentSchema, PlayerSchema, QuestSchema } from "./rooms/schema";
 import { MapSchema } from "@colyseus/schema/lib/types/MapSchema";
 
-class Database {
+import { DB } from "../shared/db"; // this is the Database interface we defined earlier
+import DatabaseConstructor, { Database } from "better-sqlite3";
+import { Kysely, SqliteDialect } from "kysely";
+
+class GameDB {
     private db;
     private debug: boolean = true;
     private _config;
@@ -19,6 +22,31 @@ class Database {
 
     async initDatabase() {
         this.db = await this.connectDatabase();
+    }
+
+    async connectDatabase() {
+        let dbFilePath = this._config.databaseLocation;
+
+        const dialect = new SqliteDialect({
+            database: new DatabaseConstructor(dbFilePath),
+        });
+
+        this.db = new Kysely<DB>({
+            dialect,
+        });
+
+        return this.db;
+    }
+
+    async findAll() {
+        let result = await this.db.selectFrom("users").selectAll().execute();
+        console.log(result);
+    }
+
+    /*
+
+    async initDatabase() {
+        //this.db = await this.connectDatabase();
     }
 
     async createDatabase() {
@@ -413,6 +441,7 @@ class Database {
         const sql = `UPDATE characters SET online=? WHERE id=? ;`;
         return this.run(sql, [online, character_id]);
     }
+    */
 }
 
-export { Database };
+export { GameDB };

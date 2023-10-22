@@ -11,7 +11,7 @@ import { GameRoom } from "./rooms/GameRoom";
 import { ChatRoom } from "./rooms/ChatRoom";
 
 import { Api } from "./Api";
-import { Database } from "./Database";
+import { Database } from "./GameDB";
 
 import Logger from "./utils/Logger";
 import { Config } from "../shared/Config";
@@ -32,9 +32,10 @@ class GameServer {
 
     async init() {
         // start db
+        /*
         this.database = new Database(this.config);
         await this.database.initDatabase();
-        await this.database.createDatabase();
+        await this.database.createDatabase();*/
 
         //////////////////////////////////////////////////
         ///////////// COLYSEUS GAME SERVER ///////////////
@@ -66,7 +67,7 @@ class GameServer {
             Logger.info("[gameserver] listening on http://localhost:" + port);
 
             // create town room
-            //matchMaker.createRoom("game_room", { location: "lh_town" });
+            matchMaker.createRoom("game_room", { location: "lh_town" });
 
             // create island room
             //matchMaker.createRoom("game_room", { location: "lh_dungeon_01" });

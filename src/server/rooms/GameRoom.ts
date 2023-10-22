@@ -6,7 +6,7 @@ import Logger from "../utils/Logger";
 import { NavMesh } from "../../shared/Libs/yuka-min";
 import { Auth } from "./commands";
 import { PlayerSchema } from "./schema";
-import { Database } from "../Database";
+import { GameDB } from "../GameDB";
 import { Config } from "../../shared/Config";
 
 export class GameRoom extends Room<GameRoomState> {
@@ -36,7 +36,7 @@ export class GameRoom extends Room<GameRoomState> {
         Logger.info("[gameroom][onCreate] navmesh " + options.location + " initialized.");
 
         // Set initial state
-        this.setState(new GameRoomState(this, this.navMesh, options));
+        //this.setState(new GameRoomState(this, this.navMesh, options));
 
         // Register message handlers for messages from the client
         this.registerMessageHandlers();
@@ -54,8 +54,9 @@ export class GameRoom extends Room<GameRoomState> {
         this.autoDispose = true;
 
         // initialize database
-        this.database = new Database(this.config);
+        this.database = new GameDB(this.config);
         await this.database.initDatabase();
+        await this.database.findAll();
 
         ///////////////////////////////////////////////////////////////////////////
         // if players are in a room, make sure we save any changes to the database.
@@ -98,7 +99,7 @@ export class GameRoom extends Room<GameRoomState> {
         /////////////////////////////////////
         // on player input
         this.onMessage("*", (client, type, data) => {
-            this.state.processMessage(client, type, data);
+            //this.state.processMessage(client, type, data);
         });
     }
 
