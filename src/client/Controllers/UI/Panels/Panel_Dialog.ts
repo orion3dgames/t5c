@@ -5,12 +5,10 @@ import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { UserInterface } from "../../UserInterface";
-import { QuestObjective, QuestStatus, ServerMsg } from "../../../../shared/types";
-import { QuestSchema } from "../../../../server/rooms/schema";
-import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
 
-import { Trainer } from "./Dialog/Trainer";
-import { Vendor } from "./Dialog/Vendor";
+import { TrainerDialog } from "./Dialog/TrainerDialog";
+import { VendorDialog } from "./Dialog/VendorDialog";
+import { QuestDialog } from "./Dialog/QuestDialog";
 
 export class Panel_Dialog extends Panel {
     // inventory tab
@@ -29,9 +27,7 @@ export class Panel_Dialog extends Panel {
 
     public currentEntity;
     public currentDialog;
-    public currentQuest;
     public currentDialogStep: number = -1;
-    public playerQuest: QuestSchema;
 
     constructor(_UI: UserInterface, _currentPlayer, options) {
         super(_UI, _currentPlayer, options);
@@ -60,31 +56,26 @@ export class Panel_Dialog extends Panel {
         this.createContent();
     }
 
+    public showTrainer(trainer) {
+        this.clear();
+        this.trainer = new TrainerDialog(this, trainer);
+    }
+
+    public showVendor(vendor) {
+        this.clear();
+        this.vendor = new VendorDialog(this, vendor);
+    }
+
+    public showQuest(quest_id: string) {
+        this.clear();
+        this.quest = new QuestDialog(this, quest_id);
+    }
+
     public replaceKeywords(text) {
         text = text.replace("@NpcName", this.currentEntity.name);
         text = text.replace("@LocationName", this._game.currentLocation.title);
         text = text.replace("@PlayerName", this._currentPlayer.name);
-        if (this.currentQuest) {
-            text = text.replace("@KillRequired", this.currentQuest.quantity);
-            text = text.replace("@KillName", this.currentQuest.spawn_name);
-        }
-        if (this.playerQuest) {
-            text = text.replace("@KillCompleted", this.playerQuest.qty);
-        }
-        if (this.playerQuest && this.currentQuest) {
-            text = text.replace("@KillRemaining", this.currentQuest.quantity - this.playerQuest.qty);
-        }
-
         return text;
-    }
-
-    public isQuestReadyToComplete() {
-        if (this.playerQuest && this.currentQuest) {
-            if (this.currentQuest.type === QuestObjective.KILL_AMOUNT && this.playerQuest.qty >= this.currentQuest.quantity && this.playerQuest.status === 0) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public nextStep(step) {
@@ -97,14 +88,6 @@ export class Panel_Dialog extends Panel {
 
         // get vars
         let currentDialog = this.currentDialog[step];
-        let lastDialogIndex = this.currentDialog.length - 1;
-
-        // load quest details
-        if (currentDialog.quest_id) {
-            this.playerQuest = this._currentPlayer.player_data.quests[currentDialog.quest_id];
-            this.currentQuest = this._game.getGameData("quest", currentDialog.quest_id);
-        }
-        let questCompleted = this.isQuestReadyToComplete();
 
         // create main description textblock
         let dialogTextBlock = new TextBlock("dialogText");
@@ -125,122 +108,12 @@ export class Panel_Dialog extends Panel {
             dialogTextBlock.text = dialogText;
         }
 
-        //////////////////////////////////
-        // if dialog is type "vendor",
-        if (currentDialog.type === "vendor") {
-            this.vendor = new Vendor(this, currentDialog);
-        }
-
-        //////////////////////////////////
-        // if dialog is type "trainer",
-        if (currentDialog.type === "trainer") {
-            this.trainer = new Trainer(this, currentDialog);
-        }
-
-        //////////////////////////////////
-        // if dialog is type "quest",
-        if (currentDialog.type === "quest") {
-            // quest accepted
-            if (this.playerQuest && this.playerQuest.status === 0) {
-                let dialogText = this.currentQuest.descriptionOngoing;
-                dialogText = this.replaceKeywords(dialogText);
-                dialogTextBlock.text = dialogText;
-                currentDialog.isEndOfDialog = true;
-            }
-
-            // quest ready to complete
-            if (questCompleted) {
-                let dialogText = this.currentQuest.descriptionReward;
-                dialogText = this.replaceKeywords(dialogText);
-                dialogTextBlock.text = dialogText;
-                currentDialog.isEndOfDialog = false;
-
-                // show rewards
-                this.showRewards(this.currentQuest.rewards);
-
-                // complete quest button
-                const createBtn = Button.CreateSimpleButton("characterBtn", "Complete Quest");
-                createBtn.left = "0px;";
-                createBtn.top = "0px";
-                createBtn.width = 1;
-                createBtn.height = "24px";
-                createBtn.background = "black";
-                createBtn.color = "white";
-                createBtn.thickness = 0;
-                this.dialogStackPanel.addControl(createBtn);
-
-                createBtn.onPointerDownObservable.add(() => {
-                    // send event to server
-                    this._room.send(ServerMsg.PLAYER_QUEST_UPDATE, {
-                        id: currentDialog.quest_id,
-                        status: QuestStatus.READY_TO_COMPLETE,
-                    });
-                    // close dialog
-                    this.close();
-                });
-            }
-
-            // quest completed
-            if (this.playerQuest && this.playerQuest.status === 1) {
-                let dialogText = this.currentQuest.descriptionCompleted;
-                dialogText = this.replaceKeywords(dialogText);
-                dialogTextBlock.text = dialogText;
-            }
-
-            // quest not started
-            if (!this.playerQuest) {
-                let dialogText = this.currentQuest.description;
-                dialogText = this.replaceKeywords(dialogText);
-                dialogTextBlock.text = dialogText;
-
-                // show quest objective
-                let dialogObjective = new TextBlock("dialogObjective");
-                dialogObjective.text = this.replaceKeywords(this.currentQuest.objective);
-                dialogObjective.fontSize = "14px";
-                dialogObjective.color = "orange";
-                dialogObjective.textWrapping = TextWrapping.WordWrap;
-                dialogObjective.resizeToFit = true;
-                this.dialogStackPanel.addControl(dialogObjective);
-
-                // show accept button
-                const dialogBtnAccept = Button.CreateSimpleButton("dialogBtnAccept", "Accept");
-                dialogBtnAccept.width = 1;
-                dialogBtnAccept.height = "24px";
-                dialogBtnAccept.background = "black";
-                dialogBtnAccept.color = "white";
-                dialogBtnAccept.thickness = 0;
-                this.dialogStackPanel.addControl(dialogBtnAccept);
-                dialogBtnAccept.onPointerDownObservable.add(() => {
-                    // sent event to server
-                    this._room.send(ServerMsg.PLAYER_QUEST_UPDATE, {
-                        id: currentDialog.quest_id,
-                        status: QuestStatus.ACCEPTED,
-                    });
-                    // go to end dialog
-                    this.nextStep(lastDialogIndex);
-                });
-
-                // show decline button
-                const dialogBtnDecline = Button.CreateSimpleButton("dialogBtnDecline", "Decline");
-                dialogBtnDecline.width = 1;
-                dialogBtnDecline.height = "24px";
-                dialogBtnDecline.background = "black";
-                dialogBtnDecline.color = "white";
-                dialogBtnDecline.thickness = 0;
-                this.dialogStackPanel.addControl(dialogBtnDecline);
-                dialogBtnDecline.onPointerDownObservable.add(() => {
-                    // go back to start
-                    this.nextStep(0);
-                });
-            }
-        }
-
         // create any quest buttons
         if (currentDialog.quests) {
             let q = 1;
             currentDialog.quests.forEach((btn: any) => {
                 let quest = this._game.getGameData("quest", btn.key);
-                const createBtn = Button.CreateSimpleButton("characterBtn-" + q, "! " + quest.title);
+                const createBtn = Button.CreateSimpleButton("questBtn-" + q, "! " + quest.title);
                 createBtn.left = "0px;";
                 createBtn.top = "0px";
                 createBtn.width = 1;
@@ -249,12 +122,42 @@ export class Panel_Dialog extends Panel {
                 createBtn.color = "white";
                 createBtn.thickness = 0;
                 this.dialogStackPanel.addControl(createBtn);
-
                 createBtn.onPointerDownObservable.add(() => {
-                    this.nextStep(btn.goToDialog);
+                    this.showQuest(btn.key);
                 });
-
                 q++;
+            });
+        }
+
+        // create any trainer buttons
+        if (currentDialog.trainer) {
+            const createBtn = Button.CreateSimpleButton("gotoVendor", "Can you train me?");
+            createBtn.left = "0px;";
+            createBtn.top = "0px";
+            createBtn.width = 1;
+            createBtn.height = "24px";
+            createBtn.background = "black";
+            createBtn.color = "white";
+            createBtn.thickness = 0;
+            this.dialogStackPanel.addControl(createBtn);
+            createBtn.onPointerDownObservable.add(() => {
+                this.showTrainer(currentDialog.trainer);
+            });
+        }
+
+        // create any vendor buttons
+        if (currentDialog.vendor) {
+            const createBtn = Button.CreateSimpleButton("gotoVendor", "Can I see you wares?");
+            createBtn.left = "0px;";
+            createBtn.top = "0px";
+            createBtn.width = 1;
+            createBtn.height = "24px";
+            createBtn.background = "black";
+            createBtn.color = "white";
+            createBtn.thickness = 0;
+            this.dialogStackPanel.addControl(createBtn);
+            createBtn.onPointerDownObservable.add(() => {
+                this.showVendor(currentDialog.vendor);
             });
         }
 
@@ -307,40 +210,6 @@ export class Panel_Dialog extends Panel {
             if (currentDialog.triggeredByClosing) {
                 this.processEvent(currentDialog.triggeredByClosing);
             }
-        }
-    }
-
-    public showRewards(rewards) {
-        if (rewards.experience) {
-            let dialogRewards = new TextBlock("dialogRewards-experience");
-            dialogRewards.text = "Experience: " + rewards.experience;
-            dialogRewards.fontSize = "14px";
-            dialogRewards.color = "orange";
-            dialogRewards.resizeToFit = true;
-            dialogRewards.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-            this.dialogStackPanel.addControl(dialogRewards);
-        }
-
-        if (rewards.gold) {
-            let dialogRewards = new TextBlock("dialogRewards-gold");
-            dialogRewards.text = "Gold: " + rewards.experience;
-            dialogRewards.fontSize = "14px";
-            dialogRewards.color = "orange";
-            dialogRewards.resizeToFit = true;
-            dialogRewards.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-            this.dialogStackPanel.addControl(dialogRewards);
-        }
-
-        if (rewards.items && rewards.items.length > 0) {
-            rewards.items.forEach((item) => {
-                let dialogRewards = new TextBlock("dialogRewards-item-" + item.key);
-                dialogRewards.text = "Item: " + item.key;
-                dialogRewards.fontSize = "14px";
-                dialogRewards.color = "orange";
-                dialogRewards.resizeToFit = true;
-                dialogRewards.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-                this.dialogStackPanel.addControl(dialogRewards);
-            });
         }
     }
 

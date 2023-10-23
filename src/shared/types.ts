@@ -98,6 +98,7 @@ export type Quest = {
     type: QuestObjective.KILL_AMOUNT;
     location: string;
     spawn_type: string;
+    spawn_name: string;
     quantity: number;
     isRepeatable: boolean;
     rewards: {
@@ -117,7 +118,8 @@ export type QuestUpdate = {
 };
 
 export enum QuestStatus {
-    ACCEPTED = 1,
+    NOT_ACCEPTED = 0,
+    ACCEPTED,
     OBJECTIVE_UPDATE,
     READY_TO_COMPLETE,
     COMPLETED,
