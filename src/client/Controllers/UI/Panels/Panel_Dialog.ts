@@ -112,13 +112,19 @@ export class Panel_Dialog extends Panel {
         if (currentDialog.quests) {
             let q = 1;
             currentDialog.quests.forEach((btn: any) => {
+                let playerQuest = this._currentPlayer.player_data.quests[btn.key] ?? false;
+
+                if (playerQuest && playerQuest.status === 1) return false;
+
                 let quest = this._game.getGameData("quest", btn.key);
+                let color = playerQuest && playerQuest.status === 1 ? "gray" : "orange";
+
                 const createBtn = Button.CreateSimpleButton("questBtn-" + q, "! " + quest.title);
                 createBtn.left = "0px;";
                 createBtn.top = "0px";
                 createBtn.width = 1;
                 createBtn.height = "24px";
-                createBtn.background = "orange";
+                createBtn.background = color;
                 createBtn.color = "white";
                 createBtn.thickness = 0;
                 this.dialogStackPanel.addControl(createBtn);

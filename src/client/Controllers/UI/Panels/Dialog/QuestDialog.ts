@@ -2,12 +2,14 @@ import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { Panel_Dialog } from "../..";
 import { Button } from "@babylonjs/gui/2D/controls/button";
-import { Quest, QuestObjective, QuestStatus, ServerMsg } from "../../../../../shared/types";
+import { Quest, QuestObjective, QuestObjectiveMap, QuestStatus, ServerMsg } from "../../../../../shared/types";
+import { QuestsHelper } from "../../../../../shared/Class/QuestsHelper";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 
 export class QuestDialog {
     private panel: Panel_Dialog;
     public currentQuest: Quest;
+    public currentLocation;
     public playerQuest;
     public questReadyToComplete;
 
@@ -40,6 +42,7 @@ export class QuestDialog {
 
         // get quest
         this.currentQuest = this.panel._game.getGameData("quest", quest_id);
+        this.currentLocation = this.panel._game.getGameData("location", this.currentQuest.location);
 
         // get player quest
         this.playerQuest = this.panel._currentPlayer.player_data.quests[quest_id] ?? false;
@@ -47,6 +50,11 @@ export class QuestDialog {
         // is quest completed
         this.questReadyToComplete = this.isQuestReadyToComplete();
 
+        //
+        this.create();
+    }
+
+    create() {
         // create quest title textblock
         let dialogTitleBlock = new TextBlock("dialogTitleBlock");
         dialogTitleBlock.text = this.currentQuest.title;
@@ -60,11 +68,6 @@ export class QuestDialog {
         dialogTitleBlock.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         this.panel.dialogStackPanel.addControl(dialogTitleBlock);
 
-        //
-        this.create();
-    }
-
-    create() {
         // create main description textblock
         let dialogTextBlock = new TextBlock("dialogText");
         dialogTextBlock.text = "";
@@ -101,7 +104,7 @@ export class QuestDialog {
             createBtn.onPointerDownObservable.add(() => {
                 // send event to server
                 this.panel._room.send(ServerMsg.PLAYER_QUEST_UPDATE, {
-                    id: this.currentQuest.key,
+                    key: this.currentQuest.key,
                     status: QuestStatus.READY_TO_COMPLETE,
                 });
                 // close dialog
@@ -117,22 +120,13 @@ export class QuestDialog {
             dialogTextBlock.text = dialogText;
 
             // show quest objective
-            let dialogObjective = new TextBlock("dialogObjective");
-            dialogObjective.text = this.replaceKeywords(this.currentQuest.objective);
-            dialogObjective.fontSize = "14px";
-            dialogObjective.color = "orange";
-            dialogObjective.textWrapping = TextWrapping.WordWrap;
-            dialogObjective.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-            dialogObjective.resizeToFit = true;
-            this.dialogStackPanel.addControl(dialogObjective);
+            this.showObjective();
         }
 
         // quest completed
         if (this.playerQuest && this.playerQuest.status === 1) {
             console.log("QUEST COMPLETED");
-            let dialogText = this.DEFAULT_TEXT_COMPLETED;
-            dialogText = this.replaceKeywords(dialogText);
-            dialogTextBlock.text = dialogText;
+            this.showCompleted();
         }
 
         // quest not started
@@ -143,14 +137,7 @@ export class QuestDialog {
             dialogTextBlock.text = dialogText;
 
             // show quest objective
-            let dialogObjective = new TextBlock("dialogObjective");
-            dialogObjective.text = this.replaceKeywords(this.currentQuest.objective);
-            dialogObjective.fontSize = "14px";
-            dialogObjective.color = "orange";
-            dialogObjective.textWrapping = TextWrapping.WordWrap;
-            dialogObjective.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-            dialogObjective.resizeToFit = true;
-            this.dialogStackPanel.addControl(dialogObjective);
+            this.showObjective();
 
             // show accept button
             const dialogBtnAccept = Button.CreateSimpleButton("dialogBtnAccept", "Accept");
@@ -163,7 +150,7 @@ export class QuestDialog {
             dialogBtnAccept.onPointerDownObservable.add(() => {
                 // sent event to server
                 this.panel._room.send(ServerMsg.PLAYER_QUEST_UPDATE, {
-                    id: this.currentQuest.key,
+                    key: this.currentQuest.key,
                     status: QuestStatus.ACCEPTED,
                 });
                 // go to end dialog
@@ -291,6 +278,10 @@ export class QuestDialog {
         this.panel.dialogStackPanel.addControl(dialogTextBlock);
 
         // show quest objective
+        this.showObjective();
+    }
+
+    public showObjective() {
         let dialogObjective = new TextBlock("dialogObjective");
         dialogObjective.text = this.replaceKeywords(this.currentQuest.objective);
         dialogObjective.fontSize = "14px";
@@ -341,7 +332,7 @@ export class QuestDialog {
         text = text.replace("@PlayerName", this.panel._currentPlayer.name);
         if (this.currentQuest) {
             text = text.replace("@KillRequired", this.currentQuest.quantity);
-            text = text.replace("@KillName", this.currentQuest.spawn_name);
+            text = text.replace("@TargetName", QuestsHelper.findQuestTargetName(this.currentLocation, this.currentQuest.spawn_key, this.currentQuest.quantity));
         }
         if (this.playerQuest) {
             text = text.replace("@KillCompleted", this.playerQuest.qty);

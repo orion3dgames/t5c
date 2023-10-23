@@ -97,8 +97,7 @@ export type Quest = {
     objective: string;
     type: QuestObjective.KILL_AMOUNT;
     location: string;
-    spawn_type: string;
-    spawn_name: string;
+    spawn_key: string;
     quantity: number;
     isRepeatable: boolean;
     rewards: {
@@ -110,10 +109,18 @@ export type Quest = {
 
 export enum QuestObjective {
     KILL_AMOUNT = 1,
+    TALK_TO,
 }
 
+export type QuestObjectiveMap = { [key in QuestObjective]?: string };
+
+export let QuestObjectives = {
+    [QuestObjective.KILL_AMOUNT]: "Kill @TargetName @KillCompleted/@KillRequired",
+    [QuestObjective.TALK_TO]: "Talk to @TargetName",
+};
+
 export type QuestUpdate = {
-    id: string;
+    key: string;
     status: QuestStatus;
 };
 

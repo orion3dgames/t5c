@@ -89,7 +89,7 @@ let LocationsDB = {
                     name: "Thief",
                 },
                 {
-                    key: "spawn_03",
+                    key: "lh_town_alexander",
                     type: "static",
                     behaviour: "idle",
                     aggressive: false,
@@ -127,33 +127,9 @@ let LocationsDB = {
                             {
                                 type: "text",
                                 text: "Greetings, dear one! I am Priestess Alice, a devoted servant of the benevolent Goddess Athlea. May her light shine upon you.",
-                                quests: [
-                                    { key: "LH_DANGEROUS_ERRANDS_01" },
-                                    { key: "LH_KILL_RATS_01" },
-                                    { key: "LH_KILL_RATS_01" },
-                                    { key: "LH_KILL_RATS_01" },
-                                ],
+                                quests: [{ key: "LH_DANGEROUS_ERRANDS_01" }],
                                 trainer: {
-                                    abilities: [
-                                        { key: "fireball" },
-                                        { key: "poisonball" },
-                                        { key: "heal" },
-                                        { key: "fireball" },
-                                        { key: "poisonball" },
-                                        { key: "heal" },
-                                        { key: "fireball" },
-                                        { key: "poisonball" },
-                                        { key: "heal" },
-                                        { key: "fireball" },
-                                        { key: "poisonball" },
-                                        { key: "heal" },
-                                        { key: "fireball" },
-                                        { key: "poisonball" },
-                                        { key: "heal" },
-                                        { key: "fireball" },
-                                        { key: "poisonball" },
-                                        { key: "heal" },
-                                    ],
+                                    abilities: [{ key: "fireball" }, { key: "poisonball" }, { key: "heal" }],
                                 },
                                 vendor: {
                                     items: [
@@ -162,16 +138,7 @@ let LocationsDB = {
                                         { key: "helm_01" },
                                         { key: "shield_01" },
                                         { key: "sword_01" },
-                                        { key: "potion_small_red" },
-                                        { key: "potion_small_blue" },
-                                        { key: "helm_01" },
-                                        { key: "shield_01" },
-                                        { key: "sword_01" },
-                                        { key: "potion_small_red" },
-                                        { key: "potion_small_blue" },
-                                        { key: "helm_01" },
-                                        { key: "shield_01" },
-                                        { key: "sword_01" },
+                                        { key: "amulet_01" },
                                     ],
                                 },
                                 buttons: [
@@ -217,21 +184,7 @@ let LocationsDB = {
                             {
                                 type: "text",
                                 text: "Hi @PlayerName, if you want to practice your spells or fighting skills, please do not hesitate to use myself as a target practise!",
-                                quests: [{ key: "LH_DANGEROUS_ERRANDS_02", goToDialog: 1 }],
-                                isEndOfDialog: true,
-                            },
-                            {
-                                type: "quest",
-                                quest_id: "LH_DANGEROUS_ERRANDS_02",
-                                quest: {
-                                    accepted: 2,
-                                    declined: 3,
-                                },
-                            },
-                            {
-                                type: "text",
-                                text: "Blessings upon you for your willingness to aid us. Please be cautious, and may the light of the Goddess Athlea guide and protect you",
-                                buttonName: "Consider it done!",
+                                quests: [{ key: "LH_DANGEROUS_ERRANDS_02" }, { key: "LH_DANGEROUS_ERRANDS_03" }],
                                 isEndOfDialog: true,
                             },
                             {
