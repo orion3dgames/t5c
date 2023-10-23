@@ -4,7 +4,7 @@ export class QuestsHelper {
         let found = "";
         spawns.forEach((element) => {
             if (element.key === targetName) {
-                found = element.name.toLocaleLowerCase();
+                found = element.name;
             }
         });
         if (quantity > 1) {
