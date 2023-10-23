@@ -44,7 +44,7 @@ const generatePanel = function (panelName: string = "Default Name", width = "300
     panel.left = left;
     panel.width = width;
     panel.height = height;
-    panel.fontFamily = getFont();
+    //panel.fontFamily = getFont();
     applyTheme(panel);
     return panel;
 };
@@ -58,12 +58,12 @@ const applyTheme = function (panel) {
 };
 
 const applyFont = function (p: Rectangle, size = "12px") {
-    p.fontFamily = getFont();
+    //p.fontFamily = getFont();
     p.fontSize = size;
 };
 
 const getFont = function () {
-    return "inherit";
+    //return "inherit";
 };
 
 const getBg = function () {

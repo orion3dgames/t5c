@@ -82,10 +82,11 @@ let LocationsDB = {
                     behaviour: "patrol",
                     aggressive: true,
                     canAttack: true,
-                    points: [new Vector3(17.47, 0.04, 2.55), new Vector3(31.77, 3.54, 2.56), new Vector3(32.46, 3.54, -11.21), new Vector3(16.87, 0.04, -8.92)],
+                    points: [new Vector3(35.19, 3.51, 3.2), new Vector3(34.04, 3.51, -12.06), new Vector3(24.15, 5.76, -24.22)],
                     amount: 1,
                     race: "male_rogue",
                     material: 0,
+                    baseHealth: 300,
                     name: "Thief",
                 },
                 {
