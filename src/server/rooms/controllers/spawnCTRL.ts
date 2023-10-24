@@ -19,7 +19,7 @@ export class spawnCTRL {
         this._location = this._state.gameData.get("location", this._room.metadata.location);
         this.process();
 
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 100; i++) {
             this.createItem();
         }
     }
@@ -92,6 +92,7 @@ export class spawnCTRL {
         let position = spawnInfo.points[Math.floor(Math.random() * spawnInfo.points.length)];
 
         let health = spawnInfo.baseHealth ?? raceData.baseHealth;
+        let rotation = spawnInfo.rotation ?? randomNumberInRange(0, Math.PI);
         let speed = spawnInfo.baseSpeed ?? Speed.MEDIUM;
 
         // create entity
@@ -105,7 +106,7 @@ export class spawnCTRL {
             x: position.x ?? 0,
             y: position.y ?? 0,
             z: position.z ?? 0,
-            rot: randomNumberInRange(0, Math.PI),
+            rot: rotation,
             health: health,
             mana: raceData.baseMana,
             maxHealth: health,

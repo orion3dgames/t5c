@@ -13,6 +13,7 @@ import { GameController } from "../../Controllers/GameController";
 import { EquipmentSchema } from "../../../server/rooms/schema";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { UserInterface } from "../../Controllers/UserInterface";
+import { PBRCustomMaterial, SimpleMaterial } from "@babylonjs/materials";
 
 export class EntityMesh {
     private _entity: Entity;
@@ -105,6 +106,7 @@ export class EntityMesh {
         */
 
         // load player mesh
+        // note: instantiateModelsToScene must be set to true so each entity has a specific material
         let key = "RACE_" + this._entity.race;
         const result = this._loadedAssets[key].instantiateModelsToScene(() => {
             return key;
@@ -127,17 +129,37 @@ export class EntityMesh {
         this.playerMesh = playerMesh;
 
         // change player texture
-        if (this._entity.material) {
-            const allChildMeshes = this.playerMesh.getChildTransformNodes(true)[0].getChildMeshes(false);
+        if (this._entity.material > -1) {
+            // remove exisiting materials and texture
+            const allChildMeshes = this.playerMesh.getChildMeshes(false);
             const selectedMaterial = allChildMeshes[0].material ?? false;
             const materialIndex = this._entity.material;
             if (selectedMaterial) {
-                if (selectedMaterial.albedoTexture) {
-                    selectedMaterial.albedoTexture.dispose();
-                    selectedMaterial.albedoTexture = new Texture("./models/races/materials/" + this._entity.materials[materialIndex].material, this._scene, {
-                        invertY: false,
-                    });
-                }
+                selectedMaterial.dispose();
+            }
+
+            // create a new material based on race and material index
+            let newMaterialName = this._entity.race + "_" + materialIndex;
+            let alreadyExistMaterial = this._scene.getMaterialByName(newMaterialName);
+
+            if (alreadyExistMaterial) {
+                // material already exists
+                allChildMeshes.forEach((element) => {
+                    element.material = alreadyExistMaterial;
+                });
+            } else {
+                // create material as it does not exists
+                let material = new PBRCustomMaterial(newMaterialName);
+                material.albedoTexture = new Texture("./models/races/materials/" + this._entity.materials[materialIndex].material, this._scene, {
+                    invertY: false,
+                });
+                material.reflectionColor = new Color3(0, 0, 0);
+                material.reflectivityColor = new Color3(0, 0, 0);
+
+                //
+                allChildMeshes.forEach((element) => {
+                    element.material = material;
+                });
             }
         }
 
@@ -273,9 +295,9 @@ export class EntityMesh {
                     let boneId = this._entity.bones[key];
                     let bone = this.skeleton.bones[boneId];
 
-                    const weaponMesh = this._loadedAssets["ROOT_ITEM_" + e.key].clone("player_" + e.key);
+                    const weaponMesh = this._loadedAssets["ROOT_ITEM_" + e.key].clone("equip_" + this._entity.sessionId + "_" + e.key);
                     weaponMesh.isVisible = true;
-                    weaponMesh.isPickable = true;
+                    weaponMesh.isPickable = false;
                     weaponMesh.checkCollisions = false;
                     weaponMesh.receiveShadows = false;
                     weaponMesh.attachToBone(bone, this.playerMesh);

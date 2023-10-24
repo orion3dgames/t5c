@@ -392,9 +392,9 @@ export class UserInterface {
     }
 
     public createInteractableButtons(entity) {
-        if (!entity.spwanInfo) return false;
+        if (!entity.spawnInfo) return false;
 
-        if (!entity.spwanInfo.interactable) return false;
+        if (!entity.spawnInfo.interactable) return false;
 
         var rect1 = new Rectangle("entity_buttons_" + entity.sessionId);
         rect1.isVisible = false;
@@ -404,7 +404,7 @@ export class UserInterface {
         rect1.zIndex = 1;
         this.NAMES_ADT.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
-        rect1.linkOffsetY = -110;
+        rect1.linkOffsetY = -120;
 
         var img = new Image("entityTalk-" + entity.sessionId, "./images/icons/talk.png");
         img.stretch = Image.STRETCH_FILL;
@@ -425,7 +425,7 @@ export class UserInterface {
         rightStackPanel.isVertical = true;
         rect1.addControl(rightStackPanel);
 
-        let interactable = entity.spwanInfo.interactable;
+        let interactable = entity.spawnInfo.interactable;
 
         const createBtn = Button.CreateSimpleButton("characterBtn", interactable.title);
         createBtn.left = "0px;";

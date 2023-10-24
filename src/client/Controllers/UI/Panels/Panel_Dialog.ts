@@ -40,7 +40,7 @@ export class Panel_Dialog extends Panel {
 
         if (entity) {
             this.currentEntity = entity;
-            this.currentDialog = entity.spwanInfo.interactable.data;
+            this.currentDialog = entity.spawnInfo.interactable.data;
             this.currentDialogStep = 0;
 
             this._panelTitle.text = entity.name;
@@ -153,7 +153,7 @@ export class Panel_Dialog extends Panel {
 
         // create any vendor buttons
         if (currentDialog.vendor) {
-            const createBtn = Button.CreateSimpleButton("gotoVendor", "Can I see you wares?");
+            const createBtn = Button.CreateSimpleButton("gotoVendor", "Can I see your wares?");
             createBtn.left = "0px;";
             createBtn.top = "0px";
             createBtn.width = 1;

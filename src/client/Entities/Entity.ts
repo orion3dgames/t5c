@@ -79,7 +79,7 @@ export class Entity {
     public equipment = [];
 
     // interactable
-    public spwanInfo;
+    public spawnInfo;
     public interactableButtons;
 
     // raceData
@@ -117,7 +117,7 @@ export class Entity {
         Object.assign(this, this.entity);
 
         // get spawnInfo
-        this.spwanInfo = this._game.currentLocation.dynamic.spawns[this.spawn_id] ?? null;
+        this.spawnInfo = this._game.currentLocation.dynamic.spawns[this.spawn_id] ?? null;
 
         // get material
         this.debugMaterialActive = this._scene.getMaterialByName("debug_entity_active");

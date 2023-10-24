@@ -117,18 +117,24 @@ export class Player extends Entity {
 
         if (!metadata) return false;
 
-        let target = this.entities[metadata.sessionId];
+        if (metadata.type === "entity") {
+            let target = this.entities[metadata.sessionId];
 
-        if (!target.spwanInfo) return false;
+            // display nameplate for a certain time for any entity right clicked
+            // show entity label
+            target.characterLabel.isVisible = true;
 
-        if (!target.spwanInfo.interactable) return false;
+            if (!target.spawnInfo) return false;
 
-        // if close enough, open dialog
-        let playerPos = this.getPosition();
-        let entityPos = target.getPosition();
-        let distanceBetween = Vector3.Distance(playerPos, entityPos);
-        if (distanceBetween < this._game.config.PLAYER_INTERACTABLE_DISTANCE) {
-            this.ui.panelDialog.open(target);
+            if (!target.spawnInfo.interactable) return false;
+
+            // if close enough, open dialog
+            let playerPos = this.getPosition();
+            let entityPos = target.getPosition();
+            let distanceBetween = Vector3.Distance(playerPos, entityPos);
+            if (distanceBetween < this._game.config.PLAYER_INTERACTABLE_DISTANCE) {
+                this.ui.panelDialog.open(target);
+            }
         }
     }
 
@@ -143,16 +149,6 @@ export class Player extends Entity {
             let targetSessionId = metadata.sessionId;
             let target = this.entities[targetSessionId];
             this._game.selectedEntity = target;
-
-            // display nameplate for a certain time for any entity right clicked
-            // show entity label
-            target.characterLabel.isVisible = true;
-
-            // hide it automatically after PLAYER_NAMEPLATE_TIMEOUT
-            setTimeout(function () {
-                target.characterLabel.isVisible = false;
-            }, this._game.config.PLAYER_NAMEPLATE_TIMEOUT);
-            /////////////////////////
         }
 
         // pick up item
