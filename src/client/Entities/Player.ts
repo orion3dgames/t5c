@@ -118,6 +118,18 @@ export class Player extends Entity {
         if (!metadata) return false;
 
         let target = this.entities[metadata.sessionId];
+
+        if (!target.spwanInfo) return false;
+
+        if (!target.spwanInfo.interactable) return false;
+
+        // if close enough, open dialog
+        let playerPos = this.getPosition();
+        let entityPos = target.getPosition();
+        let distanceBetween = Vector3.Distance(playerPos, entityPos);
+        if (distanceBetween < this._game.config.PLAYER_INTERACTABLE_DISTANCE) {
+            this.ui.panelDialog.open(target);
+        }
     }
 
     // process left click for player

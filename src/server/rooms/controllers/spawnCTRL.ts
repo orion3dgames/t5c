@@ -1,6 +1,6 @@
 import { BrainSchema, LootSchema } from "../schema";
 import { GameRoom } from "../GameRoom";
-import { EntityState } from "../../../shared/types";
+import { EntityState, Speed } from "../../../shared/types";
 import { nanoid } from "nanoid";
 import Logger from "../../utils/Logger";
 import { randomNumberInRange } from "../../../shared/Utils";
@@ -92,6 +92,7 @@ export class spawnCTRL {
         let position = spawnInfo.points[Math.floor(Math.random() * spawnInfo.points.length)];
 
         let health = spawnInfo.baseHealth ?? raceData.baseHealth;
+        let speed = spawnInfo.baseSpeed ?? Speed.MEDIUM;
 
         // create entity
         let data = {
@@ -109,6 +110,7 @@ export class spawnCTRL {
             mana: raceData.baseMana,
             maxHealth: health,
             maxMana: raceData.baseMana,
+            speed: speed,
             level: 1,
             anim_state: EntityState.IDLE,
             toRegion: false,

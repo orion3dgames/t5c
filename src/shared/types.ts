@@ -348,6 +348,14 @@ export interface ILootTableEntry<T extends string = string, V extends number | s
 ///////////////// UTILS /////////////////////
 //////////////////////////////////////////////////////////////
 
+export enum Speed {
+    VERY_SLOW = 0.2,
+    SLOW = 0.35,
+    MEDIUM = 0.65,
+    QUICK = 0.8,
+    VERY_QUICK = 1,
+}
+
 export enum CalculationTypes {
     ADD = 1,
     REMOVE = 2,

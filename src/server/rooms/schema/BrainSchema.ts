@@ -81,9 +81,13 @@ export class BrainSchema extends Entity {
         this._navMesh = state._gameroom.navMesh;
         this._state = state;
 
-        // assign data
+        // assign default data
+        Object.assign(this, this._state.gameData.get("race", data.race));
+
+        // assign spawn data
         Object.assign(this, data);
-        Object.assign(this, this._state.gameData.get("race", this.race));
+
+        console.log(this.speed);
 
         // add equipment
         if (data.initial_equipment && data.initial_equipment.length > 0) {

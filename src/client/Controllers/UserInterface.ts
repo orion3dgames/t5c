@@ -4,6 +4,7 @@ import { Engine } from "@babylonjs/core/Engines/engine";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { Control } from "@babylonjs/gui/2D/controls/control";
+import { Image } from "@babylonjs/gui/2D/controls/image";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 
@@ -397,13 +398,19 @@ export class UserInterface {
 
         var rect1 = new Rectangle("entity_buttons_" + entity.sessionId);
         rect1.isVisible = false;
-        rect1.width = "100px";
-        rect1.height = "200px";
+        rect1.width = "50px";
+        rect1.height = "50px";
         rect1.thickness = 0;
         rect1.zIndex = 1;
         this.NAMES_ADT.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
-        rect1.linkOffsetY = -200;
+        rect1.linkOffsetY = -110;
+
+        var img = new Image("entityTalk-" + entity.sessionId, "./images/icons/talk.png");
+        img.stretch = Image.STRETCH_FILL;
+        rect1.addControl(img);
+
+        /*
 
         const rightStackPanel = new StackPanel("rightStackPanel");
         rightStackPanel.left = 0;
@@ -430,11 +437,12 @@ export class UserInterface {
         createBtn.thickness = 1;
         createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        rightStackPanel.addControl(createBtn);
+        rightStackPanel.addControl(createBtn);*/
 
+        /*
         createBtn.onPointerDownObservable.add(() => {
             this.panelDialog.open(entity);
-        });
+        });*/
 
         return rect1;
     }

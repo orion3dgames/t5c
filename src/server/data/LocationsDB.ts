@@ -1,4 +1,4 @@
-import { PlayerSlots } from "../../shared/types";
+import { PlayerSlots, Speed } from "../../shared/types";
 import { Vector3 } from "../../shared/Libs/yuka-min";
 
 let LocationsDB = {
@@ -66,15 +66,9 @@ let LocationsDB = {
                             slot: PlayerSlots.WEAPON,
                             key: "sword_01",
                         },
-                        {
-                            slot: PlayerSlots.HEAD,
-                            key: "helm_01",
-                        },
-                        {
-                            slot: PlayerSlots.OFF_HAND,
-                            key: "shield_01",
-                        },
                     ],
+                    baseHealth: 40,
+                    baseSpeed: Speed.VERY_SLOW,
                 },
                 {
                     key: "lh_town_thief",
@@ -86,8 +80,9 @@ let LocationsDB = {
                     amount: 1,
                     race: "male_rogue",
                     material: 0,
-                    baseHealth: 300,
                     name: "Thief",
+                    baseHealth: 300,
+                    baseSpeed: Speed.SLOW,
                 },
                 {
                     key: "lh_town_alexander",
