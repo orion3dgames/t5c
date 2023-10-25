@@ -296,12 +296,18 @@ export class EntityMesh {
                     let boneId = this._entity.bones[key];
                     let bone = this.skeleton.bones[boneId];
 
-                    const weaponMesh = this._loadedAssets["ROOT_ITEM_" + e.key].clone("equip_" + this._entity.sessionId + "_" + e.key);
+                    const weaponMesh = this._loadedAssets["ROOT_ITEM_" + e.key].createInstance("equip_" + this._entity.sessionId + "_" + e.key);
                     weaponMesh.isVisible = true;
                     weaponMesh.isPickable = false;
                     weaponMesh.checkCollisions = false;
                     weaponMesh.receiveShadows = false;
                     weaponMesh.attachToBone(bone, this.playerMesh);
+
+                    // fix for black items
+                    const selectedMaterial = weaponMesh.material ?? false;
+                    if (selectedMaterial) {
+                        selectedMaterial.needDepthPrePass = true;
+                    }
 
                     // if mesh offset required
                     if (equipOptions.scale) {

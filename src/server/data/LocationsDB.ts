@@ -57,7 +57,7 @@ let LocationsDB = {
                         new Vector3(-8.8, 0.01, -22.39),
                         new Vector3(-8.51, 0.01, -14.93),
                     ],
-                    amount: 15,
+                    amount: 10,
                     race: "male_rogue",
                     material: 0,
                     name: "Bandit",

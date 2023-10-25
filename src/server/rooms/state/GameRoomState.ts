@@ -291,13 +291,13 @@ export class GameRoomState extends Schema {
             let targetState = this.getEntity(data.targetId) as Entity;
             let hotbarData = playerState.player_data.hotbar.get("" + data.digit);
 
-            if (!hotbarData) {
-                //console.error("hotbarData is invalid", data, playerState.player_data.hotbar);
+            if (data.digit === 5) {
+                this.spawnCTRL.createItem(playerState);
                 return false;
             }
 
-            if (data.digit === 5) {
-                this.spawnCTRL.createItem(playerState);
+            if (!hotbarData) {
+                //console.error("hotbarData is invalid", data, playerState.player_data.hotbar);
                 return false;
             }
 

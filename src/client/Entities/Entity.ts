@@ -117,7 +117,9 @@ export class Entity {
         Object.assign(this, this.entity);
 
         // get spawnInfo
-        this.spawnInfo = this._game.currentLocation.dynamic.spawns[this.spawn_id] ?? null;
+        if (entity.type === "entity" && this._game.currentLocation.dynamic.spawns) {
+            this.spawnInfo = this._game.currentLocation.dynamic.spawns[this.spawn_id] ?? null;
+        }
 
         // get material
         this.debugMaterialActive = this._scene.getMaterialByName("debug_entity_active");

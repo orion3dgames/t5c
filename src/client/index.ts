@@ -1,7 +1,7 @@
-//if (process.env.NODE_ENV !== "production") {
-import("@babylonjs/core/Debug/debugLayer");
-import("@babylonjs/inspector");
-//}
+if (process.env.NODE_ENV !== "production") {
+    import("@babylonjs/core/Debug/debugLayer");
+    import("@babylonjs/inspector");
+}
 
 // ES6 IMPORTS
 // if there are cases where es6 dependencies could be causing issues just try and load the whole babylon core, and
