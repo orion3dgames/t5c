@@ -14,6 +14,7 @@ import { EquipmentSchema } from "../../../server/rooms/schema";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { UserInterface } from "../../Controllers/UserInterface";
 import { PBRCustomMaterial, SimpleMaterial } from "@babylonjs/materials";
+import { randomNumberInRange } from "../../../shared/Utils";
 
 export class EntityMesh {
     private _entity: Entity;

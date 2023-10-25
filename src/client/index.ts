@@ -3,6 +3,12 @@ import("@babylonjs/core/Debug/debugLayer");
 import("@babylonjs/inspector");
 //}
 
+// ES6 IMPORTS
+// if there are cases where es6 dependencies could be causing issues just try and load the whole babylon core, and
+// that fixes it, then it is a dependencies issue, check this link out for answers.
+// bjs post: https://forum.babylonjs.com/t/pickedmesh-is-null-in-onpointerobservable-after-update-to-6-25-0/45076/7
+// bjs docs: https://doc.babylonjs.com/setup/frameworkPackages/es6Support#faq
+// import("@babylonjs/core");
 import "@babylonjs/core/Culling/ray";
 import "@babylonjs/core/Animations/animatable";
 import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
@@ -12,6 +18,7 @@ import "@babylonjs/loaders/glTF/2.0/Extensions/KHR_materials_pbrSpecularGlossine
 import "@babylonjs/loaders/glTF/2.0/Extensions/KHR_draco_mesh_compression";
 import "@babylonjs/core/Rendering/depthRendererSceneComponent";
 import "@babylonjs/core/Rendering/outlineRenderer";
+
 import { Engine } from "@babylonjs/core/Engines/engine";
 
 // IMPORT SCREEN
