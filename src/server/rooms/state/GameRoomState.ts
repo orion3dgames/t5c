@@ -319,5 +319,16 @@ export class GameRoomState extends Schema {
 
             Logger.info(`[gameroom][entity_ability_key] player action processed`, data);
         }
+
+        //////////////// DEBUG /////////////////
+        if (type === ServerMsg.DEBUG_REMOVE_ENTITIES) {
+            if (this.entityCTRL.hasEntities()) {
+                this.entityCTRL.all.forEach((entity) => {
+                    if (entity.type !== "player") {
+                        this.entities.delete(entity.sessionId);
+                    }
+                });
+            }
+        }
     }
 }

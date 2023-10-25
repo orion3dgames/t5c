@@ -304,10 +304,11 @@ export class EntityMesh {
                     weaponMesh.attachToBone(bone, this.playerMesh);
 
                     // fix for black items
+                    /*
                     const selectedMaterial = weaponMesh.material ?? false;
                     if (selectedMaterial) {
                         selectedMaterial.needDepthPrePass = true;
-                    }
+                    }*/
 
                     // if mesh offset required
                     if (equipOptions.scale) {

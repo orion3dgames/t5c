@@ -81,6 +81,7 @@ export enum ServerMsg {
     PLAYER_QUEST_UPDATE,
     PLAYER_BUY_ITEM,
     PLAYER_SELL_ITEM,
+    DEBUG_REMOVE_ENTITIES,
 }
 
 //////////////////////////////////////////////////////////////

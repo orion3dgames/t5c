@@ -40,7 +40,7 @@ export class DebugBox {
     }
 
     _createUI() {
-        const debugPanel = generatePanel("debugPanel", "160px;", "170px", "0px", "-15px");
+        const debugPanel = generatePanel("debugPanel", "160px;", "180px", "0px", "-15px");
         debugPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
         debugPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         this._playerUI.addControl(debugPanel);
@@ -89,6 +89,7 @@ export class DebugBox {
 
         locationText += "Press N: Toggle Navmesh\n";
         locationText += "Press H: Toggle Map\n";
+        locationText += "Press J: Remove Entities\n";
         this._debugTextUI.text = locationText;
     }
 }

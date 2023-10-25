@@ -41,7 +41,7 @@ export class GameScene {
 
     public gameData;
 
-    private _entities: (Player | Entity | Item)[] = [];
+    public _entities: (Player | Entity | Item)[] = [];
 
     constructor() {}
 
