@@ -148,6 +148,7 @@ export class GameRoomState extends Schema {
             initial_inventory: data.inventory ?? [],
             initial_equipment: data.equipment ?? [],
             initial_quests: data.quests ?? [],
+            initial_hotbar: data.hotbar ?? [],
         };
 
         console.log(player);
@@ -285,17 +286,35 @@ export class GameRoomState extends Schema {
 
         /////////////////////////////////////
         // player entity_attack
-        if (type === ServerMsg.PLAYER_ABILITY_PRESSED) {
+        if (type === ServerMsg.PLAYER_HOTBAR_ACTIVATED) {
             // get players involved
             let targetState = this.getEntity(data.targetId) as Entity;
+            let hotbarData = playerState.player_data.hotbar.get("" + data.digit);
+
+            if (!hotbarData) {
+                //console.error("hotbarData is invalid", data, playerState.player_data.hotbar);
+                return false;
+            }
 
             if (data.digit === 5) {
                 this.spawnCTRL.createItem(playerState);
                 return false;
             }
 
-            if (targetState) {
+            // if item
+            if (hotbarData && hotbarData.type === "item") {
+                const item = playerState.getInventoryItem(hotbarData.key, "key");
+                if (item && item.class === ItemClass.CONSUMABLE) {
+                    playerState.consumeItem(item);
+                }
+                return false;
+            }
+
+            // if ability
+            if (targetState && hotbarData && hotbarData.type === "ability") {
+                console.error("PLAYER_HOTBAR_ACTIVATED", hotbarData.key);
                 playerState.abilitiesCTRL.processAbility(playerState, targetState, data);
+                return false;
             }
 
             Logger.info(`[gameroom][entity_ability_key] player action processed`, data);

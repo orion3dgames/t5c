@@ -47,6 +47,10 @@ export class ChatBox {
         this._refreshChatBox();
     }
 
+    get chatInput(): InputText {
+        return this._chatInput;
+    }
+
     _createUI() {
         const chatPanel = generatePanel("chatPanel", "350px;", "200px", "-35px", "15px");
         chatPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;

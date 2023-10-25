@@ -119,6 +119,21 @@ export class Player extends Entity {
 
         if (metadata.type === "entity") {
             let target = this.entities[metadata.sessionId];
+        }
+    }
+
+    // process left click for player
+    public leftClick(pointerInfo) {
+        let metadata = this.getMeshMetadata(pointerInfo);
+
+        if (!metadata) return false;
+
+        // select entity
+        if (metadata.type === "player" || metadata.type === "entity") {
+            // select entity
+            let targetSessionId = metadata.sessionId;
+            let target = this.entities[targetSessionId];
+            this._game.selectedEntity = target;
 
             // display nameplate for a certain time for any entity right clicked
             // show entity label
@@ -135,20 +150,6 @@ export class Player extends Entity {
             if (distanceBetween < this._game.config.PLAYER_INTERACTABLE_DISTANCE) {
                 this.ui.panelDialog.open(target);
             }
-        }
-    }
-
-    // process left click for player
-    public leftClick(pointerInfo) {
-        let metadata = this.getMeshMetadata(pointerInfo);
-
-        if (!metadata) return false;
-
-        // select entity
-        if (metadata.type === "player" || metadata.type === "entity") {
-            let targetSessionId = metadata.sessionId;
-            let target = this.entities[targetSessionId];
-            this._game.selectedEntity = target;
         }
 
         // pick up item
@@ -268,7 +269,7 @@ export class Player extends Entity {
             let target = this._game.selectedEntity;
 
             // send to server
-            this._room.send(ServerMsg.PLAYER_ABILITY_PRESSED, {
+            this._room.send(ServerMsg.PLAYER_HOTBAR_ACTIVATED, {
                 senderId: this._room.sessionId,
                 targetId: target ? target.sessionId : false,
                 digit: digit,
@@ -289,7 +290,7 @@ export class Player extends Entity {
             this.ui._CastingBar.update(text, width);
         }
 
-        // check for cooldowns  (estethic only as server really controls cooldowns)
+        // check for cooldowns (estethic only as server really controls cooldowns)
         this.ability_in_cooldown.forEach((cooldown, digit) => {
             if (cooldown > 0) {
                 let cooldownUI = this.ui.MAIN_ADT.getControlByName("ability_" + digit + "_cooldown");
@@ -320,7 +321,7 @@ export class Player extends Entity {
 
     public getAbilityByDigit(digit): Ability | boolean {
         let found = false;
-        this.player_data.abilities.forEach((element) => {
+        this.player_data.hotbar.forEach((element) => {
             if (element.digit === digit) {
                 found = this._game.getGameData("ability", element.key);
             }
@@ -368,15 +369,18 @@ export class Player extends Entity {
 
         // server confirm player can start casting
         this._room.onMessage(ServerMsg.PLAYER_CASTING_START, (data) => {
+            console.log("ServerMsg.PLAYER_CASTING_START", data);
             this.startCasting(data);
         });
 
         this._room.onMessage(ServerMsg.PLAYER_CASTING_CANCEL, (data) => {
+            console.log("ServerMsg.PLAYER_CASTING_CANCEL", data);
             this.stopCasting(data);
         });
 
         // server confirms ability can be cast
         this._room.onMessage(ServerMsg.PLAYER_ABILITY_CAST, (data) => {
+            console.log("ServerMsg.PLAYER_ABILITY_CAST", data);
             let digit = data.digit;
             let ability = this.getAbilityByDigit(digit) as Ability;
             if (ability) {

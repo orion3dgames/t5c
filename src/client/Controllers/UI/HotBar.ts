@@ -9,7 +9,7 @@ import { ServerMsg } from "../../../shared/types";
 import { Room } from "colyseus.js";
 import { UserInterface } from "../UserInterface";
 
-export class AbilityBar {
+export class HotBar {
     private _playerUI;
     private _abilityUI;
     private _UI: UserInterface;
@@ -18,7 +18,6 @@ export class AbilityBar {
     private _loadedAssets;
     private _currentPlayer: Player;
     private _UITooltip;
-    private abylity_number: number = 9;
 
     constructor(_UI: UserInterface, _currentPlayer) {
         this._playerUI = _UI._playerUI;
@@ -27,12 +26,13 @@ export class AbilityBar {
         this._loadedAssets = _UI._loadedAssets;
         this._game = _UI._game;
         this._UI = _UI;
+
         // create ui
         this._createUI();
 
         // add ui events
         let entity = this._currentPlayer.entity;
-        entity.player_data.abilities.onAdd((item, sessionId) => {
+        entity.player_data.hotbar.onAdd((item, sessionId) => {
             this._createUI();
             // todo: could be a performance issue here?
             // orion to keep an eye on this one
@@ -77,10 +77,10 @@ export class AbilityBar {
         abilityPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         paddingPanel.addControl(abilityPanel);
 
-        for (let i = 1; i <= this.abylity_number; i++) {
+        for (let i = 1; i <= this._game.config.PLAYER_HOTBAR_SIZE; i++) {
             // calculate responsive width and height
             let iconGutter = 4;
-            let iconWidth = width / this.abylity_number - iconGutter;
+            let iconWidth = width / this._game.config.PLAYER_HOTBAR_SIZE - iconGutter;
             let iconLeft = iconWidth + iconGutter;
             let leftMargin = i > 1 ? (i - 1) * iconLeft + "px" : "0px";
 
@@ -99,26 +99,32 @@ export class AbilityBar {
             abilityRect[i] = headlineRect;
         }
 
-        // add learned abilities
-        if (this._currentPlayer.entity.player_data.abilities) {
-            this._currentPlayer.entity.player_data.abilities.forEach((data) => {
-                let ability = this._game.getGameData("ability", data.key);
-                if (ability) {
-                    this.addAbilityIcon(data.digit, ability, abilityRect[data.digit]);
+        // add hotbar icons
+        if (this._currentPlayer.entity.player_data.hotbar) {
+            this._currentPlayer.entity.player_data.hotbar.forEach((data) => {
+                let hotbarData;
+                if (data.type === "item") {
+                    hotbarData = this._game.getGameData("item", data.key);
+                }
+                if (data.type === "ability") {
+                    hotbarData = this._game.getGameData("ability", data.key);
+                }
+
+                if (hotbarData) {
+                    this.addAbilityIcon(data.digit, data, hotbarData, abilityRect[data.digit]);
                 }
             });
         }
     }
 
-    addAbilityIcon(digit, ability, headlineRect: Rectangle) {
-        var imageData = this._game._loadedAssets[ability.icon];
-        var img = new Image("ability_image_" + digit, "./images/icons/" + ability.icon + ".png");
+    addAbilityIcon(digit, hotbar, hotbarData, headlineRect: Rectangle) {
+        var imageData = this._game._loadedAssets[hotbarData.icon];
+        var img = new Image("ability_image_" + digit, "./images/icons/" + hotbarData.icon + ".png");
         img.stretch = Image.STRETCH_FILL;
         headlineRect.addControl(img);
-        img._markAsDirty();
 
         headlineRect.onPointerEnterObservable.add(() => {
-            this.showTooltip(ability, headlineRect);
+            this.showTooltip(hotbar.type, hotbarData, headlineRect);
         });
 
         headlineRect.onPointerOutObservable.add(() => {
@@ -126,11 +132,10 @@ export class AbilityBar {
         });
 
         headlineRect.onPointerClickObservable.add(() => {
-            let entity = this._game.selectedEntity;
-            if (entity && !this._currentPlayer.isCasting) {
-                this._room.send(ServerMsg.PLAYER_ABILITY_PRESSED, {
+            if (!this._currentPlayer.isCasting) {
+                this._room.send(ServerMsg.PLAYER_HOTBAR_ACTIVATED, {
                     senderId: this._room.sessionId,
-                    targetId: entity.sessionId,
+                    targetId: this._game?.selectedEntity?.sessionId ?? false,
                     digit: digit,
                 });
             }
@@ -174,8 +179,13 @@ export class AbilityBar {
         headlineRect.addControl(abilityCooldown);
     }
 
-    showTooltip(ability, headlineRect) {
-        this._UI._Tooltip.refresh("ability", ability, headlineRect, "center", "top");
+    showTooltip(type, hotbarData, headlineRect) {
+        if (type === "item") {
+            this._UI._Tooltip.refresh("item", hotbarData, headlineRect, "center", "top");
+        }
+        if (type === "ability") {
+            this._UI._Tooltip.refresh("ability", hotbarData, headlineRect, "center", "top");
+        }
     }
 
     hideTooltip() {

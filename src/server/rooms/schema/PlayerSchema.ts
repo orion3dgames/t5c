@@ -6,7 +6,7 @@ import { animationCTRL } from "../controllers/animationCTRL";
 import { moveCTRL } from "../controllers/moveCTRL";
 import { dynamicCTRL } from "../controllers/dynamicCTRL";
 import { NavMesh, Vector3 } from "../../../shared/Libs/yuka-min";
-import { InventorySchema, EquipmentSchema, AbilitySchema, LootSchema, BrainSchema, QuestSchema } from "../schema";
+import { InventorySchema, EquipmentSchema, AbilitySchema, LootSchema, BrainSchema, QuestSchema, HotbarSchema } from "../schema";
 import { GameRoomState } from "../state/GameRoomState";
 import { Entity } from "../schema/Entity";
 import {
@@ -30,6 +30,7 @@ export class PlayerData extends Schema {
     @type({ map: InventorySchema }) inventory = new MapSchema<InventorySchema>();
     @type({ map: AbilitySchema }) abilities = new MapSchema<AbilitySchema>();
     @type({ map: QuestSchema }) quests = new MapSchema<QuestSchema>();
+    @type({ map: HotbarSchema }) hotbar = new MapSchema<HotbarSchema>();
     @type("uint32") public gold: number = 0;
     @type("uint8") public strength: number = 0;
     @type("uint8") public endurance: number = 0;
@@ -143,6 +144,11 @@ export class PlayerSchema extends Entity {
             this.player_data.quests.set(element.key, new QuestSchema(element));
         });
 
+        // add hotbar
+        data.initial_hotbar.forEach((element) => {
+            this.player_data.hotbar.set(element.digit, new HotbarSchema(element));
+        });
+
         // add inventory items
         let i = 0;
         data.initial_inventory.forEach((element) => {
@@ -209,29 +215,42 @@ export class PlayerSchema extends Entity {
         let client = this.getClient();
         let character = client.auth;
 
+        // update character
         db.updateCharacter(client.auth.id, this);
 
         // update player items
-        if (this.player_data.inventory && this.player_data.inventory.size > 0) {
-            db.saveItems(character.id, this.player_data.inventory);
-        }
+        db.saveItems(character.id, this.player_data.inventory);
 
         // update player abilities
-        if (this.player_data.abilities && this.player_data.abilities.size > 0) {
-            db.saveAbilities(character.id, this.player_data.abilities);
-        }
+        db.saveAbilities(character.id, this.player_data.abilities);
 
         // update player equipment
-        if (this.equipment && this.equipment.size > 0) {
-            db.saveEquipment(character.id, this.equipment);
-        }
+        db.saveEquipment(character.id, this.equipment);
 
         // update player quests
-        if (this.player_data.quests && this.player_data.quests.size > 0) {
-            db.saveQuests(character.id, this.player_data.quests);
-        }
+        db.saveQuests(character.id, this.player_data.quests);
 
+        // update player hotbar
+        db.saveHotbar(character.id, this.player_data.hotbar);
+
+        // log
         Logger.info("[gameroom][onCreate] player " + this.name + " saved to database.");
+    }
+
+    //////////////////////////////////////////////
+    /////////////// HOTBAR ///////////////////////
+    //////////////////////////////////////////////
+
+    findNextAvailableHotbarSlot(): number | boolean {
+        if (this.player_data.hotbar.size > 0) {
+            for (let i = 1; i <= this._state.config.PLAYER_HOTBAR_SIZE; i++) {
+                if (!this.player_data.hotbar.get("" + i)) {
+                    return i;
+                }
+            }
+            return false;
+        }
+        return 1;
     }
 
     //////////////////////////////////////////////

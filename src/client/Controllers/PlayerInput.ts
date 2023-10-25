@@ -2,12 +2,13 @@ import { Scene } from "@babylonjs/core/scene";
 import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 import { KeyboardEventTypes } from "@babylonjs/core/Events/keyboardEvents";
 import { GameController } from "./GameController";
+import { UserInterface } from "./UserInterface";
 
 export class PlayerInput {
     private _scene: Scene;
     private _game: GameController;
     private _room;
-    private _ui;
+    private _ui: UserInterface;
 
     //simple movement
     public x: number = 0;
@@ -121,42 +122,13 @@ export class PlayerInput {
         this._scene.onKeyboardObservable.add((kbInfo) => {
             switch (kbInfo.type) {
                 case KeyboardEventTypes.KEYDOWN:
-                    //console.log(kbInfo.event.code);
-                    /*
-                    if (kbInfo.event.code === "ArrowUp") {
-                        this.left_arrow = true;
-                    }
-                    if (kbInfo.event.code === "ArrowDown") {
-                        this.down_arrow = true;
-                    }
-                    if (kbInfo.event.code === "ArrowLeft") {
-                        this.left_arrow = true;
-                    }
-                    if (kbInfo.event.code === "ArrowRight") {
-                        this.right_arrow = true;
+                    // on press enter, let's focus chatbox input
+                    // note: this a debatable one, must monitor
+                    if (kbInfo.event.code === "Enter") {
+                        this._ui._ChatBox.chatInput.focus();
                     }
 
-                    // working on keyboard movement
-                    if (this.left_arrow || this.down_arrow || this.left_arrow || this.right_arrow) {
-                        if (kbInfo.event.code === "ArrowUp") {
-                            this.y = 1;
-                        }
-                        if (kbInfo.event.code === "ArrowDown") {
-                            this.y = -1;
-                        }
-                        if (kbInfo.event.code === "ArrowLeft") {
-                            this.x = 1;
-                        }
-                        if (kbInfo.event.code === "ArrowRight") {
-                            this.x = -1;
-                        }
-                        this.angle = Math.atan2(this.x, this.y);
-                        console.log("KEYBOARD", this.x, this.y, this.angle);
-                        this.calculateVelocityForces();
-                        this.player_can_move = true;
-                    }*/
-
-                    // abilities
+                    // hotbar
                     if (kbInfo.event.code === "Digit1") {
                         this.digit_pressed = 1;
                     }
@@ -194,6 +166,41 @@ export class PlayerInput {
                     if (kbInfo.event.code === "ControlLeft") {
                         this.left_alt_pressed = true;
                     }
+
+                    /*
+                    if (kbInfo.event.code === "ArrowUp") {
+                        this.left_arrow = true;
+                    }
+                    if (kbInfo.event.code === "ArrowDown") {
+                        this.down_arrow = true;
+                    }
+                    if (kbInfo.event.code === "ArrowLeft") {
+                        this.left_arrow = true;
+                    }
+                    if (kbInfo.event.code === "ArrowRight") {
+                        this.right_arrow = true;
+                    }
+
+                    // working on keyboard movement
+                    if (this.left_arrow || this.down_arrow || this.left_arrow || this.right_arrow) {
+                        if (kbInfo.event.code === "ArrowUp") {
+                            this.y = 1;
+                        }
+                        if (kbInfo.event.code === "ArrowDown") {
+                            this.y = -1;
+                        }
+                        if (kbInfo.event.code === "ArrowLeft") {
+                            this.x = 1;
+                        }
+                        if (kbInfo.event.code === "ArrowRight") {
+                            this.x = -1;
+                        }
+                        this.angle = Math.atan2(this.x, this.y);
+                        console.log("KEYBOARD", this.x, this.y, this.angle);
+                        this.calculateVelocityForces();
+                        this.player_can_move = true;
+                    }*/
+
                     break;
 
                 case KeyboardEventTypes.KEYUP:

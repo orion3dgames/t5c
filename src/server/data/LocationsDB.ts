@@ -7,7 +7,7 @@ let LocationsDB = {
         key: "lh_town",
         mesh: "lh_town",
         sun: true,
-        sunIntensity: 1.5,
+        sunIntensity: 1.4,
         fog: false,
         spawnPoint: {
             x: 0,

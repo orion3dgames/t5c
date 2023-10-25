@@ -73,7 +73,7 @@ export enum ServerMsg {
     PLAYER_DROP_ITEM,
     PLAYER_USE_ITEM,
     PLAYER_UNEQUIP_ITEM,
-    PLAYER_ABILITY_PRESSED,
+    PLAYER_HOTBAR_ACTIVATED,
     PLAYER_ABILITY_CAST,
     PLAYER_CASTING_START,
     PLAYER_CASTING_CANCEL,
@@ -250,6 +250,7 @@ export type Item = {
     icon: string;
     material?: string;
     class: ItemClass;
+    cooldown?: number;
     value: number;
     destroyable: boolean;
     sellable: boolean;

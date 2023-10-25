@@ -10,7 +10,7 @@ import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 
 import {
     ChatBox,
-    AbilityBar,
+    HotBar,
     DebugBox,
     EntitySelectedBar,
     Tooltip,
@@ -61,7 +61,7 @@ export class UserInterface {
     // interface
     public _ChatBox: ChatBox;
     private _DebugBox: DebugBox;
-    private _AbilityBar: AbilityBar;
+    private _HotBar: HotBar;
     private _targetEntitySelectedBar: EntitySelectedBar;
     private _playerEntitySelectedBar: EntitySelectedBar;
     public _Tooltip: Tooltip;
@@ -171,8 +171,8 @@ export class UserInterface {
         this._RessurectBox = new RessurectBox(this, currentPlayer);
         this._ExperienceBar = new ExperienceBar(this, currentPlayer);
 
-        // create abilities ui + events
-        this._AbilityBar = new AbilityBar(this, currentPlayer);
+        // create hotbar and events
+        this._HotBar = new HotBar(this, currentPlayer);
 
         // create chat ui + events
         this._ChatBox = new ChatBox(this._playerUI, this._chatRoom, currentPlayer, this._entities, this._game);

@@ -3,6 +3,7 @@ import { EntityState, Ability, CalculationTypes, ServerMsg } from "../../../shar
 import { dropCTRL } from "./dropCTRL";
 import { AbilitySchema } from "../schema/player/AbilitySchema";
 import { randomNumberInRange } from "../../../shared/Utils";
+import { HotbarSchema } from "../schema";
 
 export class abilitiesCTRL {
     private _owner;
@@ -21,27 +22,9 @@ export class abilitiesCTRL {
     constructor(owner, data) {
         this._owner = owner;
         this.abilitiesDB = this._owner._state.gameData.load("abilities");
-        this.refreshAbilities();
     }
 
     public update() {}
-
-    /**
-     * refresh player abilities, useful after any changes
-     */
-    public refreshAbilities() {
-        this.abilitiesOwned = this._owner.player_data.abilities;
-        let i = 1;
-        this.abilities = [];
-        this.abilitiesOwned.forEach((element) => {
-            const digit = i;
-            const skill = this.abilitiesDB[element.key];
-            skill.digit = digit;
-            this.abilities.push(skill);
-            element.digit = digit;
-            i++;
-        });
-    }
 
     /**
      * allow player to learn a ability
@@ -50,18 +33,26 @@ export class abilitiesCTRL {
     public learnAbility(ability: Ability) {
         // only proceed if the ability does not already
         if (!this._owner.player_data.abilities[ability.key]) {
-            console.log("learnAbility", "DIGIT", this.abilities.length, this._owner.player_data.abilities.size);
+            // add ability to player
             this._owner.player_data.abilities.set(
                 ability.key,
                 new AbilitySchema({
-                    digit: this.abilities.length + 1,
                     key: ability.key,
                 })
             );
+            // add ability to the hotbar
+            let slotAvailable = this._owner.findNextAvailableHotbarSlot();
+            if (slotAvailable) {
+                this._owner.player_data.hotbar.set(
+                    slotAvailable,
+                    new HotbarSchema({
+                        digit: slotAvailable,
+                        type: "ability",
+                        key: ability.key,
+                    })
+                );
+            }
         }
-        // refresh abilities
-        this.abilitiesOwned = this._owner.abilities;
-        this.refreshAbilities();
     }
 
     /**
@@ -78,6 +69,7 @@ export class abilitiesCTRL {
         // make sure ability exists
         if (!ability) {
             return false;
+            3;
         }
 
         // cancel any existing auto attack
@@ -119,7 +111,10 @@ export class abilitiesCTRL {
     }
 
     getByDigit(digit) {
-        return this.abilities[digit - 1];
+        let hotbarData = this._owner.player_data.hotbar.get("" + digit);
+        if (hotbarData) {
+            return this.abilitiesDB[hotbarData.key];
+        }
     }
 
     targetIsInRange(target, ability): boolean {

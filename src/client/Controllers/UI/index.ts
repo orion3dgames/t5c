@@ -1,5 +1,5 @@
 import { ChatBox } from "./ChatBox";
-import { AbilityBar } from "./AbilityBar";
+import { HotBar } from "./HotBar";
 import { DebugBox } from "./DebugBox";
 import { EntitySelectedBar } from "./EntitySelectedBar";
 import { Tooltip } from "./Tooltip";
@@ -22,7 +22,7 @@ import { Cursor } from "./Cursor";
 
 export {
     ChatBox,
-    AbilityBar,
+    HotBar,
     DebugBox,
     EntitySelectedBar,
     Tooltip,
