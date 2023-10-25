@@ -87,8 +87,6 @@ export class BrainSchema extends Entity {
         // assign spawn data
         Object.assign(this, data);
 
-        console.log(this.speed);
-
         // add equipment
         if (data.initial_equipment && data.initial_equipment.length > 0) {
             data.initial_equipment.forEach((element) => {

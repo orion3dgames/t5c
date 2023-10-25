@@ -25,12 +25,13 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
 export class GameScene {
-    private _game: GameController;
-    private _scene: Scene;
+    public _game: GameController;
+    public _scene: Scene;
     private _input: PlayerInput;
-    private _ui;
+    public _ui;
     private _shadow: CascadedShadowGenerator;
     private _navMesh: NavMesh;
+    public _navMeshDebug;
 
     private _roomId: string;
     private room: Room<any>;
@@ -110,7 +111,8 @@ export class GameScene {
 
         // load navmesh
         this._navMesh = await this.loadNavMesh(location.key);
-        //let navMeshGroup = createConvexRegionHelper(this._navMesh, this._scene) // function to show the navmesh as a mesh in-game
+        this._navMeshDebug = createConvexRegionHelper(this._navMesh, this._scene); // function to show the navmesh as a mesh in-game
+        this._navMeshDebug.isVisible = false;
 
         // initialize assets controller & load level
         this._game.initializeAssetController();
@@ -191,7 +193,7 @@ export class GameScene {
         this._ui = new UserInterface(this._game, this._entities, this._currentPlayer);
 
         // setup input Controller
-        this._input = new PlayerInput(this._game, this._scene, this.room, this._ui);
+        this._input = new PlayerInput(this);
 
         ////////////////////////////////////////////////////
         //  when a entity joins the room event

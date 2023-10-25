@@ -3,8 +3,11 @@ import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 import { KeyboardEventTypes } from "@babylonjs/core/Events/keyboardEvents";
 import { GameController } from "./GameController";
 import { UserInterface } from "./UserInterface";
+import { GameScene } from "../Screens/GameScene";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
 export class PlayerInput {
+    private _gameScene: GameScene;
     private _scene: Scene;
     private _game: GameController;
     private _room;
@@ -45,10 +48,12 @@ export class PlayerInput {
     public movementTimerNow: number = 0;
     public movementTimerDelay: number = 200;
 
-    constructor(game: GameController, scene, room, ui) {
-        (this._game = game), (this._scene = scene);
-        this._room = room;
-        this._ui = ui;
+    constructor(gameScene: GameScene) {
+        this._gameScene = gameScene;
+        this._game = gameScene._game;
+        this._scene = gameScene._scene;
+        this._room = this._game.currentRoom;
+        this._ui = gameScene._ui;
 
         // detect mouse movement
         this._scene.onPointerObservable.add((pointerInfo) => {
@@ -158,8 +163,28 @@ export class PlayerInput {
                     }
 
                     // characters
-                    if (kbInfo.event.code === "KeyC") {
-                        this.keyboard_c = true;
+                    if (kbInfo.event.code === "KeyN") {
+                        this._gameScene._navMeshDebug.isVisible = !this._gameScene._navMeshDebug.isVisible;
+                    }
+                    if (kbInfo.event.code === "KeyH") {
+                        let assetKey = "ENV_" + this._game.currentLocationKey;
+                        let allMeshes = this._game._loadedAssets[assetKey];
+                        if (allMeshes.loadedMeshes) {
+                            let isVisible = !allMeshes.loadedMeshes[0].isVisible;
+                            allMeshes.loadedMeshes.forEach((m: Mesh) => {
+                                m.isVisible = isVisible;
+                            });
+                        }
+                        /*
+                        loadedMeshes..forEach((m: Mesh) => {
+                            // default values
+                            m.checkCollisions = false;
+                            m.isPickable = true;
+                            m.receiveShadows = true;
+                            m.metadata = {
+                                type: "environment",
+                            };
+                        });*/
                     }
 
                     // show items toggle
