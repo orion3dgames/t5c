@@ -118,7 +118,7 @@ let RacesDB: raceDataMap = {
             LootTableEntry("amulet_01", 1, 1, 1, 1, 1),
         ],
         default_abilities: ["base_attack"],
-        materials: [{ title: "Color 1", material: "mage_texture.png" }],
+        materials: [{ title: "Color 1", material: "rogue_texture.png" }],
     },
 };
 

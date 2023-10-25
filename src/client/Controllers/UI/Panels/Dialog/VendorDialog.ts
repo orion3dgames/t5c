@@ -9,20 +9,23 @@ import { Ability, ServerMsg } from "../../../../../shared/types";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { CubicEase, EasingFunction } from "@babylonjs/core/Animations/easing";
 import { Animation } from "@babylonjs/core/Animations/animation";
+import { InputText } from "@babylonjs/gui/2D/controls/inputText";
 
-export class Trainer {
+export class VendorDialog {
     private panel: Panel_Dialog;
     private currentDialog;
     private panelDetails;
     private stackPanel: StackPanel;
     private selected;
 
+    private sellBtn;
+
     private backgroundColor = "#292929";
     private backgroundSelected = "green";
 
-    constructor(panel: Panel_Dialog, currentDialog) {
+    constructor(panel: Panel_Dialog, vendor) {
         this.panel = panel;
-        this.currentDialog = currentDialog;
+        this.currentDialog = vendor;
         this.refresh();
     }
 
@@ -31,56 +34,11 @@ export class Trainer {
             el.dispose();
         });
 
-        // only show spells that not already learnt
-        let abilities = this.currentDialog.abilities ?? [];
-        let abilityAvailableToLearn: any[] = [];
-        abilities.forEach((ability) => {
-            if (!this.playerHasAbility(ability)) {
-                abilityAvailableToLearn.push(ability);
-            }
-        });
-        console.log("AVAILABLE TO LEARN", abilityAvailableToLearn);
-
         // create ui
-        this.create(abilityAvailableToLearn);
+        this.create();
     }
 
-    canLearn(ability: Ability): boolean {
-        let playerData = this.panel._currentPlayer.player_data;
-        let canLearn = true;
-        if (ability.required_strength && ability.required_strength > playerData.strength) {
-            canLearn = false;
-        }
-        if (ability.required_endurance && ability.required_endurance > playerData.endurance) {
-            canLearn = false;
-        }
-        if (ability.required_agility && ability.required_agility > playerData.agility) {
-            canLearn = false;
-        }
-        if (ability.required_intelligence && ability.required_intelligence > playerData.intelligence) {
-            canLearn = false;
-        }
-        if (ability.required_wisdom && ability.required_wisdom > playerData.wisdom) {
-            canLearn = false;
-        }
-        if (ability.required_level && ability.required_level > this.panel._currentPlayer.level) {
-            canLearn = false;
-        }
-        if (ability.value && ability.value > playerData.gold) {
-            canLearn = false;
-        }
-        return canLearn;
-    }
-
-    canLearnColor(ability) {
-        return this.canLearn(ability) ? "green" : "red";
-    }
-
-    playerHasAbility(ability) {
-        return this.panel._currentPlayer.player_data.abilities[ability.key] ? true : false;
-    }
-
-    create(abilities) {
+    create() {
         const createBtn = Button.CreateSimpleButton("characterBtn", "Back");
         createBtn.left = "0px;";
         createBtn.top = "0px";
@@ -94,13 +52,14 @@ export class Trainer {
         this.panel._panelContent.addControl(createBtn);
 
         createBtn.onPointerDownObservable.add(() => {
+            this.sellingModeOff();
             this.panel.nextStep(0);
         });
 
         // add scrollable container
         const scrollViewer = new ScrollViewer("scrollViewer");
         scrollViewer.width = 1;
-        scrollViewer.height = 0.54;
+        scrollViewer.height = 0.53;
         scrollViewer.top = "24px;";
         scrollViewer.thickness = 0;
         scrollViewer.background = this.backgroundColor;
@@ -108,6 +67,19 @@ export class Trainer {
         scrollViewer.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         scrollViewer.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         this.panel._panelContent.addControl(scrollViewer);
+
+        // add details scrollable container
+        let ItemDetailsBloc = new Rectangle("ItemDetailsBloc");
+        ItemDetailsBloc.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        ItemDetailsBloc.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        ItemDetailsBloc.width = 1;
+        ItemDetailsBloc.height = 0.4;
+        ItemDetailsBloc.top = -0.1;
+        ItemDetailsBloc.background = "black";
+        ItemDetailsBloc.setPaddingInPixels(5, 5, 5, 5);
+        ItemDetailsBloc.thickness = 0;
+        this.panel._panelContent.addControl(ItemDetailsBloc);
+        this.panelDetails = ItemDetailsBloc;
 
         // add detail window
         const stackPanel = new StackPanel("stackPanel");
@@ -120,9 +92,9 @@ export class Trainer {
         scrollViewer.addControl(stackPanel);
         this.stackPanel = stackPanel;
 
-        if (abilities.length > 0) {
-            abilities.forEach((a) => {
-                let ability = this.panel._game.getGameData("ability", a.key);
+        if (this.currentDialog.items.length > 0) {
+            this.currentDialog.items.forEach((a) => {
+                let item = this.panel._game.getGameData("item", a.key);
 
                 let blocContainer = new Rectangle("blocContainer");
                 blocContainer.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
@@ -134,7 +106,7 @@ export class Trainer {
                 blocContainer.background = this.backgroundColor;
                 blocContainer.thickness = 0;
                 blocContainer.metadata = {
-                    ability: ability,
+                    item: item,
                 };
                 stackPanel.addControl(blocContainer);
 
@@ -142,37 +114,26 @@ export class Trainer {
                 blockTitle.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
                 blockTitle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
                 blockTitle.paddingLeft = "5px";
-                blockTitle.text = ability.title + " (Level " + ability.required_level + ")";
+                blockTitle.text = item.title;
                 blockTitle.fontSize = "14px";
-                blockTitle.color = this.canLearnColor(ability);
+                blockTitle.color = "white";
                 blockTitle.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
                 blockTitle.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
                 blocContainer.addControl(blockTitle);
 
                 // on hover tooltip
                 blocContainer.onPointerClickObservable.add(() => {
+                    this.sellingModeOff();
                     this.select(blocContainer, blockTitle);
-                    this.createDetails(ability);
+                    this.createDetails(item);
                 });
             });
 
-            // add details scrollable container
-            const scrollViewerDetails = new ScrollViewer("scrollViewerDetails");
-            scrollViewerDetails.width = 1;
-            scrollViewerDetails.height = 0.4;
-            scrollViewerDetails.top = -0.1;
-            scrollViewerDetails.thickness = 0;
-            scrollViewerDetails.setPaddingInPixels(5, 5, 5, 5);
-            scrollViewerDetails.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-            scrollViewerDetails.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-            this.panel._panelContent.addControl(scrollViewerDetails);
-            this.panelDetails = scrollViewerDetails;
-
             // select first available ability
             let firstElement = this.stackPanel.children[0] as Rectangle;
-            let ability = this.panel._game.getGameData("ability", abilities[0].key);
+            let item = this.panel._game.getGameData("item", this.currentDialog.items[0].key);
             this.select(this.stackPanel.children[0], firstElement.children[0]);
-            this.createDetails(ability);
+            this.createDetails(item);
         } else {
             // nothing available to learn, show empty message
             const tooltipName = new TextBlock("emptyText");
@@ -194,19 +155,159 @@ export class Trainer {
         // reset all
         this.stackPanel.children.forEach((el: any) => {
             el.background = this.backgroundColor;
-            el.children[0].color = this.canLearnColor(el.metadata.ability);
         });
 
         // color selected line
-        blocContainer.background = this.canLearnColor(blocContainer.metadata.ability);
+        blocContainer.background = "green";
         blockTitle.color = "white";
     }
 
-    createDetails(ability) {
+    sellingModeOn() {
+        this.panel._game.sellingMode = true;
+        this.panel._UI._Cursor.activate("sell");
+        if (this.sellBtn.textBlock) {
+            this.sellBtn.textBlock.text = "Sell (ON)";
+        }
+    }
+
+    sellingModeOff() {
+        this.panel._game.sellingMode = false;
+        this.panel._UI._Cursor.activate();
+        if (this.sellBtn.textBlock) {
+            this.sellBtn.textBlock.text = "Sell";
+        }
+    }
+
+    createDetails(item) {
         // clear previous ability
         this.panelDetails.getDescendants().forEach((el) => {
             el.dispose();
         });
+
+        ////////////////////////////////////////////
+        ////////////////////////////////////////////
+        ////////////////////////////////////////////
+        let totalQuantity = 1;
+
+        let actionBloc = new Rectangle("actionBloc" + item.key);
+        actionBloc.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        actionBloc.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        actionBloc.top = "0px";
+        actionBloc.left = "0px;";
+        actionBloc.width = 1;
+        actionBloc.height = "35px;";
+        actionBloc.thickness = 0;
+        this.panelDetails.addControl(actionBloc);
+
+        const sellBtn = Button.CreateSimpleButton("sellBtn", "Sell");
+        sellBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        sellBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        sellBtn.left = "0px;";
+        sellBtn.top = "0px";
+        sellBtn.width = "100px;";
+        sellBtn.height = "24px";
+        sellBtn.background = "orange";
+        sellBtn.color = "white";
+        sellBtn.thickness = 0;
+        sellBtn.fontSize = "14px";
+        actionBloc.addControl(sellBtn);
+        this.sellBtn = sellBtn;
+
+        sellBtn.onPointerClickObservable.add(() => {
+            if (this.panel._game.sellingMode === false) {
+                this.sellingModeOn();
+            } else {
+                this.sellingModeOff();
+            }
+        });
+
+        const createBtn = Button.CreateSimpleButton("buyBtn", "Buy " + totalQuantity);
+        createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        createBtn.left = "-29px;";
+        createBtn.top = "0px";
+        createBtn.width = "60px;";
+        createBtn.height = "24px";
+        createBtn.background = "orange";
+        createBtn.color = "white";
+        createBtn.thickness = 0;
+        createBtn.fontSize = "14px";
+        createBtn.hoverCursor = this.panel._UI._Cursor.get("buy");
+        actionBloc.addControl(createBtn);
+
+        const plusBtn = Button.CreateSimpleButton("plusBtn", "+");
+        plusBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        plusBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        plusBtn.left = "0px;";
+        plusBtn.top = "0px";
+        plusBtn.width = "24px;";
+        plusBtn.height = "24px";
+        plusBtn.background = "gray";
+        plusBtn.color = "white";
+        plusBtn.thickness = 0;
+        actionBloc.addControl(plusBtn);
+        plusBtn.onPointerClickObservable.add(() => {
+            totalQuantity++;
+            if (createBtn.textBlock) {
+                createBtn.textBlock.text = "Buy " + totalQuantity;
+            }
+        });
+
+        const minusBtn = Button.CreateSimpleButton("minusBtn", "-");
+        minusBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        minusBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        minusBtn.left = "-95px;";
+        minusBtn.top = "0px";
+        minusBtn.width = "24px;";
+        minusBtn.height = "24px";
+        minusBtn.background = "gray";
+        minusBtn.color = "white";
+        minusBtn.thickness = 0;
+        actionBloc.addControl(minusBtn);
+        minusBtn.onPointerClickObservable.add(() => {
+            if (totalQuantity > 1) {
+                totalQuantity--;
+                if (createBtn.textBlock) {
+                    createBtn.textBlock.text = "Buy " + totalQuantity;
+                }
+            }
+        });
+
+        let clicked = false;
+        let observable = createBtn.onPointerClickObservable.add(() => {
+            this.sellingModeOff();
+            if (clicked === false) {
+                clicked = true;
+                this.panel._room.send(ServerMsg.PLAYER_BUY_ITEM, {
+                    key: item.key,
+                    qty: totalQuantity,
+                });
+                if (createBtn.textBlock) {
+                    createBtn.textBlock.text = "...";
+                }
+                // todo: we need some sort of callback here
+                setTimeout(() => {
+                    totalQuantity = 1;
+                    clicked = false;
+                    if (createBtn.textBlock) {
+                        createBtn.textBlock.text = "Buy " + totalQuantity;
+                    }
+                }, 200);
+            }
+        });
+
+        ////////////////////////////////////////////
+        ////////////////////////////////////////////
+        ////////////////////////////////////////////
+
+        const scrollViewerDetails = new ScrollViewer("scrollViewerDetails");
+        scrollViewerDetails.width = 1;
+        scrollViewerDetails.height = 1;
+        scrollViewerDetails.top = "35px";
+        scrollViewerDetails.thickness = 0;
+        scrollViewerDetails.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        scrollViewerDetails.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        this.panelDetails.addControl(scrollViewerDetails);
 
         const stackPanel = new StackPanel("stackPanel");
         stackPanel.width = 1;
@@ -215,9 +316,9 @@ export class Trainer {
         stackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         stackPanel.spacing = 5;
         stackPanel.adaptHeightToChildren = true;
-        this.panelDetails.addControl(stackPanel);
+        scrollViewerDetails.addControl(stackPanel);
 
-        let titleBloc = new Rectangle("titleBloc" + ability.key);
+        let titleBloc = new Rectangle("titleBloc" + item.key);
         titleBloc.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         titleBloc.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         titleBloc.top = "5px";
@@ -227,48 +328,8 @@ export class Trainer {
         titleBloc.thickness = 0;
         stackPanel.addControl(titleBloc);
 
-        if (this.canLearn(ability)) {
-            const createBtn = Button.CreateSimpleButton("learnBTN", "Train");
-            createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-            createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-            createBtn.left = "-5px;";
-            createBtn.top = "5px";
-            createBtn.width = "50px;";
-            createBtn.height = "20px";
-            createBtn.background = "orange";
-            createBtn.color = "white";
-            createBtn.thickness = 0;
-            titleBloc.addControl(createBtn);
-
-            let observable = createBtn.onPointerClickObservable.add(() => {
-                this.panel._room.send(ServerMsg.PLAYER_LEARN_SKILL, ability.key);
-                if (createBtn.textBlock) {
-                    createBtn.textBlock.text = "...";
-                }
-                if (observable) {
-                    observable.remove();
-                }
-                // todo: we need some sort of callback here
-                setTimeout(() => {
-                    this.refresh();
-                }, 500);
-            });
-        } else {
-            const createBtn = Button.CreateSimpleButton("learnBTN", "Train");
-            createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-            createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-            createBtn.left = "-5px;";
-            createBtn.top = "5px";
-            createBtn.width = "50px;";
-            createBtn.height = "20px";
-            createBtn.background = "gray";
-            createBtn.color = "white";
-            createBtn.thickness = 0;
-            titleBloc.addControl(createBtn);
-        }
-
         // add icon + title
-        let imageBLoc = new Rectangle("imageBLoc" + ability.key);
+        let imageBLoc = new Rectangle("imageBLoc" + item.key);
         imageBLoc.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         imageBLoc.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         imageBLoc.top = "0px";
@@ -278,34 +339,38 @@ export class Trainer {
         imageBLoc.thickness = 0;
         titleBloc.addControl(imageBLoc);
 
-        var imageData = this.panel._loadedAssets[ability.icon];
-        var img = new Image("itemImage_" + ability.key, imageData);
+        var imageData = this.panel._loadedAssets[item.icon];
+        var img = new Image("itemImage_" + item.key, imageData);
         img.stretch = Image.STRETCH_FILL;
         imageBLoc.addControl(img);
 
         // add title
-        const tooltipName = new TextBlock("abilityName" + ability.key);
+        const tooltipName = new TextBlock("abilityName" + item.key);
+        tooltipName.width = 0.7;
         tooltipName.color = "#FFF";
-        tooltipName.top = "5px";
+        tooltipName.top = "0px";
         tooltipName.left = "40px";
         tooltipName.fontSize = "18px;";
+        tooltipName.fontWeight = "bold;";
         tooltipName.resizeToFit = true;
-        tooltipName.text = ability.title;
+        tooltipName.textWrapping = TextWrapping.WordWrap;
+        tooltipName.text = item.title;
+        tooltipName.lineSpacing = "-4px";
         tooltipName.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         tooltipName.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-        tooltipName.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        tooltipName.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
         tooltipName.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         titleBloc.addControl(tooltipName);
 
         // addd description
-        const abilityDescr = new TextBlock("abilityDescr" + ability.key);
+        const abilityDescr = new TextBlock("abilityDescr" + item.key);
         abilityDescr.color = "rgba(255,255,255,.6)";
         abilityDescr.top = 0;
         abilityDescr.left = "0px";
         abilityDescr.fontSize = "12px;";
         abilityDescr.textWrapping = TextWrapping.WordWrap;
         abilityDescr.resizeToFit = true;
-        abilityDescr.text = ability.description;
+        abilityDescr.text = item.description;
         abilityDescr.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         abilityDescr.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         abilityDescr.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
@@ -314,29 +379,11 @@ export class Trainer {
 
         // add requirements
         let requirements = "";
-        if (ability.value) {
-            requirements += "Cost: " + ability.value + "\n";
-        }
-        if (ability.required_level) {
-            requirements += "Level Required: " + ability.required_level + "\n";
-        }
-        if (ability.required_strength) {
-            requirements += "Strength Required: " + ability.required_strength + "\n";
-        }
-        if (ability.required_endurance) {
-            requirements += "Endurance Required: " + ability.required_endurance + "\n";
-        }
-        if (ability.required_agility) {
-            requirements += "Agility Required: " + ability.required_agility + "\n";
-        }
-        if (ability.required_intelligence) {
-            requirements += "Intelligence Required: " + ability.required_intelligence + "\n";
-        }
-        if (ability.required_wisdom) {
-            requirements += "Wisdom Required: " + ability.required_wisdom + "\n";
+        if (item.value) {
+            requirements += "Cost: " + item.value + "\n";
         }
 
-        const requiredBloc = new TextBlock("requiredBloc" + ability.key);
+        const requiredBloc = new TextBlock("requiredBloc" + item.key);
         requiredBloc.color = "rgba(255,255,255,.6)";
         requiredBloc.top = 0;
         requiredBloc.left = "0px";

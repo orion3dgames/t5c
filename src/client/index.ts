@@ -3,6 +3,13 @@ import("@babylonjs/core/Debug/debugLayer");
 import("@babylonjs/inspector");
 //}
 
+// ES6 IMPORTS
+// if there are cases where es6 dependencies could be causing issues just try and load the whole babylon core, and
+// that fixes it, then it is a dependencies issue, check this link out for answers.
+// bjs post: https://forum.babylonjs.com/t/pickedmesh-is-null-in-onpointerobservable-after-update-to-6-25-0/45076/7
+// bjs docs: https://doc.babylonjs.com/setup/frameworkPackages/es6Support#faq
+// import("@babylonjs/core");
+import "@babylonjs/core/Culling/ray";
 import "@babylonjs/core/Animations/animatable";
 import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
 import "@babylonjs/core/Loading/loadingScreen";
@@ -126,18 +133,18 @@ class App {
         });
 
         //for development: make inspector visible/invisible
-        if (isLocal()) {
-            window.addEventListener("keydown", (ev) => {
-                //Shift+Ctrl+Alt+I
-                if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.keyCode === 73) {
-                    if (this.game.scene.debugLayer.isVisible()) {
-                        this.game.scene.debugLayer.hide();
-                    } else {
-                        this.game.scene.debugLayer.show();
-                    }
+        //if (isLocal()) {
+        window.addEventListener("keydown", (ev) => {
+            //Shift+Ctrl+Alt+I
+            if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.keyCode === 73) {
+                if (this.game.scene.debugLayer.isVisible()) {
+                    this.game.scene.debugLayer.hide();
+                } else {
+                    this.game.scene.debugLayer.show();
                 }
-            });
-        }
+            }
+        });
+        //}
 
         //resize if the screen is resized/rotated
         window.addEventListener("resize", () => {

@@ -134,7 +134,7 @@ export class GameScene {
                     function () {
                         return modelToLoadKey;
                     },
-                    true,
+                    false,
                     { doNotInstantiate: true }
                 );
 

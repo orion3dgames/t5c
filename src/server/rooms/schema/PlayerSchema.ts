@@ -122,10 +122,11 @@ export class PlayerSchema extends Entity {
         this.client = this.getClient();
         this.isTeleporting = false;
 
-        // add player data
-        // assign player data
+        // add default
+        Object.assign(this, this._state.gameData.get("race", data.race));
+
+        // add spawn data
         Object.assign(this, data);
-        Object.assign(this, this._state.gameData.get("race", this.race));
 
         // add abilities
         data.initial_abilities.forEach((element) => {

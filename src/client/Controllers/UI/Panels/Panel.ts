@@ -8,8 +8,9 @@ import { Scene } from "@babylonjs/core/scene";
 import { GameController } from "../../GameController";
 import { UserInterface } from "../../UserInterface";
 import { Room } from "colyseus.js";
-import { Trainer } from "./Dialog/Trainer";
-import { Vendor } from "./Dialog/Vendor";
+import { TrainerDialog } from "./Dialog/TrainerDialog";
+import { VendorDialog } from "./Dialog/VendorDialog";
+import { QuestDialog } from "./Dialog/QuestDialog";
 
 export class Panel {
     public _UI: UserInterface;
@@ -33,8 +34,9 @@ export class Panel {
     public _isDragging: boolean = false;
 
     //
-    public trainer: Trainer;
-    public vendor: Vendor;
+    public trainer: TrainerDialog;
+    public vendor: VendorDialog;
+    public quest: QuestDialog;
 
     constructor(_UI, _currentPlayer, options) {
         //

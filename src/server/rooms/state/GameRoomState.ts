@@ -10,7 +10,7 @@ import { GameRoom } from "../GameRoom";
 
 import { NavMesh, Vector3 } from "../../../shared/Libs/yuka-min";
 import Logger from "../../utils/Logger";
-import { ItemClass, ServerMsg } from "../../../shared/types";
+import { ItemClass, ServerMsg, Speed } from "../../../shared/types";
 
 export class GameRoomState extends Schema {
     // networked variables
@@ -131,6 +131,7 @@ export class GameRoomState extends Schema {
             mana: data.mana,
             maxMana: data.mana,
             level: data.level,
+            speed: Speed.MEDIUM,
 
             sessionId: client.sessionId,
             name: data.name,

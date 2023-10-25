@@ -4,6 +4,8 @@ import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollVie
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
+import { QuestObjectives } from "../../../../shared/types";
+import { QuestsHelper } from "../../../../shared/Class/QuestsHelper";
 
 export class Panel_Quests extends Panel {
     private panel: Rectangle;
@@ -39,9 +41,9 @@ export class Panel_Quests extends Panel {
         this.createContent();
     }
 
-    public replaceKeywords(text, quest, pQuest) {
+    public replaceKeywords(text, quest, pQuest, location) {
         text = text.replace("@KillRequired", quest.quantity);
-        text = text.replace("@KillName", quest.spawn_name);
+        text = text.replace("@TargetName", QuestsHelper.findQuestTargetName(location, quest.spawn_key, quest.quantity));
         text = text.replace("@KillCompleted", pQuest.qty);
         return text;
     }
@@ -79,7 +81,10 @@ export class Panel_Quests extends Panel {
         if (quests.size > 0) {
             quests.forEach((q) => {
                 let quest = this._game.getGameData("quest", q.key);
-                let short_objective = this.replaceKeywords(quest.short_objective, quest, q);
+                let location = this._game.getGameData("location", quest.location);
+
+                let short_objective = QuestObjectives[quest.type];
+                short_objective = this.replaceKeywords(short_objective, quest, q, location);
 
                 let questPanel = new Rectangle("questPanel");
                 questPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;

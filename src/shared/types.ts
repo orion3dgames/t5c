@@ -97,7 +97,7 @@ export type Quest = {
     objective: string;
     type: QuestObjective.KILL_AMOUNT;
     location: string;
-    spawn_type: string;
+    spawn_key: string;
     quantity: number;
     isRepeatable: boolean;
     rewards: {
@@ -109,15 +109,24 @@ export type Quest = {
 
 export enum QuestObjective {
     KILL_AMOUNT = 1,
+    TALK_TO,
 }
 
+export type QuestObjectiveMap = { [key in QuestObjective]?: string };
+
+export let QuestObjectives = {
+    [QuestObjective.KILL_AMOUNT]: "Kill @TargetName @KillCompleted/@KillRequired",
+    [QuestObjective.TALK_TO]: "Talk to @TargetName",
+};
+
 export type QuestUpdate = {
-    id: string;
+    key: string;
     status: QuestStatus;
 };
 
 export enum QuestStatus {
-    ACCEPTED = 1,
+    NOT_ACCEPTED = 0,
+    ACCEPTED,
     OBJECTIVE_UPDATE,
     READY_TO_COMPLETE,
     COMPLETED,
@@ -338,6 +347,14 @@ export interface ILootTableEntry<T extends string = string, V extends number | s
 //////////////////////////////////////////////////////////////
 ///////////////// UTILS /////////////////////
 //////////////////////////////////////////////////////////////
+
+export enum Speed {
+    VERY_SLOW = 0.2,
+    SLOW = 0.35,
+    MEDIUM = 0.65,
+    QUICK = 0.8,
+    VERY_QUICK = 1,
+}
 
 export enum CalculationTypes {
     ADD = 1,

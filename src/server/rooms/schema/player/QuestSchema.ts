@@ -13,7 +13,7 @@ export class QuestSchema extends Schema {
     objective: string;
     type: QuestObjective;
     location: string;
-    spawn_type: string;
+    spawn_key: string;
     experienceOnCompletion: number;
     isRepeatable: boolean;
 

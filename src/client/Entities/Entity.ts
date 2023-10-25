@@ -79,7 +79,7 @@ export class Entity {
     public equipment = [];
 
     // interactable
-    public spwanInfo;
+    public spawnInfo;
     public interactableButtons;
 
     // raceData
@@ -117,7 +117,7 @@ export class Entity {
         Object.assign(this, this.entity);
 
         // get spawnInfo
-        this.spwanInfo = this._game.currentLocation.dynamic.spawns[this.spawn_id] ?? null;
+        this.spawnInfo = this._game.currentLocation.dynamic.spawns[this.spawn_id] ?? null;
 
         // get material
         this.debugMaterialActive = this._scene.getMaterialByName("debug_entity_active");
@@ -207,7 +207,7 @@ export class Entity {
             }
 
             // hide any dialog this entity could be linked too
-            if (this.ui.panelDialog.currentEntity.sessionId === this.sessionId) {
+            if (this.ui.panelDialog.currentEntity && this.ui.panelDialog.currentEntity.sessionId === this.sessionId) {
                 this.ui.panelDialog.clear();
                 this.ui.panelDialog.close();
             }
