@@ -46,7 +46,7 @@ export class GameRoom extends Room<GameRoomState> {
 
         //Set a simulation interval that can change the state of the game
         this.setSimulationInterval((dt) => {
-            this.state.update(dt);
+            //this.state.update(dt);
         }, this.config.updateRate);
 
         // set max clients
@@ -56,13 +56,12 @@ export class GameRoom extends Room<GameRoomState> {
         // initialize database
         this.database = new GameDB(this.config);
         await this.database.initDatabase();
-        await this.database.findAll();
 
         ///////////////////////////////////////////////////////////////////////////
         // if players are in a room, make sure we save any changes to the database.
         // only save if there is any players
         this.delayedInterval = this.clock.setInterval(() => {
-            if (this.state.entities && this.state.entities.size > 0) {
+            if (this.state && this.state.entities && this.state.entities.size > 0) {
                 this.state.entityCTRL.all.forEach((entity) => {
                     if (entity instanceof PlayerSchema) {
                         entity.save(this.database);

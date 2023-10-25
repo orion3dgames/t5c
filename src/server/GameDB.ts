@@ -8,8 +8,11 @@ import { EquipmentSchema, PlayerSchema, QuestSchema } from "./rooms/schema";
 import { MapSchema } from "@colyseus/schema/lib/types/MapSchema";
 
 import { DB } from "../shared/db"; // this is the Database interface we defined earlier
-import DatabaseConstructor, { Database } from "better-sqlite3";
+
+import { Database } from "@colyseus/database";
 import { Kysely, SqliteDialect } from "kysely";
+import DatabaseConstructor from "better-sqlite3";
+import { generateRandomPlayerName } from "../shared/Utils";
 
 class GameDB {
     private db;
@@ -27,6 +30,21 @@ class GameDB {
     async connectDatabase() {
         let dbFilePath = this._config.databaseLocation;
 
+        this.db = new Database<{
+            // database schema / types
+            characters: PlayerSchema;
+        }>({
+            // database config
+            dialect: new SqliteDialect({
+                database: new DatabaseConstructor(dbFilePath),
+            }),
+        });
+
+        console.log("DATABASE LOADED");
+
+        await this.saveUser(generateRandomPlayerName(), generateRandomPlayerName());
+
+        /*
         const dialect = new SqliteDialect({
             database: new DatabaseConstructor(dbFilePath),
         });
@@ -35,12 +53,106 @@ class GameDB {
             dialect,
         });
 
+        */
         return this.db;
     }
 
-    async findAll() {
-        let result = await this.db.selectFrom("users").selectAll().execute();
-        console.log(result);
+    async saveUser(username: string, password: string, token: string = nanoid()) {
+        // collection API
+        const Player = this.db.collection("characters");
+        console.log("saveUser", Player);
+
+        const playerId = await Player.insert({
+            name: "Rigolo1",
+        });
+
+        console.log("player created", playerId);
+
+        const character = await Player.find(playerId);
+
+        //let c = (await this.run(`INSERT INTO users (username, password, token) VALUES (?,?,?)`, [username, password, token])) as any;
+        //return await this.getUserById(c.id);
+    }
+
+    /*
+    async createCharacter(token, name, race, material) {
+        let user = await this.getUserByToken(token);
+        const sql = `INSERT INTO characters (
+            "user_id", "name", "race", "material",
+            "strength", "endurance", "agility", "intelligence", "wisdom", 
+            "location","x","y","z","rot","level","experience","health", "mana", "gold", "points") 
+            VALUES (
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?,
+                
+                ?,
+                ?,
+                ?,
+                ?
+            );`;
+        let c = await (<any>(
+            this.run(sql, [
+                user.id,
+                name,
+                race,
+                material,
+                this.generateStatPoint(),
+
+                this.generateStatPoint(),
+                this.generateStatPoint(),
+                this.generateStatPoint(),
+                this.generateStatPoint(),
+                "lh_town",
+
+                "4.20",
+                "0",
+                "-23.26",
+                "0",
+                "1",
+                "0",
+
+                "50",
+                "50",
+                "50000",
+                "50",
+            ])
+        ));
+
+        // add default abilities
+        let abilities = [{ digit: 1, key: "base_attack" }];
+        abilities.forEach((ability) => {
+            const sql_abilities = `INSERT INTO character_abilities ("owner_id", "digit", "key") VALUES ("${c.id}", "${ability.digit}", "${ability.key}")`;
+            this.run(sql_abilities);
+        });
+
+        //
+        const sql_quests = `INSERT INTO character_quests ("owner_id", "key", "status", "qty") VALUES ("${c.id}", "LH_DANGEROUS_ERRANDS_01", "0", "5")`;
+        //this.run(sql_quests);
+
+        // add default items
+        let items = [{ qty: 1, key: "potion_small_red" }];
+        items.forEach((item) => {
+            const sql = `INSERT INTO character_inventory ("owner_id", "qty", "key") VALUES ("${c.id}", "${item.qty}", "${item.key}")`;
+            this.run(sql);
+        });
+
+        return await this.getCharacter(c.id);
     }
 
     /*
