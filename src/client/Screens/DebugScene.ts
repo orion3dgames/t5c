@@ -21,6 +21,7 @@ import { mergeMesh, calculateRanges, bakeVertexData, setAnimationParameters, mer
 import AnimationHelper from "../Entities/Common/AnimationHelper";
 import { Skeleton } from "@babylonjs/core/Bones/skeleton";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { GameController } from "../Controllers/GameController";
 
 class JavascriptDataDownloader {
     private data;
@@ -47,6 +48,7 @@ const frameOffset = 6;
 export class DebugScene {
     public _engine: Engine;
     public _scene: Scene;
+    public _game: GameController;
     public _newState: State;
     public _button: Button;
     public _ui;
@@ -57,17 +59,21 @@ export class DebugScene {
     public INST_COUNT = 100;
     public PICKED_ANIMS = ["Idle", "Walking_A"];
     public URL_MESH = "male_rogue";
+    public RACES = ["male_rogue", "male_mage"];
 
     public models = [];
     public vatManager;
     public playerMesh;
 
     public animationRanges;
+
     public animationGroups;
     public selectedAnimationGroups;
 
     public skeletonForAnim: Skeleton[] = []; //
     public rootForAnim: TransformNode[] = []; //
+
+    public mainSkeleton: Skeleton;
 
     constructor() {
         this._newState = State.NULL;
@@ -75,6 +81,7 @@ export class DebugScene {
 
     public async createScene(app) {
         this._engine = app.engine;
+        this._game = app;
 
         let scene = new Scene(app.engine);
         scene.clearColor = new Color4(0, 0, 0, 1);
@@ -113,20 +120,28 @@ export class DebugScene {
             label.text = "FPS: " + this._engine.getFps();
         });
 
+        // preload assets
+        this._game.initializeAssetController();
+        await this._game._assetsCtrl.fetchAsset("ITEM_sword_01");
+        await this._game._assetsCtrl.fetchAsset("RACE_male_knight");
+        await this._game._assetsCtrl.fetchAsset("RACE_male_mage");
+        console.log("loading complete", this._game._loadedAssets);
+
         // add VAT manager
         this.vatManager = new BakedVertexAnimationManager(this._scene);
 
         // load weapon
-        const weaponLoad = await SceneLoader.ImportMeshAsync("", "./models/items/", "sword_01.glb", this._scene);
+        const weaponLoad = this._game._loadedAssets["ITEM_sword_01"];
         const weaponMesh = weaponLoad.meshes[0];
         const weaponMeshMerged = await mergeMesh(weaponMesh);
 
-        //////////////////////////////////////////////////////////
-        // load mesh
-        await this.loadMesh(this.URL_MESH);
+        // preload skeletons and animation
+        await this.prepareMesh(this._game._loadedAssets["RACE_male_knight"], "male_knight");
+        //await this.prepareMesh(this._game._loadedAssets["RACE_male_mage"], "male_mage");
 
         ///
         const createInst = (id, animIndex) => {
+            const index = this.RACES[Math.floor(Math.random() * this.RACES.length)];
             const playerInstance = this.playerMesh.createInstance("player_" + id);
             playerInstance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
             setAnimationParameters(playerInstance.instancedBuffers.bakedVertexAnimationSettingsInstanced, animIndex, this.animationRanges);
@@ -136,7 +151,8 @@ export class DebugScene {
             this.createLabel(playerInstance, id);
 
             // attach weapon
-            if (weaponMeshMerged) {
+            let rand = Math.random();
+            if (weaponMeshMerged && rand > 0.5) {
                 const weapon = weaponMeshMerged.createInstance("player_" + id + "_sword");
                 const skeletonAnim = this.skeletonForAnim[animIndex];
                 let bone = skeletonAnim.bones[12];
@@ -148,7 +164,6 @@ export class DebugScene {
             createInst(i + "", Math.floor(Math.random() * this.selectedAnimationGroups.length));
         }
 
-        //
         this._scene.registerBeforeRender(() => {
             this.vatManager.time += this._scene.getEngine().getDeltaTime() / 1000.0;
 
@@ -174,18 +189,17 @@ export class DebugScene {
         }
     }
 
-    async loadMesh(key) {
-        const { meshes, animationGroups, skeletons } = await SceneLoader.ImportMeshAsync("", "./models/races/", key + ".glb", this._scene);
-
-        console.log(animationGroups);
-
-        animationGroups.forEach((ag) => ag.stop());
-
-        this.animationGroups = animationGroups;
-        this.selectedAnimationGroups = animationGroups.filter((ag) => this.PICKED_ANIMS.includes(ag.name));
-
+    async prepareMesh(asset, key) {
+        //const { meshes, animationGroups, skeletons } = await SceneLoader.ImportMeshAsync("", "./models/races/", key + ".glb", this._scene);
+        const meshes = asset.meshes;
+        const animationGroups = asset.animationGroups;
+        const skeletons = asset.skeletons;
         const skeleton = skeletons[0];
         const root = meshes[0];
+
+        animationGroups.forEach((ag) => ag.stop());
+        this.animationGroups = animationGroups;
+        this.selectedAnimationGroups = animationGroups.filter((ag) => this.PICKED_ANIMS.includes(ag.name));
 
         // prepare skeletons and root anims
         this.PICKED_ANIMS.forEach((name) => {
@@ -199,8 +213,6 @@ export class DebugScene {
                 this.rootForAnim.push(rootAnim);
             }
         });
-
-        console.log(this.skeletonForAnim);
 
         // reset position & rotation
         // not sure why?
