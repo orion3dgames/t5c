@@ -5,6 +5,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { BlackAndWhitePostProcess } from "@babylonjs/core/PostProcesses/blackAndWhitePostProcess";
 import { Player } from "../Player";
 import { PlayerInput } from "../../Controllers/PlayerInput";
+import { SSAORenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/ssaoRenderingPipeline";
 
 export class PlayerCamera {
     private player: Player;
@@ -49,6 +50,9 @@ export class PlayerCamera {
 
         //
         this.cameraPos = this.camera.position;
+
+        // text ssao
+        //const ssao = new SSAORenderingPipeline("ssaopipeline", this._scene, 1, this.camera);
     }
 
     public follow(): void {
