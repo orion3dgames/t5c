@@ -139,8 +139,23 @@ export class Player extends Entity {
             // show entity label
             target.characterLabel.isVisible = true;
 
+            // if spawninfo available
             if (!target.spawnInfo) return false;
 
+            // if targets is aggresive
+            // note: need to find a better wayt to do this, not linked to hotbar
+            if (target.spawnInfo.aggressive) {
+                // send to server
+                this._room.send(ServerMsg.PLAYER_HOTBAR_ACTIVATED, {
+                    senderId: this._room.sessionId,
+                    targetId: target ? target.sessionId : false,
+                    digit: 1,
+                });
+
+                return false;
+            }
+
+            // if interactable target
             if (!target.spawnInfo.interactable) return false;
 
             // if close enough, open dialog
