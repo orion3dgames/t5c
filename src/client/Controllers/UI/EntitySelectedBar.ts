@@ -50,8 +50,8 @@ export class EntitySelectedBar {
         let leftMargin = 15;
         let topMargin = 15;
         if (this._options.panelName === "target") {
-            leftMargin = 275;
-            topMargin = 15;
+            leftMargin = 30;
+            topMargin = 85;
         }
         ////////////////////////////////////
         //////////////////// panel

@@ -164,6 +164,13 @@ export class Player extends Entity {
             let distanceBetween = Vector3.Distance(playerPos, entityPos);
             if (distanceBetween < this._game.config.PLAYER_INTERACTABLE_DISTANCE) {
                 this.ui.panelDialog.open(target);
+
+                // stop any movement
+                // todo: improve
+                this._input.left_click = false;
+                this._input.vertical = 0;
+                this._input.horizontal = 0;
+                this._input.player_can_move = false;
             }
         }
 
@@ -174,6 +181,9 @@ export class Player extends Entity {
 
         // move to clicked point
         if (metadata.type === "environment" && !this.isDead) {
+            // deselect any entity
+            this._game.selectedEntity = false;
+
             /*
             // removed click to move
             // todo: add client prediction.
