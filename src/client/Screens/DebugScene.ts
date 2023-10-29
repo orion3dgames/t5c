@@ -22,6 +22,10 @@ import AnimationHelper from "../Entities/Common/AnimationHelper";
 import { Skeleton } from "@babylonjs/core/Bones/skeleton";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { GameController } from "../Controllers/GameController";
+import { AnimationGroup } from "@babylonjs/core";
+import axios from "axios";
+import { apiUrl } from "../Utils";
+import { nanoid } from "nanoid";
 
 class JavascriptDataDownloader {
     private data;
@@ -56,24 +60,40 @@ export class DebugScene {
     public results;
 
     public PLANE_SIZE = 10;
-    public INST_COUNT = 100;
-    public PICKED_ANIMS = ["Idle", "Walking_A"];
-    public URL_MESH = "male_rogue";
-    public RACES = ["male_rogue", "male_mage"];
+    public SPAWN_INFO = [
+        {
+            key: "male_rogue",
+            amount: 50,
+            PICKED_ANIMS: ["Idle", "Walking_A"],
+        },
+        {
+            key: "male_knight",
+            amount: 50,
+            PICKED_ANIMS: ["Idle", "Walking_A"],
+        },
+        {
+            key: "male_mage",
+            amount: 50,
+            PICKED_ANIMS: ["Idle", "Walking_A"],
+        },
+    ];
 
     public models = [];
-    public vatManager;
+    public vatManagers: BakedVertexAnimationManager[] = [];
     public playerMesh;
 
-    public animationRanges;
-
-    public animationGroups;
-    public selectedAnimationGroups;
+    public animationRanges: any[] = [];
+    public animationGroups: any[] = [];
+    public selectedAnimationGroups: any[] = [];
 
     public skeletonForAnim: Skeleton[] = []; //
     public rootForAnim: TransformNode[] = []; //
 
     public mainSkeleton: Skeleton;
+
+    public entityData: any[] = [];
+
+    public entities = new Map();
 
     constructor() {
         this._newState = State.NULL;
@@ -122,75 +142,109 @@ export class DebugScene {
 
         // preload assets
         this._game.initializeAssetController();
-        await this._game._assetsCtrl.fetchAsset("ITEM_sword_01");
-        await this._game._assetsCtrl.fetchAsset("RACE_male_knight");
-        await this._game._assetsCtrl.fetchAsset("RACE_male_mage");
+        await this._game._assetsCtrl.load();
         console.log("loading complete", this._game._loadedAssets);
-
-        // add VAT manager
-        this.vatManager = new BakedVertexAnimationManager(this._scene);
 
         // load weapon
         const weaponLoad = this._game._loadedAssets["ITEM_sword_01"];
         const weaponMesh = weaponLoad.meshes[0];
-        const weaponMeshMerged = await mergeMesh(weaponMesh);
+        this._game._loadedAssets["ITEM_sword_01"] = await mergeMesh(weaponMesh);
 
         // preload skeletons and animation
-        await this.prepareMesh(this._game._loadedAssets["RACE_male_knight"], "male_knight");
-        //await this.prepareMesh(this._game._loadedAssets["RACE_male_mage"], "male_mage");
+        await Promise.all(
+            this.SPAWN_INFO.map(async (spawn) => {
+                await this.prepareMesh(spawn);
+            })
+        );
 
-        ///
-        const createInst = (id, animIndex) => {
-            const index = this.RACES[Math.floor(Math.random() * this.RACES.length)];
-            const playerInstance = this.playerMesh.createInstance("player_" + id);
-            playerInstance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-            setAnimationParameters(playerInstance.instancedBuffers.bakedVertexAnimationSettingsInstanced, animIndex, this.animationRanges);
-            playerInstance.position.x = randomNumberInRange(-this.PLANE_SIZE, this.PLANE_SIZE);
-            playerInstance.position.z = randomNumberInRange(-this.PLANE_SIZE, this.PLANE_SIZE);
-            playerInstance.rotation.y = 0;
-            this.createLabel(playerInstance, id);
-
-            // attach weapon
-            let rand = Math.random();
-            if (weaponMeshMerged && rand > 0.5) {
-                const weapon = weaponMeshMerged.createInstance("player_" + id + "_sword");
-                const skeletonAnim = this.skeletonForAnim[animIndex];
-                let bone = skeletonAnim.bones[12];
-                weapon.attachToBone(bone, playerInstance);
+        for (const spawn of this.SPAWN_INFO) {
+            for (let i = 0; i < spawn.amount; i++) {
+                this.createInst(spawn.key, i + "", 1);
             }
-        };
-
-        for (let i = 0; i < this.INST_COUNT; i++) {
-            createInst(i + "", Math.floor(Math.random() * this.selectedAnimationGroups.length));
         }
 
+        // render animations
         this._scene.registerBeforeRender(() => {
-            this.vatManager.time += this._scene.getEngine().getDeltaTime() / 1000.0;
+            for (const spawnInfo of this.SPAWN_INFO) {
+                let entityData = this.entityData[spawnInfo.key];
 
-            this.skeletonForAnim.forEach((skel) => {
-                skel.prepare();
-            });
+                entityData.vat.time += this._scene.getEngine().getDeltaTime() / 1000.0;
+                const frame = entityData.vat.time * 60 + frameOffset;
 
-            const frame = this.vatManager.time * 60 + frameOffset;
+                // prepare skeleton
+                entityData.skeletonForAnim.forEach((skel) => {
+                    skel.prepare();
+                });
 
-            this.selectedAnimationGroups.forEach((animationGroup) => {
-                animationGroup.goToFrame(frame);
-            });
+                //
+                if (entityData.selectedAnimationGroups) {
+                    entityData.selectedAnimationGroups.forEach((animationGroup) => {
+                        const frameRange = animationGroup.to - animationGroup.from;
+                        animationGroup.goToFrame(animationGroup.from + (frame % Math.trunc(frameRange)));
+                    });
+                }
+            }
         });
 
-        //
-        for (const animationGroup of this.animationGroups) {
-            const indexAnim = this.PICKED_ANIMS.indexOf(animationGroup.name);
-            if (indexAnim >= 0) {
-                AnimationHelper.RetargetAnimationGroupToRoot(animationGroup, this.rootForAnim[indexAnim]);
-                AnimationHelper.RetargetSkeletonToAnimationGroup(animationGroup, this.skeletonForAnim[indexAnim]);
-                animationGroup.play(true);
+        // retarget animations
+        for (const spawnInfo of this.SPAWN_INFO) {
+            let entityData = this.entityData[spawnInfo.key];
+            if (entityData.animationGroups) {
+                for (const animationGroup of entityData.animationGroups) {
+                    const indexAnim = spawnInfo.PICKED_ANIMS.indexOf(animationGroup.name);
+                    if (indexAnim >= 1) {
+                        AnimationHelper.RetargetAnimationGroupToRoot(animationGroup, entityData.rootForAnim[indexAnim]);
+                        AnimationHelper.RetargetSkeletonToAnimationGroup(animationGroup, entityData.skeletonForAnim[indexAnim]);
+                        animationGroup.play(true);
+                    }
+                }
             }
         }
     }
 
-    async prepareMesh(asset, key) {
-        //const { meshes, animationGroups, skeletons } = await SceneLoader.ImportMeshAsync("", "./models/races/", key + ".glb", this._scene);
+    ///
+    createInst(key, id, animIndex) {
+        let sessionId = nanoid();
+        let entityData = this.entityData[key];
+
+        const playerInstance = entityData.mesh.createInstance("player_" + id);
+        playerInstance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+        setAnimationParameters(playerInstance.instancedBuffers.bakedVertexAnimationSettingsInstanced, animIndex, entityData.animationRanges);
+        playerInstance.position.x = randomNumberInRange(-this.PLANE_SIZE, this.PLANE_SIZE);
+        playerInstance.position.z = randomNumberInRange(-this.PLANE_SIZE, this.PLANE_SIZE);
+        playerInstance.rotation.y = 0;
+        this.createLabel(playerInstance, id);
+
+        // attach weapon
+        let weaponMeshMerged = this._game._loadedAssets["ITEM_sword_01"];
+        let rand = Math.random();
+        if (weaponMeshMerged && rand > 0.5) {
+            const weapon = weaponMeshMerged.createInstance("player_" + id + "_sword");
+            const skeletonAnim = entityData.skeletonForAnim[animIndex];
+            let bone = skeletonAnim.bones[38];
+            weapon.attachToBone(bone, playerInstance);
+        }
+
+        // save entity
+        this.entities.set(sessionId, entityData);
+    }
+
+    getAnimationGroups(animationGroups, raceAnimations) {
+        let anims: AnimationGroup[] = [];
+        for (let i in raceAnimations) {
+            let animationGroup = raceAnimations[i];
+            if (animationGroups[animationGroup.animation_id]) {
+                anims.push(animationGroups[animationGroup.animation_id]);
+            }
+        }
+        return anims;
+    }
+
+    async prepareMesh(spawnInfo) {
+        let asset = this._game._loadedAssets["RACE_" + spawnInfo.key];
+        let race = this._game.getGameData("race", spawnInfo.key);
+        let key = spawnInfo.key;
+
         const meshes = asset.meshes;
         const animationGroups = asset.animationGroups;
         const skeletons = asset.skeletons;
@@ -198,21 +252,30 @@ export class DebugScene {
         const root = meshes[0];
 
         animationGroups.forEach((ag) => ag.stop());
-        this.animationGroups = animationGroups;
-        this.selectedAnimationGroups = animationGroups.filter((ag) => this.PICKED_ANIMS.includes(ag.name));
+
+        //
+        this.entityData[key] = {
+            mesh: false,
+            animationRanges: [],
+            animationGroups: animationGroups,
+            selectedAnimationGroups: this.getAnimationGroups(animationGroups, race.animations),
+            rootForAnim: [],
+            skeletonForAnim: [],
+            vat: new BakedVertexAnimationManager(this._scene),
+        };
 
         // prepare skeletons and root anims
-        this.PICKED_ANIMS.forEach((name) => {
-            const skel = skeleton.clone("skeleton_" + name);
-            this.skeletonForAnim.push(skel);
+        for (let i in race.animations) {
+            const skel = skeleton.clone("skeleton_" + key + "_" + i);
+            this.entityData[key].skeletonForAnim.push(skel);
             const rootAnim = root.instantiateHierarchy(undefined, { doNotInstantiate: true }, (source, clone) => {
                 clone.name = source.name;
             });
             if (rootAnim) {
-                rootAnim.name = "_root_" + name;
-                this.rootForAnim.push(rootAnim);
+                rootAnim.name = "_root_" + i;
+                this.entityData[key].rootForAnim.push(rootAnim);
             }
-        });
+        }
 
         // reset position & rotation
         // not sure why?
@@ -222,7 +285,7 @@ export class DebugScene {
         root.rotation.setAll(0);
 
         // calculate animations ranges
-        const ranges = calculateRanges(this.selectedAnimationGroups);
+        const ranges = calculateRanges(this.entityData[key].selectedAnimationGroups);
 
         // merge mesh
         const merged = mergeMeshAndSkeleton(root, skeleton);
@@ -233,47 +296,48 @@ export class DebugScene {
         // setup vat
         if (merged) {
             // save data
-            this.playerMesh = merged;
-            this.animationRanges = ranges;
+            this.entityData[key].mesh = merged;
+            this.entityData[key].animationRanges = ranges;
 
             //
             merged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
             merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-
-            // bake VAT
-            merged.bakedVertexAnimationManager = this.vatManager;
+            merged.bakedVertexAnimationManager = this.entityData[key].vat;
             merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
 
-            // bake vertex data
-            //this.bakeToJson(merged, this.selectedAnimationGroups);
+            // bake to file
+            //await this.bakeTextureAnimation(key, merged);
 
             // bake realtime
-            const b = new VertexAnimationBaker(this._scene, merged);
-            const bufferFromMesh = await bakeVertexData(merged, this.selectedAnimationGroups);
-            const buffer = bufferFromMesh;
-            this.vatManager.texture = b.textureFromBakedVertexData(buffer);
+            //await this.bakeTextureAnimationRealtime(key, merged);
 
-            /*
             // load prebaked vat animations
+            await this.loadBakedAnimation(key, merged);
 
-            const b = new VertexAnimationBaker(this._scene, merged);
-            let req = await request("get", "./models/races/male_adventurer.json", {}, false, { headers: { "Content-Type": "application/json" } });
-            let bufferFromMesh = b.loadBakedVertexDataFromJSON(JSON.parse(req.data));
-            this.vatManager.texture = b.textureFromBakedVertexData(bufferFromMesh);*/
-
-            //dispose resources
-            /*
-            meshes.forEach((m) => m.dispose(false, true));
-            this.animationGroups.forEach((ag) => ag.dispose());
-            skeletons.forEach((s) => s.dispose());*/
+            //merged.setEnabled(false);
         }
     }
 
-    async bakeToJson(merged, selectedAnimationGroups) {
+    async bakeTextureAnimation(key: string, merged) {
         const b = new VertexAnimationBaker(this._scene, merged);
-        const bufferFromMesh = await bakeVertexData(merged, selectedAnimationGroups);
+        const bufferFromMesh = await bakeVertexData(merged, this.entityData[key].selectedAnimationGroups);
         let vertexDataJson = b.serializeBakedVertexDataToJSON(bufferFromMesh);
         new JavascriptDataDownloader(vertexDataJson).download();
+    }
+
+    async bakeTextureAnimationRealtime(key: string, merged) {
+        const b = new VertexAnimationBaker(this._scene, merged);
+        const bufferFromMesh = await bakeVertexData(merged, this.entityData[key].selectedAnimationGroups);
+        const buffer = bufferFromMesh;
+        this.entityData[key].vat.texture = b.textureFromBakedVertexData(buffer);
+    }
+
+    async loadBakedAnimation(key: string, merged) {
+        const b = new VertexAnimationBaker(this._scene, merged);
+        const req = await fetch("./models/races/vat/" + key + ".json");
+        const json = await req.json();
+        let bufferFromMesh = await b.loadBakedVertexDataFromJSON(json);
+        this.entityData[key].vat.texture = b.textureFromBakedVertexData(bufferFromMesh);
     }
 
     createLabel(mesh, delta) {

@@ -127,6 +127,12 @@ export class AssetsController {
         await this.prepareTextures();
     }
 
+    public async load() {
+        this.assetToPreload = this.assetDatabase;
+        await this.preloadAssets();
+        await this.prepareTextures();
+    }
+
     public async fetchAsset(key) {
         // is asset is database
         let entry = this.assetDatabase.find((el: AssetEntry) => {
