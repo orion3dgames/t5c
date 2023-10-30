@@ -44,7 +44,7 @@ const setAnimationParameters = function (vec, animIndex, ranges) {
     const anim = ranges[animIndex];
     const from = Math.floor(anim.from);
     const to = Math.floor(anim.to);
-    const ofst = 6;
+    const ofst = 0;
     vec.set(from, to - 1, ofst, 60); // skip one frame to avoid weird artifacts
     return animIndex;
 };
