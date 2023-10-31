@@ -28,55 +28,70 @@ export class EntityAnimator {
     }
 
     private _build(): void {
+        /////////// essential animations
         // find animations
         let idleAnimation = this._entity.animations["IDLE"] ?? 0;
         let walkAnimation = this._entity.animations["WALK"] ?? 0;
         let attackAnimation = this._entity.animations["ATTACK"] ?? 0;
         let deathAnimation = this._entity.animations["DEATH"] ?? 0;
-        let takingDamageAnimation = this._entity.animations["DAMAGE"];
-        let castingAnimation = this._entity.animations["CASTING"] ?? 0;
-        let castingShootAnimation = this._entity.animations["CAST"] ?? 0;
-        let pickupAnimation = this._entity.animations["PICKUP"] ?? 0;
 
         // find animations
         let idleAnimationNumber = idleAnimation.animation_id;
         let walkAnimationNumber = walkAnimation.animation_id;
         let attackAnimationNumber = attackAnimation.animation_id;
         let deathAnimationNumber = deathAnimation.animation_id;
-        let takingDamageAnimationNumber = takingDamageAnimation.animation_id;
-        let castingAnimationNumber = castingAnimation.animation_id;
-        let castingShootAnimationNumber = castingShootAnimation.animation_id;
-        let pickupAnimationNumber = pickupAnimation.animation_id;
 
         // set animations
         this._idle = this._playerAnimations[idleAnimationNumber];
         this._walk = this._playerAnimations[walkAnimationNumber];
         this._attack = this._playerAnimations[attackAnimationNumber];
         this._death = this._playerAnimations[deathAnimationNumber];
-        this._damage = this._playerAnimations[takingDamageAnimationNumber];
-        this._casting = this._playerAnimations[castingAnimationNumber];
-        this._cast = this._playerAnimations[castingShootAnimationNumber];
-        this._pickup = this._playerAnimations[pickupAnimationNumber];
-
-        // stop all animations
-        this._playerAnimations[0].stop();
 
         // set if animation is looped
         this._idle.loopAnimation = true;
         this._walk.loopAnimation = true;
         this._attack.loopAnimation = true;
         this._death.loopAnimation = false;
-        this._damage.loopAnimation = true;
-        this._casting.loopAnimation = true;
-        this._cast.loopAnimation = false;
-        this._pickup.loopAnimation = false;
 
         // set animation speed
-        this._walk.speedRatio = 1.5;
-        this._attack.speedRatio = 1.1;
-        this._cast.speedRatio = 2;
-        this._pickup.speedRatio = 2;
-        this._death.speedRatio = 1;
+        this._idle.speedRatio = idleAnimation.speed;
+        this._walk.speedRatio = walkAnimation.speed;
+        this._attack.speedRatio = attackAnimation.speed;
+        this._death.speedRatio = deathAnimation.speed;
+
+        //////////// optional animations
+        //
+        let takingDamageAnimation = this._entity.animations["DAMAGE"] ?? false;
+        if (takingDamageAnimation) {
+            let takingDamageAnimationNumber = takingDamageAnimation.animation_id ?? 0;
+            this._damage = this._playerAnimations[takingDamageAnimationNumber];
+            this._damage.loopAnimation = true;
+            this._damage.speedRatio = takingDamageAnimation.speed;
+        }
+
+        let castingAnimation = this._entity.animations["CASTING"] ?? false;
+        if (castingAnimation) {
+            let castingAnimationNumber = castingAnimation.animation_id ?? 0;
+            this._casting = this._playerAnimations[castingAnimationNumber];
+            this._casting.loopAnimation = true;
+            this._casting.speedRatio = castingAnimation.speed;
+        }
+
+        let castingShootAnimation = this._entity.animations["CAST"] ?? false;
+        if (castingShootAnimation) {
+            let castingShootAnimationNumber = castingShootAnimation.animation_id ?? 0;
+            this._cast = this._playerAnimations[castingShootAnimationNumber];
+            this._cast.loopAnimation = false;
+            this._cast.speedRatio = castingShootAnimation.speed;
+        }
+
+        let pickupAnimation = this._entity.animations["PICKUP"] ?? false;
+        if (pickupAnimation) {
+            let pickupAnimationNumber = pickupAnimation.animation_id ?? 0;
+            this._pickup = this._playerAnimations[pickupAnimationNumber];
+            this._pickup.loopAnimation = false;
+            this._pickup.speedRatio = pickupAnimation.speed;
+        }
 
         //initialize current and previous
         this._currentAnim = this._idle;
