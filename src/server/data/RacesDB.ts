@@ -120,6 +120,32 @@ let RacesDB: raceDataMap = {
         default_abilities: ["base_attack"],
         materials: [{ title: "Color 1", material: "rogue_texture.png" }],
     },
+    rat_01: {
+        key: "rat_01",
+        title: "Rat",
+        description: "To be written...",
+        icon: "ICON_RACE_male_mage",
+        speed: 0.1,
+        scale: 0.3,
+        rotationFix: Math.PI,
+        meshIndex: 1,
+        animations: {
+            IDLE: { animation_id: 2, duration: 1000, speed: 1 },
+            WALK: { animation_id: 5, duration: 1000, speed: 1.3 },
+            ATTACK: { animation_id: 0, duration: 1000, speed: 1 },
+            DEATH: { animation_id: 1, duration: 1000, speed: 1 },
+        },
+        bones: {},
+        baseHealth: 50,
+        baseMana: 50,
+        healthRegen: 0.2,
+        manaRegen: 0.4, // per second
+        experienceGain: { min: 2000, max: 4000 },
+        goldGain: { min: 120, max: 250 },
+        drops: [LootTableEntry("sword_01", 10, 1, 1, 1, 1)],
+        default_abilities: ["base_attack"],
+        materials: [],
+    },
 };
 
 export { RacesDB };

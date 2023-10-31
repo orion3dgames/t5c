@@ -145,14 +145,15 @@ export class Player extends Entity {
             // if targets is aggresive
             // note: need to find a better wayt to do this, not linked to hotbar
             if (target.spawnInfo.aggressive) {
+                /*
                 // send to server
                 this._room.send(ServerMsg.PLAYER_HOTBAR_ACTIVATED, {
                     senderId: this._room.sessionId,
                     targetId: target ? target.sessionId : false,
                     digit: 1,
                 });
-
                 return false;
+                */
             }
 
             // if interactable target

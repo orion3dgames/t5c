@@ -130,7 +130,7 @@ export class EntityMesh {
         this.playerMesh = playerMesh;
 
         // change player texture
-        if (this._entity.material > -1) {
+        if (this._entity.material > -1 && this._entity.materials.length > 0) {
             // remove exisiting materials and texture
             const allChildMeshes = this.playerMesh.getChildMeshes(false);
             const selectedMaterial = allChildMeshes[0].material ?? false;

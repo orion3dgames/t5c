@@ -369,7 +369,7 @@ export class DebugScene {
         const b = new VertexAnimationBaker(this._scene, merged);
         const bufferFromMesh = await bakeVertexData(merged, this.entityData[key].selectedAnimationGroups);
         let vertexDataJson = b.serializeBakedVertexDataToJSON(bufferFromMesh);
-        new JavascriptDataDownloader(vertexDataJson).download();
+        new JavascriptDataDownloader(vertexDataJson).download("text/json", key + ".json");
     }
 
     async bakeTextureAnimationRealtime(key: string, merged) {
