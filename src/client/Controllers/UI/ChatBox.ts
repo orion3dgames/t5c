@@ -106,6 +106,10 @@ export class ChatBox {
 
         // add stack panel
         const chatStackPanel = new StackPanel("chatStackPanel");
+        chatStackPanel.width = "100%";
+        chatStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        chatStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        chatStackPanel.paddingTop = "5px;";
         chatScrollViewer.addControl(chatStackPanel);
         this._chatUI = chatStackPanel;
 
@@ -220,30 +224,38 @@ export class ChatBox {
             element.dispose();
         });
 
-        // display chat messages
-        let i = 0;
+        this._chatUIScroll.verticalBar.value = 1;
+
         this._game.currentChats.slice().forEach((msg: PlayerMessage) => {
-            // message container
-            var headlineRect = new Rectangle("chatMsgRect_" + i);
+            // container
+            var headlineRect = new Rectangle("chatMsgRect_" + msg.createdAt);
+            headlineRect.width = "100%";
+            headlineRect.thickness = 0;
+            headlineRect.paddingBottom = "1px";
+            headlineRect.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            headlineRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            headlineRect.height = "50px;";
             headlineRect.adaptHeightToChildren = true;
             this._chatUI.addControl(headlineRect);
 
-            // work out the message prefix
             let prefix = "[GLOBAL] " + msg.name + ": ";
             if (this._currentPlayer) {
                 prefix = msg.senderID == this._currentPlayer.sessionId ? "You said: " : "[GLOBAL] " + msg.name + ": ";
             }
 
-            // message textblock
-            var roomTxt = new TextBlock("chatMsgTxt_" + i);
-
+            // message
+            var roomTxt = new TextBlock("chatMsgTxt_" + msg.createdAt);
+            roomTxt.paddingLeft = "5px";
+            roomTxt.text = prefix + msg.message;
+            roomTxt.textHorizontalAlignment = 0;
+            roomTxt.fontSize = "12px";
+            roomTxt.color = msg.color;
+            roomTxt.left = "0px";
             roomTxt.textWrapping = TextWrapping.WordWrap;
             roomTxt.resizeToFit = true;
+            roomTxt.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+            roomTxt.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             headlineRect.addControl(roomTxt);
-
-            i++;
         });
-
-        this._chatUIScroll.verticalBar.value = 1;
     }
 }

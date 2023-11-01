@@ -141,7 +141,7 @@ let RacesDB: raceDataMap = {
         animations: {
             IDLE: { animation_id: 2, duration: 1000, speed: 1 },
             WALK: { animation_id: 5, duration: 1000, speed: 1.3 },
-            ATTACK: { animation_id: 0, duration: 1000, speed: 1 },
+            ATTACK: { animation_id: 0, duration: 1000, speed: 0.75 },
             DEATH: { animation_id: 1, duration: 1000, speed: 1 },
         },
         bones: {},
