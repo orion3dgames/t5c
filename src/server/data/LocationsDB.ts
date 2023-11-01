@@ -284,7 +284,7 @@ let LocationsDB = {
                         new Vector3(2.78, 0.1, -30.45),
                     ],
                     radius: 0,
-                    amount: 10,
+                    amount: 25,
                     race: "rat_01",
                     material: 0,
                     name: "Rat",
