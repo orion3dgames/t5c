@@ -1,4 +1,4 @@
-import { abilityMap, EntityState, CalculationTypes } from "../../shared/types";
+import { abilityMap, EntityState, CalculationTypes, AbilityType, AbilityElement } from "../../shared/types";
 
 let AbilitiesDB: abilityMap = {
     base_attack: {
@@ -20,17 +20,17 @@ let AbilitiesDB: abilityMap = {
             particule: "damage",
             color: "white",
         },
-        affinity: "strength",
         casterPropertyAffected: [],
         targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 4, max: 8 }],
     },
 
-    fireball: {
-        title: "Fireball",
-        key: "fireball",
-        icon: "ICON_ABILITY_fireball",
+    fire_dart: {
+        //-((1d17+6+self.int/23)*self.fire/target.r_fire)
+        title: "Fire dart",
+        key: "fire_dart",
+        icon: "ICON_ABILITY_fire_dart",
         sound: "fire_attack_2",
-        description: "Hurls a massive fiery ball that explodes on contact with target.",
+        description: "Sends a small flaming projectile towards the target.",
         castSelf: false,
         castTime: 1000,
         cooldown: 1000,
@@ -44,20 +44,24 @@ let AbilitiesDB: abilityMap = {
             particule: "fireball",
             color: "orange",
         },
-
-        affinity: "intelligence",
-        casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 15, max: 15 }],
-        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 10, max: 20 }],
-        required_level: 1,
-        value: 100,
+        casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 1, max: 2 }],
+        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 4, max: 6 }],
+        type: AbilityType.PHYSICAL,
+        element: AbilityElement.FIRE,
+        required_level: 2,
+        required_intelligence: 21,
+        required_wisdom: 21,
+        skill_points: 5,
+        value: 532,
     },
 
-    poisonball: {
-        title: "Poison Cloud",
-        key: "poisonball",
-        icon: "ICON_ABILITY_poisonball",
+    poison: {
+        //-((self.int/21)*self.water/target.r_water)
+        title: "Poison",
+        key: "poison",
+        icon: "ICON_ABILITY_poison",
         sound: "fire_attack_2",
-        description: "Trow a bottle of viscous poisonous liquid onto target that will damage target overtime.",
+        description: "Trow a bottle of poisonous liquid onto target that will damage target overtime.",
         castSelf: false,
         castTime: 0,
         cooldown: 10000,
@@ -71,7 +75,6 @@ let AbilitiesDB: abilityMap = {
             particule: "fireball",
             color: "green",
         },
-        affinity: "intelligence",
         casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 5, max: 10 }],
         targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 4, max: 8 }],
         required_level: 3,
@@ -79,10 +82,11 @@ let AbilitiesDB: abilityMap = {
         required_wisdom: 19,
         value: 500,
     },
-    heal: {
-        title: "Heal",
-        key: "heal",
-        icon: "ICON_ABILITY_heal",
+    light_heal: {
+        //(1d5+8+self.wis/23)*self.light/100)
+        title: "Light Heal",
+        key: "light_heal",
+        icon: "ICON_ABILITY_light_heal",
         sound: "heal_1",
         description: "A spell from ancient times that will leave target feeling fresh & revigorated.",
         castSelf: true,
@@ -98,13 +102,13 @@ let AbilitiesDB: abilityMap = {
             particule: "heal",
             color: "white",
         },
-        affinity: "wisdom",
         casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 10, max: 10 }],
         targetPropertyAffected: [{ key: "health", type: CalculationTypes.ADD, min: 30, max: 50 }],
-        required_level: 5,
-        required_intelligence: 20,
-        required_wisdom: 35,
-        value: 1000,
+        required_level: 2,
+        required_intelligence: 15,
+        required_wisdom: 19,
+        skill_points: 9,
+        value: 897,
     },
 };
 

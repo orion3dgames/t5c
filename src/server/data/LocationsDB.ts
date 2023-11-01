@@ -113,14 +113,17 @@ let LocationsDB = {
                     amount: 1,
                     race: "male_mage",
                     material: 2,
-                    name: "Alice",
+                    name: "Kilhiam ",
                     interactable: {
                         title: "Talk",
                         data: [
                             {
                                 type: "text",
-                                text: "Greetings, dear one! I am Priestess Alice, a devoted servant of the benevolent Goddess Athlea. May her light shine upon you.",
+                                text: "Greetings, dear one! I am Priestess Kilhiam, a devoted servant of the benevolent Goddess Athlea. May her light shine upon you.",
                                 quests: [{ key: "LH_DANGEROUS_ERRANDS_01" }],
+                                trainer: {
+                                    abilities: [{ key: "light_heal" }],
+                                },
                                 buttons: [
                                     { label: "Can you heal me?", goToDialog: 1 },
                                     { label: "Sorry, I'm busy adventuring.", goToDialog: 2 },
@@ -157,7 +160,7 @@ let LocationsDB = {
                     amount: 1,
                     race: "male_knight",
                     material: 1,
-                    name: "Trainer",
+                    name: "Iraltok",
                     baseHealth: 5000,
                     interactable: {
                         title: "Talk",
@@ -166,7 +169,7 @@ let LocationsDB = {
                                 type: "text",
                                 text: "Greetings, are you need of training.",
                                 trainer: {
-                                    abilities: [{ key: "fireball" }, { key: "poisonball" }, { key: "heal" }],
+                                    abilities: [{ key: "fire_dart" }, { key: "poison" }],
                                 },
                             },
                         ],

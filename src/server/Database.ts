@@ -306,7 +306,7 @@ class Database {
         ));
 
         // add default abilities
-        let abilities = [{ key: "base_attack" }, { key: "fireball" }];
+        let abilities = [{ key: "base_attack" }, { key: "fire_dart" }];
         abilities.forEach((ability) => {
             const sql_abilities = `INSERT INTO character_abilities ("owner_id", "key") VALUES ("${c.id}", "${ability.key}")`;
             this.run(sql_abilities);
@@ -315,7 +315,7 @@ class Database {
         // add default hotbar
         let hotbar = [
             { digit: 1, type: "ability", key: "base_attack" },
-            { digit: 2, type: "ability", key: "fireball" },
+            { digit: 2, type: "ability", key: "fire_dart" },
             { digit: 8, type: "item", key: "potion_small_red" },
             { digit: 9, type: "item", key: "potion_small_blue" },
         ];

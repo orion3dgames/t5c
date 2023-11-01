@@ -14,8 +14,17 @@ const LEVEL_EXPERIENCE = [
     92590, // Level 7
     137420, // Level 8
     193690, // Level 9
-    262440, // Level 10
-    355720, // Level 11
+    262450, // Level 10
+    344700, // Level 11
+    441442, // Level 12
+    553700, // Level 13
+    682500, // Level 14
+    828700, // Level 15
+    993480, // Level 16
+    1177700, // Level 17
+    1382400, // Level 18
+    1608300, // Level 19
+    1857000, // Level 20
 ];
 
 export class Leveling {

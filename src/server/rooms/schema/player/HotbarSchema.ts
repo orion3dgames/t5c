@@ -12,12 +12,13 @@ export class HotbarSchema extends Schema {
 
     constructor(data) {
         super(data);
+
+        if (data.type === "ability") {
+            Object.assign(this, GameData.get("ability", data.key));
+        }
+        if (data.type === "item") {
+            Object.assign(this, GameData.get("item", data.key));
+        }
         Object.assign(this, data);
-        if (this.type === "ability") {
-            Object.assign(this, GameData.get("ability", this.key));
-        }
-        if (this.type === "item") {
-            Object.assign(this, GameData.get("item", this.key));
-        }
     }
 }

@@ -137,6 +137,18 @@ export enum QuestStatus {
 ///////////////// ABILITIES /////////////////////
 //////////////////////////////////////////////////////////////
 
+export enum AbilityType {
+    PHYSICAL = 0,
+    MENTAL,
+}
+
+export enum AbilityElement {
+    FIRE = 0,
+    WATER,
+    EARTH,
+    LIGHT,
+}
+
 export type Ability = {
     // unique key
     key: string;
@@ -184,13 +196,17 @@ export type Ability = {
         color?: string; // main color of effect
     };
 
-    affinity?: string;
-
     // what properties will affect caster
     casterPropertyAffected: PropertyAffected[];
 
     // what properties will affect caster
     targetPropertyAffected: PropertyAffected[];
+
+    //
+    type?: AbilityType;
+
+    //
+    element?: AbilityElement;
 
     // what properties a player must have to learn this ability
     required_level?: number;
@@ -200,6 +216,10 @@ export type Ability = {
     required_intelligence?: number;
     required_wisdom?: number;
 
+    // skill points
+    skill_points?: number;
+
+    // costs
     value?: number;
 };
 

@@ -59,7 +59,7 @@ export class EntityActions {
         end.y += 1;*/
 
         if (ability.effect.type === "self") {
-            //target = source;
+            target = source;
         }
 
         // set effect
