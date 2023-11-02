@@ -5,7 +5,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { ActionManager } from "@babylonjs/core/Actions/actionManager";
 import { ExecuteCodeAction } from "@babylonjs/core/Actions/directActions";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Matrix, Vector3 } from "@babylonjs/core/Maths/math";
+import { Matrix, Vector3, Vector4 } from "@babylonjs/core/Maths/math";
 import { Entity } from "../Entity";
 import { Skeleton } from "@babylonjs/core/Bones/skeleton";
 import { PlayerSlots } from "../../../shared/types";
@@ -23,6 +23,7 @@ export class EntityMesh {
     private _loadedAssets;
     private _room;
     private _game: GameController;
+    private _entityData;
     private _animationGroups: AnimationGroup[];
     public skeleton: Skeleton;
     public mesh: Mesh;
@@ -40,6 +41,7 @@ export class EntityMesh {
         this._loadedAssets = entity._game._loadedAssets;
         this.isCurrentPlayer = entity.isCurrentPlayer;
         this._room = entity._room;
+        this._entityData = this._game._vatController.entityData.get(this._entity.race);
     }
 
     public async load() {
@@ -81,7 +83,7 @@ export class EntityMesh {
 
         // add selected image
         var material = this._scene.getMaterialByName("entity_selected");
-        const selectedMesh = MeshBuilder.CreateCylinder("entity_selected_" + this._entity.race, { diameter: 2, height: 0.01, tessellation: 10 }, this._scene);
+        const selectedMesh = MeshBuilder.CreateCylinder("entity_selected_" + this._entity.race, { diameter: 2, height: 0.01, tessellation: 8 }, this._scene);
         selectedMesh.parent = box;
         selectedMesh.material = material;
         selectedMesh.isVisible = false;
@@ -91,33 +93,8 @@ export class EntityMesh {
         this.selectedMesh = selectedMesh;
 
         // load player mesh
-        /*
-        let modelToLoad = "RACE_" + this._entity.race;
-        let modelToLoadKey = "LOADED_RACE_" + this._entity.race;
-
-        let mergedMesh = this.mergeMeshAndSkeleton(
-            modelToLoad,
-            this._loadedAssets[modelToLoadKey].rootNodes[0],
-            this._loadedAssets[modelToLoadKey].skeletons[0]
-        );
-        let instance = mergedMesh.createInstance("player_" + this._entity.race);
-        const playerMesh = instance;
-        this._animationGroups = this._loadedAssets[modelToLoadKey].animationGroups;
-        this._skeleton = this._loadedAssets[modelToLoadKey].skeletons[0];
-        */
-
-        // load player mesh
-        // note: instantiateModelsToScene must be set to true so each entity has a specific material
-        let key = "RACE_" + this._entity.race;
-        const result = this._loadedAssets[key].instantiateModelsToScene(() => {
-            return key;
-        }, false);
-        const playerMesh = result.rootNodes[0];
-
-        this._animationGroups = result.animationGroups;
-        this.skeleton = result.skeletons[0];
-
-        // set initial player scale & rotation
+        let materialIndex = this._entity.material ?? 0;
+        const playerMesh = this._entityData.mesh[materialIndex].createInstance(this._entity.type + "" + this._entity.sessionId);
         playerMesh.parent = box;
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
         if (this._entity.rotationFix) {
@@ -127,42 +104,10 @@ export class EntityMesh {
         playerMesh.isPickable = false;
         playerMesh.checkCollisions = false;
         playerMesh.position = new Vector3(0, -1, 0);
+
+        playerMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+
         this.playerMesh = playerMesh;
-
-        // change player texture
-        if (this._entity.material > -1 && this._entity.materials.length > 0) {
-            // remove exisiting materials and texture
-            const allChildMeshes = this.playerMesh.getChildMeshes(false);
-            const selectedMaterial = allChildMeshes[0].material ?? false;
-            const materialIndex = this._entity.material;
-            if (selectedMaterial) {
-                selectedMaterial.dispose();
-            }
-
-            // create a new material based on race and material index
-            let newMaterialName = this._entity.race + "_" + materialIndex;
-            let alreadyExistMaterial = this._scene.getMaterialByName(newMaterialName);
-
-            if (alreadyExistMaterial) {
-                // material already exists
-                allChildMeshes.forEach((element) => {
-                    element.material = alreadyExistMaterial;
-                });
-            } else {
-                // create material as it does not exists
-                let material = new PBRCustomMaterial(newMaterialName);
-                material.albedoTexture = new Texture("./models/races/materials/" + this._entity.materials[materialIndex].material, this._scene, {
-                    invertY: false,
-                });
-                material.reflectionColor = new Color3(0, 0, 0);
-                material.reflectivityColor = new Color3(0, 0, 0);
-
-                //
-                allChildMeshes.forEach((element) => {
-                    element.material = material;
-                });
-            }
-        }
 
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);
@@ -200,29 +145,13 @@ export class EntityMesh {
         );
 
         // check for any equipemnt changes
+        /*
         this._entity.entity.equipment.onAdd((e) => {
             this.refreshMeshes(e);
         });
         this._entity.entity.equipment.onRemove((e) => {
             this.refreshMeshes(e);
-        });
-    }
-
-    mergeMeshAndSkeleton(key, mesh, skeleton) {
-        // pick what you want to merge
-        const allChildMeshes = mesh.getChildTransformNodes(true)[0].getChildMeshes(false);
-
-        // Ignore Backpack because pf different attributes
-        // https://forum.babylonjs.com/t/error-during-merging-meshes-from-imported-glb/23483
-        //const childMeshes = allChildMeshes.filter((m) => !m.name.includes("Backpack"));
-
-        // multiMaterial = true
-        const merged = Mesh.MergeMeshes(allChildMeshes, false, true, undefined, undefined, true);
-        if (merged) {
-            merged.name = key + "_MergedModel";
-            merged.skeleton = skeleton;
-        }
-        return merged;
+        });*/
     }
 
     public freezeMeshes() {
@@ -269,7 +198,7 @@ export class EntityMesh {
     ///////////// EQUIPMENT ////////////////////
     ////////////////////////////////////////////////////
 
-    public refreshMeshes(e) {
+    public attachEquipement(e) {
         if (!this._entity.bones) {
             return false;
         }
@@ -293,14 +222,15 @@ export class EntityMesh {
 
                 // if mesh needs to be added
                 if (equipOptions.mesh) {
-                    let boneId = this._entity.bones[key];
-                    let bone = this.skeleton.bones[boneId];
-
                     const weaponMesh = this._loadedAssets["ROOT_ITEM_" + e.key].createInstance("equip_" + this._entity.sessionId + "_" + e.key);
                     weaponMesh.isVisible = true;
                     weaponMesh.isPickable = false;
                     weaponMesh.checkCollisions = false;
                     weaponMesh.receiveShadows = false;
+
+                    const skeletonAnim = this._entityData.skeletonForAnim[this._entity.animatorController._currentAnim];
+                    let boneId = this._entity.bones[key];
+                    let bone = skeletonAnim.bones[boneId];
                     weaponMesh.attachToBone(bone, this.playerMesh);
 
                     // fix for black items
@@ -324,7 +254,7 @@ export class EntityMesh {
                         weaponMesh.position.z += equipOptions.offset_z;
                     }
 
-                    // if rotationFix neede
+                    // if rotationFix needed
                     if (equipOptions.rotation) {
                         // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
                         weaponMesh.rotationQuaternion = null;
@@ -336,6 +266,18 @@ export class EntityMesh {
             }
         });
     }
+
+    /*
+    reattachEquipement(newAnimationIndex) {
+        this.equipments.forEach((item) => {
+            let boneId = this._entity.bones[item.key];
+            let bone = this.skeleton.bones[boneId];
+            item.detachFromBone();
+            const skeletonAnim = this._entityData.skeletonForAnim[newAnimationIndex];
+            let bone = skeletonAnim.bones[12];
+            item.attachToBone(bone, this.mesh);
+        });
+    }*/
 
     public getAnimation() {
         return this._animationGroups;

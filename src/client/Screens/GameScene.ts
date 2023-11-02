@@ -23,6 +23,7 @@ import { PlayerInputs, ServerMsg } from "../../shared/types";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { VatController } from "../Controllers/VatController";
 
 export class GameScene {
     public _game: GameController;
@@ -117,38 +118,18 @@ export class GameScene {
         // initialize assets controller & load level
         this._game.initializeAssetController();
         await this._game._assetsCtrl.loadLevel(location.key);
+        await this._game._assetsCtrl.prepareItems();
         this._game.engine.displayLoadingUI();
 
-        // instanciate items so we can use them later as instances/clones
-        // todo: this is probably a terrible way to do this...
-        await this._instantiate();
+        // preload any skeletons and animation
+        let spawns = location.dynamic.spawns ?? [];
+        this._game._vatController = new VatController(this._game, spawns);
+        await this._game._vatController.initialize();
+
+        console.log(this._game._vatController.entityData);
 
         // init network
         await this._initNetwork();
-    }
-
-    private async _instantiate(): Promise<void> {
-        for (let k in this._game._loadedAssets) {
-            if (k.includes("ITEM_") && this._game._loadedAssets[k] instanceof AssetContainer) {
-                let v = this._game._loadedAssets[k] as AssetContainer;
-                let modelToLoadKey = "ROOT_" + k;
-                const root = v.instantiateModelsToScene(
-                    function () {
-                        return modelToLoadKey;
-                    },
-                    false,
-                    { doNotInstantiate: true }
-                );
-
-                root.rootNodes[0].name = modelToLoadKey;
-                let mergedMesh = mergeMesh(root.rootNodes[0]);
-                if (mergedMesh) {
-                    this._game._loadedAssets[modelToLoadKey] = mergedMesh;
-                    this._game._loadedAssets[modelToLoadKey].isVisible = false;
-                }
-                root.rootNodes[0].dispose();
-            }
-        }
     }
 
     public async loadNavMesh(key) {
@@ -261,6 +242,9 @@ export class GameScene {
                 entity.update(delta);
                 entity.lod(this._currentPlayer);
             }
+
+            // process vat animations
+            this._game._vatController.process();
 
             /////////////////
             // server update rate

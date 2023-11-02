@@ -4,30 +4,58 @@ import { EntityState } from "../../../shared/types";
 
 export class EntityAnimator {
     private _entity;
+    private playerMesh;
+    private entityData;
 
     //animations
     private _playerAnimations: AnimationGroup[];
-    private _idle: AnimationGroup;
-    private _walk: AnimationGroup;
-    private _attack: AnimationGroup;
-    private _death: AnimationGroup;
-    private _damage: AnimationGroup;
-    private _casting: AnimationGroup;
-    private _cast: AnimationGroup;
-    private _pickup: AnimationGroup;
+    private _idle;
+    private _walk;
+    private _attack;
+    private _death;
+    private _damage;
+    private _casting;
+    private _cast;
+    private _pickup;
 
     // current anim status
-    private _currentAnim: AnimationGroup;
-    private _prevAnim: AnimationGroup;
+    public _currentAnim;
+    private _prevAnim;
 
-    constructor(player_animations, entity: Entity) {
+    constructor(entity: Entity) {
+        // get player mesh
+        this.playerMesh = entity.meshController.playerMesh;
+
+        // set default vat animation
+        this.entityData = entity._game._vatController.entityData.get(entity.race);
+
+        /*
         this._playerAnimations = player_animations;
+        this._entity = entity;
+        this._build();
+        */
         this._entity = entity;
 
         this._build();
     }
 
+    private setAnimationParameters(vec, animIndex) {
+        animIndex = animIndex ?? 0;
+        const anim = this.entityData.animationRanges[animIndex];
+        const from = Math.floor(anim.from);
+        const to = Math.floor(anim.to);
+        const ofst = 0;
+        vec.set(from, to - 1, ofst, 60); // skip one frame to avoid weird artifacts
+        return animIndex;
+    }
+
     private _build(): void {
+        this._idle = 0;
+        this._walk = 1;
+        this._attack = 2;
+        this._death = 3;
+
+        /*
         /////////// essential animations
         // find animations
         let idleAnimation = this._entity.animations["IDLE"] ?? 0;
@@ -96,6 +124,7 @@ export class EntityAnimator {
         //initialize current and previous
         this._currentAnim = this._idle;
         this._prevAnim = this._walk;
+        */
     }
 
     //
@@ -146,9 +175,10 @@ export class EntityAnimator {
 
         // play animation and stop previous animation
         if (this._currentAnim != null && this._prevAnim !== this._currentAnim) {
-            this._prevAnim.stop();
-            this._currentAnim.play(this._currentAnim.loopAnimation);
-            this._prevAnim = this._currentAnim;
+            this.setAnimationParameters(this.playerMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim);
+            //this._prevAnim.stop();
+            //this._currentAnim.play(this._currentAnim.loopAnimation);
+            //this._prevAnim = this._currentAnim;
         }
     }
 }

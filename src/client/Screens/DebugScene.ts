@@ -17,13 +17,12 @@ import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 
-import { mergeMesh, calculateRanges, bakeVertexData, setAnimationParameters, mergeMeshAndSkeleton } from "../Entities/Common/VatHelper";
+import { calculateRanges, bakeVertexData, setAnimationParameters } from "../Entities/Common/VatHelper";
 import AnimationHelper from "../Entities/Common/AnimationHelper";
-import { Skeleton } from "@babylonjs/core/Bones/skeleton";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { GameController } from "../Controllers/GameController";
 import { AnimationGroup, InstancedMesh } from "@babylonjs/core";
 import { nanoid } from "nanoid";
+import { mergeMesh, mergeMeshAndSkeleton } from "../Entities/Common/MeshHelper";
 
 class JavascriptDataDownloader {
     private data;

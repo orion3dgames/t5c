@@ -21,6 +21,7 @@ import { EntityState } from "../../shared/types";
 import { PlayerInput } from "../../client/Controllers/PlayerInput";
 import { ActionManager } from "@babylonjs/core/Actions/actionManager";
 import { GameController } from "../Controllers/GameController";
+import { setAnimationParameters } from "./Common/VatHelper";
 
 export class Entity {
     public _scene: Scene;
@@ -143,7 +144,7 @@ export class Entity {
         this._shadow.addShadowCaster(this.meshController.mesh, true);
 
         // add all entity related stuff
-        this.animatorController = new EntityAnimator(this.meshController.getAnimation(), this);
+        this.animatorController = new EntityAnimator(this);
         this.moveController = new EntityMove(this.mesh, this._navMesh, this.isCurrentPlayer, this.speed);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
 
@@ -183,6 +184,10 @@ export class Entity {
         this.characterLabel = this.ui.createEntityLabel(this);
         this.characterChatLabel = this.ui.createEntityChatLabel(this);
         this.interactableButtons = this.ui.createInteractableButtons(this);
+
+        // set default vat animation
+        let entityData = this._game._vatController.entityData.get(this.race);
+        setAnimationParameters(this.playerMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, 0, entityData.animationRanges);
     }
 
     public update(delta): any {
