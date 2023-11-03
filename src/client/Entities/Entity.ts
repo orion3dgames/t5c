@@ -260,7 +260,7 @@ export class Entity {
 
         ////////////////////////////////////
         // animate player continuously
-        this.animatorController.animate(this, this.mesh.position, this.moveController.getNextPosition());
+        this.animatorController.animate(this, delta);
     }
 
     public getPosition() {
