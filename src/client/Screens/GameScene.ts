@@ -126,7 +126,6 @@ export class GameScene {
         this._game._vatController = new VatController(this._game, spawns);
         await this._game._vatController.initialize();
         await this._game._vatController.check(this._game._currentCharacter.race);
-
         console.log(this._game._vatController.entityData);
 
         // init network

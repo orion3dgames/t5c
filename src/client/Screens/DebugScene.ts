@@ -141,20 +141,8 @@ export class DebugScene {
     public results;
     public SPAWN_INFO = [
         {
-            key: "male_rogue",
-            name: "Bandit",
-            material: 0,
-            amount: 70,
-        },
-        {
-            key: "male_mage",
-            name: "Bandit",
-            material: 0,
-            amount: 70,
-        },
-        {
-            key: "male_knight",
-            name: "Bandit",
+            key: "rat_01",
+            name: "Rat",
             material: 0,
             amount: 70,
         },
@@ -354,19 +342,19 @@ export class DebugScene {
             });
 
             // bake to file
-            //await this.bakeTextureAnimation(key, merged);
+            await this.bakeTextureAnimation(key, merged);
 
             // bake realtime
             //await this.bakeTextureAnimationRealtime(key, merged);
 
             // load prebaked vat animations
-            await this.loadBakedAnimation(key, merged);
+            //await this.loadBakedAnimation(key, merged);
         }
     }
 
     async bakeTextureAnimation(key: string, merged) {
         const b = new VertexAnimationBaker(this._scene, merged);
-        const bufferFromMesh = await bakeVertexData(merged, this.entityData[key].selectedAnimationGroups);
+        const bufferFromMesh = await bakeVertexData(merged, this.entityData.get(key).selectedAnimationGroups);
         let vertexDataJson = b.serializeBakedVertexDataToJSON(bufferFromMesh);
         new JavascriptDataDownloader(vertexDataJson).download("text/json", key + ".json");
     }

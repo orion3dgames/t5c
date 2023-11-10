@@ -110,39 +110,36 @@ export class EntityAnimator {
 
             // if player is being attacked
         } else if (player.anim_state === EntityState.TAKING_DAMAGE) {
-            this._currentAnim = this._damage;
-
+            //this._currentAnim = this._damage;
             // if player is being attacked
         } else if (player.anim_state === EntityState.SPELL_CASTING) {
             // if player is castin
-            this._currentAnim = this._casting;
-
+            //this._currentAnim = this._casting;
             // if player launched a spell
         } else if (player.anim_state === EntityState.SPELL_CAST) {
-            this._currentAnim = this._cast;
-
+            //this._currentAnim = this._cast;
             // if player pickup
         } else if (player.anim_state === EntityState.PICKUP) {
-            this._currentAnim = this._pickup;
-
+            //this._currentAnim = this._pickup;
             // all other cases, should be idle
         } else {
-            this._currentAnim = this._death;
+            this._currentAnim = this._idle;
         }
 
         // play animation and stop previous animation
         if (this._currentAnim != null && this._prevAnim !== this._currentAnim) {
-            console.log("CHANGE ANIMATION TO", this._currentAnim);
+            //console.log("CHANGE ANIMATION TO", this._currentAnim);
             this.setAnimationParameters(this.playerMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim, delta);
             this._prevAnim = this._currentAnim;
             this.endOfLoop = false;
         }
 
-        // if animation is loop=false;
+        // if animation is loop=false; and finished playing
         if (this.currentFrame === this.targetFrame && this._currentAnim.loop === false && this.endOfLoop === false) {
-            console.log("ANIMATION FINISHED, STOP ANIMATION ", this.currentFrame, this.targetFrame);
+            //console.log("ANIMATION FINISHED, STOP ANIMATION ", this.currentFrame, this.targetFrame);
             this.playerMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced.set(this.targetFrame, this.targetFrame, 0, 0);
             this.endOfLoop = true;
+            this.entityData.vat.time = 0;
         } else {
             this.currentFrame++;
         }
