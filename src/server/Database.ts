@@ -327,6 +327,8 @@ class Database {
         // default equipment
         const sql_equip = `INSERT INTO character_equipment ("owner_id", "slot", "key") VALUES ("${c.id}", "${PlayerSlots.HEAD}", "helm_01")`;
         this.run(sql_equip);
+        const sql_equip2 = `INSERT INTO character_equipment ("owner_id", "slot", "key") VALUES ("${c.id}", "${PlayerSlots.WEAPON}", "sword_01")`;
+        this.run(sql_equip2);
 
         //
         const sql_quests = `INSERT INTO character_quests ("owner_id", "key", "status", "qty") VALUES ("${c.id}", "LH_DANGEROUS_ERRANDS_01", "0", "5")`;

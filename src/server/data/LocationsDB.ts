@@ -61,9 +61,18 @@ let LocationsDB = {
                     race: "male_rogue",
                     material: 0,
                     name: "Bandit",
-                    equipment: [],
                     baseHealth: 40,
                     baseSpeed: Speed.VERY_SLOW,
+                    equipment: [
+                        {
+                            key: "helm_01",
+                            slot: PlayerSlots.HEAD,
+                        },
+                        {
+                            key: "sword_01",
+                            slot: PlayerSlots.WEAPON,
+                        },
+                    ],
                 },
                 {
                     key: "lh_town_thief",
@@ -72,12 +81,22 @@ let LocationsDB = {
                     aggressive: true,
                     canAttack: true,
                     points: [new Vector3(0, 0, 0)],
-                    amount: 10,
+                    amount: 50,
                     race: "male_mage",
                     material: 2,
                     name: "Thief",
                     baseHealth: 25,
                     baseSpeed: Speed.SLOW,
+                    equipment: [
+                        {
+                            key: "helm_01",
+                            slot: PlayerSlots.HEAD,
+                        },
+                        {
+                            key: "sword_01",
+                            slot: PlayerSlots.WEAPON,
+                        },
+                    ],
                 },
                 {
                     key: "lh_town_thief",

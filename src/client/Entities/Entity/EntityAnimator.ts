@@ -133,6 +133,7 @@ export class EntityAnimator {
         if (this._currentAnim != null && this._prevAnim !== this._currentAnim) {
             //console.log("CHANGE ANIMATION TO", this._currentAnim);
             this.setAnimationParameters(this.playerMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim, delta);
+            this._entity.meshController.reattachEquipement(this._currentAnim.index);
             this._prevAnim = this._currentAnim;
             this.endOfLoop = false;
         }

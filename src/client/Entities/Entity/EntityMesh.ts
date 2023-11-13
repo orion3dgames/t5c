@@ -236,6 +236,8 @@ export class EntityMesh {
                     let bone = skeletonAnim.bones[boneId];
                     weaponMesh.attachToBone(bone, this.playerMesh);
 
+                    weaponMesh.metadata = e;
+
                     // fix for black items
                     const selectedMaterial = weaponMesh.material ?? false;
                     if (selectedMaterial) {
@@ -269,17 +271,17 @@ export class EntityMesh {
         });
     }
 
-    /*
     reattachEquipement(newAnimationIndex) {
-        this.equipments.forEach((item) => {
-            let boneId = this._entity.bones[item.key];
-            let bone = this.skeleton.bones[boneId];
+        this.equipments.forEach((item: any) => {
+            let key = PlayerSlots[item.metadata.slot];
+            let boneId = this._entity.bones[key];
             item.detachFromBone();
             const skeletonAnim = this._entityData.skeletonForAnim[newAnimationIndex];
-            let bone = skeletonAnim.bones[12];
+            let bone = skeletonAnim.bones[boneId];
+            console.log(item, key, bone, boneId, newAnimationIndex);
             item.attachToBone(bone, this.mesh);
         });
-    }*/
+    }
 
     public getAnimation() {
         return this._animationGroups;
