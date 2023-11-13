@@ -67,6 +67,9 @@ export class EntityAnimator {
             speed: 1,
             ranges: this.entityData.animationRanges[3],
         };
+
+        this._currentAnim = this._idle;
+        this._prevAnim = this._idle;
     }
 
     private setAnimationParameters(vec, currentAnim, delta = 60) {

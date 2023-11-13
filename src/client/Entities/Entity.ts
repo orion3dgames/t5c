@@ -148,6 +148,9 @@ export class Entity {
         this.moveController = new EntityMove(this.mesh, this._navMesh, this.isCurrentPlayer, this.speed);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
 
+        // attach equipment
+        this.meshController.attachEquipement();
+
         ///////////////////////////////////////////////////////////
         // entity network event
         // colyseus automatically sends entity updates, so let's listen to those changes

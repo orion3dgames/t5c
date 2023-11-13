@@ -1,7 +1,7 @@
 import sqlite3 from "sqlite3";
 import Logger from "./utils/Logger";
 import { nanoid } from "nanoid";
-import { PlayerCharacter, PlayerUser } from "../shared/types";
+import { PlayerCharacter, PlayerSlots, PlayerUser } from "../shared/types";
 import { ParsedQs } from "qs";
 import { InventorySchema } from "./rooms/schema/player/InventorySchema";
 import { AbilitySchema } from "./rooms/schema/player/AbilitySchema";
@@ -323,6 +323,10 @@ class Database {
             const sql = `INSERT INTO character_hotbar ("owner_id", "digit", "type", "key") VALUES ("${c.id}", "${item.digit}", "${item.type}", "${item.key}")`;
             this.run(sql);
         });
+
+        // default equipment
+        const sql_equip = `INSERT INTO character_equipment ("owner_id", "slot", "key") VALUES ("${c.id}", "${PlayerSlots.HEAD}", "helm_01")`;
+        this.run(sql_equip);
 
         //
         const sql_quests = `INSERT INTO character_quests ("owner_id", "key", "status", "qty") VALUES ("${c.id}", "LH_DANGEROUS_ERRANDS_01", "0", "5")`;

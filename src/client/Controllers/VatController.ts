@@ -53,7 +53,7 @@ export class VatController {
                 await this.prepareMesh(spawn.race);
             })
         );
-        //await this.retargetAnimations();
+        await this.retargetAnimations();
     }
 
     async check(race) {
@@ -230,11 +230,11 @@ export class VatController {
         return anims;
     }
 
-    process() {
+    process(delta) {
         const frameOffset = 0;
         this.entityData.forEach((entityData) => {
             entityData.vat.time += this._game.scene.getEngine().getDeltaTime() / 1000.0;
-            const frame = entityData.vat.time * 60 + frameOffset;
+            const frame = entityData.vat.time * delta + frameOffset;
 
             // prepare skeleton (for weapon animations)
             entityData.skeletonForAnim.forEach((skel) => {

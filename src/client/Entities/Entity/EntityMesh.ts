@@ -144,14 +144,13 @@ export class EntityMesh {
             })
         );
 
-        // check for any equipemnt changes
-        /*
+        // check for any equipment changes
         this._entity.entity.equipment.onAdd((e) => {
-            this.refreshMeshes(e);
+            this.attachEquipement();
         });
         this._entity.entity.equipment.onRemove((e) => {
-            this.refreshMeshes(e);
-        });*/
+            this.attachEquipement();
+        });
     }
 
     public freezeMeshes() {
@@ -198,8 +197,12 @@ export class EntityMesh {
     ///////////// EQUIPMENT ////////////////////
     ////////////////////////////////////////////////////
 
-    public attachEquipement(e) {
+    public attachEquipement() {
         if (!this._entity.bones) {
+            return false;
+        }
+
+        if (!this._entity.animatorController) {
             return false;
         }
 
@@ -228,17 +231,16 @@ export class EntityMesh {
                     weaponMesh.checkCollisions = false;
                     weaponMesh.receiveShadows = false;
 
-                    const skeletonAnim = this._entityData.skeletonForAnim[this._entity.animatorController._currentAnim];
+                    const skeletonAnim = this._entityData.skeletonForAnim[this._entity.animatorController._currentAnim.index];
                     let boneId = this._entity.bones[key];
                     let bone = skeletonAnim.bones[boneId];
                     weaponMesh.attachToBone(bone, this.playerMesh);
 
                     // fix for black items
-                    /*
                     const selectedMaterial = weaponMesh.material ?? false;
                     if (selectedMaterial) {
                         selectedMaterial.needDepthPrePass = true;
-                    }*/
+                    }
 
                     // if mesh offset required
                     if (equipOptions.scale) {
