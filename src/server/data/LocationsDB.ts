@@ -128,6 +128,16 @@ let LocationsDB = {
                     race: "male_mage",
                     material: 2,
                     name: "Kilhiam ",
+                    equipment: [
+                        {
+                            key: "helm_01",
+                            slot: PlayerSlots.HEAD,
+                        },
+                        {
+                            key: "sword_01",
+                            slot: PlayerSlots.WEAPON,
+                        },
+                    ],
                     interactable: {
                         title: "Talk",
                         data: [
