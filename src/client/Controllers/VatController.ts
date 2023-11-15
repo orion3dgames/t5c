@@ -37,9 +37,14 @@ export class VatController {
     public _game: GameController;
     private _spawns = [];
     private _entityData = new Map();
+    private _skeletonData = new Map();
 
     public get entityData() {
         return this._entityData;
+    }
+
+    public get skeletonData() {
+        return this._skeletonData;
     }
 
     constructor(game, spawns) {
@@ -233,6 +238,7 @@ export class VatController {
     process(delta) {
         const frameOffset = 0;
         this.entityData.forEach((entityData) => {
+            // player vat
             entityData.vat.time += this._game.scene.getEngine().getDeltaTime() / 1000.0;
             const frame = entityData.vat.time * delta + frameOffset;
 

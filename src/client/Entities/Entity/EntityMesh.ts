@@ -47,8 +47,8 @@ export class EntityMesh {
     public async load() {
         // create collision cube
         const box = MeshBuilder.CreateBox(this._entity.sessionId, { width: 1.5, height: 2.5, depth: 1.5 }, this._scene);
-        box.visibility = 0;
-        box.setPivotMatrix(Matrix.Translation(0, 1, 0), false);
+        box.visibility = 0.2;
+        //box.setPivotMatrix(Matrix.Translation(0, 1, 0), false);
 
         // set collision mesh
         this.mesh = box;
@@ -103,7 +103,7 @@ export class EntityMesh {
         playerMesh.scaling.set(this._entity.scale, this._entity.scale, this._entity.scale);
         playerMesh.isPickable = false;
         playerMesh.checkCollisions = false;
-        playerMesh.position = new Vector3(0, -1, 0);
+        playerMesh.position = new Vector3(0, 0, 0);
 
         playerMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
 
@@ -230,11 +230,13 @@ export class EntityMesh {
                     weaponMesh.isPickable = false;
                     weaponMesh.checkCollisions = false;
                     weaponMesh.receiveShadows = false;
+                    weaponMesh.showBoundingBox = true;
 
                     const skeletonAnim = this._entityData.skeletonForAnim[this._entity.animatorController._currentAnim.index];
                     let boneId = this._entity.bones[key];
                     let bone = skeletonAnim.bones[boneId];
                     weaponMesh.attachToBone(bone, this.playerMesh);
+                    console.log(boneId, skeletonAnim);
 
                     weaponMesh.metadata = e;
 
@@ -272,14 +274,37 @@ export class EntityMesh {
     }
 
     reattachEquipement(newAnimationIndex) {
-        this.equipments.forEach((item: any) => {
-            let key = PlayerSlots[item.metadata.slot];
+        this.equipments.forEach((weaponMesh: any) => {
+            let equipOptions = this._game.getGameData("item", weaponMesh.metadata.key);
+            let key = PlayerSlots[weaponMesh.metadata.slot];
             let boneId = this._entity.bones[key];
-            item.detachFromBone();
+            weaponMesh.detachFromBone(true);
             const skeletonAnim = this._entityData.skeletonForAnim[newAnimationIndex];
             let bone = skeletonAnim.bones[boneId];
-            console.log(item, key, bone, boneId, newAnimationIndex);
-            item.attachToBone(bone, this.mesh);
+            weaponMesh.attachToBone(bone, this.mesh);
+
+            // if rotationFix needed
+            if (equipOptions.rotation) {
+                // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
+                weaponMesh.rotationQuaternion = null;
+                weaponMesh.rotation.set(equipOptions.rotation, this._entity.rotationFix, 0);
+            } else {
+                weaponMesh.rotation.set(0, this._entity.rotationFix, 0);
+            }
+
+            // if mesh offset required
+            if (equipOptions.scale) {
+                weaponMesh.scaling = new Vector3(equipOptions.scale, equipOptions.scale, equipOptions.scale);
+            }
+            if (equipOptions.offset_x) {
+                weaponMesh.position.x += equipOptions.offset_x;
+            }
+            if (equipOptions.offset_y) {
+                weaponMesh.position.y += equipOptions.offset_y;
+            }
+            if (equipOptions.offset_z) {
+                weaponMesh.position.z += equipOptions.offset_z;
+            }
         });
     }
 

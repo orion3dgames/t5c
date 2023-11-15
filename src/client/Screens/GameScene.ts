@@ -236,15 +236,15 @@ export class GameScene {
             let delta = this._game.engine.getFps();
             let timeNow = Date.now();
 
+            // process vat animations
+            this._game._vatController.process(delta);
+
             // entities update 60fps
             for (let sessionId in this._entities) {
                 const entity = this._entities[sessionId];
                 entity.update(delta);
                 //entity.lod(this._currentPlayer);
             }
-
-            // process vat animations
-            this._game._vatController.process(delta);
 
             /////////////////
             // server update rate
