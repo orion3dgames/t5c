@@ -1,18 +1,17 @@
 // colyseus
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { GameController } from "./GameController";
-import { bakeVertexData, calculateRanges, setAnimationParameters } from "../Entities/Common/VatHelper";
+import { bakeVertexData, calculateRanges } from "../Entities/Common/VatHelper";
 import { BakedVertexAnimationManager } from "@babylonjs/core/BakedVertexAnimation/bakedVertexAnimationManager";
-import { Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
+import { Vector4 } from "@babylonjs/core/Maths/math.vector";
 import { VertexAnimationBaker } from "@babylonjs/core/BakedVertexAnimation/vertexAnimationBaker";
 import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
 import AnimationHelper from "../Entities/Common/AnimationHelper";
-import { mergeMesh, mergeMeshAndSkeleton } from "../Entities/Common/MeshHelper";
+import { mergeMeshAndSkeleton } from "../Entities/Common/MeshHelper";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Material, PBRMaterial } from "@babylonjs/core";
 import { PBRCustomMaterial } from "@babylonjs/materials/custom/pbrCustomMaterial";
-import { PlayerSlots } from "../../shared/types";
-import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 
 class JavascriptDataDownloader {
     private data;
@@ -59,12 +58,27 @@ export class VatController {
                 await this.prepareMesh(spawn.race);
             })
         );
+        await this.retargetAnimations();
     }
 
     async check(race) {
         if (!this._entityData.has(race)) {
             await this.prepareMesh(race);
         }
+    }
+
+    // retarget animations for equipment
+    async retargetAnimations() {
+        this.entityData.forEach((entityData) => {
+            let indexAnim = 0;
+            for (const animationGroup of entityData.selectedAnimationGroups) {
+                AnimationHelper.RetargetAnimationGroupToRoot(animationGroup, entityData.rootForAnim[indexAnim]);
+                AnimationHelper.RetargetSkeletonToAnimationGroup(animationGroup, entityData.skeletonForAnim[indexAnim]);
+                animationGroup.play(true);
+                entityData.rootForAnim[indexAnim].setEnabled(false);
+                indexAnim++;
+            }
+        });
     }
 
     async prepareMesh(key) {
@@ -82,14 +96,29 @@ export class VatController {
 
         const selectedAnimationGroups = this.getAnimationGroups(animationGroups, race.animations);
 
-        // calculate animations ranges
-        const ranges = calculateRanges(selectedAnimationGroups);
+        // prepare skeletons and root anims
+        const rootForAnimations: any[] = [];
+        const skeletonForAnim: any[] = [];
+        for (let i in race.animations) {
+            const skel = skeleton.clone("skeleton_" + key + "_" + i);
+            skeletonForAnim.push(skel);
+            const rootAnim = root.instantiateHierarchy(null, { doNotInstantiate: true }, (source, clone) => {
+                clone.name = source.name;
+            });
+            if (rootAnim) {
+                rootAnim.name = "_root_" + i;
+                rootForAnimations.push(rootAnim);
+            }
+        }
 
-        //
+        // reset position & rotation
         root.position.setAll(0);
         root.scaling.setAll(1);
         root.rotationQuaternion = null;
         root.rotation.setAll(0);
+
+        // calculate animations ranges
+        const ranges = calculateRanges(selectedAnimationGroups);
 
         // merge mesh
         const merged = mergeMeshAndSkeleton(root, skeleton);
@@ -123,60 +152,14 @@ export class VatController {
                 mergedMeshes.push(merged);
             }
 
-            // prepare items
-            let items = this._game.loadGameData("items");
-            let itemMeshes = new Map();
-            for (let itemKey in items) {
-                let item = items[itemKey];
-                let slot = item.equippable ? PlayerSlots[item.equippable.slot] : 0;
-                let boneId = race.bones[slot];
-
-                if (slot && boneId) {
-                    let rawMesh = this._game._loadedAssets["ITEM_" + item.key].meshes[0];
-                    rawMesh.position.copyFrom(skeleton.bones[boneId].getAbsolutePosition()); // must be set in Blender
-                    rawMesh.rotationQuaternion = undefined;
-                    rawMesh.rotation.set(0, Math.PI * 1.5, 0); // we must set it in Blender
-                    rawMesh.scaling.setAll(1);
-
-                    let itemMesh = mergeMesh(rawMesh);
-
-                    if (itemMesh) {
-                        // weapon VAT
-                        itemMesh.skeleton = skeleton;
-                        itemMesh.bakedVertexAnimationManager = vat;
-                        itemMesh.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
-                        itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-
-                        // manually set MatricesIndicesKind & MatricesWeightsKind
-                        // https://doc.babylonjs.com/features/featuresDeepDive/mesh/bonesSkeletons#preparing-mesh
-                        const totalCount = itemMesh.getTotalVertices();
-                        const weaponMI: any = [];
-                        const weaponMW: any = [];
-                        for (let i = 0; i < totalCount; i++) {
-                            weaponMI.push(boneId, 0, 0, 0);
-                            weaponMW.push(1, 0, 0, 0);
-                        }
-
-                        itemMesh.setVerticesData(VertexBuffer.MatricesIndicesKind, weaponMI, false);
-                        itemMesh.setVerticesData(VertexBuffer.MatricesWeightsKind, weaponMW, false);
-
-                        //
-                        //itemMesh.setEnabled(false);
-
-                        //
-                        itemMeshes.set(itemKey, itemMesh);
-                    }
-                }
-            }
-
             // save
             this._entityData.set(key, {
                 mesh: mergedMeshes,
                 animationRanges: ranges,
                 selectedAnimationGroups: selectedAnimationGroups,
-                skeleton: skeleton,
+                rootForAnim: rootForAnimations,
+                skeletonForAnim: skeletonForAnim,
                 vat: vat,
-                items: itemMeshes,
             });
 
             // bake to file
@@ -253,8 +236,24 @@ export class VatController {
     }
 
     process(delta) {
+        const frameOffset = 0;
         this.entityData.forEach((entityData) => {
+            // player vat
             entityData.vat.time += this._game.scene.getEngine().getDeltaTime() / 1000.0;
+            const frame = entityData.vat.time * delta + frameOffset;
+
+            // prepare skeleton (for weapon animations)
+            entityData.skeletonForAnim.forEach((skel) => {
+                skel.prepare();
+            });
+
+            // not sure what is the purpose of this block
+            if (entityData.selectedAnimationGroups) {
+                entityData.selectedAnimationGroups.forEach((animationGroup) => {
+                    const frameRange = animationGroup.to - animationGroup.from;
+                    animationGroup.goToFrame(animationGroup.from + (frame % Math.trunc(frameRange)));
+                });
+            }
         });
     }
 }
