@@ -187,10 +187,6 @@ export class Entity {
         this.characterLabel = this.ui.createEntityLabel(this);
         this.characterChatLabel = this.ui.createEntityChatLabel(this);
         this.interactableButtons = this.ui.createInteractableButtons(this);
-
-        // set default vat animation
-        let entityData = this._game._vatController.entityData.get(this.race);
-        setAnimationParameters(this.playerMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, 0, entityData.animationRanges);
     }
 
     public update(delta): any {

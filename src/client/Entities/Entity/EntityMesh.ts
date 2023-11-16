@@ -15,6 +15,9 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { UserInterface } from "../../Controllers/UserInterface";
 import { PBRCustomMaterial, SimpleMaterial } from "@babylonjs/materials";
 import { randomNumberInRange } from "../../../shared/Utils";
+import { mergeMesh } from "../Common/MeshHelper";
+import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
+import { setAnimationParameters } from "../Common/VatHelper";
 
 export class EntityMesh {
     private _entity: Entity;
@@ -47,7 +50,7 @@ export class EntityMesh {
     public async load() {
         // create collision cube
         const box = MeshBuilder.CreateBox(this._entity.sessionId, { width: 1.5, height: 2.5, depth: 1.5 }, this._scene);
-        box.visibility = 0.2;
+        box.visibility = 0;
         //box.setPivotMatrix(Matrix.Translation(0, 1, 0), false);
 
         // set collision mesh
@@ -104,7 +107,6 @@ export class EntityMesh {
         playerMesh.isPickable = false;
         playerMesh.checkCollisions = false;
         playerMesh.position = new Vector3(0, 0, 0);
-
         playerMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
 
         this.playerMesh = playerMesh;
@@ -225,6 +227,54 @@ export class EntityMesh {
 
                 // if mesh needs to be added
                 if (equipOptions.mesh) {
+                    // create instance of mesh
+                    let instance = this._entityData.items.get(item.key).createInstance("equip_" + this._entity.sessionId + "_" + e.key);
+                    instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+
+                    // or like this(so we don't need to sync it every frame)
+                    instance.setParent(this.playerMesh);
+                    instance.position.setAll(0);
+                    instance.rotationQuaternion = undefined;
+                    instance.rotation.setAll(0);
+
+                    // if mesh offset required
+                    if (equipOptions.scale) {
+                        instance.scaling = new Vector3(equipOptions.scale, equipOptions.scale, equipOptions.scale);
+                    }
+                    if (equipOptions.offset_x) {
+                        instance.position.x += equipOptions.offset_x;
+                    }
+                    if (equipOptions.offset_y) {
+                        instance.position.y += equipOptions.offset_y;
+                    }
+                    if (equipOptions.offset_z) {
+                        instance.position.z += equipOptions.offset_z;
+                    }
+
+                    // if rotationFix needed
+                    if (equipOptions.rotation_x || equipOptions.rotation_y || equipOptions.rotation_z) {
+                        // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
+                        instance.rotationQuaternion = null;
+                        instance.rotation.set(equipOptions.rotation_x ?? 0, equipOptions.rotation_y ?? 0, equipOptions.rotation_z ?? 0);
+                    }
+
+                    // add
+                    this.equipments.push(instance);
+
+                    /*
+                        // skin item to player mesh
+                        const totalCount = itemMeshMerged.getTotalVertices();
+                        const weaponMI:any = [];
+                        const weaponMW:any = [];
+                        for (let i = 0; i < totalCount; i++) {
+                            weaponMI.push(boneId, 0, 0, 0);
+                            weaponMW.push(1, 0, 0, 0);
+                        }
+                        itemMeshMerged.setVerticesData(VertexBuffer.MatricesIndicesKind, weaponMI, false);
+                        itemMeshMerged.setVerticesData(VertexBuffer.MatricesWeightsKind, weaponMW, false);
+
+                       
+                    /*
                     const weaponMesh = this._loadedAssets["ROOT_ITEM_" + e.key].createInstance("equip_" + this._entity.sessionId + "_" + e.key);
                     weaponMesh.isVisible = true;
                     weaponMesh.isPickable = false;
@@ -268,42 +318,8 @@ export class EntityMesh {
                     }
 
                     this.equipments.push(weaponMesh);
+                    */
                 }
-            }
-        });
-    }
-
-    reattachEquipement(newAnimationIndex) {
-        this.equipments.forEach((weaponMesh: any) => {
-            let equipOptions = this._game.getGameData("item", weaponMesh.metadata.key);
-            let key = PlayerSlots[weaponMesh.metadata.slot];
-            let boneId = this._entity.bones[key];
-            weaponMesh.detachFromBone(true);
-            const skeletonAnim = this._entityData.skeletonForAnim[newAnimationIndex];
-            let bone = skeletonAnim.bones[boneId];
-            weaponMesh.attachToBone(bone, this.mesh);
-
-            // if rotationFix needed
-            if (equipOptions.rotation) {
-                // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
-                weaponMesh.rotationQuaternion = null;
-                weaponMesh.rotation.set(equipOptions.rotation, this._entity.rotationFix, 0);
-            } else {
-                weaponMesh.rotation.set(0, this._entity.rotationFix, 0);
-            }
-
-            // if mesh offset required
-            if (equipOptions.scale) {
-                weaponMesh.scaling = new Vector3(equipOptions.scale, equipOptions.scale, equipOptions.scale);
-            }
-            if (equipOptions.offset_x) {
-                weaponMesh.position.x += equipOptions.offset_x;
-            }
-            if (equipOptions.offset_y) {
-                weaponMesh.position.y += equipOptions.offset_y;
-            }
-            if (equipOptions.offset_z) {
-                weaponMesh.position.z += equipOptions.offset_z;
             }
         });
     }

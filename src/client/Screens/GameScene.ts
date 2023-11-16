@@ -214,7 +214,7 @@ export class GameScene {
 
             // if item
             if (entity.type === "item") {
-                this._entities[sessionId] = new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._game);
+                //this._entities[sessionId] = new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._game);
             }
         });
 
