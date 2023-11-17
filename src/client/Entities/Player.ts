@@ -37,6 +37,8 @@ export class Player extends Entity {
     public closestEntity;
     public closestEntityDistance;
 
+    public input_sequence: number = 0;
+
     constructor(
         entity: PlayerSchema,
         room: Room,
@@ -191,7 +193,7 @@ export class Player extends Entity {
             let destination = pointerInfo._pickInfo.pickedPoint;
             let pickedMesh = pointerInfo._pickInfo.pickedMesh;
 
-            const foundPath: any = this._navMesh.checkPath(this.getPosition(), destination);
+            const foundPath = this._navMesh.getRegionForPoint(destination);
             if (foundPath) {
                 // remove decal if already exist
                 if (this.moveDecal) {
@@ -255,6 +257,9 @@ export class Player extends Entity {
 
     // update at server rate
     public updateServerRate(delta) {
+        // process player movement
+        this.moveController.processMove();
+
         ///////////// DIALOG ///////////////////////////
         // if moving, look for the closest interactable entities.
         if (this.isMoving) {

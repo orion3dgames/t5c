@@ -1,25 +1,33 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { PlayerInputs } from "../../../shared/types";
+import { PlayerInputs, ServerMsg } from "../../../shared/types";
 import { NavMesh, Vector3 as Vector3Y } from "../../../shared/Libs/yuka-min";
+import { Entity } from "../Entity";
 
 export class EntityMove {
+    private _player;
     private _mesh;
     private speed;
     private _navMesh: NavMesh;
+    private _input;
+    private _room;
     public playerInputs: PlayerInputs[] = [];
     private playerLatestSequence: number;
 
     private nextPosition: Vector3;
     private nextRotation: Vector3;
 
+    private sequence: number = 0;
+
     private isCurrentPlayer: boolean;
 
-    constructor(mesh, navMesh: NavMesh, isCurrentPlayer, speed) {
-        this._mesh = mesh;
-        this._navMesh = navMesh;
-        this.speed = speed;
-        this.isCurrentPlayer = isCurrentPlayer;
+    constructor(player: Entity) {
+        this._player = player;
+        this._mesh = player.mesh;
+        this._navMesh = player._navMesh;
+        this._input = player._input;
+        this._room = player._room;
+        (this.isCurrentPlayer = player.isCurrentPlayer), (this.speed = player.speed);
     }
 
     public getNextPosition() {
@@ -68,6 +76,28 @@ export class EntityMove {
         this.playerInputs.push(latestInput);
     }
 
+    //
+    public processMove() {
+        // detect movement
+        if (this._input.player_can_move && !this._player.blocked) {
+            // increment seq
+            this.sequence++;
+
+            // prepare input to be sent
+            let latestInput = {
+                seq: this.sequence,
+                h: this._input.horizontal,
+                v: this._input.vertical,
+            };
+
+            // sent current input to server for processing
+            this._room.send(ServerMsg.PLAYER_MOVE, latestInput);
+
+            // do client side prediction
+            this.predictionMove(latestInput);
+        }
+    }
+
     public tween() {
         // continuously lerp between current position and next position
         this._mesh.position = Vector3.Lerp(this._mesh.position, this.nextPosition, 0.1);
@@ -98,7 +128,6 @@ export class EntityMove {
         if (this.isCurrentPlayer) {
             let sourcePos = new Vector3Y(oldX, oldY, oldZ); // new pos
             let destinationPos = new Vector3Y(newX, newY, newZ); // new pos
-            //const foundPath: any = this._navMesh.checkPath(sourcePos, destinationPos);
             const foundPath = this._navMesh.getRegionForPoint(destinationPos, 0.5);
             if (foundPath) {
                 // adjust height of the entity according to the ground

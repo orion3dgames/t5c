@@ -144,7 +144,7 @@ export class Entity {
 
         // add all entity related stuff
         this.animatorController = new EntityAnimator(this.meshController.getAnimation(), this);
-        this.moveController = new EntityMove(this.mesh, this._navMesh, this.isCurrentPlayer, this.speed);
+        this.moveController = new EntityMove(this);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
 
         ///////////////////////////////////////////////////////////

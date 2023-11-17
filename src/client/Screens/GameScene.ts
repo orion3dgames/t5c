@@ -249,13 +249,12 @@ export class GameScene {
         // main game loop
         let timeServer = Date.now();
         let timeServerSlow = Date.now();
-        let sequence = 0;
-        let latestInput: PlayerInputs;
         this._scene.registerBeforeRender(() => {
             let delta = this._game.engine.getFps();
             let timeNow = Date.now();
 
-            // entities update 60fps
+            /////////////////
+            // main game loop
             for (let sessionId in this._entities) {
                 const entity = this._entities[sessionId];
                 entity.update(delta);
@@ -278,8 +277,6 @@ export class GameScene {
                         entity.updateSlowRate(5000);
                     }
                 }
-
-                // reset timer
                 timeServerSlow = timeNow;
             }
 
@@ -296,26 +293,6 @@ export class GameScene {
                         entity.updateServerRate(this._game.config.updateRate);
                     }
                 }
-
-                // detect movement
-                if (this._input.player_can_move && !this._currentPlayer.blocked) {
-                    // increment seq
-                    sequence++;
-
-                    // prepare input to be sent
-                    latestInput = {
-                        seq: sequence,
-                        h: this._input.horizontal,
-                        v: this._input.vertical,
-                    };
-
-                    // sent current input to server for processing
-                    this.room.send(ServerMsg.PLAYER_MOVE, latestInput);
-
-                    // do client side prediction
-                    this._currentPlayer.moveController.predictionMove(latestInput);
-                }
-
                 timeServer = timeNow;
             }
         });

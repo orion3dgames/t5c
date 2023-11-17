@@ -73,7 +73,7 @@ export class moveCTRL {
     }
 
     setTargetDestination(targetPos: Vector3): void {
-        const foundPath: any = this._owner._navMesh.checkPath(this._owner.getPosition(), targetPos);
+        const foundPath: any = this._owner._navMesh.checkPoint(targetPos);
         if (foundPath) {
             this._owner.AI_TARGET_WAYPOINTS = this._owner._navMesh.findPath(this._owner.getPosition(), targetPos);
             this._owner.AI_TARGET_WAYPOINTS.push(targetPos);
@@ -159,7 +159,6 @@ export class moveCTRL {
         // check if destination is in navmesh
         let sourcePos = new Vector3(oldX, oldY, oldZ); // new pos
         let destinationPos = new Vector3(newX, newY, newZ); // new pos
-        //const foundPath: any = this._owner._navMesh.checkPath(sourcePos, destinationPos);
         const foundPath = this._owner._navMesh.getRegionForPoint(destinationPos, 0.5);
         if (foundPath) {
             // adjust height of the entity according to the ground
