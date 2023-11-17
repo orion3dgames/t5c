@@ -75,12 +75,8 @@ export class GameRoomState extends Schema {
             });
         }
 
-        // keep updating spawn points every 5 seconds
-        this.spawnTimer += deltaTime;
-        if (this.spawnTimer > this.spawnInterval) {
-            this.spawnTimer = 0;
-            this.spawnCTRL.update();
-        }
+        // spawn
+        this.spawnCTRL.update(deltaTime);
     }
 
     getEntity(sessionId) {

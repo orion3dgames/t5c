@@ -10,8 +10,13 @@ export class spawnCTRL {
     private _state: GameRoomState;
     private _room: GameRoom;
     private _location;
-
     private spawnsAmount = [];
+
+    private SPAWN_RATE = 2;
+    private SPAWN_INTERVAL = 500;
+    private SPAWN_CURRENT = 0;
+
+    private DESPAWN = false;
 
     constructor(state: GameRoomState) {
         this._state = state;
@@ -19,33 +24,46 @@ export class spawnCTRL {
         this._location = this._state.gameData.get("location", this._room.metadata.location);
         this.process();
 
-        for (let i = 0; i < 5; i++) {
-            //this.createItem();
+        for (let i = 0; i < 100; i++) {
+            this.createItem();
         }
     }
 
-    public update() {
-        this.process();
+    public update(delta) {
+        this.SPAWN_CURRENT += delta;
+
+        // spawn every SPAWN_INTERVAL
+        if (this.SPAWN_CURRENT >= this.SPAWN_INTERVAL) {
+            this.process();
+            this.SPAWN_CURRENT = 0;
+        }
     }
 
     public process() {
         //Logger.info("[gameroom][state][spawning] spawnController: " + this._location.key);
         let dynamic = this._location.dynamic;
         let spawns = dynamic.spawns ?? [];
-        spawns.forEach((spawnInfo, index) => {
-            spawnInfo.spawnIndex = "_" + index;
-            spawnInfo.index = index;
-            if (!this.spawnsAmount[spawnInfo.spawnIndex]) {
-                this.spawnsAmount[spawnInfo.spawnIndex] = 0;
+        spawns.forEach((spawn, index) => {
+            // needed later to find spawn details on client???
+            // todo: improve
+            spawn.index = index;
+
+            // if first spawn, set amount to zero
+            if (!this.spawnsAmount[spawn.key]) {
+                this.spawnsAmount[spawn.key] = 0;
             }
-            this.spawn(spawnInfo);
+
+            // only spawn if more are needed
+            if (this.spawnsAmount[spawn.key] < spawn.amount) {
+                this.spawn(spawn);
+            }
         });
     }
 
-    private spawn(e) {
-        for (let i = 0; i < e.amount; i++) {
-            if (this.spawnsAmount[e.spawnIndex] < e.amount) {
-                this.createEntity(e);
+    private spawn(spawn) {
+        for (let i = 0; i < this.SPAWN_RATE; i++) {
+            if (this.spawnsAmount[spawn.key] < spawn.amount) {
+                this.createEntity(spawn);
             }
         }
     }
@@ -83,25 +101,26 @@ export class spawnCTRL {
         //Logger.info("[gameroom][state][createEntity] created new item " + data.key + ": " + sessionId);
     }
 
-    public createEntity(spawnInfo) {
+    public createEntity(spawn) {
         // random id
         let sessionId = nanoid(10);
 
         // monster pool to chose from
-        let raceData = this._state.gameData.get("race", spawnInfo.race);
-        let position = spawnInfo.points[Math.floor(Math.random() * spawnInfo.points.length)];
+        let raceData = this._state.gameData.get("race", spawn.race);
+        let position = spawn.points[Math.floor(Math.random() * spawn.points.length)];
 
-        let health = spawnInfo.baseHealth ?? raceData.baseHealth;
-        let rotation = spawnInfo.rotation ?? randomNumberInRange(0, Math.PI);
-        let speed = spawnInfo.baseSpeed ?? Speed.MEDIUM;
+        let health = spawn.baseHealth ?? raceData.baseHealth;
+        let mana = spawn.baseMana ?? raceData.baseMana;
+        let rotation = spawn.rotation ?? randomNumberInRange(0, Math.PI);
+        let speed = spawn.baseSpeed ?? Speed.MEDIUM;
 
         // create entity
         let data = {
             sessionId: sessionId,
             type: "entity",
             race: raceData.key,
-            material: spawnInfo.material,
-            name: spawnInfo.name,
+            material: spawn.material,
+            name: spawn.name,
             location: this._room.metadata.location,
             x: position.x ?? 0,
             y: position.y ?? 0,
@@ -110,24 +129,24 @@ export class spawnCTRL {
             health: health,
             mana: raceData.baseMana,
             maxHealth: health,
-            maxMana: raceData.baseMana,
+            maxMana: 100,
             speed: speed,
             level: 1,
             anim_state: EntityState.IDLE,
             toRegion: false,
-            AI_SPAWN_INFO: spawnInfo,
-            spawn_id: spawnInfo.index,
-            initial_equipment: spawnInfo.equipment,
+            AI_SPAWN_INFO: spawn,
+            spawn_id: spawn.index,
+            initial_equipment: spawn.equipment,
         };
 
         //
-        this.spawnsAmount[spawnInfo.spawnIndex]++;
+        this.spawnsAmount[spawn.key]++;
 
         // add to manager
         this._state.entityCTRL.add(new BrainSchema(this._state, data));
 
         // log
-        //Logger.info("[gameroom][state][createEntity] created new entity " + raceData.key + ": " + sessionId, spawnInfo);
+        Logger.info("[gameroom][state][createEntity] created new entity " + raceData.key + ": " + sessionId + ":" + mana);
     }
 
     removeEntity(entity) {

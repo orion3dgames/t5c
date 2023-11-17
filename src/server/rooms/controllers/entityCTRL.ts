@@ -3,6 +3,8 @@ import { GameRoomState } from "../state/GameRoomState";
 export class entityCTRL {
     private _state: GameRoomState;
 
+    public player_count: number = 0;
+
     constructor(state) {
         this._state = state;
     }
@@ -37,9 +39,15 @@ export class entityCTRL {
 
     add(entity) {
         this._state.entities.set(entity.sessionId, entity);
+        if (entity.type === "player") {
+            this.player_count++;
+        }
     }
 
     delete(entity) {
         this._state.entities.delete(entity.sessionId);
+        if (entity.type === "player") {
+            this.player_count--;
+        }
     }
 }
