@@ -1886,6 +1886,37 @@ class NavMesh {
     }
 
     /**
+     * Returns a random point on the NavMesh within the given radius of the given position.
+     * todo: work in progress
+     */
+    getRandomPointAround(position, radius = 10) {
+        return new Vector3(0, 0, 0);
+    }
+
+    /**
+     * Returns a random point within a area
+     * todo: work in progress
+     */
+    getRandomPointWithinArea(positions = []) {
+        return new Vector3(0, 0, 0);
+    }
+
+    /**
+     * Returns false if from or to position is outside of the navmesh
+     *
+     * @param {Vector3} position - The end/destination position.
+     * @return {bool} true = on navmesh, false = outside of navmesh
+     */
+    checkPoint(position) {
+        let toRegion = this.getRegionForPoint(position, this.epsilonContainsTest);
+        if (toRegion === null) {
+            // if target are outside the navmesh, return false
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Returns false if from or to position is outside of the navmesh
      *
      * @param {Vector3} from - The start/source position.
