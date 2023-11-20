@@ -281,7 +281,6 @@ export class GameController {
 
     public sendMessage(type: ServerMsg, data: {} = {}) {
         let message = {
-            type: ServerMsg[type], // todo: remove this later, but useful for debugging
             date: new Date().getTime(),
         };
         if (Object.keys(data).length) {

@@ -7,7 +7,7 @@ let LocationsDB = {
         key: "lh_town",
         mesh: "lh_town",
         sun: true,
-        sunIntensity: 1.4,
+        sunIntensity: 0.2,
         fog: false,
         spawnPoint: {
             x: 0,
@@ -135,7 +135,7 @@ let LocationsDB = {
                                 isEndOfDialog: true,
                                 triggeredByClosing: {
                                     type: "cast_ability",
-                                    ability: "heal",
+                                    ability: "light_heal",
                                     target: "target",
                                 },
                             },

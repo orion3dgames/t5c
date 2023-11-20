@@ -58,10 +58,6 @@ export class EntityActions {
         start.y += 1;
         end.y += 1;*/
 
-        if (ability.effect.type === "self") {
-            target = source;
-        }
-
         // set effect
         if (ability.effect.particule === "fireball") {
             this.particule_fireball(source, target, ability.effect.color);

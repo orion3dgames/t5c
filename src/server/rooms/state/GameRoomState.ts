@@ -163,7 +163,7 @@ export class GameRoomState extends Schema {
         ////////// SERVER EVENTS ///////////
         ////////////////////////////////////
 
-        console.log("NEW MESSAGE processMessage", type, data);
+        Logger.info(`[gameroom][` + ServerMsg[type] + `] player message`, data);
 
         if (type === ServerMsg.PING) {
             client.send(ServerMsg.PONG, data);
@@ -301,7 +301,6 @@ export class GameRoomState extends Schema {
             }
 
             if (!hotbarData) {
-                //console.error("hotbarData is invalid", data, playerState.player_data.hotbar);
                 return false;
             }
 
@@ -316,12 +315,9 @@ export class GameRoomState extends Schema {
 
             // if ability
             if (targetState && hotbarData && hotbarData.type === "ability") {
-                console.error("PLAYER_HOTBAR_ACTIVATED", hotbarData.key);
                 playerState.abilitiesCTRL.processAbility(playerState, targetState, data);
                 return false;
             }
-
-            Logger.info(`[gameroom][entity_ability_key] player action processed`, data);
         }
 
         //////////////// DEBUG /////////////////
