@@ -90,8 +90,7 @@ class Database {
             "owner_id" INTEGER,
             "key" TEXT,
             "status" INTEGER DEFAULT 0,
-            "qty" INTEGER DEFAULT 0, 
-            UNIQUE("owner_id","key"),
+            "qty" INTEGER DEFAULT 0,
             UNIQUE("id")
         );`;
 

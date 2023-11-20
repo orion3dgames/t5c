@@ -1902,9 +1902,9 @@ class NavMesh {
     }
 
     /**
-     * Returns false if from or to position is outside of the navmesh
+     * Returns false if a position is outside of the navmesh
      *
-     * @param {Vector3} position - The end/destination position.
+     * @param {Vector3} position - The position to test.
      * @return {bool} true = on navmesh, false = outside of navmesh
      */
     checkPoint(position) {
