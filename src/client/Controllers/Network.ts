@@ -1,6 +1,7 @@
 // colyseus
 import { Client, Room } from "colyseus.js";
 import { isLocal } from "../Utils";
+import { ServerMsg } from "../../shared/types";
 
 export class Network {
     public _client: Client;

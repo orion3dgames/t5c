@@ -149,7 +149,7 @@ export class Player extends Entity {
             if (target.spawnInfo.aggressive) {
                 /*
                 // send to server
-                this._room.send(ServerMsg.PLAYER_HOTBAR_ACTIVATED, {
+                this._game.sendMessage(ServerMsg.PLAYER_HOTBAR_ACTIVATED, {
                     senderId: this._room.sessionId,
                     targetId: target ? target.sessionId : false,
                     digit: 1,
@@ -179,7 +179,9 @@ export class Player extends Entity {
 
         // pick up item
         if (metadata.type === "item") {
-            this._room.send(ServerMsg.PLAYER_PICKUP, metadata.sessionId);
+            this._game.sendMessage(ServerMsg.PLAYER_PICKUP, {
+                sessionId: metadata.sessionId,
+            });
         }
 
         // move to clicked point
@@ -211,7 +213,7 @@ export class Player extends Entity {
                 }, 1000);
 
                 // send to server
-                this._room.send(ServerMsg.PLAYER_MOVE_TO, {
+                this._game.sendMessage(ServerMsg.PLAYER_MOVE_TO, {
                     x: destination._x,
                     y: destination._y,
                     z: destination._z,
@@ -300,7 +302,7 @@ export class Player extends Entity {
             let target = this._game.selectedEntity;
 
             // send to server
-            this._room.send(ServerMsg.PLAYER_HOTBAR_ACTIVATED, {
+            this._game.sendMessage(ServerMsg.PLAYER_HOTBAR_ACTIVATED, {
                 senderId: this._room.sessionId,
                 targetId: target ? target.sessionId : false,
                 digit: digit,

@@ -11,7 +11,7 @@ export class RessurectBox {
     private _UI;
     private _playerUI;
     private _scene: Scene;
-    private _room;
+    private _game;
     private _currentPlayer;
 
     // revive panel
@@ -20,7 +20,7 @@ export class RessurectBox {
     constructor(_UI: UserInterface, _currentPlayer) {
         this._UI = _UI;
         this._playerUI = _UI._playerUI;
-        this._room = _UI._room;
+        this._game = _UI._game;
         this._currentPlayer = _currentPlayer;
         this._createUI();
     }
@@ -66,7 +66,7 @@ export class RessurectBox {
         revivePanel.addControl(reviveButton);
 
         reviveButton.onPointerDownObservable.add(() => {
-            this._room.send(ServerMsg.PLAYER_RESSURECT);
+            this._game.sendMessage(ServerMsg.PLAYER_RESSURECT);
         });
     }
 

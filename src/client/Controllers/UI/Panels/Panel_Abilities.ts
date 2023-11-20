@@ -139,45 +139,6 @@ export class Panel_Abilities extends Panel {
             abilityDescr.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
             abilityDescr.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
             skillsPanel.addControl(abilityDescr);
-
-            /*
-            let entity = this._currentPlayer.entity;
-            if (entity.player_data.abilities[ability.key]) {
-                
-                const abilityLearn = Button.CreateSimpleButton("abilityForget" + ability.key, "Forget");
-                abilityLearn.top = "2px;";
-                abilityLearn.left = "-2px;";
-                abilityLearn.width = "100px;";
-                abilityLearn.height = "30px";
-                abilityLearn.color = "white";
-                abilityLearn.background = "#000";
-                abilityLearn.thickness = 1;
-                abilityLearn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-                abilityLearn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-                skillsPanel.addControl(abilityLearn);
-                abilityLearn.onPointerDownObservable.add(() => {
-                    this._room.send(ServerMsg.PLAYER_LEARN_SKILL, ability.key);
-                });
-                
-            } else {
-                /*
-                const abilityLearn = Button.CreateSimpleButton("abilityLearn" + ability.key, "Learn");
-                abilityLearn.top = "2px;";
-                abilityLearn.left = "-2px;";
-                abilityLearn.width = "100px;";
-                abilityLearn.height = "30px";
-                abilityLearn.color = "white";
-                abilityLearn.background = "#000";
-                abilityLearn.thickness = 1;
-                abilityLearn.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-                abilityLearn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-                skillsPanel.addControl(abilityLearn);
-                abilityLearn.onPointerDownObservable.add(() => {
-                    this._room.send(ServerMsg.PLAYER_LEARN_SKILL, ability.key);
-                });
-                
-            }
-            */
         }
     }
 

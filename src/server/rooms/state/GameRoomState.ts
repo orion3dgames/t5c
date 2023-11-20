@@ -163,6 +163,8 @@ export class GameRoomState extends Schema {
         ////////// SERVER EVENTS ///////////
         ////////////////////////////////////
 
+        console.log("NEW MESSAGE processMessage", type, data);
+
         if (type === ServerMsg.PING) {
             client.send(ServerMsg.PONG, data);
         }
@@ -190,7 +192,8 @@ export class GameRoomState extends Schema {
         /////////////////////////////////////
         // on player learn skill
         if (type === ServerMsg.PLAYER_LEARN_SKILL) {
-            const ability = this.gameData.get("ability", data);
+            let key = data.key;
+            const ability = this.gameData.get("ability", key);
             if (ability) {
                 playerState.abilitiesCTRL.learnAbility(ability);
             }
@@ -199,8 +202,9 @@ export class GameRoomState extends Schema {
         /////////////////////////////////////
         // on player add stat point
         if (type === ServerMsg.PLAYER_ADD_STAT_POINT) {
+            let key = data.key;
             if (playerState.player_data.points > 0) {
-                playerState.player_data[data] += 1;
+                playerState.player_data[key] += 1;
                 playerState.player_data.points -= 1;
             }
         }
@@ -219,8 +223,9 @@ export class GameRoomState extends Schema {
         /////////////////////////////////////
         // on player ressurect
         if (type === ServerMsg.PLAYER_PICKUP) {
+            let sessionId = data.sessionId;
             playerState.abilitiesCTRL.cancelAutoAttack(playerState);
-            const itemState = this.getEntity(data);
+            const itemState = this.getEntity(sessionId);
             if (itemState) {
                 playerState.setTarget(itemState);
             }
@@ -244,7 +249,8 @@ export class GameRoomState extends Schema {
         }
 
         if (type === ServerMsg.PLAYER_SELL_ITEM) {
-            const item = playerState.getInventoryItemByIndex(data);
+            const index = data.index;
+            const item = playerState.getInventoryItemByIndex(index);
             if (item) {
                 playerState.sellItem(item);
             }
@@ -254,7 +260,8 @@ export class GameRoomState extends Schema {
         // on player equip
         // data will equal the inventory index of the clicked item
         if (type === ServerMsg.PLAYER_USE_ITEM) {
-            const item = playerState.getInventoryItemByIndex(data);
+            const index = data.index;
+            const item = playerState.getInventoryItemByIndex(index);
             if (item) {
                 if (item.class === ItemClass.CONSUMABLE) {
                     playerState.consumeItem(item);
@@ -267,7 +274,8 @@ export class GameRoomState extends Schema {
         /////////////////////////////////////
         // on player unequip
         if (type === ServerMsg.PLAYER_UNEQUIP_ITEM) {
-            const item = this.gameData.get("item", data);
+            const key = data.key;
+            const item = this.gameData.get("item", key);
             // does item exist in database
             if (item) {
                 playerState.unequipItem(item.key, item.slot);

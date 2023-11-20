@@ -11,6 +11,7 @@ export class EntityMove {
     private _navMesh: NavMesh;
     private _input;
     private _room;
+    private _game;
     public playerInputs: PlayerInputs[] = [];
     private playerLatestSequence: number;
 
@@ -27,6 +28,7 @@ export class EntityMove {
         this._navMesh = player._navMesh;
         this._input = player._input;
         this._room = player._room;
+        this._game = player._game;
         (this.isCurrentPlayer = player.isCurrentPlayer), (this.speed = player.speed);
     }
 
@@ -91,7 +93,7 @@ export class EntityMove {
             };
 
             // sent current input to server for processing
-            this._room.send(ServerMsg.PLAYER_MOVE, latestInput);
+            this._game.sendMessage(ServerMsg.PLAYER_MOVE, latestInput);
 
             // do client side prediction
             this.predictionMove(latestInput);

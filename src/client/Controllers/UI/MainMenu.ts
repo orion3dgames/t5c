@@ -53,7 +53,7 @@ export class MainMenu {
                 reset: {
                     menuTitle: "Stuck?",
                     click: () => {
-                        this._room.send(ServerMsg.PLAYER_RESET_POSITION);
+                        this._game.sendMessage(ServerMsg.PLAYER_RESET_POSITION);
                     },
                 },
                 quit: {

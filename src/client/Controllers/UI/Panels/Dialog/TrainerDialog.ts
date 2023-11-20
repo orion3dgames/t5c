@@ -241,7 +241,9 @@ export class TrainerDialog {
             titleBloc.addControl(createBtn);
 
             let observable = createBtn.onPointerClickObservable.add(() => {
-                this.panel._room.send(ServerMsg.PLAYER_LEARN_SKILL, ability.key);
+                this.panel._game.sendMessage(ServerMsg.PLAYER_LEARN_SKILL, {
+                    key: ability.key,
+                });
                 if (createBtn.textBlock) {
                     createBtn.textBlock.text = "...";
                 }

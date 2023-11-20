@@ -6,6 +6,7 @@ import { AssetsController } from "./AssetsController";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { Room } from "colyseus.js";
 import { Config } from "../../shared/Config";
+import { ServerMsg } from "../../shared/types";
 
 export class GameController {
     // core
@@ -276,5 +277,18 @@ export class GameController {
         this._currentUser = null;
         this._currentCharacter = null;
         this.setScene(State.LOGIN);
+    }
+
+    public sendMessage(type: ServerMsg, data: {} = {}) {
+        let message = {
+            type: ServerMsg[type], // todo: remove this later, but useful for debugging
+            date: new Date().getTime(),
+        };
+        if (Object.keys(data).length) {
+            for (const [key, value] of Object.entries(data)) {
+                message[key] = value;
+            }
+        }
+        this.currentRoom.send(type, message);
     }
 }

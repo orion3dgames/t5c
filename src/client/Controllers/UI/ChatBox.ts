@@ -197,7 +197,7 @@ export class ChatBox {
 
     // send message to server
     private sendMessage() {
-        this._chatRoom.send(ServerMsg.PLAYER_SEND_MESSAGE, {
+        this._game.sendMessage(ServerMsg.PLAYER_SEND_MESSAGE, {
             name: this._currentPlayer.name,
             message: this._chatInput.text,
             senderId: this._currentPlayer.sessionId,

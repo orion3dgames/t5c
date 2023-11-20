@@ -9,11 +9,13 @@ export class InventoryDropdown {
     private _UI;
     private _selected;
     private _room;
+    private _game;
     private dropdown: StackPanel;
     private _bgColor = "rgba(0,0,0,1";
     constructor(_UI: UserInterface) {
         this._UI = _UI;
         this._room = _UI._room;
+        this._game = _UI._game;
     }
 
     public refresh() {
@@ -57,7 +59,9 @@ export class InventoryDropdown {
             actions.push({
                 title: "Equip Item",
                 click: () => {
-                    this._room.send(ServerMsg.PLAYER_USE_ITEM, inventory.i);
+                    this._game.sendMessage(ServerMsg.PLAYER_USE_ITEM, {
+                        index: inventory.i,
+                    });
                 },
             });
         }
@@ -65,14 +69,19 @@ export class InventoryDropdown {
             actions.push({
                 title: "Use Item",
                 click: () => {
-                    this._room.send(ServerMsg.PLAYER_USE_ITEM, inventory.i);
+                    this._game.sendMessage(ServerMsg.PLAYER_USE_ITEM, {
+                        index: inventory.i,
+                    });
                 },
             });
         }
         actions.push({
             title: "Drop Item(s)",
             click: () => {
-                this._room.send(ServerMsg.PLAYER_DROP_ITEM, { slot: inventory.i, drop_all: true });
+                this._game.sendMessage(ServerMsg.PLAYER_DROP_ITEM, {
+                    slot: inventory.i,
+                    drop_all: true,
+                });
             },
         });
 
@@ -80,7 +89,9 @@ export class InventoryDropdown {
             actions.push({
                 title: "Drop One",
                 click: () => {
-                    this._room.send(ServerMsg.PLAYER_DROP_ITEM, { slot: inventory.i });
+                    this._game.sendMessage(ServerMsg.PLAYER_DROP_ITEM, {
+                        slot: inventory.i,
+                    });
                 },
             });
         }

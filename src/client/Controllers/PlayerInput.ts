@@ -165,7 +165,7 @@ export class PlayerInput {
 
                     // characters
                     if (kbInfo.event.code === "KeyJ") {
-                        this._room.send(ServerMsg.DEBUG_REMOVE_ENTITIES);
+                        this._game.sendMessage(ServerMsg.DEBUG_REMOVE_ENTITIES);
                     }
                     if (kbInfo.event.code === "KeyN") {
                         this._gameScene._navMeshDebug.isVisible = !this._gameScene._navMeshDebug.isVisible;
@@ -179,56 +179,12 @@ export class PlayerInput {
                                 m.isVisible = isVisible;
                             });
                         }
-                        /*
-                        loadedMeshes..forEach((m: Mesh) => {
-                            // default values
-                            m.checkCollisions = false;
-                            m.isPickable = true;
-                            m.receiveShadows = true;
-                            m.metadata = {
-                                type: "environment",
-                            };
-                        });*/
                     }
 
                     // show items toggle
                     if (kbInfo.event.code === "ControlLeft") {
                         this.left_alt_pressed = true;
                     }
-
-                    /*
-                    if (kbInfo.event.code === "ArrowUp") {
-                        this.left_arrow = true;
-                    }
-                    if (kbInfo.event.code === "ArrowDown") {
-                        this.down_arrow = true;
-                    }
-                    if (kbInfo.event.code === "ArrowLeft") {
-                        this.left_arrow = true;
-                    }
-                    if (kbInfo.event.code === "ArrowRight") {
-                        this.right_arrow = true;
-                    }
-
-                    // working on keyboard movement
-                    if (this.left_arrow || this.down_arrow || this.left_arrow || this.right_arrow) {
-                        if (kbInfo.event.code === "ArrowUp") {
-                            this.y = 1;
-                        }
-                        if (kbInfo.event.code === "ArrowDown") {
-                            this.y = -1;
-                        }
-                        if (kbInfo.event.code === "ArrowLeft") {
-                            this.x = 1;
-                        }
-                        if (kbInfo.event.code === "ArrowRight") {
-                            this.x = -1;
-                        }
-                        this.angle = Math.atan2(this.x, this.y);
-                        console.log("KEYBOARD", this.x, this.y, this.angle);
-                        this.calculateVelocityForces();
-                        this.player_can_move = true;
-                    }*/
 
                     break;
 

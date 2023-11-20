@@ -278,7 +278,7 @@ export class VendorDialog {
             this.sellingModeOff();
             if (clicked === false) {
                 clicked = true;
-                this.panel._room.send(ServerMsg.PLAYER_BUY_ITEM, {
+                this.panel._game.sendMessage(ServerMsg.PLAYER_BUY_ITEM, {
                     key: item.key,
                     qty: totalQuantity,
                 });

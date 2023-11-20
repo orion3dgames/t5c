@@ -5,9 +5,11 @@ import { Button } from "@babylonjs/gui/2D/controls/button";
 import { Quest, QuestObjective, QuestObjectiveMap, QuestStatus, ServerMsg } from "../../../../../shared/types";
 import { QuestsHelper } from "../../../../../shared/Class/QuestsHelper";
 import { Control } from "@babylonjs/gui/2D/controls/control";
+import { GameController } from "../../../GameController";
 
 export class QuestDialog {
     private panel: Panel_Dialog;
+    private _game: GameController;
     public currentQuest: Quest;
     public currentLocation;
     public playerQuest;
@@ -22,6 +24,7 @@ export class QuestDialog {
 
     constructor(panel: Panel_Dialog, quest_id) {
         this.panel = panel;
+        this._game = panel._game;
         this.dialogStackPanel = this.panel.dialogStackPanel;
 
         // show back button
@@ -103,7 +106,7 @@ export class QuestDialog {
 
             createBtn.onPointerDownObservable.add(() => {
                 // send event to server
-                this.panel._room.send(ServerMsg.PLAYER_QUEST_UPDATE, {
+                this._game.sendMessage(ServerMsg.PLAYER_QUEST_UPDATE, {
                     key: this.currentQuest.key,
                     status: QuestStatus.READY_TO_COMPLETE,
                 });
@@ -149,7 +152,7 @@ export class QuestDialog {
             this.dialogStackPanel.addControl(dialogBtnAccept);
             dialogBtnAccept.onPointerDownObservable.add(() => {
                 // sent event to server
-                this.panel._room.send(ServerMsg.PLAYER_QUEST_UPDATE, {
+                this._game.sendMessage(ServerMsg.PLAYER_QUEST_UPDATE, {
                     key: this.currentQuest.key,
                     status: QuestStatus.ACCEPTED,
                 });

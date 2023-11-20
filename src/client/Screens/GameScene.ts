@@ -268,7 +268,7 @@ export class GameScene {
             let updateSlow = 5000 / 1000; // game is networked update every 100ms
             if (timePassedSlow >= updateSlow) {
                 // send ping to server
-                this.room.send(ServerMsg.PING, { date: Date.now() });
+                this._game.sendMessage(ServerMsg.PING);
 
                 // update entities
                 for (let sessionId in this._entities) {

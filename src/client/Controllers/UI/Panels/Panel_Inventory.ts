@@ -232,7 +232,9 @@ export class Panel_Inventory extends Panel {
             child.onPointerClickObservable.add((e) => {
                 if (child.metadata.item && e.buttonIndex === 0) {
                     if (this._game.sellingMode) {
-                        this._room.send(ServerMsg.PLAYER_SELL_ITEM, element.i);
+                        this._game.sendMessage(ServerMsg.PLAYER_SELL_ITEM, {
+                            index: element.i,
+                        });
                     }
                 }
                 if (child.metadata.item && e.buttonIndex === 2) {
