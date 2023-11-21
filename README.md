@@ -2,7 +2,6 @@
 Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 
 ## Current progress:
-- can support up to 20 people per map (depends on server of course)
 - fully player authorative movement with client side prediction and server reconciliation
   - diablo like movement using the mouse with the ability to click to move
 - scene management (login, register, character selection, etc...)
@@ -19,7 +18,16 @@ Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 - ability to equip items and see them on your character
 - basic player levelling with experience and ability points
 - fully functional UI (experience bar, abilities bar, draggable panels, etc...)
-- and more... 
+- simple quest system
+- simple trainer system (learn abilities)
+- simple vendor system (buy and sell)
+  
+## Currently working on (21/11/2023)
+
+- vat animation with instances
+ > this should technically allow many more monsters and players, current tests are very promising and should allow up to 200-400 on the screen at the same time
+- damage calculation + progression
+- fine tuning all the current systems
 
 ## Links
 Follow the progress on the official babylon.js forum: [https://forum.babylonjs.com/t/multiplayer-top-down-rpg-babylon-js-colyseus/35733](https://forum.babylonjs.com/t/multiplayer-top-down-rpg-babylon-js-colyseus/35733)
