@@ -190,6 +190,8 @@ export class Entity {
     }
 
     public update(delta): any {
+        this.playerMesh.position = Vector3.Lerp(this.playerMesh.position, this.mesh.position, 0.1);
+
         ////////////////////////////////////
         // what to do when an entity dies
         if (this.health < 1 && !this.isDead) {

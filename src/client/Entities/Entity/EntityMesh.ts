@@ -98,7 +98,8 @@ export class EntityMesh {
         // load player mesh
         let materialIndex = this._entity.material ?? 0;
         const playerMesh = this._entityData.mesh[materialIndex].createInstance(this._entity.type + "" + this._entity.sessionId);
-        playerMesh.parent = box;
+        //playerMesh.parent = box;
+        playerMesh.position.copyFrom(this.mesh.position);
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
         if (this._entity.rotationFix) {
             playerMesh.rotation.set(0, this._entity.rotationFix, 0);
@@ -106,7 +107,6 @@ export class EntityMesh {
         playerMesh.scaling.set(this._entity.scale, this._entity.scale, this._entity.scale);
         playerMesh.isPickable = false;
         playerMesh.checkCollisions = false;
-        playerMesh.position = new Vector3(0, 0, 0);
         playerMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
 
         this.playerMesh = playerMesh;
