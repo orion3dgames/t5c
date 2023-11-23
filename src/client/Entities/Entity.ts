@@ -147,6 +147,10 @@ export class Entity extends TransformNode {
         // add mesh to shadow generator
         //this._shadow.addShadowCaster(this.meshController.mesh, true);
 
+        // set initial position & roation
+        this.position = new Vector3(entity.x, entity.y, entity.z);
+        this.rotation = new Vector3(0, entity.rot, 0);
+
         // add all entity related stuff
         this.animatorController = new EntityAnimator(this);
         this.moveController = new EntityMove(this);
@@ -188,8 +192,8 @@ export class Entity extends TransformNode {
 
         //////////////////////////////////////////////////////////////////////////
         // misc
-        //this.characterLabel = this._ui.createEntityLabel(this);
-        //this.characterChatLabel = this._ui.createEntityChatLabel(this);
+        this.characterLabel = this._ui.createEntityLabel(this);
+        this.characterChatLabel = this._ui.createEntityChatLabel(this);
         this.interactableButtons = this._ui.createInteractableButtons(this);
     }
 
@@ -280,6 +284,11 @@ export class Entity extends TransformNode {
             // hide everything
             this.mesh.setEnabled(false);
             this.mesh.freezeWorldMatrix();
+
+            // hide gui
+            this.characterLabel.isEnabled = false;
+            this.characterChatLabel.isEnabled = false;
+
             this.meshController.equipments?.forEach((equipment) => {
                 equipment.setEnabled(false);
                 equipment.freezeWorldMatrix();
@@ -290,8 +299,14 @@ export class Entity extends TransformNode {
             let playerPos = new Vector3(_currentPlayer.x, _currentPlayer.y, _currentPlayer.z);
             let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
             if (distanceFromPlayer < this._game.config.PLAYER_VIEW_DISTANCE) {
+                // show mesh
                 this.mesh.unfreezeWorldMatrix();
                 this.mesh.setEnabled(true);
+
+                // show gui
+                this.characterLabel.isEnabled = true;
+                this.characterChatLabel.isEnabled = true;
+
                 this.meshController.equipments?.forEach((equipment) => {
                     equipment.unfreezeWorldMatrix();
                     equipment.setEnabled(true);

@@ -99,7 +99,7 @@ let LocationsDB = {
                         },
                     ],
                 },
-                /*
+
                 {
                     key: "lh_town_thief",
                     type: "path",
@@ -254,7 +254,7 @@ let LocationsDB = {
                         ],
                     },
                 },
-                */
+
                 {
                     key: "spawn_dummy",
                     type: "static",
