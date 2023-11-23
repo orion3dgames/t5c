@@ -1,10 +1,11 @@
 import { Scene } from "@babylonjs/core/scene";
-import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+
 import { Room } from "colyseus.js";
 
 import { PlayerCamera } from "./Player/PlayerCamera";
@@ -19,14 +20,14 @@ import { NavMesh } from "../../shared/Libs/yuka-min";
 import { AI_STATE } from "./Entity/AIState";
 import { EntityState } from "../../shared/types";
 import { PlayerInput } from "../../client/Controllers/PlayerInput";
-import { ActionManager } from "@babylonjs/core/Actions/actionManager";
-import { GameController } from "../Controllers/GameController";
-import { setAnimationParameters } from "./Common/VatHelper";
 
-export class Entity {
+import { GameController } from "../Controllers/GameController";
+import { GameScene } from "../Screens/GameScene";
+
+export class Entity extends TransformNode {
     public _scene: Scene;
     public _room: Room;
-    public ui: UserInterface;
+    public _ui: UserInterface;
     public _input: PlayerInput;
     public _shadow;
     public _navMesh;
@@ -42,7 +43,6 @@ export class Entity {
 
     // entity
     public mesh: AbstractMesh; //outer collisionbox of player
-    public playerMesh: AbstractMesh; //outer collisionbox of player
     public playerSkeleton;
     public debugMesh: Mesh;
     public selectedMesh: Mesh;
@@ -98,14 +98,16 @@ export class Entity {
     // flags
     public blocked: boolean = false; // if true, player will not moved
 
-    constructor(entity, room: Room, scene: Scene, ui: UserInterface, shadow: CascadedShadowGenerator, navMesh: NavMesh, game: GameController) {
+    constructor(name: string, scene: Scene, gamescene: GameScene, entity) {
+        super(name, scene);
+
         // setup class variables
         this._scene = scene;
-        this._room = room;
-        this._game = game;
-        this._navMesh = navMesh;
-        this.ui = ui;
-        this._shadow = shadow;
+        this._room = gamescene.room;
+        this._game = gamescene._game;
+        this._navMesh = gamescene._navMesh;
+        this._ui = gamescene._ui;
+        this._shadow = gamescene._shadow;
         this.sessionId = entity.sessionId; // network id from colyseus
         this.isCurrentPlayer = this._room.sessionId === entity.sessionId;
         this.entity = entity;
@@ -135,13 +137,12 @@ export class Entity {
         this.meshController = new EntityMesh(this);
         await this.meshController.load();
         this.mesh = this.meshController.mesh;
-        this.playerMesh = this.meshController.playerMesh;
         this.debugMesh = this.meshController.debugMesh;
         this.selectedMesh = this.meshController.selectedMesh;
         this.playerSkeleton = this.meshController.skeleton;
 
         // add mesh to shadow generator
-        this._shadow.addShadowCaster(this.meshController.mesh, true);
+        //this._shadow.addShadowCaster(this.meshController.mesh, true);
 
         // add all entity related stuff
         this.animatorController = new EntityAnimator(this);
@@ -162,7 +163,7 @@ export class Entity {
             if (this.health !== this.entity.health) {
                 let healthChange = this.entity.health - this.health;
                 if (healthChange < 0 || healthChange > 1) {
-                    this.ui._DamageText.addDamage(this, healthChange);
+                    this._ui._DamageText.addDamage(this, healthChange);
                 }
             }
 
@@ -184,9 +185,9 @@ export class Entity {
 
         //////////////////////////////////////////////////////////////////////////
         // misc
-        this.characterLabel = this.ui.createEntityLabel(this);
-        this.characterChatLabel = this.ui.createEntityChatLabel(this);
-        this.interactableButtons = this.ui.createInteractableButtons(this);
+        this.characterLabel = this._ui.createEntityLabel(this);
+        this.characterChatLabel = this._ui.createEntityChatLabel(this);
+        this.interactableButtons = this._ui.createInteractableButtons(this);
     }
 
     public update(delta): any {
@@ -213,9 +214,9 @@ export class Entity {
             }
 
             // hide any dialog this entity could be linked too
-            if (this.ui.panelDialog.currentEntity && this.ui.panelDialog.currentEntity.sessionId === this.sessionId) {
-                this.ui.panelDialog.clear();
-                this.ui.panelDialog.close();
+            if (this._ui.panelDialog.currentEntity && this._ui.panelDialog.currentEntity.sessionId === this.sessionId) {
+                this._ui.panelDialog.clear();
+                this._ui.panelDialog.close();
             }
         }
 
@@ -263,7 +264,7 @@ export class Entity {
     }
 
     public getPosition() {
-        return new Vector3(this.mesh.position.x, this.mesh.position.y, this.mesh.position.z);
+        return new Vector3(this.position.x, this.position.y, this.position.z);
     }
 
     public updateSlowRate() {}
@@ -272,6 +273,7 @@ export class Entity {
 
     // basic performance LOD logic
     public lod(_currentPlayer) {
+        /*
         // hide everything
         this.mesh.setEnabled(false);
         this.mesh.freezeWorldMatrix();
@@ -282,7 +284,7 @@ export class Entity {
 
         // only enable if close enough to local player
         let entityPos = this.position();
-        let playerPos = _currentPlayer.position();
+        let playerPos = new Vector3(this.x, this.y, this.z);
         let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
         if (distanceFromPlayer < this._game.config.PLAYER_VIEW_DISTANCE) {
             this.mesh.unfreezeWorldMatrix();
@@ -291,11 +293,7 @@ export class Entity {
                 equipment.unfreezeWorldMatrix();
                 equipment.setEnabled(true);
             });
-        }
-    }
-
-    public position() {
-        return new Vector3(this.x, this.y, this.z);
+        }*/
     }
 
     public remove() {

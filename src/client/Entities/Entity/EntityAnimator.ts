@@ -4,7 +4,7 @@ import { EntityState } from "../../../shared/types";
 
 export class EntityAnimator {
     private _entity;
-    private playerMesh;
+    private mesh;
     private entityData;
 
     //animations
@@ -29,7 +29,7 @@ export class EntityAnimator {
 
     constructor(entity: Entity) {
         // get player mesh
-        this.playerMesh = entity.meshController.playerMesh;
+        this.mesh = entity.meshController.mesh;
 
         // set default vat animation
         this.entityData = entity._game._vatController.entityData.get(entity.race);
@@ -93,7 +93,7 @@ export class EntityAnimator {
     ///////////////////////////
     // todo: to be improved so we can better control the states... have no idea how yet
     public animate(player, delta): void {
-        let currentPos = player.mesh.position;
+        let currentPos = player.position;
         let nextPos = player.moveController.getNextPosition();
         player.isMoving = false;
 
@@ -131,10 +131,11 @@ export class EntityAnimator {
 
         // play animation and stop previous animation
         if (this._currentAnim != null && this._prevAnim !== this._currentAnim) {
-            //console.log("CHANGE ANIMATION TO", this._currentAnim);
-            this.setAnimationParameters(this.playerMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim, delta);
+            console.log("CHANGE ANIMATION TO", this._currentAnim);
+            this.setAnimationParameters(this.mesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim, delta);
 
             player.meshController.equipments.forEach((itemMesh) => {
+                console.log("EQUIPEMENT CHANGE ANIMATION TO", this._currentAnim);
                 this.setAnimationParameters(itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim, delta);
             });
 
@@ -145,7 +146,7 @@ export class EntityAnimator {
         // if animation is loop=false; and finished playing
         if (this.currentFrame === this.targetFrame && this._currentAnim.loop === false && this.endOfLoop === false) {
             console.log("ANIMATION FINISHED, STOP ANIMATION ", this.currentFrame, this.targetFrame);
-            this.playerMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced.set(this.targetFrame, this.targetFrame, 0, 0);
+            this.mesh.instancedBuffers.bakedVertexAnimationSettingsInstanced.set(this.targetFrame, this.targetFrame, 0, 0);
             this.endOfLoop = true;
             this.entityData.vat.time = 0;
             player.meshController.equipments.forEach((itemMesh) => {

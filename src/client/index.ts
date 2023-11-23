@@ -61,6 +61,9 @@ class App {
             antialias: true,
         });
 
+        //
+        this.engine.setHardwareScalingLevel(1);
+
         // loading
         var loadingScreen = new Loading("Loading Assets...");
         this.engine.loadingScreen = loadingScreen;

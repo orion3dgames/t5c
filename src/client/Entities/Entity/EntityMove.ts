@@ -5,8 +5,8 @@ import { NavMesh, Vector3 as Vector3Y } from "../../../shared/Libs/yuka-min";
 import { Entity } from "../Entity";
 
 export class EntityMove {
+    private _node: Entity;
     private _mesh;
-    private _playerMesh;
     private speed;
     private _navMesh: NavMesh;
     public playerInputs: PlayerInputs[] = [];
@@ -18,8 +18,8 @@ export class EntityMove {
     private isCurrentPlayer: boolean;
 
     constructor(entity: Entity) {
+        this._node = entity;
         this._mesh = entity.mesh;
-        this._playerMesh = entity.playerMesh;
         this._navMesh = entity._navMesh;
         this.speed = entity.speed;
         this.isCurrentPlayer = entity.isCurrentPlayer;
@@ -71,20 +71,21 @@ export class EntityMove {
         this.playerInputs.push(latestInput);
     }
 
+    // move transform node
     public tween() {
         // continuously lerp between current position and next position
-        this._mesh.position = Vector3.Lerp(this._mesh.position, this.nextPosition, 0.1);
+        this._node.position = Vector3.Lerp(this._node.position, this.nextPosition, 0.1);
 
         // rotation
         // TODO DAYD : make it better
         // maybe look into Scalar.LerpAngle ??? https://doc.babylonjs.com/typedoc/classes/BABYLON.Scalar#LerpAngle
-        const gap = Math.abs(this._mesh.rotation.y - this.nextRotation.y);
-        if (gap > Math.PI) this._mesh.rotation.y = this.nextRotation.y;
-        else this._mesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.45);
+        const gap = Math.abs(this._node.rotation.y - this.nextRotation.y);
+        if (gap > Math.PI) this._node.rotation.y = this.nextRotation.y;
+        else this._node.rotation = Vector3.Lerp(this._node.rotation, this.nextRotation, 0.45);
 
         // test
-        this._playerMesh.position = Vector3.Lerp(this._mesh.position, this.nextPosition, 0.1);
-        this._playerMesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.45);
+        //this._mesh.position = Vector3.Lerp(this._node.position, this.nextPosition, 0.1);
+        //this._mesh.rotation = Vector3.Lerp(this._node.rotation, this.nextRotation, 0.45);
     }
 
     public move(input: PlayerInputs): void {

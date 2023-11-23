@@ -28,17 +28,17 @@ import { VatController } from "../Controllers/VatController";
 export class GameScene {
     public _game: GameController;
     public _scene: Scene;
-    private _input: PlayerInput;
+    public _input: PlayerInput;
     public _ui;
-    private _shadow: CascadedShadowGenerator;
-    private _navMesh: NavMesh;
+    public _shadow: CascadedShadowGenerator;
+    public _navMesh: NavMesh;
     public _navMeshDebug;
 
-    private _roomId: string;
-    private room: Room<any>;
-    private chatRoom: Room<any>;
-    private _currentPlayer: Player;
-    private _loadedAssets: AssetContainer[] = [];
+    public _roomId: string;
+    public room: Room<any>;
+    public chatRoom: Room<any>;
+    public _currentPlayer: Player;
+    public _loadedAssets: AssetContainer[] = [];
 
     public gameData;
 
@@ -189,7 +189,7 @@ export class GameScene {
                 // if player type
                 if (isCurrentPlayer) {
                     // create player entity
-                    let _player = new Player(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._game, this._input, this._entities);
+                    let _player = new Player(sessionId, this._scene, this, entity);
 
                     // set currentPlayer
                     this._currentPlayer = _player;
@@ -206,13 +206,13 @@ export class GameScene {
                     //////////////////
                     // else must be another player
                 } else {
-                    this._entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._game);
+                    this._entities[sessionId] = new Entity(sessionId, this._scene, this, entity);
                 }
             }
 
             // if entity
             if (entity.type === "entity") {
-                this._entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._game);
+                this._entities[sessionId] = new Entity(sessionId, this._scene, this, entity);
             }
 
             // if item

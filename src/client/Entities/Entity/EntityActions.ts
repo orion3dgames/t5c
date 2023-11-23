@@ -50,7 +50,7 @@ export class EntityActions {
         // adjust from pos to be the bone position
         /*
         let bone = player.playerSkeleton.bones[12];
-        data.fromPos = bone.getPosition(Space.WORLD, player.playerMesh);
+        data.fromPos = bone.getPosition(Space.WORLD, player.mesh);
         data.fromPos.y -= 0.8;*/
 
         // correct height

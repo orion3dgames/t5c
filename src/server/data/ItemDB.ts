@@ -72,7 +72,7 @@ let ItemsDB: itemDataMap = {
             offset_x: 0,
             offset_y: 0.575,
             offset_z: 0.055,
-            rotation_y: Math.PI / 2,
+            rotation_y: 0,
             scale: 1,
         },
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],

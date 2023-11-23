@@ -31,7 +31,6 @@ export class EntityMesh {
     public skeleton: Skeleton;
     public mesh: Mesh;
     public playerMesh;
-    public isCurrentPlayer: boolean;
     public debugMesh: Mesh;
     public selectedMesh: Mesh;
     public equipments: Mesh[] = [];
@@ -39,35 +38,14 @@ export class EntityMesh {
     constructor(entity: Entity) {
         this._entity = entity;
         this._scene = entity._scene;
-        this._ui = entity.ui;
+        this._ui = entity._ui;
         this._game = entity._game;
         this._loadedAssets = entity._game._loadedAssets;
-        this.isCurrentPlayer = entity.isCurrentPlayer;
         this._room = entity._room;
         this._entityData = this._game._vatController.entityData.get(this._entity.race);
     }
 
     public async load() {
-        // create collision cube
-        const box = MeshBuilder.CreateBox(this._entity.sessionId, { width: 1.5, height: 2.5, depth: 1.5 }, this._scene);
-        box.visibility = 0;
-        //box.setPivotMatrix(Matrix.Translation(0, 1, 0), false);
-
-        // set collision mesh
-        this.mesh = box;
-        this.mesh.isPickable = true;
-        this.mesh.isVisible = true;
-        this.mesh.checkCollisions = true;
-        this.mesh.showBoundingBox = true;
-        this.mesh.position = new Vector3(this._entity.x, this._entity.y, this._entity.z);
-
-        this.mesh.metadata = {
-            sessionId: this._entity.sessionId,
-            type: this._entity.type,
-            race: this._entity.race,
-            name: this._entity.name,
-        };
-
         // debug aggro mesh
         /*
         if (this._entity.type === "entity") {
@@ -82,12 +60,13 @@ export class EntityMesh {
             sphere.parent = box;
             sphere.material = material;
             this.debugMesh = sphere;
-        }*/
-
+        }
+        */
         // add selected image
+
         var material = this._scene.getMaterialByName("entity_selected");
         const selectedMesh = MeshBuilder.CreateCylinder("entity_selected_" + this._entity.race, { diameter: 2, height: 0.01, tessellation: 8 }, this._scene);
-        selectedMesh.parent = box;
+        selectedMesh.parent = this._entity;
         selectedMesh.material = material;
         selectedMesh.isVisible = false;
         selectedMesh.isPickable = false;
@@ -98,19 +77,25 @@ export class EntityMesh {
         // load player mesh
         let materialIndex = this._entity.material ?? 0;
         const playerMesh = this._entityData.mesh[materialIndex].createInstance(this._entity.type + "" + this._entity.sessionId);
-        //playerMesh.parent = box;
-        playerMesh.position.copyFrom(this.mesh.position);
+        playerMesh.parent = this._entity;
+        playerMesh.isPickable = true;
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
         if (this._entity.rotationFix) {
             playerMesh.rotation.set(0, this._entity.rotationFix, 0);
         }
         playerMesh.scaling.set(this._entity.scale, this._entity.scale, this._entity.scale);
-        playerMesh.isPickable = false;
-        playerMesh.checkCollisions = false;
         playerMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+        this.mesh = playerMesh;
 
-        this.playerMesh = playerMesh;
+        // set metadata
+        this.mesh.metadata = {
+            sessionId: this._entity.sessionId,
+            type: this._entity.type,
+            race: this._entity.race,
+            name: this._entity.name,
+        };
 
+        /*
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);
 
@@ -144,7 +129,7 @@ export class EntityMesh {
                     this.mesh.actionManager.hoverCursor = this._ui._Cursor.get();
                 }
             })
-        );
+        );*/
 
         // check for any equipment changes
         this._entity.entity.equipment.onAdd((e) => {
@@ -232,14 +217,14 @@ export class EntityMesh {
                     instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
 
                     // or like this(so we don't need to sync it every frame)
-                    instance.setParent(this.playerMesh);
+                    instance.setParent(this.mesh);
                     instance.position.setAll(0);
                     instance.rotationQuaternion = undefined;
                     instance.rotation.setAll(0);
 
                     // if mesh offset required
                     if (equipOptions.scale) {
-                        instance.scaling = new Vector3(equipOptions.scale, equipOptions.scale, equipOptions.scale);
+                        //instance.scaling = new Vector3(equipOptions.scale, equipOptions.scale, equipOptions.scale);
                     }
                     if (equipOptions.offset_x) {
                         instance.position.x += equipOptions.offset_x;
@@ -251,12 +236,13 @@ export class EntityMesh {
                         instance.position.z += equipOptions.offset_z;
                     }
 
+                    /*
                     // if rotationFix needed
                     if (equipOptions.rotation_x || equipOptions.rotation_y || equipOptions.rotation_z) {
                         // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
                         instance.rotationQuaternion = null;
-                        instance.rotation.set(equipOptions.rotation_x ?? 0, equipOptions.rotation_y ?? 0, equipOptions.rotation_z ?? 0);
-                    }
+                        instance.rotation.set(equipOptions.rotation_x ?? 0, 0, equipOptions.rotation_z ?? 0);
+                    }*/
 
                     // add
                     this.equipments.push(instance);

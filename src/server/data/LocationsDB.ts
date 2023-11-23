@@ -39,7 +39,9 @@ let LocationsDB = {
                 },
             ],
             spawns: [
+                /*
                 {
+                
                     key: "lh_town_bandits",
                     type: "area",
                     behaviour: "patrol",
@@ -252,6 +254,7 @@ let LocationsDB = {
                         ],
                     },
                 },
+                */
                 {
                     key: "spawn_dummy",
                     type: "static",
@@ -283,6 +286,16 @@ let LocationsDB = {
                             },
                         ],
                     },
+                    equipment: [
+                        {
+                            key: "helm_01",
+                            slot: PlayerSlots.HEAD,
+                        },
+                        {
+                            key: "sword_01",
+                            slot: PlayerSlots.WEAPON,
+                        },
+                    ],
                 },
             ],
         },
