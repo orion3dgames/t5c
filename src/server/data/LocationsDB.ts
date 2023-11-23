@@ -39,9 +39,7 @@ let LocationsDB = {
                 },
             ],
             spawns: [
-                /*
                 {
-                
                     key: "lh_town_bandits",
                     type: "area",
                     behaviour: "patrol",
@@ -59,7 +57,7 @@ let LocationsDB = {
                         new Vector3(-8.8, 0.01, -22.39),
                         new Vector3(-8.51, 0.01, -14.93),
                     ],
-                    amount: 150,
+                    amount: 100,
                     race: "male_rogue",
                     material: 0,
                     name: "Bandit",
@@ -76,6 +74,7 @@ let LocationsDB = {
                         },
                     ],
                 },
+
                 {
                     key: "lh_town_thief",
                     type: "global",
@@ -83,7 +82,7 @@ let LocationsDB = {
                     aggressive: true,
                     canAttack: true,
                     points: [new Vector3(0, 0, 0)],
-                    amount: 50,
+                    amount: 100,
                     race: "male_mage",
                     material: 2,
                     name: "Thief",
@@ -100,6 +99,7 @@ let LocationsDB = {
                         },
                     ],
                 },
+                /*
                 {
                     key: "lh_town_thief",
                     type: "path",

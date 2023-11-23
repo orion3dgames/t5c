@@ -246,7 +246,7 @@ export class GameScene {
             for (let sessionId in this._entities) {
                 const entity = this._entities[sessionId];
                 entity.update(delta);
-                //entity.lod(this._currentPlayer);
+                entity.lod(this._currentPlayer);
             }
 
             /////////////////

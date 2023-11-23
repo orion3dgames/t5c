@@ -23,6 +23,7 @@ import { PlayerInput } from "../../client/Controllers/PlayerInput";
 
 import { GameController } from "../Controllers/GameController";
 import { GameScene } from "../Screens/GameScene";
+import { Player } from "./Player";
 
 export class Entity extends TransformNode {
     public _scene: Scene;
@@ -51,6 +52,7 @@ export class Entity extends TransformNode {
     public sessionId: string;
     public entity;
     public isCurrentPlayer: boolean;
+    public _currentPlayer: Player;
 
     // character
     public type: string = "";
@@ -111,6 +113,7 @@ export class Entity extends TransformNode {
         this.sessionId = entity.sessionId; // network id from colyseus
         this.isCurrentPlayer = this._room.sessionId === entity.sessionId;
         this.entity = entity;
+        this._currentPlayer = gamescene._currentPlayer;
         this.type = "entity";
 
         // update player data from server data
@@ -185,8 +188,8 @@ export class Entity extends TransformNode {
 
         //////////////////////////////////////////////////////////////////////////
         // misc
-        this.characterLabel = this._ui.createEntityLabel(this);
-        this.characterChatLabel = this._ui.createEntityChatLabel(this);
+        //this.characterLabel = this._ui.createEntityLabel(this);
+        //this.characterChatLabel = this._ui.createEntityChatLabel(this);
         this.interactableButtons = this._ui.createInteractableButtons(this);
     }
 
@@ -273,27 +276,28 @@ export class Entity extends TransformNode {
 
     // basic performance LOD logic
     public lod(_currentPlayer) {
-        /*
-        // hide everything
-        this.mesh.setEnabled(false);
-        this.mesh.freezeWorldMatrix();
-        this.meshController.equipments?.forEach((equipment) => {
-            equipment.setEnabled(false);
-            equipment.freezeWorldMatrix();
-        });
-
-        // only enable if close enough to local player
-        let entityPos = this.position();
-        let playerPos = new Vector3(this.x, this.y, this.z);
-        let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
-        if (distanceFromPlayer < this._game.config.PLAYER_VIEW_DISTANCE) {
-            this.mesh.unfreezeWorldMatrix();
-            this.mesh.setEnabled(true);
+        if (_currentPlayer) {
+            // hide everything
+            this.mesh.setEnabled(false);
+            this.mesh.freezeWorldMatrix();
             this.meshController.equipments?.forEach((equipment) => {
-                equipment.unfreezeWorldMatrix();
-                equipment.setEnabled(true);
+                equipment.setEnabled(false);
+                equipment.freezeWorldMatrix();
             });
-        }*/
+
+            // only enable if close enough to local player
+            let entityPos = new Vector3(this.x, this.y, this.z);
+            let playerPos = new Vector3(_currentPlayer.x, _currentPlayer.y, _currentPlayer.z);
+            let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
+            if (distanceFromPlayer < this._game.config.PLAYER_VIEW_DISTANCE) {
+                this.mesh.unfreezeWorldMatrix();
+                this.mesh.setEnabled(true);
+                this.meshController.equipments?.forEach((equipment) => {
+                    equipment.unfreezeWorldMatrix();
+                    equipment.setEnabled(true);
+                });
+            }
+        }
     }
 
     public remove() {
