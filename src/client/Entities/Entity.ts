@@ -145,7 +145,7 @@ export class Entity {
 
         // add all entity related stuff
         this.animatorController = new EntityAnimator(this);
-        this.moveController = new EntityMove(this.mesh, this._navMesh, this.isCurrentPlayer, this.speed);
+        this.moveController = new EntityMove(this);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
 
         // attach equipment
@@ -190,8 +190,6 @@ export class Entity {
     }
 
     public update(delta): any {
-        this.playerMesh.position = Vector3.Lerp(this.playerMesh.position, this.mesh.position, 0.1);
-
         ////////////////////////////////////
         // what to do when an entity dies
         if (this.health < 1 && !this.isDead) {

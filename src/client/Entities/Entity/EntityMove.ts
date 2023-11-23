@@ -2,9 +2,11 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { PlayerInputs } from "../../../shared/types";
 import { NavMesh, Vector3 as Vector3Y } from "../../../shared/Libs/yuka-min";
+import { Entity } from "../Entity";
 
 export class EntityMove {
     private _mesh;
+    private _playerMesh;
     private speed;
     private _navMesh: NavMesh;
     public playerInputs: PlayerInputs[] = [];
@@ -15,11 +17,12 @@ export class EntityMove {
 
     private isCurrentPlayer: boolean;
 
-    constructor(mesh, navMesh: NavMesh, isCurrentPlayer, speed) {
-        this._mesh = mesh;
-        this._navMesh = navMesh;
-        this.speed = speed;
-        this.isCurrentPlayer = isCurrentPlayer;
+    constructor(entity: Entity) {
+        this._mesh = entity.mesh;
+        this._playerMesh = entity.playerMesh;
+        this._navMesh = entity._navMesh;
+        this.speed = entity.speed;
+        this.isCurrentPlayer = entity.isCurrentPlayer;
     }
 
     public getNextPosition() {
@@ -78,6 +81,10 @@ export class EntityMove {
         const gap = Math.abs(this._mesh.rotation.y - this.nextRotation.y);
         if (gap > Math.PI) this._mesh.rotation.y = this.nextRotation.y;
         else this._mesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.45);
+
+        // test
+        this._playerMesh.position = Vector3.Lerp(this._mesh.position, this.nextPosition, 0.1);
+        this._playerMesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.45);
     }
 
     public move(input: PlayerInputs): void {

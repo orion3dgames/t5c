@@ -1,5 +1,5 @@
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
-import { Scene } from "@babylonjs/core/scene";
+import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
@@ -71,6 +71,9 @@ export class GameScene {
             // if token not valid, send back to login screen
             this._game.setScene(State.LOGIN);
         }
+
+        // performance
+        scene.performancePriority = ScenePerformancePriority.Intermediate;
 
         // get location details
         let location = this._game.currentLocation;
