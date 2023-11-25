@@ -21,7 +21,7 @@ let AbilitiesDB: abilityMap = {
             color: "white",
         },
         casterPropertyAffected: [],
-        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 4, max: 8 }],
+        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 10, max: 15 }],
     },
 
     fire_dart: {
@@ -44,8 +44,8 @@ let AbilitiesDB: abilityMap = {
             particule: "fireball",
             color: "orange",
         },
-        casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 1, max: 2 }],
-        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 4, max: 6 }],
+        casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 5, max: 10 }],
+        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 20, max: 40 }],
         type: AbilityType.PHYSICAL,
         element: AbilityElement.FIRE,
         required_level: 2,

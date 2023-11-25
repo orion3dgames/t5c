@@ -4,6 +4,7 @@ import { EntityState } from "../../../shared/types";
 
 export class EntityAnimator {
     private _entity;
+    private ratio;
 
     //animations
     private _playerAnimations: AnimationGroup[];
@@ -23,8 +24,18 @@ export class EntityAnimator {
     constructor(player_animations, entity: Entity) {
         this._playerAnimations = player_animations;
         this._entity = entity;
+        this.ratio = entity._scene.getAnimationRatio();
 
         this._build();
+    }
+
+    public refresh() {
+        this.ratio = this._entity._scene.getAnimationRatio();
+        // set animation speed
+        this._idle.speedRatio = this._entity.animations["IDLE"].speed * this.ratio;
+        this._walk.speedRatio = this._entity.animations["WALK"].speed * this.ratio;
+        this._attack.speedRatio = this._entity.animations["ATTACK"].speed * this.ratio;
+        this._death.speedRatio = this._entity.animations["DEATH"].speed * this.ratio;
     }
 
     private _build(): void {
@@ -59,6 +70,7 @@ export class EntityAnimator {
         this._attack.speedRatio = attackAnimation.speed;
         this._death.speedRatio = deathAnimation.speed;
 
+        ////////////////////////////////////////////////////////////
         //////////// optional animations
         //
         let takingDamageAnimation = this._entity.animations["DAMAGE"] ?? false;

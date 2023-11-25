@@ -140,7 +140,7 @@ export class Entity {
         this.playerSkeleton = this.meshController.skeleton;
 
         // add mesh to shadow generator
-        this._shadow.addShadowCaster(this.meshController.mesh, true);
+        //this._shadow.addShadowCaster(this.meshController.mesh, true);
 
         // add all entity related stuff
         this.animatorController = new EntityAnimator(this.meshController.getAnimation(), this);
@@ -264,13 +264,19 @@ export class Entity {
 
     public updateSlowRate() {}
 
-    public updateServerRate(delta) {}
+    public updateServerRate(delta) {
+        this.animatorController.refresh();
+    }
 
     // basic performance LOD logic
     public lod(_currentPlayer) {
         // hide everything
         this.mesh.setEnabled(false);
         this.mesh.freezeWorldMatrix();
+
+        // hide gui
+        //this.characterLabel.isVisible = false;
+        //this.characterChatLabel.isVisible = false;
         this.meshController.equipments?.forEach((equipment) => {
             equipment.setEnabled(false);
             equipment.freezeWorldMatrix();
@@ -283,6 +289,11 @@ export class Entity {
         if (distanceFromPlayer < this._game.config.PLAYER_VIEW_DISTANCE) {
             this.mesh.unfreezeWorldMatrix();
             this.mesh.setEnabled(true);
+
+            // show gui
+            //this.characterLabel.isVisible = true;
+            //this.characterChatLabel.isVisible = true;
+
             this.meshController.equipments?.forEach((equipment) => {
                 equipment.unfreezeWorldMatrix();
                 equipment.setEnabled(true);

@@ -187,8 +187,7 @@ export class Player extends Entity {
         // move to clicked point
         if (metadata.type === "environment" && !this.isDead) {
             // deselect any entity
-            this._game.selectedEntity = false;
-
+            //this._game.selectedEntity = false;
             /*
             // removed click to move
             // todo: add client prediction.
