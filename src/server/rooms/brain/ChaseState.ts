@@ -22,12 +22,6 @@ class ChaseState extends State {
             return false;
         }
 
-        // if target is dead or invalid
-        if (owner.AI_TARGET.isEntityDead()) {
-            owner._stateMachine.changeTo("DEAD");
-            return false;
-        }
-
         // iterate searching timer
         owner.CHASE_TIMER += owner._state.config.updateRate;
 

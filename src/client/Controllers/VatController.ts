@@ -138,52 +138,31 @@ export class VatController {
                     rawMesh.rotation.set(0, Math.PI * 1.5, 0); // we must set it in Blender
                     rawMesh.scaling.setAll(1);
 
-                    /*
                     // if mesh offset required
-                    if (item.scale) {
-                        rawMesh.scaling = new Vector3(item.scale, item.scale, item.scale);
+                    let equipOptions = item.equippable;
+                    if (equipOptions.scale) {
+                        rawMesh.scaling = new Vector3(equipOptions.scale, equipOptions.scale, equipOptions.scale);
                     }
-                    if (item.offset_x) {
-                        rawMesh.position.x += item.offset_x;
+                    if (equipOptions.offset_x) {
+                        rawMesh.position.x += equipOptions.offset_x;
                     }
-                    if (item.offset_y) {
-                        rawMesh.position.y += item.offset_y;
+                    if (equipOptions.offset_y) {
+                        rawMesh.position.y += equipOptions.offset_y;
                     }
-                    if (item.offset_z) {
-                        rawMesh.position.z += item.offset_z;
+                    if (equipOptions.offset_z) {
+                        rawMesh.position.z += equipOptions.offset_z;
                     }
 
                     // if rotationFix needed
-                    if (item.rotation_x || item.rotation_y || item.rotation_z) {
+                    if (equipOptions.rotation_x || equipOptions.rotation_y || equipOptions.rotation_z) {
                         // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
                         rawMesh.rotationQuaternion = null;
-                        rawMesh.rotation.set(item.rotation_x ?? 0, item.rotation_y, item.rotation_z ?? 0);
-                    }*/
+                        rawMesh.rotation.set(equipOptions.rotation_x ?? 0, equipOptions.rotation_y ?? 0, equipOptions.rotation_z ?? 0);
+                    }
 
                     let itemMesh = mergeMesh(rawMesh);
 
                     if (itemMesh) {
-                        /*
-                        // if mesh offset required
-                        if (item.scale) {
-                            itemMesh.scaling = new Vector3(item.scale, item.scale, item.scale);
-                        }
-                        if (item.offset_x) {
-                            itemMesh.position.x += item.offset_x;
-                        }
-                        if (item.offset_y) {
-                            itemMesh.position.y += item.offset_y;
-                        }
-                        if (item.offset_z) {
-                            itemMesh.position.z += item.offset_z;
-                        }
-
-                        // if rotationFix needed
-                        if (item.rotation_x || item.rotation_y || item.rotation_z) {
-                            // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
-                            itemMesh.rotationQuaternion = null;
-                            itemMesh.rotation.set(item.rotation_x ?? 0, 0, item.rotation_z ?? 0);
-                        }*/
 
                         // weapon VAT
                         itemMesh.skeleton = skeleton;

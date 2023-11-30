@@ -331,9 +331,6 @@ export class abilitiesCTRL {
         // cancel auto attack timer
         this.cancelAutoAttack(owner);
 
-        // set target as dead
-        target.setAsDead();
-
         // get player
         let client = owner.getClient();
 

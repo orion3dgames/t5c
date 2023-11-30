@@ -31,6 +31,7 @@ class AttackState extends State {
             owner.ATTACK_TIMER = 0;
             owner.AI_TARGET.health -= damage;
             owner.AI_TARGET.normalizeStats();
+            console.log(owner.name, owner.sessionId, 'attacking', owner.AI_TARGET.sessionId, 'dmg: ', damage);
         }
 
         // increment attack timer
