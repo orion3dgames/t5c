@@ -131,11 +131,11 @@ export class EntityAnimator {
 
         // play animation and stop previous animation
         if (this._currentAnim != null && this._prevAnim !== this._currentAnim) {
-            console.log("CHANGE ANIMATION TO", this._currentAnim);
+            //console.log("CHANGE ANIMATION TO", this._currentAnim);
             this.setAnimationParameters(this.mesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim, delta);
 
             player.meshController.equipments.forEach((itemMesh) => {
-                console.log("EQUIPEMENT CHANGE ANIMATION TO", this._currentAnim);
+                //console.log("EQUIPEMENT CHANGE ANIMATION TO", this._currentAnim);
                 this.setAnimationParameters(itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim, delta);
             });
 
@@ -145,13 +145,14 @@ export class EntityAnimator {
 
         // if animation is loop=false; and finished playing
         if (this.currentFrame === this.targetFrame && this._currentAnim.loop === false && this.endOfLoop === false) {
-            console.log("ANIMATION FINISHED, STOP ANIMATION ", this.currentFrame, this.targetFrame);
+            //console.log("ANIMATION FINISHED, STOP ANIMATION ", this.currentFrame, this.targetFrame);
             this.mesh.instancedBuffers.bakedVertexAnimationSettingsInstanced.set(this.targetFrame, this.targetFrame, 0, 0);
             this.endOfLoop = true;
-            //this.entityData.vat.time = 0;
+            
             player.meshController.equipments.forEach((itemMesh) => {
                 itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced.set(this.targetFrame, this.targetFrame, 0, 0);
             });
+            //this.entityData.vat.time = 0;
         } else {
             this.currentFrame++;
         }

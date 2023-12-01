@@ -205,14 +205,18 @@ export class EntityMesh {
 
         // equip all items
         this._entity.equipment.forEach((e: EquipmentSchema) => {
+            
             let item = this._game.getGameData("item", e.key);
             if (item && item.equippable) {
                 let equipOptions = item.equippable;
                 // if mesh needs to be added
                 if (equipOptions.mesh) {
+                    
                     // create instance of mesh
                     let instance = this._entityData.items.get(item.key).createInstance("equip_" + this._entity.sessionId + "_" + e.key);
                     instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+
+                    console.log(e, instance);
 
                     // or like this(so we don't need to sync it every frame)
                     instance.setParent(this.mesh);

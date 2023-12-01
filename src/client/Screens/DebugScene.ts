@@ -141,7 +141,7 @@ export class DebugScene {
     public results;
     public SPAWN_INFO = [
         {
-            key: "rat_01",
+            key: "male_knight",
             name: "Rat",
             material: 0,
             amount: 70,
@@ -214,8 +214,7 @@ export class DebugScene {
                 await this.prepareMesh(spawn);
             })
         );
-        console.log(this.entityData);
-
+  
         // create intances
         for (const spawn of this.SPAWN_INFO) {
             for (let i = 0; i < spawn.amount; i++) {

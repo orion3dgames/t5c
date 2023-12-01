@@ -69,37 +69,16 @@ let LocationsDB = {
                             slot: PlayerSlots.HEAD,
                         },
                         {
+                            key: "shield_01",
+                            slot: PlayerSlots.OFF_HAND,
+                        },
+                        {
                             key: "sword_01",
                             slot: PlayerSlots.WEAPON,
                         },
                     ],
                 },
                 
-                {
-                    key: "lh_town_thief",
-                    type: "global",
-                    behaviour: "patrol",
-                    aggressive: true,
-                    canAttack: true,
-                    points: [new Vector3(0, 0, 0)],
-                    amount: 1,
-                    race: "male_mage",
-                    material: 2,
-                    name: "Thief",
-                    baseHealth: 25,
-                    baseSpeed: Speed.SLOW,
-                    equipment: [
-                        {
-                            key: "helm_01",
-                            slot: PlayerSlots.HEAD,
-                        },
-                        {
-                            key: "sword_01",
-                            slot: PlayerSlots.WEAPON,
-                        },
-                    ],
-                },
-                /*
                 {
                     key: "lh_town_thief",
                     type: "path",
@@ -113,6 +92,7 @@ let LocationsDB = {
                     name: "Thief",
                     baseHealth: 300,
                     baseSpeed: Speed.SLOW,
+                    equipment: [],
                 },
                 {
                     key: "lh_town_alexander",
@@ -297,7 +277,7 @@ let LocationsDB = {
                         },
                     ],
                 },
-                */
+                
             ],
         },
     },
