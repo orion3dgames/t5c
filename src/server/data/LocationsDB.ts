@@ -40,6 +40,22 @@ let LocationsDB = {
             ],
             spawns: [
                 {
+                    key: "lh_town_thief",
+                    type: "global",
+                    behaviour: "patrol",
+                    aggressive: true,
+                    canAttack: true,
+                    points: [new Vector3(5.38, 0.01, -1.3), new Vector3(15.53, 0.01, -8.95), new Vector3(-4.72, 0.01, -2.28)],
+                    amount: 100,
+                    race: "rat_01",
+                    material: 0,
+                    name: "Thief",
+                    baseHealth: 20,
+                    baseSpeed: Speed.VERY_SLOW,
+                    equipment: [],
+                },
+                /*
+                {
                     key: "lh_town_bandits",
                     type: "area",
                     behaviour: "patrol",
@@ -77,22 +93,6 @@ let LocationsDB = {
                             slot: PlayerSlots.WEAPON,
                         },
                     ],
-                },
-                
-                {
-                    key: "lh_town_thief",
-                    type: "path",
-                    behaviour: "patrol",
-                    aggressive: true,
-                    canAttack: true,
-                    points: [new Vector3(35.19, 3.51, 3.2), new Vector3(34.04, 3.51, -12.06), new Vector3(24.15, 5.76, -24.22)],
-                    amount: 1,
-                    race: "male_rogue",
-                    material: 0,
-                    name: "Thief",
-                    baseHealth: 300,
-                    baseSpeed: Speed.SLOW,
-                    equipment: [],
                 },
                 {
                     key: "lh_town_alexander",
@@ -277,7 +277,7 @@ let LocationsDB = {
                         },
                     ],
                 },
-                
+                */
             ],
         },
     },

@@ -216,8 +216,6 @@ export class EntityMesh {
                     let instance = this._entityData.items.get(item.key).createInstance("equip_" + this._entity.sessionId + "_" + e.key);
                     instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
 
-                    console.log(e, instance);
-
                     // or like this(so we don't need to sync it every frame)
                     instance.setParent(this.mesh);
                     instance.position.setAll(0);
