@@ -287,22 +287,14 @@ export class AssetsController {
     //What we do once the environment assets have been imported
     //handles setting the necessary flags for collision and trigger meshes,
     public async prepareLevel(key) {
-        /*
+        
         if (this._game.currentLocation.waterPlane) {
             // Water
             var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 32 }, this._game.scene);
-            waterMesh.position = new Vector3(0, -4, 0);
+            waterMesh.position = new Vector3(0, -1, 0);
 
-            var water = new WaterMaterial("water", this._game.scene);
-            water.bumpTexture = new Texture("textures/waterbump.jpg", this._game.scene);
-
-            // Water properties
-            water.backFaceCulling = true;
-            water.windForce = 0.1;
-            water.waveHeight = 0.6;
-            water.bumpHeight = 0.5;
-            water.waterColor = Color3.FromInts(0, 157, 255);
-            water.colorBlendFactor = 0.5;
+            var water = new StandardMaterial("water");
+            water.diffuseTexture = new Texture("textures/waterbump.jpg");
             waterMesh.material = water;
         }
 
