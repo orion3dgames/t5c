@@ -148,11 +148,10 @@ export class EntityAnimator {
             //console.log("ANIMATION FINISHED, STOP ANIMATION ", this.currentFrame, this.targetFrame);
             this.mesh.instancedBuffers.bakedVertexAnimationSettingsInstanced.set(this.targetFrame, this.targetFrame, 0, 0);
             this.endOfLoop = true;
-            
             player.meshController.equipments.forEach((itemMesh) => {
                 itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced.set(this.targetFrame, this.targetFrame, 0, 0);
             });
-            //this.entityData.vat.time = 0;
+            this.entityData.vat.time = 0;
         } else {
             this.currentFrame++;
         }

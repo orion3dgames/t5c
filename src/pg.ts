@@ -2,7 +2,7 @@ let ASSETS_LOADED = new Map();
 const SPAWN_INFO = [
     {
         key: "male_knight",
-        quantity: 0,
+        quantity: 200,
         items: [
             { key: "helm_01" },
             { key: "shield_01" },
@@ -19,7 +19,7 @@ const SPAWN_INFO = [
     },
     {
         key: "male_mage",
-        quantity: 1,
+        quantity: 200,
         items: [
             { key: "helm_01" },
             { key: "shield_01" },
@@ -36,7 +36,7 @@ const SPAWN_INFO = [
     },
     {
         key: "male_rogue",
-        quantity: 1,
+        quantity: 100,
         items: [
             { key: "helm_01" },
             { key: "shield_01" },
@@ -50,6 +50,15 @@ const SPAWN_INFO = [
         },
         rotationFix: Math.PI,
         scale: 1
+    },
+    {
+        key: "rat_01",
+        quantity: 100,
+        items: [],
+        animations: ["Rat_Attack", "Rat_Death", "Rat_Idle", "Rat_Walk"],
+        bones: {},
+        rotationFix: Math.PI,
+        scale: 0.3
     },
 ];
 
@@ -85,7 +94,7 @@ const ITEM_DATA = {
         key: "helm_01",
         equippable: {
             slot: "HEAD",
-            rotation_y: Math.PI * 2,
+            rotation_y: Math.PI * 1.5,
             offset_x: 0,
             offset_y: 0.575,
             offset_z: 0.055,
@@ -94,28 +103,21 @@ const ITEM_DATA = {
         },
     },
 }; 
-const PLANE_SIZE = 10;
+const PLANE_SIZE = 20;
 let SELECTED_ENTITY = false;
 let ENTITY_DATA = new Map();
 let INPUT_DATA = {
     VERTICAL: 0,
     HORIZONTAL: 0,
 }
+let PLAYER_CAMERA;
+const URL_ROOT = "https://raw.githubusercontent.com/orion3dgames/t5c/feature/vat-skin";
 
 var createScene = function () {
     // This creates a basic Babylon Scene object (non-mesh)
     var scene = new BABYLON.Scene(engine);
 
     scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
-
-    // This creates and positions a free camera (non-mesh)
-    var camera = new BABYLON.ArcRotateCamera("camera1", Math.PI / 2, Math.PI / 4, 20, new BABYLON.Vector3(0, 3, 3), scene);
-
-    // This targets the camera to scene origin
-    camera.setTarget(BABYLON.Vector3.Zero());
-
-    // This attaches the camera to the canvas
-    camera.attachControl(canvas, true);
 
     // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
     var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
@@ -124,7 +126,12 @@ var createScene = function () {
     light.intensity = 0.7;
 
     // Our built-in 'ground' shape.
-    var ground = BABYLON.MeshBuilder.CreateGround("ground", { width: PLANE_SIZE + 1, height: PLANE_SIZE + 1 }, scene);
+    var ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 20, height: 20 }, scene);
+
+    // This creates and positions a free camera (non-mesh)
+    PLAYER_CAMERA = new BABYLON.ArcRotateCamera("camera1", Math.PI / 2, Math.PI / 4, 20, new BABYLON.Vector3(0, 3, 3), scene);
+    PLAYER_CAMERA.attachControl(scene);
+    PLAYER_CAMERA.inputs.attached.keyboard.detachControl();
 
     // PRELOAD DATA 
     loadAssets(scene);
@@ -147,10 +154,10 @@ async function loadAssets(scene){
 
         switch (obj.extension) {
             case "glb":
-                assetTask = assetsManager.addContainerTask(obj.name, "", "", "https://raw.githubusercontent.com/orion3dgames/t5c/main/public/models/" + obj.filename);
+                assetTask = assetsManager.addContainerTask(obj.name, "", "", URL_ROOT+"/public/models/" + obj.filename);
                 break;
             case "json":
-                assetTask = assetsManager.addTextFileTask(obj.name, "https://raw.githubusercontent.com/orion3dgames/t5c/main/public/models/" + obj.filename);               
+                assetTask = assetsManager.addTextFileTask(obj.name, URL_ROOT+"/public/models/" + obj.filename);               
                 break;
         } 
 
@@ -185,7 +192,7 @@ async function loadAssets(scene){
     // small timeout to fix await above not working? else ENTITY_DATA is empty
     setTimeout(()=>{
         runGameLoop(scene);      
-    }, 1000)
+    }, 2000)
 }
 
 function runGameLoop(scene){
@@ -198,7 +205,7 @@ function runGameLoop(scene){
         let entityData = ENTITY_DATA.get(spawn.key);
         for (let i = 0; i < spawn.quantity; i++) {
             let sessionId = Math.random() * 10000;
-            let instance = entityData.mesh.createInstance("instance_" + sessionId);
+            let instance = entityData.mesh.createInstance("entity_" + sessionId);
             players.set(sessionId, new Entity(sessionId, scene, instance, entityData, spawn, false));
         }
 
@@ -230,24 +237,20 @@ function runGameLoop(scene){
     scene.onKeyboardObservable.add((kbInfo) => {
         switch (kbInfo.type) {
             case BABYLON.KeyboardEventTypes.KEYDOWN:
-                if (this.left_arrow || this.down_arrow || this.left_arrow || this.right_arrow) {
-                    if (kbInfo.event.code === "ArrowUp") {
-                        this.y = 1;
-                    }
-                    if (kbInfo.event.code === "ArrowDown") {
-                        this.y = -1;
-                    }
-                    if (kbInfo.event.code === "ArrowLeft") {
-                        this.x = 1;
-                    }
-                    if (kbInfo.event.code === "ArrowRight") {
-                        this.x = -1;
-                    }
-                    this.angle = Math.atan2(this.x, this.y);
-                    INPUT_DATA.VERTICAL = -Math.cos(this.angle + Math.PI);
-                    INPUT_DATA.HORIZONTAL = Math.sin(this.angle + Math.PI);
-                    console.log("MOVING", this.vertical, this.horizontal, this.angle)
+                
+                if (kbInfo.event.code === "ArrowUp") {
+                    INPUT_DATA.VERTICAL = 1;
                 }
+                if (kbInfo.event.code === "ArrowDown") {
+                    INPUT_DATA.VERTICAL = -1;
+                }
+                if (kbInfo.event.code === "ArrowLeft") {
+                    INPUT_DATA.HORIZONTAL = -1;
+                }
+                if (kbInfo.event.code === "ArrowRight") {
+                    INPUT_DATA.HORIZONTAL = 1;
+                }
+                //console.log("MOVING", kbInfo.event.code, INPUT_DATA)
                 break;
 
             case BABYLON.KeyboardEventTypes.KEYUP:
@@ -264,6 +267,30 @@ function runGameLoop(scene){
         }
     });
 
+    scene.onPointerObservable.add((pointerInfo) => {
+        if (pointerInfo.type === BABYLON.PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 0) {
+            let metadata = getMeshMetadata(pointerInfo);
+            let entity = players.get(metadata.sessionId);
+            if(entity){
+                let rand = Math.floor(randomNumberInRange(0,4));
+                if(rand === 0) entity._nextAnim = "DEATH";
+                if(rand === 1) entity._nextAnim = "WALKING";
+                if(rand === 2) entity._nextAnim = "IDLE";
+                if(rand === 3) entity._nextAnim = "ATTACK";
+                console.log(rand, entity, entity._nextAnim);
+            }
+        }
+    });
+}
+
+function getMeshMetadata(pointerInfo) {
+    if (!pointerInfo._pickInfo.pickedMesh) return false;
+
+    if (!pointerInfo._pickInfo.pickedMesh.metadata) return false;
+
+    if (pointerInfo._pickInfo.pickedMesh.metadata === null) return false;
+
+    return pointerInfo._pickInfo.pickedMesh.metadata;
 }
 
 // get random item from a Set
@@ -274,7 +301,7 @@ function getRandomItem(players) {
 }
 
 async function fetchVAT(key){
-    const response = await fetch("https://raw.githubusercontent.com/orion3dgames/t5c/main/public/models/races/vat/"+key+".json");    
+    const response = await fetch(URL_ROOT+"/public/models/races/vat/"+key+".json");    
     const movies = await response.json();
     return movies;
 }
@@ -444,17 +471,22 @@ class Entity extends BABYLON.TransformNode {
     currentAnimationRange = 0;
     currentAnimationIndex = 0;
     equipments = [];
-    position;
 
-    _death;
     currentFrame;
     targetFrame;
     endOfLoop = false;
     _currentAnim;
     _prevAnim;
+    _nextAnim;
+
     _walking;
     _idle;
+    _death;
+    _attack;
+
     sessionId;
+    nextPosition;
+    camera;
 
     isPlayer = false;
 
@@ -464,10 +496,10 @@ class Entity extends BABYLON.TransformNode {
         this.sessionId = name;
         this.isPlayer = isPlayer;
 
+        this.nextPosition = new BABYLON.Vector3(randomNumberInRange(-PLANE_SIZE, PLANE_SIZE), 0, randomNumberInRange(-PLANE_SIZE, PLANE_SIZE));
+
         // prepare player mesh
         playerInstance.setParent(this);
-        playerInstance.position.x = randomNumberInRange(-PLANE_SIZE, PLANE_SIZE);
-        playerInstance.position.z = randomNumberInRange(-PLANE_SIZE, PLANE_SIZE);
         playerInstance.rotation.y = 0;
         playerInstance.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
         if (spawnInfo.rotationFix) {
@@ -477,6 +509,10 @@ class Entity extends BABYLON.TransformNode {
         this.mesh = playerInstance;
         this.entityData = entityData;
 
+        this.mesh.metadata = {
+            sessionId: this.sessionId
+        }
+
         //
         this.mesh.instancedBuffers.bakedVertexAnimationSettingsInstanced = new BABYLON.Vector4(0, 0, 0, 0);
 
@@ -484,11 +520,15 @@ class Entity extends BABYLON.TransformNode {
         spawnInfo.items.forEach((e) => {
             
             let item = ITEM_DATA[e.key];   
-            let equipOptions = item.equippable;
-        
+      
             // create instance of mesh
             let instance = this.entityData.items.get(item.key).createInstance("equip_" + this.sessionId + "_" + e.key);
             instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new BABYLON.Vector4(0, 0, 0, 0);
+            instance.isPickable = true;
+            
+            instance.metadata = {
+                sessionId: this.sessionId
+            }
 
             // or like this(so we don't need to sync it every frame)
             instance.setParent(this.mesh);
@@ -498,10 +538,7 @@ class Entity extends BABYLON.TransformNode {
             
             //
             this.equipments.push(instance);
-            console.log("creating item", instance);
         });
-
-        console.log("creating items", this.equipments);
 
         // PREPARE ANIMATIONS
         this._idle = {
@@ -516,6 +553,12 @@ class Entity extends BABYLON.TransformNode {
             speed: 1,
             ranges: this.entityData.animationRanges[1],
         };
+        this._attack = {
+            index: 2,
+            loop: true,
+            speed: 1,
+            ranges: this.entityData.animationRanges[2],
+        };
         this._death = {
             index: 3,
             loop: false,
@@ -524,24 +567,57 @@ class Entity extends BABYLON.TransformNode {
         };
 
         this._currentAnim = this._idle;
+        this._nextAnim = "IDLE";
+    }
+
+    isMoving(currentPos, nextPos, epsilon = 0.05) {
+        return !currentPos.equalsWithEpsilon(nextPos, epsilon);
+    }
+
+    move() {
+        let speed = 0.10;
+
+        // save current position
+        let oldX = this.nextPosition.x;
+        let oldZ = this.nextPosition.z;
+
+        // calculate new position
+        let newX = oldX - INPUT_DATA.HORIZONTAL * speed;
+        let newZ = oldZ - INPUT_DATA.VERTICAL * speed;
+        this.nextPosition.x = newX;
+        this.nextPosition.z = newZ;
+    }
+
+    animate(){       
+        if(this.isMoving(this.position, this.nextPosition)){
+            this._currentAnim = this._walking;
+        }else if(this._nextAnim === "WALKING"){
+            this._currentAnim = this._walking;
+        }else if(this._nextAnim === "DEATH"){
+            this._currentAnim = this._death;
+        }else if(this._nextAnim === "ATTACK"){
+            this._currentAnim = this._attack;
+        }else{
+            this._currentAnim = this._idle;
+        }  
     }
 
     ///////////////////////////
-    // todo: to be improved so we can better control the states... have no idea how yet
     update(player, delta) {
-
-        // movement
-        if(this.isPlayer && (INPUT_DATA.VERTICAL > 0 || INPUT_DATA.HORIZONTAL > 0)){
-            this.position.x += INPUT_DATA.VERTICAL;
-            this.position.z += INPUT_DATA.HORIZONTAL;
+        
+        // calculate next position based on input
+        if(this.isPlayer){
+            this.move();
         }
+        
+        // calculate animation to playe
+        this.animate();
 
+        //
+        this.position = BABYLON.Vector3.Lerp(this.position, this.nextPosition, 0.1);
 
-        //////////////////////////////////
-        if(SELECTED_ENTITY && SELECTED_ENTITY.sessionId == this.sessionId){
-            this._currentAnim = this._walking;
-        }else{
-            this._currentAnim = this._idle;
+        if(this.isPlayer){
+            PLAYER_CAMERA.setTarget(this.position);
         }
 
         // play animation and stop previous animation
