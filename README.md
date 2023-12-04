@@ -22,12 +22,13 @@ Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 - simple trainer system (learn abilities)
 - simple vendor system (buy and sell)
   
-## Currently working on (21/11/2023)
+## Current Roadmap 2023/2024
 
 - vat animation with instances
- > this should technically allow many more monsters and players, current tests are very promising and should allow up to 200-400 on the screen at the same time
-- damage calculation + progression
+ > this should allow many more monsters and players, current tests are very promising and should allow up to 200-400 on the screen at the same time
+- dynamic damage calculation + progression
 - fine tuning all the current systems
+- more to come...
 
 ## Links
 Follow the progress on the official babylon.js forum: [https://forum.babylonjs.com/t/multiplayer-top-down-rpg-babylon-js-colyseus/35733](https://forum.babylonjs.com/t/multiplayer-top-down-rpg-babylon-js-colyseus/35733)
@@ -48,11 +49,11 @@ Check out my devlogs on [https://dev.to/orion3d](https://dev.to/orion3d)
 - Run `yarn server-dev` to launch the server
 - Run `yarn client-dev` to launch the client
 
-The client should be accessible at [`http://localhost:8080`](http://localhost:8080)
+> The client should be accessible at [`http://localhost:8080`](http://localhost:8080)
 
-The server should be available locally at [http://localhost:3000](http://localhost:3000)
+> The server should be available locally at [http://localhost:3000](http://localhost:3000)
 
-The Colyseus monitor should be available at [[http://localhost:3000/monitor](http://localhost:3000/monitor)
+> The Colyseus monitor should be available at [[http://localhost:3000/monitor](http://localhost:3000/monitor)
 
 ## Load testing
 - Run `npx tsx ./loadtest/test.ts --room game_room --numClients 1 --endpoint ws://localhost:3000`

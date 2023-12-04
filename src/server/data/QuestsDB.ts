@@ -51,14 +51,7 @@ let QuestsDB = {
         quantity: 1,
         isRepeatable: false,
         rewards: {
-            experience: 1000,
-            gold: 250,
-            items: [
-                {
-                    key: "sword_01",
-                    qty: 1,
-                },
-            ],
+            experience: 10000,
         },
     },
 };

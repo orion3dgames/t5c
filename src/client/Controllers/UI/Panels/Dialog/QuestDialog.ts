@@ -117,7 +117,7 @@ export class QuestDialog {
 
         // quest accepted
         if (this.playerQuest && this.playerQuest.status === 0 && !this.questReadyToComplete) {
-            console.log("QUEST ACCPETED");
+            console.log("QUEST ACCEPTED");
             let dialogText = this.DEFAULT_TEXT_ONGOING;
             dialogText = this.replaceKeywords(dialogText);
             dialogTextBlock.text = dialogText;
