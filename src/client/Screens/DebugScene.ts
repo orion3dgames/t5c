@@ -141,10 +141,10 @@ export class DebugScene {
     public results;
     public SPAWN_INFO = [
         {
-            key: "male_knight",
+            key: "rat_01",
             name: "Rat",
             material: 0,
-            amount: 70,
+            amount: 1,
         },
     ];
 
@@ -214,7 +214,9 @@ export class DebugScene {
                 await this.prepareMesh(spawn);
             })
         );
-  
+
+        /*
+
         // create intances
         for (const spawn of this.SPAWN_INFO) {
             for (let i = 0; i < spawn.amount; i++) {
@@ -263,7 +265,7 @@ export class DebugScene {
                 entityData.rootForAnim[indexAnim].setEnabled(false);
                 indexAnim++;
             }
-        });
+        });*/
     }
 
     ///

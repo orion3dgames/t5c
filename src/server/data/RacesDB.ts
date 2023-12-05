@@ -12,14 +12,10 @@ let RacesDB: raceDataMap = {
         rotationFix: Math.PI,
         meshIndex: 1,
         animations: {
-            IDLE: { animation_id: 36, duration: 1000, speed: 1 },
-            WALK: { animation_id: 72, duration: 1000, speed: 1.3 },
             ATTACK: { animation_id: 1, duration: 1000, speed: 1 },
             DEATH: { animation_id: 24, duration: 1000, speed: 1 }, // 24 for knight, 23 for rogue and mage
-            DAMAGE: { animation_id: 34, duration: 1000, speed: 1 },
-            CASTING: { animation_id: 63, duration: 1000, speed: 1 },
-            CAST: { animation_id: 62, duration: 1000, speed: 1 },
-            PICKUP: { animation_id: 47, duration: 1000, speed: 1 },
+            IDLE: { animation_id: 36, duration: 1000, speed: 1 },
+            WALK: { animation_id: 72, duration: 1000, speed: 1.3 },
         },
         bones: {
             WEAPON: 12,
@@ -52,14 +48,10 @@ let RacesDB: raceDataMap = {
         rotationFix: Math.PI,
         meshIndex: 1,
         animations: {
-            IDLE: { animation_id: 36, duration: 1000, speed: 1 },
-            WALK: { animation_id: 72, duration: 1000, speed: 1.3 },
             ATTACK: { animation_id: 1, duration: 1000, speed: 1 },
             DEATH: { animation_id: 23, duration: 1000, speed: 1 }, // 24 for knight, 23 for rogue and mage
-            DAMAGE: { animation_id: 34, duration: 1000, speed: 1 },
-            CASTING: { animation_id: 63, duration: 1000, speed: 1 },
-            CAST: { animation_id: 62, duration: 1000, speed: 1 },
-            PICKUP: { animation_id: 47, duration: 1000, speed: 1 },
+            IDLE: { animation_id: 36, duration: 1000, speed: 1 },
+            WALK: { animation_id: 72, duration: 1000, speed: 1.3 },
         },
         bones: {
             WEAPON: 12,
@@ -90,14 +82,10 @@ let RacesDB: raceDataMap = {
         rotationFix: Math.PI,
         meshIndex: 1,
         animations: {
-            IDLE: { animation_id: 36, duration: 1000, speed: 1 },
-            WALK: { animation_id: 72, duration: 1000, speed: 1.3 },
             ATTACK: { animation_id: 1, duration: 1000, speed: 1 },
             DEATH: { animation_id: 23, duration: 1000, speed: 1 }, // 24 for knight, 23 for rogue and mage
-            DAMAGE: { animation_id: 34, duration: 1000, speed: 1 },
-            CASTING: { animation_id: 63, duration: 1000, speed: 1 },
-            CAST: { animation_id: 62, duration: 1000, speed: 1 },
-            PICKUP: { animation_id: 47, duration: 1000, speed: 1 },
+            IDLE: { animation_id: 36, duration: 1000, speed: 1 },
+            WALK: { animation_id: 72, duration: 1000, speed: 1.3 },
         },
         bones: {
             WEAPON: 12,
@@ -139,10 +127,10 @@ let RacesDB: raceDataMap = {
         rotationFix: Math.PI,
         meshIndex: 1,
         animations: {
-            IDLE: { animation_id: 2, duration: 1000, speed: 1 },
-            WALK: { animation_id: 5, duration: 1000, speed: 1.3 },
             ATTACK: { animation_id: 0, duration: 1000, speed: 0.75 },
             DEATH: { animation_id: 1, duration: 1000, speed: 1 },
+            IDLE: { animation_id: 2, duration: 1000, speed: 1 },
+            WALK: { animation_id: 5, duration: 1000, speed: 1.3 },
         },
         bones: {},
         materials: [],

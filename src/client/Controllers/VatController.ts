@@ -85,6 +85,14 @@ export class VatController {
         // calculate animations ranges
         const ranges = calculateRanges(selectedAnimationGroups);
 
+        ///////////////////////////////////////////////
+        // fix the "death" animation range => there is/are extra frame(s), not part of the death animation, depending on the model
+        if (race.key === "male_knight" || race.key === "rat_01") {
+            // ranges[3].to -= 1;
+        } else {
+            //ranges[3].to -= 3;
+        }
+
         //
         root.position.setAll(0);
         root.scaling.setAll(1);
@@ -96,7 +104,6 @@ export class VatController {
 
         // setup vat
         if (merged) {
-            
             // hide
             merged.isVisible = false;
 
@@ -132,7 +139,7 @@ export class VatController {
 
             // prepare items
             let itemMeshes = new Map();
-            if(Object.keys(race.bones).length > 0){
+            if (Object.keys(race.bones).length > 0) {
                 let items = this._game.loadGameData("items");
                 for (let itemKey in items) {
                     let item = items[itemKey];
@@ -171,7 +178,6 @@ export class VatController {
                         let itemMesh = mergeMesh(rawMesh);
 
                         if (itemMesh) {
-
                             // weapon VAT
                             itemMesh.skeleton = skeleton;
                             itemMesh.bakedVertexAnimationManager = vat;
@@ -199,7 +205,6 @@ export class VatController {
                         }
                     }
                 }
-                
             }
 
             // save

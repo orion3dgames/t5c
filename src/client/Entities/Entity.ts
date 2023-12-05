@@ -116,8 +116,6 @@ export class Entity extends TransformNode {
         this._currentPlayer = gamescene._currentPlayer;
         this.type = "entity";
 
-       
-
         // update player data from server data
         Object.assign(this, this._game.getGameData("race", entity.race));
 
