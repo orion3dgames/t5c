@@ -141,7 +141,7 @@ export class DebugScene {
     public results;
     public SPAWN_INFO = [
         {
-            key: "rat_01",
+            key: "male_rogue",
             name: "Rat",
             material: 0,
             amount: 1,

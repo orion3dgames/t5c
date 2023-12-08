@@ -145,14 +145,12 @@ export class EntityAnimator {
     play(player) {
         // play animation and stop previous animation
         if (this._currentAnim != null && this._prevAnim !== this._currentAnim) {
-            console.log("CHANGE ANIMATION TO", this._currentAnim);
+            //console.log("CHANGE ANIMATION TO", this._currentAnim);
             this.setAnimationParameters(this.mesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim);
-
             player.meshController.equipments.forEach((itemMesh) => {
-                console.log("EQUIPEMENT CHANGE ANIMATION TO", this._currentAnim);
+                //console.log("EQUIPEMENT CHANGE ANIMATION TO", this._currentAnim);
                 this.setAnimationParameters(itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim);
             });
-
             this._prevAnim = this._currentAnim;
             this.endOfLoop = false;
         }

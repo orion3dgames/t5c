@@ -7,7 +7,7 @@ let LocationsDB = {
         key: "lh_town",
         mesh: "lh_town",
         sun: true,
-        sunIntensity: 0.2,
+        sunIntensity: 1.2,
         fog: false,
         spawnPoint: {
             x: 0,
@@ -46,7 +46,7 @@ let LocationsDB = {
                     aggressive: true,
                     canAttack: true,
                     points: [new Vector3(5.38, 0.01, -1.3), new Vector3(15.53, 0.01, -8.95), new Vector3(-4.72, 0.01, -2.28)],
-                    amount: 1,
+                    amount: 10,
                     race: "male_rogue",
                     material: 0,
                     name: "Thief",
