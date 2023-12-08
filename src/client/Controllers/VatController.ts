@@ -13,6 +13,7 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { PBRCustomMaterial } from "@babylonjs/materials/custom/pbrCustomMaterial";
 import { PlayerSlots } from "../../shared/types";
 import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
+import { AssetContainer } from "@babylonjs/core/assetContainer";
 
 class JavascriptDataDownloader {
     private data;
@@ -104,11 +105,14 @@ export class VatController {
 
         // setup vat
         if (merged) {
-            // hide
-            merged.isVisible = false;
+            merged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
+            merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
 
             // create vat manager
+            const b = new VertexAnimationBaker(this._game.scene, merged);
             const vat = new BakedVertexAnimationManager(this._game.scene);
+
+            //merged.setEnabled(false);
 
             // copy mesh for each material
             let materials = race.materials ?? [];
@@ -120,20 +124,19 @@ export class VatController {
 
                     // prepare clone
                     let clone = merged.clone(raceKey);
+                    clone.bakedVertexAnimationManager = vat;
                     clone.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
                     clone.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-                    clone.bakedVertexAnimationManager = vat;
                     mergedMeshes.push(this.prepareClone(clone, material, raceKey, materialId));
-
                     materialId++;
                 });
             } else {
                 // in the case where there is only one material
                 let raceKey = race.key + "_0";
                 let clone = merged.clone(raceKey);
+                clone.bakedVertexAnimationManager = vat;
                 clone.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
                 clone.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-                clone.bakedVertexAnimationManager = vat;
                 mergedMeshes.push(clone);
             }
 
@@ -149,7 +152,7 @@ export class VatController {
                     if (slot && boneId) {
                         let rawMesh = this._game._loadedAssets["ITEM_" + item.key].meshes[0];
                         rawMesh.position.copyFrom(skeleton.bones[boneId].getAbsolutePosition()); // must be set in Blender
-                        rawMesh.rotationQuaternion = undefined;
+                        rawMesh.rotationQuaternion = null;
                         rawMesh.rotation.set(0, Math.PI * 1.5, 0); // we must set it in Blender
                         rawMesh.scaling.setAll(1);
 
@@ -171,7 +174,7 @@ export class VatController {
                         // if rotationFix needed
                         if (equipOptions.rotation_x || equipOptions.rotation_y || equipOptions.rotation_z) {
                             // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
-                            rawMesh.rotationQuaternion = null;
+                            rawMesh.rotationQuaternion = undefined;
                             rawMesh.rotation.set(equipOptions.rotation_x ?? 0, equipOptions.rotation_y ?? 0, equipOptions.rotation_z ?? 0);
                         }
 
@@ -207,9 +210,15 @@ export class VatController {
                 }
             }
 
+            // load prebaked vat animations
+            const req = await fetch("./models/races/vat/" + key + ".json");
+            const json = await req.json();
+            let bufferFromMesh = await b.loadBakedVertexDataFromJSON(json);
+            vat.texture = b.textureFromBakedVertexData(bufferFromMesh);
+
             // save
             this._entityData.set(key, {
-                mesh: mergedMeshes,
+                meshes: mergedMeshes,
                 animationRanges: ranges,
                 selectedAnimationGroups: selectedAnimationGroups,
                 skeleton: skeleton,
@@ -217,14 +226,14 @@ export class VatController {
                 items: itemMeshes,
             });
 
+            // hiding the mesh seems to start
+            //merged.setEnabled(false);
+
             // bake to file
             //await this.bakeTextureAnimation(key, merged);
 
             // bake realtime
             //await this.bakeTextureAnimationRealtime(key, merged);
-
-            // load prebaked vat animations
-            await this.loadBakedAnimation(key, merged);
         }
     }
 

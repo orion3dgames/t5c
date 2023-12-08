@@ -59,7 +59,6 @@ let LocationsDB = {
                         },
                     ],
                 },
-                /*
                 {
                     key: "lh_town_bandits",
                     type: "area",
@@ -79,7 +78,7 @@ let LocationsDB = {
                         new Vector3(-8.51, 0.01, -14.93),
                     ],
                     amount: 10,
-                    race: "male_rogue",
+                    race: "male_knight",
                     material: 0,
                     name: "Bandit",
                     baseHealth: 40,
@@ -99,6 +98,7 @@ let LocationsDB = {
                         },
                     ],
                 },
+
                 {
                     key: "lh_town_alexander",
                     type: "static",
@@ -282,7 +282,6 @@ let LocationsDB = {
                         },
                     ],
                 },
-                */
             ],
         },
     },

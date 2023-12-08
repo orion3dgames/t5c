@@ -76,7 +76,7 @@ export class EntityMesh {
 
         // load player mesh
         let materialIndex = this._entity.material ?? 0;
-        const playerMesh = this._entityData.mesh[materialIndex].createInstance(this._entity.type + "" + this._entity.sessionId);
+        const playerMesh = this._entityData.meshes[materialIndex].createInstance(this._entity.type + "" + this._entity.sessionId);
         playerMesh.parent = this._entity;
         playerMesh.isPickable = true;
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
@@ -205,13 +205,11 @@ export class EntityMesh {
 
         // equip all items
         this._entity.equipment.forEach((e: EquipmentSchema) => {
-            
             let item = this._game.getGameData("item", e.key);
             if (item && item.equippable) {
                 let equipOptions = item.equippable;
                 // if mesh needs to be added
                 if (equipOptions.mesh) {
-                    
                     // create instance of mesh
                     let instance = this._entityData.items.get(item.key).createInstance("equip_" + this._entity.sessionId + "_" + e.key);
                     instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);

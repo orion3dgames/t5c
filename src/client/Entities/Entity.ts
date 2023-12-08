@@ -283,6 +283,7 @@ export class Entity extends TransformNode {
     // basic performance LOD logic
     public lod(_currentPlayer) {
         if (_currentPlayer) {
+            /*
             // hide everything
             this.mesh.setEnabled(false);
             this.mesh.freezeWorldMatrix();
@@ -314,6 +315,7 @@ export class Entity extends TransformNode {
                     equipment.setEnabled(true);
                 });
             }
+            */
         }
     }
 
