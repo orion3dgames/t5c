@@ -33,7 +33,7 @@ export class EntityMesh {
     public playerMesh;
     public debugMesh: Mesh;
     public selectedMesh: Mesh;
-    public equipments: Mesh[] = [];
+    public equipments;
 
     constructor(entity: Entity) {
         this._entity = entity;
@@ -43,6 +43,8 @@ export class EntityMesh {
         this._loadedAssets = entity._game._loadedAssets;
         this._room = entity._room;
         this._entityData = this._game._vatController.entityData.get(this._entity.race);
+
+        this.equipments = new Map();
     }
 
     public async load() {
@@ -71,13 +73,12 @@ export class EntityMesh {
         selectedMesh.isVisible = false;
         selectedMesh.isPickable = false;
         selectedMesh.checkCollisions = false;
-        selectedMesh.position = new Vector3(0, -1, 0);
+        selectedMesh.position = new Vector3(0, 0.1, 0);
         this.selectedMesh = selectedMesh;
 
         // load player mesh
-        //let materialIndex = this._entity.material ?? 0;
-        let materialIndex = 0;
-        const playerMesh = this._entityData.mesh.createInstance(this._entity.type + "" + this._entity.sessionId);
+        let materialIndex = this._entity.material ?? 0;
+        const playerMesh = this._entityData.meshes[materialIndex].createInstance(this._entity.type + "" + this._entity.sessionId);
         playerMesh.parent = this._entity;
         playerMesh.isPickable = true;
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
@@ -132,12 +133,14 @@ export class EntityMesh {
             })
         );*/
 
+        this.equipAllItems();
+
         // check for any equipment changes
         this._entity.entity.equipment.onAdd((e) => {
-            this.attachEquipement();
+            this.equipItem(e);
         });
         this._entity.entity.equipment.onRemove((e) => {
-            this.attachEquipement();
+            this.removeItem(e);
         });
     }
 
@@ -185,46 +188,46 @@ export class EntityMesh {
     ///////////// EQUIPMENT ////////////////////
     ////////////////////////////////////////////////////
 
-    public attachEquipement() {
-        if (!this._entity.bones) {
-            return false;
+    removeItem(e) {
+        if (this.equipments.has(e.key)) {
+            console.log("removeItem", e, this.equipments.has(e.key));
+            this.equipments.get(e.key).dispose();
+            this.equipments.delete(e.key);
         }
+    }
 
-        if (!this._entity.animatorController) {
-            return false;
+    equipItem(e) {
+        if (this.equipments.has(e.key)) return false;
+
+        console.log("equipItem", e);
+
+        let item = this._game.getGameData("item", e.key);
+        if (item && item.equippable) {
+            let equipOptions = item.equippable;
+            // if mesh needs to be added
+            if (equipOptions.mesh) {
+                // create instance of mesh
+                let instance = this._entityData.items.get(item.key).createInstance("equip_" + this._entity.sessionId + "_" + e.key);
+                instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+                instance.isPickable = true;
+
+                // or like this(so we don't need to sync it every frame)
+                instance.setParent(this.mesh);
+                instance.position.setAll(0);
+                instance.rotationQuaternion = undefined;
+                instance.rotation.setAll(0);
+
+                // add
+                this.equipments.set(e.key, instance);
+            }
         }
+    }
 
-        // remove current equipped
-        if (this.equipments.length > 0) {
-            this.equipments.forEach((equipment) => {
-                equipment.dispose();
-            });
-        }
-
-        //
-        this.equipments = [];
-
+    public equipAllItems() {
+        console.log("equipAllItems");
         // equip all items
         this._entity.equipment.forEach((e: EquipmentSchema) => {
-            let item = this._game.getGameData("item", e.key);
-            if (item && item.equippable) {
-                let equipOptions = item.equippable;
-                // if mesh needs to be added
-                if (equipOptions.mesh) {
-                    // create instance of mesh
-                    let instance = this._entityData.items.get(item.key).createInstance("equip_" + this._entity.sessionId + "_" + e.key);
-                    instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-
-                    // or like this(so we don't need to sync it every frame)
-                    instance.setParent(this.mesh);
-                    instance.position.setAll(0);
-                    instance.rotationQuaternion = undefined;
-                    instance.rotation.setAll(0);
-
-                    // add
-                    this.equipments.push(instance);
-                }
-            }
+            this.equipItem(e);
         });
     }
 

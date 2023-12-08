@@ -132,9 +132,7 @@ export class GameScene {
         console.log(this._game._vatController.entityData);
 
         // init network
-        setTimeout(() => {
-            this._initNetwork();
-        }, 2000);
+        await this._initNetwork();
     }
 
     public async loadNavMesh(key) {
@@ -248,7 +246,7 @@ export class GameScene {
             for (let sessionId in this._entities) {
                 const entity = this._entities[sessionId];
                 entity.update(delta);
-                entity.lod(this._currentPlayer);
+                //entity.lod(this._currentPlayer);
             }
 
             /////////////////

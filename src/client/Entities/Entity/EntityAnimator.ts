@@ -113,7 +113,7 @@ export class EntityAnimator {
     }
 
     // determine what animation should be played
-    public animate(player, delta): void {
+    public animate(player): void {
         let currentPos = player.position;
         let nextPos = player.moveController.getNextPosition();
         player.isMoving = false;
@@ -136,9 +136,6 @@ export class EntityAnimator {
         } else {
             this._currentAnim = this._idle;
         }
-
-        // play animation
-        this.play(player);
     }
 
     // play animation

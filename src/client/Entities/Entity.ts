@@ -158,9 +158,6 @@ export class Entity extends TransformNode {
         this.moveController = new EntityMove(this);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
 
-        // attach equipment
-        this.meshController.attachEquipement();
-
         ///////////////////////////////////////////////////////////
         // entity network event
         // colyseus automatically sends entity updates, so let's listen to those changes
@@ -235,6 +232,10 @@ export class Entity extends TransformNode {
         }
 
         ////////////////////////////////////
+        // animate player continuously
+        this.animatorController.animate(this);
+
+        ////////////////////////////////////
         // only do the below if entity is not dead
         if (!this.isDead) {
             // if entity is selected, show
@@ -269,7 +270,7 @@ export class Entity extends TransformNode {
 
         ////////////////////////////////////
         // animate player continuously
-        this.animatorController.animate(this, delta);
+        this.animatorController.play(this);
     }
 
     public getPosition() {

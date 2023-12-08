@@ -55,11 +55,13 @@ export class VatController {
     }
 
     async initialize() {
-        await Promise.all(
-            this._spawns.map(async (spawn: any) => {
+        for (let spawn of this._spawns) {
+            if (!this._entityData.has(spawn.race)) {
                 await this.prepareMesh(spawn.race);
-            })
-        );
+            }
+        }
+
+        console.log("prepareMesh", "ALL FINISHED");
     }
 
     async check(race) {
@@ -116,9 +118,7 @@ export class VatController {
 
             // copy mesh for each material
             let mergedMeshes: any[] = [];
-            /*
             let materials = race.materials ?? [];
-            
             if (materials.length > 1) {
                 let materialId = 0;
                 race.materials.forEach((material) => {
@@ -129,6 +129,7 @@ export class VatController {
                     clone.bakedVertexAnimationManager = vat;
                     clone.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
                     clone.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+                    clone.setEnabled(false);
                     mergedMeshes.push(this.prepareClone(clone, material, raceKey, materialId));
                     materialId++;
                 });
@@ -139,8 +140,9 @@ export class VatController {
                 clone.bakedVertexAnimationManager = vat;
                 clone.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
                 clone.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+                clone.setEnabled(false);
                 mergedMeshes.push(clone);
-            }*/
+            }
 
             // prepare items
             let itemMeshes = new Map();
@@ -154,7 +156,7 @@ export class VatController {
                     if (slot && boneId) {
                         let rawMesh = this._game._loadedAssets["ITEM_" + item.key].meshes[0];
                         rawMesh.position.copyFrom(skeleton.bones[boneId].getAbsolutePosition()); // must be set in Blender
-                        rawMesh.rotationQuaternion = null;
+                        rawMesh.rotationQuaternion = undefined;
                         rawMesh.rotation.set(0, Math.PI * 1.5, 0); // we must set it in Blender
                         rawMesh.scaling.setAll(1);
 
@@ -176,7 +178,7 @@ export class VatController {
                         // if rotationFix needed
                         if (equipOptions.rotation_x || equipOptions.rotation_y || equipOptions.rotation_z) {
                             // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
-                            rawMesh.rotationQuaternion = undefined;
+                            rawMesh.rotationQuaternion = null;
                             rawMesh.rotation.set(equipOptions.rotation_x ?? 0, equipOptions.rotation_y ?? 0, equipOptions.rotation_z ?? 0);
                         }
 
@@ -213,7 +215,7 @@ export class VatController {
             }
 
             // load prebaked vat animations
-            let bufferFromMesh = await b.loadBakedVertexDataFromJSON(bakedAnimationJson);
+            let bufferFromMesh = b.loadBakedVertexDataFromJSON(bakedAnimationJson);
             vat.texture = b.textureFromBakedVertexData(bufferFromMesh);
 
             // save
@@ -227,7 +229,8 @@ export class VatController {
                 items: itemMeshes,
             });
 
-            // hiding the mesh seems to start
+            console.log("prepareMesh", key, "finishes");
+
             merged.setEnabled(false);
 
             // bake to file
