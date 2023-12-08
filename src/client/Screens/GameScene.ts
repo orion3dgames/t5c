@@ -132,7 +132,9 @@ export class GameScene {
         console.log(this._game._vatController.entityData);
 
         // init network
-        await this._initNetwork();
+        setTimeout(() => {
+            this._initNetwork();
+        }, 2000);
     }
 
     public async loadNavMesh(key) {

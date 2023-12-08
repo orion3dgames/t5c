@@ -75,8 +75,9 @@ export class EntityMesh {
         this.selectedMesh = selectedMesh;
 
         // load player mesh
-        let materialIndex = this._entity.material ?? 0;
-        const playerMesh = this._entityData.meshes[materialIndex].createInstance(this._entity.type + "" + this._entity.sessionId);
+        //let materialIndex = this._entity.material ?? 0;
+        let materialIndex = 0;
+        const playerMesh = this._entityData.mesh.createInstance(this._entity.type + "" + this._entity.sessionId);
         playerMesh.parent = this._entity;
         playerMesh.isPickable = true;
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.

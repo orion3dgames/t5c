@@ -68,55 +68,57 @@ export class VatController {
         }
     }
 
+    async fetchVAT(key) {
+        const response = await fetch("./models/races/vat/" + key + ".json");
+        const movies = await response.json();
+        return movies;
+    }
+
     async prepareMesh(key) {
         console.log("prepareMesh", key);
-        let asset = this._game._loadedAssets["RACE_" + key];
         let race = this._game.getGameData("race", key);
 
-        const meshes = asset.meshes;
-        const animationGroups = asset.animationGroups;
-        const skeletons = asset.skeletons;
+        const bakedAnimationJson = await this.fetchVAT(race.key);
+        const { meshes, animationGroups, skeletons } = this._game._loadedAssets["RACE_" + key];
         const skeleton = skeletons[0];
         const root = meshes[0] as Mesh;
+        root.name = "__root__model";
 
         animationGroups.forEach((ag) => ag.stop());
 
         const selectedAnimationGroups = this.getAnimationGroups(animationGroups, race.animations);
-
-        // calculate animations ranges
-        const ranges = calculateRanges(selectedAnimationGroups);
-
-        ///////////////////////////////////////////////
-        // fix the "death" animation range => there is/are extra frame(s), not part of the death animation, depending on the model
-        if (race.key === "male_knight" || race.key === "rat_01") {
-            // ranges[3].to -= 1;
-        } else {
-            //ranges[3].to -= 3;
-        }
 
         //
         root.position.setAll(0);
         root.scaling.setAll(1);
         root.rotationQuaternion = null;
         root.rotation.setAll(0);
+        root.setEnabled(false);
 
         // merge mesh
         const merged = mergeMeshAndSkeleton(root, skeleton);
 
         // setup vat
         if (merged) {
+            //
             merged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
             merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+
+            // calculate animations ranges
+            const ranges = calculateRanges(selectedAnimationGroups);
 
             // create vat manager
             const b = new VertexAnimationBaker(this._game.scene, merged);
             const vat = new BakedVertexAnimationManager(this._game.scene);
 
-            //merged.setEnabled(false);
+            merged.bakedVertexAnimationManager = vat;
+            merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
 
             // copy mesh for each material
-            let materials = race.materials ?? [];
             let mergedMeshes: any[] = [];
+            /*
+            let materials = race.materials ?? [];
+            
             if (materials.length > 1) {
                 let materialId = 0;
                 race.materials.forEach((material) => {
@@ -138,7 +140,7 @@ export class VatController {
                 clone.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
                 clone.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
                 mergedMeshes.push(clone);
-            }
+            }*/
 
             // prepare items
             let itemMeshes = new Map();
@@ -211,14 +213,13 @@ export class VatController {
             }
 
             // load prebaked vat animations
-            const req = await fetch("./models/races/vat/" + key + ".json");
-            const json = await req.json();
-            let bufferFromMesh = await b.loadBakedVertexDataFromJSON(json);
+            let bufferFromMesh = await b.loadBakedVertexDataFromJSON(bakedAnimationJson);
             vat.texture = b.textureFromBakedVertexData(bufferFromMesh);
 
             // save
             this._entityData.set(key, {
                 meshes: mergedMeshes,
+                mesh: merged,
                 animationRanges: ranges,
                 selectedAnimationGroups: selectedAnimationGroups,
                 skeleton: skeleton,
@@ -227,7 +228,7 @@ export class VatController {
             });
 
             // hiding the mesh seems to start
-            //merged.setEnabled(false);
+            merged.setEnabled(false);
 
             // bake to file
             //await this.bakeTextureAnimation(key, merged);

@@ -1,17 +1,16 @@
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
-const calculateRanges = function (animationGroups) {
+function calculateRanges(animationGroups) {
     return animationGroups.reduce((acc, ag, index) => {
         if (index === 0) {
             acc.push({ from: Math.floor(ag.from), to: Math.floor(ag.to) });
         } else {
             const prev = acc[index - 1];
-
             acc.push({ from: prev.to + 1, to: prev.to + 1 + Math.floor(ag.to) });
         }
         return acc;
     }, []);
-};
+}
 
 const setAnimationParameters = function (vec, animIndex, ranges) {
     animIndex = animIndex ?? 0;

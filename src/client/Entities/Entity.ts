@@ -314,8 +314,7 @@ export class Entity extends TransformNode {
                     equipment.unfreezeWorldMatrix();
                     equipment.setEnabled(true);
                 });
-            }
-            */
+            }*/
         }
     }
 
