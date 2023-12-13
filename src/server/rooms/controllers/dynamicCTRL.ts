@@ -59,7 +59,8 @@ export class dynamicCTRL {
     // check quest update
     // note: currently called from abilityCtrl when a entity dies
     checkQuestUpdate(type, target: BrainSchema) {
-        if (type === "kill") {
+        //
+        if (type === "kill" && target.AI_SPAWN_INFO) {
             this._player.player_data.quests.forEach((element: QuestSchema) => {
                 if (element.type === QuestObjective.KILL_AMOUNT && element.spawn_key === target.AI_SPAWN_INFO.key) {
                     element.qty++;
