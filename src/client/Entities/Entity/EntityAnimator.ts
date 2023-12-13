@@ -166,4 +166,11 @@ export class EntityAnimator {
             });
         }
     }
+
+    refreshItems() {
+        this._entity.meshController.equipments.forEach((itemMesh) => {
+            //console.log("EQUIPEMENT CHANGE ANIMATION TO", this._currentAnim);
+            this.setAnimationParameters(itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim);
+        });
+    }
 }

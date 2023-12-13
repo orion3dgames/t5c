@@ -8,9 +8,35 @@ let ASSETS_LOADED = new Map();
 const SPAWN_INFO = [
     {
         key: "male_knight",
+        quantity: 25,
+        items: [{ key: "sword_01" }, { key: "helm_01" }],
+        animations: ["1H_Melee_Attack_Slice_Diagonal", "Death_A", "Idle", "Walking_A"],
+        bones: {
+            WEAPON: 12,
+            OFF_HAND: 7,
+            HEAD: 14,
+        },
+        rotationFix: Math.PI,
+        scale: 1,
+    },
+    {
+        key: "male_knight",
+        quantity: 25,
+        items: [{ key: "shield_01" }, { key: "sword_01" }, { key: "helm_01" }],
+        animations: ["1H_Melee_Attack_Slice_Diagonal", "Death_A", "Idle", "Walking_A"],
+        bones: {
+            WEAPON: 12,
+            OFF_HAND: 7,
+            HEAD: 14,
+        },
+        rotationFix: Math.PI,
+        scale: 1,
+    },
+    {
+        key: "male_mage",
         quantity: 50,
         items: [{ key: "helm_01" }, { key: "shield_01" }, { key: "sword_01" }],
-        animations: ["1H_Melee_Attack_Chop", "Death_A", "Idle", "Walking_A"],
+        animations: ["1H_Melee_Attack_Slice_Diagonal", "Death_A", "Idle", "Walking_A"],
         bones: {
             WEAPON: 12,
             OFF_HAND: 7,
@@ -23,7 +49,7 @@ const SPAWN_INFO = [
         key: "male_rogue",
         quantity: 50,
         items: [{ key: "helm_01" }, { key: "shield_01" }, { key: "sword_01" }],
-        animations: ["1H_Melee_Attack_Chop", "Death_A", "Idle", "Walking_A"],
+        animations: ["1H_Melee_Attack_Slice_Diagonal", "Death_A", "Idle", "Walking_A"],
         bones: {
             WEAPON: 12,
             OFF_HAND: 7,
@@ -88,10 +114,21 @@ const PLANE_SIZE = 20;
 let SELECTED_ENTITY = false;
 let ENTITY_DATA = new Map();
 let INPUT_DATA = {
-    VERTICAL: 0,
-    HORIZONTAL: 0,
+    left_click: false,
+    player_can_move: false,
+    x: 0,
+    y: 0,
+    angle: 0,
+    camY: 0,
+    vertical: 0,
+    horizontal: 0,
+    middle_click: false,
+    movementX: 0,
+    movementY: 0,
+    digit1: false,
 };
 let PLAYER_CAMERA;
+let PLAYER_ROOT_CAMERA;
 const URL_ROOT = "https://raw.githubusercontent.com/orion3dgames/t5c/feature/vat-skin";
 
 var createScene = function () {
@@ -109,16 +146,57 @@ var createScene = function () {
     // Our built-in 'ground' shape.
     var ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 40, height: 40 }, scene);
 
-    // This creates and positions a free camera (non-mesh)
-    PLAYER_CAMERA = new BABYLON.ArcRotateCamera("camera1", Math.PI / 2, Math.PI / 4, 20, new BABYLON.Vector3(0, 3, 3), scene);
-    PLAYER_CAMERA.attachControl(scene);
-    PLAYER_CAMERA.inputs.attached.keyboard.detachControl();
+    // UI
+    let ADT = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI_Names", true, scene);
+
+    let helpBox = new BABYLON.GUI.TextBlock("helpBox");
+    helpBox.text = " Left click & drag to move \n Middle mouse click and drag to rotate camera \n Digit 1 to remove/add helmet ";
+    helpBox.fontSize = "16px";
+    helpBox.fontWeight = "bold";
+    helpBox.color = "white";
+    helpBox.resizeToFit = true;
+    helpBox.top = "15px;";
+    helpBox.left = "15px;";
+    helpBox.textWrapping = BABYLON.GUI.TextWrapping.WordWrap;
+    helpBox.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+    helpBox.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+    helpBox.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+    ADT.addControl(helpBox);
+
+    //
+    buildCamera(scene);
 
     // PRELOAD DATA
     loadAssets(scene);
 
     return scene;
 };
+
+function buildCamera(scene) {
+    // root camera parent that handles positioning of the camera to follow the player
+    PLAYER_ROOT_CAMERA = new BABYLON.TransformNode("root");
+    PLAYER_ROOT_CAMERA.position = new BABYLON.Vector3(0, 1.5, 0); //initialized at (0,0,0)
+
+    // to face the player from behind (180 degrees)
+    PLAYER_ROOT_CAMERA.rotation = new BABYLON.Vector3(0, (3 / 4) * Math.PI, 0);
+
+    // rotations along the x-axis (up/down tilting)
+    const yTilt = new BABYLON.TransformNode("ytilt");
+
+    // adjustments to camera view to point down at our player
+    yTilt.rotation = new BABYLON.Vector3(0.6, 0, 0);
+    yTilt.parent = PLAYER_ROOT_CAMERA;
+
+    // our actual camera that's pointing at our root's position
+    PLAYER_CAMERA = new BABYLON.UniversalCamera("cam", new BABYLON.Vector3(0, 0, -45), scene);
+    PLAYER_CAMERA.lockedTarget = PLAYER_ROOT_CAMERA.position;
+    PLAYER_CAMERA.fov = 0.35;
+    PLAYER_CAMERA.parent = yTilt;
+
+    // set as active camera
+    scene.activeCamera = PLAYER_CAMERA;
+    scene.cameraToUseForPointers = PLAYER_CAMERA; // is this necessary?
+}
 
 async function loadAssets(scene) {
     let assetsManager = new BABYLON.AssetsManager(scene);
@@ -164,16 +242,15 @@ async function loadAssets(scene) {
     await assetsManager.loadAsync();
 
     // PREPARE RACES MODELS FOR VAT
-    await Promise.all(
-        SPAWN_INFO.map(async (spawn) => {
-            prepareModel(scene, spawn);
-        })
-    );
+    for (let spawn of SPAWN_INFO) {
+        if (!ENTITY_DATA.has(spawn.key)) {
+            await prepareModel(scene, spawn);
+        }
+    }
+    console.log("prepareModel", "ALL FINISHED");
 
     // small timeout to fix await above not working? else ENTITY_DATA is empty
-    setTimeout(() => {
-        runGameLoop(scene);
-    }, 2000);
+    runGameLoop(scene);
 }
 
 function runGameLoop(scene) {
@@ -188,15 +265,13 @@ function runGameLoop(scene) {
             let instance = entityData.mesh.createInstance("entity_" + sessionId);
             players.set(sessionId, new Entity(sessionId, scene, instance, entityData, spawn, false));
         }
-
-        // add player
-        if (spawn.key === "male_knight") {
-            let entityData = ENTITY_DATA.get("male_knight");
-            let sessionId = "player";
-            let instance = entityData.mesh.createInstance("instance_" + sessionId);
-            players.set(sessionId, new Entity(sessionId, scene, instance, entityData, spawn, true));
-        }
     });
+    // add player
+    spawn = SPAWN_INFO[0];
+    let entityData = ENTITY_DATA.get("male_knight");
+    let sessionId = "player";
+    let instance = entityData.mesh.createInstance("instance_" + sessionId);
+    players.set(sessionId, new Entity(sessionId, scene, instance, entityData, spawn, true));
 
     // game loop
     scene.registerBeforeRender(() => {
@@ -214,36 +289,67 @@ function runGameLoop(scene) {
     scene.onKeyboardObservable.add((kbInfo) => {
         switch (kbInfo.type) {
             case BABYLON.KeyboardEventTypes.KEYDOWN:
-                if (kbInfo.event.code === "ArrowUp") {
-                    INPUT_DATA.VERTICAL = 1;
+                if (kbInfo.event.code === "Digit1") {
+                    INPUT_DATA.digit1 = true;
                 }
-                if (kbInfo.event.code === "ArrowDown") {
-                    INPUT_DATA.VERTICAL = -1;
-                }
-                if (kbInfo.event.code === "ArrowLeft") {
-                    INPUT_DATA.HORIZONTAL = -1;
-                }
-                if (kbInfo.event.code === "ArrowRight") {
-                    INPUT_DATA.HORIZONTAL = 1;
-                }
-                //console.log("MOVING", kbInfo.event.code, INPUT_DATA)
                 break;
 
             case BABYLON.KeyboardEventTypes.KEYUP:
-                if (
-                    kbInfo.event.code === "ArrowUp" ||
-                    kbInfo.event.code === "ArrowLeft" ||
-                    kbInfo.event.code === "ArrowRight" ||
-                    kbInfo.event.code === "ArrowDown"
-                ) {
-                    INPUT_DATA.VERTICAL = 0;
-                    INPUT_DATA.HORIZONTAL = 0;
+                if (kbInfo.event.code === "Digit1") {
+                    INPUT_DATA.digit1 = false;
                 }
                 break;
         }
     });
 
     scene.onPointerObservable.add((pointerInfo) => {
+        if (pointerInfo.type === BABYLON.PointerEventTypes.POINTERDOWN) {
+            // left click
+            if (pointerInfo.event.button == 0) {
+                INPUT_DATA.left_click = true;
+            }
+            // middle click
+            if (pointerInfo.event.button == 1) {
+                INPUT_DATA.middle_click = true;
+            }
+        }
+
+        if (pointerInfo.type === BABYLON.PointerEventTypes.POINTERUP) {
+            // left click
+            if (pointerInfo.event.button == 0) {
+                INPUT_DATA.left_click = false;
+                INPUT_DATA.angle = 0;
+                INPUT_DATA.vertical = 0;
+                INPUT_DATA.horizontal = 0;
+                INPUT_DATA.player_can_move = false;
+            }
+            // middle click
+            if (pointerInfo.event.button == 1) {
+                INPUT_DATA.middle_click = false;
+            }
+        }
+
+        if (pointerInfo.type === BABYLON.PointerEventTypes.POINTERMOVE) {
+            if (INPUT_DATA.left_click) {
+                INPUT_DATA.player_can_move = true;
+                let dpi = window.devicePixelRatio;
+                let editor = document.getElementById("monacoHost");
+                let offsetX = editor.offsetWidth;
+                INPUT_DATA.x = (((pointerInfo.event.clientX - offsetX) * dpi) / pointerInfo.event.target.width) * 2 - 1;
+                INPUT_DATA.y = ((pointerInfo.event.clientY * dpi) / pointerInfo.event.target.height) * 2 - 1;
+                INPUT_DATA.angle = Math.atan2(INPUT_DATA.x, INPUT_DATA.y);
+                if (INPUT_DATA.angle !== 0) {
+                    INPUT_DATA.vertical = -Math.cos(INPUT_DATA.angle + Math.PI - INPUT_DATA.camY);
+                    INPUT_DATA.horizontal = Math.sin(INPUT_DATA.angle + Math.PI - INPUT_DATA.camY);
+                }
+            }
+        }
+
+        if (INPUT_DATA.middle_click) {
+            INPUT_DATA.movementX = pointerInfo.event.movementX / 100;
+            INPUT_DATA.movementY = pointerInfo.event.movementY / 75;
+        }
+
         if (pointerInfo.type === BABYLON.PointerEventTypes.POINTERDOWN && pointerInfo.event.button === 0) {
             let metadata = getMeshMetadata(pointerInfo);
             let entity = players.get(metadata.sessionId);
@@ -284,6 +390,8 @@ async function fetchVAT(key) {
 
 // prepare model
 async function prepareModel(scene, spawn) {
+    console.log("prepareMesh", spawn.key);
+
     const PICKED_ANIMS = spawn.animations;
 
     const bakedAnimationJson = await fetchVAT(spawn.key);
@@ -312,22 +420,18 @@ async function prepareModel(scene, spawn) {
 
         const ranges = calculateRanges(selectedAnimationGroups);
 
-        // fix the "death" animation range => there is/are extra frame(s), not part of the death animation, depending on the model
-        if (spawn.key === "male_knight" || spawn.key === "rat_01") {
-            ranges[1].to -= 1;
-        } else {
-            ranges[1].to -= 3;
-        }
-
         const b = new BABYLON.VertexAnimationBaker(scene, modelMeshMerged);
         const manager = new BABYLON.BakedVertexAnimationManager(scene);
 
         modelMeshMerged.bakedVertexAnimationManager = manager;
         modelMeshMerged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new BABYLON.Vector4(0, 0, 0, 0);
 
-        // load baked animation from json
-        let bufferFromMesh = await b.loadBakedVertexDataFromJSON(bakedAnimationJson);
-        manager.texture = b.textureFromBakedVertexData(bufferFromMesh);
+        let raceKey = spawn.key + "_0";
+        let clone = modelMeshMerged.clone(raceKey);
+        clone.bakedVertexAnimationManager = manager;
+        clone.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
+        clone.instancedBuffers.bakedVertexAnimationSettingsInstanced = new BABYLON.Vector4(0, 0, 0, 0);
+        clone.setEnabled(false);
 
         // prepare  items
         let itemMeshes = new Map();
@@ -394,18 +498,24 @@ async function prepareModel(scene, spawn) {
             }
         }
 
+        // load baked animation from json
+        let bufferFromMesh = await b.loadBakedVertexDataFromJSON(bakedAnimationJson);
+        manager.texture = b.textureFromBakedVertexData(bufferFromMesh);
+
         // hide merged mesh
         modelMeshMerged.setEnabled(false);
 
         // save
         ENTITY_DATA.set(spawn.key, {
-            mesh: modelMeshMerged,
+            mesh: clone,
             animationRanges: ranges,
             animationGroups: animationGroups,
             selectedAnimationGroups: selectedAnimationGroups,
             vat: manager,
             items: itemMeshes,
         });
+
+        console.log("prepareMesh", spawn.key, "finishes");
     }
 }
 
@@ -452,7 +562,7 @@ class Entity extends BABYLON.TransformNode {
     spawnInfo;
     currentAnimationRange = 0;
     currentAnimationIndex = 0;
-    equipments = [];
+    equipments;
 
     fromFrame;
     toFrame;
@@ -470,18 +580,19 @@ class Entity extends BABYLON.TransformNode {
 
     sessionId;
     nextPosition;
+    nextRotation;
     camera;
     timer = 0;
+    heightChange;
 
     isPlayer = false;
+    target;
 
     constructor(name, scene, playerInstance, entityData, spawnInfo, isPlayer = false) {
         super(name, scene);
 
         this.sessionId = name;
         this.isPlayer = isPlayer;
-
-        this.nextPosition = new BABYLON.Vector3(randomNumberInRange(-PLANE_SIZE, PLANE_SIZE), 0, randomNumberInRange(-PLANE_SIZE, PLANE_SIZE));
 
         // prepare player mesh
         playerInstance.setParent(this);
@@ -501,27 +612,17 @@ class Entity extends BABYLON.TransformNode {
         //
         this.mesh.instancedBuffers.bakedVertexAnimationSettingsInstanced = new BABYLON.Vector4(0, 0, 0, 0);
 
+        // initial spawn position
+        this.target = new BABYLON.Vector3(0, 0, 0);
+        this.position = new BABYLON.Vector3(randomNumberInRange(-PLANE_SIZE, PLANE_SIZE), 0, randomNumberInRange(-PLANE_SIZE, PLANE_SIZE));
+        this.nextPosition = new BABYLON.Vector3(0, 0, 0);
+        this.nextRotation = new BABYLON.Vector3(0, 0, 0);
+        this.nextPosition.set(this.position.x, this.position.y, this.position.z);
+
         // add equipment
+        this.equipments = new Map();
         spawnInfo.items.forEach((e) => {
-            let item = ITEM_DATA[e.key];
-
-            // create instance of mesh
-            let instance = this.entityData.items.get(item.key).createInstance("equip_" + this.sessionId + "_" + e.key);
-            instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new BABYLON.Vector4(0, 0, 0, 0);
-            instance.isPickable = true;
-
-            instance.metadata = {
-                sessionId: this.sessionId,
-            };
-
-            // or like this(so we don't need to sync it every frame)
-            instance.setParent(this.mesh);
-            instance.position.setAll(0);
-            instance.rotationQuaternion = undefined;
-            instance.rotation.setAll(0);
-
-            //
-            this.equipments.push(instance);
+            this.addItem(e.key);
         });
 
         // PREPARE ANIMATIONS
@@ -559,17 +660,21 @@ class Entity extends BABYLON.TransformNode {
     }
 
     move() {
-        let speed = 0.1;
+        let speed = 0.15;
 
         // save current position
         let oldX = this.nextPosition.x;
+        let oldY = this.nextPosition.y;
         let oldZ = this.nextPosition.z;
+        const newRotY = Math.atan2(INPUT_DATA.horizontal, INPUT_DATA.vertical);
 
         // calculate new position
-        let newX = oldX - INPUT_DATA.HORIZONTAL * speed;
-        let newZ = oldZ - INPUT_DATA.VERTICAL * speed;
+        let newX = oldX - INPUT_DATA.horizontal * speed;
+        let newZ = oldZ - INPUT_DATA.vertical * speed;
         this.nextPosition.x = newX;
         this.nextPosition.z = newZ;
+        this.nextPosition.y = 0;
+        this.nextRotation.y = this.nextRotation.y + (newRotY - this.nextRotation.y);
     }
 
     animate() {
@@ -586,28 +691,143 @@ class Entity extends BABYLON.TransformNode {
         }
     }
 
+    followCamera() {
+        PLAYER_ROOT_CAMERA.position = this.position;
+        if (INPUT_DATA.middle_click) {
+            const rotationX =
+                Math.abs(PLAYER_ROOT_CAMERA.rotation.x + INPUT_DATA.movementY) < 0.5
+                    ? PLAYER_ROOT_CAMERA.rotation.x + INPUT_DATA.movementY
+                    : PLAYER_ROOT_CAMERA.rotation.x;
+            const rotationY = PLAYER_ROOT_CAMERA.rotation.y + INPUT_DATA.movementX;
+            PLAYER_ROOT_CAMERA.rotation = new BABYLON.Vector3(rotationX, rotationY, 0);
+        }
+    }
+
+    addItem(key) {
+        let item = ITEM_DATA[key];
+
+        // create instance of mesh
+        let instance = this.entityData.items.get(item.key).createInstance("equip_" + this.sessionId + "_" + key);
+        instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new BABYLON.Vector4(0, 0, 0, 0);
+        instance.isPickable = true;
+
+        instance.metadata = {
+            sessionId: this.sessionId,
+        };
+
+        // or like this(so we don't need to sync it every frame)
+        instance.setParent(this.mesh);
+        instance.position.setAll(0);
+        instance.rotationQuaternion = undefined;
+        instance.rotation.setAll(0);
+
+        //
+        this.equipments.set(item.key, instance);
+    }
+
+    getPosition() {
+        return new BABYLON.Vector3(this.position.x, this.position.y, this.position.z);
+    }
+
+    moveTowards() {
+        // move entity
+        if (this.target) {
+            let currentPos = this.getPosition();
+            let destination = this.target;
+
+            // calculate next position towards destination
+            let updatedPos = this.moveTo(currentPos, destination, 0.45);
+            this.nextPosition.copyFrom(updatedPos);
+
+            // calculate rotation
+            this.rot = Math.atan2(currentPos.x - updatedPos.x, currentPos.z - updatedPos.z);
+
+            // check if arrived at waypoint
+            let distance = new BABYLON.Vector3.Distance(updatedPos, destination);
+            if (distance < 1) {
+                this.target = false;
+            }
+            //}
+        } else {
+            console.error("moveTowards failed");
+        }
+    }
+
+    moveTo(source, destination, speed) {
+        let currentX = source.x;
+        let currentZ = source.z;
+        let targetX = destination.x;
+        let targetZ = destination.z;
+        let newPos = new BABYLON.Vector3(source.x, source.y, source.z);
+        if (targetX < currentX) {
+            newPos.x -= speed;
+            if (newPos.x < targetX) {
+                newPos.x = targetX;
+            }
+        }
+        if (targetX > currentX) {
+            newPos.x += speed;
+            if (newPos.x > targetX) {
+                newPos.x = targetX;
+            }
+        }
+        if (targetZ < currentZ) {
+            newPos.z -= speed;
+            if (newPos.z < targetZ) {
+                newPos.z = targetZ;
+            }
+        }
+        if (targetZ > currentZ) {
+            newPos.z += speed;
+            if (newPos.z > targetZ) {
+                newPos.z = targetZ;
+            }
+        }
+        return newPos;
+    }
+
     ///////////////////////////
     update(player, delta) {
         // calculate next position based on input
-        if (this.isPlayer) {
+        if (this.isPlayer && INPUT_DATA.player_can_move === true) {
             this.move();
         }
 
-        // calculate animation to playe
+        // calculate animation to play
         this.animate();
 
-        //
-        this.timer++;
-        if (this.timer > 100) {
-            this.nextPosition.y = randomNumberInRange(0, 3);
-            this.timer = 0;
+        if (this.isPlayer) {
+            INPUT_DATA.camY = PLAYER_ROOT_CAMERA.rotation.y;
+        } else {
+            // has target
+            if (!this.target) {
+                this.target = new Vector3(randomNumberInRange(-PLANE_SIZE, PLANE_SIZE), 0, randomNumberInRange(-PLANE_SIZE, PLANE_SIZE));
+            }
+
+            this.moveTowards();
         }
 
-        //
+        // tween position
         this.position = BABYLON.Vector3.Lerp(this.position, this.nextPosition, 0.1);
+        const gap = Math.abs(this.rotation.y - this.nextRotation.y);
+        if (gap > Math.PI) this.rotation.y = this.nextRotation.y;
+        else this.rotation = BABYLON.Vector3.Lerp(this.rotation, this.nextRotation, 0.45);
 
+        // move camera
         if (this.isPlayer) {
-            PLAYER_CAMERA.setTarget(this.position);
+            this.followCamera();
+
+            // player events
+            if (INPUT_DATA.digit1 === true) {
+                if (this.equipments.has("helm_01")) {
+                    this.equipments.get("helm_01").dispose();
+                    this.equipments.delete("helm_01");
+                } else {
+                    this.addItem("helm_01");
+                }
+
+                INPUT_DATA.digit1 = false;
+            }
         }
 
         // play animation and stop previous animation
@@ -629,7 +849,7 @@ class Entity extends BABYLON.TransformNode {
 
         // if animation is loop=false; and finished playing
         if (currentAnimFrame >= this.toFrame - this.fromFrame && this._currentAnim.loop === false && this.endOfLoop === false) {
-            //console.log("ANIMATION FINISHED, STOP ANIMATION ", this.currentFrame, this.targetFrame);
+            console.log("ANIMATION FINISHED, STOP ANIMATION ", this.currentFrame, this.targetFrame);
             this.mesh.instancedBuffers.bakedVertexAnimationSettingsInstanced.set(this.toFrame - 1, this.toFrame, this._currentAnimVATOffset, 60);
             this.endOfLoop = true;
             this.equipments.forEach((itemMesh) => {
@@ -666,41 +886,5 @@ class Entity extends BABYLON.TransformNode {
         this._currentAnimVATOffset = this.computeOffsetInAnim(this.fromFrame, this.toFrame, this._currentAnimVATTimeAtStart, delta);
 
         vec.set(this.fromFrame, this.toFrame, this._currentAnimVATOffset, delta); // skip one frame to avoid weird artifacts
-    }
-}
-
-class AnimationHelper {
-    static RetargetSkeletonToAnimationGroup(animationGroup, retargetSkeleton) {
-        for (let i = 0; i < animationGroup.targetedAnimations.length; ++i) {
-            const ta = animationGroup.targetedAnimations[i];
-            const bone = AnimationHelper._FindBoneByTransformNodeName(retargetSkeleton, ta.target.name);
-            if (!bone) {
-                animationGroup.targetedAnimations.splice(i, 1);
-                i--;
-                continue;
-            }
-            bone._linkedTransformNode = ta.target;
-        }
-    }
-
-    static RetargetAnimationGroupToRoot(animationGroup, root) {
-        for (let i = 0; i < animationGroup.targetedAnimations.length; ++i) {
-            const ta = animationGroup.targetedAnimations[i];
-            const children = root.getDescendants(false, (node) => node.name === ta.target.name);
-            if (children.length === 0) {
-                animationGroup.targetedAnimations.splice(i, 1);
-                i--;
-                continue;
-            }
-            ta.target = children[0];
-        }
-    }
-    static _FindBoneByTransformNodeName(skeleton, name) {
-        for (const bone of skeleton.bones) {
-            if (bone._linkedTransformNode.name === name) {
-                return bone;
-            }
-        }
-        return null;
     }
 }

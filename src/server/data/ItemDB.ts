@@ -68,7 +68,6 @@ let ItemsDB: itemDataMap = {
             slot: PlayerSlots.HEAD,
             mesh: "helm_01",
             material: "helm_material_01",
-            offset_x: 0,
             offset_y: 0.575,
             offset_z: 0.055,
             rotation_y: Math.PI * 1.5,

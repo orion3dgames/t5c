@@ -74,7 +74,7 @@ export class EntityMove {
     // move transform node
     public tween() {
         // continuously lerp between current position and next position
-        this._node.position = Vector3.Lerp(this._node.position, this.nextPosition, 0.1);
+        this._node.position = Vector3.Lerp(this._node.position, this.nextPosition, 0.15);
 
         // rotation
         // TODO DAYD : make it better
@@ -114,7 +114,7 @@ export class EntityMove {
                 //newY -= distance; // smooth transition*/
 
                 this.nextPosition.x = newX;
-                this.nextPosition.y = newY;
+                this.nextPosition.y = 0;
                 this.nextPosition.z = newZ;
                 this.nextRotation.y = this.nextRotation.y + (newRotY - this.nextRotation.y);
             }

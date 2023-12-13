@@ -97,7 +97,6 @@ export class EntityMesh {
             name: this._entity.name,
         };
 
-        /*
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);
 
@@ -131,17 +130,19 @@ export class EntityMesh {
                     this.mesh.actionManager.hoverCursor = this._ui._Cursor.get();
                 }
             })
-        );*/
+        );
 
-        this.equipAllItems();
-
-        // check for any equipment changes
-        this._entity.entity.equipment.onAdd((e) => {
-            this.equipItem(e);
-        });
-        this._entity.entity.equipment.onRemove((e) => {
-            this.removeItem(e);
-        });
+        setTimeout(() => {
+            this.equipAllItems();
+            // check for any equipment changes
+            this._entity.entity.equipment.onAdd((e) => {
+                this.equipItem(e);
+            });
+            this._entity.entity.equipment.onRemove((e) => {
+                this.removeItem(e);
+            });
+            this._entity.animatorController.refreshItems();
+        }, 1000);
     }
 
     public freezeMeshes() {
@@ -190,7 +191,6 @@ export class EntityMesh {
 
     removeItem(e) {
         if (this.equipments.has(e.key)) {
-            console.log("removeItem", e, this.equipments.has(e.key));
             this.equipments.get(e.key).dispose();
             this.equipments.delete(e.key);
         }
@@ -198,8 +198,6 @@ export class EntityMesh {
 
     equipItem(e) {
         if (this.equipments.has(e.key)) return false;
-
-        console.log("equipItem", e);
 
         let item = this._game.getGameData("item", e.key);
         if (item && item.equippable) {
@@ -209,7 +207,7 @@ export class EntityMesh {
                 // create instance of mesh
                 let instance = this._entityData.items.get(item.key).createInstance("equip_" + this._entity.sessionId + "_" + e.key);
                 instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-                instance.isPickable = true;
+                instance.isPickable = false;
 
                 // or like this(so we don't need to sync it every frame)
                 instance.setParent(this.mesh);
@@ -224,7 +222,6 @@ export class EntityMesh {
     }
 
     public equipAllItems() {
-        console.log("equipAllItems");
         // equip all items
         this._entity.equipment.forEach((e: EquipmentSchema) => {
             this.equipItem(e);
