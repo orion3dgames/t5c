@@ -38,7 +38,7 @@ class JavascriptDataDownloader {
 export class VatController {
     public _game: GameController;
     private _spawns = [];
-    private _entityData = new Map();
+    public _entityData = new Map();
     private _skeletonData = new Map();
 
     public get entityData() {
@@ -60,17 +60,19 @@ export class VatController {
                 await this.prepareMesh(spawn.race);
             }
         }
-
         console.log("prepareMesh", "ALL FINISHED");
     }
 
     async check(race) {
         if (!this._entityData.has(race)) {
+            console.log("prepareMesh", "ADDING PLAYER");
             await this.prepareMesh(race);
         }
     }
 
     async fetchVAT(key) {
+        const url = "./models/races/vat/" + key + ".json";
+        console.log("[fetchVAT]", url);
         const response = await fetch("./models/races/vat/" + key + ".json");
         const movies = await response.json();
         return movies;
@@ -84,12 +86,12 @@ export class VatController {
         const { meshes, animationGroups, skeletons } = this._game._loadedAssets["RACE_" + key];
         const skeleton = skeletons[0];
         const root = meshes[0] as Mesh;
-        root.name = "__root__model";
+        root.name = "_root_race_" + key;
 
         animationGroups.forEach((ag) => ag.stop());
         const selectedAnimationGroups = this.getAnimationGroups(animationGroups, race.animations);
 
-        //
+        // reset positions
         root.position.setAll(0);
         root.scaling.setAll(1);
         root.rotationQuaternion = null;
@@ -97,153 +99,133 @@ export class VatController {
         root.setEnabled(false);
 
         // merge mesh
-        const merged = mergeMeshAndSkeleton(root, skeleton);
+        const modelMeshMerged = mergeMeshAndSkeleton(root, skeleton);
 
         // setup vat
-        if (merged) {
+        if (modelMeshMerged) {
             //
-            merged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
-            merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+            modelMeshMerged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
+            modelMeshMerged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
 
             // calculate animations ranges
             const ranges = calculateRanges(selectedAnimationGroups);
 
             // create vat manager
-            const b = new VertexAnimationBaker(this._game.scene, merged);
-            const vat = new BakedVertexAnimationManager(this._game.scene);
+            const b = new VertexAnimationBaker(this._game.scene, modelMeshMerged);
+            const manager = new BakedVertexAnimationManager(this._game.scene);
 
-            merged.bakedVertexAnimationManager = vat;
-            merged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+            //
+            modelMeshMerged.bakedVertexAnimationManager = manager;
+            modelMeshMerged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
 
             // copy mesh for each material
-            let mergedMeshes: any[] = [];
-            let materials = race.materials ?? [];
-            if (materials.length > 1) {
-                let materialId = 0;
-                race.materials.forEach((material) => {
-                    let raceKey = race.key + "_" + materialId;
-
-                    // prepare clone
-                    let clone = merged.clone(raceKey);
-                    clone.bakedVertexAnimationManager = vat;
-                    clone.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
-                    clone.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-                    clone.setEnabled(false);
-                    mergedMeshes.push(this.prepareClone(clone, material, raceKey, materialId));
-                    materialId++;
-                });
-            } else {
-                // in the case where there is only one material
-                let raceKey = race.key + "_0";
-                let clone = merged.clone(raceKey);
-                clone.bakedVertexAnimationManager = vat;
-                clone.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
-                clone.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-                clone.setEnabled(false);
-                mergedMeshes.push(clone);
-            }
+            let mergedMeshes: Mesh[] = [];
+            let raceKey = race.key + "_0";
+            let clone = modelMeshMerged.clone(raceKey);
+            clone.bakedVertexAnimationManager = manager;
+            clone.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
+            clone.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+            mergedMeshes.push(clone);
+            clone.setEnabled(false);
 
             // prepare items
             let itemMeshes = new Map();
             if (Object.keys(race.bones).length > 0) {
                 let items = this._game.loadGameData("items");
                 for (let itemKey in items) {
-                    let itemMesh = this.prepareItem(itemKey, race.key, skeleton, vat);
-                    if (itemMesh) {
-                        itemMeshes.set(itemKey, itemMesh);
+                    let item = this._game.getGameData("item", itemKey);
+                    let slot = item.equippable ? PlayerSlots[item.equippable.slot] : 0;
+                    let boneId = race.bones[slot];
+
+                    if (slot && boneId) {
+                        let rawMesh = this._game._loadedAssets["ITEM_" + item.key].meshes[0];
+                        rawMesh.position.copyFrom(skeleton.bones[boneId].getAbsolutePosition()); // must be set in Blender
+                        rawMesh.rotationQuaternion = undefined;
+                        rawMesh.rotation.set(0, Math.PI * 1.5, 0); // we must set it in Blender
+                        rawMesh.scaling.setAll(1);
+
+                        // if mesh offset required
+                        let equipOptions = item.equippable;
+                        if (equipOptions.scale) {
+                            rawMesh.scaling = new Vector3(equipOptions.scale, equipOptions.scale, equipOptions.scale);
+                        }
+                        if (equipOptions.offset_x) {
+                            rawMesh.position.x += equipOptions.offset_x;
+                        }
+                        if (equipOptions.offset_y) {
+                            rawMesh.position.y += equipOptions.offset_y;
+                        }
+                        if (equipOptions.offset_z) {
+                            rawMesh.position.z += equipOptions.offset_z;
+                        }
+
+                        // if rotationFix needed
+                        if (equipOptions.rotation_x || equipOptions.rotation_y || equipOptions.rotation_z) {
+                            // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
+                            rawMesh.rotationQuaternion = null;
+                            rawMesh.rotation.set(equipOptions.rotation_x ?? 0, equipOptions.rotation_y ?? 0, equipOptions.rotation_z ?? 0);
+                        }
+
+                        let itemMesh = mergeMesh(rawMesh, itemKey);
+
+                        if (itemMesh) {
+                            itemMesh.name = race.key + "_" + itemMesh.name;
+
+                            // weapon VAT
+                            itemMesh.skeleton = skeleton;
+                            itemMesh.bakedVertexAnimationManager = manager;
+                            itemMesh.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
+                            itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+
+                            // manually set MatricesIndicesKind & MatricesWeightsKind
+                            // https://doc.babylonjs.com/features/featuresDeepDive/mesh/bonesSkeletons#preparing-mesh
+                            const totalCount = itemMesh.getTotalVertices();
+                            const weaponMI: any = [];
+                            const weaponMW: any = [];
+                            for (let i = 0; i < totalCount; i++) {
+                                weaponMI.push(boneId, 0, 0, 0);
+                                weaponMW.push(1, 0, 0, 0);
+                            }
+
+                            itemMesh.setVerticesData(VertexBuffer.MatricesIndicesKind, weaponMI, false);
+                            itemMesh.setVerticesData(VertexBuffer.MatricesWeightsKind, weaponMW, false);
+
+                            //
+                            itemMesh.setEnabled(false);
+
+                            console.log("ADDING ITEM", itemKey, manager);
+
+                            itemMeshes.set(itemKey, itemMesh);
+                        }
                     }
                 }
             }
 
             // load prebaked vat animations
-            let bufferFromMesh = b.loadBakedVertexDataFromJSON(bakedAnimationJson);
-            vat.texture = b.textureFromBakedVertexData(bufferFromMesh);
+            let bufferFromMesh = await b.loadBakedVertexDataFromJSON(bakedAnimationJson);
+            manager.texture = b.textureFromBakedVertexData(bufferFromMesh);
+            manager.texture.name = key + "_VATRIG";
+            //manager.name = raceKey + "_vatmanager";
+            console.log("prepareMesh", key, "vatManager");
+
+            modelMeshMerged.setEnabled(false);
 
             // save
             this._entityData.set(key, {
                 meshes: mergedMeshes,
-                mesh: merged,
                 animationRanges: ranges,
                 selectedAnimationGroups: selectedAnimationGroups,
-                skeleton: skeleton,
-                vat: vat,
+                vat: manager,
                 items: itemMeshes,
             });
 
             console.log("prepareMesh", key, "finishes");
-
-            merged.setEnabled(false);
 
             // bake to file
             //await this.bakeTextureAnimation(key, merged);
 
             // bake realtime
             //await this.bakeTextureAnimationRealtime(key, merged);
-        }
-    }
-
-    prepareItem(itemKey, raceKey, skeleton, vat) {
-        let item = this._game.getGameData("item", itemKey);
-        let race = this._game.getGameData("race", raceKey);
-        let slot = item.equippable ? PlayerSlots[item.equippable.slot] : 0;
-        let boneId = race.bones[slot];
-
-        if (slot && boneId) {
-            let rawMesh = this._game._loadedAssets["ITEM_" + item.key].meshes[0];
-            rawMesh.position.copyFrom(skeleton.bones[boneId].getAbsolutePosition()); // must be set in Blender
-            rawMesh.rotationQuaternion = undefined;
-            rawMesh.rotation.set(0, Math.PI * 1.5, 0); // we must set it in Blender
-            rawMesh.scaling.setAll(1);
-
-            // if mesh offset required
-            let equipOptions = item.equippable;
-            if (equipOptions.scale) {
-                rawMesh.scaling = new Vector3(equipOptions.scale, equipOptions.scale, equipOptions.scale);
-            }
-            if (equipOptions.offset_x) {
-                rawMesh.position.x += equipOptions.offset_x;
-            }
-            if (equipOptions.offset_y) {
-                rawMesh.position.y += equipOptions.offset_y;
-            }
-            if (equipOptions.offset_z) {
-                rawMesh.position.z += equipOptions.offset_z;
-            }
-
-            // if rotationFix needed
-            if (equipOptions.rotation_x || equipOptions.rotation_y || equipOptions.rotation_z) {
-                // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
-                rawMesh.rotationQuaternion = null;
-                rawMesh.rotation.set(equipOptions.rotation_x ?? 0, equipOptions.rotation_y ?? 0, equipOptions.rotation_z ?? 0);
-            }
-
-            let itemMesh = mergeMesh(rawMesh);
-
-            if (itemMesh) {
-                // weapon VAT
-                itemMesh.skeleton = skeleton;
-                itemMesh.bakedVertexAnimationManager = vat;
-                itemMesh.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
-                itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-
-                // manually set MatricesIndicesKind & MatricesWeightsKind
-                // https://doc.babylonjs.com/features/featuresDeepDive/mesh/bonesSkeletons#preparing-mesh
-                const totalCount = itemMesh.getTotalVertices();
-                const weaponMI: any = [];
-                const weaponMW: any = [];
-                for (let i = 0; i < totalCount; i++) {
-                    weaponMI.push(boneId, 0, 0, 0);
-                    weaponMW.push(1, 0, 0, 0);
-                }
-
-                itemMesh.setVerticesData(VertexBuffer.MatricesIndicesKind, weaponMI, false);
-                itemMesh.setVerticesData(VertexBuffer.MatricesWeightsKind, weaponMW, false);
-
-                //
-                itemMesh.setEnabled(false);
-
-                return itemMesh;
-            }
         }
     }
 
@@ -310,7 +292,7 @@ export class VatController {
     }
 
     process(delta) {
-        this.entityData.forEach((entityData) => {
+        this._entityData.forEach((entityData) => {
             entityData.vat.time += this._game.scene.getEngine().getDeltaTime() / 1000.0;
         });
     }
