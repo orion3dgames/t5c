@@ -1,3 +1,5 @@
+> :warning: **Project Finished as of FEB 2024**: I've went as far as I intended to go at the start and I am not planning in adding anything else!
+
 # T5C - The 5th Continent
 Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 
@@ -21,14 +23,6 @@ Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 - simple quest system
 - simple trainer system (learn abilities)
 - simple vendor system (buy and sell)
-  
-## Current Roadmap 2023/2024
-
-- vat animation with instances
- > this should allow many more monsters and players, current tests are very promising and should allow up to 200-400 on the screen at the same time
-- dynamic damage calculation + progression
-- fine tuning all the current systems
-- more to come...
 
 ## Links
 Follow the progress on the official babylon.js forum: [https://forum.babylonjs.com/t/multiplayer-top-down-rpg-babylon-js-colyseus/35733](https://forum.babylonjs.com/t/multiplayer-top-down-rpg-babylon-js-colyseus/35733)
