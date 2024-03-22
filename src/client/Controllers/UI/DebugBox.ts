@@ -5,6 +5,7 @@ import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { generatePanel } from "./Theme";
 import { ServerMsg } from "../../../shared/types";
+import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 
 export class DebugBox {
     private _playerUI;
@@ -14,6 +15,7 @@ export class DebugBox {
     private _currentPlayer;
     private _entities;
     private ping: number = 0;
+    public _debugPanel: Rectangle;
     private _debugTextUI;
 
     constructor(_playerUI, _engine: Engine, _scene: Scene, _room, _currentPlayer, _entities) {
@@ -43,7 +45,9 @@ export class DebugBox {
         const debugPanel = generatePanel("debugPanel", "160px;", "180px", "0px", "-15px");
         debugPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
         debugPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        debugPanel.isVisible = false;
         this._playerUI.addControl(debugPanel);
+        this._debugPanel = debugPanel;
 
         const debugText = new TextBlock("debugText");
         debugText.color = "#FFF";
