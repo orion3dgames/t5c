@@ -24,6 +24,7 @@ export class EntityMove {
 
     constructor(entity: Entity) {
         this._node = entity;
+        this._input = entity._input;
         this._mesh = entity.mesh;
         this._navMesh = entity._navMesh;
         this.speed = entity.speed;
@@ -87,10 +88,6 @@ export class EntityMove {
         const gap = Math.abs(this._node.rotation.y - this.nextRotation.y);
         if (gap > Math.PI) this._node.rotation.y = this.nextRotation.y;
         else this._node.rotation = Vector3.Lerp(this._node.rotation, this.nextRotation, 0.45);
-
-        // test
-        //this._mesh.position = Vector3.Lerp(this._node.position, this.nextPosition, 0.1);
-        //this._mesh.rotation = Vector3.Lerp(this._node.rotation, this.nextRotation, 0.45);
     }
 
     public move(input: PlayerInputs): void {
@@ -109,7 +106,6 @@ export class EntityMove {
 
         // check it fits in navmesh
         if (this.isCurrentPlayer) {
-            let sourcePos = new Vector3Y(oldX, oldY, oldZ); // new pos
             let destinationPos = new Vector3Y(newX, newY, newZ); // new pos
             const foundPath = this._navMesh.getRegionForPoint(destinationPos, 0.5);
             if (foundPath) {
@@ -118,11 +114,34 @@ export class EntityMove {
                 const distance = currentRegion.plane.distanceToPoint(destinationPos);
                 newY -= distance; // smooth transition
 
+                // set new position
                 this.nextPosition.x = newX;
                 this.nextPosition.y = 0;
                 this.nextPosition.z = newZ;
                 this.nextRotation.y = this.nextRotation.y + (newRotY - this.nextRotation.y);
             }
+        }
+    }
+
+    //
+    public processMove() {
+        // detect movement
+        if (this._input.player_can_move && !this._node.blocked) {
+            // increment seq
+            this.sequence++;
+
+            // prepare input to be sent
+            let latestInput = {
+                seq: this.sequence,
+                h: this._input.horizontal,
+                v: this._input.vertical,
+            };
+
+            // sent current input to server for processing
+            this._game.sendMessage(ServerMsg.PLAYER_MOVE, latestInput);
+
+            // do client side prediction
+            this.predictionMove(latestInput);
         }
     }
 }

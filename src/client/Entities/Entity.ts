@@ -149,15 +149,11 @@ export class Entity extends TransformNode {
         // add mesh to shadow generator
         //this._shadow.addShadowCaster(this.meshController.mesh, true);
 
-        // set initial position & roation
-        this.position = new Vector3(entity.x, entity.y, entity.z);
-        this.rotation = new Vector3(0, entity.rot, 0);
-        //this._shadow.addShadowCaster(this.meshController.mesh, true);
-
         // add all entity related stuff
-        this.animatorController = new EntityAnimator(this);
         this.moveController = new EntityMove(this);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
+
+        this.animatorController = new EntityAnimator(this);
 
         ///////////////////////////////////////////////////////////
         // entity network event
@@ -286,10 +282,6 @@ export class Entity extends TransformNode {
 
     // basic performance LOD logic
     public lod(_currentPlayer) {}
-
-    public position() {
-        return new Vector3(this.x, this.y, this.z);
-    }
 
     public remove() {
         // delete any ui linked to entity

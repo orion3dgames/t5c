@@ -6,6 +6,7 @@ export class EntityAnimator {
     private _entity;
     private mesh;
     private entityData;
+    private ratio;
 
     //animations
     private _playerAnimations: AnimationGroup[];
