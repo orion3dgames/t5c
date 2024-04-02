@@ -123,7 +123,7 @@ let RacesDB: raceDataMap = {
         default_abilities: ["base_attack"],
 
         speed: 0.1,
-        scale: 1,
+        scale: 0.1,
         rotationFix: Math.PI,
         meshIndex: 1,
         animations: {
