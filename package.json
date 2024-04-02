@@ -18,9 +18,9 @@
     "author": "Orion3d",
     "license": "MIT",
     "devDependencies": {
-      "@babylonjs/gui-editor": "6.27.1",
-      "@babylonjs/inspector": "6.27.1",
-      "@babylonjs/materials": "6.27.1",
+      "@babylonjs/gui-editor": "7.0.0",
+      "@babylonjs/inspector": "7.0.0",
+      "@babylonjs/materials": "7.0.0",
 
       "@colyseus/core": "^0.15.6",
       "@colyseus/loadtest": "^0.15.2",
@@ -45,11 +45,11 @@
     },
     "dependencies": {
 
-      "@babylonjs/core": "6.27.1",
-      "@babylonjs/gui": "6.27.1",
-      "@babylonjs/loaders": "6.27.1",
-      "@babylonjs/serializers": "6.27.1",
-      "babylonjs-gltf2interface": "6.27.1",
+      "@babylonjs/core": "7.0.0",
+      "@babylonjs/gui": "7.0.0",
+      "@babylonjs/loaders": "7.0.0",
+      "@babylonjs/serializers": "7.0.0",
+      "babylonjs-gltf2interface": "7.0.0",
 
       "colyseus": "^0.15.7",
       "colyseus.js": "^0.15.13",

@@ -141,8 +141,8 @@ export class DebugScene {
     public results;
     public SPAWN_INFO = [
         {
-            key: "male_knight",
-            name: "Rat",
+            key: "rat_01",
+            name: "Knight",
             material: 0,
             amount: 1,
         },
@@ -375,12 +375,14 @@ export class DebugScene {
         this.entityData.get(key).vat.texture = b.textureFromBakedVertexData(bufferFromMesh);
     }
 
+    // todo: there must a better way to do this, it's so ugly
     getAnimationGroups(animationGroups, raceAnimations) {
         let anims: AnimationGroup[] = [];
         for (let i in raceAnimations) {
             let animationGroup = raceAnimations[i];
-            if (animationGroups[animationGroup.animation_id]) {
-                anims.push(animationGroups[animationGroup.animation_id]);
+            let anim = animationGroups.filter((ag) => animationGroup.name === ag.name);
+            if (anim && anim[0]) {
+                anims.push(anim[0]);
             }
         }
         return anims;

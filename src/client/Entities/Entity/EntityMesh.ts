@@ -78,6 +78,7 @@ export class EntityMesh {
 
         // load player mesh
         let materialIndex = this._entity.material ?? 0;
+        //let materialIndex = 0;
         const playerMesh = this._entityData.meshes[materialIndex].createInstance(this._entity.type + "" + this._entity.sessionId);
         playerMesh.parent = this._entity;
         playerMesh.isPickable = true;
@@ -197,6 +198,7 @@ export class EntityMesh {
     }
 
     equipItem(e) {
+        //console.log(this._entity.race, this._entityData.vat.texture.name, e.key);
         if (this.equipments.has(e.key)) return false;
 
         let item = this._game.getGameData("item", e.key);

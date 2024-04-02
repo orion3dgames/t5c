@@ -125,7 +125,7 @@ export class AssetsController {
         this.assetToPreload = this.assetDatabase;
         this.assetToPreload.push({ name: "ENV_" + key, filename: "environment/" + key + ".glb", extension: "glb", type: "mesh" });
         await this.preloadAssets();
-        await this.prepareLevel(key);
+        //await this.prepareLevel(key);
         await this.prepareTextures();
     }
 
@@ -336,6 +336,7 @@ export class AssetsController {
             if (k.includes("ITEM_") && this._game._loadedAssets[k] instanceof AssetContainer) {
                 let v = this._game._loadedAssets[k] as AssetContainer;
                 let modelToLoadKey = "ROOT_" + k;
+                console.log("prepareItems", modelToLoadKey);
                 const root = v.instantiateModelsToScene(
                     function () {
                         return modelToLoadKey;

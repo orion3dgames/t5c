@@ -105,6 +105,7 @@ export class GameScene {
         light.autoCalcShadowZBounds = true;
 
         // shadow generator
+        // toto: something is wrong with the shadows.
         this._shadow = new CascadedShadowGenerator(1024, light);
         this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_LOW;
         this._shadow.lambda = 0.82;
@@ -121,18 +122,21 @@ export class GameScene {
         // initialize assets controller & load level
         this._game.initializeAssetController();
         await this._game._assetsCtrl.loadLevel(location.key);
-        await this._game._assetsCtrl.prepareItems();
+        //await this._game._assetsCtrl.prepareItems();
         this._game.engine.displayLoadingUI();
+        console.log(this._game._loadedAssets);
 
         // preload any skeletons and animation
         let spawns = location.dynamic.spawns ?? [];
         this._game._vatController = new VatController(this._game, spawns);
+
         await this._game._vatController.initialize();
         await this._game._vatController.check(this._game._currentCharacter.race);
-        console.log(this._game._vatController.entityData);
 
         // init network
-        await this._initNetwork();
+        setTimeout(() => {
+            this._initNetwork();
+        }, 1000);
     }
 
     public async loadNavMesh(key) {

@@ -12,10 +12,10 @@ let RacesDB: raceDataMap = {
         rotationFix: Math.PI,
         meshIndex: 1,
         animations: {
-            ATTACK: { animation_id: 1, duration: 1000, speed: 1 },
-            DEATH: { animation_id: 24, duration: 1000, speed: 1 }, // 24 for knight, 23 for rogue and mage
-            IDLE: { animation_id: 36, duration: 1000, speed: 1 },
-            WALK: { animation_id: 72, duration: 1000, speed: 1.3 },
+            ATTACK: { name: "1H_Melee_Attack_Chop", duration: 1000, speed: 1 },
+            DEATH: { name: "Death_A", duration: 1000, speed: 1 },
+            IDLE: { name: "Idle", duration: 1000, speed: 1 },
+            WALK: { name: "Walking_A", duration: 1000, speed: 1.3 },
         },
         bones: {
             WEAPON: 12,
@@ -48,10 +48,10 @@ let RacesDB: raceDataMap = {
         rotationFix: Math.PI,
         meshIndex: 1,
         animations: {
-            ATTACK: { animation_id: 1, duration: 1000, speed: 1 },
-            DEATH: { animation_id: 23, duration: 1000, speed: 1 }, // 24 for knight, 23 for rogue and mage
-            IDLE: { animation_id: 36, duration: 1000, speed: 1 },
-            WALK: { animation_id: 72, duration: 1000, speed: 1.3 },
+            ATTACK: { name: "1H_Melee_Attack_Chop", duration: 1000, speed: 1 },
+            DEATH: { name: "Death_A", duration: 1000, speed: 1 },
+            IDLE: { name: "Idle", duration: 1000, speed: 1 },
+            WALK: { name: "Walking_A", duration: 1000, speed: 1.3 },
         },
         bones: {
             WEAPON: 12,
@@ -82,10 +82,10 @@ let RacesDB: raceDataMap = {
         rotationFix: Math.PI,
         meshIndex: 1,
         animations: {
-            ATTACK: { animation_id: 1, duration: 1000, speed: 1 },
-            DEATH: { animation_id: 23, duration: 1000, speed: 1 }, // 24 for knight, 23 for rogue and mage
-            IDLE: { animation_id: 36, duration: 1000, speed: 1 },
-            WALK: { animation_id: 72, duration: 1000, speed: 1.3 },
+            ATTACK: { name: "1H_Melee_Attack_Chop", duration: 1000, speed: 1 },
+            DEATH: { name: "Death_A", duration: 1000, speed: 1 },
+            IDLE: { name: "Idle", duration: 1000, speed: 1 },
+            WALK: { name: "Walking_A", duration: 1000, speed: 1.3 },
         },
         bones: {
             WEAPON: 12,
@@ -127,10 +127,10 @@ let RacesDB: raceDataMap = {
         rotationFix: Math.PI,
         meshIndex: 1,
         animations: {
-            ATTACK: { animation_id: 0, duration: 1000, speed: 0.75 },
-            DEATH: { animation_id: 1, duration: 1000, speed: 1 },
-            IDLE: { animation_id: 2, duration: 1000, speed: 1 },
-            WALK: { animation_id: 5, duration: 1000, speed: 1.3 },
+            ATTACK: { name: "Rat_Attack", duration: 1000, speed: 1 },
+            DEATH: { name: "Rat_Death", duration: 1000, speed: 1 },
+            IDLE: { name: "Rat_Idle", duration: 1000, speed: 1 },
+            WALK: { name: "Rat_Walk", duration: 1000, speed: 1.3 },
         },
         bones: {},
         materials: [],

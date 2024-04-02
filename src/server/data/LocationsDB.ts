@@ -7,8 +7,7 @@ let LocationsDB = {
         key: "lh_town",
         mesh: "lh_town",
         sun: true,
-        sunIntensity: 1.2,
-        fog: false,
+        sunIntensity: 0.2,
         spawnPoint: {
             x: 0,
             y: 0,
@@ -46,8 +45,8 @@ let LocationsDB = {
                     aggressive: true,
                     canAttack: true,
                     points: [new Vector3(5.38, 0.01, -1.3), new Vector3(15.53, 0.01, -8.95), new Vector3(-4.72, 0.01, -2.28)],
-                    amount: 10,
-                    race: "male_knight",
+                    amount: 200,
+                    race: "male_rogue",
                     material: 0,
                     name: "Thief",
                     baseHealth: 20,
@@ -56,6 +55,14 @@ let LocationsDB = {
                         {
                             key: "helm_01",
                             slot: PlayerSlots.HEAD,
+                        },
+                        {
+                            key: "shield_01",
+                            slot: PlayerSlots.OFF_HAND,
+                        },
+                        {
+                            key: "sword_01",
+                            slot: PlayerSlots.WEAPON,
                         },
                     ],
                 },
@@ -78,8 +85,8 @@ let LocationsDB = {
                         new Vector3(-8.8, 0.01, -22.39),
                         new Vector3(-8.51, 0.01, -14.93),
                     ],
-                    amount: 10,
-                    race: "male_knight",
+                    amount: 20,
+                    race: "male_mage",
                     material: 0,
                     name: "Bandit",
                     baseHealth: 40,
@@ -99,7 +106,7 @@ let LocationsDB = {
                         },
                     ],
                 },
-                /*
+
                 {
                     key: "lh_town_alexander",
                     type: "static",
@@ -283,7 +290,6 @@ let LocationsDB = {
                         },
                     ],
                 },
-                */
             ],
         },
     },

@@ -73,7 +73,7 @@ export class VatController {
     async fetchVAT(key) {
         const url = "./models/races/vat/" + key + ".json";
         console.log("[fetchVAT]", url);
-        const response = await fetch("./models/races/vat/" + key + ".json");
+        const response = await fetch(url);
         const movies = await response.json();
         return movies;
     }
@@ -85,7 +85,7 @@ export class VatController {
         const bakedAnimationJson = await this.fetchVAT(race.key);
         const { meshes, animationGroups, skeletons } = this._game._loadedAssets["RACE_" + key];
         const skeleton = skeletons[0];
-        const root = meshes[0] as Mesh;
+        const root = meshes[0];
         root.name = "_root_race_" + key;
 
         animationGroups.forEach((ag) => ag.stop());
@@ -119,6 +119,7 @@ export class VatController {
             modelMeshMerged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
 
             // copy mesh for each material
+            /*
             let mergedMeshes: Mesh[] = [];
             let raceKey = race.key + "_0";
             let clone = modelMeshMerged.clone(raceKey);
@@ -126,7 +127,35 @@ export class VatController {
             clone.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
             clone.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
             mergedMeshes.push(clone);
-            clone.setEnabled(false);
+            clone.setEnabled(false);*/
+
+            // copy mesh for each material
+            let mergedMeshes: any[] = [];
+            let materials = race.materials ?? [];
+            if (materials.length > 1) {
+                let materialId = 0;
+                race.materials.forEach((material) => {
+                    let raceKey = race.key + "_" + materialId;
+
+                    // prepare clone
+                    let clone = modelMeshMerged.clone(raceKey);
+                    clone.bakedVertexAnimationManager = manager;
+                    clone.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
+                    clone.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+                    clone.setEnabled(false);
+                    mergedMeshes.push(this.prepareClone(clone, material, raceKey, materialId));
+                    materialId++;
+                });
+            } else {
+                // in the case where there is only one material
+                let raceKey = race.key + "_0";
+                let clone = modelMeshMerged.clone(raceKey);
+                clone.bakedVertexAnimationManager = manager;
+                clone.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
+                clone.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+                clone.setEnabled(false);
+                mergedMeshes.push(clone);
+            }
 
             // prepare items
             let itemMeshes = new Map();
@@ -138,7 +167,8 @@ export class VatController {
                     let boneId = race.bones[slot];
 
                     if (slot && boneId) {
-                        let rawMesh = this._game._loadedAssets["ITEM_" + item.key].meshes[0];
+                        // needs to be cloned....
+                        let rawMesh = this._game._loadedAssets["ITEM_" + item.key].meshes[0].clone();
                         rawMesh.position.copyFrom(skeleton.bones[boneId].getAbsolutePosition()); // must be set in Blender
                         rawMesh.rotationQuaternion = undefined;
                         rawMesh.rotation.set(0, Math.PI * 1.5, 0); // we must set it in Blender
@@ -171,6 +201,9 @@ export class VatController {
                         if (itemMesh) {
                             itemMesh.name = race.key + "_" + itemMesh.name;
 
+                            // offset to hide the items
+                            itemMesh.position.y -= 5000;
+
                             // weapon VAT
                             itemMesh.skeleton = skeleton;
                             itemMesh.bakedVertexAnimationManager = manager;
@@ -191,21 +224,24 @@ export class VatController {
                             itemMesh.setVerticesData(VertexBuffer.MatricesWeightsKind, weaponMW, false);
 
                             //
-                            itemMesh.setEnabled(false);
+                            //itemMesh.setEnabled(false);
 
+                            //
                             console.log("ADDING ITEM", itemKey, manager);
-
                             itemMeshes.set(itemKey, itemMesh);
+
+                            //
+                            //itemMesh.setEnabled(false);
+                            //rawMesh.setEnabled(false);
                         }
                     }
                 }
             }
 
             // load prebaked vat animations
-            let bufferFromMesh = await b.loadBakedVertexDataFromJSON(bakedAnimationJson);
+            let bufferFromMesh = b.loadBakedVertexDataFromJSON(bakedAnimationJson);
             manager.texture = b.textureFromBakedVertexData(bufferFromMesh);
             manager.texture.name = key + "_VATRIG";
-            //manager.name = raceKey + "_vatmanager";
             console.log("prepareMesh", key, "vatManager");
 
             modelMeshMerged.setEnabled(false);
@@ -280,12 +316,14 @@ export class VatController {
         this._entityData.get(key).vat.texture = b.textureFromBakedVertexData(bufferFromMesh);
     }
 
+    // todo: there must a better way to do this, it's so ugly
     getAnimationGroups(animationGroups, raceAnimations) {
         let anims: AnimationGroup[] = [];
         for (let i in raceAnimations) {
             let animationGroup = raceAnimations[i];
-            if (animationGroups[animationGroup.animation_id]) {
-                anims.push(animationGroups[animationGroup.animation_id]);
+            let anim = animationGroups.filter((ag) => animationGroup.name === ag.name);
+            if (anim && anim[0]) {
+                anims.push(anim[0]);
             }
         }
         return anims;
