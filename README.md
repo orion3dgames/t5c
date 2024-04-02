@@ -1,5 +1,3 @@
-> :warning: **Project Finished as of FEB 2024**: I've went as far as I intended to go at the start and I am not planning in adding anything else!
-
 # T5C - The 5th Continent
 Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 
