@@ -60,7 +60,7 @@ export class UserInterface {
 
     // interface
     public _ChatBox: ChatBox;
-    private _DebugBox: DebugBox;
+    public _DebugBox: DebugBox;
     private _HotBar: HotBar;
     private _targetEntitySelectedBar: EntitySelectedBar;
     private _playerEntitySelectedBar: EntitySelectedBar;

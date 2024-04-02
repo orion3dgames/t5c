@@ -19,7 +19,7 @@ class IdleState extends State {
         }
 
         // if there is a closest player, and in aggro range
-        if (owner.isAnyPlayerInAggroRange()) {
+        if (owner.isAnyPlayerInAggroRange() && owner.AI_SPAWN_INFO.aggressive === true) {
             owner.setPlayerTarget(owner.AI_CLOSEST_PLAYER);
             owner._stateMachine.changeTo("CHASE");
         }

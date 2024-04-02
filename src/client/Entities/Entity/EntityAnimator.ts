@@ -4,25 +4,46 @@ import { EntityState } from "../../../shared/types";
 
 export class EntityAnimator {
     private _entity;
-    private ratio;
+    private mesh;
+    private entityData;
 
     //animations
     private _playerAnimations: AnimationGroup[];
-    private _idle: AnimationGroup;
-    private _walk: AnimationGroup;
-    private _attack: AnimationGroup;
-    private _death: AnimationGroup;
-    private _damage: AnimationGroup;
-    private _casting: AnimationGroup;
-    private _cast: AnimationGroup;
-    private _pickup: AnimationGroup;
+    private _idle;
+    private _walk;
+    private _attack;
+    private _death;
+    private _damage;
+    private _casting;
+    private _cast;
+    private _pickup;
 
     // current anim status
-    private _currentAnim: AnimationGroup;
-    private _prevAnim: AnimationGroup;
+    public _currentAnim;
+    private _prevAnim;
+    private _nextAnim;
 
-    constructor(player_animations, entity: Entity) {
-        this._playerAnimations = player_animations;
+    //
+    public currentFrame: number = 0;
+    public targetFrame: number = 0;
+    public endOfLoop: boolean = false;
+
+    //
+    _currentAnimVATTimeAtStart;
+    toFrame;
+    fromFrame;
+    _currentAnimVATOffset;
+
+    currentAnimationRange = 0;
+    currentAnimationIndex = 0;
+
+    constructor(entity: Entity) {
+        // get player mesh
+        this.mesh = entity.meshController.mesh;
+
+        // set default vat animation
+        this.entityData = entity._game._vatController.entityData.get(entity.race);
+
         this._entity = entity;
         this.ratio = entity._scene.getAnimationRatio();
 
@@ -39,75 +60,61 @@ export class EntityAnimator {
     }
 
     private _build(): void {
-        /////////// essential animations
-        // find animations
-        let idleAnimation = this._entity.animations["IDLE"] ?? 0;
-        let walkAnimation = this._entity.animations["WALK"] ?? 0;
-        let attackAnimation = this._entity.animations["ATTACK"] ?? 0;
-        let deathAnimation = this._entity.animations["DEATH"] ?? 0;
+        this._attack = {
+            index: 0,
+            loop: true,
+            speed: 1,
+            ranges: this.entityData.animationRanges[0],
+        };
 
-        // find animations
-        let idleAnimationNumber = idleAnimation.animation_id;
-        let walkAnimationNumber = walkAnimation.animation_id;
-        let attackAnimationNumber = attackAnimation.animation_id;
-        let deathAnimationNumber = deathAnimation.animation_id;
+        this._death = {
+            index: 1,
+            loop: false,
+            speed: 1,
+            ranges: this.entityData.animationRanges[1],
+        };
 
-        // set animations
-        this._idle = this._playerAnimations[idleAnimationNumber];
-        this._walk = this._playerAnimations[walkAnimationNumber];
-        this._attack = this._playerAnimations[attackAnimationNumber];
-        this._death = this._playerAnimations[deathAnimationNumber];
+        this._idle = {
+            index: 2,
+            loop: true,
+            speed: 1,
+            ranges: this.entityData.animationRanges[2],
+        };
 
-        // set if animation is looped
-        this._idle.loopAnimation = true;
-        this._walk.loopAnimation = true;
-        this._attack.loopAnimation = true;
-        this._death.loopAnimation = false;
+        this._walk = {
+            index: 3,
+            loop: true,
+            speed: 1,
+            ranges: this.entityData.animationRanges[3],
+        };
 
-        // set animation speed
-        this._idle.speedRatio = idleAnimation.speed;
-        this._walk.speedRatio = walkAnimation.speed;
-        this._attack.speedRatio = attackAnimation.speed;
-        this._death.speedRatio = deathAnimation.speed;
-
-        ////////////////////////////////////////////////////////////
-        //////////// optional animations
-        //
-        let takingDamageAnimation = this._entity.animations["DAMAGE"] ?? false;
-        if (takingDamageAnimation) {
-            let takingDamageAnimationNumber = takingDamageAnimation.animation_id ?? 0;
-            this._damage = this._playerAnimations[takingDamageAnimationNumber];
-            this._damage.loopAnimation = true;
-            this._damage.speedRatio = takingDamageAnimation.speed;
-        }
-
-        let castingAnimation = this._entity.animations["CASTING"] ?? false;
-        if (castingAnimation) {
-            let castingAnimationNumber = castingAnimation.animation_id ?? 0;
-            this._casting = this._playerAnimations[castingAnimationNumber];
-            this._casting.loopAnimation = true;
-            this._casting.speedRatio = castingAnimation.speed;
-        }
-
-        let castingShootAnimation = this._entity.animations["CAST"] ?? false;
-        if (castingShootAnimation) {
-            let castingShootAnimationNumber = castingShootAnimation.animation_id ?? 0;
-            this._cast = this._playerAnimations[castingShootAnimationNumber];
-            this._cast.loopAnimation = false;
-            this._cast.speedRatio = castingShootAnimation.speed;
-        }
-
-        let pickupAnimation = this._entity.animations["PICKUP"] ?? false;
-        if (pickupAnimation) {
-            let pickupAnimationNumber = pickupAnimation.animation_id ?? 0;
-            this._pickup = this._playerAnimations[pickupAnimationNumber];
-            this._pickup.loopAnimation = false;
-            this._pickup.speedRatio = pickupAnimation.speed;
-        }
-
-        //initialize current and previous
         this._currentAnim = this._idle;
-        this._prevAnim = this._walk;
+        this._prevAnim = this._death;
+    }
+
+    // This method will compute the VAT offset to use so that the animation starts at frame #0 for VAT time = time passed as 3rd parameter
+    computeOffsetInAnim(fromFrame, toFrame, time, fps = 60) {
+        const totalFrames = toFrame - fromFrame + 1;
+        const t = (time * fps) / totalFrames;
+        const frame = Math.floor((t - Math.floor(t)) * totalFrames);
+
+        return totalFrames - frame;
+    }
+
+    private setAnimationParameters(vec, currentAnim, delta = 60) {
+        const animIndex = currentAnim.index ?? 0;
+        const anim = this.entityData.animationRanges[animIndex];
+
+        const from = Math.floor(anim.from);
+        const to = Math.floor(anim.to);
+
+        this.fromFrame = from;
+        this.toFrame = to - 1;
+
+        this._currentAnimVATTimeAtStart = this.entityData.vat.time;
+        this._currentAnimVATOffset = this.computeOffsetInAnim(this.fromFrame, this.toFrame, this._currentAnimVATTimeAtStart, delta);
+
+        vec.set(this.fromFrame, this.toFrame, this._currentAnimVATOffset, delta); // skip one frame to avoid weird artifacts
     }
 
     //
@@ -115,9 +122,10 @@ export class EntityAnimator {
         return !currentPos.equalsWithEpsilon(nextPos, epsilon);
     }
 
-    ///////////////////////////
-    // todo: to be improved so we can better control the states... have no idea how yet
-    public animate(player, currentPos, nextPos): void {
+    // determine what animation should be played
+    public animate(player): void {
+        let currentPos = player.position;
+        let nextPos = player.moveController.getNextPosition();
         player.isMoving = false;
 
         // if player is moving
@@ -134,33 +142,45 @@ export class EntityAnimator {
         } else if (player.anim_state === EntityState.ATTACK) {
             this._currentAnim = this._attack;
 
-            // if player is being attacked
-        } else if (player.anim_state === EntityState.TAKING_DAMAGE) {
-            this._currentAnim = this._damage;
-
-            // if player is being attacked
-        } else if (player.anim_state === EntityState.SPELL_CASTING) {
-            // if player is castin
-            this._currentAnim = this._casting;
-
-            // if player launched a spell
-        } else if (player.anim_state === EntityState.SPELL_CAST) {
-            this._currentAnim = this._cast;
-
-            // if player pickup
-        } else if (player.anim_state === EntityState.PICKUP) {
-            this._currentAnim = this._pickup;
-
-            // all other cases, should be idle
+            // else play idle
         } else {
             this._currentAnim = this._idle;
         }
+    }
 
+    // play animation
+    play(player) {
         // play animation and stop previous animation
         if (this._currentAnim != null && this._prevAnim !== this._currentAnim) {
-            this._prevAnim.stop();
-            this._currentAnim.play(this._currentAnim.loopAnimation);
+            //console.log("CHANGE ANIMATION TO", this._currentAnim);
+            this.setAnimationParameters(this.mesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim);
+            player.meshController.equipments.forEach((itemMesh) => {
+                //console.log("EQUIPEMENT CHANGE ANIMATION TO", this._currentAnim);
+                this.setAnimationParameters(itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim);
+            });
             this._prevAnim = this._currentAnim;
+            this.endOfLoop = false;
         }
+
+        const currentVATTime = this.entityData.vat.time;
+        const currentAnimFrame = Math.floor((currentVATTime - this._currentAnimVATTimeAtStart) * 60);
+
+        // if animation is loop=false; and finished playing
+        if (currentAnimFrame >= this.toFrame - this.fromFrame && this._currentAnim.loop === false && this.endOfLoop === false) {
+            console.log("ANIMATION FINISHED, STOP ANIMATION ", this.currentFrame, this.targetFrame);
+            this.mesh.instancedBuffers.bakedVertexAnimationSettingsInstanced.set(this.toFrame - 1, this.toFrame, this._currentAnimVATOffset, 60);
+            this.endOfLoop = true;
+            player.meshController.equipments.forEach((itemMesh) => {
+                console.log("ITEM ANIMATION FINISHED, STOP ANIMATION ", this.currentFrame, this.targetFrame);
+                itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced.set(this.toFrame - 1, this.toFrame, this._currentAnimVATOffset, 60);
+            });
+        }
+    }
+
+    refreshItems() {
+        this._entity.meshController.equipments.forEach((itemMesh) => {
+            //console.log("EQUIPEMENT CHANGE ANIMATION TO", this._currentAnim);
+            this.setAnimationParameters(itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim);
+        });
     }
 }

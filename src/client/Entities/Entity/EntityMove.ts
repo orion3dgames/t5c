@@ -5,7 +5,7 @@ import { NavMesh, Vector3 as Vector3Y } from "../../../shared/Libs/yuka-min";
 import { Entity } from "../Entity";
 
 export class EntityMove {
-    private _player;
+    private _node: Entity;
     private _mesh;
     private speed;
     private _navMesh: NavMesh;
@@ -22,14 +22,12 @@ export class EntityMove {
 
     private isCurrentPlayer: boolean;
 
-    constructor(player: Entity) {
-        this._player = player;
-        this._mesh = player.mesh;
-        this._navMesh = player._navMesh;
-        this._input = player._input;
-        this._room = player._room;
-        this._game = player._game;
-        (this.isCurrentPlayer = player.isCurrentPlayer), (this.speed = player.speed);
+    constructor(entity: Entity) {
+        this._node = entity;
+        this._mesh = entity.mesh;
+        this._navMesh = entity._navMesh;
+        this.speed = entity.speed;
+        this.isCurrentPlayer = entity.isCurrentPlayer;
     }
 
     public getNextPosition() {
@@ -78,38 +76,21 @@ export class EntityMove {
         this.playerInputs.push(latestInput);
     }
 
-    //
-    public processMove() {
-        // detect movement
-        if (this._input.player_can_move && !this._player.blocked) {
-            // increment seq
-            this.sequence++;
-
-            // prepare input to be sent
-            let latestInput = {
-                seq: this.sequence,
-                h: this._input.horizontal,
-                v: this._input.vertical,
-            };
-
-            // sent current input to server for processing
-            this._game.sendMessage(ServerMsg.PLAYER_MOVE, latestInput);
-
-            // do client side prediction
-            this.predictionMove(latestInput);
-        }
-    }
-
+    // move transform node
     public tween() {
         // continuously lerp between current position and next position
-        this._mesh.position = Vector3.Lerp(this._mesh.position, this.nextPosition, 0.1);
+        this._node.position = Vector3.Lerp(this._node.position, this.nextPosition, 0.15);
 
         // rotation
         // TODO DAYD : make it better
         // maybe look into Scalar.LerpAngle ??? https://doc.babylonjs.com/typedoc/classes/BABYLON.Scalar#LerpAngle
-        const gap = Math.abs(this._mesh.rotation.y - this.nextRotation.y);
-        if (gap > Math.PI) this._mesh.rotation.y = this.nextRotation.y;
-        else this._mesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.45);
+        const gap = Math.abs(this._node.rotation.y - this.nextRotation.y);
+        if (gap > Math.PI) this._node.rotation.y = this.nextRotation.y;
+        else this._node.rotation = Vector3.Lerp(this._node.rotation, this.nextRotation, 0.45);
+
+        // test
+        //this._mesh.position = Vector3.Lerp(this._node.position, this.nextPosition, 0.1);
+        //this._mesh.rotation = Vector3.Lerp(this._node.rotation, this.nextRotation, 0.45);
     }
 
     public move(input: PlayerInputs): void {
@@ -133,12 +114,12 @@ export class EntityMove {
             const foundPath = this._navMesh.getRegionForPoint(destinationPos, 0.5);
             if (foundPath) {
                 // adjust height of the entity according to the ground
-                let currentRegion = foundPath;
+                let currentRegion = this._navMesh.getRegionForPoint(destinationPos, 0.5);
                 const distance = currentRegion.plane.distanceToPoint(destinationPos);
-                newY -= distance; // smooth transition*/
+                newY -= distance; // smooth transition
 
                 this.nextPosition.x = newX;
-                this.nextPosition.y = newY;
+                this.nextPosition.y = 0;
                 this.nextPosition.z = newZ;
                 this.nextRotation.y = this.nextRotation.y + (newRotY - this.nextRotation.y);
             }

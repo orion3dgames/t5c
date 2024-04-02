@@ -21,6 +21,8 @@ import {
 import { GameController } from "./GameController";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { AssetContainer } from "@babylonjs/core/assetContainer";
+import { mergeMesh } from "../Entities/Common/MeshHelper";
 
 type AssetEntry = {
     name: string;
@@ -123,7 +125,7 @@ export class AssetsController {
         this.assetToPreload = this.assetDatabase;
         this.assetToPreload.push({ name: "ENV_" + key, filename: "environment/" + key + ".glb", extension: "glb", type: "mesh" });
         await this.preloadAssets();
-        await this.prepareLevel(key);
+        //await this.prepareLevel(key);
         await this.prepareTextures();
     }
 
@@ -319,5 +321,30 @@ export class AssetsController {
                 type: "environment",
             };
         });
+    }
+
+    public async prepareItems() {
+        for (let k in this._game._loadedAssets) {
+            if (k.includes("ITEM_") && this._game._loadedAssets[k] instanceof AssetContainer) {
+                let v = this._game._loadedAssets[k] as AssetContainer;
+                let modelToLoadKey = "ROOT_" + k;
+                console.log("prepareItems", modelToLoadKey);
+                const root = v.instantiateModelsToScene(
+                    function () {
+                        return modelToLoadKey;
+                    },
+                    false,
+                    { doNotInstantiate: true }
+                );
+
+                root.rootNodes[0].name = modelToLoadKey;
+                let mergedMesh = mergeMesh(root.rootNodes[0]);
+                if (mergedMesh) {
+                    this._game._loadedAssets[modelToLoadKey] = mergedMesh;
+                    this._game._loadedAssets[modelToLoadKey].isVisible = false;
+                }
+                root.rootNodes[0].dispose();
+            }
+        }
     }
 }

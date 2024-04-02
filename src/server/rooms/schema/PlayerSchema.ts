@@ -475,6 +475,7 @@ export class PlayerSchema extends Entity {
         this.health = 0;
         this.blocked = true;
         this.anim_state = EntityState.DEAD;
+        console.log("setAsDead", "SET AS DEAD", this.sessionId);
     }
 
     resetPosition() {

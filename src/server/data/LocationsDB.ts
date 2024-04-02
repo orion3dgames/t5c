@@ -40,6 +40,50 @@ let LocationsDB = {
             ],
             spawns: [
                 {
+                    key: "spawn_01",
+                    type: "global",
+                    behaviour: "patrol",
+                    aggressive: true,
+                    canAttack: true,
+                    points: [new Vector3(5.38, 0.01, -1.3), new Vector3(15.53, 0.01, -8.95), new Vector3(-4.72, 0.01, -2.28)],
+                    radius: 0,
+                    amount: 100,
+                    race: "rat_01",
+                    material: 0,
+                    name: "Rat",
+                    baseSpeed: Speed.VERY_SLOW,
+                },
+
+                {
+                    key: "lh_town_thief",
+                    type: "global",
+                    behaviour: "patrol",
+                    aggressive: true,
+                    canAttack: true,
+                    points: [new Vector3(5.38, 0.01, -1.3), new Vector3(15.53, 0.01, -8.95), new Vector3(-4.72, 0.01, -2.28)],
+                    amount: 100,
+                    race: "male_rogue",
+                    material: 0,
+                    name: "Thief",
+                    baseHealth: 20,
+                    baseSpeed: Speed.VERY_SLOW,
+                    equipment: [
+                        {
+                            key: "helm_01",
+                            slot: PlayerSlots.HEAD,
+                        },
+                        {
+                            key: "shield_01",
+                            slot: PlayerSlots.OFF_HAND,
+                        },
+                        {
+                            key: "sword_01",
+                            slot: PlayerSlots.WEAPON,
+                        },
+                    ],
+                },
+
+                {
                     key: "lh_town_bandits",
                     type: "area",
                     behaviour: "patrol",
@@ -105,6 +149,16 @@ let LocationsDB = {
                     race: "male_mage",
                     material: 2,
                     name: "Kilhiam ",
+                    equipment: [
+                        {
+                            key: "helm_01",
+                            slot: PlayerSlots.HEAD,
+                        },
+                        {
+                            key: "sword_01",
+                            slot: PlayerSlots.WEAPON,
+                        },
+                    ],
                     interactable: {
                         title: "Talk",
                         data: [
@@ -200,6 +254,7 @@ let LocationsDB = {
                         ],
                     },
                 },
+
                 {
                     key: "spawn_dummy",
                     type: "static",
