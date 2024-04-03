@@ -235,56 +235,49 @@ export class GameScene {
 
         ////////////////////////////////////////////////////
         // main game loop
-        let timeServer = Date.now();
-        let timeServerSlow = Date.now();
+
+        const lastUpdates = {
+            SERVER: Date.now(),
+            SLOW: Date.now(),
+            PING: Date.now(),
+        };
+
+        // start game loop
         this._scene.registerBeforeRender(() => {
+            // get current delta
             let delta = this._game.engine.getFps();
-            let timeNow = Date.now();
 
             // process vat animations
             this._game._vatController.process(delta);
 
-            /////////////////
-            // main game loop
+            // iterate through each items
+            const currentTime = Date.now();
             for (let sessionId in this._entities) {
                 const entity = this._entities[sessionId];
+
+                // main entity update
                 entity.update(delta);
                 entity.lod(this._currentPlayer);
+
+                // server player gameloop
+                if (currentTime - lastUpdates["SERVER"] >= 100 && entity.type === "player") {
+                    entity.updateServerRate(delta);
+                    lastUpdates["SERVER"] = currentTime;
+                }
+
+                // slow game loop
+                if (currentTime - lastUpdates["SLOW"] >= 1000) {
+                    console.log("SLOW UPDATE");
+                    entity.updateSlowRate(delta);
+                    lastUpdates["SLOW"] = currentTime;
+                }
             }
 
-            /////////////////
-            // server update rate
-            // every 5000ms loop
-            let timePassedSlow = (timeNow - timeServerSlow) / 1000;
-            let updateSlow = 5000 / 1000; // game is networked update every 100ms
-            if (timePassedSlow >= updateSlow) {
+            // game update loop
+            if (currentTime - lastUpdates["PING"] >= 1000) {
                 // send ping to server
                 this._game.sendMessage(ServerMsg.PING);
-
-                // update entities
-                for (let sessionId in this._entities) {
-                    const entity = this._entities[sessionId];
-                    if (entity && entity.type === "player") {
-                        entity.updateSlowRate(5000);
-                    }
-                }
-                timeServerSlow = timeNow;
-            }
-
-            /////////////////
-            // server update rate
-            // every 100ms loop
-            let timePassed = (timeNow - timeServer) / 1000;
-            let updateRate = this._game.config.updateRate / 1000; // game is networked update every 100ms
-            if (timePassed >= updateRate) {
-                // player uppdate at server rate
-                for (let sessionId in this._entities) {
-                    const entity = this._entities[sessionId];
-                    if (entity && entity.type === "player") {
-                        entity.updateServerRate(this._game.config.updateRate);
-                    }
-                }
-                timeServer = timeNow;
+                lastUpdates["PING"] = currentTime;
             }
         });
     }

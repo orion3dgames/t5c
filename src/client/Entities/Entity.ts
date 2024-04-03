@@ -273,14 +273,12 @@ export class Entity extends TransformNode {
         this.animatorController.play(this);
     }
 
+    public updateServerRate(delta) {}
+
+    public updateSlowRate(delta) {}
+
     public getPosition() {
         return new Vector3(this.position.x, this.position.y, this.position.z);
-    }
-
-    public updateSlowRate() {}
-
-    public updateServerRate(delta) {
-        //this.animatorController.refresh();
     }
 
     // basic performance LOD logic

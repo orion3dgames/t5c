@@ -230,26 +230,10 @@ export class Player extends Entity {
         this.cameraController.follow();
     }
 
-    public findCloseToInteractableEntity() {
-        let closestDistance = 1000000;
-        for (let sessionId in this.entities) {
-            let entity = this.entities[sessionId];
-            if (entity.type === "entity" && entity.interactableButtons && entity.health > 0) {
-                entity.interactableButtons.isVisible = false;
-                let playerPos = this.getPosition();
-                let entityPos = entity.getPosition();
-                let distanceBetween = Vector3.Distance(playerPos, entityPos);
-                if (distanceBetween < closestDistance) {
-                    closestDistance = distanceBetween;
-                    this.closestEntity = entity;
-                    this.closestEntityDistance = closestDistance;
-                }
-            }
-        }
-    }
-
     // update at server rate
     public updateServerRate(delta) {
+        super.updateServerRate(delta);
+
         // process player movement
         this.moveController.processMove();
 
@@ -280,7 +264,7 @@ export class Player extends Entity {
             let distanceTo = Vector3.Distance(element.getAbsolutePosition(), currentPos);
             element.unfreezeWorldMatrix();
             element.setEnabled(true);
-            if (distanceTo < 36) {
+            if (distanceTo < 10) {
                 element.unfreezeWorldMatrix();
                 element.setEnabled(true);
             }
@@ -341,6 +325,24 @@ export class Player extends Entity {
             this.cameraController.bw(false);
             this._ui._RessurectBox.close();
             this.isDeadUI = false;
+        }
+    }
+
+    public findCloseToInteractableEntity() {
+        let closestDistance = 1000000;
+        for (let sessionId in this.entities) {
+            let entity = this.entities[sessionId];
+            if (entity.type === "entity" && entity.interactableButtons && entity.health > 0) {
+                entity.interactableButtons.isVisible = false;
+                let playerPos = this.getPosition();
+                let entityPos = entity.getPosition();
+                let distanceBetween = Vector3.Distance(playerPos, entityPos);
+                if (distanceBetween < closestDistance) {
+                    closestDistance = distanceBetween;
+                    this.closestEntity = entity;
+                    this.closestEntityDistance = closestDistance;
+                }
+            }
         }
     }
 
