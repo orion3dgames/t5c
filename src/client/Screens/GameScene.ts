@@ -23,20 +23,21 @@ import { PlayerInputs, ServerMsg } from "../../shared/types";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { VatController } from "../Controllers/VatController";
 
 export class GameScene {
     public _game: GameController;
     public _scene: Scene;
-    private _input: PlayerInput;
+    public _input: PlayerInput;
     public _ui;
-    private _shadow: CascadedShadowGenerator;
-    private _navMesh: NavMesh;
+    public _shadow: CascadedShadowGenerator;
+    public _navMesh: NavMesh;
     public _navMeshDebug;
 
     private _roomId: string;
-    private room: Room<any>;
+    public room: Room<any>;
     private chatRoom: Room<any>;
-    private _currentPlayer: Player;
+    public _currentPlayer: Player;
     private _loadedAssets: AssetContainer[] = [];
 
     public gameData;
@@ -117,7 +118,15 @@ export class GameScene {
         // initialize assets controller & load level
         this._game.initializeAssetController();
         await this._game._assetsCtrl.loadLevel(location.key);
+        //await this._game._assetsCtrl.prepareItems();
         this._game.engine.displayLoadingUI();
+        console.log(this._game._loadedAssets);
+
+        // preload any skeletons and animation
+        let spawns = location.dynamic.spawns ?? [];
+        this._game._vatController = new VatController(this._game, spawns);
+        await this._game._vatController.initialize();
+        await this._game._vatController.check(this._game._currentCharacter.race);
 
         // instanciate items so we can use them later as instances/clones
         // todo: this is probably a terrible way to do this...
@@ -205,7 +214,7 @@ export class GameScene {
                 // if player type
                 if (isCurrentPlayer) {
                     // create player entity
-                    let _player = new Player(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._game, this._input, this._entities);
+                    let _player = new Player(sessionId, this._scene, this, entity);
 
                     // set currentPlayer
                     this._currentPlayer = _player;
@@ -222,18 +231,18 @@ export class GameScene {
                     //////////////////
                     // else must be another player
                 } else {
-                    this._entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._game);
+                    this._entities[sessionId] = new Entity(sessionId, this._scene, this, entity);
                 }
             }
 
             // if entity
             if (entity.type === "entity") {
-                this._entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._game);
+                this._entities[sessionId] = new Entity(sessionId, this._scene, this, entity);
             }
 
             // if item
             if (entity.type === "item") {
-                this._entities[sessionId] = new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._game);
+                //this._entities[sessionId] = new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._game);
             }
         });
 
@@ -252,6 +261,9 @@ export class GameScene {
         this._scene.registerBeforeRender(() => {
             let delta = this._game.engine.getFps();
             let timeNow = Date.now();
+
+            // process vat animations
+            this._game._vatController.process(delta);
 
             /////////////////
             // main game loop
@@ -299,7 +311,7 @@ export class GameScene {
     }
 
     // triggered on resize event
-    public resize() {
+    resize() {
         if (this._ui) {
             this._ui.resize();
         }

@@ -7,6 +7,7 @@ import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { Room } from "colyseus.js";
 import { Config } from "../../shared/Config";
 import { ServerMsg } from "../../shared/types";
+import { VatController } from "./VatController";
 
 export class GameController {
     // core
@@ -41,6 +42,7 @@ export class GameController {
     // all preloaded assets
     public _assetsCtrl: AssetsController;
     public _loadedAssets: AssetContainer[] = [];
+    public _vatController: VatController;
 
     //
     public sellingMode: boolean = false;
