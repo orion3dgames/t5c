@@ -284,8 +284,7 @@ export class Entity extends TransformNode {
     }
 
     // basic performance LOD logic
-    public lod(_currentPlayer) {
-        /*
+    public lod(_currentPlayer: Entity) {
         // hide everything
         this.mesh.setEnabled(false);
         this.mesh.freezeWorldMatrix();
@@ -300,7 +299,7 @@ export class Entity extends TransformNode {
 
         // only enable if close enough to local player
         let entityPos = this.getPosition();
-        let playerPos = _currentPlayer.position();
+        let playerPos = _currentPlayer.getPosition();
         let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
         if (distanceFromPlayer < this._game.config.PLAYER_VIEW_DISTANCE) {
             this.mesh.unfreezeWorldMatrix();
@@ -315,7 +314,6 @@ export class Entity extends TransformNode {
                 equipment.setEnabled(true);
             });
         }
-        */
     }
 
     public remove() {
