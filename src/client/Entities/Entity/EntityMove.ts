@@ -25,6 +25,7 @@ export class EntityMove {
     constructor(entity: Entity) {
         this._node = entity;
         this._input = entity._input;
+        this._game = entity._game;
         this._mesh = entity.mesh;
         this._navMesh = entity._navMesh;
         this.speed = entity.speed;
