@@ -149,11 +149,14 @@ export class Entity extends TransformNode {
         // add mesh to shadow generator
         //this._shadow.addShadowCaster(this.meshController.mesh, true);
 
+        // set initial position & roation
+        this.position = new Vector3(entity.x, entity.y, entity.z);
+        this.rotation = new Vector3(0, entity.rot, 0);
+
         // add all entity related stuff
+        this.animatorController = new EntityAnimator(this);
         this.moveController = new EntityMove(this);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
-
-        this.animatorController = new EntityAnimator(this);
 
         ///////////////////////////////////////////////////////////
         // entity network event
@@ -277,11 +280,43 @@ export class Entity extends TransformNode {
     public updateSlowRate() {}
 
     public updateServerRate(delta) {
-        this.animatorController.refresh();
+        //this.animatorController.refresh();
     }
 
     // basic performance LOD logic
-    public lod(_currentPlayer) {}
+    public lod(_currentPlayer) {
+        /*
+        // hide everything
+        this.mesh.setEnabled(false);
+        this.mesh.freezeWorldMatrix();
+
+        // hide gui
+        //this.characterLabel.isVisible = false;
+        //this.characterChatLabel.isVisible = false;
+        this.meshController.equipments?.forEach((equipment) => {
+            equipment.setEnabled(false);
+            equipment.freezeWorldMatrix();
+        });
+
+        // only enable if close enough to local player
+        let entityPos = this.getPosition();
+        let playerPos = _currentPlayer.position();
+        let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
+        if (distanceFromPlayer < this._game.config.PLAYER_VIEW_DISTANCE) {
+            this.mesh.unfreezeWorldMatrix();
+            this.mesh.setEnabled(true);
+
+            // show gui
+            //this.characterLabel.isVisible = true;
+            //this.characterChatLabel.isVisible = true;
+
+            this.meshController.equipments?.forEach((equipment) => {
+                equipment.unfreezeWorldMatrix();
+                equipment.setEnabled(true);
+            });
+        }
+        */
+    }
 
     public remove() {
         // delete any ui linked to entity

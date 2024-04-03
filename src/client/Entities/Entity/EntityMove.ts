@@ -107,17 +107,17 @@ export class EntityMove {
 
         // check it fits in navmesh
         if (this.isCurrentPlayer) {
+            let sourcePos = new Vector3Y(oldX, oldY, oldZ); // new pos
             let destinationPos = new Vector3Y(newX, newY, newZ); // new pos
             const foundPath = this._navMesh.getRegionForPoint(destinationPos, 0.5);
             if (foundPath) {
                 // adjust height of the entity according to the ground
-                let currentRegion = this._navMesh.getRegionForPoint(destinationPos, 0.5);
+                let currentRegion = foundPath;
                 const distance = currentRegion.plane.distanceToPoint(destinationPos);
-                newY -= distance; // smooth transition
+                newY -= distance; // smooth transition*/
 
-                // set new position
                 this.nextPosition.x = newX;
-                this.nextPosition.y = 0;
+                this.nextPosition.y = newY;
                 this.nextPosition.z = newZ;
                 this.nextRotation.y = this.nextRotation.y + (newRotY - this.nextRotation.y);
             }

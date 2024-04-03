@@ -78,7 +78,9 @@ export class EntityMesh {
 
         // load player mesh
         let materialIndex = this._entity.material ?? 0;
-        //let materialIndex = 0;
+        if (!this._entityData.meshes[materialIndex]) {
+            materialIndex = 0;
+        }
         const playerMesh = this._entityData.meshes[materialIndex].createInstance(this._entity.type + "" + this._entity.sessionId);
         playerMesh.parent = this._entity;
         playerMesh.isPickable = true;
