@@ -275,7 +275,9 @@ export class Entity extends TransformNode {
 
     public updateServerRate(delta) {}
 
-    public updateSlowRate(delta) {}
+    public updateSlowRate(delta) {
+        this.animatorController.refreshAnimationRatio();
+    }
 
     public getPosition() {
         return new Vector3(this.position.x, this.position.y, this.position.z);

@@ -156,8 +156,6 @@ export class Panel_Character extends Panel {
         slotPanel.paddingBottom = "7px;";
         panel.addControl(slotPanel);
         this.slotPanel = slotPanel;
-
-        this.refresh();
     }
 
     private leftPanelContent(panel) {

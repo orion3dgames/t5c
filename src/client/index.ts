@@ -174,9 +174,6 @@ class App {
     private async _process(): Promise<void> {
         // make sure scene and camera is initialized
         if (this.game.scene && this.game.scene.activeCamera) {
-            //when the scene is ready, hide loading
-            this.engine.hideLoadingUI();
-
             // render scene
             this.game.scene.render();
         }

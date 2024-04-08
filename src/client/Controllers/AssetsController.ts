@@ -330,8 +330,8 @@ export class AssetsController {
                 root.rootNodes[0].name = modelToLoadKey;
                 let mergedMesh = mergeMesh(root.rootNodes[0]);
                 if (mergedMesh) {
+                    mergedMesh.setEnabled(false);
                     this._game._loadedAssets[modelToLoadKey] = mergedMesh;
-                    this._game._loadedAssets[modelToLoadKey].isVisible = false;
                 }
                 root.dispose();
             }

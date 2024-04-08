@@ -43,10 +43,11 @@ export class PlayerCamera {
         this.camera.lockedTarget = this._camRoot.position;
         this.camera.fov = 0.35;
         this.camera.parent = yTilt;
+        this.camera.inputs.clear();
 
         // set as active camera
         this._scene.activeCamera = this.camera;
-        this._scene.cameraToUseForPointers = this.camera; // is this necessary?
+        //this._scene.cameraToUseForPointers = this.camera; // is this necessary?
 
         //
         this.cameraPos = this.camera.position;

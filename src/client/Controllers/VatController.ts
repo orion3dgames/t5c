@@ -225,15 +225,15 @@ export class VatController {
                             itemMesh.setVerticesData(VertexBuffer.MatricesWeightsKind, weaponMW, false);
 
                             //
+                            //rawMesh.setEnabled(false);
+                            //itemMesh.setEnabled(false);
+
+                            //rawMesh.setEnabled(false);
                             //itemMesh.setEnabled(false);
 
                             //
                             console.log("ADDING ITEM", itemKey, manager);
                             itemMeshes.set(itemKey, itemMesh);
-
-                            //
-                            //itemMesh.visibility = 0;
-                            //rawMesh.visibility = 0;
                         }
                     }
                 }
@@ -253,6 +253,7 @@ export class VatController {
                 animationRanges: ranges,
                 selectedAnimationGroups: selectedAnimationGroups,
                 vat: manager,
+                skeleton: skeleton,
                 items: itemMeshes,
             });
 

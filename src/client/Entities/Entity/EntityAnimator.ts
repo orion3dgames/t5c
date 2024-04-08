@@ -51,8 +51,8 @@ export class EntityAnimator {
         this._build();
     }
 
-    public refresh() {
-        //this.ratio = this._entity._scene.getAnimationRatio();
+    public refreshAnimationRatio() {
+        this.ratio = this._entity._scene.getAnimationRatio();
         // set animation speed
         this._idle.speedRatio = this._entity.animations["IDLE"].speed * this.ratio;
         this._walk.speedRatio = this._entity.animations["WALK"].speed * this.ratio;
@@ -153,7 +153,7 @@ export class EntityAnimator {
     play(player) {
         // play animation and stop previous animation
         if (this._currentAnim != null && this._prevAnim !== this._currentAnim) {
-            console.log("ANIMATION CHANGED for", player.name, this._prevAnim, this._currentAnim);
+            //console.log("ANIMATION CHANGED for", player.name, this._prevAnim, this._currentAnim);
             this.setAnimationParameters(this.mesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim);
             player.meshController.equipments.forEach((itemMesh) => {
                 this.setAnimationParameters(itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim);
@@ -168,11 +168,11 @@ export class EntityAnimator {
 
         // if animation is loop=false; and finished playing
         if (currentAnimFrame >= this.toFrame - this.fromFrame && this._currentAnim.loop === false && this.endOfLoop === false) {
-            console.log("ANIMATION FINISHED, STOP ANIMATION ", this.currentFrame, this.targetFrame);
+            //console.log("ANIMATION FINISHED, STOP ANIMATION ", this.currentFrame, this.targetFrame);
             this.mesh.instancedBuffers.bakedVertexAnimationSettingsInstanced.set(this.toFrame - 1, this.toFrame, this._currentAnimVATOffset, 60);
             this.endOfLoop = true;
             player.meshController.equipments.forEach((itemMesh) => {
-                console.log("ITEM ANIMATION FINISHED, STOP ANIMATION ", this.currentFrame, this.targetFrame);
+                //console.log("ITEM ANIMATION FINISHED, STOP ANIMATION ", this.currentFrame, this.targetFrame);
                 itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced.set(this.toFrame - 1, this.toFrame, this._currentAnimVATOffset, 60);
             });
         }

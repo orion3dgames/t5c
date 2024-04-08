@@ -34,12 +34,6 @@ export class EntitySelectedBar {
         this._loadedAssets = _UI._loadedAssets;
 
         this._createUI();
-
-        // some ui must be constantly refreshed as things change
-        this._scene.registerBeforeRender(() => {
-            // refresh
-            this._update();
-        });
     }
 
     _createUI() {
@@ -197,7 +191,7 @@ export class EntitySelectedBar {
     }
 
     // refresh panel
-    private _update() {
+    public update() {
         this._selectedEntityBar.isVisible = false;
 
         let entity = this._game.selectedEntity ? this._game.selectedEntity : false;

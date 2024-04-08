@@ -106,10 +106,6 @@ export class UserInterface {
         this._loadedAssets = this._game._loadedAssets;
 
         // create ui
-        const namesUI = AdvancedDynamicTexture.CreateFullscreenUI("UI_Names", true, this._scene);
-        this.NAMES_ADT = namesUI;
-
-        // create ui
         const uiLayer = AdvancedDynamicTexture.CreateFullscreenUI("UI_Player", true, this._scene);
         this.MAIN_ADT = uiLayer;
         /*
@@ -169,7 +165,7 @@ export class UserInterface {
     public setCurrentPlayer(currentPlayer) {
         // set current player
         this._currentPlayer = currentPlayer;
-        /*
+
         // cursor
         this._Cursor = new Cursor(this);
 
@@ -189,7 +185,8 @@ export class UserInterface {
         this._ChatBox = new ChatBox(this._playerUI, this._chatRoom, currentPlayer, this._entities, this._game);
 
         // create chat ui + events
-        this._DamageText = new DamageText(this.NAMES_ADT, this._scene, this._entities);
+        // todo: let's do this with 3d billboards
+        //this._DamageText = new DamageText(this.NAMES_ADT, this._scene, this._entities);
 
         // create selected entity panel
         this._targetEntitySelectedBar = new EntitySelectedBar(this, {
@@ -276,14 +273,45 @@ export class UserInterface {
         this._Tooltip = new Tooltip(this, currentPlayer);
 
         // some ui must be constantly refreshed as things change
+        /*
         this._scene.registerBeforeRender(() => {
             this.update();
             this.dragging();
-        });
+        });*/
 
         // initial resize event
-        this.resize();
-        */
+        //this.resize();
+    }
+
+    // update every server tick
+    public update() {
+        this.fpsPanel.text = "FPS: " + this._engine.getFps().toFixed(0);
+        this._targetEntitySelectedBar.update();
+        this._playerEntitySelectedBar.update();
+        this._Tooltip.update();
+    }
+
+    // update every 1000ms
+    public slow_update() {
+        this._DebugBox.update();
+
+        this.panelInventory.update();
+        this.panelAbilities.update();
+        this.panelCharacter.update();
+        this.panelHelp.update();
+        this.panelDialog.update();
+        this.panelQuests.update();
+
+        /*
+        // hide entity labels if out of distance
+        for (let sessionId in this._entities) {
+            let entity = this._entities[sessionId];
+            if (entity && entity.mesh && entity.mesh.isEnabled()) {
+                entity.characterLabel.isVisible = true;
+            } else {
+                entity.characterLabel.isVisible = false;
+            }
+        }*/
     }
 
     public resize() {
@@ -299,41 +327,7 @@ export class UserInterface {
         }*/
     }
 
-    public update() {
-        this.fpsPanel.text = "FPS: " + this._engine.getFps().toFixed(0);
-        /*
-        //
-
-        if (this._currentPlayer._input.left_alt_pressed === true && this.showingLabels === false) {
-            for (let sessionId in this._entities) {
-                if (this._entities[sessionId].characterLabel) {
-                    this._entities[sessionId].characterLabel.isVisible = true;
-                }
-            }
-            this.showingLabels = true;
-        }
-
-        if (this._currentPlayer._input.left_alt_pressed === false && this.showingLabels === true) {
-            for (let sessionId in this._entities) {
-                if (this._entities[sessionId].characterLabel) {
-                    this._entities[sessionId].characterLabel.isVisible = false;
-                }
-            }
-            this.showingLabels = false;
-        }
-
-        /*
-        // hide entity labels if out of distance
-        for (let sessionId in this._entities) {
-            let entity = this._entities[sessionId];
-            if (entity && entity.mesh && entity.mesh.isEnabled()) {
-                entity.characterLabel.isVisible = true;
-            } else {
-                entity.characterLabel.isVisible = false;
-            }
-        }*/
-    }
-
+    /*
     // chatbox label
     public createEntityChatLabel(entity) {
         var rect1 = new Rectangle("player_chat_" + entity.sessionId);
@@ -425,40 +419,7 @@ export class UserInterface {
         img.stretch = Image.STRETCH_FILL;
         rect1.addControl(img);
 
-        /*
-
-        const rightStackPanel = new StackPanel("rightStackPanel");
-        rightStackPanel.left = 0;
-        rightStackPanel.top = 0;
-        rightStackPanel.width = 1;
-        rightStackPanel.height = 1;
-        rightStackPanel.spacing = 5;
-        rightStackPanel.adaptHeightToChildren = true;
-        rightStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        rightStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        rightStackPanel.setPaddingInPixels(5, 5, 5, 5);
-        rightStackPanel.isVertical = true;
-        rect1.addControl(rightStackPanel);
-
-        let interactable = entity.spawnInfo.interactable;
-
-        const createBtn = Button.CreateSimpleButton("characterBtn", interactable.title);
-        createBtn.left = "0px;";
-        createBtn.top = "0px";
-        createBtn.width = 1;
-        createBtn.height = "30px";
-        createBtn.background = "orange";
-        createBtn.color = "white";
-        createBtn.thickness = 1;
-        createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        rightStackPanel.addControl(createBtn);*/
-
-        /*
-        createBtn.onPointerDownObservable.add(() => {
-            this.panelDialog.open(entity);
-        });*/
-
         return rect1;
     }
+    */
 }

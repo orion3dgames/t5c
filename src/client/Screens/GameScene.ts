@@ -24,6 +24,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VatController } from "../Controllers/VatController";
+import { SceneOptimizer, SceneOptimizerOptions } from "@babylonjs/core/Misc/sceneOptimizer";
 
 export class GameScene {
     public _game: GameController;
@@ -103,6 +104,8 @@ export class GameScene {
         light.radius = 0.27;
         light.intensity = location.sunIntensity;
         light.autoCalcShadowZBounds = true;
+
+        //SceneOptimizer.OptimizeAsync(scene, SceneOptimizerOptions.ModerateDegradationAllowed());
 
         // shadow generator
         // toto: something is wrong with the shadows.
@@ -239,7 +242,8 @@ export class GameScene {
             SERVER: Date.now(),
             SLOW: Date.now(),
             PING: Date.now(),
-            UI: Date.now(),
+            UI_SERVER: Date.now(),
+            UI_SLOW: Date.now(),
         };
 
         // start game loop
@@ -257,7 +261,6 @@ export class GameScene {
 
                 // main entity update
                 entity.update(delta);
-                entity.lod(this._currentPlayer);
 
                 // server player gameloop
                 if (currentTime - lastUpdates["SERVER"] >= 100 && entity.type === "player") {
@@ -268,6 +271,7 @@ export class GameScene {
                 // slow game loop
                 if (currentTime - lastUpdates["SLOW"] >= 1000) {
                     console.log("SLOW UPDATE");
+                    entity.lod(this._currentPlayer);
                     entity.updateSlowRate(delta);
                     lastUpdates["SLOW"] = currentTime;
                 }
@@ -279,11 +283,18 @@ export class GameScene {
                 this._game.sendMessage(ServerMsg.PING);
                 lastUpdates["PING"] = currentTime;
             }
+        });
 
+        this._scene.registerAfterRender(() => {
+            const currentTime = Date.now();
             // ui update loop
-            if (currentTime - lastUpdates["UI"] >= 1000) {
+            if (currentTime - lastUpdates["UI_SERVER"] >= 100) {
                 this._ui.update();
-                lastUpdates["UI"] = currentTime;
+                lastUpdates["UI_SERVER"] = currentTime;
+            }
+            if (currentTime - lastUpdates["UI_SLOW"] >= 1000) {
+                this._ui.slow_update();
+                lastUpdates["UI_SLOW"] = currentTime;
             }
         });
     }
@@ -291,7 +302,7 @@ export class GameScene {
     // triggered on resize event
     public resize() {
         if (this._ui) {
-            this._ui.resize();
+            //this._ui.resize();
         }
     }
 }

@@ -121,9 +121,8 @@ let RacesDB: raceDataMap = {
         goldGain: { min: 4, max: 20 },
         drops: [],
         default_abilities: ["base_attack"],
-
         speed: 0.1,
-        scale: 0.1,
+        scale: 0.2,
         rotationFix: Math.PI,
         meshIndex: 1,
         animations: {

@@ -171,7 +171,7 @@ export class Item extends TransformNode {
 
         //////////////////////////////////////////////////////////////////////////
         // misc
-        this.characterLabel = this._ui.createItemLabel(this);
+        //this.characterLabel = this._ui.createItemLabel(this);
     }
 
     public lod(delta) {}

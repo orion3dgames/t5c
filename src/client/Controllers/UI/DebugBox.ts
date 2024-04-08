@@ -28,12 +28,6 @@ export class DebugBox {
 
         this._createUI();
 
-        // some ui must be constantly refreshed as things change
-        this._scene.registerBeforeRender(() => {
-            // refresh
-            this._update();
-        });
-
         // on pong
         this._room.onMessage(ServerMsg.PONG, (data) => {
             let dateNow = Date.now();
@@ -71,7 +65,7 @@ export class DebugBox {
     }
 
     // debug panel refresh
-    private _update() {
+    public update() {
         let entityCount = countPlayers(this._entities);
         let count = 0;
         for (let index in this._entities) {
