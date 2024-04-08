@@ -106,13 +106,11 @@ export class GameScene {
 
         // shadow generator
         // toto: something is wrong with the shadows.
-        this._shadow = new CascadedShadowGenerator(1024, light);
+        /*
+        this._shadow = new CascadedShadowGenerator(128, light);
         this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_LOW;
         this._shadow.lambda = 0.82;
-        this._shadow.bias = 0.018;
-        this._shadow.shadowMaxZ = 1000;
-        this._shadow.stabilizeCascades = false;
-        this._shadow.depthClamp = true;
+        this._shadow.bias = 0.018;*/
 
         // load navmesh
         this._navMesh = await this.loadNavMesh(location.key);
@@ -122,7 +120,7 @@ export class GameScene {
         // initialize assets controller & load level
         this._game.initializeAssetController();
         await this._game._assetsCtrl.loadLevel(location.key);
-        //await this._game._assetsCtrl.prepareItems();
+        await this._game._assetsCtrl.prepareItems();
         this._game.engine.displayLoadingUI();
         console.log(this._game._loadedAssets);
 
@@ -132,6 +130,7 @@ export class GameScene {
 
         await this._game._vatController.initialize();
         await this._game._vatController.check(this._game._currentCharacter.race);
+        console.log(this._game._vatController._entityData);
 
         // init network
         setTimeout(() => {
@@ -221,7 +220,7 @@ export class GameScene {
 
             // if item
             if (entity.type === "item") {
-                //this._entities[sessionId] = new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._game);
+                this._entities[sessionId] = new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._game);
             }
         });
 
@@ -240,6 +239,7 @@ export class GameScene {
             SERVER: Date.now(),
             SLOW: Date.now(),
             PING: Date.now(),
+            UI: Date.now(),
         };
 
         // start game loop
@@ -278,6 +278,12 @@ export class GameScene {
                 // send ping to server
                 this._game.sendMessage(ServerMsg.PING);
                 lastUpdates["PING"] = currentTime;
+            }
+
+            // ui update loop
+            if (currentTime - lastUpdates["UI"] >= 1000) {
+                this._ui.update();
+                lastUpdates["UI"] = currentTime;
             }
         });
     }

@@ -7,7 +7,7 @@ let LocationsDB = {
         key: "lh_town",
         mesh: "lh_town",
         sun: true,
-        sunIntensity: 0.05,
+        sunIntensity: 0.1,
         spawnPoint: {
             x: 0,
             y: 0,
@@ -42,24 +42,16 @@ let LocationsDB = {
                     key: "lh_town_thief",
                     type: "global",
                     behaviour: "patrol",
-                    aggressive: true,
+                    aggressive: false,
                     canAttack: true,
                     points: [new Vector3(5.38, 0.01, -1.3), new Vector3(15.53, 0.01, -8.95), new Vector3(-4.72, 0.01, -2.28)],
-                    amount: 20,
-                    race: "male_rogue",
-                    material: 1,
+                    amount: 40,
+                    race: "male_mage",
+                    material: 0,
                     name: "Thief",
                     baseHealth: 20,
                     baseSpeed: Speed.VERY_SLOW,
                     equipment: [
-                        {
-                            key: "helm_01",
-                            slot: PlayerSlots.HEAD,
-                        },
-                        {
-                            key: "shield_01",
-                            slot: PlayerSlots.OFF_HAND,
-                        },
                         {
                             key: "sword_01",
                             slot: PlayerSlots.WEAPON,
@@ -85,8 +77,8 @@ let LocationsDB = {
                         new Vector3(-8.8, 0.01, -22.39),
                         new Vector3(-8.51, 0.01, -14.93),
                     ],
-                    amount: 50,
-                    race: "male_mage",
+                    amount: 40,
+                    race: "male_rogue",
                     material: 2,
                     name: "Bandit",
                     baseHealth: 40,
@@ -117,7 +109,7 @@ let LocationsDB = {
                     rotation: 3.12,
                     amount: 1,
                     race: "male_knight",
-                    material: 3,
+                    material: 0,
                     name: "Alexander The Righteous",
                     interactable: {
                         title: "Talk",
@@ -139,19 +131,10 @@ let LocationsDB = {
                     points: [new Vector3(9.67, 0, -28.58)],
                     rotation: 3.12,
                     amount: 1,
-                    race: "male_mage",
+                    race: "male_knight",
                     material: 2,
                     name: "Kilhiam ",
-                    equipment: [
-                        {
-                            key: "helm_01",
-                            slot: PlayerSlots.HEAD,
-                        },
-                        {
-                            key: "sword_01",
-                            slot: PlayerSlots.WEAPON,
-                        },
-                    ],
+                    equipment: [],
                     interactable: {
                         title: "Talk",
                         data: [
@@ -258,7 +241,7 @@ let LocationsDB = {
                     rotation: 3.12,
                     radius: 0,
                     amount: 1,
-                    race: "male_mage",
+                    race: "male_knight",
                     material: 1,
                     name: "Harmless Dummy",
                     baseHealth: 5000,
@@ -279,16 +262,7 @@ let LocationsDB = {
                             },
                         ],
                     },
-                    equipment: [
-                        {
-                            key: "helm_01",
-                            slot: PlayerSlots.HEAD,
-                        },
-                        {
-                            key: "sword_01",
-                            slot: PlayerSlots.WEAPON,
-                        },
-                    ],
+                    equipment: [],
                 },
             ],
         },

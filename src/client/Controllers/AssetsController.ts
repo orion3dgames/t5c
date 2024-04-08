@@ -68,16 +68,6 @@ export class AssetsController {
             { name: "TXT_particle_01", filename: "particle_01.png", extension: "png", type: "texture" },
         ];
 
-        // add locations
-        /*
-        let locations = this._game.loadGameData("locations");
-        if (locations) {
-            for (let key in locations) {
-                let el = locations[key];
-                this.assetDatabase.push({ name: "ENV_" + el.key, filename: "environment/" + el.mesh + ".glb", extension: "glb", type: "mesh" });
-            }
-        }*/
-
         // add abilities (icons)
         let abilities = this._game.loadGameData("abilities");
         if (abilities) {
@@ -289,7 +279,6 @@ export class AssetsController {
     //What we do once the environment assets have been imported
     //handles setting the necessary flags for collision and trigger meshes,
     public async prepareLevel(key) {
-        
         if (this._game.currentLocation.waterPlane) {
             // Water
             var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 32 }, this._game.scene);
@@ -313,13 +302,14 @@ export class AssetsController {
 
         //Loop through all environment meshes that were imported
         this.allMeshes.forEach((m: Mesh) => {
-            // default values
             m.checkCollisions = false;
-            m.isPickable = true;
-            m.receiveShadows = true;
+            m.receiveShadows = false;
             m.metadata = {
                 type: "environment",
             };
+            m.isPickable = false;
+            m.doNotSyncBoundingInfo = true;
+            m.freezeWorldMatrix();
         });
     }
 
@@ -343,7 +333,7 @@ export class AssetsController {
                     this._game._loadedAssets[modelToLoadKey] = mergedMesh;
                     this._game._loadedAssets[modelToLoadKey].isVisible = false;
                 }
-                root.rootNodes[0].dispose();
+                root.dispose();
             }
         }
     }

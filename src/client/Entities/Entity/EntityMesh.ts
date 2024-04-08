@@ -64,8 +64,8 @@ export class EntityMesh {
             this.debugMesh = sphere;
         }
         */
-        // add selected image
 
+        // add selected image
         var material = this._scene.getMaterialByName("entity_selected");
         const selectedMesh = MeshBuilder.CreateCylinder("entity_selected_" + this._entity.race, { diameter: 2, height: 0.01, tessellation: 8 }, this._scene);
         selectedMesh.parent = this._entity;

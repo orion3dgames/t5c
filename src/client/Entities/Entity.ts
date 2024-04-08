@@ -169,7 +169,7 @@ export class Entity extends TransformNode {
             if (this.health !== this.entity.health) {
                 let healthChange = this.entity.health - this.health;
                 if (healthChange < 0 || healthChange > 1) {
-                    this._ui._DamageText.addDamage(this, healthChange);
+                    //this._ui._DamageText.addDamage(this, healthChange);
                 }
             }
 
@@ -191,9 +191,9 @@ export class Entity extends TransformNode {
 
         //////////////////////////////////////////////////////////////////////////
         // misc
-        this.characterLabel = this._ui.createEntityLabel(this);
-        this.characterChatLabel = this._ui.createEntityChatLabel(this);
-        this.interactableButtons = this._ui.createInteractableButtons(this);
+        //this.characterLabel = this._ui.createEntityLabel(this);
+        //this.characterChatLabel = this._ui.createEntityChatLabel(this);
+        //this.interactableButtons = this._ui.createInteractableButtons(this);
     }
 
     public update(delta): any {
@@ -221,8 +221,8 @@ export class Entity extends TransformNode {
 
             // hide any dialog this entity could be linked too
             if (this._ui.panelDialog.currentEntity && this._ui.panelDialog.currentEntity.sessionId === this.sessionId) {
-                this._ui.panelDialog.clear();
-                this._ui.panelDialog.close();
+                //this._ui.panelDialog.clear();
+                //this._ui.panelDialog.close();
             }
         }
 

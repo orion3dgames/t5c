@@ -12,7 +12,7 @@ export class spawnCTRL {
     private _location;
     private spawnsAmount = [];
 
-    private SPAWN_RATE = 1;
+    private SPAWN_RATE = 10;
     private SPAWN_INTERVAL = 500;
     private SPAWN_CURRENT = 0;
 

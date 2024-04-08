@@ -9,7 +9,7 @@ class Config {
     // server settings
     port = 3000;
     maxClients = 20; // set maximum clients per room
-    updateRate = 100; // Set frequency the patched state should be sent to all clients, in milliseconds
+    updateRate = 200; // Set frequency the patched state should be sent to all clients, in milliseconds
     databaseUpdateRate = 10000; // the frequency at which server save data to the database, in milliseconds
     logLevel = "info";
 
@@ -18,8 +18,8 @@ class Config {
 
     // game settings
     PLAYER_NAMEPLATE_TIMEOUT = 15000; // 15 seconds
-    PLAYER_VIEW_DISTANCE = 22;
-    PLAYER_LOSE_FOCUS_DISTANCE = 22;
+    PLAYER_VIEW_DISTANCE = 30;
+    PLAYER_LOSE_FOCUS_DISTANCE = 30;
     PLAYER_GRACE_PERIOD = 0;
     PLAYER_INTERACTABLE_DISTANCE = 5;
     PLAYER_INVENTORY_SPACE = 23;

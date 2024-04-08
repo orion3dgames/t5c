@@ -46,13 +46,13 @@ export class EntityAnimator {
         this.entityData = entity._game._vatController.entityData.get(entity.race);
 
         this._entity = entity;
-        this.ratio = entity._scene.getAnimationRatio();
+        this.ratio = 0;
 
         this._build();
     }
 
     public refresh() {
-        this.ratio = this._entity._scene.getAnimationRatio();
+        //this.ratio = this._entity._scene.getAnimationRatio();
         // set animation speed
         this._idle.speedRatio = this._entity.animations["IDLE"].speed * this.ratio;
         this._walk.speedRatio = this._entity.animations["WALK"].speed * this.ratio;
@@ -119,29 +119,29 @@ export class EntityAnimator {
     }
 
     //
-    private checkIfPlayerIsMoving(currentPos: Vector3, nextPos: Vector3, epsilon = 0.05): boolean {
+    private checkIfPlayerIsMoving(currentPos: Vector3, nextPos: Vector3, epsilon = 0.01): boolean {
         return !currentPos.equalsWithEpsilon(nextPos, epsilon);
     }
 
     // determine what animation should be played
-    public animate(player): void {
-        let currentPos = player.position;
-        let nextPos = player.moveController.getNextPosition();
-        player.isMoving = false;
+    public animate(entity): void {
+        let currentPos = entity.getPosition();
+        let nextPos = entity.moveController.getNextPosition();
+        entity.isMoving = false;
 
-        // if player is moving
-        // note to myself: when a players dies, the below still considers the player is moving... to be improved.
-        if (this.checkIfPlayerIsMoving(currentPos, nextPos) && player.health > 0) {
-            this._currentAnim = this._walk;
-            player.isMoving = true;
-
-            // if player has died
-        } else if (player.anim_state === EntityState.DEAD) {
+        // if player has died
+        if (entity.anim_state === EntityState.DEAD) {
             this._currentAnim = this._death;
 
             // if player is attacking
-        } else if (player.anim_state === EntityState.ATTACK) {
+        } else if (entity.anim_state === EntityState.ATTACK) {
             this._currentAnim = this._attack;
+
+            // if player is moving
+            // note to myself: when a players dies, the below still considers the player is moving... to be improved.
+        } else if (this.checkIfPlayerIsMoving(currentPos, nextPos) && entity.health > 0) {
+            this._currentAnim = this._walk;
+            entity.isMoving = true;
 
             // else play idle
         } else {
@@ -153,6 +153,7 @@ export class EntityAnimator {
     play(player) {
         // play animation and stop previous animation
         if (this._currentAnim != null && this._prevAnim !== this._currentAnim) {
+            console.log("ANIMATION CHANGED for", player.name, this._prevAnim, this._currentAnim);
             this.setAnimationParameters(this.mesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim);
             player.meshController.equipments.forEach((itemMesh) => {
                 this.setAnimationParameters(itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim);

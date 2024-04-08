@@ -117,6 +117,7 @@ export class Player extends Entity {
 
     // process left click for player
     public leftClick(pointerInfo) {
+        /*
         let metadata = this.getMeshMetadata(pointerInfo);
 
         if (!metadata) return false;
@@ -146,7 +147,7 @@ export class Player extends Entity {
                     digit: 1,
                 });
                 return false;
-                */
+                
             }
 
             // if interactable target
@@ -210,8 +211,9 @@ export class Player extends Entity {
                     z: destination._z,
                 });
             }
-            */
+            
         }
+        */
     }
 
     // update at engine rate 60fps
@@ -250,7 +252,7 @@ export class Player extends Entity {
 
             // if far enough, hide interactable button & any open dialog
             if (this.closestEntityDistance > 5 && this.closestEntity.interactableButtons) {
-                this._ui.panelDialog.close();
+                //this._ui.panelDialog.close();
             }
         }
 
@@ -329,6 +331,7 @@ export class Player extends Entity {
     }
 
     public findCloseToInteractableEntity() {
+        /*
         let closestDistance = 1000000;
         for (let sessionId in this.entities) {
             let entity = this.entities[sessionId];
@@ -343,7 +346,7 @@ export class Player extends Entity {
                     this.closestEntityDistance = closestDistance;
                 }
             }
-        }
+        }*/
     }
 
     public getAbilityByDigit(digit): Ability | boolean {

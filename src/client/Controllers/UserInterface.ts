@@ -88,6 +88,9 @@ export class UserInterface {
     // labels
     public showingLabels: boolean = false;
 
+    // debug
+    public fpsPanel;
+
     _isDragging;
     _pointerDownPosition;
 
@@ -124,11 +127,19 @@ export class UserInterface {
 
         this._playerUI = uiLayerContainer;
 
-        // set highlight layer
-        this._hightlight = new HighlightLayer("hl", this._scene);
-        this._hightlight.blurHorizontalSize = 0.5;
-        this._hightlight.blurVerticalSize = 0.5;
-        this._hightlight.innerGlow = false;
+        const fpsPanel = new TextBlock("fpsPanel");
+        fpsPanel.color = "#FFF";
+        fpsPanel.top = "5px";
+        fpsPanel.left = "-5px";
+        fpsPanel.fontSize = "12px;";
+        fpsPanel.resizeToFit = true;
+        fpsPanel.text = "FPS: 0";
+        fpsPanel.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        fpsPanel.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        fpsPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        fpsPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        this._playerUI.addControl(fpsPanel);
+        this.fpsPanel = fpsPanel;
     }
 
     public dragging() {
@@ -158,7 +169,7 @@ export class UserInterface {
     public setCurrentPlayer(currentPlayer) {
         // set current player
         this._currentPlayer = currentPlayer;
-
+        /*
         // cursor
         this._Cursor = new Cursor(this);
 
@@ -272,9 +283,11 @@ export class UserInterface {
 
         // initial resize event
         this.resize();
+        */
     }
 
     public resize() {
+        /*
         if (this._engine.getRenderWidth() < 1100) {
             if (this._ChatBox) {
                 this._ChatBox.chatPanel.top = "-115px;";
@@ -283,10 +296,12 @@ export class UserInterface {
             if (this._ChatBox) {
                 this._ChatBox.chatPanel.top = "-30px;";
             }
-        }
+        }*/
     }
 
     public update() {
+        this.fpsPanel.text = "FPS: " + this._engine.getFps().toFixed(0);
+        /*
         //
 
         if (this._currentPlayer._input.left_alt_pressed === true && this.showingLabels === false) {

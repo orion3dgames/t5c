@@ -202,7 +202,8 @@ export class VatController {
                             itemMesh.name = race.key + "_" + itemMesh.name;
 
                             // offset to hide the items
-                            itemMesh.position.y -= 5000;
+                            itemMesh.position.y = 5000;
+                            rawMesh.position.y = 5000;
 
                             // weapon VAT
                             itemMesh.skeleton = skeleton;
@@ -231,8 +232,8 @@ export class VatController {
                             itemMeshes.set(itemKey, itemMesh);
 
                             //
-                            //itemMesh.setEnabled(false);
-                            //rawMesh.setEnabled(false);
+                            //itemMesh.visibility = 0;
+                            //rawMesh.visibility = 0;
                         }
                     }
                 }
@@ -276,6 +277,7 @@ export class VatController {
         let alreadyExistMaterial = this._game.scene.getMaterialByName(raceKey);
 
         if (alreadyExistMaterial) {
+            alreadyExistMaterial.freeze();
             // material already exists
             cloneMesh.material = alreadyExistMaterial;
         } else {
@@ -286,6 +288,7 @@ export class VatController {
             });
             mat.reflectionColor = new Color3(0, 0, 0);
             mat.reflectivityColor = new Color3(0, 0, 0);
+            mat.freeze();
 
             //
             cloneMesh.material = mat;
