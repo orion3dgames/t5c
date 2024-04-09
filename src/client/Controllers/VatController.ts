@@ -159,6 +159,7 @@ export class VatController {
 
             // prepare items
             let itemMeshes = new Map();
+            /*
             if (Object.keys(race.bones).length > 0) {
                 let items = this._game.loadGameData("items");
                 for (let itemKey in items) {
@@ -237,7 +238,7 @@ export class VatController {
                         }
                     }
                 }
-            }
+            }*/
 
             // load prebaked vat animations
             let bufferFromMesh = b.loadBakedVertexDataFromJSON(bakedAnimationJson);
@@ -264,6 +265,88 @@ export class VatController {
 
             // bake realtime
             //await this.bakeTextureAnimationRealtime(key, merged);
+        }
+    }
+
+    async prepareItemForVat(raceKey, itemKey) {
+        console.log("adding for vat", raceKey, itemKey);
+        // get entityData
+        let entityData = this._entityData.get(raceKey);
+
+        // make sure not already loaded
+        if (entityData.items.has(itemKey)) {
+            return false;
+        }
+
+        // load item
+        let item = this._game.getGameData("item", itemKey);
+        let race = this._game.getGameData("race", raceKey);
+        let slot = item.equippable ? PlayerSlots[item.equippable.slot] : 0;
+        let boneId = race.bones[slot];
+
+        let rawMesh = this._game._loadedAssets["ITEM_" + item.key].meshes[0].clone(); // mandatory: needs to be cloned
+        rawMesh.position.copyFrom(entityData.skeleton.bones[boneId].getAbsolutePosition());
+        rawMesh.rotationQuaternion = undefined;
+        rawMesh.rotation.set(0, Math.PI * 1.5, 0); // we must set it in Blender
+        rawMesh.scaling.setAll(1);
+
+        // if mesh offset required
+        let equipOptions = item.equippable;
+        if (equipOptions.scale) {
+            rawMesh.scaling = new Vector3(equipOptions.scale, equipOptions.scale, equipOptions.scale);
+        }
+        if (equipOptions.offset_x) {
+            rawMesh.position.x += equipOptions.offset_x;
+        }
+        if (equipOptions.offset_y) {
+            rawMesh.position.y += equipOptions.offset_y;
+        }
+        if (equipOptions.offset_z) {
+            rawMesh.position.z += equipOptions.offset_z;
+        }
+
+        // if rotationFix needed
+        if (equipOptions.rotation_x || equipOptions.rotation_y || equipOptions.rotation_z) {
+            // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
+            rawMesh.rotationQuaternion = null;
+            rawMesh.rotation.set(equipOptions.rotation_x ?? 0, equipOptions.rotation_y ?? 0, equipOptions.rotation_z ?? 0);
+        }
+
+        let itemMesh = mergeMesh(rawMesh, itemKey);
+
+        if (itemMesh) {
+            itemMesh.name = race.key + "_" + itemMesh.name;
+
+            // offset to hide the items
+            itemMesh.position.y = 5000;
+            rawMesh.position.y = 5000;
+
+            // weapon VAT
+            itemMesh.skeleton = entityData.skeleton;
+            itemMesh.bakedVertexAnimationManager = entityData.vat;
+            itemMesh.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
+            itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+
+            // manually set MatricesIndicesKind & MatricesWeightsKind
+            // https://doc.babylonjs.com/features/featuresDeepDive/mesh/bonesSkeletons#preparing-mesh
+            const totalCount = itemMesh.getTotalVertices();
+            const weaponMI: any = [];
+            const weaponMW: any = [];
+            for (let i = 0; i < totalCount; i++) {
+                weaponMI.push(boneId, 0, 0, 0);
+                weaponMW.push(1, 0, 0, 0);
+            }
+
+            itemMesh.setVerticesData(VertexBuffer.MatricesIndicesKind, weaponMI, false);
+            itemMesh.setVerticesData(VertexBuffer.MatricesWeightsKind, weaponMW, false);
+
+            //
+            //rawMesh.setEnabled(false);
+            //itemMesh.setEnabled(false);
+
+            //
+            console.log("PREPARING ITEM FOR VAT", race, itemKey);
+            entityData.items.set(itemKey, itemMesh);
         }
     }
 

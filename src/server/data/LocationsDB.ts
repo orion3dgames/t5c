@@ -53,10 +53,6 @@ let LocationsDB = {
                     baseSpeed: Speed.VERY_SLOW,
                     equipment: [
                         {
-                            key: "helm_01",
-                            slot: PlayerSlots.HEAD,
-                        },
-                        {
                             key: "shield_01",
                             slot: PlayerSlots.OFF_HAND,
                         },
@@ -85,7 +81,7 @@ let LocationsDB = {
                         new Vector3(-8.8, 0.01, -22.39),
                         new Vector3(-8.51, 0.01, -14.93),
                     ],
-                    amount: 100,
+                    amount: 50,
                     race: "male_rogue",
                     material: 2,
                     name: "Bandit",

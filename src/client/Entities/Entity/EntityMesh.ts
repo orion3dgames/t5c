@@ -145,7 +145,7 @@ export class EntityMesh {
                 this.removeItem(e);
             });
             this._entity.animatorController.refreshItems();
-        }, 1000);
+        }, 200);
     }
 
     public freezeMeshes() {
@@ -199,7 +199,7 @@ export class EntityMesh {
         }
     }
 
-    equipItem(e) {
+    async equipItem(e) {
         //console.log(this._entity.race, this._entityData.vat.texture.name, e.key);
         if (this.equipments.has(e.key)) return false;
 
@@ -208,6 +208,9 @@ export class EntityMesh {
             let equipOptions = item.equippable;
             // if mesh needs to be added
             if (equipOptions.mesh) {
+                // add item for vat
+                await this._game._vatController.prepareItemForVat(this._entity.race, e.key);
+
                 // create instance of mesh
                 let instance = this._entityData.items.get(item.key).createInstance("equip_" + this._entity.sessionId + "_" + e.key);
                 instance.isEnabled(true);
