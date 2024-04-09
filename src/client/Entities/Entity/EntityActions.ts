@@ -15,7 +15,7 @@ import { Entity } from "../Entity";
 export class EntityActions {
     private _scene: Scene;
     private _loadedAssets: any[];
-    private _entities: Entity[];
+    private _entities;
     private particleTxt_01: Texture;
 
     private colors = {
@@ -44,8 +44,8 @@ export class EntityActions {
             });
         }
         */
-        let source = this._entities[data.fromId];
-        let target = this._entities[data.targetId];
+        let source = this._entities.get(data.fromId);
+        let target = this._entities.get(data.targetId);
 
         // adjust from pos to be the bone position
         /*

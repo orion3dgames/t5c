@@ -117,7 +117,6 @@ export class Player extends Entity {
 
     // process left click for player
     public leftClick(pointerInfo) {
-        /*
         let metadata = this.getMeshMetadata(pointerInfo);
 
         if (!metadata) return false;
@@ -126,12 +125,13 @@ export class Player extends Entity {
         if (metadata.type === "player" || metadata.type === "entity") {
             // select entity
             let targetSessionId = metadata.sessionId;
-            let target = this.entities[targetSessionId];
+            let target = this.entities.get(targetSessionId);
             this._game.selectedEntity = target;
 
             // display nameplate for a certain time for any entity right clicked
-            // show entity label
-            target.characterLabel.isVisible = true;
+            if (target.characterLabel) {
+                target.characterLabel.isVisible = true;
+            }
 
             // if spawninfo available
             if (!target.spawnInfo) return false;
@@ -139,7 +139,6 @@ export class Player extends Entity {
             // if targets is aggresive
             // note: need to find a better wayt to do this, not linked to hotbar
             if (target.spawnInfo.aggressive) {
-                /*
                 // send to server
                 this._game.sendMessage(ServerMsg.PLAYER_HOTBAR_ACTIVATED, {
                     senderId: this._room.sessionId,
@@ -147,7 +146,6 @@ export class Player extends Entity {
                     digit: 1,
                 });
                 return false;
-                
             }
 
             // if interactable target
@@ -169,6 +167,7 @@ export class Player extends Entity {
             }
         }
 
+        /*
         // pick up item
         if (metadata.type === "item") {
             this._game.sendMessage(ServerMsg.PLAYER_PICKUP, {

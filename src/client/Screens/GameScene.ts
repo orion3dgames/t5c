@@ -229,9 +229,9 @@ export class GameScene {
 
         // when an entity is removed
         this.room.state.entities.onRemove((entity, sessionId) => {
-            if (this._entities[sessionId]) {
-                this._entities[sessionId].remove();
-                delete this._entities[sessionId];
+            if (this._entities.has(sessionId)) {
+                this._entities.get(sessionId)?.remove();
+                this._entities.delete(sessionId);
             }
         });
 
@@ -262,12 +262,12 @@ export class GameScene {
 
                 // server player gameloop
                 if (currentTime - lastUpdates["SERVER"] >= 100) {
-                    entity.updateServerRate(delta);
+                    entity.updateServerRate(100);
                 }
 
                 // slow game loop
                 if (currentTime - lastUpdates["SLOW"] >= 1000) {
-                    entity.updateSlowRate(delta);
+                    entity.updateSlowRate(1000);
                     entity.lod(this._currentPlayer);
                 }
             });

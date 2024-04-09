@@ -344,7 +344,7 @@ export class VatController {
             //itemMesh.setEnabled(false);
 
             //
-            console.log("PREPARING ITEM FOR VAT", race, itemKey);
+            //console.log("PREPARING ITEM FOR VAT", race, itemKey);
             entityData.items.set(itemKey, itemMesh);
         }
     }
