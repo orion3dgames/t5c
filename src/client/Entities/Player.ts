@@ -218,6 +218,7 @@ export class Player extends Entity {
 
     // update at engine rate 60fps
     public update(delta) {
+        // run super function first
         super.update(delta);
 
         if (this && this.moveController) {
@@ -234,27 +235,11 @@ export class Player extends Entity {
 
     // update at server rate
     public updateServerRate(delta) {
+        // run super function first
         super.updateServerRate(delta);
 
         // process player movement
         this.moveController.processMove();
-
-        ///////////// DIALOG ///////////////////////////
-        // if moving, look for the closest interactable entities.
-        if (this.isMoving) {
-            // look for
-            this.findCloseToInteractableEntity();
-
-            // if close enough, show interactable button
-            if (this.closestEntityDistance < 5 && this.closestEntity.interactableButtons) {
-                this.closestEntity.interactableButtons.isVisible = true;
-            }
-
-            // if far enough, hide interactable button & any open dialog
-            if (this.closestEntityDistance > 5 && this.closestEntity.interactableButtons) {
-                //this._ui.panelDialog.close();
-            }
-        }
 
         ///////////// ENVIRONMENT LOD ///////////////////////////
         // only show meshes close to us
@@ -330,23 +315,49 @@ export class Player extends Entity {
         }
     }
 
+    public updateSlowRate(delta: any): void {
+        // run super function first
+        super.updateSlowRate(delta);
+
+        ///////////// DIALOG ///////////////////////////
+        // only if moving, look for the closest interactable entities.
+        if (this.isMoving) {
+            // look for closest npc
+            // todo: maybe this is a silly way?
+            this.findCloseToInteractableEntity();
+            //console.log("closest entity is ", this.closestEntity.name, this.closestEntityDistance);
+
+            // if close enough, show interactable button
+            if (this.closestEntityDistance < 5 && this.closestEntity.interactableButtons) {
+                this.closestEntity.interactableButtons.isVisible = true;
+            }
+
+            // if far enough, hide interactable button & any open dialog
+            if (this.closestEntityDistance > 5 && this.closestEntity.interactableButtons) {
+                this._ui.panelDialog.close();
+            }
+        }
+    }
+
+    /**
+     * This function is called every time the player moves, so that
+     * the closest interactable entity can be highlighted on screen.
+     */
     public findCloseToInteractableEntity() {
-        /*
-        let closestDistance = 1000000;
-        for (let sessionId in this.entities) {
-            let entity = this.entities[sessionId];
+        let minDistanceSquared = Infinity;
+        let playerPos = this.getPosition();
+        this.entities.forEach((entity) => {
             if (entity.type === "entity" && entity.interactableButtons && entity.health > 0) {
                 entity.interactableButtons.isVisible = false;
-                let playerPos = this.getPosition();
                 let entityPos = entity.getPosition();
-                let distanceBetween = Vector3.Distance(playerPos, entityPos);
-                if (distanceBetween < closestDistance) {
-                    closestDistance = distanceBetween;
+                let distanceSquared = Vector3.Distance(playerPos, entityPos);
+                if (distanceSquared < minDistanceSquared) {
                     this.closestEntity = entity;
-                    this.closestEntityDistance = closestDistance;
+                    this.closestEntityDistance = distanceSquared;
+                    minDistanceSquared = distanceSquared;
                 }
             }
-        }*/
+        });
     }
 
     public getAbilityByDigit(digit): Ability | boolean {

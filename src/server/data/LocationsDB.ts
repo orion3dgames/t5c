@@ -111,7 +111,7 @@ let LocationsDB = {
                     canAttack: false,
                     points: [new Vector3(38.7, 3.51, -11.81)],
                     rotation: 3.12,
-                    amount: 1,
+                    amount: 0,
                     race: "male_knight",
                     material: 0,
                     name: "Alexander The Righteous",

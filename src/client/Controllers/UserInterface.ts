@@ -47,7 +47,7 @@ export class UserInterface {
     private _engine: Engine;
     public _room: Room;
     private _chatRoom: Room;
-    public _entities: (Entity | Player | Item)[];
+    public _entities: Map<string, Player | Entity | Item>;
     private _currentPlayer;
     public _loadedAssets;
 
@@ -94,7 +94,7 @@ export class UserInterface {
     _isDragging;
     _pointerDownPosition;
 
-    constructor(game: GameController, entities: (Entity | Player | Item)[], currentPlayer) {
+    constructor(game: GameController, entities: Map<string, Player | Entity | Item>, currentPlayer) {
         // set var we will be needing
         this._game = game;
         this._scene = game.scene;
@@ -104,6 +104,10 @@ export class UserInterface {
         this._entities = entities;
         this._currentPlayer = currentPlayer;
         this._loadedAssets = this._game._loadedAssets;
+
+        // create ui
+        const NAMES_ADT = AdvancedDynamicTexture.CreateFullscreenUI("UI_Names", true, this._scene);
+        this.NAMES_ADT = NAMES_ADT;
 
         // create ui
         const uiLayer = AdvancedDynamicTexture.CreateFullscreenUI("UI_Player", true, this._scene);
@@ -294,7 +298,6 @@ export class UserInterface {
     // update every 1000ms
     public slow_update() {
         this._DebugBox.update();
-
         this.panelInventory.update();
         this.panelAbilities.update();
         this.panelCharacter.update();
@@ -399,6 +402,7 @@ export class UserInterface {
         rect1.addControl(label);
         return rect1;
     }
+    */
 
     public createInteractableButtons(entity) {
         if (!entity.spawnInfo) return false;
@@ -421,5 +425,4 @@ export class UserInterface {
 
         return rect1;
     }
-    */
 }

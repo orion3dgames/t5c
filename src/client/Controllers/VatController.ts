@@ -269,7 +269,6 @@ export class VatController {
     }
 
     async prepareItemForVat(raceKey, itemKey) {
-        console.log("adding for vat", raceKey, itemKey);
         // get entityData
         let entityData = this._entityData.get(raceKey);
 

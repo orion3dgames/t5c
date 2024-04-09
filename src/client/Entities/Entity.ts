@@ -193,7 +193,7 @@ export class Entity extends TransformNode {
         // misc
         //this.characterLabel = this._ui.createEntityLabel(this);
         //this.characterChatLabel = this._ui.createEntityChatLabel(this);
-        //this.interactableButtons = this._ui.createInteractableButtons(this);
+        this.interactableButtons = this._ui.createInteractableButtons(this);
     }
 
     public update(delta): any {
@@ -268,6 +268,8 @@ export class Entity extends TransformNode {
             }
         }
 
+        this.animatorController.refreshAnimationRatio();
+
         ////////////////////////////////////
         // animate player continuously
         this.animatorController.play(this);
@@ -275,9 +277,7 @@ export class Entity extends TransformNode {
 
     public updateServerRate(delta) {}
 
-    public updateSlowRate(delta) {
-        this.animatorController.refreshAnimationRatio();
-    }
+    public updateSlowRate(delta) {}
 
     public getPosition() {
         return new Vector3(this.position.x, this.position.y, this.position.z);
@@ -285,18 +285,6 @@ export class Entity extends TransformNode {
 
     // basic performance LOD logic
     public lod(_currentPlayer: Entity) {
-        // hide everything
-        this.mesh.setEnabled(false);
-        this.mesh.freezeWorldMatrix();
-
-        // hide gui
-        //this.characterLabel.isVisible = false;
-        //this.characterChatLabel.isVisible = false;
-        this.meshController.equipments?.forEach((equipment) => {
-            equipment.setEnabled(false);
-            equipment.freezeWorldMatrix();
-        });
-
         // only enable if close enough to local player
         let entityPos = this.getPosition();
         let playerPos = _currentPlayer.getPosition();
@@ -312,6 +300,18 @@ export class Entity extends TransformNode {
             this.meshController.equipments?.forEach((equipment) => {
                 equipment.unfreezeWorldMatrix();
                 equipment.setEnabled(true);
+            });
+        } else {
+            // hide everything
+            this.mesh.setEnabled(false);
+            this.mesh.freezeWorldMatrix();
+
+            // hide gui
+            //this.characterLabel.isVisible = false;
+            //this.characterChatLabel.isVisible = false;
+            this.meshController.equipments?.forEach((equipment) => {
+                equipment.setEnabled(false);
+                equipment.freezeWorldMatrix();
             });
         }
     }

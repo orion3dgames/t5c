@@ -43,7 +43,7 @@ export class GameScene {
 
     public gameData;
 
-    public _entities: (Player | Entity | Item)[] = [];
+    public _entities: Map<string, Player | Entity | Item> = new Map();
 
     constructor() {}
 
@@ -204,7 +204,7 @@ export class GameScene {
                     this._ui.setCurrentPlayer(_player);
 
                     // add to entities
-                    this._entities[sessionId] = _player;
+                    this._entities.set(sessionId, _player);
 
                     // player is loaded, let's hide the loading gui
                     this._game.engine.hideLoadingUI();
@@ -212,18 +212,18 @@ export class GameScene {
                     //////////////////
                     // else must be another player
                 } else {
-                    this._entities[sessionId] = new Entity(sessionId, this._scene, this, entity);
+                    this._entities.set(sessionId, new Entity(sessionId, this._scene, this, entity));
                 }
             }
 
             // if entity
             if (entity.type === "entity") {
-                this._entities[sessionId] = new Entity(sessionId, this._scene, this, entity);
+                this._entities.set(sessionId, new Entity(sessionId, this._scene, this, entity));
             }
 
             // if item
             if (entity.type === "item") {
-                this._entities[sessionId] = new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._game);
+                //this._entities.set(sessionId, new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._game));
             }
         });
 
@@ -256,25 +256,28 @@ export class GameScene {
 
             // iterate through each items
             const currentTime = Date.now();
-            for (let sessionId in this._entities) {
-                const entity = this._entities[sessionId];
-
+            this._entities.forEach((entity, sessionId) => {
                 // main entity update
                 entity.update(delta);
-                entity.lod(this._currentPlayer);
 
                 // server player gameloop
-                if (currentTime - lastUpdates["SERVER"] >= 100 && entity.type === "player") {
+                if (currentTime - lastUpdates["SERVER"] >= 100) {
                     entity.updateServerRate(delta);
-                    lastUpdates["SERVER"] = currentTime;
                 }
 
                 // slow game loop
                 if (currentTime - lastUpdates["SLOW"] >= 1000) {
-                    console.log("SLOW UPDATE");
                     entity.updateSlowRate(delta);
-                    lastUpdates["SLOW"] = currentTime;
+                    entity.lod(this._currentPlayer);
                 }
+            });
+
+            // reset timers
+            if (currentTime - lastUpdates["SERVER"] >= 100) {
+                lastUpdates["SERVER"] = currentTime;
+            }
+            if (currentTime - lastUpdates["SLOW"] >= 1000) {
+                lastUpdates["SLOW"] = currentTime;
             }
 
             // game update loop
@@ -283,10 +286,7 @@ export class GameScene {
                 this._game.sendMessage(ServerMsg.PING);
                 lastUpdates["PING"] = currentTime;
             }
-        });
 
-        this._scene.registerAfterRender(() => {
-            const currentTime = Date.now();
             // ui update loop
             if (currentTime - lastUpdates["UI_SERVER"] >= 100) {
                 this._ui.update();
