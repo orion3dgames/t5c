@@ -261,6 +261,7 @@ export class GameScene {
 
                 // main entity update
                 entity.update(delta);
+                entity.lod(this._currentPlayer);
 
                 // server player gameloop
                 if (currentTime - lastUpdates["SERVER"] >= 100 && entity.type === "player") {
@@ -271,7 +272,6 @@ export class GameScene {
                 // slow game loop
                 if (currentTime - lastUpdates["SLOW"] >= 1000) {
                     console.log("SLOW UPDATE");
-                    entity.lod(this._currentPlayer);
                     entity.updateSlowRate(delta);
                     lastUpdates["SLOW"] = currentTime;
                 }
