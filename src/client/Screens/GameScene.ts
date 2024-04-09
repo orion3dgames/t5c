@@ -102,14 +102,12 @@ export class GameScene {
         var light = new DirectionalLight("DirectionalLight", new Vector3(-1, -2, -1), scene);
         light.position = new Vector3(100, 100, 100);
         light.radius = 0.27;
-        light.intensity = location.sunIntensity;
-        light.autoCalcShadowZBounds = true;
+        light.intensity = 0.5;
+        //light.autoCalcShadowZBounds = true;
 
-        //SceneOptimizer.OptimizeAsync(scene, SceneOptimizerOptions.ModerateDegradationAllowed());
-
+        /*
         // shadow generator
         // toto: something is wrong with the shadows.
-        /*
         this._shadow = new CascadedShadowGenerator(128, light);
         this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_LOW;
         this._shadow.lambda = 0.82;

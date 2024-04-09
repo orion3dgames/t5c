@@ -302,14 +302,14 @@ export class AssetsController {
 
         //Loop through all environment meshes that were imported
         this.allMeshes.forEach((m: Mesh) => {
+            m.isPickable = false;
+            m.doNotSyncBoundingInfo = true;
+            m.freezeWorldMatrix();
             m.checkCollisions = false;
             m.receiveShadows = false;
             m.metadata = {
                 type: "environment",
             };
-            m.isPickable = false;
-            m.doNotSyncBoundingInfo = true;
-            m.freezeWorldMatrix();
         });
     }
 
