@@ -248,11 +248,10 @@ export class Player extends Entity {
         let allMeshes = this._game._loadedAssets[key]?.loadedMeshes ?? [];
         allMeshes.forEach((element) => {
             let distanceTo = Vector3.Distance(element.getAbsolutePosition(), currentPos);
-            element.unfreezeWorldMatrix();
-            element.setEnabled(true);
-            if (distanceTo < 10) {
-                element.unfreezeWorldMatrix();
+            if (distanceTo < this._game.config.PLAYER_VIEW_DISTANCE) {
                 element.setEnabled(true);
+            } else {
+                element.setEnabled(false);
             }
         });*/
 

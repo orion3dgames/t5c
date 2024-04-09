@@ -66,14 +66,13 @@ export class DebugBox {
 
     // debug panel refresh
     public update() {
-        let entityCount = countPlayers(this._entities);
+        let entityCount = this._entities.size;
         let count = 0;
-        for (let index in this._entities) {
-            const element = this._entities[index];
+        this._entities.forEach((element) => {
             if (element.mesh && element.mesh.isEnabled()) {
                 count += 1;
             }
-        }
+        });
 
         let locationText = "";
         locationText += "Total Nodes: " + entityCount + " \n";
