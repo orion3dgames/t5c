@@ -30,7 +30,7 @@ Check out my devlogs on [https://dev.to/orion3d](https://dev.to/orion3d)
 ## Requirements
 - Download and install [Node.js LTS](https://nodejs.org/en/download/)
 - Clone or download this repository.
-- Run `yarn install`
+- Run `npm install`
 
 ## Technology
 - Babylon.js 6.x.x [https://www.babylonjs.com/](https://www.babylonjs.com/)
@@ -38,8 +38,8 @@ Check out my devlogs on [https://dev.to/orion3d](https://dev.to/orion3d)
 - SQLite 3.x.x [https://www.sqlite.org/](https://www.sqlite.org/)
 
 ## How to run
-- Run `yarn server-dev` to launch the server
-- Run `yarn client-dev` to launch the client
+- Run `npm run server-dev` to launch the server
+- Run `npm run client-dev` to launch the client
 
 > The client should be accessible at [`http://localhost:8080`](http://localhost:8080)
 

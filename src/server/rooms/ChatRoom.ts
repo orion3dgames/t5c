@@ -5,11 +5,12 @@ import { ServerMsg } from "../../shared/types";
 
 export class ChatRoom extends Room {
     public maxClients = 1000;
-    public autoDispose = true;
 
     // When room is initialized
     onCreate(options: any) {
         Logger.info("[chat_room][onCreate] room created.", options);
+
+        this.autoDispose = true;
 
         //For chat
         this.onMessage(ServerMsg.PLAYER_SEND_MESSAGE, (client, message) => {
