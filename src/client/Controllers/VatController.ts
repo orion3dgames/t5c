@@ -283,7 +283,7 @@ export class VatController {
         let slot = item.equippable ? PlayerSlots[item.equippable.slot] : 0;
         let boneId = race.bones[slot];
 
-        let rawMesh = this._game._loadedAssets["ITEM_" + item.key].meshes[0].clone(); // mandatory: needs to be cloned
+        let rawMesh = this._game._loadedAssets["ITEM_" + item.key].meshes[0].clone("rawmesh_" + item.key); // mandatory: needs to be cloned
         rawMesh.position.copyFrom(entityData.skeleton.bones[boneId].getAbsolutePosition());
         rawMesh.rotationQuaternion = undefined;
         rawMesh.rotation.set(0, Math.PI * 1.5, 0); // we must set it in Blender
