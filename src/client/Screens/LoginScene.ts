@@ -50,6 +50,9 @@ export class LoginScene {
         // create ui
         const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
         this.create(guiMenu);
+
+        // hide loading gui
+        this._game.engine.hideLoadingUI();
     }
 
     create(guiMenu) {

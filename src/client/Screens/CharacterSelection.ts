@@ -73,6 +73,9 @@ export class CharacterSelectionScene {
             let index = user.characters.length - 1;
             this.selectCharacter(index, user.characters[index]);
         }
+
+        // hide loading gui
+        this._game.engine.hideLoadingUI();
     }
 
     generateleftPanel() {
