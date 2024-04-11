@@ -318,8 +318,8 @@ export class Entity extends TransformNode {
 
     public remove() {
         // delete any ui linked to entity
-        this.characterLabel.dispose();
-        this.characterChatLabel.dispose();
+        //this.characterLabel.dispose();
+        //this.characterChatLabel.dispose();
         if (this.interactableButtons) {
             this.interactableButtons.dispose();
         }

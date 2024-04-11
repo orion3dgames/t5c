@@ -136,8 +136,9 @@ export class Player extends Entity {
             // if spawninfo available
             if (!target.spawnInfo) return false;
 
-            // if targets is aggresive
-            // note: need to find a better wayt to do this, not linked to hotbar
+            // if targets is aggressive, clicking on with will trigger move & attack
+            // note: need to find a better way to do this, not linked to hotbar
+            /*
             if (target.spawnInfo.aggressive) {
                 // send to server
                 this._game.sendMessage(ServerMsg.PLAYER_HOTBAR_ACTIVATED, {
@@ -146,7 +147,7 @@ export class Player extends Entity {
                     digit: 1,
                 });
                 return false;
-            }
+            }*/
 
             // if interactable target
             if (!target.spawnInfo.interactable) return false;
@@ -167,14 +168,13 @@ export class Player extends Entity {
             }
         }
 
-        /*
         // pick up item
         if (metadata.type === "item") {
             this._game.sendMessage(ServerMsg.PLAYER_PICKUP, {
                 sessionId: metadata.sessionId,
             });
         }
-
+        /*
         // move to clicked point
         if (metadata.type === "environment" && !this.isDead) {
             // deselect any entity
@@ -323,7 +323,6 @@ export class Player extends Entity {
             // look for closest npc
             // todo: maybe this is a silly way?
             this.findCloseToInteractableEntity();
-            //console.log("closest entity is ", this.closestEntity.name, this.closestEntityDistance);
 
             // if close enough, show interactable button
             if (this.closestEntityDistance < 5 && this.closestEntity.interactableButtons) {
