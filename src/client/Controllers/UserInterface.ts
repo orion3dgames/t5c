@@ -47,20 +47,20 @@ export class UserInterface {
     private _engine: Engine;
     public _room: Room;
     private _chatRoom: Room;
-    public _entities: (Entity | Player | Item)[];
+    public _entities: Map<string, Player | Entity | Item>;
     private _currentPlayer;
     public _loadedAssets;
 
     //UI Elements
     public MAIN_ADT: AdvancedDynamicTexture;
-    public NAMES_ADT: AdvancedDynamicTexture;
+    public LABELS_ADT: AdvancedDynamicTexture;
     public _playerUI;
-    private _namesUI;
+    public _labelsUI;
     public _hightlight;
 
     // interface
     public _ChatBox: ChatBox;
-    private _DebugBox: DebugBox;
+    public _DebugBox: DebugBox;
     private _HotBar: HotBar;
     private _targetEntitySelectedBar: EntitySelectedBar;
     private _playerEntitySelectedBar: EntitySelectedBar;
@@ -88,10 +88,13 @@ export class UserInterface {
     // labels
     public showingLabels: boolean = false;
 
+    // debug
+    public fpsPanel;
+
     _isDragging;
     _pointerDownPosition;
 
-    constructor(game: GameController, entities: (Entity | Player | Item)[], currentPlayer) {
+    constructor(game: GameController, entities: Map<string, Player | Entity | Item>, currentPlayer) {
         // set var we will be needing
         this._game = game;
         this._scene = game.scene;
@@ -103,8 +106,8 @@ export class UserInterface {
         this._loadedAssets = this._game._loadedAssets;
 
         // create ui
-        const namesUI = AdvancedDynamicTexture.CreateFullscreenUI("UI_Names", true, this._scene);
-        this.NAMES_ADT = namesUI;
+        const LABELS_ADT = AdvancedDynamicTexture.CreateFullscreenUI("UI_Names", true, this._scene);
+        this.LABELS_ADT = LABELS_ADT;
 
         // create ui
         const uiLayer = AdvancedDynamicTexture.CreateFullscreenUI("UI_Player", true, this._scene);
@@ -124,33 +127,19 @@ export class UserInterface {
 
         this._playerUI = uiLayerContainer;
 
-        // set highlight layer
-        this._hightlight = new HighlightLayer("hl", this._scene);
-        this._hightlight.blurHorizontalSize = 0.5;
-        this._hightlight.blurVerticalSize = 0.5;
-        this._hightlight.innerGlow = false;
-    }
-
-    public dragging() {
-        if (this._isDragging) {
-            var deltaX = this._scene.pointerX - this._pointerDownPosition.x;
-            var deltaY = this._scene.pointerY - this._pointerDownPosition.y;
-            this._isDragging.leftInPixels += deltaX;
-            this._isDragging.topInPixels += deltaY;
-            this._pointerDownPosition.x = this._scene.pointerX;
-            this._pointerDownPosition.y = this._scene.pointerY;
-            this._InventoryDropdown.refresh();
-        }
-    }
-
-    public startDragging(panel) {
-        this._isDragging = panel;
-        this._pointerDownPosition = { x: this._scene.pointerX, y: this._scene.pointerY };
-    }
-
-    public stopDragging() {
-        this._isDragging.isPointerBlocker = true;
-        this._isDragging = null;
+        const fpsPanel = new TextBlock("fpsPanel");
+        fpsPanel.color = "#FFF";
+        fpsPanel.top = "5px";
+        fpsPanel.left = "-5px";
+        fpsPanel.fontSize = "12px;";
+        fpsPanel.resizeToFit = true;
+        fpsPanel.text = "FPS: 0";
+        fpsPanel.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        fpsPanel.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        fpsPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        fpsPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        this._playerUI.addControl(fpsPanel);
+        this.fpsPanel = fpsPanel;
     }
 
     // set current player
@@ -177,8 +166,9 @@ export class UserInterface {
         // create chat ui + events
         this._ChatBox = new ChatBox(this._playerUI, this._chatRoom, currentPlayer, this._entities, this._game);
 
-        // create chat ui + events
-        this._DamageText = new DamageText(this.NAMES_ADT, this._scene, this._entities);
+        // create damage text
+        // todo: let's do this with 3d billboards
+        //this._DamageText = new DamageText(this.NAMES_ADT, this._scene, this._entities);
 
         // create selected entity panel
         this._targetEntitySelectedBar = new EntitySelectedBar(this, {
@@ -264,14 +254,64 @@ export class UserInterface {
         // create tooltip
         this._Tooltip = new Tooltip(this, currentPlayer);
 
-        // some ui must be constantly refreshed as things change
-        this._scene.registerBeforeRender(() => {
-            this.update();
-            this.dragging();
-        });
-
         // initial resize event
         this.resize();
+    }
+
+    // update every server tick
+    public update() {
+        //
+        this.fpsPanel.text = "FPS: " + this._engine.getFps().toFixed(0);
+        this._targetEntitySelectedBar.update();
+        this._playerEntitySelectedBar.update();
+        this._Tooltip.update();
+
+        //
+        this.dragging();
+    }
+
+    // update every 1000ms
+    public slow_update() {
+        this._DebugBox.update();
+        this.panelInventory.update();
+        this.panelAbilities.update();
+        this.panelCharacter.update();
+        this.panelHelp.update();
+        this.panelDialog.update();
+        this.panelQuests.update();
+
+        /*
+        // hide entity labels if out of distance
+        for (let sessionId in this._entities) {
+            let entity = this._entities[sessionId];
+            if (entity && entity.mesh && entity.mesh.isEnabled()) {
+                entity.characterLabel.isVisible = true;
+            } else {
+                entity.characterLabel.isVisible = false;
+            }
+        }*/
+    }
+
+    public dragging() {
+        if (this._isDragging) {
+            var deltaX = this._scene.pointerX - this._pointerDownPosition.x;
+            var deltaY = this._scene.pointerY - this._pointerDownPosition.y;
+            this._isDragging.leftInPixels += deltaX;
+            this._isDragging.topInPixels += deltaY;
+            this._pointerDownPosition.x = this._scene.pointerX;
+            this._pointerDownPosition.y = this._scene.pointerY;
+            this._InventoryDropdown.refresh();
+        }
+    }
+
+    public startDragging(panel) {
+        this._isDragging = panel;
+        this._pointerDownPosition = { x: this._scene.pointerX, y: this._scene.pointerY };
+    }
+
+    public stopDragging() {
+        this._isDragging.isPointerBlocker = true;
+        this._isDragging = null;
     }
 
     public resize() {
@@ -286,39 +326,6 @@ export class UserInterface {
         }
     }
 
-    public update() {
-        //
-
-        if (this._currentPlayer._input.left_alt_pressed === true && this.showingLabels === false) {
-            for (let sessionId in this._entities) {
-                if (this._entities[sessionId].characterLabel) {
-                    this._entities[sessionId].characterLabel.isVisible = true;
-                }
-            }
-            this.showingLabels = true;
-        }
-
-        if (this._currentPlayer._input.left_alt_pressed === false && this.showingLabels === true) {
-            for (let sessionId in this._entities) {
-                if (this._entities[sessionId].characterLabel) {
-                    this._entities[sessionId].characterLabel.isVisible = false;
-                }
-            }
-            this.showingLabels = false;
-        }
-
-        /*
-        // hide entity labels if out of distance
-        for (let sessionId in this._entities) {
-            let entity = this._entities[sessionId];
-            if (entity && entity.mesh && entity.mesh.isEnabled()) {
-                entity.characterLabel.isVisible = true;
-            } else {
-                entity.characterLabel.isVisible = false;
-            }
-        }*/
-    }
-
     // chatbox label
     public createEntityChatLabel(entity) {
         var rect1 = new Rectangle("player_chat_" + entity.sessionId);
@@ -328,8 +335,8 @@ export class UserInterface {
         rect1.thickness = 1;
         rect1.cornerRadius = 5;
         rect1.background = "rgba(0,0,0,.5)";
-        rect1.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        this.NAMES_ADT.addControl(rect1);
+        rect1.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        this.LABELS_ADT.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
         rect1.linkOffsetY = -130;
 
@@ -354,7 +361,7 @@ export class UserInterface {
         rect1.width = "300px";
         rect1.height = "40px";
         rect1.thickness = 0;
-        this.NAMES_ADT.addControl(rect1);
+        this.LABELS_ADT.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
         rect1.linkOffsetY = -80;
 
@@ -376,7 +383,7 @@ export class UserInterface {
         rect1.width = "200px";
         rect1.height = "40px";
         rect1.thickness = 0;
-        this.NAMES_ADT.addControl(rect1);
+        this.LABELS_ADT.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
         rect1.linkOffsetY = -30;
 
@@ -402,47 +409,13 @@ export class UserInterface {
         rect1.height = "50px";
         rect1.thickness = 0;
         rect1.zIndex = 1;
-        this.NAMES_ADT.addControl(rect1);
+        this.LABELS_ADT.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
         rect1.linkOffsetY = -120;
 
         var img = new Image("entityTalk-" + entity.sessionId, "./images/icons/talk.png");
         img.stretch = Image.STRETCH_FILL;
         rect1.addControl(img);
-
-        /*
-
-        const rightStackPanel = new StackPanel("rightStackPanel");
-        rightStackPanel.left = 0;
-        rightStackPanel.top = 0;
-        rightStackPanel.width = 1;
-        rightStackPanel.height = 1;
-        rightStackPanel.spacing = 5;
-        rightStackPanel.adaptHeightToChildren = true;
-        rightStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        rightStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        rightStackPanel.setPaddingInPixels(5, 5, 5, 5);
-        rightStackPanel.isVertical = true;
-        rect1.addControl(rightStackPanel);
-
-        let interactable = entity.spawnInfo.interactable;
-
-        const createBtn = Button.CreateSimpleButton("characterBtn", interactable.title);
-        createBtn.left = "0px;";
-        createBtn.top = "0px";
-        createBtn.width = 1;
-        createBtn.height = "30px";
-        createBtn.background = "orange";
-        createBtn.color = "white";
-        createBtn.thickness = 1;
-        createBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
-        createBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        rightStackPanel.addControl(createBtn);*/
-
-        /*
-        createBtn.onPointerDownObservable.add(() => {
-            this.panelDialog.open(entity);
-        });*/
 
         return rect1;
     }

@@ -178,16 +178,16 @@ export class ChatBox {
 
     // show chat message above player
     public showChatMessage(msg: PlayerMessage) {
-        let player = this._entities[msg.senderID];
+        let player = this._entities.get(msg.senderID);
         if (msg.senderID === this._currentPlayer.sessionId) {
             player = this._currentPlayer;
         }
         if (player.showTimer) {
             clearInterval(player.showTimer);
         }
-        if (player && player.characterLabel) {
+        if (player && player.characterChatLabel) {
             let el = player.characterLabel;
-            player.characterChatLabel.isVisible = true;
+            player.characterChatLabel.isVisible = false;
             player.characterChatLabel._children[0].text = msg.message;
             player.showTimer = setTimeout(function () {
                 player.characterChatLabel.isVisible = false;

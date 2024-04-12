@@ -12,7 +12,7 @@ export class spawnCTRL {
     private _location;
     private spawnsAmount = [];
 
-    private SPAWN_RATE = 1;
+    private SPAWN_RATE = 10;
     private SPAWN_INTERVAL = 500;
     private SPAWN_CURRENT = 0;
 
@@ -108,6 +108,7 @@ export class spawnCTRL {
         // monster pool to chose from
         let raceData = this._state.gameData.get("race", spawn.race);
         let position = spawn.points[Math.floor(Math.random() * spawn.points.length)];
+        console.log(position);
 
         let health = spawn.baseHealth ?? raceData.baseHealth;
         let mana = spawn.baseMana ?? raceData.baseMana;

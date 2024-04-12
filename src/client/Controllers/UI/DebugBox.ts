@@ -5,6 +5,7 @@ import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { generatePanel } from "./Theme";
 import { ServerMsg } from "../../../shared/types";
+import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 
 export class DebugBox {
     private _playerUI;
@@ -14,6 +15,7 @@ export class DebugBox {
     private _currentPlayer;
     private _entities;
     private ping: number = 0;
+    public _debugPanel: Rectangle;
     private _debugTextUI;
 
     constructor(_playerUI, _engine: Engine, _scene: Scene, _room, _currentPlayer, _entities) {
@@ -26,12 +28,6 @@ export class DebugBox {
 
         this._createUI();
 
-        // some ui must be constantly refreshed as things change
-        this._scene.registerBeforeRender(() => {
-            // refresh
-            this._update();
-        });
-
         // on pong
         this._room.onMessage(ServerMsg.PONG, (data) => {
             let dateNow = Date.now();
@@ -43,7 +39,9 @@ export class DebugBox {
         const debugPanel = generatePanel("debugPanel", "160px;", "180px", "0px", "-15px");
         debugPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
         debugPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        debugPanel.isVisible = false;
         this._playerUI.addControl(debugPanel);
+        this._debugPanel = debugPanel;
 
         const debugText = new TextBlock("debugText");
         debugText.color = "#FFF";
@@ -67,15 +65,14 @@ export class DebugBox {
     }
 
     // debug panel refresh
-    private _update() {
-        let entityCount = countPlayers(this._entities);
+    public update() {
+        let entityCount = this._entities.size;
         let count = 0;
-        for (let index in this._entities) {
-            const element = this._entities[index];
+        this._entities.forEach((element) => {
             if (element.mesh && element.mesh.isEnabled()) {
                 count += 1;
             }
-        }
+        });
 
         let locationText = "";
         locationText += "Total Nodes: " + entityCount + " \n";

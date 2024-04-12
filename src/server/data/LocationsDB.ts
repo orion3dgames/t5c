@@ -7,8 +7,7 @@ let LocationsDB = {
         key: "lh_town",
         mesh: "lh_town",
         sun: true,
-        sunIntensity: 1.2,
-        fog: true,
+        sunIntensity: 1,
         spawnPoint: {
             x: 0,
             y: 0,
@@ -40,6 +39,31 @@ let LocationsDB = {
             ],
             spawns: [
                 {
+                    key: "lh_town_thief",
+                    type: "global",
+                    behaviour: "patrol",
+                    aggressive: false,
+                    canAttack: true,
+                    points: [new Vector3(5.38, 0.01, -1.3), new Vector3(15.53, 0.01, -8.95), new Vector3(-4.72, 0.01, -2.28)],
+                    amount: 10,
+                    race: "male_mage",
+                    material: 1,
+                    name: "Thief",
+                    baseHealth: 20,
+                    baseSpeed: Speed.VERY_SLOW,
+                    equipment: [
+                        {
+                            key: "shield_01",
+                            slot: PlayerSlots.OFF_HAND,
+                        },
+                        {
+                            key: "sword_01",
+                            slot: PlayerSlots.WEAPON,
+                        },
+                    ],
+                },
+
+                {
                     key: "lh_town_bandits",
                     type: "area",
                     behaviour: "patrol",
@@ -57,41 +81,50 @@ let LocationsDB = {
                         new Vector3(-8.8, 0.01, -22.39),
                         new Vector3(-8.51, 0.01, -14.93),
                     ],
-                    amount: 50,
+                    amount: 100,
                     race: "male_rogue",
-                    material: 0,
-                    name: "Rat",
-                    equipment: [
-                        { key: "helm_01", slot: PlayerSlots.HEAD },
-                        { key: "shield_01", slot: PlayerSlots.OFF_HAND },
-                        { key: "sword_01", slot: PlayerSlots.WEAPON },
-                    ],
+                    material: 2,
+                    name: "Bandit",
                     baseHealth: 40,
                     baseSpeed: Speed.VERY_SLOW,
-                },
-                {
-                    key: "lh_town_thief",
-                    type: "path",
-                    behaviour: "patrol",
-                    aggressive: true,
-                    canAttack: true,
-                    points: [
-                        new Vector3(32.68, 3.51, -11.49),
-                        new Vector3(26.49, 5.76, -24.07),
-                        new Vector3(32.44, 3.51, 4.88),
-                        new Vector3(13.85, 0.01, 1.48),
-                    ],
-                    amount: 25,
-                    race: "male_mage",
-                    material: 0,
-                    name: "Thief",
-                    baseHealth: 50,
-                    baseSpeed: Speed.VERY_SLOW,
                     equipment: [
-                        { key: "helm_01", slot: PlayerSlots.HEAD },
-                        { key: "shield_01", slot: PlayerSlots.OFF_HAND },
-                        { key: "sword_01", slot: PlayerSlots.WEAPON },
+                        {
+                            key: "helm_01",
+                            slot: PlayerSlots.HEAD,
+                        },
+                        {
+                            key: "shield_01",
+                            slot: PlayerSlots.OFF_HAND,
+                        },
+                        {
+                            key: "sword_01",
+                            slot: PlayerSlots.WEAPON,
+                        },
                     ],
+                },
+
+                {
+                    key: "lh_town_alexander",
+                    type: "static",
+                    behaviour: "idle",
+                    aggressive: false,
+                    canAttack: false,
+                    points: [new Vector3(38.7, 3.51, -11.81)],
+                    rotation: 3.12,
+                    amount: 0,
+                    race: "male_knight",
+                    material: 0,
+                    name: "Alexander The Righteous",
+                    interactable: {
+                        title: "Talk",
+                        data: [
+                            {
+                                type: "text",
+                                text: "Greetings, noble traveler! I am Sir Alexander, a humble knight on a quest to vanquish the forces of darkness and bring peace to this enchanted realm. How may I be of service to you today?",
+                                isEndOfDialog: true,
+                            },
+                        ],
+                    },
                 },
                 {
                     key: "spawn_04",
@@ -102,9 +135,10 @@ let LocationsDB = {
                     points: [new Vector3(9.67, 0, -28.58)],
                     rotation: 3.12,
                     amount: 1,
-                    race: "male_mage",
+                    race: "male_knight",
                     material: 2,
                     name: "Kilhiam ",
+                    equipment: [],
                     interactable: {
                         title: "Talk",
                         data: [
@@ -126,7 +160,7 @@ let LocationsDB = {
                                 isEndOfDialog: true,
                                 triggeredByClosing: {
                                     type: "cast_ability",
-                                    ability: "light_heal",
+                                    ability: "heal",
                                     target: "target",
                                 },
                             },
@@ -200,6 +234,7 @@ let LocationsDB = {
                         ],
                     },
                 },
+
                 {
                     key: "spawn_dummy",
                     type: "static",
@@ -210,7 +245,7 @@ let LocationsDB = {
                     rotation: 3.12,
                     radius: 0,
                     amount: 1,
-                    race: "male_mage",
+                    race: "male_knight",
                     material: 1,
                     name: "Harmless Dummy",
                     baseHealth: 5000,
@@ -231,30 +266,7 @@ let LocationsDB = {
                             },
                         ],
                     },
-                },
-
-                {
-                    key: "lh_town_alexander",
-                    type: "static",
-                    behaviour: "idle",
-                    aggressive: false,
-                    canAttack: false,
-                    points: [new Vector3(38.7, 3.51, -11.81)],
-                    rotation: 3.12,
-                    amount: 1,
-                    race: "male_knight",
-                    material: 3,
-                    name: "Alexander The Righteous",
-                    interactable: {
-                        title: "Talk",
-                        data: [
-                            {
-                                type: "text",
-                                text: "Greetings, noble traveler! I am Sir Alexander, a humble knight on a quest to vanquish the forces of darkness and bring peace to this enchanted realm. How may I be of service to you today?",
-                                isEndOfDialog: true,
-                            },
-                        ],
-                    },
+                    equipment: [],
                 },
             ],
         },

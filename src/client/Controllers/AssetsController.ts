@@ -21,6 +21,8 @@ import {
 import { GameController } from "./GameController";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { AssetContainer } from "@babylonjs/core/assetContainer";
+import { mergeMesh } from "../Entities/Common/MeshHelper";
 
 type AssetEntry = {
     name: string;
@@ -65,16 +67,6 @@ export class AssetsController {
             { name: "TXT_decal_target", filename: "decal_target.png", extension: "png", type: "texture" },
             { name: "TXT_particle_01", filename: "particle_01.png", extension: "png", type: "texture" },
         ];
-
-        // add locations
-        /*
-        let locations = this._game.loadGameData("locations");
-        if (locations) {
-            for (let key in locations) {
-                let el = locations[key];
-                this.assetDatabase.push({ name: "ENV_" + el.key, filename: "environment/" + el.mesh + ".glb", extension: "glb", type: "mesh" });
-            }
-        }*/
 
         // add abilities (icons)
         let abilities = this._game.loadGameData("abilities");
@@ -123,7 +115,7 @@ export class AssetsController {
         this.assetToPreload = this.assetDatabase;
         this.assetToPreload.push({ name: "ENV_" + key, filename: "environment/" + key + ".glb", extension: "glb", type: "mesh" });
         await this.preloadAssets();
-        await this.prepareLevel(key);
+        //await this.prepareLevel(key);
         await this.prepareTextures();
     }
 
@@ -287,7 +279,6 @@ export class AssetsController {
     //What we do once the environment assets have been imported
     //handles setting the necessary flags for collision and trigger meshes,
     public async prepareLevel(key) {
-        
         if (this._game.currentLocation.waterPlane) {
             // Water
             var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 32 }, this._game.scene);
@@ -311,13 +302,39 @@ export class AssetsController {
 
         //Loop through all environment meshes that were imported
         this.allMeshes.forEach((m: Mesh) => {
-            // default values
+            m.isPickable = false;
+            m.doNotSyncBoundingInfo = true;
+            m.freezeWorldMatrix();
             m.checkCollisions = false;
-            m.isPickable = true;
-            m.receiveShadows = true;
+            m.receiveShadows = false;
             m.metadata = {
                 type: "environment",
             };
         });
+    }
+
+    public async prepareItems() {
+        for (let k in this._game._loadedAssets) {
+            if (k.includes("ITEM_") && this._game._loadedAssets[k] instanceof AssetContainer) {
+                let v = this._game._loadedAssets[k] as AssetContainer;
+                let modelToLoadKey = "ROOT_" + k;
+                console.log("prepareItems", modelToLoadKey);
+                const root = v.instantiateModelsToScene(
+                    function () {
+                        return modelToLoadKey;
+                    },
+                    false,
+                    { doNotInstantiate: true }
+                );
+
+                root.rootNodes[0].name = modelToLoadKey;
+                let mergedMesh = mergeMesh(root.rootNodes[0]);
+                if (mergedMesh) {
+                    mergedMesh.setEnabled(false);
+                    this._game._loadedAssets[modelToLoadKey] = mergedMesh;
+                }
+                root.dispose();
+            }
+        }
     }
 }

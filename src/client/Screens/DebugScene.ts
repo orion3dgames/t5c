@@ -17,13 +17,12 @@ import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 
-import { mergeMesh, calculateRanges, bakeVertexData, setAnimationParameters, mergeMeshAndSkeleton } from "../Entities/Common/VatHelper";
+import { calculateRanges, bakeVertexData, setAnimationParameters } from "../Entities/Common/VatHelper";
 import AnimationHelper from "../Entities/Common/AnimationHelper";
-import { Skeleton } from "@babylonjs/core/Bones/skeleton";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { GameController } from "../Controllers/GameController";
 import { AnimationGroup, InstancedMesh } from "@babylonjs/core";
 import { nanoid } from "nanoid";
+import { mergeMesh, mergeMeshAndSkeleton } from "../Entities/Common/MeshHelper";
 
 class JavascriptDataDownloader {
     private data;
@@ -142,22 +141,10 @@ export class DebugScene {
     public results;
     public SPAWN_INFO = [
         {
-            key: "male_rogue",
-            name: "Bandit",
+            key: "rat_01",
+            name: "Knight",
             material: 0,
-            amount: 70,
-        },
-        {
-            key: "male_mage",
-            name: "Bandit",
-            material: 0,
-            amount: 70,
-        },
-        {
-            key: "male_knight",
-            name: "Bandit",
-            material: 0,
-            amount: 70,
+            amount: 1,
         },
     ];
 
@@ -227,7 +214,8 @@ export class DebugScene {
                 await this.prepareMesh(spawn);
             })
         );
-        console.log(this.entityData);
+
+        /*
 
         // create intances
         for (const spawn of this.SPAWN_INFO) {
@@ -277,7 +265,7 @@ export class DebugScene {
                 entityData.rootForAnim[indexAnim].setEnabled(false);
                 indexAnim++;
             }
-        });
+        });*/
     }
 
     ///
@@ -355,19 +343,19 @@ export class DebugScene {
             });
 
             // bake to file
-            //await this.bakeTextureAnimation(key, merged);
+            await this.bakeTextureAnimation(key, merged);
 
             // bake realtime
             //await this.bakeTextureAnimationRealtime(key, merged);
 
             // load prebaked vat animations
-            await this.loadBakedAnimation(key, merged);
+            //await this.loadBakedAnimation(key, merged);
         }
     }
 
     async bakeTextureAnimation(key: string, merged) {
         const b = new VertexAnimationBaker(this._scene, merged);
-        const bufferFromMesh = await bakeVertexData(merged, this.entityData[key].selectedAnimationGroups);
+        const bufferFromMesh = await bakeVertexData(merged, this.entityData.get(key).selectedAnimationGroups);
         let vertexDataJson = b.serializeBakedVertexDataToJSON(bufferFromMesh);
         new JavascriptDataDownloader(vertexDataJson).download("text/json", key + ".json");
     }
@@ -387,12 +375,14 @@ export class DebugScene {
         this.entityData.get(key).vat.texture = b.textureFromBakedVertexData(bufferFromMesh);
     }
 
+    // todo: there must a better way to do this, it's so ugly
     getAnimationGroups(animationGroups, raceAnimations) {
         let anims: AnimationGroup[] = [];
         for (let i in raceAnimations) {
             let animationGroup = raceAnimations[i];
-            if (animationGroups[animationGroup.animation_id]) {
-                anims.push(animationGroups[animationGroup.animation_id]);
+            let anim = animationGroups.filter((ag) => animationGroup.name === ag.name);
+            if (anim && anim[0]) {
+                anims.push(anim[0]);
             }
         }
         return anims;

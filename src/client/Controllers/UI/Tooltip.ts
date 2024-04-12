@@ -37,12 +37,6 @@ export class Tooltip {
 
         // create basic tooltip ui
         this._createUI();
-
-        // some ui must be constantly refreshed as things change
-        this._scene.registerBeforeRender(() => {
-            // refresh
-            this._update();
-        });
     }
 
     private _createUI() {
@@ -276,7 +270,7 @@ export class Tooltip {
         }
     }
 
-    private _update() {
+    public update() {
         this.setPosition();
     }
 }

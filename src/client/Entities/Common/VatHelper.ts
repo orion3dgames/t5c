@@ -1,43 +1,16 @@
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
-const mergeMesh = function (mesh) {
-    const allChildMeshes = mesh.getChildMeshes(false);
-    const merged = Mesh.MergeMeshes(allChildMeshes, false, true, undefined, undefined, true);
-    if (merged) {
-        merged.name = "_MergedModel";
-    }
-    return merged;
-};
-
-const mergeMeshAndSkeleton = function (mesh, skeleton) {
-    // pick what you want to merge
-    const allChildMeshes = mesh.getChildTransformNodes(true)[0].getChildMeshes(false);
-
-    // Ignore Backpack because pf different attributes
-    // https://forum.babylonjs.com/t/error-during-merging-meshes-from-imported-glb/23483
-    //const childMeshes = allChildMeshes.filter((m) => !m.name.includes("Backpack"));
-
-    // multiMaterial = true
-    const merged = Mesh.MergeMeshes(allChildMeshes, false, true, undefined, undefined, true);
-    if (merged) {
-        merged.name = "_MergedModel";
-        merged.skeleton = skeleton;
-    }
-    return merged;
-};
-
-const calculateRanges = function (animationGroups) {
+function calculateRanges(animationGroups) {
     return animationGroups.reduce((acc, ag, index) => {
         if (index === 0) {
             acc.push({ from: Math.floor(ag.from), to: Math.floor(ag.to) });
         } else {
             const prev = acc[index - 1];
-
             acc.push({ from: prev.to + 1, to: prev.to + 1 + Math.floor(ag.to) });
         }
         return acc;
     }, []);
-};
+}
 
 const setAnimationParameters = function (vec, animIndex, ranges) {
     animIndex = animIndex ?? 0;
@@ -88,4 +61,4 @@ const bakeVertexData = async function (mesh: Mesh, ags) {
     return vertexData;
 };
 
-export { mergeMesh, mergeMeshAndSkeleton, bakeVertexData, calculateRanges, setAnimationParameters };
+export { bakeVertexData, calculateRanges, setAnimationParameters };

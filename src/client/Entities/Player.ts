@@ -16,6 +16,7 @@ import { PlayerInput } from "../../client/Controllers/PlayerInput";
 import { UserInterface } from "../../client/Controllers/UserInterface";
 import State from "../../client/Screens/Screens";
 import { Ability, ServerMsg } from "../../shared/types";
+import { GameScene } from "../Screens/GameScene";
 
 export class Player extends Entity {
     public game;
@@ -39,31 +40,21 @@ export class Player extends Entity {
 
     public input_sequence: number = 0;
 
-    constructor(
-        entity: PlayerSchema,
-        room: Room,
-        scene: Scene,
-        ui: UserInterface,
-        shadow: CascadedShadowGenerator,
-        navMesh: NavMesh,
-        game: GameController,
-        input: PlayerInput,
-        entities
-    ) {
-        super(entity, room, scene, ui, shadow, navMesh, game);
+    constructor(name, scene, gamescene: GameScene, entity) {
+        super(name, scene, gamescene, entity);
 
-        this.entities = entities;
+        this.entities = gamescene._entities;
 
-        this._input = input;
+        this._input = gamescene._input;
 
         this.ability_in_cooldown = [false, false, false, false, false, false, false, false, false, false, false];
 
         this.type = "player";
 
-        this.spawnPlayer(input);
+        this.spawnPlayer();
     }
 
-    private async spawnPlayer(input) {
+    private async spawnPlayer() {
         // add player controllers
         this.utilsController = new EntityUtils(this._scene, this._room);
         this.cameraController = new PlayerCamera(this);
@@ -102,6 +93,9 @@ export class Player extends Entity {
                 }
             }
         });
+
+        // add chat label
+        //this.characterChatLabel = this._ui.createEntityChatLabel(this);
     }
 
     getMeshMetadata(pointerInfo) {
@@ -134,20 +128,21 @@ export class Player extends Entity {
         if (metadata.type === "player" || metadata.type === "entity") {
             // select entity
             let targetSessionId = metadata.sessionId;
-            let target = this.entities[targetSessionId];
+            let target = this.entities.get(targetSessionId);
             this._game.selectedEntity = target;
 
             // display nameplate for a certain time for any entity right clicked
-            // show entity label
-            target.characterLabel.isVisible = true;
+            if (target.characterLabel) {
+                target.characterLabel.isVisible = true;
+            }
 
             // if spawninfo available
             if (!target.spawnInfo) return false;
 
-            // if targets is aggresive
-            // note: need to find a better wayt to do this, not linked to hotbar
+            // if targets is aggressive, clicking on with will trigger move & attack
+            // note: need to find a better way to do this, not linked to hotbar
+            /*
             if (target.spawnInfo.aggressive) {
-                /*
                 // send to server
                 this._game.sendMessage(ServerMsg.PLAYER_HOTBAR_ACTIVATED, {
                     senderId: this._room.sessionId,
@@ -155,8 +150,7 @@ export class Player extends Entity {
                     digit: 1,
                 });
                 return false;
-                */
-            }
+            }*/
 
             // if interactable target
             if (!target.spawnInfo.interactable) return false;
@@ -166,7 +160,7 @@ export class Player extends Entity {
             let entityPos = target.getPosition();
             let distanceBetween = Vector3.Distance(playerPos, entityPos);
             if (distanceBetween < this._game.config.PLAYER_INTERACTABLE_DISTANCE) {
-                this.ui.panelDialog.open(target);
+                this._ui.panelDialog.open(target);
 
                 // stop any movement
                 // todo: improve
@@ -183,11 +177,12 @@ export class Player extends Entity {
                 sessionId: metadata.sessionId,
             });
         }
-
+        /*
         // move to clicked point
         if (metadata.type === "environment" && !this.isDead) {
             // deselect any entity
-            //this._game.selectedEntity = false;
+            this._game.selectedEntity = false;
+
             /*
             // removed click to move
             // todo: add client prediction.
@@ -218,12 +213,14 @@ export class Player extends Entity {
                     z: destination._z,
                 });
             }
-            */
+            
         }
+        */
     }
 
     // update at engine rate 60fps
     public update(delta) {
+        // run super function first
         super.update(delta);
 
         if (this && this.moveController) {
@@ -238,60 +235,28 @@ export class Player extends Entity {
         this.cameraController.follow();
     }
 
-    public findCloseToInteractableEntity() {
-        let closestDistance = 1000000;
-        for (let sessionId in this.entities) {
-            let entity = this.entities[sessionId];
-            if (entity.type === "entity" && entity.interactableButtons && entity.health > 0) {
-                entity.interactableButtons.isVisible = false;
-                let playerPos = this.getPosition();
-                let entityPos = entity.getPosition();
-                let distanceBetween = Vector3.Distance(playerPos, entityPos);
-                if (distanceBetween < closestDistance) {
-                    closestDistance = distanceBetween;
-                    this.closestEntity = entity;
-                    this.closestEntityDistance = closestDistance;
-                }
-            }
-        }
-    }
-
     // update at server rate
     public updateServerRate(delta) {
+        // run super function first
+        super.updateServerRate(delta);
+
         // process player movement
         this.moveController.processMove();
 
-        ///////////// DIALOG ///////////////////////////
-        // if moving, look for the closest interactable entities.
-        if (this.isMoving) {
-            // look for
-            this.findCloseToInteractableEntity();
-
-            // if close enough, show interactable button
-            if (this.closestEntityDistance < 5 && this.closestEntity.interactableButtons) {
-                this.closestEntity.interactableButtons.isVisible = true;
-            }
-
-            // if far enough, hide interactable button & any open dialog
-            if (this.closestEntityDistance > 5 && this.closestEntity.interactableButtons) {
-                this.ui.panelDialog.close();
-            }
-        }
-
         ///////////// ENVIRONMENT LOD ///////////////////////////
         // only show meshes close to us
+        /*
         let currentPos = this.getPosition();
         let key = "ENV_" + this._game.currentLocation.mesh;
-        let allMeshes = this._game._loadedAssets[key].loadedMeshes;
+        let allMeshes = this._game._loadedAssets[key]?.loadedMeshes ?? [];
         allMeshes.forEach((element) => {
             let distanceTo = Vector3.Distance(element.getAbsolutePosition(), currentPos);
-            element.unfreezeWorldMatrix();
-            element.setEnabled(true);
-            if (distanceTo < 36) {
-                element.unfreezeWorldMatrix();
+            if (distanceTo < this._game.config.PLAYER_VIEW_DISTANCE) {
                 element.setEnabled(true);
+            } else {
+                element.setEnabled(false);
             }
-        });
+        });*/
 
         ///////////// ABILITY & CASTING EVENTS ///////////////////////////
         // if digit pressed
@@ -314,18 +279,18 @@ export class Player extends Entity {
         // check if casting
         if (this.isCasting === true) {
             // increment casting timer
-            this.ui._CastingBar.open();
+            this._ui._CastingBar.open();
             this.castingElapsed += delta; // increment casting timer by server delta
             let widthInPercentage = ((this.castingElapsed / this.castingTarget) * 100) / 100; // percentage between 0 and 1
             let text = this.castingElapsed + "/" + this.castingTarget;
             let width = widthInPercentage;
-            this.ui._CastingBar.update(text, width);
+            this._ui._CastingBar.update(text, width);
         }
 
         // check for cooldowns (estethic only as server really controls cooldowns)
         this.ability_in_cooldown.forEach((cooldown, digit) => {
             if (cooldown > 0) {
-                let cooldownUI = this.ui.MAIN_ADT.getControlByName("ability_" + digit + "_cooldown");
+                let cooldownUI = this._ui.MAIN_ADT.getControlByName("ability_" + digit + "_cooldown");
                 let ability = this.getAbilityByDigit(digit) as Ability;
                 if (ability && cooldownUI) {
                     this.ability_in_cooldown[digit] -= delta;
@@ -338,7 +303,7 @@ export class Player extends Entity {
         ///////////// RESSURECT EVENTS ///////////////////////////
         // if dead
         if (!this.isDeadUI && this.health < 1) {
-            this.ui._RessurectBox.open();
+            this._ui._RessurectBox.open();
             this.cameraController.bw(true);
             this.isDeadUI = true;
         }
@@ -346,9 +311,53 @@ export class Player extends Entity {
         // if ressurect
         if (this.isDeadUI && this.health > 0) {
             this.cameraController.bw(false);
-            this.ui._RessurectBox.close();
+            this._ui._RessurectBox.close();
             this.isDeadUI = false;
         }
+    }
+
+    public updateSlowRate(delta: any): void {
+        // run super function first
+        super.updateSlowRate(delta);
+
+        ///////////// DIALOG ///////////////////////////
+        // only if moving, look for the closest interactable entities.
+        if (this.isMoving) {
+            // look for closest npc
+            // todo: maybe this is a silly way?
+            this.findCloseToInteractableEntity();
+
+            // if close enough, show interactable button
+            if (this.closestEntityDistance < 5 && this.closestEntity.interactableButtons) {
+                this.closestEntity.interactableButtons.isVisible = true;
+            }
+
+            // if far enough, hide interactable button & any open dialog
+            if (this.closestEntityDistance > 5 && this.closestEntity.interactableButtons) {
+                this._ui.panelDialog.close();
+            }
+        }
+    }
+
+    /**
+     * This function is called every time the player moves, so that
+     * the closest interactable entity can be highlighted on screen.
+     */
+    public findCloseToInteractableEntity() {
+        let minDistanceSquared = Infinity;
+        let playerPos = this.getPosition();
+        this.entities.forEach((entity) => {
+            if (entity.type === "entity" && entity.interactableButtons && entity.health > 0) {
+                entity.interactableButtons.isVisible = false;
+                let entityPos = entity.getPosition();
+                let distanceSquared = Vector3.Distance(playerPos, entityPos);
+                if (distanceSquared < minDistanceSquared) {
+                    this.closestEntity = entity;
+                    this.closestEntityDistance = distanceSquared;
+                    minDistanceSquared = distanceSquared;
+                }
+            }
+        });
     }
 
     public getAbilityByDigit(digit): Ability | boolean {
@@ -370,7 +379,7 @@ export class Player extends Entity {
             this.castingElapsed = 0;
             this.castingTarget = ability.castTime;
             this.castingDigit = digit;
-            this.ui._CastingBar.open();
+            this._ui._CastingBar.open();
         }
     }
 
@@ -380,7 +389,7 @@ export class Player extends Entity {
         this.castingElapsed = 0;
         this.castingTarget = 0;
         this.castingDigit = 0;
-        this.ui._CastingBar.close();
+        this._ui._CastingBar.close();
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -390,7 +399,7 @@ export class Player extends Entity {
 
     public registerServerMessages() {
         this._room.onMessage(ServerMsg.SERVER_MESSAGE, (data) => {
-            this.ui._ChatBox.addNotificationMessage(data.type, data.message, data.message);
+            this._ui._ChatBox.addNotificationMessage(data.type, data.message, data.message);
         });
 
         // on teleport confirmation
@@ -422,7 +431,7 @@ export class Player extends Entity {
                     this.castingElapsed = 0;
                     this.castingTarget = 0;
                     this.isCasting = false;
-                    this.ui._CastingBar.close();
+                    this._ui._CastingBar.close();
                     this.ability_in_cooldown[digit] = ability.cooldown; // set cooldown
                 }
 

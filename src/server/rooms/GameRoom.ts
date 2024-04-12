@@ -11,7 +11,6 @@ import { Config } from "../../shared/Config";
 
 export class GameRoom extends Room<GameRoomState> {
     public maxClients = 64;
-    public autoDispose = false;
     public database: any;
     public delayedInterval!: Delayed;
     public navMesh: NavMesh;

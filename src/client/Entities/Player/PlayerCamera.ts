@@ -43,10 +43,11 @@ export class PlayerCamera {
         this.camera.lockedTarget = this._camRoot.position;
         this.camera.fov = 0.35;
         this.camera.parent = yTilt;
+        this.camera.inputs.clear();
 
         // set as active camera
         this._scene.activeCamera = this.camera;
-        this._scene.cameraToUseForPointers = this.camera; // is this necessary?
+        //this._scene.cameraToUseForPointers = this.camera; // is this necessary?
 
         //
         this.cameraPos = this.camera.position;
@@ -66,7 +67,8 @@ export class PlayerCamera {
             const rotationX =
                 Math.abs(this._camRoot.rotation.x + this._input.movementY) < 0.5 ? this._camRoot.rotation.x + this._input.movementY : this._camRoot.rotation.x;
             const rotationY = this._camRoot.rotation.y + this._input.movementX;
-            this._camRoot.rotation = new Vector3(0, rotationY, 0);
+            this._camRoot.rotation = new Vector3(rotationX, rotationY, 0);
+            //this._camRoot.rotation = new Vector3(0, rotationY, 0);
         }
     }
 

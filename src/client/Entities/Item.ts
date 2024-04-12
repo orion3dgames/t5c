@@ -75,7 +75,7 @@ export class Item extends TransformNode {
         this.spawn(entity);
     }
 
-    public async spawn(entity, mode = "clone") {
+    public async spawn(entity, mode = "instance") {
         // load item mesh
         if (mode === "instance") {
             // instance
@@ -171,7 +171,7 @@ export class Item extends TransformNode {
 
         //////////////////////////////////////////////////////////////////////////
         // misc
-        this.characterLabel = this._ui.createItemLabel(this);
+        //this.characterLabel = this._ui.createItemLabel(this);
     }
 
     public lod(delta) {}

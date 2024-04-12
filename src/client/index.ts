@@ -8,7 +8,6 @@ if (process.env.NODE_ENV !== "production") {
 // that fixes it, then it is a dependencies issue, check this link out for answers.
 // bjs post: https://forum.babylonjs.com/t/pickedmesh-is-null-in-onpointerobservable-after-update-to-6-25-0/45076/7
 // bjs docs: https://doc.babylonjs.com/setup/frameworkPackages/es6Support#faq
-// import("@babylonjs/core");
 import "@babylonjs/core/Culling/ray";
 import "@babylonjs/core/Animations/animatable";
 import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
@@ -60,6 +59,9 @@ class App {
             adaptToDeviceRatio: true,
             antialias: true,
         });
+
+        //
+        this.engine.setHardwareScalingLevel(1);
 
         // loading
         var loadingScreen = new Loading("Loading Assets...");
@@ -172,9 +174,6 @@ class App {
     private async _process(): Promise<void> {
         // make sure scene and camera is initialized
         if (this.game.scene && this.game.scene.activeCamera) {
-            //when the scene is ready, hide loading
-            this.engine.hideLoadingUI();
-
             // render scene
             this.game.scene.render();
         }

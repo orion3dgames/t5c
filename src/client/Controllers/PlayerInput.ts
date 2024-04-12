@@ -170,6 +170,9 @@ export class PlayerInput {
                     if (kbInfo.event.code === "KeyN") {
                         this._gameScene._navMeshDebug.isVisible = !this._gameScene._navMeshDebug.isVisible;
                     }
+                    if (kbInfo.event.code === "KeyD") {
+                        this._ui._DebugBox._debugPanel.isVisible = !this._ui._DebugBox._debugPanel.isVisible;
+                    }
                     if (kbInfo.event.code === "KeyH") {
                         let assetKey = "ENV_" + this._game.currentLocationKey;
                         let allMeshes = this._game._loadedAssets[assetKey];

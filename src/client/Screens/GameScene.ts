@@ -1,5 +1,5 @@
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
-import { Scene } from "@babylonjs/core/scene";
+import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
@@ -23,25 +23,27 @@ import { PlayerInputs, ServerMsg } from "../../shared/types";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { VatController } from "../Controllers/VatController";
+import { SceneOptimizer, SceneOptimizerOptions } from "@babylonjs/core/Misc/sceneOptimizer";
 
 export class GameScene {
     public _game: GameController;
     public _scene: Scene;
-    private _input: PlayerInput;
+    public _input: PlayerInput;
     public _ui;
-    private _shadow: CascadedShadowGenerator;
-    private _navMesh: NavMesh;
+    public _shadow: CascadedShadowGenerator;
+    public _navMesh: NavMesh;
     public _navMeshDebug;
 
-    private _roomId: string;
-    private room: Room<any>;
-    private chatRoom: Room<any>;
-    private _currentPlayer: Player;
-    private _loadedAssets: AssetContainer[] = [];
+    public _roomId: string;
+    public room: Room<any>;
+    public chatRoom: Room<any>;
+    public _currentPlayer: Player;
+    public _loadedAssets: AssetContainer[] = [];
 
     public gameData;
 
-    public _entities: (Player | Entity | Item)[] = [];
+    public _entities: Map<string, Player | Entity | Item> = new Map();
 
     constructor() {}
 
@@ -71,6 +73,9 @@ export class GameScene {
             this._game.setScene(State.LOGIN);
         }
 
+        // performance
+        scene.performancePriority = ScenePerformancePriority.Intermediate;
+
         // get location details
         let location = this._game.currentLocation;
 
@@ -97,17 +102,16 @@ export class GameScene {
         var light = new DirectionalLight("DirectionalLight", new Vector3(-1, -2, -1), scene);
         light.position = new Vector3(100, 100, 100);
         light.radius = 0.27;
-        light.intensity = location.sunIntensity;
-        light.autoCalcShadowZBounds = true;
+        light.intensity = 0.5;
+        //light.autoCalcShadowZBounds = true;
 
+        /*
         // shadow generator
-        this._shadow = new CascadedShadowGenerator(1024, light);
+        // toto: something is wrong with the shadows.
+        this._shadow = new CascadedShadowGenerator(128, light);
         this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_LOW;
         this._shadow.lambda = 0.82;
-        this._shadow.bias = 0.018;
-        this._shadow.shadowMaxZ = 1000;
-        this._shadow.stabilizeCascades = false;
-        this._shadow.depthClamp = true;
+        this._shadow.bias = 0.018;*/
 
         // load navmesh
         this._navMesh = await this.loadNavMesh(location.key);
@@ -117,38 +121,22 @@ export class GameScene {
         // initialize assets controller & load level
         this._game.initializeAssetController();
         await this._game._assetsCtrl.loadLevel(location.key);
+        await this._game._assetsCtrl.prepareItems();
         this._game.engine.displayLoadingUI();
+        console.log(this._game._loadedAssets);
 
-        // instanciate items so we can use them later as instances/clones
-        // todo: this is probably a terrible way to do this...
-        await this._instantiate();
+        // preload any skeletons and animation
+        let spawns = location.dynamic.spawns ?? [];
+        this._game._vatController = new VatController(this._game, spawns);
+
+        await this._game._vatController.initialize();
+        await this._game._vatController.check(this._game._currentCharacter.race);
+        console.log(this._game._vatController._entityData);
 
         // init network
-        await this._initNetwork();
-    }
-
-    private async _instantiate(): Promise<void> {
-        for (let k in this._game._loadedAssets) {
-            if (k.includes("ITEM_") && this._game._loadedAssets[k] instanceof AssetContainer) {
-                let v = this._game._loadedAssets[k] as AssetContainer;
-                let modelToLoadKey = "ROOT_" + k;
-                const root = v.instantiateModelsToScene(
-                    function () {
-                        return modelToLoadKey;
-                    },
-                    false,
-                    { doNotInstantiate: true }
-                );
-
-                root.rootNodes[0].name = modelToLoadKey;
-                let mergedMesh = mergeMesh(root.rootNodes[0]);
-                if (mergedMesh) {
-                    this._game._loadedAssets[modelToLoadKey] = mergedMesh;
-                    this._game._loadedAssets[modelToLoadKey].isVisible = false;
-                }
-                root.rootNodes[0].dispose();
-            }
-        }
+        setTimeout(() => {
+            this._initNetwork();
+        }, 500);
     }
 
     public async loadNavMesh(key) {
@@ -205,7 +193,7 @@ export class GameScene {
                 // if player type
                 if (isCurrentPlayer) {
                     // create player entity
-                    let _player = new Player(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._game, this._input, this._entities);
+                    let _player = new Player(sessionId, this._scene, this, entity);
 
                     // set currentPlayer
                     this._currentPlayer = _player;
@@ -214,7 +202,7 @@ export class GameScene {
                     this._ui.setCurrentPlayer(_player);
 
                     // add to entities
-                    this._entities[sessionId] = _player;
+                    this._entities.set(sessionId, _player);
 
                     // player is loaded, let's hide the loading gui
                     this._game.engine.hideLoadingUI();
@@ -222,78 +210,89 @@ export class GameScene {
                     //////////////////
                     // else must be another player
                 } else {
-                    this._entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._game);
+                    this._entities.set(sessionId, new Entity(sessionId, this._scene, this, entity));
                 }
             }
 
             // if entity
             if (entity.type === "entity") {
-                this._entities[sessionId] = new Entity(entity, this.room, this._scene, this._ui, this._shadow, this._navMesh, this._game);
+                this._entities.set(sessionId, new Entity(sessionId, this._scene, this, entity));
             }
 
             // if item
             if (entity.type === "item") {
-                this._entities[sessionId] = new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._game);
+                this._entities.set(sessionId, new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._game));
             }
         });
 
         // when an entity is removed
         this.room.state.entities.onRemove((entity, sessionId) => {
-            if (this._entities[sessionId]) {
-                this._entities[sessionId].remove();
-                delete this._entities[sessionId];
+            if (this._entities.has(sessionId)) {
+                this._entities.get(sessionId)?.remove();
+                this._entities.delete(sessionId);
             }
         });
 
         ////////////////////////////////////////////////////
         // main game loop
-        let timeServer = Date.now();
-        let timeServerSlow = Date.now();
-        this._scene.registerBeforeRender(() => {
-            let delta = this._game.engine.getFps();
-            let timeNow = Date.now();
 
-            /////////////////
-            // main game loop
-            for (let sessionId in this._entities) {
-                const entity = this._entities[sessionId];
+        const lastUpdates = {
+            SERVER: Date.now(),
+            SLOW: Date.now(),
+            PING: Date.now(),
+            UI_SERVER: Date.now(),
+            UI_SLOW: Date.now(),
+        };
+
+        // start game loop
+        this._scene.registerBeforeRender(() => {
+            // get current delta
+            let delta = this._game.engine.getFps();
+
+            // process vat animations
+            this._game._vatController.process(delta);
+
+            // iterate through each items
+            const currentTime = Date.now();
+            this._entities.forEach((entity, sessionId) => {
+                // main entity update
                 entity.update(delta);
-                entity.lod(this._currentPlayer);
+
+                // server player gameloop
+                if (currentTime - lastUpdates["SERVER"] >= 100) {
+                    entity.updateServerRate(100);
+                }
+
+                // slow game loop
+                if (currentTime - lastUpdates["SLOW"] >= 1000) {
+                    entity.updateSlowRate(1000);
+                    entity.lod(this._currentPlayer);
+                }
+            });
+
+            // reset timers
+            if (currentTime - lastUpdates["SERVER"] >= 100) {
+                lastUpdates["SERVER"] = currentTime;
+            }
+            if (currentTime - lastUpdates["SLOW"] >= 1000) {
+                lastUpdates["SLOW"] = currentTime;
             }
 
-            /////////////////
-            // server update rate
-            // every 5000ms loop
-            let timePassedSlow = (timeNow - timeServerSlow) / 1000;
-            let updateSlow = 5000 / 1000; // game is networked update every 100ms
-            if (timePassedSlow >= updateSlow) {
+            // game update loop
+            if (currentTime - lastUpdates["PING"] >= 1000) {
                 // send ping to server
                 this._game.sendMessage(ServerMsg.PING);
-
-                // update entities
-                for (let sessionId in this._entities) {
-                    const entity = this._entities[sessionId];
-                    if (entity && entity.type === "player") {
-                        entity.updateSlowRate(5000);
-                    }
-                }
-                timeServerSlow = timeNow;
+                lastUpdates["PING"] = currentTime;
             }
 
-            /////////////////
-            // server update rate
-            // every 100ms loop
-            let timePassed = (timeNow - timeServer) / 1000;
-            let updateRate = this._game.config.updateRate / 1000; // game is networked update every 100ms
-            if (timePassed >= updateRate) {
-                // player uppdate at server rate
-                for (let sessionId in this._entities) {
-                    const entity = this._entities[sessionId];
-                    if (entity && entity.type === "player") {
-                        entity.updateServerRate(this._game.config.updateRate);
-                    }
-                }
-                timeServer = timeNow;
+            // ui update loop
+            if (currentTime - lastUpdates["UI_SERVER"] >= 100) {
+                this._ui.update();
+                lastUpdates["UI_SERVER"] = currentTime;
+            }
+            if (currentTime - lastUpdates["UI_SLOW"] >= 1000) {
+                this._ui.slow_update();
+                lastUpdates["UI_SLOW"] = currentTime;
             }
         });
     }

@@ -103,6 +103,9 @@ export class CharacterEditor {
             this._game.setScene(State.LOGIN);
         }
 
+        // hide loading gui
+        this._game.engine.hideLoadingUI();
+
         /////////////////////////////////////////////////////////
         //////////////////////// UI
         /////////////////////////////////////////////////////////
@@ -192,10 +195,10 @@ export class CharacterEditor {
         await this.loadCharacter(this.selected_race);
     }
 
-    cleanup(previousChoice){
-        previousChoice.materials.forEach(element => {
+    cleanup(previousChoice) {
+        previousChoice.materials.forEach((element) => {
             let material = this._scene.getMaterialByName(previousChoice.key) as PBRMaterial;
-            if (material) { 
+            if (material) {
                 if (material.albedoTexture) {
                     material.albedoTexture.dispose();
                 }
@@ -205,7 +208,6 @@ export class CharacterEditor {
     }
 
     async loadCharacter(choice) {
-    
         if (this.selected_mesh) {
             this.selected_mesh.dispose();
         }

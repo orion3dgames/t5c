@@ -31,7 +31,7 @@ export class ExperienceBar {
         let entity = this._currentPlayer.entity;
         if (entity && entity.player_data) {
             entity.player_data.onChange((item, sessionId) => {
-                this._update();
+                this.update();
             });
         }
     }
@@ -107,8 +107,7 @@ export class ExperienceBar {
         }
     }
 
-    // debug panel refresh
-    private _update() {
+    public update() {
         if (this._currentPlayer) {
             let player_experience = this._currentPlayer.player_data.experience;
             let progress = Leveling.getLevelProgress(player_experience);
