@@ -1,11 +1,10 @@
 import { Scene } from "@babylonjs/core/scene";
+import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-
 import { Room } from "colyseus.js";
 
 import { PlayerCamera } from "./Player/PlayerCamera";
@@ -20,18 +19,16 @@ import { NavMesh } from "../../shared/Libs/yuka-min";
 import { AI_STATE } from "./Entity/AIState";
 import { EntityState } from "../../shared/types";
 import { PlayerInput } from "../../client/Controllers/PlayerInput";
-
+import { ActionManager } from "@babylonjs/core/Actions/actionManager";
 import { GameController } from "../Controllers/GameController";
-import { GameScene } from "../Screens/GameScene";
-import { Player } from "./Player";
 
-export class Entity extends TransformNode {
+export class Entity {
     public _scene: Scene;
     public _room: Room;
-    public _ui: UserInterface;
+    public ui: UserInterface;
     public _input: PlayerInput;
-    public _shadow: CascadedShadowGenerator;
-    public _navMesh: NavMesh;
+    public _shadow;
+    public _navMesh;
     public _game: GameController;
 
     // controllers
@@ -44,6 +41,7 @@ export class Entity extends TransformNode {
 
     // entity
     public mesh: AbstractMesh; //outer collisionbox of player
+    public playerMesh: AbstractMesh; //outer collisionbox of player
     public playerSkeleton;
     public debugMesh: Mesh;
     public selectedMesh: Mesh;
@@ -52,7 +50,6 @@ export class Entity extends TransformNode {
     public sessionId: string;
     public entity;
     public isCurrentPlayer: boolean;
-    public _currentPlayer: Player;
 
     // character
     public type: string = "";
@@ -100,20 +97,17 @@ export class Entity extends TransformNode {
     // flags
     public blocked: boolean = false; // if true, player will not moved
 
-    constructor(name: string, scene: Scene, gamescene: GameScene, entity) {
-        super(name, scene);
-
+    constructor(entity, room: Room, scene: Scene, ui: UserInterface, shadow: CascadedShadowGenerator, navMesh: NavMesh, game: GameController) {
         // setup class variables
         this._scene = scene;
-        this._room = gamescene.room;
-        this._game = gamescene._game;
-        this._navMesh = gamescene._navMesh;
-        this._ui = gamescene._ui;
-        this._shadow = gamescene._shadow;
+        this._room = room;
+        this._game = game;
+        this._navMesh = navMesh;
+        this.ui = ui;
+        this._shadow = shadow;
         this.sessionId = entity.sessionId; // network id from colyseus
         this.isCurrentPlayer = this._room.sessionId === entity.sessionId;
         this.entity = entity;
-        this._currentPlayer = gamescene._currentPlayer;
         this.type = "entity";
 
         // update player data from server data
@@ -121,8 +115,6 @@ export class Entity extends TransformNode {
 
         // set entity
         Object.assign(this, this.entity);
-
-        this.name = this.sessionId;
 
         // get spawnInfo
         if (entity.type === "entity" && this._game.currentLocation.dynamic.spawns) {
@@ -142,6 +134,7 @@ export class Entity extends TransformNode {
         this.meshController = new EntityMesh(this);
         await this.meshController.load();
         this.mesh = this.meshController.mesh;
+        this.playerMesh = this.meshController.playerMesh;
         this.debugMesh = this.meshController.debugMesh;
         this.selectedMesh = this.meshController.selectedMesh;
         this.playerSkeleton = this.meshController.skeleton;
@@ -149,12 +142,8 @@ export class Entity extends TransformNode {
         // add mesh to shadow generator
         //this._shadow.addShadowCaster(this.meshController.mesh, true);
 
-        // set initial position & roation
-        this.position = new Vector3(entity.x, entity.y, entity.z);
-        this.rotation = new Vector3(0, entity.rot, 0);
-
         // add all entity related stuff
-        this.animatorController = new EntityAnimator(this);
+        this.animatorController = new EntityAnimator(this.meshController.getAnimation(), this);
         this.moveController = new EntityMove(this);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
 
@@ -169,7 +158,7 @@ export class Entity extends TransformNode {
             if (this.health !== this.entity.health) {
                 let healthChange = this.entity.health - this.health;
                 if (healthChange < 0 || healthChange > 1) {
-                    this._ui._DamageText.addDamage(this, healthChange);
+                    this.ui._DamageText.addDamage(this, healthChange);
                 }
             }
 
@@ -191,9 +180,9 @@ export class Entity extends TransformNode {
 
         //////////////////////////////////////////////////////////////////////////
         // misc
-        this.characterLabel = this._ui.createEntityLabel(this);
-        this.characterChatLabel = this._ui.createEntityChatLabel(this);
-        this.interactableButtons = this._ui.createInteractableButtons(this);
+        this.characterLabel = this.ui.createEntityLabel(this);
+        this.characterChatLabel = this.ui.createEntityChatLabel(this);
+        this.interactableButtons = this.ui.createInteractableButtons(this);
     }
 
     public update(delta): any {
@@ -220,9 +209,9 @@ export class Entity extends TransformNode {
             }
 
             // hide any dialog this entity could be linked too
-            if (this._ui.panelDialog.currentEntity && this._ui.panelDialog.currentEntity.sessionId === this.sessionId) {
-                this._ui.panelDialog.clear();
-                this._ui.panelDialog.close();
+            if (this.ui.panelDialog.currentEntity && this.ui.panelDialog.currentEntity.sessionId === this.sessionId) {
+                this.ui.panelDialog.clear();
+                this.ui.panelDialog.close();
             }
         }
 
@@ -230,10 +219,6 @@ export class Entity extends TransformNode {
         if (this.health > 0) {
             this.isDead = false;
         }
-
-        ////////////////////////////////////
-        // animate player continuously
-        this.animatorController.animate(this);
 
         ////////////////////////////////////
         // only do the below if entity is not dead
@@ -270,53 +255,54 @@ export class Entity extends TransformNode {
 
         ////////////////////////////////////
         // animate player continuously
-        this.animatorController.play(this);
+        this.animatorController.animate(this, this.mesh.position, this.moveController.getNextPosition());
     }
 
     public getPosition() {
-        return new Vector3(this.position.x, this.position.y, this.position.z);
+        return new Vector3(this.mesh.position.x, this.mesh.position.y, this.mesh.position.z);
     }
 
     public updateSlowRate() {}
 
-    public updateServerRate(delta) {}
+    public updateServerRate(delta) {
+        this.animatorController.refresh();
+    }
 
     // basic performance LOD logic
     public lod(_currentPlayer) {
-        if (_currentPlayer) {
-            /*
-            // hide everything
-            this.mesh.setEnabled(false);
-            this.mesh.freezeWorldMatrix();
+        // hide everything
+        this.mesh.setEnabled(false);
+        this.mesh.freezeWorldMatrix();
 
-            // hide gui
-            this.characterLabel.isEnabled = false;
-            this.characterChatLabel.isEnabled = false;
+        // hide gui
+        //this.characterLabel.isVisible = false;
+        //this.characterChatLabel.isVisible = false;
+        this.meshController.equipments?.forEach((equipment) => {
+            equipment.setEnabled(false);
+            equipment.freezeWorldMatrix();
+        });
+
+        // only enable if close enough to local player
+        let entityPos = this.position();
+        let playerPos = _currentPlayer.position();
+        let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
+        if (distanceFromPlayer < this._game.config.PLAYER_VIEW_DISTANCE) {
+            this.mesh.unfreezeWorldMatrix();
+            this.mesh.setEnabled(true);
+
+            // show gui
+            //this.characterLabel.isVisible = true;
+            //this.characterChatLabel.isVisible = true;
 
             this.meshController.equipments?.forEach((equipment) => {
-                equipment.setEnabled(false);
-                equipment.freezeWorldMatrix();
+                equipment.unfreezeWorldMatrix();
+                equipment.setEnabled(true);
             });
-
-            // only enable if close enough to local player
-            let entityPos = new Vector3(this.x, this.y, this.z);
-            let playerPos = new Vector3(_currentPlayer.x, _currentPlayer.y, _currentPlayer.z);
-            let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
-            if (distanceFromPlayer < this._game.config.PLAYER_VIEW_DISTANCE) {
-                // show mesh
-                this.mesh.unfreezeWorldMatrix();
-                this.mesh.setEnabled(true);
-
-                // show gui
-                this.characterLabel.isEnabled = true;
-                this.characterChatLabel.isEnabled = true;
-
-                this.meshController.equipments?.forEach((equipment) => {
-                    equipment.unfreezeWorldMatrix();
-                    equipment.setEnabled(true);
-                });
-            }*/
         }
+    }
+
+    public position() {
+        return new Vector3(this.x, this.y, this.z);
     }
 
     public remove() {

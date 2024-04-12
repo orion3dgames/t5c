@@ -16,7 +16,6 @@ import { PlayerInput } from "../../client/Controllers/PlayerInput";
 import { UserInterface } from "../../client/Controllers/UserInterface";
 import State from "../../client/Screens/Screens";
 import { Ability, ServerMsg } from "../../shared/types";
-import { GameScene } from "../Screens/GameScene";
 
 export class Player extends Entity {
     public game;
@@ -38,21 +37,33 @@ export class Player extends Entity {
     public closestEntity;
     public closestEntityDistance;
 
-    constructor(name, scene, gamescene: GameScene, entity) {
-        super(name, scene, gamescene, entity);
+    public input_sequence: number = 0;
 
-        this.entities = gamescene._entities;
+    constructor(
+        entity: PlayerSchema,
+        room: Room,
+        scene: Scene,
+        ui: UserInterface,
+        shadow: CascadedShadowGenerator,
+        navMesh: NavMesh,
+        game: GameController,
+        input: PlayerInput,
+        entities
+    ) {
+        super(entity, room, scene, ui, shadow, navMesh, game);
 
-        this._input = gamescene._input;
+        this.entities = entities;
+
+        this._input = input;
 
         this.ability_in_cooldown = [false, false, false, false, false, false, false, false, false, false, false];
 
         this.type = "player";
 
-        this.spawnPlayer();
+        this.spawnPlayer(input);
     }
 
-    private async spawnPlayer() {
+    private async spawnPlayer(input) {
         // add player controllers
         this.utilsController = new EntityUtils(this._scene, this._room);
         this.cameraController = new PlayerCamera(this);
@@ -138,7 +149,7 @@ export class Player extends Entity {
             if (target.spawnInfo.aggressive) {
                 /*
                 // send to server
-                this._room.send(ServerMsg.PLAYER_HOTBAR_ACTIVATED, {
+                this._game.sendMessage(ServerMsg.PLAYER_HOTBAR_ACTIVATED, {
                     senderId: this._room.sessionId,
                     targetId: target ? target.sessionId : false,
                     digit: 1,
@@ -155,7 +166,7 @@ export class Player extends Entity {
             let entityPos = target.getPosition();
             let distanceBetween = Vector3.Distance(playerPos, entityPos);
             if (distanceBetween < this._game.config.PLAYER_INTERACTABLE_DISTANCE) {
-                this._ui.panelDialog.open(target);
+                this.ui.panelDialog.open(target);
 
                 // stop any movement
                 // todo: improve
@@ -168,7 +179,9 @@ export class Player extends Entity {
 
         // pick up item
         if (metadata.type === "item") {
-            this._room.send(ServerMsg.PLAYER_PICKUP, metadata.sessionId);
+            this._game.sendMessage(ServerMsg.PLAYER_PICKUP, {
+                sessionId: metadata.sessionId,
+            });
         }
 
         // move to clicked point
@@ -181,7 +194,7 @@ export class Player extends Entity {
             let destination = pointerInfo._pickInfo.pickedPoint;
             let pickedMesh = pointerInfo._pickInfo.pickedMesh;
 
-            const foundPath: any = this._navMesh.checkPath(this.getPosition(), destination);
+            const foundPath = this._navMesh.getRegionForPoint(destination);
             if (foundPath) {
                 // remove decal if already exist
                 if (this.moveDecal) {
@@ -199,7 +212,7 @@ export class Player extends Entity {
                 }, 1000);
 
                 // send to server
-                this._room.send(ServerMsg.PLAYER_MOVE_TO, {
+                this._game.sendMessage(ServerMsg.PLAYER_MOVE_TO, {
                     x: destination._x,
                     y: destination._y,
                     z: destination._z,
@@ -245,6 +258,9 @@ export class Player extends Entity {
 
     // update at server rate
     public updateServerRate(delta) {
+        // process player movement
+        this.moveController.processMove();
+
         ///////////// DIALOG ///////////////////////////
         // if moving, look for the closest interactable entities.
         if (this.isMoving) {
@@ -258,16 +274,15 @@ export class Player extends Entity {
 
             // if far enough, hide interactable button & any open dialog
             if (this.closestEntityDistance > 5 && this.closestEntity.interactableButtons) {
-                this._ui.panelDialog.close();
+                this.ui.panelDialog.close();
             }
         }
 
         ///////////// ENVIRONMENT LOD ///////////////////////////
         // only show meshes close to us
-        /*
         let currentPos = this.getPosition();
         let key = "ENV_" + this._game.currentLocation.mesh;
-        let allMeshes = this._game._loadedAssets[key]?.loadedMeshes ?? [];
+        let allMeshes = this._game._loadedAssets[key].loadedMeshes;
         allMeshes.forEach((element) => {
             let distanceTo = Vector3.Distance(element.getAbsolutePosition(), currentPos);
             element.unfreezeWorldMatrix();
@@ -276,7 +291,7 @@ export class Player extends Entity {
                 element.unfreezeWorldMatrix();
                 element.setEnabled(true);
             }
-        });*/
+        });
 
         ///////////// ABILITY & CASTING EVENTS ///////////////////////////
         // if digit pressed
@@ -286,7 +301,7 @@ export class Player extends Entity {
             let target = this._game.selectedEntity;
 
             // send to server
-            this._room.send(ServerMsg.PLAYER_HOTBAR_ACTIVATED, {
+            this._game.sendMessage(ServerMsg.PLAYER_HOTBAR_ACTIVATED, {
                 senderId: this._room.sessionId,
                 targetId: target ? target.sessionId : false,
                 digit: digit,
@@ -299,18 +314,18 @@ export class Player extends Entity {
         // check if casting
         if (this.isCasting === true) {
             // increment casting timer
-            this._ui._CastingBar.open();
+            this.ui._CastingBar.open();
             this.castingElapsed += delta; // increment casting timer by server delta
             let widthInPercentage = ((this.castingElapsed / this.castingTarget) * 100) / 100; // percentage between 0 and 1
             let text = this.castingElapsed + "/" + this.castingTarget;
             let width = widthInPercentage;
-            this._ui._CastingBar.update(text, width);
+            this.ui._CastingBar.update(text, width);
         }
 
         // check for cooldowns (estethic only as server really controls cooldowns)
         this.ability_in_cooldown.forEach((cooldown, digit) => {
             if (cooldown > 0) {
-                let cooldownUI = this._ui.MAIN_ADT.getControlByName("ability_" + digit + "_cooldown");
+                let cooldownUI = this.ui.MAIN_ADT.getControlByName("ability_" + digit + "_cooldown");
                 let ability = this.getAbilityByDigit(digit) as Ability;
                 if (ability && cooldownUI) {
                     this.ability_in_cooldown[digit] -= delta;
@@ -323,7 +338,7 @@ export class Player extends Entity {
         ///////////// RESSURECT EVENTS ///////////////////////////
         // if dead
         if (!this.isDeadUI && this.health < 1) {
-            this._ui._RessurectBox.open();
+            this.ui._RessurectBox.open();
             this.cameraController.bw(true);
             this.isDeadUI = true;
         }
@@ -331,7 +346,7 @@ export class Player extends Entity {
         // if ressurect
         if (this.isDeadUI && this.health > 0) {
             this.cameraController.bw(false);
-            this._ui._RessurectBox.close();
+            this.ui._RessurectBox.close();
             this.isDeadUI = false;
         }
     }
@@ -355,7 +370,7 @@ export class Player extends Entity {
             this.castingElapsed = 0;
             this.castingTarget = ability.castTime;
             this.castingDigit = digit;
-            this._ui._CastingBar.open();
+            this.ui._CastingBar.open();
         }
     }
 
@@ -365,7 +380,7 @@ export class Player extends Entity {
         this.castingElapsed = 0;
         this.castingTarget = 0;
         this.castingDigit = 0;
-        this._ui._CastingBar.close();
+        this.ui._CastingBar.close();
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -375,7 +390,7 @@ export class Player extends Entity {
 
     public registerServerMessages() {
         this._room.onMessage(ServerMsg.SERVER_MESSAGE, (data) => {
-            this._ui._ChatBox.addNotificationMessage(data.type, data.message, data.message);
+            this.ui._ChatBox.addNotificationMessage(data.type, data.message, data.message);
         });
 
         // on teleport confirmation
@@ -407,7 +422,7 @@ export class Player extends Entity {
                     this.castingElapsed = 0;
                     this.castingTarget = 0;
                     this.isCasting = false;
-                    this._ui._CastingBar.close();
+                    this.ui._CastingBar.close();
                     this.ability_in_cooldown[digit] = ability.cooldown; // set cooldown
                 }
 

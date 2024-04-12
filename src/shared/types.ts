@@ -285,9 +285,7 @@ export type Item = {
         slot: PlayerSlots;
         mesh?: string;
         material?: string;
-        rotation_x?: number;
-        rotation_y?: number;
-        rotation_z?: number;
+        rotation?: number;
         offset_x?: number;
         offset_y?: number;
         offset_z?: number;

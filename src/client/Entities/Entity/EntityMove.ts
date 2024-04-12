@@ -100,49 +100,42 @@ export class EntityMove {
         }
     }
 
-    // move transform node
     public tween() {
         // continuously lerp between current position and next position
-        this._player.position = Vector3.Lerp(this._player.position, this.nextPosition, 0.15);
+        this._mesh.position = Vector3.Lerp(this._mesh.position, this.nextPosition, 0.1);
 
         // rotation
         // TODO DAYD : make it better
         // maybe look into Scalar.LerpAngle ??? https://doc.babylonjs.com/typedoc/classes/BABYLON.Scalar#LerpAngle
-        const gap = Math.abs(this._player.rotation.y - this.nextRotation.y);
-        if (gap > Math.PI) this._player.rotation.y = this.nextRotation.y;
-        else this._player.rotation = Vector3.Lerp(this._player.rotation, this.nextRotation, 0.45);
-
-        // test
-        //this._mesh.position = Vector3.Lerp(this._node.position, this.nextPosition, 0.1);
-        //this._mesh.rotation = Vector3.Lerp(this._node.rotation, this.nextRotation, 0.45);
+        const gap = Math.abs(this._mesh.rotation.y - this.nextRotation.y);
+        if (gap > Math.PI) this._mesh.rotation.y = this.nextRotation.y;
+        else this._mesh.rotation = Vector3.Lerp(this._mesh.rotation, this.nextRotation, 0.45);
     }
 
     public move(input: PlayerInputs): void {
+        let speed = this.speed;
+
+        // save current position
+        let oldX = this.nextPosition.x;
+        let oldY = this.nextPosition.y;
+        let oldZ = this.nextPosition.z;
+
+        // calculate new position
+        let newX = oldX - input.h * speed;
+        let newY = oldY;
+        let newZ = oldZ - input.v * speed;
+        const newRotY = Math.atan2(input.h, input.v);
+
+        // check it fits in navmesh
         if (this.isCurrentPlayer) {
-            //
-            let speed = this.speed;
-
-            // save current position
-            let oldX = this.nextPosition.x;
-            let oldY = this.nextPosition.y;
-            let oldZ = this.nextPosition.z;
-
-            // calculate new position
-            let newX = oldX - input.h * speed;
-            let newY = oldY;
-            let newZ = oldZ - input.v * speed;
-            const newRotY = Math.atan2(input.h, input.v);
-
-            // check it fits in navmesh
+            let sourcePos = new Vector3Y(oldX, oldY, oldZ); // new pos
             let destinationPos = new Vector3Y(newX, newY, newZ); // new pos
             const foundPath = this._navMesh.getRegionForPoint(destinationPos, 0.5);
             if (foundPath) {
                 // adjust height of the entity according to the ground
                 let currentRegion = foundPath;
-                if (currentRegion && currentRegion.plane) {
-                    const distance = currentRegion.plane.distanceToPoint(destinationPos);
-                    newY -= distance; // smooth transition*/
-                }
+                const distance = currentRegion.plane.distanceToPoint(destinationPos);
+                newY -= distance; // smooth transition*/
 
                 this.nextPosition.x = newX;
                 this.nextPosition.y = newY;
