@@ -75,7 +75,7 @@ export class Item extends TransformNode {
         this.spawn(entity);
     }
 
-    public async spawn(entity, mode = "clone") {
+    public async spawn(entity, mode = "instance") {
         // load item mesh
         if (mode === "instance") {
             // instance

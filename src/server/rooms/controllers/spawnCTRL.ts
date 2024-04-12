@@ -25,7 +25,7 @@ export class spawnCTRL {
         this.process();
 
         for (let i = 0; i < 20; i++) {
-            //this.createItem();
+            this.createItem();
         }
     }
 

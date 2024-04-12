@@ -53,9 +53,9 @@ export class UserInterface {
 
     //UI Elements
     public MAIN_ADT: AdvancedDynamicTexture;
-    public NAMES_ADT: AdvancedDynamicTexture;
+    public LABELS_ADT: AdvancedDynamicTexture;
     public _playerUI;
-    private _namesUI;
+    public _labelsUI;
     public _hightlight;
 
     // interface
@@ -106,8 +106,8 @@ export class UserInterface {
         this._loadedAssets = this._game._loadedAssets;
 
         // create ui
-        const NAMES_ADT = AdvancedDynamicTexture.CreateFullscreenUI("UI_Names", true, this._scene);
-        this.NAMES_ADT = NAMES_ADT;
+        const LABELS_ADT = AdvancedDynamicTexture.CreateFullscreenUI("UI_Names", true, this._scene);
+        this.LABELS_ADT = LABELS_ADT;
 
         // create ui
         const uiLayer = AdvancedDynamicTexture.CreateFullscreenUI("UI_Player", true, this._scene);
@@ -142,28 +142,6 @@ export class UserInterface {
         this.fpsPanel = fpsPanel;
     }
 
-    public dragging() {
-        if (this._isDragging) {
-            var deltaX = this._scene.pointerX - this._pointerDownPosition.x;
-            var deltaY = this._scene.pointerY - this._pointerDownPosition.y;
-            this._isDragging.leftInPixels += deltaX;
-            this._isDragging.topInPixels += deltaY;
-            this._pointerDownPosition.x = this._scene.pointerX;
-            this._pointerDownPosition.y = this._scene.pointerY;
-            this._InventoryDropdown.refresh();
-        }
-    }
-
-    public startDragging(panel) {
-        this._isDragging = panel;
-        this._pointerDownPosition = { x: this._scene.pointerX, y: this._scene.pointerY };
-    }
-
-    public stopDragging() {
-        this._isDragging.isPointerBlocker = true;
-        this._isDragging = null;
-    }
-
     // set current player
     ////////////////////////////
     public setCurrentPlayer(currentPlayer) {
@@ -188,7 +166,7 @@ export class UserInterface {
         // create chat ui + events
         this._ChatBox = new ChatBox(this._playerUI, this._chatRoom, currentPlayer, this._entities, this._game);
 
-        // create chat ui + events
+        // create damage text
         // todo: let's do this with 3d billboards
         //this._DamageText = new DamageText(this.NAMES_ADT, this._scene, this._entities);
 
@@ -276,23 +254,20 @@ export class UserInterface {
         // create tooltip
         this._Tooltip = new Tooltip(this, currentPlayer);
 
-        // some ui must be constantly refreshed as things change
-        /*
-        this._scene.registerBeforeRender(() => {
-            this.update();
-            this.dragging();
-        });*/
-
         // initial resize event
-        //this.resize();
+        this.resize();
     }
 
     // update every server tick
     public update() {
+        //
         this.fpsPanel.text = "FPS: " + this._engine.getFps().toFixed(0);
         this._targetEntitySelectedBar.update();
         this._playerEntitySelectedBar.update();
         this._Tooltip.update();
+
+        //
+        this.dragging();
     }
 
     // update every 1000ms
@@ -317,8 +292,29 @@ export class UserInterface {
         }*/
     }
 
+    public dragging() {
+        if (this._isDragging) {
+            var deltaX = this._scene.pointerX - this._pointerDownPosition.x;
+            var deltaY = this._scene.pointerY - this._pointerDownPosition.y;
+            this._isDragging.leftInPixels += deltaX;
+            this._isDragging.topInPixels += deltaY;
+            this._pointerDownPosition.x = this._scene.pointerX;
+            this._pointerDownPosition.y = this._scene.pointerY;
+            this._InventoryDropdown.refresh();
+        }
+    }
+
+    public startDragging(panel) {
+        this._isDragging = panel;
+        this._pointerDownPosition = { x: this._scene.pointerX, y: this._scene.pointerY };
+    }
+
+    public stopDragging() {
+        this._isDragging.isPointerBlocker = true;
+        this._isDragging = null;
+    }
+
     public resize() {
-        /*
         if (this._engine.getRenderWidth() < 1100) {
             if (this._ChatBox) {
                 this._ChatBox.chatPanel.top = "-115px;";
@@ -327,10 +323,9 @@ export class UserInterface {
             if (this._ChatBox) {
                 this._ChatBox.chatPanel.top = "-30px;";
             }
-        }*/
+        }
     }
 
-    /*
     // chatbox label
     public createEntityChatLabel(entity) {
         var rect1 = new Rectangle("player_chat_" + entity.sessionId);
@@ -340,8 +335,8 @@ export class UserInterface {
         rect1.thickness = 1;
         rect1.cornerRadius = 5;
         rect1.background = "rgba(0,0,0,.5)";
-        rect1.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        this.NAMES_ADT.addControl(rect1);
+        rect1.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        this.LABELS_ADT.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
         rect1.linkOffsetY = -130;
 
@@ -366,7 +361,7 @@ export class UserInterface {
         rect1.width = "300px";
         rect1.height = "40px";
         rect1.thickness = 0;
-        this.NAMES_ADT.addControl(rect1);
+        this.LABELS_ADT.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
         rect1.linkOffsetY = -80;
 
@@ -388,7 +383,7 @@ export class UserInterface {
         rect1.width = "200px";
         rect1.height = "40px";
         rect1.thickness = 0;
-        this.NAMES_ADT.addControl(rect1);
+        this.LABELS_ADT.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
         rect1.linkOffsetY = -30;
 
@@ -402,7 +397,6 @@ export class UserInterface {
         rect1.addControl(label);
         return rect1;
     }
-    */
 
     public createInteractableButtons(entity) {
         if (!entity.spawnInfo) return false;
@@ -415,7 +409,7 @@ export class UserInterface {
         rect1.height = "50px";
         rect1.thickness = 0;
         rect1.zIndex = 1;
-        this.NAMES_ADT.addControl(rect1);
+        this.LABELS_ADT.addControl(rect1);
         rect1.linkWithMesh(entity.mesh);
         rect1.linkOffsetY = -120;
 

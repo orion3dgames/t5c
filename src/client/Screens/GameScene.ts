@@ -136,7 +136,7 @@ export class GameScene {
         // init network
         setTimeout(() => {
             this._initNetwork();
-        }, 1000);
+        }, 500);
     }
 
     public async loadNavMesh(key) {
@@ -221,7 +221,7 @@ export class GameScene {
 
             // if item
             if (entity.type === "item") {
-                //this._entities.set(sessionId, new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._game));
+                this._entities.set(sessionId, new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._game));
             }
         });
 
@@ -300,7 +300,7 @@ export class GameScene {
     // triggered on resize event
     public resize() {
         if (this._ui) {
-            //this._ui.resize();
+            this._ui.resize();
         }
     }
 }

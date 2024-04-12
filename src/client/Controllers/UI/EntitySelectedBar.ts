@@ -9,6 +9,7 @@ import { UserInterface } from "../UserInterface";
 
 export class EntitySelectedBar {
     private _playerUI;
+    private LABELS_ADT;
     private _scene;
     private _game: GameController;
     private _loadedAssets;
@@ -26,8 +27,11 @@ export class EntitySelectedBar {
     private _manaBarInside;
     private _manaBarText;
 
+    private _label;
+
     constructor(_UI: UserInterface, options = { panelName: "", currentPlayer: false }) {
         this._playerUI = _UI._playerUI;
+        this.LABELS_ADT = _UI.LABELS_ADT;
         this._scene = _UI._scene;
         this._game = _UI._game;
         this._options = options;
@@ -188,6 +192,29 @@ export class EntitySelectedBar {
         this._manaBar = manaBar;
         this._manaBarInside = manaBarInside;
         this._manaBarText = manaBarText;
+
+        ////////////////////////////////////
+        //////////////////// show target label
+    }
+
+    public createLabel(entity) {
+        var rect1 = new Rectangle("entity_nameplate");
+        rect1.isVisible = true;
+        rect1.width = "300px";
+        rect1.height = "40px";
+        rect1.thickness = 0;
+        this.LABELS_ADT.addControl(rect1);
+        rect1.linkWithMesh(entity.mesh);
+        rect1.linkOffsetY = -80;
+        this._label = rect1;
+
+        var label = new TextBlock("player_nameplate_text_" + entity.sessionId);
+        label.text = entity.name;
+        label.color = "white";
+        label.fontWeight = "light";
+        label.outlineWidth = 5;
+        label.outlineColor = "black";
+        rect1.addControl(label);
     }
 
     // refresh panel

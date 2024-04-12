@@ -93,6 +93,9 @@ export class Player extends Entity {
                 }
             }
         });
+
+        // add chat label
+        //this.characterChatLabel = this._ui.createEntityChatLabel(this);
     }
 
     getMeshMetadata(pointerInfo) {

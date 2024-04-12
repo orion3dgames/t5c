@@ -122,8 +122,6 @@ export class Entity extends TransformNode {
         // set entity
         Object.assign(this, this.entity);
 
-        this.name = this.sessionId;
-
         // get spawnInfo
         if (entity.type === "entity" && this._game.currentLocation.dynamic.spawns) {
             this.spawnInfo = this._game.currentLocation.dynamic.spawns[this.spawn_id] ?? null;
@@ -192,8 +190,7 @@ export class Entity extends TransformNode {
         //////////////////////////////////////////////////////////////////////////
         // misc
         //this.characterLabel = this._ui.createEntityLabel(this);
-        //this.characterChatLabel = this._ui.createEntityChatLabel(this);
-        this.interactableButtons = this._ui.createInteractableButtons(this);
+        //this.interactableButtons = this._ui.createInteractableButtons(this);
     }
 
     public update(delta): any {
@@ -221,8 +218,8 @@ export class Entity extends TransformNode {
 
             // hide any dialog this entity could be linked too
             if (this._ui.panelDialog.currentEntity && this._ui.panelDialog.currentEntity.sessionId === this.sessionId) {
-                //this._ui.panelDialog.clear();
-                //this._ui.panelDialog.close();
+                this._ui.panelDialog.clear();
+                this._ui.panelDialog.close();
             }
         }
 
