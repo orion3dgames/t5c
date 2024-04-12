@@ -3,7 +3,7 @@ import State from "../client/Screens/Screens";
 class Config {
     // general settings
     title = "T5C";
-    version = "Version 0.3.1";
+    version = "Version 0.4.0";
     lang = "en";
 
     // server settings
