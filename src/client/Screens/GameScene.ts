@@ -123,7 +123,6 @@ export class GameScene {
         await this._game._assetsCtrl.loadLevel(location.key);
         await this._game._assetsCtrl.prepareItems();
         this._game.engine.displayLoadingUI();
-        console.log(this._game._loadedAssets);
 
         // preload any skeletons and animation
         let spawns = location.dynamic.spawns ?? [];
@@ -131,7 +130,7 @@ export class GameScene {
 
         await this._game._vatController.initialize();
         await this._game._vatController.check(this._game._currentCharacter.race);
-        console.log(this._game._vatController._entityData);
+        console.log("[VAT] loaded", this._game._vatController._entityData);
 
         // init network
         setTimeout(() => {

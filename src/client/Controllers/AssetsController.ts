@@ -239,7 +239,7 @@ export class AssetsController {
         };
 
         this._assetsManager.onFinish = () => {
-            console.log("loading complete", assetLoaded);
+            console.log("[ASSETS] loading complete", assetLoaded);
             for (let i in assetLoaded) {
                 this._game._loadedAssets[i] = assetLoaded[i];
             }
@@ -318,7 +318,6 @@ export class AssetsController {
             if (k.includes("ITEM_") && this._game._loadedAssets[k] instanceof AssetContainer) {
                 let v = this._game._loadedAssets[k] as AssetContainer;
                 let modelToLoadKey = "ROOT_" + k;
-                console.log("prepareItems", modelToLoadKey);
                 const root = v.instantiateModelsToScene(
                     function () {
                         return modelToLoadKey;
