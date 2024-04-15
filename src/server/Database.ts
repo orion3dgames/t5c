@@ -465,6 +465,11 @@ class Database {
         const sql = `UPDATE characters SET online=? WHERE id=? ;`;
         return this.run(sql, [online, character_id]);
     }
+
+    async doesUserNameExists(name: string) {
+        const sql = `SELECT COUNT(id) as count FROM users WHERE username=? ;`;
+        return this.get(sql, [name]);
+    }
 }
 
 export { Database };

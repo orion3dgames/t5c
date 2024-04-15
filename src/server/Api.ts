@@ -4,6 +4,7 @@ import Logger from "./utils/Logger";
 import { generateRandomPlayerName } from "../shared/Utils";
 import { GameData } from "./GameData";
 import { Database } from "./Database";
+import { generateId } from "colyseus";
 
 class Api {
     constructor(app, database: Database) {
@@ -142,14 +143,41 @@ class Api {
         app.get("/register", (req, res) => {});
 
         app.post("/returnRandomUser", (req, res) => {
-            database.saveUser(generateRandomPlayerName(), generateRandomPlayerName()).then((user) => {
-                database.createCharacter(user.token, generateRandomPlayerName(), "male_knight", 0).then((character) => {
-                    character.user_id = user.id;
-                    character.token = user.token;
-                    character.password = user.password;
-                    return res.send({
-                        message: "Successful",
-                        user: character,
+            let username;
+            let password = generateId();
+            const doSomething = async (username) =>
+                new Promise((resolve) => {
+                    database.doesUserNameExists(username).then((doesExists) => {
+                        if (doesExists.count > 0) {
+                            resolve("no");
+                        } else {
+                            resolve("ok");
+                        }
+                    });
+                });
+
+            const loop = async (value) => {
+                let result = null;
+                while (result != "ok") {
+                    if (result > 20) {
+                        result = "ok";
+                    }
+                    username = generateRandomPlayerName();
+                    result = await doSomething(username);
+                    value = value + 1;
+                }
+            };
+
+            loop(1).then(() => {
+                database.saveUser(username, password).then((user) => {
+                    database.createCharacter(user.token, generateRandomPlayerName(), "male_knight", 0).then((character) => {
+                        character.user_id = user.id;
+                        character.token = user.token;
+                        character.password = user.password;
+                        return res.send({
+                            message: "Successful",
+                            user: character,
+                        });
                     });
                 });
             });

@@ -210,7 +210,7 @@ var nameList = [
 ];
 
 const generateRandomPlayerName = function () {
-    return nameList[Math.floor(Math.random() * nameList.length)] + "_" + nameList[Math.floor(Math.random() * nameList.length)];
+    return nameList[Math.floor(Math.random() * nameList.length)] + " " + nameList[Math.floor(Math.random() * nameList.length)];
 };
 
 const distanceBetween = function (a, b): number {
