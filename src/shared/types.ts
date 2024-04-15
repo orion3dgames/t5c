@@ -82,6 +82,8 @@ export enum ServerMsg {
     PLAYER_BUY_ITEM,
     PLAYER_SELL_ITEM,
     DEBUG_REMOVE_ENTITIES,
+    DEBUG_INCREASE_ENTITIES,
+    DEBUG_DECREASE_ENTITIES,
 }
 
 //////////////////////////////////////////////////////////////

@@ -9,11 +9,11 @@ import { GameRoomState } from "../state/GameRoomState";
 export class spawnCTRL {
     private _state: GameRoomState;
     private _room: GameRoom;
-    private _location;
+    public location;
     private spawnsAmount = [];
 
     private SPAWN_RATE = 10;
-    private SPAWN_INTERVAL = 500;
+    private SPAWN_INTERVAL = 300;
     private SPAWN_CURRENT = 0;
 
     private DESPAWN = false;
@@ -21,11 +21,30 @@ export class spawnCTRL {
     constructor(state: GameRoomState) {
         this._state = state;
         this._room = state._gameroom;
-        this._location = this._state.gameData.get("location", this._room.metadata.location);
+        this.location = this._state.gameData.get("location", this._room.metadata.location);
         this.process();
 
         for (let i = 0; i < 20; i++) {
             this.createItem();
+        }
+    }
+
+    public debug_increase(amount) {
+        console.log(this.location.dynamic.spawns);
+        if (this.location.dynamic.spawns[0]) {
+            this.location.dynamic.spawns[0].amount += amount;
+        }
+        if (this.location.dynamic.spawns[1]) {
+            this.location.dynamic.spawns[1].amount += amount;
+        }
+    }
+
+    public debug_decrease(amount) {
+        if (this.location.dynamic.spawns[0] && this.location.dynamic.spawns[0] > amount - 1) {
+            this.location.dynamic.spawns[0].amount -= amount;
+        }
+        if (this.location.dynamic.spawns[1] && this.location.dynamic.spawns[1] > amount - 1) {
+            this.location.dynamic.spawns[1].amount -= amount;
         }
     }
 
@@ -41,7 +60,7 @@ export class spawnCTRL {
 
     public process() {
         //Logger.info("[gameroom][state][spawning] spawnController: " + this._location.key);
-        let dynamic = this._location.dynamic;
+        let dynamic = this.location.dynamic;
         let spawns = dynamic.spawns ?? [];
         spawns.forEach((spawn, index) => {
             // needed later to find spawn details on client???

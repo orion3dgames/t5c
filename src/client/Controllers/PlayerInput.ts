@@ -134,6 +134,8 @@ export class PlayerInput {
                         this._ui._ChatBox.chatInput.focus();
                     }
 
+                    console.log(kbInfo.event.code);
+
                     // hotbar
                     if (kbInfo.event.code === "Digit1") {
                         this.digit_pressed = 1;
@@ -166,6 +168,12 @@ export class PlayerInput {
                     // characters
                     if (kbInfo.event.code === "KeyJ") {
                         this._game.sendMessage(ServerMsg.DEBUG_REMOVE_ENTITIES);
+                    }
+                    if (kbInfo.event.code === "NumpadAdd") {
+                        this._game.sendMessage(ServerMsg.DEBUG_INCREASE_ENTITIES);
+                    }
+                    if (kbInfo.event.code === "NumpadSubtract") {
+                        this._game.sendMessage(ServerMsg.DEBUG_DECREASE_ENTITIES);
                     }
                     if (kbInfo.event.code === "KeyN") {
                         this._gameScene._navMeshDebug.isVisible = !this._gameScene._navMeshDebug.isVisible;

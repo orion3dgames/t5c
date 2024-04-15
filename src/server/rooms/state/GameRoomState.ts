@@ -320,12 +320,40 @@ export class GameRoomState extends Schema {
             }
         }
 
-        //////////////// DEBUG /////////////////
+        /////////
+        /////// DEBUG /////////////////
+
+        if (process.env.NODE_ENV !== "production") {
+            let amountToChange = 100;
+
+            // debug: add 100 entities
+            if (type === ServerMsg.DEBUG_INCREASE_ENTITIES) {
+                this.spawnCTRL.debug_increase(amountToChange);
+            }
+
+            // debug: delete 100 entities
+            if (type === ServerMsg.DEBUG_DECREASE_ENTITIES) {
+                let i = 1;
+                this.spawnCTRL.debug_decrease(amountToChange);
+                this.entities.forEach((entity) => {
+                    if (
+                        entity.type === "entity" &&
+                        entity.AI_SPAWN_INFO &&
+                        (entity.AI_SPAWN_INFO.key === "lh_town_thief" || entity.AI_SPAWN_INFO.key === "lh_town_bandits") &&
+                        i <= amountToChange
+                    ) {
+                        this.spawnCTRL.removeEntity(entity);
+                        i++;
+                    }
+                });
+            }
+        }
+
         if (type === ServerMsg.DEBUG_REMOVE_ENTITIES) {
             if (this.entityCTRL.hasEntities()) {
                 this.entityCTRL.all.forEach((entity) => {
                     if (entity.type !== "player") {
-                        this.entities.delete(entity.sessionId);
+                        this.spawnCTRL.removeEntity(entity);
                     }
                 });
             }
