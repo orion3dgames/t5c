@@ -337,7 +337,7 @@ export class GameRoomState extends Schema {
                 this.spawnCTRL.debug_decrease(amountToChange);
                 this.entities.forEach((entity) => {
                     if (
-                        entity.type === "entity" &&
+                        entity instanceof BrainSchema &&
                         entity.AI_SPAWN_INFO &&
                         (entity.AI_SPAWN_INFO.key === "lh_town_thief" || entity.AI_SPAWN_INFO.key === "lh_town_bandits") &&
                         i <= amountToChange
