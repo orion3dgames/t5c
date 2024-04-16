@@ -3,6 +3,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PlayerInputs, ServerMsg } from "../../../shared/types";
 import { NavMesh, Vector3 as Vector3Y } from "../../../shared/Libs/yuka-min";
 import { Entity } from "../Entity";
+import { Player } from "../Player";
 
 export class EntityMove {
     private _node: Entity;
@@ -82,6 +83,11 @@ export class EntityMove {
     public tween() {
         // continuously lerp between current position and next position
         this._node.position = Vector3.Lerp(this._node.position, this.nextPosition, 0.15);
+
+        // move camera at the same time
+        if (this._node.isCurrentPlayer) {
+            this._node.cameraController._camRoot.position = Vector3.Lerp(this._node.cameraController._camRoot.position, this.nextPosition, 0.15);
+        }
 
         // rotation
         // TODO DAYD : make it better

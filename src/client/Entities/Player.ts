@@ -231,8 +231,8 @@ export class Player extends Entity {
             this.moveController.tween();
         }
 
-        // move camera as player moves
-        this.cameraController.follow();
+        // update camera
+        this.cameraController.update();
     }
 
     // update at server rate

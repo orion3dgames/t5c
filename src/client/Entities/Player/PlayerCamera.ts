@@ -27,6 +27,7 @@ export class PlayerCamera {
         // root camera parent that handles positioning of the camera to follow the player
         this._camRoot = new TransformNode("root");
         this._camRoot.position = new Vector3(0, 1.5, 0); //initialized at (0,0,0)
+        //this._camRoot.parent = player;
 
         // to face the player from behind (180 degrees)
         this._camRoot.rotation = new Vector3(0, (3 / 4) * Math.PI, 0);
@@ -56,19 +57,13 @@ export class PlayerCamera {
         //const ssao = new SSAORenderingPipeline("ssaopipeline", this._scene, 1, this.camera);
     }
 
-    public follow(): void {
-        // debug: testing online camera lag
-        if (this._input.keyboard_c === false) {
-            this._camRoot.position = this.player.getPosition();
-        }
-
+    public update(): void {
         // rotate camera around the Y position if right click is true
         if (this._input.middle_click) {
             const rotationX =
                 Math.abs(this._camRoot.rotation.x + this._input.movementY) < 0.5 ? this._camRoot.rotation.x + this._input.movementY : this._camRoot.rotation.x;
             const rotationY = this._camRoot.rotation.y + this._input.movementX;
             this._camRoot.rotation = new Vector3(rotationX, rotationY, 0);
-            //this._camRoot.rotation = new Vector3(0, rotationY, 0);
         }
     }
 
