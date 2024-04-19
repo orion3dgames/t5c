@@ -21,7 +21,7 @@ let AbilitiesDB: abilityMap = {
             color: "white",
         },
         casterPropertyAffected: [],
-        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 10, max: 15 }],
+        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 2, max: 5 }],
     },
 
     fire_dart: {
