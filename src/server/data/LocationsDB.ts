@@ -49,7 +49,7 @@ let LocationsDB = {
                     race: "male_mage",
                     material: 1,
                     name: "Thief",
-                    baseHealth: 20,
+                    baseHealth: 40,
                     baseSpeed: Speed.VERY_SLOW,
                     equipment: [
                         {
@@ -85,7 +85,7 @@ let LocationsDB = {
                     race: "male_rogue",
                     material: 2,
                     name: "Bandit",
-                    baseHealth: 40,
+                    baseHealth: 80,
                     baseSpeed: Speed.VERY_SLOW,
                     equipment: [
                         {
