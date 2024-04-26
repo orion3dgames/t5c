@@ -310,6 +310,7 @@ export class AssetsController {
             m.metadata = {
                 type: "environment",
             };
+            m.alwaysSelectAsActiveMesh = true;
         });
     }
 

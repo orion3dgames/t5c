@@ -45,7 +45,7 @@ let AbilitiesDB: abilityMap = {
             color: "orange",
         },
         casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 5, max: 10 }],
-        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 20, max: 40 }],
+        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 5, max: 10 }],
         type: AbilityType.PHYSICAL,
         element: AbilityElement.FIRE,
         required_level: 2,

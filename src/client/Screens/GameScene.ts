@@ -232,6 +232,9 @@ export class GameScene {
             }
         });
 
+        //
+        this._scene.freezeActiveMeshes();
+
         ////////////////////////////////////////////////////
         // main game loop
 

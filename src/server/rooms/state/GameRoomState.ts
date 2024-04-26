@@ -163,7 +163,9 @@ export class GameRoomState extends Schema {
         ////////// SERVER EVENTS ///////////
         ////////////////////////////////////
 
-        Logger.info(`[gameroom][` + ServerMsg[type] + `] player message`, data);
+        if (type !== ServerMsg.PING) {
+            Logger.info(`[gameroom][` + ServerMsg[type] + `] player message`, data);
+        }
 
         if (type === ServerMsg.PING) {
             client.send(ServerMsg.PONG, data);

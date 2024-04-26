@@ -377,6 +377,8 @@ export class PlayerSchema extends Entity {
             i: "" + availableSlot,
         };
 
+        console.log("PICK UP", loot.key, "QTY: " + loot.qty, "SLOT: " + availableSlot);
+
         //
         let item = this._state.gameData.get("item", loot.key);
 
@@ -435,7 +437,8 @@ export class PlayerSchema extends Entity {
         let slot = item.equippable.slot;
         let key = item.key;
 
-        if (item && item.qty > 0 && this.isEquipementSlotAvailable(slot) === true) {
+        // if can equip
+        if (this.canEquip(item, slot)) {
             // remove from inventory
             this.reduceItemQuantity(item, 1);
 
@@ -452,7 +455,7 @@ export class PlayerSchema extends Entity {
             return false;
         }
 
-        // remove item from inventory
+        // remove item from equipment
         this.equipment.delete(key);
 
         // equip
@@ -462,6 +465,10 @@ export class PlayerSchema extends Entity {
                 qty: 1,
             })
         );
+    }
+
+    canEquip(item, slot) {
+        return item && item.qty > 0 && this.isEquipementSlotAvailable(slot) === true;
     }
 
     ///////////////////////////////////////////////

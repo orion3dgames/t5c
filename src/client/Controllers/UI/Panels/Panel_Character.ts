@@ -343,6 +343,12 @@ export class Panel_Character extends Panel {
         let slotImage = slotPanel.getChildByName("slot_image_" + slot_id) as Image;
         let item = this._game.getGameData("item", item_key);
 
+        // make sure to remove any exisiting events
+        slotImage.source = "";
+        slotPanel.onPointerClickObservable.clear();
+        slotPanel.onPointerEnterObservable.clear();
+        slotPanel.onPointerOutObservable.clear();
+
         // equip item
         if (type === "ADD") {
             var imageData = this._loadedAssets[item.icon];
@@ -363,14 +369,6 @@ export class Panel_Character extends Panel {
             slotPanel.onPointerOutObservable.add((e) => {
                 this._UI._Tooltip.close();
             });
-        }
-
-        // unequip
-        if (type === "REMOVE") {
-            slotImage.source = "";
-            slotPanel.onPointerClickObservable.clear();
-            slotPanel.onPointerEnterObservable.clear();
-            slotPanel.onPointerOutObservable.clear();
         }
     }
 }

@@ -63,7 +63,7 @@ export class GameRoom extends Room<GameRoomState> {
             if (this.state.entities && this.state.entities.size > 0) {
                 this.state.entityCTRL.all.forEach((entity) => {
                     if (entity instanceof PlayerSchema) {
-                        entity.save(this.database);
+                        //entity.save(this.database);
                     }
                 });
             }
