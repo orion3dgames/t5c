@@ -37,7 +37,7 @@ class JavascriptDataDownloader {
 
 export class VatController {
     public _game: GameController;
-    private _spawns = [];
+    private _spawns: any[] = [];
     public _entityData = new Map();
     private _skeletonData = new Map();
 
@@ -60,26 +60,22 @@ export class VatController {
                 await this.prepareMesh(spawn.race);
             }
         }
-        //console.log("prepareMesh", "ALL FINISHED");
     }
 
     async check(race) {
         if (!this._entityData.has(race)) {
-            //console.log("prepareMesh", "ADDING PLAYER");
             await this.prepareMesh(race);
         }
     }
 
     async fetchVAT(key) {
         const url = "./models/races/vat/" + key + ".json";
-        //console.log("[fetchVAT]", url);
         const response = await fetch(url);
         const movies = await response.json();
         return movies;
     }
 
     async prepareMesh(key) {
-        //console.log("prepareMesh", key);
         let race = this._game.getGameData("race", key);
 
         const bakedAnimationJson = await this.fetchVAT(race.key);
@@ -119,17 +115,6 @@ export class VatController {
             modelMeshMerged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
 
             // copy mesh for each material
-            /*
-            let mergedMeshes: Mesh[] = [];
-            let raceKey = race.key + "_0";
-            let clone = modelMeshMerged.clone(raceKey);
-            clone.bakedVertexAnimationManager = manager;
-            clone.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
-            clone.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-            mergedMeshes.push(clone);
-            clone.setEnabled(false);*/
-
-            // copy mesh for each material
             let mergedMeshes: any[] = [];
             let materials = race.materials ?? [];
             if (materials.length > 1) {
@@ -160,9 +145,8 @@ export class VatController {
             // load prebaked vat animations
             let bufferFromMesh = b.loadBakedVertexDataFromJSON(bakedAnimationJson);
             manager.texture = b.textureFromBakedVertexData(bufferFromMesh);
-            manager.texture.name = key + "_VATRIG";
-            //onsole.log("prepareMesh", key, "vatManager");
 
+            // hide mesh
             modelMeshMerged.setEnabled(false);
 
             // save
@@ -174,14 +158,6 @@ export class VatController {
                 skeleton: skeleton,
                 items: new Map(),
             });
-
-            //console.log("prepareMesh", key, "finishes");
-
-            // bake to file
-            //await this.bakeTextureAnimation(key, merged);
-
-            // bake realtime
-            //await this.bakeTextureAnimationRealtime(key, merged);
         }
     }
 
@@ -199,6 +175,11 @@ export class VatController {
         let race = this._game.getGameData("race", raceKey);
         let slot = item.equippable ? PlayerSlots[item.equippable.slot] : 0;
         let boneId = race.bones[slot];
+
+        /*
+        const { meshes, animationGroups, skeletons } = this._game._loadedAssets["RACE_" + key];
+        const skeleton = skeletons[0];
+        const root = meshes[0];*/
 
         let rawMesh = this._game._loadedAssets["ITEM_" + item.key].meshes[0].clone("rawmesh_" + item.key); // mandatory: needs to be cloned
         rawMesh.position.copyFrom(entityData.skeleton.bones[boneId].getAbsolutePosition());
@@ -234,8 +215,8 @@ export class VatController {
             itemMesh.name = race.key + "_" + itemMesh.name;
 
             // offset to hide the items
-            itemMesh.position.y = 5000;
-            rawMesh.position.y = 5000;
+            itemMesh.position.y = 0;
+            rawMesh.position.y = 0;
 
             // weapon VAT
             itemMesh.skeleton = entityData.skeleton;

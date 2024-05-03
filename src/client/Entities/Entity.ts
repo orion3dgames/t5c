@@ -145,7 +145,7 @@ export class Entity extends TransformNode {
         this.playerSkeleton = this.meshController.skeleton;
 
         // add mesh to shadow generator
-        //this._shadow.addShadowCaster(this.meshController.mesh, true);
+        //this._shadow.addShadowCaster(this.meshController.mesh, false);
 
         // set initial position & roation
         this.position = new Vector3(entity.x, entity.y, entity.z);
@@ -155,6 +155,7 @@ export class Entity extends TransformNode {
         this.animatorController = new EntityAnimator(this);
         this.moveController = new EntityMove(this);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
+        this.utilsController = new EntityUtils(this._scene);
 
         ///////////////////////////////////////////////////////////
         // entity network event
@@ -167,6 +168,7 @@ export class Entity extends TransformNode {
             if (this.health !== this.entity.health) {
                 let healthChange = this.entity.health - this.health;
                 if (healthChange < 0 || healthChange > 1) {
+                    //this.utilsController.showDamageBubble(healthChange, this);
                     //this._ui._DamageText.addDamage(this, healthChange);
                 }
             }
@@ -270,6 +272,9 @@ export class Entity extends TransformNode {
         ////////////////////////////////////
         // animate player continuously
         this.animatorController.play(this);
+
+        //
+        this.utilsController.update();
     }
 
     public updateServerRate(delta) {}

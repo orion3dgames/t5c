@@ -99,16 +99,16 @@ export class GameScene {
         }
 
         // shadow light
+        /*
         var light = new DirectionalLight("DirectionalLight", new Vector3(-1, -2, -1), scene);
-        light.position = new Vector3(100, 100, 100);
+        light.position = new Vector3(1, 10, 1);
         light.radius = 0.27;
         light.intensity = 0.5;
-        //light.autoCalcShadowZBounds = true;
+        light.autoCalcShadowZBounds = true;
 
-        /*
         // shadow generator
         // toto: something is wrong with the shadows.
-        this._shadow = new CascadedShadowGenerator(128, light);
+        this._shadow = new CascadedShadowGenerator(1024, light);
         this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_LOW;
         this._shadow.lambda = 0.82;
         this._shadow.bias = 0.018;*/
@@ -133,9 +133,7 @@ export class GameScene {
         console.log("[VAT] loaded", this._game._vatController._entityData);
 
         // init network
-        setTimeout(() => {
-            this._initNetwork();
-        }, 500);
+        this._initNetwork();
     }
 
     public async loadNavMesh(key) {

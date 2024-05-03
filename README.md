@@ -2,6 +2,7 @@
 Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 
 ## Current progress:
+- vat animations and instances
 - fully player authorative movement with client side prediction and server reconciliation
   - diablo like movement using the mouse with the ability to click to move
 - scene management (login, register, character selection, etc...)
@@ -9,10 +10,10 @@ Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 - multiplayer animated characters
 - global chat (works accross zones)
 - uses a navmesh for collision detection
-- persistence with mysql lite
+- basic persistence with mysql lite
 - basic enemies with simple AI behaviour (IDLE, PATROL, CHASE, ATTACK, DEAD)
 - enemies can drop items (based on a loot table)
-- 4 abilities ( basic attack, fireball, dot, heal )
+- 4 basic abilities ( sword attack, fireball, dot, heal )
 - ability to target players and enemies
 - ability to pick up items and see them in your inventory
 - ability to equip items and see them on your character

@@ -56,7 +56,6 @@ export class Player extends Entity {
 
     private async spawnPlayer() {
         // add player controllers
-        this.utilsController = new EntityUtils(this._scene, this._room);
         this.cameraController = new PlayerCamera(this);
         this.actionsController = new EntityActions(this._scene, this._game._loadedAssets, this.entities);
 
