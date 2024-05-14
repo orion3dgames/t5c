@@ -279,11 +279,10 @@ export class AssetsController {
     //What we do once the environment assets have been imported
     //handles setting the necessary flags for collision and trigger meshes,
     public async prepareLevel(key) {
+        // add water
         if (this._game.currentLocation.waterPlane) {
-            // Water
             var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 32 }, this._game.scene);
             waterMesh.position = new Vector3(0, -1, 0);
-
             var water = new StandardMaterial("water");
             water.diffuseTexture = new Texture("textures/waterbump.jpg");
             waterMesh.material = water;
@@ -295,8 +294,8 @@ export class AssetsController {
         let sound = new Sound("music", soundData, this._scene, function(){ sound.play() }, {
             volume: 0.3
         });*/
-        // instantiate the scene
 
+        // instantiate the scene
         let assetKey = "ENV_" + key;
         this.allMeshes = this._game._loadedAssets[assetKey].loadedMeshes;
 
@@ -314,26 +313,18 @@ export class AssetsController {
         });
     }
 
-    public async prepareItems() {
-        for (let k in this._game._loadedAssets) {
-            if (k.includes("ITEM_") && this._game._loadedAssets[k] instanceof AssetContainer) {
-                let v = this._game._loadedAssets[k] as AssetContainer;
-                let modelToLoadKey = "ROOT_" + k;
-                const root = v.instantiateModelsToScene(
-                    function () {
-                        return modelToLoadKey;
-                    },
-                    false,
-                    { doNotInstantiate: true }
-                );
-
-                root.rootNodes[0].name = modelToLoadKey;
-                let mergedMesh = mergeMesh(root.rootNodes[0]);
-                if (mergedMesh) {
-                    mergedMesh.setEnabled(false);
-                    this._game._loadedAssets[modelToLoadKey] = mergedMesh;
-                }
-                root.dispose();
+    public async prepareItem(itemKey) {
+        let modelToLoadKey = "ROOT_ITEM_" + itemKey;
+        if (!this._game._loadedAssets[modelToLoadKey]) {
+            // get raw mesh
+            let rawMesh = this._game._loadedAssets["ITEM_" + itemKey].meshes[0];
+            // create a merged mesh
+            let itemMesh = mergeMesh(rawMesh, "raw_" + itemKey);
+            if (itemMesh) {
+                // hide it
+                itemMesh.setEnabled(false);
+                // save it for future usage
+                this._game._loadedAssets[modelToLoadKey] = itemMesh;
             }
         }
     }

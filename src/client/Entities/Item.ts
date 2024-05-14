@@ -76,6 +76,7 @@ export class Item extends TransformNode {
     }
 
     public async spawn(entity, mode = "instance") {
+        /*
         // load item mesh
         if (mode === "instance") {
             // instance
@@ -95,7 +96,17 @@ export class Item extends TransformNode {
                 doNotInstantiate: false,
             });
             this.mesh = result.rootNodes[0] as Mesh;
+        }*/
+
+        let key = "ROOT_ITEM_" + entity.key;
+
+        // load mesh if not already loaded
+        if (!this._game._loadedAssets[key]) {
+            await this._game._assetsCtrl.prepareItem(entity.key);
         }
+
+        //
+        this.mesh = this._game._loadedAssets[key].createInstance("GROUND_" + entity.sessionId);
 
         // set initial player scale & rotation
         this.mesh.parent = this;

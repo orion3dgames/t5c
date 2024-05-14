@@ -121,7 +121,6 @@ export class GameScene {
         // initialize assets controller & load level
         this._game.initializeAssetController();
         await this._game._assetsCtrl.loadLevel(location.key);
-        await this._game._assetsCtrl.prepareItems();
         this._game.engine.displayLoadingUI();
 
         // preload any skeletons and animation
@@ -229,9 +228,6 @@ export class GameScene {
                 this._entities.delete(sessionId);
             }
         });
-
-        //
-        this._scene.freezeActiveMeshes();
 
         ////////////////////////////////////////////////////
         // main game loop

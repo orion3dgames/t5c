@@ -176,15 +176,11 @@ export class VatController {
         let slot = item.equippable ? PlayerSlots[item.equippable.slot] : 0;
         let boneId = race.bones[slot];
 
-        /*
-        const { meshes, animationGroups, skeletons } = this._game._loadedAssets["RACE_" + key];
-        const skeleton = skeletons[0];
-        const root = meshes[0];*/
-
-        let rawMesh = this._game._loadedAssets["ITEM_" + item.key].meshes[0].clone("rawmesh_" + item.key); // mandatory: needs to be cloned
+        // clone raw mesh
+        let rawMesh = this._game._loadedAssets["ITEM_" + item.key].meshes[0].clone("vat_" + item.key); // mandatory: needs to be cloned
         rawMesh.position.copyFrom(entityData.skeleton.bones[boneId].getAbsolutePosition());
         rawMesh.rotationQuaternion = undefined;
-        rawMesh.rotation.set(0, Math.PI * 1.5, 0); // we must set it in Blender
+        rawMesh.rotation.set(0, Math.PI * 1.5, 0); // could be set it in Blender
         rawMesh.scaling.setAll(1);
 
         // if mesh offset required
@@ -209,16 +205,12 @@ export class VatController {
             rawMesh.rotation.set(equipOptions.rotation_x ?? 0, equipOptions.rotation_y ?? 0, equipOptions.rotation_z ?? 0);
         }
 
+        // merge mesh
         let itemMesh = mergeMesh(rawMesh, itemKey);
-
         if (itemMesh) {
             itemMesh.name = race.key + "_" + itemMesh.name;
 
-            // offset to hide the items
-            itemMesh.position.y = 0;
-            rawMesh.position.y = 0;
-
-            // weapon VAT
+            // attach to VAT
             itemMesh.skeleton = entityData.skeleton;
             itemMesh.bakedVertexAnimationManager = entityData.vat;
             itemMesh.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
@@ -237,11 +229,12 @@ export class VatController {
             itemMesh.setVerticesData(VertexBuffer.MatricesIndicesKind, weaponMI, false);
             itemMesh.setVerticesData(VertexBuffer.MatricesWeightsKind, weaponMW, false);
 
-            //
-            //rawMesh.setEnabled(false);
+            // cleanup
+            //rawMesh.dispose();
+            rawMesh.position.y = 5000; // offset to hide the raw item as setEnabled does not work
+            itemMesh.position.y = 5000; // offset to hide the raw item as setEnabled does not work
             //itemMesh.setEnabled(false);
 
-            //
             //console.log("PREPARING ITEM FOR VAT", race, itemKey);
             entityData.items.set(itemKey, itemMesh);
         }

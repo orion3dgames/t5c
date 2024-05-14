@@ -5,7 +5,6 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { BlackAndWhitePostProcess } from "@babylonjs/core/PostProcesses/blackAndWhitePostProcess";
 import { Player } from "../Player";
 import { PlayerInput } from "../../Controllers/PlayerInput";
-import { SSAORenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/ssaoRenderingPipeline";
 
 export class PlayerCamera {
     private player: Player;
@@ -25,7 +24,7 @@ export class PlayerCamera {
 
     private _build(player: Player) {
         // root camera parent that handles positioning of the camera to follow the player
-        this._camRoot = new TransformNode("root");
+        this._camRoot = new TransformNode("camera_root");
         this._camRoot.position = new Vector3(0, 1.5, 0); //initialized at (0,0,0)
         //this._camRoot.parent = player;
 
@@ -33,14 +32,14 @@ export class PlayerCamera {
         this._camRoot.rotation = new Vector3(0, (3 / 4) * Math.PI, 0);
 
         // rotations along the x-axis (up/down tilting)
-        const yTilt = new TransformNode("ytilt");
+        const yTilt = new TransformNode("camera_ytilt");
 
         // adjustments to camera view to point down at our player
         yTilt.rotation = new Vector3(0.6, 0, 0);
         yTilt.parent = this._camRoot;
 
         // our actual camera that's pointing at our root's position
-        this.camera = new UniversalCamera("cam", new Vector3(0, 0, -45), this._scene);
+        this.camera = new UniversalCamera("camera", new Vector3(0, 0, -45), this._scene);
         this.camera.lockedTarget = this._camRoot.position;
         this.camera.fov = 0.35;
         this.camera.parent = yTilt;
