@@ -62,6 +62,7 @@ export class EntityAnimator {
 
     private _build(): void {
         this._attack = {
+            name: "ATTACK",
             index: 0,
             loop: true,
             speed: 1,
@@ -69,6 +70,7 @@ export class EntityAnimator {
         };
 
         this._death = {
+            name: "DEATH",
             index: 1,
             loop: false,
             speed: 1,
@@ -76,6 +78,7 @@ export class EntityAnimator {
         };
 
         this._idle = {
+            name: "IDLE",
             index: 2,
             loop: true,
             speed: 1,
@@ -83,6 +86,7 @@ export class EntityAnimator {
         };
 
         this._walk = {
+            name: "WALK",
             index: 3,
             loop: true,
             speed: 1,
@@ -90,7 +94,7 @@ export class EntityAnimator {
         };
 
         this._currentAnim = this._idle;
-        this._prevAnim = this._death;
+        this._prevAnim = this._walk;
     }
 
     // This method will compute the VAT offset to use so that the animation starts at frame #0 for VAT time = time passed as 3rd parameter
@@ -119,7 +123,7 @@ export class EntityAnimator {
     }
 
     //
-    private checkIfPlayerIsMoving(currentPos: Vector3, nextPos: Vector3, epsilon = 0.01): boolean {
+    private checkIfPlayerIsMoving(currentPos: Vector3, nextPos: Vector3, epsilon = 0.015): boolean {
         return !currentPos.equalsWithEpsilon(nextPos, epsilon);
     }
 
@@ -138,10 +142,16 @@ export class EntityAnimator {
             this._currentAnim = this._attack;
 
             // if player is moving
-            // note to myself: when a players dies, the below still considers the player is moving... to be improved.
         } else if (this.checkIfPlayerIsMoving(currentPos, nextPos) && entity.health > 0) {
+            //console.log("PLAYER IS STILL MOVING...");
             this._currentAnim = this._walk;
             entity.isMoving = true;
+
+            // todo: I hate this, but I have no idea how to fix this in a better way at this stage...
+            if (entity._input && !entity._input.player_can_move) {
+                this._currentAnim = this._idle;
+                entity.isMoving = false;
+            }
 
             // else play idle
         } else {
@@ -153,7 +163,7 @@ export class EntityAnimator {
     play(player) {
         // play animation and stop previous animation
         if (this._currentAnim != null && this._prevAnim !== this._currentAnim) {
-            //console.log("ANIMATION CHANGED for", player.name, this._prevAnim, this._currentAnim);
+            //console.log("[PLAY 1] ANIMATION CHANGED for", player.name, this._prevAnim.name, "-", this._currentAnim.name);
             this.setAnimationParameters(this.mesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim);
             player.meshController.equipments.forEach((itemMesh) => {
                 this.setAnimationParameters(itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim);
@@ -168,7 +178,7 @@ export class EntityAnimator {
 
         // if animation is loop=false; and finished playing
         if (currentAnimFrame >= this.toFrame - this.fromFrame && this._currentAnim.loop === false && this.endOfLoop === false) {
-            //console.log("ANIMATION FINISHED, STOP ANIMATION ", this.currentFrame, this.targetFrame);
+            //console.log("[PLAY 2] ANIMATION FINISHED, STOP ANIMATION ", this.currentFrame, this.targetFrame);
             this.mesh.instancedBuffers.bakedVertexAnimationSettingsInstanced.set(this.toFrame - 1, this.toFrame, this._currentAnimVATOffset, 60);
             this.endOfLoop = true;
             player.meshController.equipments.forEach((itemMesh) => {
