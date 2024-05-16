@@ -127,7 +127,6 @@ export class GameRoomState extends Schema {
             mana: data.mana,
             maxMana: data.mana,
             level: data.level,
-            speed: Speed.MEDIUM,
 
             sessionId: client.sessionId,
             name: data.name,

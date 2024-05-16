@@ -80,13 +80,13 @@ export class EntityMove {
     }
 
     // move transform node
-    public tween() {
+    public tween(tween: number = 0.2): void {
         // continuously lerp between current position and next position
-        this._node.position = Vector3.Lerp(this._node.position, this.nextPosition, 0.1);
+        this._node.position = Vector3.Lerp(this._node.position, this.nextPosition, tween);
 
         // move camera at the same time
         if (this._node.isCurrentPlayer) {
-            this._node.cameraController._camRoot.position = Vector3.Lerp(this._node.cameraController._camRoot.position, this.nextPosition, 0.1);
+            this._node.cameraController._camRoot.position = Vector3.Lerp(this._node.cameraController._camRoot.position, this.nextPosition, tween);
         }
 
         // rotation
