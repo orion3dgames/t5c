@@ -57,7 +57,7 @@ class GameServer {
         // on localhost, simulate bad latency
         if (process.env.NODE_ENV !== "production") {
             Logger.info("[gameserver] Simulating 200ms of latency.");
-            gameServer.simulateLatency(200);
+            gameServer.simulateLatency(500);
         }
 
         // listen

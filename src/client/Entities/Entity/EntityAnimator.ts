@@ -193,4 +193,8 @@ export class EntityAnimator {
             this.setAnimationParameters(itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim);
         });
     }
+
+    refreshItem(itemMesh) {
+        this.setAnimationParameters(itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim);
+    }
 }

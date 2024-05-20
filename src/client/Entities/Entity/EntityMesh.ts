@@ -144,7 +144,7 @@ export class EntityMesh {
             this._entity.entity.equipment.onRemove((e) => {
                 this.removeItem(e);
             });
-            this._entity.animatorController.refreshItems();
+            //this._entity.animatorController.refreshItems();
         }, 200);
     }
 
@@ -196,6 +196,9 @@ export class EntityMesh {
 
                 // add
                 this.equipments.set(e.key, instance);
+
+                //
+                this._entity.animatorController.refreshItems();
             }
         }
     }
