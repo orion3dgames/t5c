@@ -166,11 +166,7 @@ export class Entity extends TransformNode {
 
             // if taking damage, show damage bubble
             if (this.health !== this.entity.health) {
-                let healthChange = this.entity.health - this.health;
-                if (healthChange < 0 || healthChange > 1) {
-                    //this.utilsController.showDamageBubble(healthChange, this);
-                    //this._ui._DamageText.addDamage(this, healthChange);
-                }
+                this.utilsController.addDamage(this);
             }
 
             if (this.type === "player" && this.anim_state !== this.entity.anim_state) {

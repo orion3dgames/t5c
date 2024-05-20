@@ -266,6 +266,8 @@ export class AssetsController {
         var material = new StandardMaterial("entity_selected");
         material.diffuseTexture = texture;
         material.useAlphaFromDiffuseTexture = true;
+        material.disableLighting = true; // dont let lighting affect the mesh
+        material.emissiveColor = Color3.White(); // material to be fully "lit"
 
         // entity selected circle
         var texture = this._game._loadedAssets["TXT_decal_target"];

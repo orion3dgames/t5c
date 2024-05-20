@@ -213,6 +213,10 @@ const generateRandomPlayerName = function () {
     return nameList[Math.floor(Math.random() * nameList.length)] + " " + nameList[Math.floor(Math.random() * nameList.length)];
 };
 
+const generateRandomId = function () {
+    return Math.random().toString(10);
+};
+
 const distanceBetween = function (a, b): number {
     return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2));
 };
@@ -236,4 +240,15 @@ const getHealthColorFromValue = function (value) {
     return `#${rHexString}${gHexString}00`; // composing both in a color code
 };
 
-export { generateRandomPlayerName, roundToTwo, roundTo, countPlayers, clamp, randomNumberInRange, distanceBetween, getHealthColorFromValue, bytesToSize };
+export {
+    generateRandomPlayerName,
+    roundToTwo,
+    roundTo,
+    countPlayers,
+    clamp,
+    randomNumberInRange,
+    distanceBetween,
+    getHealthColorFromValue,
+    bytesToSize,
+    generateRandomId,
+};

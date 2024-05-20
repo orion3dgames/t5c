@@ -18,6 +18,7 @@ import { randomNumberInRange } from "../../../shared/Utils";
 import { mergeMesh } from "../Common/MeshHelper";
 import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 import { setAnimationParameters } from "../Common/VatHelper";
+import { AbstractMesh } from "@babylonjs/core";
 
 export class EntityMesh {
     private _entity: Entity;
@@ -34,6 +35,7 @@ export class EntityMesh {
     public debugMesh: Mesh;
     public selectedMesh: Mesh;
     public equipments;
+    public namePlateAnchor: AbstractMesh;
 
     constructor(entity: Entity) {
         this._entity = entity;
@@ -67,6 +69,7 @@ export class EntityMesh {
 
         // add selected image
         var material = this._scene.getMaterialByName("entity_selected");
+
         const selectedMesh = MeshBuilder.CreateCylinder("entity_selected_" + this._entity.race, { diameter: 2, height: 0.01, tessellation: 8 }, this._scene);
         selectedMesh.parent = this._entity;
         selectedMesh.material = material;
@@ -134,6 +137,12 @@ export class EntityMesh {
                 }
             })
         );
+
+        // add name plate
+        var nameplateAnchor = new AbstractMesh("Nameplate Anchor", this._scene);
+        nameplateAnchor.billboardMode = Mesh.BILLBOARDMODE_ALL;
+        nameplateAnchor.position.y = -2.5; //-meshHieght
+        nameplateAnchor.parent = this._entity;
 
         setTimeout(() => {
             this.equipAllItems();
