@@ -213,8 +213,8 @@ const generateRandomPlayerName = function () {
     return nameList[Math.floor(Math.random() * nameList.length)] + " " + nameList[Math.floor(Math.random() * nameList.length)];
 };
 
-const generateRandomId = function () {
-    return Math.random().toString(10);
+const generateRandomId = function (number = 10) {
+    return Math.random().toString(number);
 };
 
 const distanceBetween = function (a, b): number {

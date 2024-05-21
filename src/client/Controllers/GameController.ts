@@ -43,6 +43,8 @@ export class GameController {
     public _assetsCtrl: AssetsController;
     public _loadedAssets: AssetContainer[] = [];
     public _vatController: VatController;
+    public instances = new Map();
+    public materials = new Map();
 
     //
     public sellingMode: boolean = false;

@@ -166,7 +166,7 @@ export class Entity extends TransformNode {
 
             // if taking damage, show damage bubble
             if (this.health !== this.entity.health) {
-                this.utilsController.addDamage(this);
+                this.utilsController.addDamageBubble(this);
             }
 
             if (this.type === "player" && this.anim_state !== this.entity.anim_state) {
@@ -187,6 +187,7 @@ export class Entity extends TransformNode {
 
         //////////////////////////////////////////////////////////////////////////
         // misc
+        this.utilsController.addNamePlate(this);
         //this.characterLabel = this._ui.createEntityLabel(this);
         //this.interactableButtons = this._ui.createInteractableButtons(this);
     }
@@ -288,25 +289,16 @@ export class Entity extends TransformNode {
         let playerPos = _currentPlayer.getPosition();
         let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
         if (distanceFromPlayer < this._game.config.PLAYER_VIEW_DISTANCE) {
-            this.mesh.unfreezeWorldMatrix();
             this.mesh.setEnabled(true);
-
-            // show gui
-            //this.characterLabel.isVisible = true;
-            //this.characterChatLabel.isVisible = true;
-
+            this.mesh.unfreezeWorldMatrix();
             this.meshController.equipments?.forEach((equipment) => {
-                equipment.unfreezeWorldMatrix();
                 equipment.setEnabled(true);
+                equipment.unfreezeWorldMatrix();
             });
         } else {
             // hide everything
             this.mesh.setEnabled(false);
             this.mesh.freezeWorldMatrix();
-
-            // hide gui
-            //this.characterLabel.isVisible = false;
-            //this.characterChatLabel.isVisible = false;
             this.meshController.equipments?.forEach((equipment) => {
                 equipment.setEnabled(false);
                 equipment.freezeWorldMatrix();
