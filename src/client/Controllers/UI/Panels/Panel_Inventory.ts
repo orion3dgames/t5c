@@ -34,6 +34,9 @@ export class Panel_Inventory extends Panel {
                     this.refresh();
                 });
             });
+            entity.player_data.listen("gold", (currentValue, previousValue) => {
+                this.updateGold();
+            });
         }
 
         // some ui must be constantly refreshed as things change
@@ -62,9 +65,6 @@ export class Panel_Inventory extends Panel {
     // refresh panel
     public update() {
         super.update();
-        if (this._currentPlayer && this._goldUI) {
-            this._goldUI.text = "Gold: " + this._currentPlayer.player_data.gold;
-        }
     }
 
     // create panel
@@ -159,6 +159,12 @@ export class Panel_Inventory extends Panel {
         this.refresh();
     }
 
+    updateGold() {
+        if (this._goldUI) {
+            this._goldUI.text = "Gold: " + this._currentPlayer.player_data.gold;
+        }
+    }
+
     ///////////////////////////////////////
     ///////////////////////////////////////
     // INVENTORY PANEL
@@ -243,5 +249,8 @@ export class Panel_Inventory extends Panel {
                 }
             });
         });
+
+        // update golve value just in case
+        this.updateGold();
     }
 }
