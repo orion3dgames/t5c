@@ -152,15 +152,14 @@ export class EntityUtils {
 
         let text = "" + healthChange;
         let color = healthChange > 0 ? Color3.Green().toHexString() : Color3.Yellow().toHexString(); // set current color
-        let { planeWidth, planeHeight, texture, material } = this.createMaterial(0.3, 1.5, text);
+        let { planeWidth, planeHeight, texture, material } = this.createMaterial(0.4, 1.5, text);
 
         // create plane
         let uuid = generateRandomId(6);
         var plane = MeshBuilder.CreatePlane("damageBubble_" + uuid, { width: planeWidth, height: planeHeight, sideOrientation: Mesh.DOUBLESIDE }, this._scene);
-        plane.position = entity.position.clone();
+        plane.parent = entity.mesh;
         plane.position.y = plane.position.y + this.entity_height;
         plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
-        plane.parent = entity.mesh;
         plane.material = material;
 
         // draw text
@@ -168,7 +167,7 @@ export class EntityUtils {
 
         // set meta
         plane.metadata = {
-            end_position: entity.position.y + 5,
+            end_position: entity.position.y + 6,
             material: material,
             texture: texture,
             offset: randomNumberInRange(-0.002, 0.002),
