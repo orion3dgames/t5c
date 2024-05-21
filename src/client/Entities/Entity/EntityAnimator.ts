@@ -123,7 +123,7 @@ export class EntityAnimator {
     }
 
     //
-    private checkIfPlayerIsMoving(currentPos: Vector3, nextPos: Vector3, epsilon = 0.015): boolean {
+    private checkIfPlayerIsMoving(currentPos: Vector3, nextPos: Vector3, epsilon = 0.01): boolean {
         return !currentPos.equalsWithEpsilon(nextPos, epsilon);
     }
 
