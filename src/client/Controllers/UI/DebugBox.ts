@@ -66,6 +66,11 @@ export class DebugBox {
 
     // debug panel refresh
     public update() {
+        // only update if visible
+        if (this._debugPanel.isVisible === false) {
+            return false;
+        }
+
         let entityCount = this._entities.size;
         let count = 0;
         this._entities.forEach((element) => {
