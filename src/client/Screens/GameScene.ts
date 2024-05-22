@@ -82,6 +82,24 @@ export class GameScene {
         // add background  color
         scene.clearColor = new Color4(location.skyColor, location.skyColor, location.skyColor, 1);
 
+        // shadow light
+        // add shadow light first:
+        // https://forum.babylonjs.com/t/shadow-doesnt-work-if-another-light-is-created-before-shadow-casting-light/39852/4
+        /*
+        var light = new DirectionalLight("DirectionalLight", new Vector3(-1, -2, -1), scene);
+        light.position = new Vector3(1, 10, 1);
+        light.intensity = 1;
+        light.autoCalcShadowZBounds = true;
+
+        // shadow generator
+        // toto: something is wrong with the shadows.
+        this._shadow = new CascadedShadowGenerator(1024, light);
+        this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_LOW;
+        this._shadow.autoCalcDepthBounds = true;
+        this._shadow.lambda = 0.82;
+        this._shadow.bias = 0.018;
+        this._shadow.depthClamp = true;*/
+
         // add sun
         if (location.sun) {
             var ambientLight = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
@@ -97,21 +115,6 @@ export class GameScene {
             scene.fogEnd = 120.0;
             scene.fogColor = new Color3(0.9, 0.9, 0.85);
         }
-
-        // shadow light
-        /*
-        var light = new DirectionalLight("DirectionalLight", new Vector3(-1, -2, -1), scene);
-        light.position = new Vector3(1, 10, 1);
-        light.radius = 0.27;
-        light.intensity = 0.5;
-        light.autoCalcShadowZBounds = true;
-
-        // shadow generator
-        // toto: something is wrong with the shadows.
-        this._shadow = new CascadedShadowGenerator(1024, light);
-        this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_LOW;
-        this._shadow.lambda = 0.82;
-        this._shadow.bias = 0.018;*/
 
         // load navmesh
         this._navMesh = await this.loadNavMesh(location.key);

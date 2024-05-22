@@ -23,6 +23,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { mergeMesh } from "../Entities/Common/MeshHelper";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 
 type AssetEntry = {
     name: string;
@@ -66,6 +67,7 @@ export class AssetsController {
             { name: "TXT_selected_circle_green", filename: "selected_circle_green.png", extension: "png", type: "texture" },
             { name: "TXT_decal_target", filename: "decal_target.png", extension: "png", type: "texture" },
             { name: "TXT_particle_01", filename: "particle_01.png", extension: "png", type: "texture" },
+            { name: "TXT_shadow_01", filename: "shadow_01.png", extension: "png", type: "texture" },
         ];
 
         // add abilities (icons)
@@ -115,8 +117,9 @@ export class AssetsController {
         this.assetToPreload = this.assetDatabase;
         this.assetToPreload.push({ name: "ENV_" + key, filename: "environment/" + key + ".glb", extension: "glb", type: "mesh" });
         await this.preloadAssets();
-        //await this.prepareLevel(key);
+        await this.prepareLevel(key);
         await this.prepareTextures();
+        await this.prepareDynamicMeshes();
     }
 
     public async load() {
@@ -269,6 +272,15 @@ export class AssetsController {
         material.disableLighting = true; // dont let lighting affect the mesh
         material.emissiveColor = Color3.White(); // material to be fully "lit"
 
+        // entity cheap shadow
+        var texture = this._game._loadedAssets["TXT_shadow_01"];
+        texture.hasAlpha = true;
+        var material = new StandardMaterial("entity_shadow");
+        material.diffuseTexture = texture;
+        material.alpha = 0.3;
+        material.useAlphaFromDiffuseTexture = true;
+        material.emissiveColor = Color3.White(); // material to be fully "lit"
+
         // entity selected circle
         var texture = this._game._loadedAssets["TXT_decal_target"];
         texture.hasAlpha = true;
@@ -276,6 +288,17 @@ export class AssetsController {
         material.diffuseTexture = texture;
         material.useAlphaFromDiffuseTexture = true;
         material.zOffset = -2;
+    }
+
+    prepareDynamicMeshes() {
+        // add cheap shadow
+        var material = this._game.scene.getMaterialByName("entity_shadow");
+        let selectedMesh = MeshBuilder.CreatePlane("raw_entity_shadow", { width: 2, height: 2 }, this._game.scene);
+        selectedMesh.material = material;
+        selectedMesh.position = new Vector3(0, -10, 0);
+        selectedMesh.rotation = new Vector3(Math.PI / 2, 0, 0);
+        selectedMesh.isEnabled(false);
+        this._game._loadedAssets["DYNAMIC_shadow_01"] = selectedMesh;
     }
 
     //What we do once the environment assets have been imported
@@ -307,11 +330,11 @@ export class AssetsController {
             m.doNotSyncBoundingInfo = true;
             m.freezeWorldMatrix();
             m.checkCollisions = false;
-            m.receiveShadows = false;
             m.metadata = {
                 type: "environment",
             };
             m.alwaysSelectAsActiveMesh = true;
+            m.receiveShadows = false;
         });
     }
 
