@@ -25,6 +25,8 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VatController } from "../Controllers/VatController";
 import { SceneOptimizer, SceneOptimizerOptions } from "@babylonjs/core/Misc/sceneOptimizer";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 
 export class GameScene {
     public _game: GameController;
@@ -80,7 +82,7 @@ export class GameScene {
         let location = this._game.currentLocation;
 
         // add background  color
-        scene.clearColor = new Color4(location.skyColor, location.skyColor, location.skyColor, 1);
+        scene.clearColor = new Color4(1, 1, 1, 1);
 
         // shadow light
         // add shadow light first:
@@ -99,6 +101,15 @@ export class GameScene {
         this._shadow.lambda = 0.82;
         this._shadow.bias = 0.018;
         this._shadow.depthClamp = true;*/
+
+        const skybox = MeshBuilder.CreateBox("skyBox", { size: 1000.0 }, scene);
+        const skyboxMaterial = new StandardMaterial("skyBox", scene);
+        skyboxMaterial.backFaceCulling = false;
+        skyboxMaterial.disableLighting = true;
+        skybox.material = skyboxMaterial;
+        skybox.infiniteDistance = true;
+        skyboxMaterial.reflectionTexture = new CubeTexture("textures/skybox", scene);
+        skyboxMaterial.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
 
         // add sun
         if (location.sun) {

@@ -277,7 +277,7 @@ export class AssetsController {
         texture.hasAlpha = true;
         var material = new StandardMaterial("entity_shadow");
         material.diffuseTexture = texture;
-        material.alpha = 0.3;
+        material.alpha = 0.4;
         material.useAlphaFromDiffuseTexture = true;
         material.emissiveColor = Color3.White(); // material to be fully "lit"
 
@@ -293,7 +293,7 @@ export class AssetsController {
     prepareDynamicMeshes() {
         // add cheap shadow
         var material = this._game.scene.getMaterialByName("entity_shadow");
-        let selectedMesh = MeshBuilder.CreatePlane("raw_entity_shadow", { width: 2, height: 2 }, this._game.scene);
+        let selectedMesh = MeshBuilder.CreatePlane("raw_entity_shadow", { width: 1.8, height: 1.8 }, this._game.scene);
         selectedMesh.material = material;
         selectedMesh.position = new Vector3(0, -10, 0);
         selectedMesh.rotation = new Vector3(Math.PI / 2, 0, 0);
@@ -307,7 +307,7 @@ export class AssetsController {
         // add water
         if (this._game.currentLocation.waterPlane) {
             var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 32 }, this._game.scene);
-            waterMesh.position = new Vector3(0, -1, 0);
+            waterMesh.position = new Vector3(0, -0.25, 0);
             var water = new StandardMaterial("water");
             water.diffuseTexture = new Texture("textures/waterbump.jpg");
             waterMesh.material = water;

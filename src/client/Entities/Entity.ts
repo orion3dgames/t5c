@@ -145,7 +145,7 @@ export class Entity extends TransformNode {
         this.playerSkeleton = this.meshController.skeleton;
 
         // add mesh to shadow generator
-        //this._shadow.addShadowCaster(this.meshController.mesh, false);
+        //this._shadow.addShadowCaster(this.meshController.mesh, true);
 
         // set initial position & roation
         this.position = new Vector3(entity.x, entity.y, entity.z);

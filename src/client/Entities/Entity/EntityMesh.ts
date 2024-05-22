@@ -66,22 +66,6 @@ export class EntityMesh {
             this.debugMesh = sphere;
         }
         */
-        // add cheap shadow
-
-        if (this._loadedAssets["DYNAMIC_shadow_01"]) {
-            let shadowMesh = this._loadedAssets["DYNAMIC_shadow_01"].createInstance("shadow_" + this._entity.sessionId);
-            shadowMesh.parent = this._entity;
-            shadowMesh.isPickable = false;
-            shadowMesh.checkCollisions = false;
-            shadowMesh.position = new Vector3(0, 0.05, 0);
-
-            let shadowMeshSmall = this._loadedAssets["DYNAMIC_shadow_01"].createInstance("shadow_" + this._entity.sessionId);
-            shadowMeshSmall.parent = this._entity;
-            shadowMeshSmall.isPickable = false;
-            shadowMeshSmall.checkCollisions = false;
-            shadowMeshSmall.position = new Vector3(0, 0.06, 0);
-            shadowMeshSmall.scaling = new Vector3(0.6, 0.6, 0.6);
-        }
 
         // selected circle
         var material = this._scene.getMaterialByName("entity_selected");
@@ -91,7 +75,7 @@ export class EntityMesh {
         selectedMesh.isVisible = false;
         selectedMesh.isPickable = false;
         selectedMesh.checkCollisions = false;
-        selectedMesh.position = new Vector3(0, 0.1, 0);
+        selectedMesh.position = new Vector3(0, 0.05, 0);
         this.selectedMesh = selectedMesh;
 
         // load player mesh
@@ -120,6 +104,16 @@ export class EntityMesh {
             race: this._entity.race,
             name: this._entity.name,
         };
+
+        // add cheap shadow
+        if (this._loadedAssets["DYNAMIC_shadow_01"]) {
+            let shadowMesh = this._loadedAssets["DYNAMIC_shadow_01"].createInstance("shadow_" + this._entity.sessionId);
+            shadowMesh.parent = this.mesh;
+            shadowMesh.isPickable = false;
+            shadowMesh.checkCollisions = false;
+            shadowMesh.doNotSyncBoundingInfo = true;
+            shadowMesh.position = new Vector3(0, 0.04, 0);
+        }
 
         // start action manager
         this.mesh.actionManager = new ActionManager(this._scene);

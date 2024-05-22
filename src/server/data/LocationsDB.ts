@@ -15,7 +15,8 @@ let LocationsDB = {
             rot: -180,
         },
         waterPlane: true,
-        skyColor: 255,
+        skyColor: 0,
+        fog: true,
         dynamic: {
             interactive: [
                 {
@@ -45,7 +46,7 @@ let LocationsDB = {
                     aggressive: false,
                     canAttack: true,
                     points: [new Vector3(5.38, 0.01, -1.3), new Vector3(15.53, 0.01, -8.95), new Vector3(-4.72, 0.01, -2.28)],
-                    amount: 10,
+                    amount: 120,
                     race: "male_mage",
                     material: 1,
                     name: "Thief",
@@ -81,7 +82,7 @@ let LocationsDB = {
                         new Vector3(-8.8, 0.01, -22.39),
                         new Vector3(-8.51, 0.01, -14.93),
                     ],
-                    amount: 100,
+                    amount: 50,
                     race: "male_rogue",
                     material: 2,
                     name: "Bandit",
