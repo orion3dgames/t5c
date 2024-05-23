@@ -27,6 +27,7 @@ import {
     Panel_Dialog,
     Panel_Quests,
     Cursor,
+    Watermark,
 } from "./UI";
 
 import { Room } from "colyseus.js";
@@ -72,6 +73,7 @@ export class UserInterface {
     public _InventoryDropdown: InventoryDropdown;
     public _DamageText: DamageText;
     public _Cursor: Cursor;
+    public _Watermark: Watermark;
 
     // openable panels
     private _panels: Panel[];
@@ -120,13 +122,14 @@ export class UserInterface {
         const uiLayerContainer = new Rectangle("uiLayerContainer");
         uiLayerContainer.width = 1;
         uiLayerContainer.height = 1;
-        uiLayerContainer.thickness = 1;
+        uiLayerContainer.thickness = 0;
         uiLayerContainer.fontFamily = "Arial, sans-serif";
         uiLayerContainer.fontSize = "14px;";
         uiLayer.addControl(uiLayerContainer);
 
         this._playerUI = uiLayerContainer;
 
+        /*
         const fpsPanel = new TextBlock("fpsPanel");
         fpsPanel.color = "#FFF";
         fpsPanel.top = "5px";
@@ -139,7 +142,7 @@ export class UserInterface {
         fpsPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         fpsPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         this._playerUI.addControl(fpsPanel);
-        this.fpsPanel = fpsPanel;
+        this.fpsPanel = fpsPanel;*/
     }
 
     // set current player
@@ -150,6 +153,7 @@ export class UserInterface {
 
         // cursor
         this._Cursor = new Cursor(this);
+        this._Watermark = new Watermark(this);
 
         // create debug ui + events
         this._DebugBox = new DebugBox(this._playerUI, this._engine, this._scene, this._room, this._currentPlayer, this._entities);
@@ -262,7 +266,7 @@ export class UserInterface {
     // update every server tick
     public update() {
         //
-        this.fpsPanel.text = "FPS: " + this._engine.getFps().toFixed(0);
+        //this.fpsPanel.text = "FPS: " + this._engine.getFps().toFixed(0);
         this._targetEntitySelectedBar.update();
         this._playerEntitySelectedBar.update();
         this._Tooltip.update();
@@ -280,17 +284,6 @@ export class UserInterface {
         this.panelHelp.update();
         this.panelDialog.update();
         this.panelQuests.update();
-
-        /*
-        // hide entity labels if out of distance
-        for (let sessionId in this._entities) {
-            let entity = this._entities[sessionId];
-            if (entity && entity.mesh && entity.mesh.isEnabled()) {
-                entity.characterLabel.isVisible = true;
-            } else {
-                entity.characterLabel.isVisible = false;
-            }
-        }*/
     }
 
     public dragging() {
