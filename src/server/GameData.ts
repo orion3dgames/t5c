@@ -3,6 +3,7 @@ import { RacesDB } from "./data/RacesDB";
 import { LocationsDB } from "./data/LocationsDB";
 import { ItemsDB } from "./data/ItemDB";
 import { QuestsDB } from "./data/QuestsDB";
+import { HelpDB } from "./data/HelpDB";
 
 import { Ability, Race, Item, Quest } from "../shared/types";
 
@@ -49,6 +50,8 @@ export class GameData {
                 break;
             case "quests":
                 returnData = QuestsDB ?? false;
+            case "help":
+                returnData = HelpDB ?? false;
                 break;
             case "":
                 returnData = false;

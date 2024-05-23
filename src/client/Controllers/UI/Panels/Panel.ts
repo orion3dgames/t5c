@@ -11,10 +11,13 @@ import { Room } from "colyseus.js";
 import { TrainerDialog } from "./Dialog/TrainerDialog";
 import { VendorDialog } from "./Dialog/VendorDialog";
 import { QuestDialog } from "./Dialog/QuestDialog";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { Player } from "../../../Entities/Player";
 
 export class Panel {
     public _UI: UserInterface;
     public _game: GameController;
+    public _engine: Engine;
     public _playerUI;
     public _room: Room;
     private _UITooltip: Tooltip;
@@ -38,7 +41,7 @@ export class Panel {
     public vendor: VendorDialog;
     public quest: QuestDialog;
 
-    constructor(_UI, _currentPlayer, options) {
+    constructor(_UI, _currentPlayer: Player, options) {
         //
         this._UI = _UI;
         this._game = _UI._game;
@@ -48,6 +51,7 @@ export class Panel {
         this._scene = _UI._scene;
         this._currentPlayer = _currentPlayer;
         this._loadedAssets = _UI._loadedAssets;
+        this._engine = _UI._engine;
 
         // set defaults
         this._options = {

@@ -9,6 +9,7 @@ import { UserInterface } from "../UserInterface";
 import State from "../../Screens/Screens";
 import { GameController } from "../GameController";
 import { ServerMsg } from "../../../shared/types";
+import { Tools } from "@babylonjs/core/Misc/tools";
 
 export class MainMenu {
     private _UI: UserInterface;
@@ -28,6 +29,7 @@ export class MainMenu {
         this._currentPlayer = _currentPlayer;
         this._room = _UI._room;
         this._game = _UI._game;
+        this._engine = _UI._engine;
 
         // mainmenu panel
         let mainmenuPanel = new Rectangle("mainmenuPanel");
@@ -54,6 +56,22 @@ export class MainMenu {
                     menuTitle: "Stuck?",
                     click: () => {
                         this._game.sendMessage(ServerMsg.PLAYER_RESET_POSITION);
+                    },
+                },
+                screenshot: {
+                    menuTitle: "Take a picture",
+                    click: () => {
+                        Tools.CreateScreenshot(
+                            this._engine,
+                            this._currentPlayer.cameraController.camera,
+                            { width: 1920, height: 1200, precision: 1 },
+                            () => {
+                                console.log("Screnshot taken!");
+                            },
+                            "image/png",
+                            true,
+                            0.9
+                        );
                     },
                 },
                 quit: {

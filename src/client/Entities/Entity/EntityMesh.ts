@@ -5,20 +5,13 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { ActionManager } from "@babylonjs/core/Actions/actionManager";
 import { ExecuteCodeAction } from "@babylonjs/core/Actions/directActions";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Matrix, Vector3, Vector4 } from "@babylonjs/core/Maths/math";
+import { Vector3, Vector4 } from "@babylonjs/core/Maths/math";
 import { Entity } from "../Entity";
 import { Skeleton } from "@babylonjs/core/Bones/skeleton";
-import { PlayerSlots } from "../../../shared/types";
 import { GameController } from "../../Controllers/GameController";
 import { EquipmentSchema } from "../../../server/rooms/schema";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { UserInterface } from "../../Controllers/UserInterface";
-import { PBRCustomMaterial, SimpleMaterial } from "@babylonjs/materials";
-import { randomNumberInRange } from "../../../shared/Utils";
-import { mergeMesh } from "../Common/MeshHelper";
-import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
-import { setAnimationParameters } from "../Common/VatHelper";
-import { AbstractMesh } from "@babylonjs/core";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 
 export class EntityMesh {
     private _entity: Entity;
