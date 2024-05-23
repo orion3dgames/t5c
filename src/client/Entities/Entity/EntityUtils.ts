@@ -6,6 +6,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Scene } from "@babylonjs/core/scene";
 import { generateRandomId, randomNumberInRange } from "../../../shared/Utils";
 import { Entity } from "../Entity";
+import { Item } from "../Item";
 
 export class EntityUtils {
     private _scene: Scene;
@@ -86,7 +87,7 @@ export class EntityUtils {
      * Draw nameplate above entity
      * @param entity
      */
-    addNamePlate(entity: Entity) {
+    addNamePlate(entity, entity_height = 3) {
         let text = entity.name;
 
         // if entity is a spawn, we can use instances as they all have the same name.
@@ -119,7 +120,7 @@ export class EntityUtils {
             let uuid = generateRandomId(6);
             let instance = rawMesh.createInstance("namePlate_" + isSpawn.key + "_" + uuid);
             instance.parent = entity.mesh;
-            instance.position.y = instance.position.y + this.entity_height;
+            instance.position.y = instance.position.y + entity_height;
         } else {
             // else we create a unique mesh
             // todo: probably can do something better here

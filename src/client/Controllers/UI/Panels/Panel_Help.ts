@@ -31,7 +31,9 @@ export class Panel_Help extends Panel {
         chatScrollViewer.height = 1;
         chatScrollViewer.top = 0;
         chatScrollViewer.thickness = 1;
+        chatScrollViewer.color = "rgba(255,255,255,.5)";
         chatScrollViewer.setPaddingInPixels(10, 10, 10, 10);
+        chatScrollViewer.fontSizeInPixels = 16;
         chatScrollViewer.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         chatScrollViewer.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         this._panelContent.addControl(chatScrollViewer);
@@ -40,6 +42,7 @@ export class Panel_Help extends Panel {
         const chatStackPanel = new StackPanel("stackPanel");
         chatStackPanel.width = 1;
         chatStackPanel.adaptHeightToChildren = true;
+        chatStackPanel.setPaddingInPixels(10, 10, 10, 10);
         chatStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         chatStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         chatScrollViewer.addControl(chatStackPanel);

@@ -64,7 +64,7 @@ export class MainMenu {
                         Tools.CreateScreenshot(
                             this._engine,
                             this._currentPlayer.cameraController.camera,
-                            { width: 1920, height: 1200, precision: 1 },
+                            { width: 1920, height: 1200, precision: 2 },
                             () => {
                                 console.log("Screnshot taken!");
                             },
