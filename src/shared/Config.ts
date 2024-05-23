@@ -35,6 +35,7 @@ class Config {
     UI_CENTER_PANEL_WIDTH = 0.6;
     UI_CENTER_PANEL_BG = "rgba(0,0,0,.5)";
     UI_SIDEBAR_WIDTH = "320px;";
+    UI_PRIMARY_COLOR = "rgba(35, 168, 28, 0.8)";
 
     // default location
     initialLocation = "lh_town";

@@ -12,13 +12,20 @@ let HelpDB = {
             {
                 type: "section",
                 title: "How to move?",
-                description: "Please press and hold the left mouse button and move your mouse to move your character.",
+                description: "Please press and hold the left mouse button and move your mouse to move your character. Release the left mouse button to stop.",
                 align: "left",
             },
             {
                 type: "section",
                 title: "How to attack?",
-                description: "Please select an enemy and click on any ability at the bottom center of the screen.",
+                description:
+                    "Please select an enemy and click on any ability at the bottom center of the screen. You can also use the relevant keyboard number to use an ability.",
+                align: "left",
+            },
+            {
+                type: "section",
+                title: "How to interact with things?",
+                description: "Simply get close to the object/npc and clicking on it will trigger the correct dialog/action.",
                 align: "left",
             },
         ],
