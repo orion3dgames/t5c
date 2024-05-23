@@ -44,7 +44,7 @@ import { ServerMsg } from "../../shared/types";
 export class UserInterface {
     public _game: GameController;
     public _scene: Scene;
-    private _engine: Engine;
+    public _engine: Engine;
     public _room: Room;
     private _chatRoom: Room;
     public _entities: Map<string, Player | Entity | Item>;
