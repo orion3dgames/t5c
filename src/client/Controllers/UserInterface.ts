@@ -198,10 +198,10 @@ export class UserInterface {
             name: "Abilities",
             width: "500px;",
             height: "400px;",
-            top: "100px;",
-            left: "15px;",
-            horizontal_position: Control.HORIZONTAL_ALIGNMENT_LEFT,
-            vertical_position: Control.VERTICAL_ALIGNMENT_TOP,
+            top: "-50px;",
+            left: "0px;",
+            horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
+            vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
         });
 
         // create panel
@@ -209,21 +209,21 @@ export class UserInterface {
             name: "Character",
             width: "500px;",
             height: "300px;",
-            top: "100px;",
-            left: "15px;",
-            horizontal_position: Control.HORIZONTAL_ALIGNMENT_LEFT,
-            vertical_position: Control.VERTICAL_ALIGNMENT_TOP,
+            top: "-50px;",
+            left: "0px;",
+            horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
+            vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
         });
 
         // create help panel
         this.panelHelp = new Panel_Help(this, currentPlayer, {
-            name: "Help",
+            name: "Welcome to T5C",
             width: "500px;",
-            height: "300px;",
-            top: "100px;",
-            left: "15px;",
-            horizontal_position: Control.HORIZONTAL_ALIGNMENT_LEFT,
-            vertical_position: Control.VERTICAL_ALIGNMENT_TOP,
+            height: "500px;",
+            top: "-50px;",
+            left: "0px;",
+            horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
+            vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
         });
 
         // create dialog panel
@@ -231,10 +231,10 @@ export class UserInterface {
             name: "Dialog Panel",
             width: "350px;",
             height: "400px;",
-            top: "100px;",
-            left: "15px;",
-            horizontal_position: Control.HORIZONTAL_ALIGNMENT_LEFT,
-            vertical_position: Control.VERTICAL_ALIGNMENT_TOP,
+            top: "-50px;",
+            left: "0px;",
+            horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
+            vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
         });
 
         // create quests panel
@@ -242,14 +242,15 @@ export class UserInterface {
             name: "Active Quests",
             width: "300px;",
             height: "300px;",
-            top: "100px;",
-            left: "15px;",
-            horizontal_position: Control.HORIZONTAL_ALIGNMENT_LEFT,
-            vertical_position: Control.VERTICAL_ALIGNMENT_TOP,
+            top: "-50px;",
+            left: "0px;",
+            horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,
+            vertical_position: Control.VERTICAL_ALIGNMENT_CENTER,
         });
 
         // open inventory by default
         this.panelInventory.open();
+        this.panelHelp.open();
 
         // create tooltip
         this._Tooltip = new Tooltip(this, currentPlayer);
