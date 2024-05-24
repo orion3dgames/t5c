@@ -11,8 +11,8 @@ import { Item } from "../Item";
 export class EntityUtils {
     private _scene: Scene;
     private damageBubbles: any = [];
-    private font_size = 30;
-    private font = "bold 30px Arial";
+    private font_size = 40;
+    private font = "bold 40px Arial";
     private entity_height: number = 3;
 
     constructor(scene: Scene) {
@@ -40,7 +40,7 @@ export class EntityUtils {
      * @param text
      * @returns
      */
-    createMaterial(height = 0.3, t_height = 1.5, text = "Hello World") {
+    createMaterial(height = 0.5, t_height = 2, text = "Hello World", scale = 1) {
         // set a few vars
         let uuid = generateRandomId(6);
         var planeHeight = height; //Set height for plane
@@ -53,6 +53,15 @@ export class EntityUtils {
 
         //Calculate width the plane has to be
         var planeWidth = DTWidth * ratio;
+
+        // scale to mesh
+        if (scale < 1) {
+            planeWidth = planeWidth * (1 / scale);
+            planeHeight = planeHeight * (1 / scale);
+        } else if (scale > 1) {
+            planeWidth = planeWidth / scale;
+            planeHeight = planeHeight / scale;
+        }
 
         //Create dynamic texture and write the text
         var texture = new DynamicTexture("UI_Nameplate_Txt_" + uuid, { width: DTWidth, height: DTHeight }, this._scene);
@@ -87,7 +96,7 @@ export class EntityUtils {
      * Draw nameplate above entity
      * @param entity
      */
-    addNamePlate(entity, entity_height = 3) {
+    addNamePlate(entity: Entity, entity_height = 2.75) {
         let text = entity.name;
 
         // if entity is a spawn, we can use instances as they all have the same name.
@@ -96,7 +105,7 @@ export class EntityUtils {
             // if raw mesh does not exists, create it
             if (!entity._game.instances.get(isSpawn.key)) {
                 // create raw mesh
-                let { planeWidth, planeHeight, texture, material } = this.createMaterial(0.3, 1.5, text);
+                let { planeWidth, planeHeight, texture, material } = this.createMaterial(0.4, 1.6, text, entity.scale);
                 var plane = MeshBuilder.CreatePlane(
                     "RawNamePlate_" + isSpawn.key,
                     { width: planeWidth, height: planeHeight, sideOrientation: Mesh.DOUBLESIDE },
@@ -121,23 +130,26 @@ export class EntityUtils {
             let instance = rawMesh.createInstance("namePlate_" + isSpawn.key + "_" + uuid);
             instance.parent = entity.mesh;
             instance.position.y = instance.position.y + entity_height;
-        } else {
-            // else we create a unique mesh
-            // todo: probably can do something better here
-            let { planeWidth, planeHeight, texture, material } = this.createMaterial(0.3, 1.5, text);
-            var plane = MeshBuilder.CreatePlane(
-                "namePlate_" + entity.name,
-                { width: planeWidth, height: planeHeight, sideOrientation: Mesh.DOUBLESIDE },
-                this._scene
-            );
-            plane.parent = entity.mesh;
-            plane.position.y = plane.position.y + this.entity_height;
-            plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
-            plane.material = material;
 
-            // draw text
-            this.drawDynamicTexture(text, texture);
+            // dont continue
+            return;
         }
+
+        // else we create a unique mesh
+        // todo: probably can do something better here
+        let { planeWidth, planeHeight, texture, material } = this.createMaterial(0.4, 1.6, text, entity.scale);
+        var plane = MeshBuilder.CreatePlane(
+            "namePlate_" + entity.name,
+            { width: planeWidth, height: planeHeight, sideOrientation: Mesh.DOUBLESIDE },
+            this._scene
+        );
+        plane.parent = entity.mesh;
+        plane.position.y = plane.position.y + this.entity_height;
+        plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
+        plane.material = material;
+
+        // draw text
+        this.drawDynamicTexture(text, texture);
     }
 
     /**

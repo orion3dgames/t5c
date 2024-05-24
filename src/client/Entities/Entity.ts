@@ -187,7 +187,9 @@ export class Entity extends TransformNode {
 
         //////////////////////////////////////////////////////////////////////////
         // misc
-        this.utilsController.addNamePlate(this);
+        if (!this.isCurrentPlayer) {
+            this.utilsController.addNamePlate(this);
+        }
         //this.characterLabel = this._ui.createEntityLabel(this);
         //this.interactableButtons = this._ui.createInteractableButtons(this);
     }

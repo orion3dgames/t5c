@@ -176,6 +176,8 @@ export class VatController {
         let slot = item.equippable ? PlayerSlots[item.equippable.slot] : 0;
         let boneId = race.bones[slot];
 
+        if (!boneId) return false;
+
         // clone raw mesh
         let rawMesh = this._game._loadedAssets["ITEM_" + item.key].meshes[0].clone("vat_" + item.key); // mandatory: needs to be cloned
         rawMesh.position.copyFrom(entityData.skeleton.bones[boneId].getAbsolutePosition());
