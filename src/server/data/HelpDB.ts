@@ -17,6 +17,12 @@ let HelpDB = {
             },
             {
                 type: "section",
+                title: "Camera Controls",
+                description: "You can press the middle click of the mouse and drag the mouse to rotate the camera.",
+                align: "left",
+            },
+            {
+                type: "section",
                 title: "How to attack?",
                 description:
                     "Please select an enemy and click on any ability at the bottom center of the screen. You can also use the relevant keyboard number to use an ability.",

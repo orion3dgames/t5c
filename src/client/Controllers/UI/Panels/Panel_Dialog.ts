@@ -108,6 +108,7 @@ export class Panel_Dialog extends Panel {
             dialogTextBlock.text = dialogText;
         }
 
+        console.log(currentDialog);
         // create any quest buttons
         if (currentDialog.quests) {
             let q = 1;

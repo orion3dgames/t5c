@@ -34,6 +34,7 @@ export class GameData {
     }
 
     public static load(type) {
+        
         let returnData;
         switch (type) {
             case "abilities":
@@ -50,6 +51,7 @@ export class GameData {
                 break;
             case "quests":
                 returnData = QuestsDB ?? false;
+                break;
             case "help":
                 returnData = HelpDB ?? false;
                 break;

@@ -290,9 +290,9 @@ class Database {
                 this.generateStatPoint(),
                 "lh_town",
 
-                "0",
-                "0",
-                "0",
+                "6.18",
+                "0.1",
+                "-11.21",
                 "1.72",
 
                 "1",

@@ -17,6 +17,7 @@ import { UserInterface } from "../../client/Controllers/UserInterface";
 import State from "../../client/Screens/Screens";
 import { Ability, ServerMsg } from "../../shared/types";
 import { GameScene } from "../Screens/GameScene";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
 export class Player extends Entity {
     public game;
@@ -242,21 +243,6 @@ export class Player extends Entity {
         // process player movement
         this.moveController.processMove();
 
-        ///////////// ENVIRONMENT LOD ///////////////////////////
-        // only show meshes close to us
-        /*
-        let currentPos = this.getPosition();
-        let key = "ENV_" + this._game.currentLocation.mesh;
-        let allMeshes = this._game._loadedAssets[key]?.loadedMeshes ?? [];
-        allMeshes.forEach((element) => {
-            let distanceTo = Vector3.Distance(element.getAbsolutePosition(), currentPos);
-            if (distanceTo < this._game.config.PLAYER_VIEW_DISTANCE) {
-                element.setEnabled(true);
-            } else {
-                element.setEnabled(false);
-            }
-        });*/
-
         ///////////// ABILITY & CASTING EVENTS ///////////////////////////
         // if digit pressed
         if (this._input.digit_pressed > 0 && !this.isCasting) {
@@ -335,6 +321,22 @@ export class Player extends Entity {
             if (this.closestEntityDistance > 5 && this.closestEntity.interactableButtons) {
                 this._ui.panelDialog.close();
             }
+
+            ///////////// ENVIRONMENT LOD ///////////////////////////
+            // only show meshes close to us         
+            let currentPos = this.getPosition();
+            let key = "ENV_" + this._game.currentLocation.mesh;
+            let allMeshes = this._game._loadedAssets[key]?.loadedMeshes ?? [];
+            allMeshes.forEach((element) => {
+                if(element.name !== '__root__'){
+                    let distanceTo = Vector3.Distance(element.getAbsolutePosition(), currentPos);
+                    if (distanceTo < 40) {
+                        element.setEnabled(true);
+                    } else {
+                        element.setEnabled(false);
+                    }
+                }
+            });
         }
     }
 

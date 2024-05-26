@@ -307,9 +307,13 @@ export class AssetsController {
         // add water
         if (this._game.currentLocation.waterPlane) {
             var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 32 }, this._game.scene);
-            waterMesh.position = new Vector3(0, -0.25, 0);
+            waterMesh.position = new Vector3(0, -0.50, 0);
             var water = new StandardMaterial("water");
-            water.diffuseTexture = new Texture("textures/waterbump.jpg");
+
+            let waterTexture = new Texture("textures/waterbump.jpg");
+            waterTexture.uScale = 40;
+            waterTexture.vScale = 40
+            water.diffuseTexture = waterTexture;
             waterMesh.material = water;
         }
 

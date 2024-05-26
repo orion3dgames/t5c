@@ -57,13 +57,26 @@ export class PlayerCamera {
     }
 
     public update(): void {
+
+        let preventVertical = false;
+
         // rotate camera around the Y position if right click is true
-        if (this._input.middle_click) {
-            const rotationX =
-                Math.abs(this._camRoot.rotation.x + this._input.movementY) < 0.5 ? this._camRoot.rotation.x + this._input.movementY : this._camRoot.rotation.x;
-            const rotationY = this._camRoot.rotation.y + this._input.movementX;
-            this._camRoot.rotation = new Vector3(rotationX, rotationY, 0);
+        if (!this._input.middle_click) {
+            return;
         }
+
+        // only do vertical if allowed
+        let rotationX = 0;
+        if(!preventVertical){
+            rotationX = Math.abs(this._camRoot.rotation.x + this._input.movementY) < 0.5 ? this._camRoot.rotation.x + this._input.movementY : this._camRoot.rotation.x;
+        }
+
+        // set horizontal rotation
+        const rotationY = this._camRoot.rotation.y + this._input.movementX;
+
+        // apply canmera rotation
+        this._camRoot.rotation = new Vector3(rotationX, rotationY, 0);
+    
     }
 
     public zoom(deltaY): void {
