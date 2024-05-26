@@ -147,13 +147,13 @@ let LocationsDB = {
                     amount: 1,
                     race: "male_knight",
                     material: 0,
-                    name: "Alexander The Righteous",
+                    name: "Bartender",
                     interactable: {
                         title: "Talk",
                         data: [
                             {
                                 type: "text",
-                                text: "Greetings, noble traveler! I am Sir Alexander, a humble knight on a quest to vanquish the forces of darkness and bring peace to this enchanted realm. How may I be of service to you today?",
+                                text: "Greetings, noble traveler! I am Alex, a humble bartender. How may I be of service to you today?",
                                 isEndOfDialog: true,
                             },
                         ],
@@ -170,7 +170,7 @@ let LocationsDB = {
                     amount: 2,
                     race: "male_mage",
                     material: 1,
-                    name: "Karack",
+                    name: "Merchant",
                 },
                 {
                     key: "spawn_04",
