@@ -1,6 +1,6 @@
 @font-face {
-    font-family: gameFont;
-    src: url(./fonts/BreatheFireIii-PKLOB.ttf);
+    font-family: "gamefont";
+    src: url(./fonts/font.ttf);
 }
 
 html,
@@ -14,7 +14,7 @@ body{
 
 html{
     cursor: url("./images/cursor/hand.png"), auto;
-    font-family: "Arial", serif;
+    font-family: "gamefont", serif;
     font-size: 16px;
     background-color: #222;
 }
