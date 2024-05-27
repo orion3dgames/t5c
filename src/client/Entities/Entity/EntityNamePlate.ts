@@ -6,18 +6,27 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Scene } from "@babylonjs/core/scene";
 import { generateRandomId, randomNumberInRange } from "../../../shared/Utils";
 import { Entity } from "../Entity";
-import { Item } from "../Item";
 
-export class EntityUtils {
+export class EntityNamePlate {
     private _scene: Scene;
+    private _entity: Entity;
     private damageBubbles: any = [];
     private font_size = 40;
     private font = "bold 40px Arial";
-    private entity_height: number = 3;
 
-    constructor(scene: Scene) {
-        this._scene = scene;
+    private currentMessage;
+    private messageTimeout;
+
+    constructor(entity: Entity) {
+        this._scene = entity._scene;
+        this._entity = entity;
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////
+    /////////////////////////    HELPERS           //////////////////////////
+    /////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////
 
     /**
      * Returns the width of a dynamic texture for the provided text
@@ -92,22 +101,86 @@ export class EntityUtils {
         texture.drawText(text, null, null, this.font, color, "transparent", true);
     }
 
+    getEntityheight(offset_y) {
+        let extendSize = this._entity.mesh.getBoundingInfo().boundingBox.extendSize.y ?? 1;
+        return extendSize * 2 + offset_y;
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////
+    ///////////////////////// METHODS //////////////////////////////
+    /////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Draw chat above entity
+     * @param entity
+     * @param offset_y
+     * @returns
+     */
+    addChatMessage(message = "Hello World!", offset_y = 0.6) {
+        // clear eny existing messsage
+        if (this.messageTimeout) {
+            clearTimeout(this.messageTimeout);
+            this.currentMessage.texture.dispose();
+            this.currentMessage.material.dispose();
+            this.currentMessage.plane.dispose();
+        }
+
+        // create mesh + texture
+        let entity_height = this.getEntityheight(offset_y);
+        let { planeWidth, planeHeight, texture, material } = this.createMaterial(0.4, 1.6, message, this._entity.scale);
+        var plane = MeshBuilder.CreatePlane(
+            "chatMessage_" + this._entity.name,
+            { width: planeWidth, height: planeHeight, sideOrientation: Mesh.DOUBLESIDE },
+            this._scene
+        );
+        plane.parent = this._entity.mesh;
+        plane.position.y = plane.position.y + entity_height;
+        plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
+        plane.material = material;
+
+        // draw text on texture
+        this.drawDynamicTexture(message, texture, "blue");
+
+        // set as actual message
+        this.currentMessage = {
+            plane: plane,
+            material: material,
+            texture: texture,
+        };
+
+        // 5 seconds
+        this.messageTimeout = setTimeout(() => {
+            texture.dispose();
+            material.dispose();
+            plane.dispose();
+        }, 7000);
+    }
+
     /**
      * Draw nameplate above entity
      * @param entity
+     * @param offset_y
+     * @returns
      */
-    addNamePlate(entity: Entity, entity_height = 2.75) {
-        let text = entity.name;
+    addNamePlate(offset_y = 0.2) {
+        let text = this._entity.name;
+        let entity_height = this.getEntityheight(offset_y);
+        let height = 0.3;
+        let t_height = 1.6;
 
         // if entity is a spawn, we can use instances as they all have the same name.
-        let isSpawn = entity.spawnInfo ?? false;
-        if (isSpawn) {
+        if (this._entity.spawnInfo) {
+            let spawnKey = this._entity.spawnInfo.key;
+            let instancekey = "nameplate_" + spawnKey;
+
             // if raw mesh does not exists, create it
-            if (!entity._game.instances.get(isSpawn.key)) {
+            if (!this._entity._game.instances.get(instancekey)) {
                 // create raw mesh
-                let { planeWidth, planeHeight, texture, material } = this.createMaterial(0.4, 1.6, text, entity.scale);
+                let { planeWidth, planeHeight, texture, material } = this.createMaterial(height, t_height, text, this._entity.scale);
                 var plane = MeshBuilder.CreatePlane(
-                    "RawNamePlate_" + isSpawn.key,
+                    "RawNamePlate_" + spawnKey,
                     { width: planeWidth, height: planeHeight, sideOrientation: Mesh.DOUBLESIDE },
                     this._scene
                 );
@@ -119,32 +192,32 @@ export class EntityUtils {
                 this.drawDynamicTexture(text, texture);
 
                 // save raw mesh for later use
-                entity._game.instances.set(isSpawn.key, plane);
+                this._entity._game.instances.set(instancekey, plane);
             }
 
             // get raw mesh
-            let rawMesh = entity._game.instances.get(isSpawn.key);
+            let rawMesh = this._entity._game.instances.get(instancekey);
 
             // create instance
             let uuid = generateRandomId(6);
-            let instance = rawMesh.createInstance("namePlate_" + isSpawn.key + "_" + uuid);
-            instance.parent = entity.mesh;
+            let instance = rawMesh.createInstance("namePlate_" + spawnKey + "_" + uuid);
+            instance.parent = this._entity.mesh;
             instance.position.y = instance.position.y + entity_height;
 
-            // dont continue
+            // don't continue
             return;
         }
 
         // else we create a unique mesh
         // todo: probably can do something better here
-        let { planeWidth, planeHeight, texture, material } = this.createMaterial(0.4, 1.6, text, entity.scale);
+        let { planeWidth, planeHeight, texture, material } = this.createMaterial(height, t_height, text, this._entity.scale);
         var plane = MeshBuilder.CreatePlane(
-            "namePlate_" + entity.name,
+            "namePlate_" + this._entity.name,
             { width: planeWidth, height: planeHeight, sideOrientation: Mesh.DOUBLESIDE },
             this._scene
         );
-        plane.parent = entity.mesh;
-        plane.position.y = plane.position.y + this.entity_height;
+        plane.parent = this._entity.mesh;
+        plane.position.y = plane.position.y + entity_height;
         plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
         plane.material = material;
 
@@ -154,11 +227,12 @@ export class EntityUtils {
 
     /**
      * Draw damage bubble above entity
+     * TODO: add instances to improve performance
      * @param entity
      */
-    addDamageBubble(entity: Entity) {
+    addDamageBubble(offset_y = 0.2) {
         // only proceed if damage has occured
-        let healthChange = entity.entity.health - entity.health;
+        let healthChange = this._entity.entity.health - this._entity.health;
         if (healthChange === 0 || healthChange === 1) {
             return false;
         }
@@ -166,12 +240,13 @@ export class EntityUtils {
         let text = "" + healthChange;
         let color = healthChange > 0 ? Color3.Green().toHexString() : Color3.Yellow().toHexString(); // set current color
         let { planeWidth, planeHeight, texture, material } = this.createMaterial(0.4, 1.5, text);
+        let entity_height = this.getEntityheight(offset_y);
 
         // create plane
         let uuid = generateRandomId(6);
         var plane = MeshBuilder.CreatePlane("damageBubble_" + uuid, { width: planeWidth, height: planeHeight, sideOrientation: Mesh.DOUBLESIDE }, this._scene);
-        plane.parent = entity.mesh;
-        plane.position.y = plane.position.y + this.entity_height;
+        plane.parent = this._entity.mesh;
+        plane.position.y = plane.position.y + entity_height;
         plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
         plane.material = material;
 
@@ -180,7 +255,7 @@ export class EntityUtils {
 
         // set meta
         plane.metadata = {
-            end_position: entity.position.y + 6,
+            end_position: this._entity.position.y + 6,
             material: material,
             texture: texture,
             offset: randomNumberInRange(-0.002, 0.002),
@@ -194,6 +269,8 @@ export class EntityUtils {
      * Update Loop
      */
     update() {
+        //
+
         // update damage bubbles
         if (this.damageBubbles.length > 0) {
             // loop through damage bubbles and update them

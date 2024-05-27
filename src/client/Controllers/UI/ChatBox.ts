@@ -182,16 +182,15 @@ export class ChatBox {
         if (msg.senderID === this._currentPlayer.sessionId) {
             player = this._currentPlayer;
         }
-        if (player.showTimer) {
-            clearInterval(player.showTimer);
-        }
-        if (player && player.characterChatLabel) {
+        if (player && player.nameplateController) {
+            player.nameplateController.addChatMessage(msg.message);
+            /*
             let el = player.characterLabel;
             player.characterChatLabel.isVisible = false;
             player.characterChatLabel._children[0].text = msg.message;
             player.showTimer = setTimeout(function () {
                 player.characterChatLabel.isVisible = false;
-            }, 20000);
+            }, 20000);*/
         }
     }
 

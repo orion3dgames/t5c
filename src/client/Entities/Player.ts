@@ -1,23 +1,11 @@
-import { Scene } from "@babylonjs/core/scene";
-import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { PointerEventTypes, PointerInfo } from "@babylonjs/core/Events/pointerEvents";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-
-import { GameController } from "../Controllers/GameController";
-import { NavMesh } from "../../shared/Libs/yuka-min";
-import { Room } from "colyseus.js";
-import { PlayerSchema } from "../../server/rooms/schema/PlayerSchema";
 import { PlayerCamera } from "./Player/PlayerCamera";
-import { EntityUtils } from "./Entity/EntityUtils";
 import { EntityActions } from "./Entity/EntityActions";
 import { Entity } from "./Entity";
-import { PlayerInput } from "../../client/Controllers/PlayerInput";
-import { UserInterface } from "../../client/Controllers/UserInterface";
 import State from "../../client/Screens/Screens";
 import { Ability, ServerMsg } from "../../shared/types";
 import { GameScene } from "../Screens/GameScene";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
 export class Player extends Entity {
     public game;
@@ -323,12 +311,12 @@ export class Player extends Entity {
             }
 
             ///////////// ENVIRONMENT LOD ///////////////////////////
-            // only show meshes close to us         
+            // only show meshes close to us
             let currentPos = this.getPosition();
             let key = "ENV_" + this._game.currentLocation.mesh;
             let allMeshes = this._game._loadedAssets[key]?.loadedMeshes ?? [];
             allMeshes.forEach((element) => {
-                if(element.name !== '__root__'){
+                if (element.name !== "__root__") {
                     let distanceTo = Vector3.Distance(element.getAbsolutePosition(), currentPos);
                     if (distanceTo < 40) {
                         element.setEnabled(true);

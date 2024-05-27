@@ -11,7 +11,7 @@ import { Room } from "colyseus.js";
 import { PlayerCamera } from "./Player/PlayerCamera";
 import { EntityAnimator } from "./Entity/EntityAnimator";
 import { EntityMove } from "./Entity/EntityMove";
-import { EntityUtils } from "./Entity/EntityUtils";
+import { EntityNamePlate } from "./Entity/EntityNamePlate";
 import { EntityActions } from "./Entity/EntityActions";
 import { EntityMesh } from "./Entity/EntityMesh";
 
@@ -38,7 +38,7 @@ export class Entity extends TransformNode {
     public cameraController: PlayerCamera;
     public animatorController: EntityAnimator;
     public moveController: EntityMove;
-    public utilsController: EntityUtils;
+    public nameplateController: EntityNamePlate;
     public actionsController: EntityActions;
     public meshController: EntityMesh;
 
@@ -155,7 +155,7 @@ export class Entity extends TransformNode {
         this.animatorController = new EntityAnimator(this);
         this.moveController = new EntityMove(this);
         this.moveController.setPositionAndRotation(entity); // set next default position from server entity
-        this.utilsController = new EntityUtils(this._scene);
+        this.nameplateController = new EntityNamePlate(this);
 
         ///////////////////////////////////////////////////////////
         // entity network event
@@ -166,7 +166,7 @@ export class Entity extends TransformNode {
 
             // if taking damage, show damage bubble
             if (this.health !== this.entity.health) {
-                this.utilsController.addDamageBubble(this);
+                this.nameplateController.addDamageBubble();
             }
 
             if (this.type === "player" && this.anim_state !== this.entity.anim_state) {
@@ -187,9 +187,7 @@ export class Entity extends TransformNode {
 
         //////////////////////////////////////////////////////////////////////////
         // misc
-        if (!this.isCurrentPlayer) {
-            this.utilsController.addNamePlate(this);
-        }
+        this.nameplateController.addNamePlate();
         //this.characterLabel = this._ui.createEntityLabel(this);
         //this.interactableButtons = this._ui.createInteractableButtons(this);
     }
@@ -273,7 +271,7 @@ export class Entity extends TransformNode {
         this.animatorController.play(this);
 
         //
-        this.utilsController.update();
+        this.nameplateController.update();
     }
 
     public updateServerRate(delta) {}
