@@ -125,16 +125,16 @@ export class Panel {
         panelHeader.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         panelHeader.color = "rgba(0,0,0,1)";
         panelHeader.thickness = 0;
+        panelHeader.fontFamily = "gamefont";
         this._panel.addControl(panelHeader);
 
         // header title
         var panelTitle = new TextBlock("panelTitle");
         panelTitle.text = this._options.name;
-        panelTitle.fontSize = "12px";
         panelTitle.color = "#FFFFFF";
-        panelTitle.top = "5px";
+        panelTitle.top = "0px";
         panelTitle.left = "5px";
-        panelTitle.fontSize = "18px";
+        panelTitle.fontSize = "22px";
         panelTitle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
         panelTitle.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         panelTitle.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;

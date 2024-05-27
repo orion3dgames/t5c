@@ -41,7 +41,7 @@ let LocationsDB = {
             spawns: [
 
                 {
-                    key: "lh_town_intro",
+                    key: "lh_town_rat",
                     type: "area",
                     behaviour: "patrol",
                     aggressive: true,
@@ -53,17 +53,12 @@ let LocationsDB = {
                         new Vector3(50.13, 0.1, 11.68)
                     ],
                     amount: 10,
-                    race: "male_mage",
+                    race: "rat_01",
                     material: 0,
-                    name: "Thief",
+                    name: "Rat",
                     baseHealth: 40,
                     baseSpeed: Speed.VERY_SLOW,
-                    equipment: [
-                        {
-                            key: "sword_01",
-                            slot: PlayerSlots.WEAPON,
-                        },
-                    ],
+                    equipment: [],
                 },
 
                 {
@@ -225,14 +220,20 @@ let LocationsDB = {
                     behaviour: "idle",
                     aggressive: false,
                     canAttack: false,
-                    points: [new Vector3(17.96, 0.1, 0.76)],
-                    rotation: 1.34,
+                    points: [new Vector3(12.92, 0.02, 3.44)],
+                    rotation: 0,
                     radius: 0,
                     amount: 1,
-                    race: "male_knight",
+                    race: "male_mage",
                     material: 1,
-                    name: "Iraltok",
+                    name: "Sorceress",
                     baseHealth: 5000,
+                    equipment: [
+                        {
+                            key: "hat_01",
+                            slot: PlayerSlots.HEAD,
+                        },
+                    ],
                     interactable: {
                         title: "Talk",
                         data: [
@@ -252,8 +253,8 @@ let LocationsDB = {
                     behaviour: "idle",
                     aggressive: false,
                     canAttack: false,
-                    points: [new Vector3(30.05, 0.1, -23.74)],
-                    rotation: 3.14,
+                    points: [new Vector3(30.22, 0.02, -24.62)],
+                    rotation: 3,
                     radius: 0,
                     amount: 1,
                     race: "male_knight",

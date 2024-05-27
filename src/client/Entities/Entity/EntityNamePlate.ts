@@ -12,7 +12,7 @@ export class EntityNamePlate {
     private _entity: Entity;
     private damageBubbles: any = [];
     private font_size = 40;
-    private font = "bold 40px Arial";
+    private font = "bold 40px gamefont";
 
     private currentMessage;
     private messageTimeout;
@@ -129,7 +129,7 @@ export class EntityNamePlate {
 
         // create mesh + texture
         let entity_height = this.getEntityheight(offset_y);
-        let { planeWidth, planeHeight, texture, material } = this.createMaterial(0.4, 1.6, message, this._entity.scale);
+        let { planeWidth, planeHeight, texture, material } = this.createMaterial(0.5, 1.4, message, this._entity.scale);
         var plane = MeshBuilder.CreatePlane(
             "chatMessage_" + this._entity.name,
             { width: planeWidth, height: planeHeight, sideOrientation: Mesh.DOUBLESIDE },
@@ -164,11 +164,11 @@ export class EntityNamePlate {
      * @param offset_y
      * @returns
      */
-    addNamePlate(offset_y = 0.2) {
+    addNamePlate(offset_y = 0.5) {
         let text = this._entity.name;
         let entity_height = this.getEntityheight(offset_y);
-        let height = 0.3;
-        let t_height = 1.6;
+        let height = 0.4;
+        let t_height = 1.4;
 
         // if entity is a spawn, we can use instances as they all have the same name.
         if (this._entity.spawnInfo) {
