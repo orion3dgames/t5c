@@ -275,6 +275,7 @@ let LocationsDB = {
                                         { key: "shield_01" },
                                         { key: "sword_01" },
                                         { key: "amulet_01" },
+                                        { key: "hat_01" },
                                     ],
                                 },
                             },
