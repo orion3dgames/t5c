@@ -154,7 +154,7 @@ export class ChatBox {
     public processMessage(message) {
         this._game.currentChats.push(message);
         this._refreshChatBox();
-        this.showChatMessage(message);
+        this.showChatMessageAboveEntity(message);
     }
 
     // process incoming messages
@@ -177,20 +177,13 @@ export class ChatBox {
     }
 
     // show chat message above player
-    public showChatMessage(msg: PlayerMessage) {
+    public showChatMessageAboveEntity(msg: PlayerMessage) {
         let player = this._entities.get(msg.senderID);
         if (msg.senderID === this._currentPlayer.sessionId) {
             player = this._currentPlayer;
         }
         if (player && player.nameplateController) {
             player.nameplateController.addChatMessage(msg.message);
-            /*
-            let el = player.characterLabel;
-            player.characterChatLabel.isVisible = false;
-            player.characterChatLabel._children[0].text = msg.message;
-            player.showTimer = setTimeout(function () {
-                player.characterChatLabel.isVisible = false;
-            }, 20000);*/
         }
     }
 
