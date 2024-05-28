@@ -342,28 +342,27 @@ export class AssetsController {
             };
 
             if (this._game.config.SHADOW_ON === true) {
+                m.receiveShadows = true;
                 if (
-                    m.name.includes("SAND") ||
-                    m.name.includes("ROAD") ||
-                    m.name.includes("EARTH") ||
-                    m.name.includes("GRASS") ||
-                    m.name.includes("WOODEN") ||
-                    m.name.includes("FLOOR_TILES")
+                    !m.name.includes("SAND") ||
+                    !m.name.includes("ROAD") ||
+                    !m.name.includes("EARTH") ||
+                    !m.name.includes("GRASS") ||
+                    !m.name.includes("WOOD") ||
+                    !m.name.includes("WOODEN") ||
+                    !m.name.includes("FLOOR_TILES")
                 ) {
-                    m.receiveShadows = true;
-                } else {
                     this._shadow.addShadowCaster(m);
                 }
             } else {
                 m.receiveShadows = false;
             }
+
+            console.log(m.name);
         });
 
         // only render shadows once
-        // we can always refresh the shadow map if we need to by doing:
-        //
         if (this._shadow) {
-            console.log("ONLY REFRESH SHADOW MAP ONCE!!");
             this._shadow.getShadowMap().refreshRate = RenderTargetTexture.REFRESHRATE_RENDER_ONCE;
         }
     }
