@@ -37,6 +37,9 @@ class Config {
     UI_SIDEBAR_WIDTH = "320px;";
     UI_PRIMARY_COLOR = "rgba(35, 168, 28, 0.8)";
 
+    //
+    SHADOW_ON = true;
+
     // default location
     initialLocation = "lh_town";
 }

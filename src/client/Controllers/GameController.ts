@@ -163,9 +163,9 @@ export class GameController {
         }
     }
 
-    async initializeAssetController() {
+    async initializeAssetController(shadow = null) {
         this._loadedAssets = [];
-        this._assetsCtrl = new AssetsController(this);
+        this._assetsCtrl = new AssetsController(this, shadow);
     }
 
     /////////////////////////////////////////

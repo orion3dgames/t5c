@@ -7,7 +7,7 @@ let LocationsDB = {
         key: "lh_town",
         mesh: "lh_town",
         sun: true,
-        sunIntensity: 1,
+        sunIntensity: 0.5,
         spawnPoint: {
             x: 0,
             y: 0,
@@ -39,19 +39,13 @@ let LocationsDB = {
                 },
             ],
             spawns: [
-
                 {
                     key: "lh_town_rat",
                     type: "area",
                     behaviour: "patrol",
                     aggressive: true,
                     canAttack: true,
-                    points: [
-                        new Vector3(33.93, 0.1, 0.31),
-                        new Vector3(44.67, 0.1, -8.61),
-                        new Vector3(53.21, 0.1, 0.45),
-                        new Vector3(50.13, 0.1, 11.68)
-                    ],
+                    points: [new Vector3(33.93, 0.1, 0.31), new Vector3(44.67, 0.1, -8.61), new Vector3(53.21, 0.1, 0.45), new Vector3(50.13, 0.1, 11.68)],
                     amount: 10,
                     race: "rat_01",
                     material: 0,
@@ -75,7 +69,7 @@ let LocationsDB = {
                         new Vector3(69.02, 0.1, 55.81),
                         new Vector3(53.82, 0.1, 57.89),
                         new Vector3(45.52, 0.1, 46.68),
-                        new Vector3(37.82, 0.1, 52.82)
+                        new Vector3(37.82, 0.1, 52.82),
                     ],
                     amount: 10,
                     race: "male_mage",
@@ -107,7 +101,7 @@ let LocationsDB = {
                         new Vector3(8.97, 0.1, 93.21),
                         new Vector3(34.44, 0.1, 97.1),
                         new Vector3(-15.45, 0.1, 73.79),
-                        new Vector3(4.56, 0.1, 68.85)
+                        new Vector3(4.56, 0.1, 68.85),
                     ],
                     amount: 10,
                     race: "male_rogue",

@@ -27,13 +27,15 @@ import { VatController } from "../Controllers/VatController";
 import { SceneOptimizer, SceneOptimizerOptions } from "@babylonjs/core/Misc/sceneOptimizer";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
+import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
+import { RenderTargetTexture } from "@babylonjs/core/Materials/Textures/renderTargetTexture";
 
 export class GameScene {
     public _game: GameController;
     public _scene: Scene;
     public _input: PlayerInput;
     public _ui;
-    public _shadow: CascadedShadowGenerator;
+    public _shadow: ShadowGenerator;
     public _navMesh: NavMesh;
     public _navMeshDebug;
 
@@ -84,24 +86,27 @@ export class GameScene {
         // add background  color
         scene.clearColor = new Color4(1, 1, 1, 1);
 
-        // shadow light
-        // add shadow light first:
-        // https://forum.babylonjs.com/t/shadow-doesnt-work-if-another-light-is-created-before-shadow-casting-light/39852/4
-        /*
-        var light = new DirectionalLight("DirectionalLight", new Vector3(-1, -2, -1), scene);
-        light.position = new Vector3(1, 10, 1);
-        light.intensity = 1;
-        light.autoCalcShadowZBounds = true;
+        if (this._game.config.SHADOW_ON === true) {
+            // shadow light
+            // https://forum.babylonjs.com/t/shadow-doesnt-work-if-another-light-is-created-before-shadow-casting-light/39852/4
+            var shadowLight = new DirectionalLight("DirectionalLight", new Vector3(-0.5, -5, -0.5), scene);
+            //shadowLight.position = new Vector3(1, 10, 1);
+            shadowLight.intensity = 1;
+            shadowLight.autoCalcShadowZBounds = true;
 
-        // shadow generator
-        // toto: something is wrong with the shadows.
-        this._shadow = new CascadedShadowGenerator(1024, light);
-        this._shadow.filteringQuality = CascadedShadowGenerator.QUALITY_LOW;
-        this._shadow.autoCalcDepthBounds = true;
-        this._shadow.lambda = 0.82;
-        this._shadow.bias = 0.018;
-        this._shadow.depthClamp = true;*/
+            // performant shadow
+            // some settings I have found looks good
+            // https://forum.babylonjs.com/t/shadows-setup-for-large-usually-static-world/39636/11?u=oriongu
+            const shadowGenerator = new ShadowGenerator(2048, shadowLight);
+            shadowGenerator.enableSoftTransparentShadow = true;
+            shadowGenerator.transparencyShadow = true;
+            shadowGenerator.filter = ShadowGenerator.FILTER_BLURCLOSEEXPONENTIALSHADOWMAP;
+            this._shadow = shadowGenerator;
+            // if you move anything you can force it to render by calling
+            //this._shadow.getShadowMap().resetRefreshCounter();
+        }
 
+        // skybox
         const skybox = MeshBuilder.CreateBox("skyBox", { size: 1000.0 }, scene);
         const skyboxMaterial = new StandardMaterial("skyBox", scene);
         skyboxMaterial.backFaceCulling = false;
@@ -113,10 +118,10 @@ export class GameScene {
 
         // add sun
         if (location.sun) {
-            var ambientLight = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
-            ambientLight.intensity = location.sunIntensity;
-            ambientLight.groundColor = new Color3(0.13, 0.13, 0.13);
-            ambientLight.specular = Color3.Black();
+            var sunLight = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
+            sunLight.intensity = location.sunIntensity;
+            sunLight.groundColor = new Color3(0.13, 0.13, 0.13);
+            sunLight.specular = Color3.Black();
         }
 
         // add fog
@@ -133,7 +138,7 @@ export class GameScene {
         this._navMeshDebug.isVisible = false;
 
         // initialize assets controller & load level
-        this._game.initializeAssetController();
+        this._game.initializeAssetController(this._shadow);
         await this._game._assetsCtrl.loadLevel(location.key);
         this._game.engine.displayLoadingUI();
 

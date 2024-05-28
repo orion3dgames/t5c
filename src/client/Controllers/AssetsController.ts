@@ -21,9 +21,10 @@ import {
 import { GameController } from "./GameController";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { mergeMesh } from "../Entities/Common/MeshHelper";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
+import { RenderTargetTexture } from "@babylonjs/core/Materials/Textures/renderTargetTexture";
 
 type AssetEntry = {
     name: string;
@@ -34,6 +35,7 @@ type AssetEntry = {
 };
 
 export class AssetsController {
+    private _shadow: ShadowGenerator;
     private _game: GameController;
     private _assetsManager: AssetsManager;
 
@@ -44,8 +46,9 @@ export class AssetsController {
     private _loadingTxt;
     private _auth;
 
-    constructor(game) {
+    constructor(game, shadow) {
         this._game = game;
+        this._shadow = shadow;
         this._loadingTxt = window.document.getElementById("loadingTextDetails");
 
         // Assets manager
@@ -307,12 +310,12 @@ export class AssetsController {
         // add water
         if (this._game.currentLocation.waterPlane) {
             var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 32 }, this._game.scene);
-            waterMesh.position = new Vector3(0, -0.50, 0);
+            waterMesh.position = new Vector3(0, -0.5, 0);
             var water = new StandardMaterial("water");
 
             let waterTexture = new Texture("textures/waterbump.jpg");
             waterTexture.uScale = 40;
-            waterTexture.vScale = 40
+            waterTexture.vScale = 40;
             water.diffuseTexture = waterTexture;
             waterMesh.material = water;
         }
@@ -337,9 +340,32 @@ export class AssetsController {
             m.metadata = {
                 type: "environment",
             };
-            m.alwaysSelectAsActiveMesh = true;
-            m.receiveShadows = false;
+
+            if (this._game.config.SHADOW_ON === true) {
+                if (
+                    m.name.includes("SAND") ||
+                    m.name.includes("ROAD") ||
+                    m.name.includes("EARTH") ||
+                    m.name.includes("GRASS") ||
+                    m.name.includes("WOODEN") ||
+                    m.name.includes("FLOOR_TILES")
+                ) {
+                    m.receiveShadows = true;
+                } else {
+                    this._shadow.addShadowCaster(m);
+                }
+            } else {
+                m.receiveShadows = false;
+            }
         });
+
+        // only render shadows once
+        // we can always refresh the shadow map if we need to by doing:
+        //
+        if (this._shadow) {
+            console.log("ONLY REFRESH SHADOW MAP ONCE!!");
+            this._shadow.getShadowMap().refreshRate = RenderTargetTexture.REFRESHRATE_RENDER_ONCE;
+        }
     }
 
     public async prepareItem(itemKey) {
