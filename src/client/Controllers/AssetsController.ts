@@ -357,8 +357,6 @@ export class AssetsController {
             } else {
                 m.receiveShadows = false;
             }
-
-            console.log(m.name);
         });
 
         // only render shadows once
