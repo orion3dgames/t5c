@@ -43,7 +43,46 @@ Eldoria was a quaint village nestled between lush forests and towering mountains
 *   **Bandits**: Roaming the Forest, a danger for heroes levels 6-8.
 *   **Mummies**: Dwelling in the Cave, a peril for heroes levels 8-10.
 
+### Character Stats
+
+*   **Strength**: Affects melee damage.
+*   **Endurance**: Increases health capacity and regen
+*   **Intelligence**: Enhances spell power and increase mana regen.
+*   **Wisdom**: Boosts defensive magic and increase mana capacity.
+
 ---  
+
+## Default Dialogues
+
+### Blacksmith Garin
+- "Greetings, adventurer! Looking for a new weapon or some sturdy armor? I've got the finest in Eldoria."
+- "If you need repairs, I'm your man. Can't have you going into battle with a broken blade!"
+
+### Merchant Elara
+- "Welcome to my shop! Potions, jewelry, and more! What can I interest you in today?"
+- "Remember, a well-prepared adventurer is a successful adventurer. Stock up before you head out!"
+
+### Sorceress Mira
+- "Ah, another seeker of knowledge. What arcane mysteries can I help you unlock today?"
+- "The power of the elements is at your fingertips. Learn well, and use your magic wisely."
+
+### Priestess Alice
+- "Blessings of Athlea upon you. How can I assist you in your journey?"
+- "Our temple is a place of healing and peace. May Athlea's light guide and protect you."
+
+### Farmer Jorin
+- "Good day! The crops are growing well this season. Can I interest you in some fresh produce?"
+- "It's hard work, but honest work. The land provides for those who tend to it with care."
+
+### Bartender Morin
+- "Welcome to the tavern! Sit, have a drink, and share your tales of adventure."
+- "We've got the best ale in Eldoria. A drink here is the perfect end to a long day of questing."
+
+### Caretaker Ren
+- "The cemetery holds many secrets. Respect the dead, and they may offer you their wisdom."
+- "It's a somber task, but someone must care for those who have passed. What brings you here today?"
+
+---
 
 ### Quests
 
@@ -95,18 +134,18 @@ _Dialogue:_
 
 #### Merchant Items
 
-*   **Health Potion Small**
-*   **Health Potion Medium**
-*   **Mana Potion Small**
-*   **Mana Potion Medium**
+*   **Health Potion Small**: Restores a small amount of health.
+*   **Health Potion Medium**: Restores a moderate amount of health.
+*   **Mana Potion Small**: Restores a small amount of mana.
+*   **Mana Potion Medium**: Restores a moderate amount of mana.
 
 #### Blacksmith Items
 
-*   **Weapon +1**
-*   **Weapon +2**
-*   **Weapon +3**
-*   **Helm +1**
- 
+*   **Weapon +1**: Suitable for level 1-3 adventurers.
+*   **Weapon +2**: Suitable for level 4-6 adventurers.
+*   **Weapon +3**: Suitable for level 7-10 adventurers.
+*   **Helm +1**: Suitable for level 4-6 adventurers.
+
 ---   
 
 ### Abilities & Spells
