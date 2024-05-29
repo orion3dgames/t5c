@@ -7,6 +7,10 @@ Eldoria was a quaint village nestled between lush forests and towering mountains
 
 ---  
 
+![Map of Eldoria](./map_eldoria.jpg)
+---
+
+
 ### Locations
 
 *   **Forge**: The heart of Eldoria’s craftsmanship, where the Blacksmith, Garin, forged weapons and armor to aid adventurers.
