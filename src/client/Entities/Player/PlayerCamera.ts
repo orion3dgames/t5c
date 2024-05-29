@@ -26,7 +26,7 @@ export class PlayerCamera {
         // root camera parent that handles positioning of the camera to follow the player
         this._camRoot = new TransformNode("camera_root");
         this._camRoot.position = new Vector3(0, 1.5, 0); //initialized at (0,0,0)
-        //this._camRoot.parent = player;
+        this._camRoot.parent = player;
 
         // to face the player from behind (180 degrees)
         this._camRoot.rotation = new Vector3(0, (3 / 4) * Math.PI, 0);
@@ -71,6 +71,9 @@ export class PlayerCamera {
                 Math.abs(this._camRoot.rotation.x + this._input.movementY) < 0.5 ? this._camRoot.rotation.x + this._input.movementY : this._camRoot.rotation.x;
         }
 
+        // delta
+        this.player._game.deltaCamY = this.player._game.deltaCamY + this._input.movementX;
+    
         // set horizontal rotation
         const rotationY = this._camRoot.rotation.y + this._input.movementX;
 

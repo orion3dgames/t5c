@@ -15,8 +15,6 @@ export class PlayerInput {
     private _ui: UserInterface;
 
     //simple movement
-    public x: number = 0;
-    public y: number = 0;
     public angle: number = 0;
     public horizontal: number = 0;
     public vertical: number = 0;
@@ -108,9 +106,9 @@ export class PlayerInput {
             if (this.left_click) {
                 // this.player_can_move = true;
                 let dpi = window.devicePixelRatio;
-                this.x = ((pointerInfo.event.clientX * dpi) / pointerInfo.event.target.width) * 2 - 1;
-                this.y = ((pointerInfo.event.clientY * dpi) / pointerInfo.event.target.height) * 2 - 1;
-                this.angle = Math.atan2(this.x, this.y);
+                const x = ((pointerInfo.event.clientX * dpi) / pointerInfo.event.target.width) * 2 - 1;
+                const y = ((pointerInfo.event.clientY * dpi) / pointerInfo.event.target.height) * 2 - 1;
+                this.angle = Math.atan2(x, y);
                 this.calculateVelocityForces();
             }
 
@@ -239,8 +237,8 @@ export class PlayerInput {
 
     private calculateVelocityForces() {
         if (this.angle !== 0) {
-            this.vertical = -Math.cos(this.angle + Math.PI - this._game.camY);
-            this.horizontal = Math.sin(this.angle + Math.PI - this._game.camY);
+            this.vertical = -Math.cos(this.angle + Math.PI - this._game.deltaCamY);
+            this.horizontal = Math.sin(this.angle + Math.PI - this._game.deltaCamY);
         }
     }
 }

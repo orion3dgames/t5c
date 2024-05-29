@@ -35,6 +35,7 @@ export class GameController {
     public locale: "en";
     public currentMs: number;
     public camY: number;
+    public deltaCamY: number = 0;
     public latestError: string;
     public isMobile: boolean = false;
     public currentChats = [];
