@@ -7,6 +7,11 @@ Eldoria was a quaint village nestled between lush forests and towering mountains
 
 ---  
 
+![Map of Eldoria](./map_eldoria.jpg)
+
+---
+
+
 ### Locations
 
 *   **Forge**: The heart of Eldoria’s craftsmanship, where the Blacksmith, Garin, forged weapons and armor to aid adventurers.
@@ -31,7 +36,7 @@ Eldoria was a quaint village nestled between lush forests and towering mountains
 *   **Blacksmith Garin**: A master of the forge, providing essential equipment.
 *   **Merchant Elara**: A savvy trader in potions and enchanted items.
 *   **Sorceress Mira**: A wise mage who trained adventurers in offensive magic and resided in the Sorceress Tower.
-*   **Priestess Alice**: A devout priestess who taught defensive spells and sought help for the temple’s troubles.
+*   **Priestess Alice**: A devout priestess who taught defensive spells and sought help for the Temple’s troubles.
 *   **Farmer Jorin**: A simple farmer with untold stories.
 *   **Bartender Morin**: The keeper of the tavern and a source of many quests.
 *   **Caretaker Ren**: Guardian of the cemetery, harboring secrets of the Mausoleum.
@@ -84,7 +89,7 @@ Eldoria was a quaint village nestled between lush forests and towering mountains
 
 ---
 
-### Quests
+### Quests 
 
 #### Clearing the Cellar
 
