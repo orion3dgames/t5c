@@ -71,9 +71,9 @@ export class PlayerCamera {
                 Math.abs(this._camRoot.rotation.x + this._input.movementY) < 0.5 ? this._camRoot.rotation.x + this._input.movementY : this._camRoot.rotation.x;
         }
 
-        // delta
+        // set camera delta
         this.player._game.deltaCamY = this.player._game.deltaCamY + this._input.movementX;
-    
+
         // set horizontal rotation
         const rotationY = this._camRoot.rotation.y + this._input.movementX;
 
@@ -89,11 +89,15 @@ export class PlayerCamera {
 
     // post processing effect black and white
     // used when current player dies and click ressurects
-    public bw(activate: boolean) {
-        if (activate === true && !this._postProcess) {
-            this._postProcess = new BlackAndWhitePostProcess("bandw", 1.0, this.camera);
+    public vfx_black_and_white_on() {
+        if (this._postProcess) {
+            this._postProcess.dispose();
         }
-        if (activate === false && this._postProcess) {
+        this._postProcess = new BlackAndWhitePostProcess("bandw", 1.0, this.camera);
+    }
+
+    public vfx_black_and_white_off() {
+        if (this._postProcess) {
             this._postProcess.dispose();
         }
     }

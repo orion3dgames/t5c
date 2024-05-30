@@ -212,9 +212,6 @@ export class Player extends Entity {
         super.update(delta);
 
         if (this && this.moveController) {
-            // global camera rotation
-            this._game.camY = this.cameraController._camRoot.rotation.y;
-
             // tween entity
             this.moveController.tween();
         }
@@ -277,13 +274,13 @@ export class Player extends Entity {
         // if dead
         if (!this.isDeadUI && this.health < 1) {
             this._ui._RessurectBox.open();
-            this.cameraController.bw(true);
+            this.cameraController.vfx_black_and_white_on();
             this.isDeadUI = true;
         }
 
         // if ressurect
         if (this.isDeadUI && this.health > 0) {
-            this.cameraController.bw(false);
+            this.cameraController.vfx_black_and_white_off();
             this._ui._RessurectBox.close();
             this.isDeadUI = false;
         }
