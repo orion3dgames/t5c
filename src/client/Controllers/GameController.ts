@@ -34,7 +34,7 @@ export class GameController {
     public selectedEntity;
     public locale: "en";
     public currentMs: number;
-    public deltaCamY: number = 0; // offset for camera to prevent camera moving when the player rotates
+    public deltaCamY: number = 2.7; // offset for camera to prevent camera moving when the player rotates
     public latestError: string;
     public isMobile: boolean = false;
     public currentChats = [];

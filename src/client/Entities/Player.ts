@@ -315,7 +315,7 @@ export class Player extends Entity {
             allMeshes.forEach((element) => {
                 if (element.name !== "__root__") {
                     let distanceTo = Vector3.Distance(element.getAbsolutePosition(), currentPos);
-                    if (distanceTo < 40) {
+                    if (distanceTo < 50) {
                         element.setEnabled(true);
                     } else {
                         element.setEnabled(false);

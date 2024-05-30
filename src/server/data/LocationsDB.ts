@@ -56,36 +56,6 @@ let LocationsDB = {
                 },
 
                 {
-                    key: "lh_town_thief",
-                    type: "area",
-                    behaviour: "patrol",
-                    aggressive: false,
-                    canAttack: true,
-                    points: [
-                        new Vector3(39.35, 0.1, 39.11),
-                        new Vector3(60.81, 0.1, 22.54),
-                        new Vector3(67.49, 0.1, 39.73),
-                        new Vector3(86.13, 0.17, 38.12),
-                        new Vector3(69.02, 0.1, 55.81),
-                        new Vector3(53.82, 0.1, 57.89),
-                        new Vector3(45.52, 0.1, 46.68),
-                        new Vector3(37.82, 0.1, 52.82),
-                    ],
-                    amount: 10,
-                    race: "male_mage",
-                    material: 1,
-                    name: "Thief",
-                    baseHealth: 40,
-                    baseSpeed: Speed.VERY_SLOW,
-                    equipment: [
-                        {
-                            key: "sword_01",
-                            slot: PlayerSlots.WEAPON,
-                        },
-                    ],
-                },
-
-                {
                     key: "lh_town_bandits",
                     type: "area",
                     behaviour: "patrol",
@@ -214,13 +184,13 @@ let LocationsDB = {
                     behaviour: "idle",
                     aggressive: false,
                     canAttack: false,
-                    points: [new Vector3(12.92, 0.02, 3.44)],
-                    rotation: 0,
+                    points: [new Vector3(59.43, 8.01, 40.29)],
+                    rotation: 2.79,
                     radius: 0,
                     amount: 1,
                     race: "male_mage",
-                    material: 1,
-                    name: "Sorceress",
+                    material: 0,
+                    name: "Mira The Sorceress",
                     baseHealth: 5000,
                     equipment: [
                         {
