@@ -1,6 +1,6 @@
 Hi all,
 
-Since I've managed to resolve most of the animations issues I was having, I decided to relax and work on some level design, keeping in mind that the overall goal was to make  enough content to bring the player from level 1 to level 10.
+Since I've managed to resolve most of the animations issues I was having, I decided to relax and work on some level design, keeping in mind that the overall goal was to make  enough content to bring the player from level 1 to level 10. The overall feeling should feel "grindy".
 
 ## Preparation is KEY
 
@@ -64,7 +64,11 @@ Once I've clarified the overall content, it's time to start level design, please
  
 ## The result
 
-After quite a bit of work, I actually managed to fit everything in quite a small area (which suits me just fine). As this is a research project (and not a future game I plan to release), I do not want to go into too much details.
+After quite a bit of work, I actually managed to fit everything in quite a small area (which suits me just fine). The idea is too keep everything tight and condensed. Of course, this map will elvove/improve naturally as I work on it. A few thing to bother me:
+- The actual farm should be moved closer to the mountain (and not in the village center)
+- Market should probably be in the town center
+- The Velvet Veil in front of the Temple may be a little ...
+- 
 
 MAP IMAGE HERE
 
