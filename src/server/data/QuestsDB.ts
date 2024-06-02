@@ -5,8 +5,8 @@ let QuestsDB = {
         key: "LH_DANGEROUS_ERRANDS_01", // unique id
         title: "Dangerous Errands",
         description:
-            "If you have a moment, our temple is currently plagued by a bandit invasion and they're roaming outside the temple creating havoc. Perhaps you could offer some assistance in this matter?",
-        objective: "@NpcName in @LocationName wants you to kill @KillRequired @TargetName found a little to the east of lighthaven temple.",
+            "If you have a moment, please go to the forest to the south. It is currently plagued by a bandit invasion, perhaps you could offer some assistance in this matter?",
+        objective: "@NpcName in @LocationName wants you to kill @KillRequired @TargetName found south of Eldoria.",
         type: QuestObjective.KILL_AMOUNT,
         location: "lh_town",
         spawn_key: "lh_town_bandits",
@@ -18,27 +18,7 @@ let QuestsDB = {
             items: [],
         },
     },
-    LH_DANGEROUS_ERRANDS_02: {
-        key: "LH_DANGEROUS_ERRANDS_02", // unique id
-        title: "Highway Patrol Thief",
-        description: "There is roaming in the mountains close by, please deal with him and I'll reward you.",
-        objective: "@NpcName in @LocationName wants you to kill the @TargetName roaming the montains in the west of lighthaven temple.",
-        type: QuestObjective.KILL_AMOUNT,
-        location: "lh_town",
-        spawn_key: "lh_town_thief",
-        quantity: 1,
-        isRepeatable: true,
-        rewards: {
-            experience: 1000,
-            gold: 250,
-            items: [
-                {
-                    key: "sword_01",
-                    qty: 1,
-                },
-            ],
-        },
-    },
+    /*
     LH_DANGEROUS_ERRANDS_03: {
         key: "LH_DANGEROUS_ERRANDS_03", // unique id
         title: "Find Alexander The Righteous",
@@ -53,7 +33,7 @@ let QuestsDB = {
         rewards: {
             experience: 10000,
         },
-    },
+    },*/
 };
 
 export { QuestsDB };

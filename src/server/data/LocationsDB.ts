@@ -39,100 +39,116 @@ let LocationsDB = {
                 },
             ],
             spawns: [
-                {
-                    key: "lh_town_rat",
-                    type: "area",
-                    behaviour: "patrol",
-                    aggressive: true,
-                    canAttack: true,
-                    points: [new Vector3(33.93, 0.1, 0.31), new Vector3(44.67, 0.1, -8.61), new Vector3(53.21, 0.1, 0.45), new Vector3(50.13, 0.1, 11.68)],
-                    amount: 10,
-                    race: "rat_01",
-                    material: 0,
-                    name: "Rat",
-                    baseHealth: 40,
-                    baseSpeed: Speed.VERY_SLOW,
-                    equipment: [],
-                },
+     
+                ///////////////////////
+                ///////// NPC /////////
 
+                // BLACKSMITH
                 {
-                    key: "lh_town_bandits",
-                    type: "area",
-                    behaviour: "patrol",
-                    aggressive: true,
-                    canAttack: true,
-                    points: [
-                        new Vector3(47.33, 0.1, 82.32),
-                        new Vector3(31.38, 0.1, 92.21),
-                        new Vector3(13.38, 0.1, 77.76),
-                        new Vector3(23.24, 0.1, 63.66),
-                        new Vector3(-1.81, 0.1, 66.85),
-                        new Vector3(-4.56, 0.1, 81.26),
-                        new Vector3(8.97, 0.1, 93.21),
-                        new Vector3(34.44, 0.1, 97.1),
-                        new Vector3(-15.45, 0.1, 73.79),
-                        new Vector3(4.56, 0.1, 68.85),
-                    ],
-                    amount: 10,
-                    race: "male_rogue",
-                    material: 2,
-                    name: "Bandit",
-                    baseHealth: 80,
-                    baseSpeed: Speed.VERY_SLOW,
-                    equipment: [
-                        {
-                            key: "helm_01",
-                            slot: PlayerSlots.HEAD,
-                        },
-                        {
-                            key: "shield_01",
-                            slot: PlayerSlots.OFF_HAND,
-                        },
-                        {
-                            key: "sword_01",
-                            slot: PlayerSlots.WEAPON,
-                        },
-                    ],
-                },
-
-                {
-                    key: "lh_town_alexander",
+                    key: "lh_town_blacksmith",
                     type: "static",
                     behaviour: "idle",
                     aggressive: false,
                     canAttack: false,
-                    points: [new Vector3(40.32, 0.1, 20.88)],
-                    rotation: 1.85,
+                    points: [new Vector3(31.22, 0.06, -24.19)],
+                    rotation: 2.7,
                     amount: 1,
                     race: "male_knight",
                     material: 0,
-                    name: "Bartender",
+                    name: "Blacksmith Garin",
                     interactable: {
                         title: "Talk",
                         data: [
                             {
                                 type: "text",
-                                text: "Greetings, noble traveler! I am Alex, a humble bartender. How may I be of service to you today?",
+                                text: "Greetings, adventurer! Looking for a new weapon or some sturdy armor? I've got the finest in Eldoria.",
+                                vendor: {
+                                    items: [
+                                        { key: "helm_01" },
+                                        { key: "shield_01" },
+                                        { key: "sword_01" },
+                                        { key: "amulet_01" },
+                                        { key: "hat_01" },
+                                    ],
+                                },
                                 isEndOfDialog: true,
                             },
                         ],
+                        
                     },
                 },
+
+                // MERCHANT
                 {
-                    key: "lh_town_market_01",
+                    key: "lh_town_merchant",
                     type: "static",
                     behaviour: "idle",
                     aggressive: false,
                     canAttack: false,
-                    points: [new Vector3(9.65, 0.1, 35.11)],
-                    rotation: 1.85,
-                    amount: 2,
-                    race: "male_mage",
-                    material: 1,
-                    name: "Merchant",
+                    points: [new Vector3(10.18, 0.06, 25.43)],
+                    rotation: 2.7,
+                    amount: 1,
+                    race: "male_rogue",
+                    material: 0,
+                    name: "Merchant Elara",
+                    interactable: {
+                        title: "Talk",
+                        data: [
+                            {
+                                type: "text",
+                                text: "Remember, a well-prepared adventurer is a successful adventurer. Stock up before you head out!",
+                                vendor: {
+                                    items: [
+                                        { key: "potion_small_red" },
+                                        { key: "potion_small_blue" },
+                                    ],
+                                },
+                                isEndOfDialog: true,
+                            },
+                        ],
+                        
+                    },
                 },
+                
+
+                // SORCERESS
                 {
-                    key: "spawn_04",
+                    key: "lh_town_sorceress",
+                    type: "static",
+                    behaviour: "idle",
+                    aggressive: false,
+                    canAttack: false,
+                    points: [new Vector3(59.43, 8.01, 40.29)],
+                    rotation: 2.79,
+                    radius: 0,
+                    amount: 1,
+                    race: "male_mage",
+                    material: 0,
+                    name: "Mira The Sorceress",
+                    baseHealth: 5000,
+                    equipment: [
+                        {
+                            key: "hat_01",
+                            slot: PlayerSlots.HEAD,
+                        },
+                    ],
+                    interactable: {
+                        title: "Talk",
+                        data: [
+                            {
+                                type: "text",
+                                text: "Ah, another seeker of knowledge. What arcane mysteries can I help you unlock today?",
+                                trainer: {
+                                    abilities: [{ key: "fire_dart" }, { key: "poison" }],
+                                },
+                            },
+                        ],
+                    },
+                },
+
+                // PRIESTESS
+                {
+                    key: "lh_town_priestress",
                     type: "static",
                     behaviour: "idle",
                     aggressive: false,
@@ -142,14 +158,14 @@ let LocationsDB = {
                     amount: 2,
                     race: "male_mage",
                     material: 2,
-                    name: "Kilhiam ",
+                    name: "Priestess Alice ",
                     equipment: [],
                     interactable: {
                         title: "Talk",
                         data: [
                             {
                                 type: "text",
-                                text: "Greetings, dear one! I am Priestess Kilhiam, a devoted servant of the benevolent Goddess Athlea. May her light shine upon you.",
+                                text: "Blessings of Athlea upon you. How can I assist you in your journey?",
                                 quests: [{ key: "LH_DANGEROUS_ERRANDS_01" }],
                                 trainer: {
                                     abilities: [{ key: "light_heal" }],
@@ -178,70 +194,102 @@ let LocationsDB = {
                         ],
                     },
                 },
+
+                // FARMER
                 {
-                    key: "spawn_trainer",
+                    key: "lh_town_farmer",
                     type: "static",
                     behaviour: "idle",
                     aggressive: false,
                     canAttack: false,
-                    points: [new Vector3(59.43, 8.01, 40.29)],
-                    rotation: 2.79,
-                    radius: 0,
+                    points: [new Vector3(13.15, 0.06, 41.13)],
+                    rotation: 2.4,
                     amount: 1,
-                    race: "male_mage",
-                    material: 0,
-                    name: "Mira The Sorceress",
-                    baseHealth: 5000,
-                    equipment: [
-                        {
-                            key: "hat_01",
-                            slot: PlayerSlots.HEAD,
-                        },
-                    ],
+                    race: "male_rogue",
+                    material: 1,
+                    name: "Farmer Jorin",
                     interactable: {
                         title: "Talk",
                         data: [
                             {
                                 type: "text",
-                                text: "Greetings, are you need of training.",
-                                trainer: {
-                                    abilities: [{ key: "fire_dart" }, { key: "poison" }],
-                                },
+                                text: "It's hard work, but honest work. The land provides for those who tend to it with care",
+                                isEndOfDialog: true,
                             },
                         ],
                     },
                 },
+
+                // BARTENDER
                 {
-                    key: "spawn_vendor",
+                    key: "lh_town_bartender",
                     type: "static",
                     behaviour: "idle",
                     aggressive: false,
                     canAttack: false,
-                    points: [new Vector3(30.22, 0.02, -24.62)],
-                    rotation: 3,
-                    radius: 0,
+                    points: [new Vector3(40.32, 0.1, 20.88)],
+                    rotation: 1.85,
                     amount: 1,
                     race: "male_knight",
-                    material: 2,
-                    name: "Vendor",
-                    baseHealth: 5000,
+                    material: 0,
+                    name: "Bartender Morin",
                     interactable: {
                         title: "Talk",
                         data: [
                             {
                                 type: "text",
-                                text: "Greetings, I'm purveyor of curiosities, do you want to trade?",
-                                vendor: {
-                                    items: [
-                                        { key: "potion_small_red" },
-                                        { key: "potion_small_blue" },
-                                        { key: "helm_01" },
-                                        { key: "shield_01" },
-                                        { key: "sword_01" },
-                                        { key: "amulet_01" },
-                                        { key: "hat_01" },
-                                    ],
-                                },
+                                text: "Welcome to the tavern! Sit, have a drink, and share your tales of adventure.",
+                                isEndOfDialog: true,
+                            },
+                        ],
+                    },
+                },
+
+                // CARETAKER
+                {
+                    key: "lh_town_caretaker",
+                    type: "static",
+                    behaviour: "idle",
+                    aggressive: false,
+                    canAttack: false,
+                    points: [new Vector3(47.54, 0.06, 67.27)],
+                    rotation: 1.5,
+                    amount: 1,
+                    race: "male_rogue",
+                    material: 1,
+                    name: "Caretaker Ren",
+                    interactable: {
+                        title: "Talk",
+                        data: [
+                            {
+                                type: "text",
+                                text: "The cemetery holds many secrets. Respect the dead, and they may offer you their wisdom.",
+                                isEndOfDialog: true,
+                            },
+                        ],
+                    },
+                },
+
+                // MADAME SERAPHINA
+                {
+                    key: "lh_town_seraphina",
+                    type: "static",
+                    behaviour: "idle",
+                    aggressive: false,
+                    canAttack: false,
+                    points: [new Vector3(-12.24, 0.06, 17.5)],
+                    rotation: -1.5,
+                    amount: 2,
+                    race: "male_mage",
+                    material: 1,
+                    name: "Madame Seraphina",
+                    interactable: {
+                        title: "Talk",
+                        data: [
+                            {
+                                type: "text",
+                                text: "Ah, a new face! Please, make yourself at home and enjoy our performances.",
+                                isEndOfDialog: true,
                             },
                         ],
                     },
@@ -267,7 +315,7 @@ let LocationsDB = {
                             {
                                 type: "text",
                                 text: "Hi @PlayerName, if you want to practice your spells or fighting skills, please do not hesitate to use myself as a target practise!",
-                                quests: [{ key: "LH_DANGEROUS_ERRANDS_02" }, { key: "LH_DANGEROUS_ERRANDS_03" }],
+                                //quests: [{ key: "LH_DANGEROUS_ERRANDS_02" }, { key: "LH_DANGEROUS_ERRANDS_03" }],
                                 isEndOfDialog: true,
                             },
                             {
@@ -280,6 +328,48 @@ let LocationsDB = {
                     },
                     equipment: [],
                 },
+
+                ////////////////////////
+                //////// ENEMIES ///////
+
+                {
+                    key: "lh_town_bandits",
+                    type: "area",
+                    behaviour: "patrol",
+                    aggressive: true,
+                    canAttack: true,
+                    points: [
+                        new Vector3(-11.15, 0.06, 68.05),
+                        new Vector3(-10.45, 0.06, 87.2),
+                        new Vector3(1.1, 0.06, 79.36),
+                        new Vector3(14.34, 0.06, 86.56),
+                        new Vector3(27.81, 0.06, 89.47),
+                        new Vector3(44.71, 0.06, 82.98),
+                        new Vector3(28.44, 0.06, 78.08)
+                    ],
+                    amount: 10,
+                    race: "male_rogue",
+                    material: 2,
+                    name: "Bandit",
+                    baseHealth: 80,
+                    baseSpeed: Speed.VERY_SLOW,
+                    equipment: [
+                        {
+                            key: "helm_01",
+                            slot: PlayerSlots.HEAD,
+                        },
+                        {
+                            key: "shield_01",
+                            slot: PlayerSlots.OFF_HAND,
+                        },
+                        {
+                            key: "sword_01",
+                            slot: PlayerSlots.WEAPON,
+                        },
+                    ],
+                },
+
+
             ],
         },
     },

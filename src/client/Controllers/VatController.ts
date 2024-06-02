@@ -39,6 +39,7 @@ export class VatController {
     public _game: GameController;
     private _spawns: any[] = [];
     public _entityData = new Map();
+    public _vatData = new Map();
     private _skeletonData = new Map();
 
     public get entityData() {
@@ -75,8 +76,18 @@ export class VatController {
         return movies;
     }
 
+    async prepareVat(vatKey){
+        if(!this._vatData.has(vatKey)){
+            // get vat data
+            const bakedAnimationJson = await this.fetchVAT(vatKey);
+
+        }
+        return this._vatData.get(vatKey);
+    }
+
     async prepareMesh(key) {
         let race = this._game.getGameData("race", key);
+        let vatKey = race.vat;
 
         const bakedAnimationJson = await this.fetchVAT(race.key);
         const { meshes, animationGroups, skeletons } = this._game._loadedAssets["RACE_" + key];
