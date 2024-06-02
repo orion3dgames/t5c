@@ -347,6 +347,7 @@ export type Race = {
     drops?: ILootTableEntry[];
     default_abilities?: string[];
     materials?;
+    vat?;
 };
 
 export interface raceDataMap {

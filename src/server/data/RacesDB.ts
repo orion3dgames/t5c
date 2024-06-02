@@ -36,6 +36,7 @@ let RacesDB: raceDataMap = {
             { title: "Color 3", material: "knight_texture_alt_B.png" },
             { title: "Color 4", material: "knight_texture_alt_C.png" },
         ],
+        vat: 'humanoid',
     },
     male_mage: {
         key: "male_mage",
@@ -71,6 +72,7 @@ let RacesDB: raceDataMap = {
             { title: "Color 2", material: "mage_texture_alt_A.png" },
             { title: "Color 3", material: "mage_texture_alt_B.png" },
         ],
+        vat: 'humanoid',
     },
     male_rogue: {
         key: "male_rogue",
@@ -107,6 +109,7 @@ let RacesDB: raceDataMap = {
         ],
         default_abilities: ["base_attack"],
         materials: [{ title: "Color 1", material: "rogue_texture.png" }],
+        vat: 'humanoid',
     },
     rat_01: {
         key: "rat_01",
@@ -133,6 +136,7 @@ let RacesDB: raceDataMap = {
         },
         bones: {},
         materials: [],
+        vat: 'rat',
     },
 };
 
