@@ -252,11 +252,26 @@ export class GameScene {
         // main game loop
 
         const lastUpdates = {
-            SERVER: Date.now(),
-            SLOW: Date.now(),
-            PING: Date.now(),
-            UI_SERVER: Date.now(),
-            UI_SLOW: Date.now(),
+            SERVER: {
+                RATE: this._game.config.updateRate ?? 100,
+                TIME: Date.now(),
+            },
+            SLOW: {
+                RATE: 1000,
+                TIME: Date.now(),
+            },
+            PING: {
+                RATE: 2000,
+                TIME: Date.now(),
+            },
+            UI_SERVER: {
+                RATE: 100,
+                TIME: Date.now(),
+            },
+            UI_SLOW: {
+                RATE: 1000,
+                TIME: Date.now(),
+            },
         };
 
         // start game loop
@@ -274,40 +289,42 @@ export class GameScene {
                 entity.update(delta);
 
                 // server player gameloop
-                if (currentTime - lastUpdates["SERVER"] >= 100) {
-                    entity.updateServerRate(100);
+                if (currentTime - lastUpdates.SERVER.TIME >= lastUpdates.SERVER.RATE) {
+                    entity.updateServerRate(lastUpdates.SERVER.RATE);
                 }
 
                 // slow game loop
-                if (currentTime - lastUpdates["SLOW"] >= 1000) {
-                    entity.updateSlowRate(1000);
+                if (currentTime - lastUpdates.SLOW.TIME >= lastUpdates.SLOW.RATE) {
+                    entity.updateSlowRate(lastUpdates.SLOW.RATE);
                     entity.lod(this._currentPlayer);
                 }
             });
 
             // reset timers
-            if (currentTime - lastUpdates["SERVER"] >= 100) {
-                lastUpdates["SERVER"] = currentTime;
+            if (currentTime - lastUpdates.SERVER.TIME >= lastUpdates.SERVER.RATE) {
+                lastUpdates.SERVER.TIME = currentTime;
             }
-            if (currentTime - lastUpdates["SLOW"] >= 1000) {
-                lastUpdates["SLOW"] = currentTime;
+            if (currentTime - lastUpdates.SLOW.TIME >= lastUpdates.SLOW.RATE) {
+                lastUpdates.SLOW.TIME = currentTime;
             }
 
             // game update loop
-            if (currentTime - lastUpdates["PING"] >= 1000) {
+            if (currentTime - lastUpdates.PING.TIME >= lastUpdates.PING.RATE) {
                 // send ping to server
                 this._game.sendMessage(ServerMsg.PING);
-                lastUpdates["PING"] = currentTime;
+                lastUpdates.PING.TIME = currentTime;
             }
 
             // ui update loop
-            if (currentTime - lastUpdates["UI_SERVER"] >= 100) {
+            if (currentTime - lastUpdates.UI_SERVER.TIME >= lastUpdates.UI_SERVER.RATE) {
                 this._ui.update();
-                lastUpdates["UI_SERVER"] = currentTime;
+                lastUpdates.UI_SERVER.TIME = currentTime;
             }
-            if (currentTime - lastUpdates["UI_SLOW"] >= 1000) {
+
+            // ui slow update loop
+            if (currentTime - lastUpdates.UI_SLOW.TIME >= lastUpdates.UI_SLOW.RATE) {
                 this._ui.slow_update();
-                lastUpdates["UI_SLOW"] = currentTime;
+                lastUpdates.UI_SLOW.TIME = currentTime;
             }
         });
     }

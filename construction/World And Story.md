@@ -23,6 +23,7 @@ Eldoria was a quaint village nestled between lush forests and towering mountains
 *   **Cemetery**: A somber place tended by Caretaker Ren, and the entrance to the Mausoleum dungeon.
 *   **Forest**: Dense and dark, home to fearsome Bandits and the site of many trials.
 *   **Sorceress Tower**: The mystical home of Sorceress Mira, where adventurers could learn offensive magic.
+*   **Velvet Veil**: A luxurious establishment in Eldoria, known for its warm hospitality, soothing ambiance, and vibrant performances. 
 *   **Port**: Locations of future development and potential quests.
 
 ### Dungeons
@@ -40,6 +41,7 @@ Eldoria was a quaint village nestled between lush forests and towering mountains
 *   **Farmer Jorin**: A simple farmer with untold stories.
 *   **Bartender Morin**: The keeper of the tavern and a source of many quests.
 *   **Caretaker Ren**: Guardian of the cemetery, harboring secrets of the Mausoleum.
+*   **Madame Seraphina**: Proprietor of the Velvet Veil.
 
 ### Enemies
 
