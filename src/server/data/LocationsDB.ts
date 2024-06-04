@@ -39,7 +39,6 @@ let LocationsDB = {
                 },
             ],
             spawns: [
-     
                 ///////////////////////
                 ///////// NPC /////////
 
@@ -53,7 +52,7 @@ let LocationsDB = {
                     points: [new Vector3(31.22, 0.06, -24.19)],
                     rotation: 2.7,
                     amount: 1,
-                    race: "male_knight",
+                    race: "male_mage",
                     material: 3,
                     name: "Blacksmith Garin",
                     equipment: [
@@ -77,18 +76,11 @@ let LocationsDB = {
                                 type: "text",
                                 text: "Greetings, adventurer! Looking for a new weapon or some sturdy armor? I've got the finest in Eldoria.",
                                 vendor: {
-                                    items: [
-                                        { key: "helm_01" },
-                                        { key: "shield_01" },
-                                        { key: "sword_01" },
-                                        { key: "amulet_01" },
-                                        { key: "hat_01" },
-                                    ],
+                                    items: [{ key: "helm_01" }, { key: "shield_01" }, { key: "sword_01" }, { key: "amulet_01" }, { key: "hat_01" }],
                                 },
                                 isEndOfDialog: true,
                             },
                         ],
-                        
                     },
                 },
 
@@ -112,18 +104,13 @@ let LocationsDB = {
                                 type: "text",
                                 text: "Remember, a well-prepared adventurer is a successful adventurer. Stock up before you head out!",
                                 vendor: {
-                                    items: [
-                                        { key: "potion_small_red" },
-                                        { key: "potion_small_blue" },
-                                    ],
+                                    items: [{ key: "potion_small_red" }, { key: "potion_small_blue" }],
                                 },
                                 isEndOfDialog: true,
                             },
                         ],
-                        
                     },
                 },
-                
 
                 // SORCERESS
                 {
@@ -357,12 +344,7 @@ let LocationsDB = {
                     behaviour: "patrol",
                     aggressive: true,
                     canAttack: true,
-                    points: [
-                        new Vector3(36.29, 0.06, -0.59),
-                        new Vector3(45.93, 0.06, 0.88),
-                        new Vector3(40.4, 0.06, 7.2),
-                        new Vector3(32.86, 0.06, 8.73)
-                    ],
+                    points: [new Vector3(36.29, 0.06, -0.59), new Vector3(45.93, 0.06, 0.88), new Vector3(40.4, 0.06, 7.2), new Vector3(32.86, 0.06, 8.73)],
                     amount: 5,
                     race: "rat_01",
                     material: 0,
@@ -385,7 +367,7 @@ let LocationsDB = {
                         new Vector3(14.34, 0.06, 86.56),
                         new Vector3(27.81, 0.06, 89.47),
                         new Vector3(44.71, 0.06, 82.98),
-                        new Vector3(28.44, 0.06, 78.08)
+                        new Vector3(28.44, 0.06, 78.08),
                     ],
                     amount: 10,
                     race: "male_knight",
@@ -408,8 +390,6 @@ let LocationsDB = {
                         },
                     ],
                 },
-
-
             ],
         },
     },
