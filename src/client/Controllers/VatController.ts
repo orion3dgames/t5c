@@ -87,8 +87,7 @@ export class VatController {
 
     async prepareMesh(key) {
         let race = this._game.getGameData("race", key);
-        let vatKey = race.vat;
-
+     
         const bakedAnimationJson = await this.fetchVAT(race.key);
         const { meshes, animationGroups, skeletons } = this._game._loadedAssets["RACE_" + key];
         const skeleton = skeletons[0];
@@ -159,6 +158,8 @@ export class VatController {
 
             // hide mesh
             modelMeshMerged.setEnabled(false);
+
+            console.log(key);
 
             // save
             this._entityData.set(key, {

@@ -148,6 +148,7 @@ export class GameScene {
 
         await this._game._vatController.initialize();
         await this._game._vatController.check(this._game._currentCharacter.race);
+        
         console.log("[VAT] loaded", this._game._vatController._entityData);
 
         // init network
