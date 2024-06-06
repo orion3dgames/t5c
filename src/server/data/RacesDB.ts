@@ -1,7 +1,80 @@
 import { LootTableEntry } from "../../shared/Class/LootTable";
 import { raceDataMap } from "../../shared/types";
 
+const raceTypes = {
+    rat: {},
+    humanoid: {
+        key: "humanoid",
+        vat: "humanoid",
+        head: {
+            meshes: {
+                HEAD_01: "mesh_name",
+                HEAD_02: "mesh_name",
+                HEAD_03: "mesh_name",
+            },
+            material: {
+                FACE_01: "material_name",
+                FACE_02: "material_name",
+                FACE_03: "material_name",
+            },
+        },
+        chest: {
+            meshes: {
+                CHEST_01: "mesh_name",
+                CHEST_02: "mesh_name",
+            },
+            material: {
+                CHEST_01: "material_name",
+                CHEST_02: "material_name",
+            },
+        },
+        left_arm: {},
+        right_arm: {},
+        left_leg: {},
+        right_leg: {},
+    },
+};
+
 let RacesDB: raceDataMap = {
+    // NEW MODULAR CHARACTER
+    humanoid: {
+        key: "male_knight",
+        title: "Knight",
+        description: "The knight is as knight should be, strong and righteous. It has a large health pool and uses stamina to cast its abilities.",
+        icon: "ICON_RACE_male_knight",
+        speed: 0.7,
+        scale: 1,
+        rotationFix: Math.PI,
+        meshIndex: 1,
+
+        animations: {
+            ATTACK: { name: "1H_Melee_Attack_Chop", duration: 1000, speed: 1 },
+            DEATH: { name: "Death_A", duration: 1000, speed: 1 },
+            IDLE: { name: "Idle", duration: 1000, speed: 1 },
+            WALK: { name: "Walking_A", duration: 1000, speed: 1.3 },
+        },
+        bones: {
+            WEAPON: 12,
+            OFF_HAND: 7,
+            HEAD: 14,
+        },
+        baseHealth: 50,
+        baseMana: 50,
+        healthRegen: 0.1,
+        manaRegen: 0.1, // per second
+        experienceGain: { min: 0, max: 0 },
+        goldGain: { min: 0, max: 0 },
+        drops: [],
+        default_abilities: ["base_attack"],
+        materials: [
+            { title: "Color 1", material: "knight_texture.png" },
+            { title: "Color 2", material: "knight_texture_alt_A.png" },
+            { title: "Color 3", material: "knight_texture_alt_B.png" },
+            { title: "Color 4", material: "knight_texture_alt_C.png" },
+        ],
+        vat: "humanoid",
+    },
+
     male_knight: {
         key: "male_knight",
         title: "Knight",
@@ -36,7 +109,7 @@ let RacesDB: raceDataMap = {
             { title: "Color 3", material: "knight_texture_alt_B.png" },
             { title: "Color 4", material: "knight_texture_alt_C.png" },
         ],
-        vat: 'humanoid',
+        vat: "humanoid",
     },
     male_mage: {
         key: "male_mage",
@@ -72,7 +145,7 @@ let RacesDB: raceDataMap = {
             { title: "Color 2", material: "mage_texture_alt_A.png" },
             { title: "Color 3", material: "mage_texture_alt_B.png" },
         ],
-        vat: 'humanoid',
+        vat: "humanoid",
     },
     male_rogue: {
         key: "male_rogue",
@@ -109,7 +182,7 @@ let RacesDB: raceDataMap = {
         ],
         default_abilities: ["base_attack"],
         materials: [{ title: "Color 1", material: "rogue_texture.png" }],
-        vat: 'humanoid',
+        vat: "humanoid",
     },
     rat_01: {
         key: "rat_01",
@@ -136,7 +209,7 @@ let RacesDB: raceDataMap = {
         },
         bones: {},
         materials: [],
-        vat: 'rat',
+        vat: "rat",
     },
 };
 
