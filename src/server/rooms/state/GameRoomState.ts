@@ -46,15 +46,16 @@ export class GameRoomState extends Schema {
         this.config = gameroom.config;
         this.navMesh = _navMesh;
 
-        this.start();
+        this.init();
     }
 
-    public async start() {
+    public async init() {
         // load game data
         // in the future, it'll be in the database
         this.gameData = new gameDataCTRL();
         await this.gameData.initialize();
 
+        // get location details
         this.roomDetails = this.gameData.get("location", this._gameroom.metadata.location);
 
         // load controllers
@@ -68,14 +69,11 @@ export class GameRoomState extends Schema {
             this.entityCTRL.all.forEach((entity) => {
                 entity.update(deltaTime);
 
-                // remove loot that's been on the ground over 5 minutes
-                if (entity.type === "item" && entity.spawnTimer > 1000 * 60 * 5) {
-                    //this.deleteEntity(entity.sessionId);
-                }
+                // todo: remove item/loot that's been on the ground over 5 minutes
             });
         }
 
-        // spawn
+        // update spawn controller
         this.spawnCTRL.update(deltaTime);
     }
 
@@ -146,8 +144,6 @@ export class GameRoomState extends Schema {
             initial_hotbar: data.hotbar ?? [],
         };
 
-        console.log(player);
-
         this.entityCTRL.add(new PlayerSchema(this, player));
 
         // set player as online
@@ -193,11 +189,7 @@ export class GameRoomState extends Schema {
         /////////////////////////////////////
         // on player learn skill
         if (type === ServerMsg.PLAYER_LEARN_SKILL) {
-            let key = data.key;
-            const ability = this.gameData.get("ability", key);
-            if (ability) {
-                playerState.abilitiesCTRL.learnAbility(ability);
-            }
+            playerState.abilitiesCTRL.learnAbility(data.key);
         }
 
         /////////////////////////////////////
@@ -213,9 +205,10 @@ export class GameRoomState extends Schema {
         /////////////////////////////////////
         // on player input
         if (type === ServerMsg.PLAYER_MOVE) {
-            let playerInputs = data;
-            playerState.moveCTRL.processPlayerInput(playerInputs);
+            playerState.moveCTRL.processPlayerInput(data);
         }
+
+        // on player click to move
         if (type === ServerMsg.PLAYER_MOVE_TO) {
             playerState.abilitiesCTRL.cancelAutoAttack(playerState);
             playerState.moveCTRL.setTargetDestination(new Vector3(data.x, data.y, data.z));
@@ -224,9 +217,8 @@ export class GameRoomState extends Schema {
         /////////////////////////////////////
         // on player ressurect
         if (type === ServerMsg.PLAYER_PICKUP) {
-            let sessionId = data.sessionId;
             playerState.abilitiesCTRL.cancelAutoAttack(playerState);
-            const itemState = this.getEntity(sessionId);
+            const itemState = this.getEntity(data.sessionId);
             if (itemState) {
                 playerState.setTarget(itemState);
             }
@@ -236,7 +228,6 @@ export class GameRoomState extends Schema {
             let slot = data.slot;
             let dropAll = data.drop_all ?? false;
             const item = playerState.getInventoryItemByIndex(slot);
-
             if (item) {
                 playerState.dropItem(item, dropAll);
             }

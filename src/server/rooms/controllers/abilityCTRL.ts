@@ -30,7 +30,14 @@ export class abilitiesCTRL {
      * allow player to learn a ability
      * @param ability
      */
-    public learnAbility(ability: Ability) {
+    public learnAbility(key) {
+        const ability = this._owner._state.gameData.get("ability", key);
+
+        // only proceed if the ability exists
+        if (!ability) {
+            return false;
+        }
+
         // only proceed if the ability does not already
         if (!this._owner.player_data.abilities[ability.key]) {
             // add ability to player

@@ -10,6 +10,7 @@
       "client-dev": "webpack serve --open --config webpack.dev.js",
       "client-start": "webpack serve --open --config webpack.dev.js",
       "client-build": "webpack --config webpack.prod.js",
+      "server-debug": "ts-node-dev --respawn --inspect --transpile-only src/server/index.ts",
       "server-dev": "ts-node-dev --respawn --transpile-only src/server/index.ts",
       "server-start": "ts-node --transpile-only src/server/index.ts",
       "server-build": "tsc && cp -r public dist",

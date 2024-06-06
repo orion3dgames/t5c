@@ -226,6 +226,8 @@ export class moveCTRL {
             }
         }
 
+        // adjust height of the entity according to the ground
+        // todo: improve performance here
         // adjust y position of the player according to the navmesh
         let currentRegion = this._owner._navMesh.getRegionForPoint(newPos, 0.5);
         if (currentRegion && currentRegion.plane) {

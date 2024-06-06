@@ -111,7 +111,7 @@ export class BrainSchema extends Entity {
         /////////////////////////////////////////////////////////////////
         // if players are connected, start monitoring them
         if (this.isEntityDead() && !this.isDead) {
-            console.log("UPDATE AI", this.sessionId, this.health)
+            console.log("UPDATE AI", this.sessionId, this.health);
             this.setAsDead();
         }
 
@@ -228,6 +228,7 @@ export class BrainSchema extends Entity {
 
         let newPos = new Vector3(source.x, source.y, source.z);
 
+        // X
         if (targetX < currentX) {
             newPos.x -= speed;
             if (newPos.x < targetX) {
@@ -240,6 +241,8 @@ export class BrainSchema extends Entity {
                 newPos.x = targetX;
             }
         }
+
+        // Z
         if (targetZ < currentZ) {
             newPos.z -= speed;
             if (newPos.z < targetZ) {
@@ -254,6 +257,7 @@ export class BrainSchema extends Entity {
         }
 
         // adjust height of the entity according to the ground
+        // todo: improve performance here
         let currentRegion = this._navMesh.getRegionForPoint(newPos, 5);
         if (currentRegion) {
             let distance = currentRegion.plane.distanceToPoint(newPos);
