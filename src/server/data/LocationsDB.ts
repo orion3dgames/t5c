@@ -76,7 +76,7 @@ let LocationsDB = {
                                 type: "text",
                                 text: "Greetings, adventurer! Looking for a new weapon or some sturdy armor? I've got the finest in Eldoria.",
                                 vendor: {
-                                    items: [{ key: "helm_01" }, { key: "shield_01" }, { key: "sword_01" }, { key: "amulet_01" }, { key: "hat_01" }],
+                                    items: [{ key: "head_01" }, { key: "shield_01" }, { key: "sword_01" }, { key: "amulet_01" }, { key: "hat_01" }],
                                 },
                                 isEndOfDialog: true,
                             },
@@ -302,12 +302,34 @@ let LocationsDB = {
                 },
 
                 {
-                    key: "spawn_dummy",
+                    key: "spawn_dummy1",
                     type: "static",
                     behaviour: "idle",
                     aggressive: false,
                     canAttack: true,
-                    points: [new Vector3(13.1, 0, -13.7)],
+                    points: [new Vector3(9, 0, -13.7)],
+                    rotation: 3.12,
+                    radius: 0,
+                    amount: 1,
+                    race: "male_knight",
+                    material: 2,
+                    name: "Harmless Dummy",
+                    baseHealth: 5000,
+                    equipment: [
+                        {
+                            key: "head_02",
+                            slot: PlayerSlots.HEAD,
+                        },
+                    ],
+                },
+
+                {
+                    key: "spawn_dummy2",
+                    type: "static",
+                    behaviour: "idle",
+                    aggressive: false,
+                    canAttack: true,
+                    points: [new Vector3(11, 0, -13.7)],
                     rotation: 3.12,
                     radius: 0,
                     amount: 1,
@@ -315,24 +337,34 @@ let LocationsDB = {
                     material: 1,
                     name: "Harmless Dummy",
                     baseHealth: 5000,
-                    interactable: {
-                        title: "Talk",
-                        data: [
-                            {
-                                type: "text",
-                                text: "Hi @PlayerName, if you want to practice your spells or fighting skills, please do not hesitate to use myself as a target practise!",
-                                //quests: [{ key: "LH_DANGEROUS_ERRANDS_02" }, { key: "LH_DANGEROUS_ERRANDS_03" }],
-                                isEndOfDialog: true,
-                            },
-                            {
-                                type: "text",
-                                text: "Very well, may the goddess watch over your chosen path.",
-                                buttonName: "Thank you",
-                                isEndOfDialog: true,
-                            },
-                        ],
-                    },
-                    equipment: [],
+                    equipment: [
+                        {
+                            key: "head_01",
+                            slot: PlayerSlots.HEAD,
+                        },
+                    ],
+                },
+
+                {
+                    key: "spawn_dummy3",
+                    type: "static",
+                    behaviour: "idle",
+                    aggressive: false,
+                    canAttack: true,
+                    points: [new Vector3(13, 0, -13.7)],
+                    rotation: 3.12,
+                    radius: 0,
+                    amount: 1,
+                    race: "male_knight",
+                    material: 0,
+                    name: "Harmless Dummy",
+                    baseHealth: 5000,
+                    equipment: [
+                        {
+                            key: "head_03",
+                            slot: PlayerSlots.HEAD,
+                        },
+                    ],
                 },
 
                 ////////////////////////
