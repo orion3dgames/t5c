@@ -42,7 +42,7 @@ let LocationsDB = {
                 ///////////////////////
                 ///////// NPC /////////
 
-                /*
+                
                 // BLACKSMITH
                 {
                     key: "lh_town_blacksmith",
