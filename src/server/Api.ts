@@ -170,7 +170,7 @@ class Api {
 
             loop(1).then(() => {
                 database.saveUser(username, password).then((user) => {
-                    database.createCharacter(user.token, generateRandomPlayerName(), "male_knight", 0).then((character) => {
+                    database.createCharacter(user.token, generateRandomPlayerName(), "humanoid", 0).then((character) => {
                         character.user_id = user.id;
                         character.token = user.token;
                         character.password = user.password;

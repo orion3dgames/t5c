@@ -254,7 +254,7 @@ export class UserInterface {
 
         // open inventory by default
         this.panelInventory.open();
-        this.panelHelp.open();
+        //this.panelHelp.open();
 
         // create tooltip
         this._Tooltip = new Tooltip(this, currentPlayer);

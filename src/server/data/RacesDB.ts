@@ -1,7 +1,62 @@
 import { LootTableEntry } from "../../shared/Class/LootTable";
 import { raceDataMap } from "../../shared/types";
 
+let meshes = {
+    humanoid: {
+        HEAD: {
+            HEAD_01: "head_Base",
+            HEAD_02: "Head_Barbarian",
+            HEAD_03: "Head_Engineer",
+            HEAD_04: "Head_Knight",
+            HEAD_05: "Head_Mage",
+            HEAD_06: "Head_Rogue",
+        },
+        BODY: {
+            BODY_01: "Base_Body",
+            BODY_02: "Armor_Robe"
+        }
+    }
+}
+
 let RacesDB: raceDataMap = {
+
+    humanoid: {
+        key: "humanoid",
+        title: "Knight",
+        description: "The knight is as knight should be, strong and righteous. It has a large health pool and uses stamina to cast its abilities.",
+        icon: "ICON_RACE_male_knight",
+        speed: 0.7,
+        scale: 1,
+        rotationFix: Math.PI,
+        meshIndex: 1,
+        animations: {
+            ATTACK: { name: "1H_Melee_Attack_Chop", duration: 1000, speed: 1 },
+            DEATH: { name: "Death_A", duration: 1000, speed: 1 },
+            IDLE: { name: "Idle", duration: 1000, speed: 1 },
+            WALK: { name: "Walking_B", duration: 1000, speed: 1.3 },
+        },
+        bones: {
+            WEAPON: 12,
+            OFF_HAND: 7,
+            HEAD: 14,
+        },
+        baseHealth: 50,
+        baseMana: 50,
+        healthRegen: 0.1,
+        manaRegen: 0.1, // per second
+        experienceGain: { min: 0, max: 0 },
+        goldGain: { min: 0, max: 0 },
+        drops: [],
+        default_abilities: ["base_attack"],
+        materials: [
+            { title: "Color 1", material: "knight_texture.png" },
+            { title: "Color 2", material: "knight_texture_alt_A.png" },
+            { title: "Color 3", material: "knight_texture_alt_B.png" },
+            { title: "Color 4", material: "knight_texture_alt_C.png" },
+        ],
+        vat: 'humanoid',
+    },
+
     male_knight: {
         key: "male_knight",
         title: "Knight",
