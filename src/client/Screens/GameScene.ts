@@ -29,6 +29,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 import { RenderTargetTexture } from "@babylonjs/core/Materials/Textures/renderTargetTexture";
+import { PlayerCamera } from "../Entities/Player/PlayerCamera";
 
 export class GameScene {
     public _game: GameController;
@@ -38,6 +39,9 @@ export class GameScene {
     public _shadow: ShadowGenerator;
     public _navMesh: NavMesh;
     public _navMeshDebug;
+    public _camera;
+
+    public hasPlayer = false;
 
     public _roomId: string;
     public room: Room<any>;
@@ -48,6 +52,7 @@ export class GameScene {
     public gameData;
 
     public _entities: Map<string, Player | Entity | Item> = new Map();
+    public toSpawn: Map<string, Player | Entity | Item> = new Map();
 
     constructor() {}
 
@@ -146,10 +151,9 @@ export class GameScene {
         let spawns = location.dynamic.spawns ?? [];
         this._game._vatController = new VatController(this._game, spawns);
 
-        await this._game._vatController.initialize();
-        await this._game._vatController.check(this._game._currentCharacter.race);
-        
-        console.log("[VAT] loaded", this._game._vatController._entityData);
+        //await this._game._vatController.initialize();
+        //await this._game._vatController.check(this._game._currentCharacter.race, this._game._currentCharacter);
+        //console.log("[VAT] loaded", this._game._vatController._entityData);
 
         // init network
         this._initNetwork();
@@ -198,9 +202,174 @@ export class GameScene {
 
         // setup input Controller
         this._input = new PlayerInput(this);
+        this._camera = new PlayerCamera(this);
 
         ////////////////////////////////////////////////////
         //  when a entity joins the room event
+        this.room.state.entities.onAdd((entity, sessionId) => {
+            this.toSpawn.set(entity.sessionId, entity);
+        });
+
+        // when an entity is removed
+        this.room.state.entities.onRemove((entity, sessionId) => {
+            if (this._entities.has(sessionId)) {
+                this._entities.get(sessionId)?.remove();
+                this._entities.delete(sessionId);
+            }
+        });
+
+        ////////////////////////////////////////////////////
+        // main game loop
+
+        const lastUpdates = {
+            SERVER: {
+                RATE: this._game.config.updateRate ?? 100,
+                TIME: Date.now(),
+            },
+            SLOW: {
+                RATE: 1000,
+                TIME: Date.now(),
+            },
+            PING: {
+                RATE: 2000,
+                TIME: Date.now(),
+            },
+            UI_SERVER: {
+                RATE: 100,
+                TIME: Date.now(),
+            },
+            UI_SLOW: {
+                RATE: 1000,
+                TIME: Date.now(),
+            },
+        };
+
+        // start game loop
+        this._scene.registerBeforeRender(() => {
+     
+            // get current delta
+            let delta = this._game.engine.getFps();
+
+            // process vat animations
+            this._game._vatController.process(delta);
+
+            // iterate through each items
+            const currentTime = Date.now();
+            if(this.hasPlayer){
+                this._entities.forEach((entity, sessionId) => {
+                    // main entity update
+                    entity.update(delta);
+
+                    // server player gameloop
+                    if (currentTime - lastUpdates.SERVER.TIME >= lastUpdates.SERVER.RATE) {
+                        entity.updateServerRate(lastUpdates.SERVER.RATE);
+                    }
+
+                    // slow game loop
+                    if (currentTime - lastUpdates.SLOW.TIME >= lastUpdates.SLOW.RATE) {
+                        entity.updateSlowRate(lastUpdates.SLOW.RATE);
+                        entity.lod(this._currentPlayer);
+                    }
+                });
+            }
+
+            // reset timers
+            if (currentTime - lastUpdates.SERVER.TIME >= lastUpdates.SERVER.RATE) {
+                lastUpdates.SERVER.TIME = currentTime;
+            }
+            if (currentTime - lastUpdates.SLOW.TIME >= lastUpdates.SLOW.RATE) {
+                lastUpdates.SLOW.TIME = currentTime;
+            }
+
+            // game update loop
+            if (currentTime - lastUpdates.PING.TIME >= lastUpdates.PING.RATE) {
+                // send ping to server
+                this._game.sendMessage(ServerMsg.PING);
+                lastUpdates.PING.TIME = currentTime;
+            }
+
+            // ui update loop
+            if (currentTime - lastUpdates.UI_SERVER.TIME >= lastUpdates.UI_SERVER.RATE) {
+                this._ui.update();
+                this.spawn();
+                lastUpdates.UI_SERVER.TIME = currentTime;
+            }
+
+            // ui slow update loop
+            if (currentTime - lastUpdates.UI_SLOW.TIME >= lastUpdates.UI_SLOW.RATE) {
+                this._ui.slow_update();
+                
+                lastUpdates.UI_SLOW.TIME = currentTime;
+            }
+
+            
+        });
+
+        //await this.spawnPlayer();
+        //await this.spawnEnnemies();
+    }
+
+    async spawn(){
+
+        let i = 0;
+        for(const value of this.toSpawn){
+            let entity = value[1];
+            i++;
+
+            console.log('[SPAWNING]', entity);
+            
+            // if player
+            if (entity.type === "player") {
+                var isCurrentPlayer = entity.sessionId === this.room.sessionId;
+                //////////////////
+                // if player type
+                if (isCurrentPlayer) {
+                    // create player entity
+                    let _player = new Player(entity.sessionId, this._scene, this, entity);
+              
+                    // set currentPlayer
+                    this._currentPlayer = _player;
+
+                    // add player specific ui
+                    this._ui.setCurrentPlayer(_player);
+
+                    // add to entities
+                    this._entities.set(entity.sessionId, _player);
+
+                    // player is loaded, let's hide the loading gui
+                    this._game.engine.hideLoadingUI();
+
+                    this.hasPlayer = true;
+
+                    //////////////////
+                    // else must be another player
+                } else {
+                    this._entities.set(entity.sessionId, new Entity(entity.sessionId, this._scene, this, entity));
+                }
+            }
+
+            // if entity
+            if (entity.type === "entity") {
+                this._entities.set(entity.sessionId, new Entity(entity.sessionId, this._scene, this, entity));
+            }
+
+            // if item
+            if (entity.type === "item") {
+                this._entities.set(entity.sessionId, new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._game));
+            }
+
+            this.toSpawn.delete(entity.sessionId);
+
+            if(i > 0){
+                break;
+            }
+        }
+        
+    }
+
+    async spawnEnnemies(){
+
+        /*
         this.room.state.entities.onAdd((entity, sessionId) => {
             // if player
             if (entity.type === "player") {
@@ -248,86 +417,7 @@ export class GameScene {
                 this._entities.delete(sessionId);
             }
         });
-
-        ////////////////////////////////////////////////////
-        // main game loop
-
-        const lastUpdates = {
-            SERVER: {
-                RATE: this._game.config.updateRate ?? 100,
-                TIME: Date.now(),
-            },
-            SLOW: {
-                RATE: 1000,
-                TIME: Date.now(),
-            },
-            PING: {
-                RATE: 2000,
-                TIME: Date.now(),
-            },
-            UI_SERVER: {
-                RATE: 100,
-                TIME: Date.now(),
-            },
-            UI_SLOW: {
-                RATE: 1000,
-                TIME: Date.now(),
-            },
-        };
-
-        // start game loop
-        this._scene.registerBeforeRender(() => {
-            // get current delta
-            let delta = this._game.engine.getFps();
-
-            // process vat animations
-            this._game._vatController.process(delta);
-
-            // iterate through each items
-            const currentTime = Date.now();
-            this._entities.forEach((entity, sessionId) => {
-                // main entity update
-                entity.update(delta);
-
-                // server player gameloop
-                if (currentTime - lastUpdates.SERVER.TIME >= lastUpdates.SERVER.RATE) {
-                    entity.updateServerRate(lastUpdates.SERVER.RATE);
-                }
-
-                // slow game loop
-                if (currentTime - lastUpdates.SLOW.TIME >= lastUpdates.SLOW.RATE) {
-                    entity.updateSlowRate(lastUpdates.SLOW.RATE);
-                    entity.lod(this._currentPlayer);
-                }
-            });
-
-            // reset timers
-            if (currentTime - lastUpdates.SERVER.TIME >= lastUpdates.SERVER.RATE) {
-                lastUpdates.SERVER.TIME = currentTime;
-            }
-            if (currentTime - lastUpdates.SLOW.TIME >= lastUpdates.SLOW.RATE) {
-                lastUpdates.SLOW.TIME = currentTime;
-            }
-
-            // game update loop
-            if (currentTime - lastUpdates.PING.TIME >= lastUpdates.PING.RATE) {
-                // send ping to server
-                this._game.sendMessage(ServerMsg.PING);
-                lastUpdates.PING.TIME = currentTime;
-            }
-
-            // ui update loop
-            if (currentTime - lastUpdates.UI_SERVER.TIME >= lastUpdates.UI_SERVER.RATE) {
-                this._ui.update();
-                lastUpdates.UI_SERVER.TIME = currentTime;
-            }
-
-            // ui slow update loop
-            if (currentTime - lastUpdates.UI_SLOW.TIME >= lastUpdates.UI_SLOW.RATE) {
-                this._ui.slow_update();
-                lastUpdates.UI_SLOW.TIME = currentTime;
-            }
-        });
+        */
     }
 
     // triggered on resize event

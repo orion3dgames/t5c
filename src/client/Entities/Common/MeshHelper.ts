@@ -18,7 +18,7 @@ const mergeMeshAndSkeleton = function (mesh, skeleton) {
     //const childMeshes = allChildMeshes.filter((m) => !m.name.includes("Backpack"));
 
     // multiMaterial = true
-    const merged = Mesh.MergeMeshes(allChildMeshes, false, true, undefined, undefined, true);
+    const merged = Mesh.MergeMeshes(allChildMeshes, false, true, undefined, undefined, false);
     if (merged) {
         merged.name = "_MergedModel";
         merged.skeleton = skeleton;

@@ -24,6 +24,7 @@ import { PlayerInput } from "../../client/Controllers/PlayerInput";
 import { GameController } from "../Controllers/GameController";
 import { GameScene } from "../Screens/GameScene";
 import { Player } from "./Player";
+import e from "express";
 
 export class Entity extends TransformNode {
     public _scene: Scene;
@@ -33,6 +34,7 @@ export class Entity extends TransformNode {
     public _shadow;
     public _navMesh;
     public _game: GameController;
+    public _gamescene: GameScene;
 
     // controllers
     public cameraController: PlayerCamera;
@@ -106,6 +108,7 @@ export class Entity extends TransformNode {
         // setup class variables
         this._scene = scene;
         this._room = gamescene.room;
+        this._gamescene = gamescene;
         this._game = gamescene._game;
         this._navMesh = gamescene._navMesh;
         this._ui = gamescene._ui;
@@ -132,10 +135,16 @@ export class Entity extends TransformNode {
         this.debugMaterialNeutral = this._scene.getMaterialByName("debug_entity_neutral");
 
         // spawn player
-        this.spawn(entity);
+        this._game._vatController.prepareMesh(entity);
+
+        //
+        setTimeout(()=>{
+            this.spawn(entity);
+        }, 200)
     }
 
     public async spawn(entity) {
+
         // load mesh controllers
         this.meshController = new EntityMesh(this);
         await this.meshController.load();
@@ -228,7 +237,9 @@ export class Entity extends TransformNode {
 
         ////////////////////////////////////
         // animate player continuously
-        this.animatorController.animate(this);
+        if(this.animatorController){
+            this.animatorController.animate(this);
+        }
 
         ////////////////////////////////////
         // only do the below if entity is not dead
@@ -263,14 +274,18 @@ export class Entity extends TransformNode {
             }
         }
 
-        this.animatorController.refreshAnimationRatio();
+        if(this.animatorController){
+            // animate player continuously
+            this.animatorController.refreshAnimationRatio();
 
-        ////////////////////////////////////
-        // animate player continuously
-        this.animatorController.play(this);
+            // animate player continuously
+            this.animatorController.play(this);
+        }
 
         //
-        this.nameplateController.update();
+        if(this.nameplateController){
+            this.nameplateController.update();
+        }
     }
 
     public updateServerRate(delta) {}
@@ -283,10 +298,16 @@ export class Entity extends TransformNode {
 
     // basic performance LOD logic
     public lod(_currentPlayer: Entity) {
+
+        if(!this.mesh){
+            return false;
+        }
+
         // only enable if close enough to local player
         let entityPos = this.getPosition();
         let playerPos = _currentPlayer.getPosition();
         let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
+        
         if (distanceFromPlayer < this._game.config.PLAYER_VIEW_DISTANCE) {
             this.mesh.setEnabled(true);
             this.mesh.unfreezeWorldMatrix();

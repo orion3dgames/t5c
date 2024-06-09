@@ -27,6 +27,7 @@ export class BrainSchema extends Entity {
     @type("string") public type: string = "";
     @type("string") public name: string = "";
     @type("string") public race: string = "";
+    @type("string") public head: string = "Head_Base";
     @type("int8") public material: number = 0;
 
     @type("string") public location: string = "";

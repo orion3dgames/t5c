@@ -133,6 +133,7 @@ export class spawnCTRL {
         let mana = spawn.baseMana ?? raceData.baseMana;
         let rotation = spawn.rotation ?? randomNumberInRange(0, Math.PI);
         let speed = spawn.baseSpeed ?? Speed.MEDIUM;
+        let head = spawn.head ?? "Head_Base";
 
         // create entity
         let data = {
@@ -140,6 +141,7 @@ export class spawnCTRL {
             type: "entity",
             race: raceData.key,
             material: spawn.material,
+            head: head,
             name: spawn.name,
             location: this._room.metadata.location,
             x: position.x ?? 0,

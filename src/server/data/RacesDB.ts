@@ -4,7 +4,7 @@ import { raceDataMap } from "../../shared/types";
 let meshes = {
     humanoid: {
         HEAD: {
-            HEAD_01: "head_Base",
+            HEAD_01: "Head_Base",
             HEAD_02: "Head_Barbarian",
             HEAD_03: "Head_Engineer",
             HEAD_04: "Head_Knight",
@@ -15,6 +15,15 @@ let meshes = {
             BODY_01: "Base_Body",
             BODY_02: "Armor_Robe"
         }
+    }
+}
+
+let raceTemplate = {
+    BASE: {
+        HEAD: "Head_Base",
+    },
+    CUSTOM_01: {
+        HEAD: "Head_Barbarian",
     }
 }
 

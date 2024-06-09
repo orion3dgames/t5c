@@ -53,14 +53,11 @@ let LocationsDB = {
                     points: [new Vector3(31.22, 0.06, -24.19)],
                     rotation: 2.7,
                     amount: 1,
-                    race: "male_mage",
+                    race: "humanoid",
                     material: 3,
+                    head: "Head_Barbarian",
                     name: "Blacksmith Garin",
                     equipment: [
-                        {
-                            key: "helm_01",
-                            slot: PlayerSlots.HEAD,
-                        },
                         {
                             key: "shield_01",
                             slot: PlayerSlots.OFF_HAND,
@@ -77,7 +74,7 @@ let LocationsDB = {
                                 type: "text",
                                 text: "Greetings, adventurer! Looking for a new weapon or some sturdy armor? I've got the finest in Eldoria.",
                                 vendor: {
-                                    items: [{ key: "head_01" }, { key: "shield_01" }, { key: "sword_01" }, { key: "amulet_01" }, { key: "hat_01" }],
+                                    items: [{ key: "shield_01" }, { key: "sword_01" }, { key: "amulet_01" }, { key: "hat_01" }],
                                 },
                                 isEndOfDialog: true,
                             },
@@ -85,6 +82,38 @@ let LocationsDB = {
                     },
                 },
 
+                {
+                    key: "lh_town_bandits",
+                    type: "area",
+                    behaviour: "patrol",
+                    aggressive: true,
+                    canAttack: true,
+                    points: [
+                        new Vector3(27.16, 0.06, 1.38),
+                        new Vector3(31.74, 0.06, -3.27),
+                        new Vector3(38.56, 0.06, 0.31)
+                    ],
+                    amount: 10,
+                    race: "humanoid",
+                    head: "Head_Rogue",
+                    material: 2,
+                    name: "Bandit",
+                    baseHealth: 80,
+                    baseSpeed: Speed.VERY_SLOW,
+                    equipment: [
+                        {
+                            key: "shield_01",
+                            slot: PlayerSlots.OFF_HAND,
+                        },
+                        {
+                            key: "sword_01",
+                            slot: PlayerSlots.WEAPON,
+                        },
+                    ],
+                    vat: "humanoid"
+                },
+
+                /*
                 // MERCHANT
                 {
                     key: "lh_town_merchant",

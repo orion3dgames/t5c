@@ -60,6 +60,8 @@ export class EntityMesh {
         }
         */
 
+        console.log('ENTITY LAOD', this._entityData);
+
         // selected circle
         var material = this._scene.getMaterialByName("entity_selected");
         const selectedMesh = MeshBuilder.CreateCylinder("entity_selected_" + this._entity.race, { diameter: 2, height: 0.01, tessellation: 8 }, this._scene);
@@ -72,11 +74,9 @@ export class EntityMesh {
         this.selectedMesh = selectedMesh;
 
         // load player mesh
-        let materialIndex = this._entity.material ?? 0;
-        if (!this._entityData.meshes[materialIndex]) {
-            materialIndex = 0;
-        }
-        const playerMesh = this._entityData.meshes[materialIndex].createInstance(this._entity.type + "" + this._entity.sessionId);
+        let materialIndex = this._entity.sessionId;
+        //let materialIndex = 0;
+        const playerMesh = this._entityData.meshes.get(materialIndex).createInstance(this._entity.type + "" + this._entity.sessionId);
         playerMesh.parent = this._entity;
         playerMesh.isPickable = true;
         playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
@@ -160,6 +160,8 @@ export class EntityMesh {
             });
             //this._entity.animatorController.refreshItems();
         }, 200);
+
+        return true;
     }
 
     public deleteMeshes() {
@@ -198,6 +200,7 @@ export class EntityMesh {
                 this._game._vatController.prepareItemForVat(this._entity.race, e.key);
 
                 // create instance of mesh
+                console.log(item.key);
                 let instance = this._entityData.items.get(item.key).createInstance("equip_" + this._entity.sessionId + "_" + e.key);
                 instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
                 instance.isPickable = false;

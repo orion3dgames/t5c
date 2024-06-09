@@ -267,9 +267,17 @@ export class UserInterface {
     public update() {
         //
         //this.fpsPanel.text = "FPS: " + this._engine.getFps().toFixed(0);
-        this._targetEntitySelectedBar.update();
-        this._playerEntitySelectedBar.update();
-        this._Tooltip.update();
+        if(this._targetEntitySelectedBar){
+            this._targetEntitySelectedBar.update();
+        }
+
+        if(this._playerEntitySelectedBar){
+            this._playerEntitySelectedBar.update();
+        }
+
+        if(this._Tooltip){
+            this._Tooltip.update();
+        }
 
         //
         this.dragging();
@@ -277,13 +285,14 @@ export class UserInterface {
 
     // update every 1000ms
     public slow_update() {
+        /*
         this._DebugBox.update();
         this.panelInventory.update();
         this.panelAbilities.update();
         this.panelCharacter.update();
         this.panelHelp.update();
         this.panelDialog.update();
-        this.panelQuests.update();
+        this.panelQuests.update();*/
     }
 
     public dragging() {
