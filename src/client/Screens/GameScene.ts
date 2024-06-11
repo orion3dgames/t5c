@@ -150,8 +150,8 @@ export class GameScene {
         // preload any skeletons and animation
         let spawns = location.dynamic.spawns ?? [];
         this._game._vatController = new VatController(this._game, spawns);
+        await this._game._vatController.initialize();
 
-        //await this._game._vatController.initialize();
         //await this._game._vatController.check(this._game._currentCharacter.race, this._game._currentCharacter);
         //console.log("[VAT] loaded", this._game._vatController._entityData);
 
@@ -246,7 +246,6 @@ export class GameScene {
 
         // start game loop
         this._scene.registerBeforeRender(() => {
-     
             // get current delta
             let delta = this._game.engine.getFps();
 
@@ -255,7 +254,7 @@ export class GameScene {
 
             // iterate through each items
             const currentTime = Date.now();
-            if(this.hasPlayer){
+            if (this.hasPlayer) {
                 this._entities.forEach((entity, sessionId) => {
                     // main entity update
                     entity.update(delta);
@@ -291,33 +290,26 @@ export class GameScene {
             // ui update loop
             if (currentTime - lastUpdates.UI_SERVER.TIME >= lastUpdates.UI_SERVER.RATE) {
                 this._ui.update();
-                this.spawn();
                 lastUpdates.UI_SERVER.TIME = currentTime;
             }
 
             // ui slow update loop
             if (currentTime - lastUpdates.UI_SLOW.TIME >= lastUpdates.UI_SLOW.RATE) {
                 this._ui.slow_update();
-                
+                this.spawn();
                 lastUpdates.UI_SLOW.TIME = currentTime;
             }
-
-            
         });
-
-        //await this.spawnPlayer();
-        //await this.spawnEnnemies();
     }
 
-    async spawn(){
-
+    async spawn() {
         let i = 0;
-        for(const value of this.toSpawn){
+        for (const value of this.toSpawn) {
             let entity = value[1];
             i++;
 
-            console.log('[SPAWNING]', entity);
-            
+            console.log("[SPAWNING]", entity);
+
             // if player
             if (entity.type === "player") {
                 var isCurrentPlayer = entity.sessionId === this.room.sessionId;
@@ -326,7 +318,7 @@ export class GameScene {
                 if (isCurrentPlayer) {
                     // create player entity
                     let _player = new Player(entity.sessionId, this._scene, this, entity);
-              
+
                     // set currentPlayer
                     this._currentPlayer = _player;
 
@@ -358,17 +350,17 @@ export class GameScene {
                 this._entities.set(entity.sessionId, new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._game));
             }
 
+            // remove from toSpawn
             this.toSpawn.delete(entity.sessionId);
 
-            if(i > 0){
+            // only spawn 1 every frame
+            if (i > 0) {
                 break;
             }
         }
-        
     }
 
-    async spawnEnnemies(){
-
+    async spawnEnnemies() {
         /*
         this.room.state.entities.onAdd((entity, sessionId) => {
             // if player

@@ -13,10 +13,10 @@ let meshes = {
         },
         BODY: {
             BODY_01: "Base_Body",
-            BODY_02: "Armor_Robe"
-        }
-    }
-}
+            BODY_02: "Armor_Robe",
+        },
+    },
+};
 
 let raceTemplate = {
     BASE: {
@@ -24,11 +24,10 @@ let raceTemplate = {
     },
     CUSTOM_01: {
         HEAD: "Head_Barbarian",
-    }
-}
+    },
+};
 
 let RacesDB: raceDataMap = {
-
     humanoid: {
         key: "humanoid",
         title: "Knight",
@@ -63,9 +62,10 @@ let RacesDB: raceDataMap = {
             { title: "Color 3", material: "knight_texture_alt_B.png" },
             { title: "Color 4", material: "knight_texture_alt_C.png" },
         ],
-        vat: 'humanoid',
+        vat: "humanoid",
     },
 
+    /*
     male_knight: {
         key: "male_knight",
         title: "Knight",
@@ -202,6 +202,7 @@ let RacesDB: raceDataMap = {
         materials: [],
         vat: "rat",
     },
+    */
 };
 
 export { RacesDB };

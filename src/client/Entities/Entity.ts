@@ -138,13 +138,12 @@ export class Entity extends TransformNode {
         this._game._vatController.prepareMesh(entity);
 
         //
-        setTimeout(()=>{
+        setTimeout(() => {
             this.spawn(entity);
-        }, 200)
+        }, 1000);
     }
 
     public async spawn(entity) {
-
         // load mesh controllers
         this.meshController = new EntityMesh(this);
         await this.meshController.load();
@@ -237,7 +236,7 @@ export class Entity extends TransformNode {
 
         ////////////////////////////////////
         // animate player continuously
-        if(this.animatorController){
+        if (this.animatorController) {
             this.animatorController.animate(this);
         }
 
@@ -274,7 +273,7 @@ export class Entity extends TransformNode {
             }
         }
 
-        if(this.animatorController){
+        if (this.animatorController) {
             // animate player continuously
             this.animatorController.refreshAnimationRatio();
 
@@ -283,7 +282,7 @@ export class Entity extends TransformNode {
         }
 
         //
-        if(this.nameplateController){
+        if (this.nameplateController) {
             this.nameplateController.update();
         }
     }
@@ -298,8 +297,7 @@ export class Entity extends TransformNode {
 
     // basic performance LOD logic
     public lod(_currentPlayer: Entity) {
-
-        if(!this.mesh){
+        if (!this.mesh) {
             return false;
         }
 
@@ -307,7 +305,7 @@ export class Entity extends TransformNode {
         let entityPos = this.getPosition();
         let playerPos = _currentPlayer.getPosition();
         let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
-        
+
         if (distanceFromPlayer < this._game.config.PLAYER_VIEW_DISTANCE) {
             this.mesh.setEnabled(true);
             this.mesh.unfreezeWorldMatrix();

@@ -262,15 +262,15 @@ export class UserInterface {
     public update() {
         //
         //this.fpsPanel.text = "FPS: " + this._engine.getFps().toFixed(0);
-        if(this._targetEntitySelectedBar){
+        if (this._targetEntitySelectedBar) {
             this._targetEntitySelectedBar.update();
         }
 
-        if(this._playerEntitySelectedBar){
+        if (this._playerEntitySelectedBar) {
             this._playerEntitySelectedBar.update();
         }
 
-        if(this._Tooltip){
+        if (this._Tooltip) {
             this._Tooltip.update();
         }
 
@@ -280,8 +280,11 @@ export class UserInterface {
 
     // update every 1000ms
     public slow_update() {
+        if (this._DebugBox) {
+            this._DebugBox.update();
+        }
+
         /*
-        this._DebugBox.update();
         this.panelInventory.update();
         this.panelAbilities.update();
         this.panelCharacter.update();

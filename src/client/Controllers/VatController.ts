@@ -55,6 +55,10 @@ export class VatController {
         this._spawns = spawns;
     }
 
+    async initialize() {
+        await this.prepareVat(this._game.getGameData("race", "humanoid"));
+    }
+
     async fetchVAT(key) {
         const url = "./models/races/vat/" + key + ".json";
         const response = await fetch(url);
@@ -62,13 +66,12 @@ export class VatController {
         return movies;
     }
 
-    async prepareVat(race){
-
+    async prepareVat(race) {
         let key = race.vat;
 
-        console.log("[prepareVat] "+key, race);
+        console.log("[prepareVat] " + key, race);
 
-        if(!this._entityData.has(key)){
+        if (!this._entityData.has(key)) {
             // get vat data
             const bakedAnimationJson = await this.fetchVAT(key);
 
@@ -77,7 +80,7 @@ export class VatController {
 
             // get selected animations
             animationGroups.forEach((ag) => ag.stop());
-            const selectedAnimationGroups = this.getAnimationGroups(animationGroups, race.animations);    
+            const selectedAnimationGroups = this.getAnimationGroups(animationGroups, race.animations);
 
             // calculate animations ranges
             const ranges = calculateRanges(selectedAnimationGroups);
@@ -99,40 +102,30 @@ export class VatController {
                 vat: manager,
                 skeleton: skeleton,
                 items: new Map(),
-            })
-
+            });
         }
         return this._entityData.get(key);
     }
 
-    makeHumanoid(root, skeleton, data){
-        
-        ///let root = baseMeshes.clone('HELLO');
+    makeHumanoid(baseMeshes, skeleton, data) {
+        let root = baseMeshes.clone("HELLO");
 
-        /*
         let keepArray = [
-            "HELLO.Rig."+data.head+"."+data.head,
+            "HELLO.Rig." + data.head + "." + data.head,
             "HELLO.Rig.Base_ArmLeft.Base_ArmLeft",
             "HELLO.Rig.Base_ArmRight.Base_ArmRight",
-            Math.random() < .5 ? "HELLO.Rig.Base_Body.Base_Body" : "HELLO.Rig.Armor_Robe.Armor_Robe",
+            Math.random() < 0.5 ? "HELLO.Rig.Base_Body.Base_Body" : "HELLO.Rig.Armor_Robe.Armor_Robe",
             "HELLO.Rig.Base_LegLeft.Base_LegLeft",
-            "HELLO.Rig.Base_LegRight.Base_LegRight"
-        ];*/
-
-        let keepArray = [
-            data.head,
-            "Base_ArmLeft",
-            "Base_ArmRight",
-            Math.random() < .5 ? "Base_Body" : "Armor_Robe",
-            "Base_LegLeft",
-            "Base_LegRight"
+            "HELLO.Rig.Base_LegRight.Base_LegRight",
         ];
 
-        console.log('[VAT] making humanoid', data.head, keepArray);
+        // let keepArray = [data.head, "Base_ArmLeft", "Base_ArmRight", Math.random() < 0.5 ? "Base_Body" : "Armor_Robe", "Base_LegLeft", "Base_LegRight"];
 
-        root.getChildMeshes(false).forEach(element => {
+        console.log("[VAT] making humanoid", data.head, keepArray);
+
+        root.getChildMeshes(false).forEach((element) => {
             console.log(element.id);
-            if(!keepArray.includes(element.id)){
+            if (!keepArray.includes(element.id)) {
                 element.dispose();
             }
         });
@@ -147,7 +140,7 @@ export class VatController {
         // gets or prepare vat
         let vat = await this.prepareVat(race);
 
-        // 
+        //
         const { meshes } = this._game._loadedAssets["RACE_" + key];
         const root = meshes[0];
         root.name = "_root_race_" + key;
@@ -164,11 +157,10 @@ export class VatController {
 
         // setup vat
         if (modelMeshMerged) {
-
             // set mesh
             modelMeshMerged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
             modelMeshMerged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-            
+
             modelMeshMerged.bakedVertexAnimationManager = vat.vat;
             modelMeshMerged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
 
@@ -202,20 +194,20 @@ export class VatController {
             }
             */
             // in the case where there is only one material
-            /*
+
             let raceKey = race.key + "_0";
             let clone = modelMeshMerged.clone(raceKey);
             clone.bakedVertexAnimationManager = vat.vat;
             clone.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
             clone.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
             clone.setEnabled(false);
-            */
-            vat.meshes.set(entity.sessionId, modelMeshMerged);
+
+            vat.meshes.set(entity.sessionId, clone);
 
             // hide mesh
-            modelMeshMerged.setEnabled(false);
+            //modelMeshMerged.setEnabled(false);
 
-            // 
+            //
             console.log("[VAT] vat loaded", vat);
         }
     }
@@ -238,14 +230,12 @@ export class VatController {
         if (!boneId) return false;
 
         // clone raw mesh
-        let rawMesh = this._game._loadedAssets["ITEM_" + item.key].meshes[0]; // mandatory: needs to be cloned
-        
+        let rawMesh = this._game._loadedAssets["ITEM_" + item.key].meshes[0].clone("TEST"); // mandatory: needs to be cloned
         rawMesh.position.copyFrom(entityData.skeleton.bones[boneId].getAbsolutePosition());
         rawMesh.rotationQuaternion = undefined;
         rawMesh.rotation.set(0, Math.PI * 1.5, 0); // could be set it in Blender
         rawMesh.scaling.setAll(1);
 
-        /*
         // if mesh offset required
         let equipOptions = item.equippable;
         if (equipOptions.scale) {
@@ -266,7 +256,7 @@ export class VatController {
             // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
             rawMesh.rotationQuaternion = null;
             rawMesh.rotation.set(equipOptions.rotation_x ?? 0, equipOptions.rotation_y ?? 0, equipOptions.rotation_z ?? 0);
-        }*/
+        }
 
         // merge mesh
         let itemMesh = mergeMesh(rawMesh, itemKey);
@@ -294,8 +284,8 @@ export class VatController {
 
             // cleanup
             //rawMesh.dispose();
-            rawMesh.position.y = 5000; // offset to hide the raw item as setEnabled does not work
-            itemMesh.position.y = 5000; // offset to hide the raw item as setEnabled does not work
+            //rawMesh.position.y = 5000; // offset to hide the raw item as setEnabled does not work
+            //itemMesh.position.y = 5000; // offset to hide the raw item as setEnabled does not work
             //itemMesh.setEnabled(false);
 
             //console.log("PREPARING ITEM FOR VAT", race, itemKey);

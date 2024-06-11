@@ -42,7 +42,6 @@ let LocationsDB = {
                 ///////////////////////
                 ///////// NPC /////////
 
-                
                 // BLACKSMITH
                 {
                     key: "lh_town_blacksmith",
@@ -88,12 +87,8 @@ let LocationsDB = {
                     behaviour: "patrol",
                     aggressive: true,
                     canAttack: true,
-                    points: [
-                        new Vector3(27.16, 0.06, 1.38),
-                        new Vector3(31.74, 0.06, -3.27),
-                        new Vector3(38.56, 0.06, 0.31)
-                    ],
-                    amount: 10,
+                    points: [new Vector3(27.16, 0.06, 1.38), new Vector3(31.74, 0.06, -3.27), new Vector3(38.56, 0.06, 0.31)],
+                    amount: 2,
                     race: "humanoid",
                     head: "Head_Rogue",
                     material: 2,
@@ -110,7 +105,7 @@ let LocationsDB = {
                             slot: PlayerSlots.WEAPON,
                         },
                     ],
-                    vat: "humanoid"
+                    vat: "humanoid",
                 },
 
                 /*
