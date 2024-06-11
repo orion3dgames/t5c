@@ -205,7 +205,7 @@ export class VatController {
             vat.meshes.set(entity.sessionId, clone);
 
             // hide mesh
-            //modelMeshMerged.setEnabled(false);
+            modelMeshMerged.setEnabled(false);
 
             //
             console.log("[VAT] vat loaded", vat);
@@ -283,10 +283,8 @@ export class VatController {
             itemMesh.setVerticesData(VertexBuffer.MatricesWeightsKind, weaponMW, false);
 
             // cleanup
-            //rawMesh.dispose();
-            //rawMesh.position.y = 5000; // offset to hide the raw item as setEnabled does not work
-            //itemMesh.position.y = 5000; // offset to hide the raw item as setEnabled does not work
-            //itemMesh.setEnabled(false);
+            rawMesh.dispose();
+            itemMesh.setEnabled(false);
 
             //console.log("PREPARING ITEM FOR VAT", race, itemKey);
             entityData.items.set(itemKey, itemMesh);

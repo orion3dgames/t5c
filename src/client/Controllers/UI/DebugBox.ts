@@ -6,6 +6,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { generatePanel } from "./Theme";
 import { ServerMsg } from "../../../shared/types";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
+import { EngineInstrumentation } from "@babylonjs/core/Instrumentation/engineInstrumentation";
 
 export class DebugBox {
     private _playerUI;
@@ -17,6 +18,7 @@ export class DebugBox {
     private ping: number = 0;
     public _debugPanel: Rectangle;
     private _debugTextUI;
+    private instrumentation: EngineInstrumentation;
 
     constructor(_playerUI, _engine: Engine, _scene: Scene, _room, _currentPlayer, _entities) {
         this._playerUI = _playerUI;
@@ -25,6 +27,8 @@ export class DebugBox {
         this._room = _room;
         this._currentPlayer = _currentPlayer;
         this._entities = _entities;
+
+        this.instrumentation = new EngineInstrumentation(this._engine);
 
         this._createUI();
 
@@ -83,6 +87,7 @@ export class DebugBox {
         locationText += "Total Nodes: " + entityCount + " \n";
         locationText += "Visible Nodes: " + count + " \n";
         locationText += "FPS: " + roundTo(this._engine.getFps(), 0) + " \n";
+        locationText += "DC: " + 0 + " \n";
         locationText += "Ping: " + this.ping + "ms\n";
         locationText += "X: " + roundTo(this._currentPlayer.x, 2) + "\n";
         locationText += "y: " + roundTo(this._currentPlayer.y, 2) + "\n";
