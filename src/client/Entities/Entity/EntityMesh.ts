@@ -12,6 +12,7 @@ import { GameController } from "../../Controllers/GameController";
 import { EquipmentSchema } from "../../../server/rooms/schema";
 import { UserInterface } from "../../Controllers/UserInterface";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { VatController } from "../../Controllers/VatController";
 
 export class EntityMesh {
     private _entity: Entity;
@@ -72,8 +73,8 @@ export class EntityMesh {
         this.selectedMesh = selectedMesh;
 
         // load player mesh
-        let materialIndex = this._entity.sessionId;
-        //let materialIndex = 0;
+        let materialIndex = VatController.findMeshKey(this._entity.raceData, this._entity.sessionId);
+        console.log("[load]", materialIndex, this._entity.raceData);
         const playerMesh = this._entityData.meshes.get(materialIndex).createInstance(this._entity.type + "" + this._entity.sessionId);
         playerMesh.parent = this._entity;
         playerMesh.isPickable = true;
@@ -186,19 +187,21 @@ export class EntityMesh {
     }
 
     async equipItem(e) {
-        //console.log(this._entity.race, this._entityData.vat.texture.name, e.key);
+        // if not already equipped
         if (this.equipments.has(e.key)) return false;
 
+        // get item data
         let item = this._game.getGameData("item", e.key);
         if (item && item.equippable) {
-            let equipOptions = item.equippable;
             // if mesh needs to be added
+            let equipOptions = item.equippable;
             if (equipOptions.mesh) {
-                // add item for vat
+                // prepare item for vat
                 this._game._vatController.prepareItemForVat(this._entityData, this._entity.race, e.key);
 
                 // create instance of mesh
-                let instance = this._entityData.items.get(item.key).createInstance("equip_" + this._entity.sessionId + "_" + e.key);
+                let mesh = this._entityData.items.get(item.key);
+                let instance = mesh.createInstance("equip_" + this._entity.sessionId + "_" + e.key);
                 instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
                 instance.isPickable = false;
 

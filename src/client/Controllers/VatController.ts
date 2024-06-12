@@ -144,9 +144,15 @@ export class VatController {
     async prepareMesh(entity) {
         let key = entity.race;
         let race = this._game.getGameData("race", key);
+        let meshId = VatController.findMeshKey(race, entity.sessionId);
 
         // gets or prepare vat
         let vat = await this.prepareVat(race);
+
+        // gets mesh if already prepared
+        if (vat.meshes.has(meshId)) {
+            return false;
+        }
 
         // clone raw mesh
         let rawMesh = this._game._loadedAssets["RACE_" + key].meshes[0].clone("TEST");
@@ -174,16 +180,29 @@ export class VatController {
             modelMeshMerged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
             modelMeshMerged.bakedVertexAnimationManager = vat.vat;
 
+            // save for later use
+            vat.meshes.set(meshId, modelMeshMerged);
+
             // hide mesh
             modelMeshMerged.setEnabled(false);
             rawMesh.dispose();
-
-            // save for later use
-            vat.meshes.set(entity.sessionId, modelMeshMerged);
         }
     }
 
+    static findMeshKey(race, sessionId) {
+        let meshId = race.key;
+        if (race.customizable) {
+            meshId = sessionId;
+        }
+        return meshId;
+    }
+
     async prepareItemForVat(entityData, raceKey, itemKey) {
+        // if already prepared, stop
+        if (entityData.items.has(itemKey)) {
+            return false;
+        }
+
         // load item
         let item = this._game.getGameData("item", itemKey);
         let slot = item.equippable ? PlayerSlots[item.equippable.slot] : 0;

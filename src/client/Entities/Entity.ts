@@ -96,6 +96,8 @@ export class Entity extends TransformNode {
     public materials;
     public vat;
     public entityData;
+    public raceData;
+
     // state
     public debugMaterialActive;
     public debugMaterialNeutral;
@@ -121,7 +123,9 @@ export class Entity extends TransformNode {
         this.type = "entity";
 
         // update player data from server data
-        Object.assign(this, this._game.getGameData("race", entity.race));
+        let race = this._game.getGameData("race", entity.race);
+        this.raceData = race;
+        Object.assign(this, race);
 
         // set entity
         Object.assign(this, this.entity);
