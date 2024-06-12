@@ -43,7 +43,7 @@ export class EntityAnimator {
         this.mesh = entity.meshController.mesh;
 
         // set default vat animation
-        this.entityData = entity._game._vatController.entityData.get(entity.race);
+        this.entityData = entity._game._vatController.entityData.get(entity.vat);
 
         this._entity = entity;
         this.ratio = 0;

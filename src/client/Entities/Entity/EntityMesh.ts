@@ -37,7 +37,7 @@ export class EntityMesh {
         this._game = entity._game;
         this._loadedAssets = entity._game._loadedAssets;
         this._room = entity._room;
-        this._entityData = this._game._vatController.entityData.get(this._entity.race);
+        this._entityData = this._game._vatController.entityData.get(this._entity.vat);
 
         this.equipments = new Map();
     }
@@ -60,7 +60,7 @@ export class EntityMesh {
         }
         */
 
-        console.log('ENTITY LAOD', this._entityData);
+        console.log("ENTITY LAOD", this._entity.name, this._entityData);
 
         // selected circle
         var material = this._scene.getMaterialByName("entity_selected");

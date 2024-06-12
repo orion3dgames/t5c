@@ -174,7 +174,7 @@ let RacesDB: raceDataMap = {
         default_abilities: ["base_attack"],
         materials: [{ title: "Color 1", material: "rogue_texture.png" }],
         vat: "humanoid",
-    },
+    },*/
     rat_01: {
         key: "rat_01",
         title: "Rat",
@@ -202,7 +202,6 @@ let RacesDB: raceDataMap = {
         materials: [],
         vat: "rat",
     },
-    */
 };
 
 export { RacesDB };

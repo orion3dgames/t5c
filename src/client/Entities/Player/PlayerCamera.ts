@@ -16,17 +16,15 @@ export class PlayerCamera {
     private _postProcess: BlackAndWhitePostProcess; //
 
     constructor(player) {
-        this.player = player;
         this._scene = player._scene;
         this._input = player._input;
-        this._build(player);
+        this.init();
     }
 
-    private _build(player: Player) {
+    public init() {
         // root camera parent that handles positioning of the camera to follow the player
         this._camRoot = new TransformNode("camera_root");
         this._camRoot.position = new Vector3(0, 1.5, 0); //initialized at (0,0,0)
-        //this._camRoot.parent = player;
 
         // to face the player from behind (180 degrees)
         this._camRoot.rotation = new Vector3(0, (3 / 4) * Math.PI, 0);
@@ -54,6 +52,10 @@ export class PlayerCamera {
 
         // text ssao
         //const ssao = new SSAORenderingPipeline("ssaopipeline", this._scene, 1, this.camera);
+    }
+    public attach(player: Player) {
+        this.player = player;
+        this._camRoot.parent = player;
     }
 
     public update(): void {

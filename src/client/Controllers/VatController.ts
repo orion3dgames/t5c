@@ -57,6 +57,12 @@ export class VatController {
 
     async initialize() {
         await this.prepareVat(this._game.getGameData("race", "humanoid"));
+        for (let spawn of this._spawns) {
+            let race = this._game.getGameData("race", spawn.race);
+            if (!this._entityData.has(race.vat)) {
+                await this.prepareVat(race);
+            }
+        }
     }
 
     async fetchVAT(key) {
@@ -69,9 +75,9 @@ export class VatController {
     async prepareVat(race) {
         let key = race.vat;
 
-        console.log("[prepareVat] " + key, race);
-
         if (!this._entityData.has(key)) {
+            console.log("[prepareVat] " + key, race);
+
             // get vat data
             const bakedAnimationJson = await this.fetchVAT(key);
 
@@ -107,7 +113,7 @@ export class VatController {
         return this._entityData.get(key);
     }
 
-    makeHumanoid(baseMeshes, skeleton, data) {
+    makeHumanoid(baseMeshes, data) {
         let root = baseMeshes.clone("HELLO");
 
         let keepArray = [
@@ -119,18 +125,15 @@ export class VatController {
             "HELLO.Rig.Base_LegRight.Base_LegRight",
         ];
 
-        // let keepArray = [data.head, "Base_ArmLeft", "Base_ArmRight", Math.random() < 0.5 ? "Base_Body" : "Armor_Robe", "Base_LegLeft", "Base_LegRight"];
-
-        console.log("[VAT] making humanoid", data.head, keepArray);
-
         root.getChildMeshes(false).forEach((element) => {
-            console.log(element.id);
             if (!keepArray.includes(element.id)) {
                 element.dispose();
             }
         });
 
-        return mergeMeshAndSkeleton(root, skeleton);
+        console.log("[VAT] making humanoid...");
+
+        return root;
     }
 
     async prepareMesh(entity) {
@@ -142,7 +145,7 @@ export class VatController {
 
         //
         const { meshes } = this._game._loadedAssets["RACE_" + key];
-        const root = meshes[0];
+        let root = meshes[0];
         root.name = "_root_race_" + key;
 
         // reset positions
@@ -152,8 +155,14 @@ export class VatController {
         root.rotation.setAll(0);
         root.setEnabled(false);
 
-        // cherry pick meshes
-        let modelMeshMerged = this.makeHumanoid(root, vat.skeleton, entity);
+        // cherry mpick based on settings
+        // todo: should be dynamic somehow
+        if (key === "humanoid") {
+            root = this.makeHumanoid(root, entity);
+        }
+
+        // merge mesh with skeleton
+        let modelMeshMerged = mergeMeshAndSkeleton(root, vat.skeleton);
 
         // setup vat
         if (modelMeshMerged) {
@@ -208,7 +217,7 @@ export class VatController {
             modelMeshMerged.setEnabled(false);
 
             //
-            console.log("[VAT] vat loaded", vat);
+            console.log("[VAT] prepare mesh done", vat);
         }
     }
 

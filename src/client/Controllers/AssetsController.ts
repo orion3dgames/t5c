@@ -98,6 +98,7 @@ export class AssetsController {
             for (let key in races) {
                 let el = races[key];
                 this.assetDatabase.push({ name: "RACE_" + el.key, filename: "races/" + el.key + ".glb", extension: "glb", type: "mesh", instantiate: true });
+                this.assetDatabase.push({ name: "RACE_" + el.vat, filename: "races/" + el.vat + ".glb", extension: "glb", type: "mesh", instantiate: true });
                 this.assetDatabase.push({ name: el.icon, filename: "portrait/" + el.icon + ".png", extension: "png", type: "image" });
             }
         }

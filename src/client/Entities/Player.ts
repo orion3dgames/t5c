@@ -46,7 +46,7 @@ export class Player extends Entity {
     private async spawnPlayer() {
         // add player controllers
         this.cameraController = this._gamescene._camera;
-        this.cameraController._camRoot.parent = this;
+        this.cameraController.attach(this);
         this.actionsController = new EntityActions(this._scene, this._game._loadedAssets, this.entities);
 
         // register player server messages

@@ -94,6 +94,7 @@ export class Entity extends TransformNode {
     public animationSpeed;
     public bones;
     public materials;
+    public vat;
 
     // state
     public debugMaterialActive;
@@ -137,10 +138,10 @@ export class Entity extends TransformNode {
         // spawn player
         this._game._vatController.prepareMesh(entity);
 
-        //
+        // wait for vat to be ready
         setTimeout(() => {
             this.spawn(entity);
-        }, 1000);
+        }, 100);
     }
 
     public async spawn(entity) {
