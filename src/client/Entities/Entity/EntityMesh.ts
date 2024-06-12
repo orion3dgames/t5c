@@ -37,7 +37,7 @@ export class EntityMesh {
         this._game = entity._game;
         this._loadedAssets = entity._game._loadedAssets;
         this._room = entity._room;
-        this._entityData = this._game._vatController.entityData.get(this._entity.vat);
+        this._entityData = entity.entityData;
 
         this.equipments = new Map();
     }
@@ -59,8 +59,6 @@ export class EntityMesh {
             this.debugMesh = sphere;
         }
         */
-
-        console.log("ENTITY LAOD", this._entity.name, this._entityData);
 
         // selected circle
         var material = this._scene.getMaterialByName("entity_selected");
@@ -200,7 +198,6 @@ export class EntityMesh {
                 this._game._vatController.prepareItemForVat(this._entityData, this._entity.race, e.key);
 
                 // create instance of mesh
-                console.log(item.key);
                 let instance = this._entityData.items.get(item.key).createInstance("equip_" + this._entity.sessionId + "_" + e.key);
                 instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
                 instance.isPickable = false;
@@ -214,7 +211,7 @@ export class EntityMesh {
                 // add
                 this.equipments.set(e.key, instance);
 
-                //
+                // refresh animation
                 this._entity.animatorController.refreshItems();
             }
         }

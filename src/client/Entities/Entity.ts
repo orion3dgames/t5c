@@ -95,7 +95,7 @@ export class Entity extends TransformNode {
     public bones;
     public materials;
     public vat;
-
+    public entityData;
     // state
     public debugMaterialActive;
     public debugMaterialNeutral;
@@ -145,6 +145,9 @@ export class Entity extends TransformNode {
     }
 
     public async spawn(entity) {
+        // set default vat animation
+        this.entityData = this._game._vatController.entityData.get(this.vat.key);
+
         // load mesh controllers
         this.meshController = new EntityMesh(this);
         await this.meshController.load();

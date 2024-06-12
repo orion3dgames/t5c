@@ -333,8 +333,8 @@ export type Race = {
     speed: number;
     scale: number;
     rotationFix: number;
-    meshIndex: number;
-    animations: {
+    meshIndex?: number;
+    animations?: {
         [key: string]: {};
     };
     bones?: { [key: string]: number };
