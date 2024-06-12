@@ -90,8 +90,7 @@ let LocationsDB = {
                     canAttack: true,
                     points: [new Vector3(27.16, 0.06, 1.38), new Vector3(31.74, 0.06, -3.27), new Vector3(38.56, 0.06, 0.31)],
                     amount: 50,
-                    race: "humanoid",
-                    head: "Head_Rogue",
+                    race: "male_knight",
                     material: 200,
                     name: "Bandit",
                     baseHealth: 80,
@@ -104,6 +103,10 @@ let LocationsDB = {
                         {
                             key: "sword_01",
                             slot: PlayerSlots.WEAPON,
+                        },
+                        {
+                            key: "helm_01",
+                            slot: PlayerSlots.HEAD,
                         },
                     ],
                 },

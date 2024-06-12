@@ -157,7 +157,7 @@ export class VatController {
 
         // cherry mpick based on settings
         // todo: should be dynamic somehow
-        if (key === "humanoid") {
+        if (race.customizable) {
             root = this.makeHumanoid(root, entity);
         }
 
@@ -221,15 +221,7 @@ export class VatController {
         }
     }
 
-    async prepareItemForVat(raceKey, itemKey) {
-        // get entityData
-        let entityData = this._entityData.get(raceKey);
-
-        // make sure not already loaded
-        if (entityData.items.has(itemKey)) {
-            return false;
-        }
-
+    async prepareItemForVat(entityData, raceKey, itemKey) {
         // load item
         let item = this._game.getGameData("item", itemKey);
         let race = this._game.getGameData("race", raceKey);
@@ -270,7 +262,7 @@ export class VatController {
         // merge mesh
         let itemMesh = mergeMesh(rawMesh, itemKey);
         if (itemMesh) {
-            itemMesh.name = race.key + "_" + itemMesh.name;
+            itemMesh.name = entityData.name + "_" + itemMesh.name;
 
             // attach to VAT
             itemMesh.skeleton = entityData.skeleton;

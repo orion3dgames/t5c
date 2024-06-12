@@ -348,6 +348,7 @@ export type Race = {
     default_abilities?: string[];
     materials?;
     vat?;
+    customizable?;
 };
 
 export interface raceDataMap {

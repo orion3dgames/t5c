@@ -197,7 +197,7 @@ export class EntityMesh {
             // if mesh needs to be added
             if (equipOptions.mesh) {
                 // add item for vat
-                this._game._vatController.prepareItemForVat(this._entity.race, e.key);
+                this._game._vatController.prepareItemForVat(this._entityData, this._entity.race, e.key);
 
                 // create instance of mesh
                 console.log(item.key);

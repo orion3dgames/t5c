@@ -63,9 +63,9 @@ let RacesDB: raceDataMap = {
             { title: "Color 4", material: "knight_texture_alt_C.png" },
         ],
         vat: "humanoid",
+        customizable: true,
     },
 
-    /*
     male_knight: {
         key: "male_knight",
         title: "Knight",
@@ -102,6 +102,8 @@ let RacesDB: raceDataMap = {
         ],
         vat: "humanoid",
     },
+
+    /*
     male_mage: {
         key: "male_mage",
         title: "Mage",
