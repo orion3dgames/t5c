@@ -11,7 +11,7 @@ import { mergeMesh, mergeMeshAndSkeleton } from "../Entities/Common/MeshHelper";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { PBRCustomMaterial } from "@babylonjs/materials/custom/pbrCustomMaterial";
-import { EquippableType, Item, PlayerSlots } from "../../shared/types";
+import { EntityState, EquippableType, Item, PlayerSlots } from "../../shared/types";
 import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { Entity } from "../Entities/Entity";
@@ -165,6 +165,7 @@ export class VatController {
 
     // this should regenerate entity mesh with any head/equipemnt/material needed
     async refreshMesh(entity: Entity) {
+        
         console.log("[VAT] refresh mesh", entity);
 
         // remove existing mesh
@@ -182,7 +183,9 @@ export class VatController {
         setTimeout(() => {
             console.log("[VAT] refresh mesh | create mesh", entity);
             entity.meshController.createMesh();
-        }, 500);
+            entity.animatorController.mesh = entity.meshController.mesh;
+            entity.animatorController.refreshAnimation();
+        }, 50);
     }
 
     async prepareMesh(entity) {
@@ -228,7 +231,7 @@ export class VatController {
             }
 
             // create a new material based on race and material index
-            let materialKey = race.materials[Math.floor(Math.random() * race.materials.length)].material;
+            let materialKey = race.materials[entity.material].material;
             let alreadyExistMaterial = this._game.scene.getMaterialByName(materialKey);
             if (alreadyExistMaterial) {
                 alreadyExistMaterial.freeze();

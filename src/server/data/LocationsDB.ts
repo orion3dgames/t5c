@@ -41,6 +41,7 @@ let LocationsDB = {
             spawns: [
                 ///////////////////////
                 ///////// NPC /////////
+                
                 /*
                 // BLACKSMITH
                 {
@@ -91,7 +92,7 @@ let LocationsDB = {
                     points: [new Vector3(27.16, 0.06, 1.38), new Vector3(31.74, 0.06, -3.27), new Vector3(38.56, 0.06, 0.31)],
                     amount: 50,
                     race: "male_knight",
-                    material: 200,
+                    material: 0,
                     name: "Bandit",
                     baseHealth: 80,
                     baseSpeed: Speed.VERY_SLOW,
@@ -120,7 +121,7 @@ let LocationsDB = {
                     points: [new Vector3(27.16, 0.06, 1.38), new Vector3(31.74, 0.06, -3.27), new Vector3(38.56, 0.06, 0.31)],
                     amount: 50,
                     race: "rat_01",
-                    material: 200,
+                    material: 0,
                     name: "Bandit",
                     baseHealth: 80,
                     baseSpeed: Speed.VERY_SLOW,

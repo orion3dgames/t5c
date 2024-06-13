@@ -4,7 +4,7 @@ import { EntityState } from "../../../shared/types";
 
 export class EntityAnimator {
     private _entity;
-    private mesh;
+    public mesh;
     private entityData;
     private ratio;
 
@@ -194,5 +194,9 @@ export class EntityAnimator {
 
     refreshItem(itemMesh) {
         this.setAnimationParameters(itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim);
+    }
+
+    refreshAnimation(){
+        this._prevAnim = false;
     }
 }

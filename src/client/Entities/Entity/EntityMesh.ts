@@ -47,7 +47,7 @@ export class EntityMesh {
     public createMesh() {
         // load player mesh
         let materialIndex = VatController.findMeshKey(this._entity.raceData, this._entity.sessionId);
-        console.log("[load]", materialIndex, this._entity.raceData);
+        console.log("[ENTITY_MESH]", this._entity.raceData.key);
         const playerMesh = this._entityData.meshes.get(materialIndex).createInstance(this._entity.type + "" + this._entity.sessionId);
         playerMesh.parent = this._entity;
         playerMesh.isPickable = true;
@@ -57,7 +57,7 @@ export class EntityMesh {
         }
         playerMesh.scaling.set(this._entity.scale, this._entity.scale, this._entity.scale);
         playerMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-        playerMesh.occlusionRetryCount = 10;
+        playerMesh.occlusionRetryCount = 1;
         playerMesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_STRICT;
 
         this.mesh = playerMesh;
@@ -96,16 +96,21 @@ export class EntityMesh {
             shadowMesh.position = new Vector3(0, 0.04, 0);
         }
 
+        // add name plate
+        var nameplateAnchor = new AbstractMesh("Nameplate Anchor", this._scene);
+        nameplateAnchor.billboardMode = Mesh.BILLBOARDMODE_ALL;
+        nameplateAnchor.position.y = -2.5; //-meshHieght
+        nameplateAnchor.parent = this._entity;
+
         setTimeout(() => {
-            this.equipAllItems();
             // check for any equipment changes
             this._entity.entity.equipment.onAdd((e) => {
+                console.log('ADDING EQUIPEMENT FROM SERVER', e);
                 this.equipItem(e);
             });
             this._entity.entity.equipment.onRemove((e) => {
                 this.removeItem(e);
             });
-            //this._entity.animatorController.refreshItems();
         }, 200);
 
         return true;
@@ -128,16 +133,17 @@ export class EntityMesh {
     ////////////////////////////////////////////////////
 
     removeItem(e) {
+        //
         if (this.equipments.has(e.key)) {
             this.equipments.get(e.key).dispose();
             this.equipments.delete(e.key);
+        }
 
-            // refresh base mesh
-            let item = this._game.getGameData("item", e.key);
-            if (item && item.equippable) {
-                if (item.equippable.mesh && item.equippable.type === EquippableType.EMBEDDED) {
-                    this._game._vatController.refreshMesh(this._entity);
-                }
+        // refresh base mesh
+        let item = this._game.getGameData("item", e.key);
+        if (item && item.equippable) {
+            if (item.equippable.mesh && item.equippable.type === EquippableType.EMBEDDED) {
+                this._game._vatController.refreshMesh(this._entity);
             }
         }
     }
@@ -178,6 +184,7 @@ export class EntityMesh {
 
             // if embedded item
             if (equipOptions && equipOptions.mesh && equipOptions.type === EquippableType.EMBEDDED) {
+                console.log('[ENTITY_MESH] equipping ', item.key);
                 this._game._vatController.refreshMesh(this._entity);
             }
         }

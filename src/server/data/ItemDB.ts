@@ -87,7 +87,7 @@ let ItemsDB: itemDataMap = {
         key: "armor_01",
         title: "Robe",
         description: "Description.",
-        icon: "ICON_ITEM_helm_01",
+        icon: "ICON_ITEM_armor_01",
         class: ItemClass.ARMOR,
         value: 2000,
         destroyable: false,
