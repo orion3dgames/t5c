@@ -50,7 +50,7 @@ let RacesDB: raceDataMap = {
         icon: "ICON_RACE_male_knight",
         speed: 0.7,
         scale: 1,
-        rotationFix: Math.PI,
+        rotationFix: 0,
         baseHealth: 50,
         baseMana: 50,
         healthRegen: 0.1,
@@ -101,7 +101,7 @@ let RacesDB: raceDataMap = {
         icon: "ICON_RACE_male_knight",
         speed: 0.7,
         scale: 1,
-        rotationFix: Math.PI,
+        rotationFix: 0,
         baseHealth: 50,
         baseMana: 50,
         healthRegen: 0.1,
@@ -131,7 +131,7 @@ let RacesDB: raceDataMap = {
         default_abilities: ["base_attack"],
         speed: 0.1,
         scale: 0.3,
-        rotationFix: Math.PI,
+        rotationFix: 0,
         vat: RaceVAT.rat,
         materials: [
             { title: "Color 1", material: "knight_texture.png" }, //

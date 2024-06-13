@@ -135,7 +135,7 @@ export class EntityNamePlate {
             { width: planeWidth, height: planeHeight, sideOrientation: Mesh.DOUBLESIDE },
             this._scene
         );
-        plane.parent = this._entity.mesh;
+        plane.parent = this._entity;
         plane.position.y = plane.position.y + entity_height;
         plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
         plane.material = material;
@@ -201,7 +201,7 @@ export class EntityNamePlate {
             // create instance
             let uuid = generateRandomId(6);
             let instance = rawMesh.createInstance("namePlate_" + spawnKey + "_" + uuid);
-            instance.parent = this._entity.mesh;
+            instance.parent = this._entity;
             instance.position.y = instance.position.y + entity_height;
 
             // don't continue
@@ -216,7 +216,7 @@ export class EntityNamePlate {
             { width: planeWidth, height: planeHeight, sideOrientation: Mesh.DOUBLESIDE },
             this._scene
         );
-        plane.parent = this._entity.mesh;
+        plane.parent = this._entity;
         plane.position.y = plane.position.y + entity_height;
         plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
         plane.material = material;
@@ -245,7 +245,7 @@ export class EntityNamePlate {
         // create plane
         let uuid = generateRandomId(6);
         var plane = MeshBuilder.CreatePlane("damageBubble_" + uuid, { width: planeWidth, height: planeHeight, sideOrientation: Mesh.DOUBLESIDE }, this._scene);
-        plane.parent = this._entity.mesh;
+        plane.parent = this._entity;
         plane.position.y = plane.position.y + entity_height;
         plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
         plane.material = material;

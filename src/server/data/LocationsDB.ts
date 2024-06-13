@@ -41,8 +41,50 @@ let LocationsDB = {
             spawns: [
                 ///////////////////////
                 ///////// NPC /////////
+
+                {
+                    key: "spawn_dummy1",
+                    type: "static",
+                    behaviour: "idle",
+                    aggressive: false,
+                    canAttack: true,
+                    points: [new Vector3(13, 0, -13.7)],
+                    rotation: 0,
+                    radius: 0,
+                    amount: 1,
+                    race: "humanoid",
+                    head: "Head_Barbarian",
+                    material: 20,
+                    name: "Name",
+                    baseHealth: 5000,
+                    equipment: [
+                        {
+                            key: "armor_01",
+                            slot: PlayerSlots.CHEST,
+                        },
+                    ],
+                },
+
+                {
+                    key: "spawn_dummy2",
+                    type: "static",
+                    behaviour: "idle",
+                    aggressive: false,
+                    canAttack: true,
+                    points: [new Vector3(10.41, 0.06, -13.72)],
+                    rotation: 0,
+                    radius: 0,
+                    amount: 1,
+                    race: "humanoid",
+                    head: "Head_Mage",
+                    material: 10,
+                    name: "Name",
+                    baseHealth: 5000,
+                    equipment: [
+                    ],
+                },
+
                 
-                /*
                 // BLACKSMITH
                 {
                     key: "lh_town_blacksmith",
@@ -51,10 +93,9 @@ let LocationsDB = {
                     aggressive: false,
                     canAttack: false,
                     points: [new Vector3(31.22, 0.06, -24.19)],
-                    rotation: 2.7,
+                    rotation: 0,
                     amount: 1,
                     race: "humanoid",
-                    vat: "humanoid",
                     material: 3,
                     head: "Head_Barbarian",
                     name: "Blacksmith Garin",
@@ -75,7 +116,7 @@ let LocationsDB = {
                                 type: "text",
                                 text: "Greetings, adventurer! Looking for a new weapon or some sturdy armor? I've got the finest in Eldoria.",
                                 vendor: {
-                                    items: [{ key: "shield_01" }, { key: "sword_01" }, { key: "amulet_01" }, { key: "hat_01" }],
+                                    items: [{ key: "shield_01" }, { key: "sword_01" }, { key: "amulet_01" }, { key: "helm_01" }],
                                 },
                                 isEndOfDialog: true,
                             },

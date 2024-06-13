@@ -172,6 +172,7 @@ class Api {
                 database.saveUser(username, password).then((user) => {
                     let race = GameData.get('race', "humanoid");
                     let material = race.materials[Math.floor(Math.random()*race.materials.length)];
+                    console.log(material);
                     let materialIndex = race.materials.indexOf(material);
                     database.createCharacter(user.token, generateRandomPlayerName(), race.key, materialIndex).then((character) => {
                         character.user_id = user.id;

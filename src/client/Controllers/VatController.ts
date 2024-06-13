@@ -173,7 +173,6 @@ export class VatController {
         if (mesh) {
             mesh.dispose();
             entity.entityData.meshes.delete(entity.sessionId);
-            console.log("[VAT] refresh mesh | remove existing mesh", entity);
         }
 
         // create new mesh based on the new data
@@ -181,7 +180,6 @@ export class VatController {
 
         // wait a bit before adding the new mesh to the entity
         setTimeout(() => {
-            console.log("[VAT] refresh mesh | create mesh", entity);
             entity.meshController.createMesh();
             entity.animatorController.mesh = entity.meshController.mesh;
             entity.animatorController.refreshAnimation();
