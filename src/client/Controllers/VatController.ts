@@ -11,7 +11,7 @@ import { mergeMesh, mergeMeshAndSkeleton } from "../Entities/Common/MeshHelper";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { PBRCustomMaterial } from "@babylonjs/materials/custom/pbrCustomMaterial";
-import { PlayerSlots } from "../../shared/types";
+import { EquippableType, Item, PlayerSlots } from "../../shared/types";
 import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
 
@@ -125,12 +125,33 @@ export class VatController {
      * @param data
      * @returns
      */
-    makeHumanoid(baseMeshes, data) {
-        let root = baseMeshes.clone("HELLO");
+    makeHumanoid(rawMesh, data) {
+        // we need to find any of the equipemnt required a specific mesh
+        let chest = "Base_Body";
+        if (data.equipment) {
+            data.equipment.forEach((equipment) => {
+                let item = this._game.getGameData("item", equipment.key) as Item;
 
-        let keepArray = [data.head, "Base_ArmLeft", "Base_ArmRight", Math.random() < 0.5 ? "Base_Body" : "Armor_Robe", "Base_LegLeft", "Base_LegRight"];
+                // chest items
+                if (item.equippable?.type === EquippableType.EMBEDDED && item.equippable.slot === PlayerSlots.CHEST) {
+                    chest = item.equippable.mesh ?? "Base_Body";
+                }
 
-        root.getChildMeshes(false).forEach((element) => {
+                // other
+            });
+        }
+
+        //
+        let keepArray = [
+            data.head, //
+            "Base_ArmLeft",
+            "Base_ArmRight",
+            chest,
+            "Base_LegLeft",
+            "Base_LegRight",
+        ];
+
+        rawMesh.getChildMeshes(false).forEach((element) => {
             var n = element.id.lastIndexOf(".");
             var result = element.id.substring(n + 1);
             if (!keepArray.includes(result)) {
@@ -138,10 +159,17 @@ export class VatController {
             }
         });
 
-        return root;
+        return rawMesh;
+    }
+
+    // this should regenerate entity mesh with any head/equipemnt/material needed
+    async refreshMesh(entity) {
+        //
     }
 
     async prepareMesh(entity) {
+        console.log("prepareMesh", entity);
+
         let key = entity.race;
         let race = this._game.getGameData("race", key);
         let meshId = VatController.findMeshKey(race, entity.sessionId);
@@ -175,6 +203,33 @@ export class VatController {
 
         // setup vat
         if (modelMeshMerged) {
+            // remove any existing material
+            const selectedMaterial = modelMeshMerged.material ?? false;
+            if (selectedMaterial) {
+                selectedMaterial.dispose();
+            }
+
+            // create a new material based on race and material index
+            let materialKey = race.materials[Math.floor(Math.random() * race.materials.length)].material;
+            let alreadyExistMaterial = this._game.scene.getMaterialByName(materialKey);
+            if (alreadyExistMaterial) {
+                alreadyExistMaterial.freeze();
+                // material already exists
+                modelMeshMerged.material = alreadyExistMaterial;
+            } else {
+                // create material as it does not exists
+                let mat = new PBRCustomMaterial(materialKey);
+                mat.albedoTexture = new Texture("./models/races/materials/" + materialKey, this._game.scene, {
+                    invertY: false,
+                });
+                mat.reflectionColor = new Color3(0, 0, 0);
+                mat.reflectivityColor = new Color3(0, 0, 0);
+                mat.freeze();
+
+                // assign to mesh
+                modelMeshMerged.material = mat;
+            }
+
             // set mesh
             modelMeshMerged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
             modelMeshMerged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
@@ -197,7 +252,7 @@ export class VatController {
         return meshId;
     }
 
-    async prepareItemForVat(entityData, raceKey, itemKey) {
+    async prepareItemForVat(entityData, itemKey) {
         // if already prepared, stop
         if (entityData.items.has(itemKey)) {
             return false;

@@ -13,6 +13,7 @@ import { EquipmentSchema } from "../../../server/rooms/schema";
 import { UserInterface } from "../../Controllers/UserInterface";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { VatController } from "../../Controllers/VatController";
+import { EquippableType } from "../../../shared/types";
 
 export class EntityMesh {
     private _entity: Entity;
@@ -142,12 +143,6 @@ export class EntityMesh {
             })
         );
 
-        // add name plate
-        var nameplateAnchor = new AbstractMesh("Nameplate Anchor", this._scene);
-        nameplateAnchor.billboardMode = Mesh.BILLBOARDMODE_ALL;
-        nameplateAnchor.position.y = -2.5; //-meshHieght
-        nameplateAnchor.parent = this._entity;
-
         setTimeout(() => {
             this.equipAllItems();
             // check for any equipment changes
@@ -195,9 +190,11 @@ export class EntityMesh {
         if (item && item.equippable) {
             // if mesh needs to be added
             let equipOptions = item.equippable;
-            if (equipOptions.mesh) {
+
+            // if dynamic item
+            if (equipOptions && equipOptions.mesh && equipOptions.type === EquippableType.DYNAMIC) {
                 // prepare item for vat
-                this._game._vatController.prepareItemForVat(this._entityData, this._entity.race, e.key);
+                this._game._vatController.prepareItemForVat(this._entityData, e.key);
 
                 // create instance of mesh
                 let mesh = this._entityData.items.get(item.key);
@@ -216,6 +213,11 @@ export class EntityMesh {
 
                 // refresh animation
                 this._entity.animatorController.refreshItems();
+            }
+
+            // if embedded item
+            if (equipOptions && equipOptions.mesh && equipOptions.type === EquippableType.EMBEDDED) {
+                this._game._vatController.refreshMesh(this._entity);
             }
         }
     }

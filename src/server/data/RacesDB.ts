@@ -1,31 +1,4 @@
-import { LootTableEntry } from "../../shared/Class/LootTable";
 import { raceDataMap } from "../../shared/types";
-
-let meshes = {
-    humanoid: {
-        HEAD: {
-            HEAD_01: "Head_Base",
-            HEAD_02: "Head_Barbarian",
-            HEAD_03: "Head_Engineer",
-            HEAD_04: "Head_Knight",
-            HEAD_05: "Head_Mage",
-            HEAD_06: "Head_Rogue",
-        },
-        BODY: {
-            BODY_01: "Base_Body",
-            BODY_02: "Armor_Robe",
-        },
-    },
-};
-
-let raceTemplate = {
-    BASE: {
-        HEAD: "Head_Base",
-    },
-    CUSTOM_01: {
-        HEAD: "Head_Barbarian",
-    },
-};
 
 let RaceVAT = {
     humanoid: {
@@ -41,6 +14,20 @@ let RaceVAT = {
             OFF_HAND: 7,
             HEAD: 14,
         },
+        meshes: {
+            HEAD: [
+                "Head_Base", //
+                "Head_Barbarian",
+                "Head_Engineer",
+                "Head_Knight",
+                "Head_Mage",
+                "Head_Rogue",
+            ],
+            BODY: [
+                "Base_Body", //
+                "Armor_Robe",
+            ],
+        },
     },
     rat: {
         key: "rat",
@@ -51,6 +38,7 @@ let RaceVAT = {
             WALK: { name: "Rat_Walk", duration: 1000, speed: 1.3 },
         },
         bones: {},
+        meshes: {},
     },
 };
 
@@ -73,7 +61,37 @@ let RacesDB: raceDataMap = {
         default_abilities: ["base_attack"],
         vat: RaceVAT.humanoid,
         customizable: true,
-        materials: [{ title: "Color 1", material: "knight_texture.png" }],
+        materials: [
+            { title: "Color 1", material: "knight_texture.png" },
+            { title: "Color 1", material: "knight_texture_alt_A.png" },
+            { title: "Color 1", material: "knight_texture_alt_B.png" },
+            { title: "Color 1", material: "knight_texture_alt_C.png" },
+
+            { title: "Color 1", material: "mage_texture.png" },
+            { title: "Color 1", material: "mage_texture_alt_A.png" },
+            { title: "Color 1", material: "mage_texture_alt_B.png" },
+            { title: "Color 1", material: "mage_texture_alt_C.png" },
+
+            { title: "Color 1", material: "rogue_texture.png" },
+            { title: "Color 1", material: "rogue_texture_alt_A.png" },
+            { title: "Color 1", material: "rogue_texture_alt_B.png" },
+            { title: "Color 1", material: "rogue_texture_alt_C.png" },
+
+            { title: "Color 1", material: "barbarian_texture.png" },
+            { title: "Color 1", material: "barbarian_texture_alt_A.png" },
+            { title: "Color 1", material: "barbarian_texture_alt_B.png" },
+            { title: "Color 1", material: "barbarian_texture_alt_C.png" },
+
+            { title: "Color 1", material: "druid_texture.png" },
+            { title: "Color 1", material: "druid_texture_alt_A.png" },
+            { title: "Color 1", material: "druid_texture_alt_B.png" },
+            { title: "Color 1", material: "druid_texture_alt_C.png" },
+
+            { title: "Color 1", material: "engineer_texture.png" },
+            { title: "Color 1", material: "engineer_texture_alt_A.png" },
+            { title: "Color 1", material: "engineer_texture_alt_B.png" },
+            { title: "Color 1", material: "engineer_texture_alt_C.png" },
+        ],
     },
 
     male_knight: {
@@ -93,7 +111,9 @@ let RacesDB: raceDataMap = {
         drops: [],
         default_abilities: ["base_attack"],
         vat: RaceVAT.humanoid,
-        materials: [{ title: "Color 1", material: "knight_texture.png" }],
+        materials: [
+            { title: "Color 1", material: "knight_texture.png" }, //
+        ],
     },
 
     rat_01: {
@@ -112,8 +132,10 @@ let RacesDB: raceDataMap = {
         speed: 0.1,
         scale: 0.3,
         rotationFix: Math.PI,
-        materials: [{ title: "Color 1", material: "knight_texture.png" }],
         vat: RaceVAT.rat,
+        materials: [
+            { title: "Color 1", material: "knight_texture.png" }, //
+        ],
     },
 
     /*

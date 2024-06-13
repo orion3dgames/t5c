@@ -278,18 +278,36 @@ export class UserInterface {
         this.dragging();
     }
 
+    // runs in the afterRender callback.
     // update every 1000ms
     public slow_update() {
         if (this._DebugBox) {
             this._DebugBox.update();
         }
 
-        this.panelInventory.update();
-        this.panelAbilities.update();
-        this.panelCharacter.update();
-        this.panelHelp.update();
-        this.panelDialog.update();
-        this.panelQuests.update();
+        if (this.panelInventory) {
+            this.panelInventory.update();
+        }
+
+        if (this.panelAbilities) {
+            this.panelAbilities.update();
+        }
+
+        if (this.panelCharacter) {
+            this.panelCharacter.update();
+        }
+
+        if (this.panelHelp) {
+            this.panelHelp.update();
+        }
+
+        if (this.panelDialog) {
+            this.panelDialog.update();
+        }
+
+        if (this.panelQuests) {
+            this.panelQuests.update();
+        }
     }
 
     public dragging() {

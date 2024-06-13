@@ -7,7 +7,7 @@ let LocationsDB = {
         key: "lh_town",
         mesh: "lh_town",
         sun: true,
-        sunIntensity: 0.5,
+        sunIntensity: 0.1,
         spawnPoint: {
             x: 0,
             y: 0,
@@ -41,7 +41,7 @@ let LocationsDB = {
             spawns: [
                 ///////////////////////
                 ///////// NPC /////////
-
+                /*
                 // BLACKSMITH
                 {
                     key: "lh_town_blacksmith",
