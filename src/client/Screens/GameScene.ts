@@ -299,12 +299,6 @@ export class GameScene {
                 }
             }
 
-            // ui slow update loop
-            if (currentTime - lastUpdates.UI_SLOW.TIME >= lastUpdates.UI_SLOW.RATE) {
-                this._ui.slow_update();
-                lastUpdates.UI_SLOW.TIME = currentTime;
-            }
-
             // spawn player
             if (!this.playerIsSpawned && this.toSpawnPlayer) {
                 // create player entity
@@ -324,6 +318,16 @@ export class GameScene {
 
                 // only do it once
                 this.playerIsSpawned = true;
+            }
+        });
+
+        this._scene.registerAfterRender(() => {
+            const currentTime = Date.now();
+
+            // ui slow update loop
+            if (currentTime - lastUpdates.UI_SLOW.TIME >= lastUpdates.UI_SLOW.RATE) {
+                this._ui.slow_update();
+                lastUpdates.UI_SLOW.TIME = currentTime;
             }
         });
     }

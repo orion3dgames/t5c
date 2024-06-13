@@ -284,13 +284,12 @@ export class UserInterface {
             this._DebugBox.update();
         }
 
-        /*
         this.panelInventory.update();
         this.panelAbilities.update();
         this.panelCharacter.update();
         this.panelHelp.update();
         this.panelDialog.update();
-        this.panelQuests.update();*/
+        this.panelQuests.update();
     }
 
     public dragging() {
