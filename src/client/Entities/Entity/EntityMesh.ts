@@ -44,35 +44,7 @@ export class EntityMesh {
         this.equipments = new Map();
     }
 
-    public async load() {
-        // debug aggro mesh
-        /*
-        if (this._entity.type === "entity") {
-            var material = this._scene.getMaterialByName("debug_entity_neutral");
-            const sphere = MeshBuilder.CreateTorus(
-                "debug_" + this._entity.race,
-                { diameter: this._game.config.MONSTER_AGGRO_DISTANCE * 2, thickness: 0.1 },
-                this._scene
-            );
-            sphere.isVisible = true;
-            sphere.position = new Vector3(0, -1, 0);
-            sphere.parent = box;
-            sphere.material = material;
-            this.debugMesh = sphere;
-        }
-        */
-
-        // selected circle
-        var material = this._scene.getMaterialByName("entity_selected");
-        const selectedMesh = MeshBuilder.CreateCylinder("entity_selected_" + this._entity.race, { diameter: 2, height: 0.01, tessellation: 8 }, this._scene);
-        selectedMesh.parent = this._entity;
-        selectedMesh.material = material;
-        selectedMesh.isVisible = false;
-        selectedMesh.isPickable = false;
-        selectedMesh.checkCollisions = false;
-        selectedMesh.position = new Vector3(0, 0.05, 0);
-        this.selectedMesh = selectedMesh;
-
+    public createMesh() {
         // load player mesh
         let materialIndex = VatController.findMeshKey(this._entity.raceData, this._entity.sessionId);
         console.log("[load]", materialIndex, this._entity.raceData);
@@ -97,51 +69,32 @@ export class EntityMesh {
             race: this._entity.race,
             name: this._entity.name,
         };
+    }
+
+    public async load() {
+        // create entity mesh
+        this.createMesh();
+
+        // selected circle
+        var material = this._scene.getMaterialByName("entity_selected");
+        const selectedMesh = MeshBuilder.CreateCylinder("entity_selected_" + this._entity.race, { diameter: 2, height: 0.01, tessellation: 8 }, this._scene);
+        selectedMesh.parent = this._entity;
+        selectedMesh.material = material;
+        selectedMesh.isVisible = false;
+        selectedMesh.isPickable = false;
+        selectedMesh.checkCollisions = false;
+        selectedMesh.position = new Vector3(0, 0.05, 0);
+        this.selectedMesh = selectedMesh;
 
         // add cheap shadow
         if (this._loadedAssets["DYNAMIC_shadow_01"]) {
             let shadowMesh = this._loadedAssets["DYNAMIC_shadow_01"].createInstance("shadow_" + this._entity.sessionId);
-            shadowMesh.parent = this.mesh;
+            shadowMesh.parent = this._entity;
             shadowMesh.isPickable = false;
             shadowMesh.checkCollisions = false;
             shadowMesh.doNotSyncBoundingInfo = true;
             shadowMesh.position = new Vector3(0, 0.04, 0);
         }
-
-        // start action manager
-        this.mesh.actionManager = new ActionManager(this._scene);
-
-        // register hover over player
-        this.mesh.actionManager.registerAction(
-            new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, (ev) => {
-                let mesh = ev.meshUnderPointer;
-                if (mesh) {
-                    for (const childMesh of mesh.getChildMeshes()) {
-                        childMesh.overlayColor = new Color3(1, 1, 1);
-                        childMesh.overlayAlpha = 0.3;
-                        childMesh.renderOverlay = true;
-                    }
-                }
-                if (this.mesh.actionManager) {
-                    this.mesh.actionManager.hoverCursor = this._ui._Cursor.get("hover");
-                }
-            })
-        );
-
-        // register hover out player
-        this.mesh.actionManager.registerAction(
-            new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (ev) => {
-                let mesh = ev.meshUnderPointer;
-                if (mesh) {
-                    for (const childMesh of mesh.getChildMeshes()) {
-                        childMesh.renderOverlay = false;
-                    }
-                }
-                if (this.mesh.actionManager) {
-                    this.mesh.actionManager.hoverCursor = this._ui._Cursor.get();
-                }
-            })
-        );
 
         setTimeout(() => {
             this.equipAllItems();
@@ -178,6 +131,14 @@ export class EntityMesh {
         if (this.equipments.has(e.key)) {
             this.equipments.get(e.key).dispose();
             this.equipments.delete(e.key);
+
+            // refresh base mesh
+            let item = this._game.getGameData("item", e.key);
+            if (item && item.equippable) {
+                if (item.equippable.mesh && item.equippable.type === EquippableType.EMBEDDED) {
+                    this._game._vatController.refreshMesh(this._entity);
+                }
+            }
         }
     }
 
@@ -203,7 +164,7 @@ export class EntityMesh {
                 instance.isPickable = false;
 
                 // or like this(so we don't need to sync it every frame)
-                instance.setParent(this.mesh);
+                instance.setParent(this._entity);
                 instance.position.setAll(0);
                 instance.rotationQuaternion = undefined;
                 instance.rotation.setAll(0);

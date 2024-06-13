@@ -14,6 +14,7 @@ import { PBRCustomMaterial } from "@babylonjs/materials/custom/pbrCustomMaterial
 import { EquippableType, Item, PlayerSlots } from "../../shared/types";
 import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
+import { Entity } from "../Entities/Entity";
 
 class JavascriptDataDownloader {
     private data;
@@ -163,8 +164,25 @@ export class VatController {
     }
 
     // this should regenerate entity mesh with any head/equipemnt/material needed
-    async refreshMesh(entity) {
-        //
+    async refreshMesh(entity: Entity) {
+        console.log("[VAT] refresh mesh", entity);
+
+        // remove existing mesh
+        let mesh = entity.entityData.meshes.get(entity.sessionId);
+        if (mesh) {
+            mesh.dispose();
+            entity.entityData.meshes.delete(entity.sessionId);
+            console.log("[VAT] refresh mesh | remove existing mesh", entity);
+        }
+
+        // create new mesh based on the new data
+        this.prepareMesh(entity);
+
+        // wait a bit before adding the new mesh to the entity
+        setTimeout(() => {
+            console.log("[VAT] refresh mesh | create mesh", entity);
+            entity.meshController.createMesh();
+        }, 500);
     }
 
     async prepareMesh(entity) {
