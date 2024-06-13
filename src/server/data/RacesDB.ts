@@ -130,7 +130,7 @@ let RacesDB: raceDataMap = {
         drops: [],
         default_abilities: ["base_attack"],
         speed: 0.1,
-        scale: 0.3,
+        scale: 1,
         rotationFix: 0,
         vat: RaceVAT.rat,
         materials: [
