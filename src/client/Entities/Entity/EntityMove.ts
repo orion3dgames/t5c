@@ -80,7 +80,7 @@ export class EntityMove {
     }
 
     // move transform node
-    public tween(tween: number = 0.2): void {
+    public tween(tween: number = 0.05): void {
         // continuously lerp between current position and next position
         this._node.position = Vector3.Lerp(this._node.position, this.nextPosition, tween);
 
@@ -96,8 +96,8 @@ export class EntityMove {
         if (gap > Math.PI) this._node.rotation.y = this.nextRotation.y;
         else this._node.rotation = Vector3.Lerp(this._node.rotation, this.nextRotation, 0.45);
         // camera
-        if(this._node.isCurrentPlayer){
-            this._node.cameraController._camRoot.rotation.y = - this._node.rotation.y + this._game.deltaCamY;
+        if (this._node.isCurrentPlayer) {
+            this._node.cameraController._camRoot.rotation.y = -this._node.rotation.y + this._game.deltaCamY;
         }
     }
 
