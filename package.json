@@ -19,9 +19,9 @@
     "author": "Orion3d",
     "license": "MIT",
     "devDependencies": {
-      "@babylonjs/gui-editor": "7.7.0",
-      "@babylonjs/inspector": "7.7.0",
-      "@babylonjs/materials": "7.7.0",
+      "@babylonjs/gui-editor": "7.11.0",
+      "@babylonjs/inspector": "7.11.0",
+      "@babylonjs/materials": "7.11.0",
 
       "@colyseus/core": "^0.15.39",
       "@colyseus/loadtest": "^0.15.2",
@@ -37,7 +37,7 @@
       "ts-node": "^10.9.2",
       "ts-node-dev": "^2.0.0",
       "typescript": "^5.4.5",
-      "webpack": "^5.91.0",
+      "webpack": "^5.92.0",
       "webpack-bundle-analyzer": "^4.10.2",
       "webpack-cli": "^5.1.4",
       "webpack-dev-server": "^5.0.4",
@@ -46,11 +46,11 @@
     },
     "dependencies": {
 
-      "@babylonjs/core": "7.7.0",
-      "@babylonjs/gui": "7.7.0",
-      "@babylonjs/loaders": "7.7.0",
-      "@babylonjs/serializers": "7.7.0",
-      "babylonjs-gltf2interface": "7.7.0",
+      "@babylonjs/core": "7.11.0",
+      "@babylonjs/gui": "7.11.0",
+      "@babylonjs/loaders": "7.11.0",
+      "@babylonjs/serializers": "7.11.0",
+      "babylonjs-gltf2interface": "7.11.0",
 
       "colyseus": "^0.15.17",
       "colyseus.js": "^0.15.19",

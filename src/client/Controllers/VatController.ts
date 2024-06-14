@@ -353,6 +353,39 @@ export class VatController {
         }
     }
 
+    async prepareEmbeddedItemForVat(entityData, itemKey) {
+        // if already prepared, stop
+        if (entityData.items.has(itemKey)) {
+            return false;
+        }
+
+        // clone raw mesh
+        let key = entityData.name;
+        let item = this._game.getGameData("item", itemKey);
+        let rawMesh = this._game._loadedAssets["RACE_" + key].meshes[0].clone("TEST") as Mesh;
+
+        // find raw mesh
+        let found = rawMesh.getChildMeshes(undefined, (node) => {
+            if (node.name.indexOf(item.equippable.mesh) > -1) {
+                return true;
+            }
+            return false;
+        });
+
+        let modelMeshMerged = found[0] as Mesh;
+
+        if (modelMeshMerged) {
+            // attach to VAT
+            modelMeshMerged.skeleton = entityData.skeleton;
+            modelMeshMerged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
+            modelMeshMerged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+            modelMeshMerged.bakedVertexAnimationManager = entityData.vat;
+            entityData.items.set(itemKey, modelMeshMerged);
+
+            rawMesh.setEnabled(false);
+        }
+    }
+
     prepareClone(cloneMesh, material: any, raceKey, materialIndex) {
         const selectedMaterial = cloneMesh.material ?? false;
 
