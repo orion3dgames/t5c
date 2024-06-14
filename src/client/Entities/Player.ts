@@ -45,7 +45,8 @@ export class Player extends Entity {
 
     private async spawnPlayer() {
         // add player controllers
-        this.cameraController = new PlayerCamera(this);
+        this.cameraController = this._gamescene._camera;
+        this.cameraController.attach(this);
         this.actionsController = new EntityActions(this._scene, this._game._loadedAssets, this.entities);
 
         // register player server messages
@@ -225,8 +226,10 @@ export class Player extends Entity {
         // run super function first
         super.updateServerRate(delta);
 
-        // process player movement
-        this.moveController.processMove();
+        if (this.moveController) {
+            // process player movement
+            this.moveController.processMove();
+        }
 
         ///////////// ABILITY & CASTING EVENTS ///////////////////////////
         // if digit pressed

@@ -29,6 +29,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 import { RenderTargetTexture } from "@babylonjs/core/Materials/Textures/renderTargetTexture";
+import { PlayerCamera } from "../Entities/Player/PlayerCamera";
 
 export class GameScene {
     public _game: GameController;
@@ -38,16 +39,20 @@ export class GameScene {
     public _shadow: ShadowGenerator;
     public _navMesh: NavMesh;
     public _navMeshDebug;
+    public _camera;
 
     public _roomId: string;
     public room: Room<any>;
     public chatRoom: Room<any>;
     public _currentPlayer: Player;
     public _loadedAssets: AssetContainer[] = [];
-
     public gameData;
 
     public _entities: Map<string, Player | Entity | Item> = new Map();
+
+    public toSpawnPlayer: Player;
+    public toSpawnOthers: Map<string, Entity | Item> = new Map();
+    public playerIsSpawned = false;
 
     constructor() {}
 
@@ -145,10 +150,8 @@ export class GameScene {
         // preload any skeletons and animation
         let spawns = location.dynamic.spawns ?? [];
         this._game._vatController = new VatController(this._game, spawns);
-
         await this._game._vatController.initialize();
-        await this._game._vatController.check(this._game._currentCharacter.race);
-        console.log("[VAT] loaded", this._game._vatController._entityData);
+        console.log("[VAT] fully loaded", this._game._vatController._entityData);
 
         // init network
         this._initNetwork();
@@ -197,46 +200,15 @@ export class GameScene {
 
         // setup input Controller
         this._input = new PlayerInput(this);
+        this._camera = new PlayerCamera(this);
 
         ////////////////////////////////////////////////////
         //  when a entity joins the room event
         this.room.state.entities.onAdd((entity, sessionId) => {
-            // if player
-            if (entity.type === "player") {
-                var isCurrentPlayer = sessionId === this.room.sessionId;
-                //////////////////
-                // if player type
-                if (isCurrentPlayer) {
-                    // create player entity
-                    let _player = new Player(sessionId, this._scene, this, entity);
-
-                    // set currentPlayer
-                    this._currentPlayer = _player;
-
-                    // add player specific ui
-                    this._ui.setCurrentPlayer(_player);
-
-                    // add to entities
-                    this._entities.set(sessionId, _player);
-
-                    // player is loaded, let's hide the loading gui
-                    this._game.engine.hideLoadingUI();
-
-                    //////////////////
-                    // else must be another player
-                } else {
-                    this._entities.set(sessionId, new Entity(sessionId, this._scene, this, entity));
-                }
-            }
-
-            // if entity
-            if (entity.type === "entity") {
-                this._entities.set(sessionId, new Entity(sessionId, this._scene, this, entity));
-            }
-
-            // if item
-            if (entity.type === "item") {
-                this._entities.set(sessionId, new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._game));
+            if (entity.type === "player" && entity.sessionId === this.room.sessionId) {
+                this.toSpawnPlayer = entity;
+            } else {
+                this.toSpawnOthers.set(entity.sessionId, entity);
             }
         });
 
@@ -250,7 +222,6 @@ export class GameScene {
 
         ////////////////////////////////////////////////////
         // main game loop
-
         const lastUpdates = {
             SERVER: {
                 RATE: this._game.config.updateRate ?? 100,
@@ -284,21 +255,23 @@ export class GameScene {
 
             // iterate through each items
             const currentTime = Date.now();
-            this._entities.forEach((entity, sessionId) => {
-                // main entity update
-                entity.update(delta);
+            if (this.playerIsSpawned) {
+                this._entities.forEach((entity, sessionId) => {
+                    // main entity update
+                    entity.update(delta);
 
-                // server player gameloop
-                if (currentTime - lastUpdates.SERVER.TIME >= lastUpdates.SERVER.RATE) {
-                    entity.updateServerRate(lastUpdates.SERVER.RATE);
-                }
+                    // server player gameloop
+                    if (currentTime - lastUpdates.SERVER.TIME >= lastUpdates.SERVER.RATE) {
+                        entity.updateServerRate(lastUpdates.SERVER.RATE);
+                    }
 
-                // slow game loop
-                if (currentTime - lastUpdates.SLOW.TIME >= lastUpdates.SLOW.RATE) {
-                    entity.updateSlowRate(lastUpdates.SLOW.RATE);
-                    entity.lod(this._currentPlayer);
-                }
-            });
+                    // slow game loop
+                    if (currentTime - lastUpdates.SLOW.TIME >= lastUpdates.SLOW.RATE) {
+                        entity.updateSlowRate(lastUpdates.SLOW.RATE);
+                        entity.lod(this._currentPlayer);
+                    }
+                });
+            }
 
             // reset timers
             if (currentTime - lastUpdates.SERVER.TIME >= lastUpdates.SERVER.RATE) {
@@ -319,7 +292,37 @@ export class GameScene {
             if (currentTime - lastUpdates.UI_SERVER.TIME >= lastUpdates.UI_SERVER.RATE) {
                 this._ui.update();
                 lastUpdates.UI_SERVER.TIME = currentTime;
+
+                // spawn entities
+                if (this.toSpawnOthers.size > 0) {
+                    this.spawn();
+                }
             }
+
+            // spawn player
+            if (!this.playerIsSpawned && this.toSpawnPlayer) {
+                // create player entity
+                let _player = new Player(this.toSpawnPlayer.sessionId, this._scene, this, this.toSpawnPlayer);
+
+                // set currentPlayer
+                this._currentPlayer = _player;
+
+                // add player specific ui
+                this._ui.setCurrentPlayer(_player);
+
+                // add to entities
+                this._entities.set(this.toSpawnPlayer.sessionId, _player);
+
+                // player is loaded, let's hide the loading gui
+                this._game.engine.hideLoadingUI();
+
+                // only do it once
+                this.playerIsSpawned = true;
+            }
+        });
+
+        this._scene.registerAfterRender(() => {
+            const currentTime = Date.now();
 
             // ui slow update loop
             if (currentTime - lastUpdates.UI_SLOW.TIME >= lastUpdates.UI_SLOW.RATE) {
@@ -327,6 +330,35 @@ export class GameScene {
                 lastUpdates.UI_SLOW.TIME = currentTime;
             }
         });
+    }
+
+    engineUpdate() {}
+
+    async spawn() {
+        let amountToSpawn = 10;
+        let i = 0;
+        for (const value of this.toSpawnOthers) {
+            let entity = value[1];
+            i++;
+
+            // if player
+            if (entity.type === "player" || entity.type === "entity") {
+                this._entities.set(entity.sessionId, new Entity(entity.sessionId, this._scene, this, entity));
+            }
+
+            // if item
+            if (entity.type === "item") {
+                this._entities.set(entity.sessionId, new Item(entity.sessionId, this._scene, entity, this.room, this._ui, this._game));
+            }
+
+            // remove
+            this.toSpawnOthers.delete(entity.sessionId);
+
+            // only spawn 1 every frame
+            if (i > amountToSpawn) {
+                break;
+            }
+        }
     }
 
     // triggered on resize event

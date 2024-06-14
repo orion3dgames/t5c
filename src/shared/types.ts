@@ -266,6 +266,12 @@ export enum ItemRarity {
     LEGENDARY = 2,
 }
 
+export enum EquippableType {
+    DYNAMIC = 0,
+    EMBEDDED,
+    NOT_VISIBLE,
+}
+
 export type Item = {
     key: string;
     title: string;
@@ -284,7 +290,8 @@ export type Item = {
     benefits?: {};
 
     equippable?: {
-        slot: PlayerSlots;
+        type?: EquippableType;
+        slot?: PlayerSlots;
         mesh?: string;
         material?: string;
         rotation_x?: number;
@@ -333,8 +340,8 @@ export type Race = {
     speed: number;
     scale: number;
     rotationFix: number;
-    meshIndex: number;
-    animations: {
+    meshIndex?: number;
+    animations?: {
         [key: string]: {};
     };
     bones?: { [key: string]: number };
@@ -348,6 +355,7 @@ export type Race = {
     default_abilities?: string[];
     materials?;
     vat?;
+    customizable?;
 };
 
 export interface raceDataMap {

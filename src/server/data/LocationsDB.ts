@@ -7,7 +7,7 @@ let LocationsDB = {
         key: "lh_town",
         mesh: "lh_town",
         sun: true,
-        sunIntensity: 0.5,
+        sunIntensity: 0.6,
         spawnPoint: {
             x: 0,
             y: 0,
@@ -39,7 +39,6 @@ let LocationsDB = {
                 },
             ],
             spawns: [
-     
                 ///////////////////////
                 ///////// NPC /////////
 
@@ -51,11 +50,22 @@ let LocationsDB = {
                     aggressive: false,
                     canAttack: false,
                     points: [new Vector3(31.22, 0.06, -24.19)],
-                    rotation: 2.7,
+                    rotation: 2.75,
                     amount: 1,
-                    race: "male_knight",
-                    material: 0,
+                    race: "humanoid",
+                    material: 3,
+                    head: "Head_Barbarian",
                     name: "Blacksmith Garin",
+                    equipment: [
+                        {
+                            key: "shield_01",
+                            slot: PlayerSlots.OFF_HAND,
+                        },
+                        {
+                            key: "sword_01",
+                            slot: PlayerSlots.WEAPON,
+                        },
+                    ],
                     interactable: {
                         title: "Talk",
                         data: [
@@ -63,18 +73,11 @@ let LocationsDB = {
                                 type: "text",
                                 text: "Greetings, adventurer! Looking for a new weapon or some sturdy armor? I've got the finest in Eldoria.",
                                 vendor: {
-                                    items: [
-                                        { key: "helm_01" },
-                                        { key: "shield_01" },
-                                        { key: "sword_01" },
-                                        { key: "amulet_01" },
-                                        { key: "hat_01" },
-                                    ],
+                                    items: [{ key: "shield_01" }, { key: "sword_01" }, { key: "amulet_01" }, { key: "helm_01" }],
                                 },
                                 isEndOfDialog: true,
                             },
                         ],
-                        
                     },
                 },
 
@@ -88,8 +91,9 @@ let LocationsDB = {
                     points: [new Vector3(10.18, 0.06, 25.43)],
                     rotation: 2.7,
                     amount: 1,
-                    race: "male_rogue",
-                    material: 0,
+                    race: "humanoid",
+                    material: 9,
+                    head: "Head_Rogue",
                     name: "Merchant Elara",
                     interactable: {
                         title: "Talk",
@@ -98,18 +102,13 @@ let LocationsDB = {
                                 type: "text",
                                 text: "Remember, a well-prepared adventurer is a successful adventurer. Stock up before you head out!",
                                 vendor: {
-                                    items: [
-                                        { key: "potion_small_red" },
-                                        { key: "potion_small_blue" },
-                                    ],
+                                    items: [{ key: "potion_small_red" }, { key: "potion_small_blue" }],
                                 },
                                 isEndOfDialog: true,
                             },
                         ],
-                        
                     },
                 },
-                
 
                 // SORCERESS
                 {
@@ -122,8 +121,9 @@ let LocationsDB = {
                     rotation: 2.79,
                     radius: 0,
                     amount: 1,
-                    race: "male_mage",
-                    material: 0,
+                    race: "humanoid",
+                    material: 7,
+                    head: "Head_Mage",
                     name: "Mira The Sorceress",
                     baseHealth: 5000,
                     equipment: [
@@ -156,10 +156,16 @@ let LocationsDB = {
                     points: [new Vector3(7.45, 0.1, -28.12)],
                     rotation: 3.12,
                     amount: 2,
-                    race: "male_mage",
-                    material: 2,
+                    race: "humanoid",
+                    material: 6,
+                    head: "Head_Mage",
                     name: "Priestess Alice ",
-                    equipment: [],
+                    equipment: [
+                        {
+                            key: "hat_01",
+                            slot: PlayerSlots.HEAD,
+                        },
+                    ],
                     interactable: {
                         title: "Talk",
                         data: [
@@ -205,8 +211,9 @@ let LocationsDB = {
                     points: [new Vector3(13.15, 0.06, 41.13)],
                     rotation: 2.4,
                     amount: 1,
-                    race: "male_rogue",
-                    material: 1,
+                    race: "humanoid",
+                    material: 15,
+                    head: "Head_Engineer",
                     name: "Farmer Jorin",
                     interactable: {
                         title: "Talk",
@@ -230,8 +237,9 @@ let LocationsDB = {
                     points: [new Vector3(40.32, 0.1, 20.88)],
                     rotation: 1.85,
                     amount: 1,
-                    race: "male_knight",
-                    material: 0,
+                    race: "humanoid",
+                    material: 19,
+                    head: "Head_Engineer",
                     name: "Bartender Morin",
                     interactable: {
                         title: "Talk",
@@ -255,8 +263,9 @@ let LocationsDB = {
                     points: [new Vector3(47.54, 0.06, 67.27)],
                     rotation: 1.5,
                     amount: 1,
-                    race: "male_rogue",
-                    material: 1,
+                    race: "humanoid",
+                    material: 8,
+                    head: "Head_Barbarian",
                     name: "Caretaker Ren",
                     interactable: {
                         title: "Talk",
@@ -280,8 +289,9 @@ let LocationsDB = {
                     points: [new Vector3(-12.24, 0.06, 17.5)],
                     rotation: -1.5,
                     amount: 2,
-                    race: "male_mage",
-                    material: 1,
+                    race: "humanoid",
+                    material: 12,
+                    head: "Head_Mage",
                     name: "Madame Seraphina",
                     interactable: {
                         title: "Talk",
@@ -296,41 +306,46 @@ let LocationsDB = {
                 },
 
                 {
-                    key: "spawn_dummy",
+                    key: "spawn_dummy1",
                     type: "static",
                     behaviour: "idle",
                     aggressive: false,
                     canAttack: true,
-                    points: [new Vector3(13.1, 0, -13.7)],
+                    points: [new Vector3(9, 0, -13.7)],
                     rotation: 3.12,
                     radius: 0,
                     amount: 1,
-                    race: "male_knight",
-                    material: 1,
+                    race: "humanoid",
+                    material: 16,
+                    head: "Head_Base",
                     name: "Harmless Dummy",
                     baseHealth: 5000,
-                    interactable: {
-                        title: "Talk",
-                        data: [
-                            {
-                                type: "text",
-                                text: "Hi @PlayerName, if you want to practice your spells or fighting skills, please do not hesitate to use myself as a target practise!",
-                                //quests: [{ key: "LH_DANGEROUS_ERRANDS_02" }, { key: "LH_DANGEROUS_ERRANDS_03" }],
-                                isEndOfDialog: true,
-                            },
-                            {
-                                type: "text",
-                                text: "Very well, may the goddess watch over your chosen path.",
-                                buttonName: "Thank you",
-                                isEndOfDialog: true,
-                            },
-                        ],
-                    },
-                    equipment: [],
+                    equipment: [
+                        {
+                            key: "head_02",
+                            slot: PlayerSlots.HEAD,
+                        },
+                    ],
                 },
 
                 ////////////////////////
                 //////// ENEMIES ///////
+
+                {
+                    key: "lh_town_bandits2",
+                    type: "area",
+                    behaviour: "patrol",
+                    aggressive: true,
+                    canAttack: true,
+                    points: [new Vector3(36.29, 0.06, -0.59), new Vector3(45.93, 0.06, 0.88), new Vector3(40.4, 0.06, 7.2), new Vector3(32.86, 0.06, 8.73)],
+                    amount: 5,
+                    race: "male_knight",
+                    material: 0,
+                    name: "Bandit",
+                    baseHealth: 20,
+                    baseSpeed: Speed.VERY_SLOW,
+                    equipment: [],
+                },
 
                 {
                     key: "lh_town_bandits",
@@ -345,11 +360,12 @@ let LocationsDB = {
                         new Vector3(14.34, 0.06, 86.56),
                         new Vector3(27.81, 0.06, 89.47),
                         new Vector3(44.71, 0.06, 82.98),
-                        new Vector3(28.44, 0.06, 78.08)
+                        new Vector3(28.44, 0.06, 78.08),
                     ],
                     amount: 10,
-                    race: "male_rogue",
-                    material: 2,
+                    race: "humanoid",
+                    material: 17,
+                    head: "Head_Rogue",
                     name: "Bandit",
                     baseHealth: 80,
                     baseSpeed: Speed.VERY_SLOW,
@@ -368,8 +384,6 @@ let LocationsDB = {
                         },
                     ],
                 },
-
-
             ],
         },
     },

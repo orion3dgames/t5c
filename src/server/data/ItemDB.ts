@@ -1,4 +1,4 @@
-import { itemDataMap, ItemClass, ItemRarity, PlayerSlots, PlayerKeys, CalculationTypes } from "../../shared/types";
+import { itemDataMap, ItemClass, ItemRarity, PlayerSlots, PlayerKeys, CalculationTypes, EquippableType } from "../../shared/types";
 
 let ItemsDB: itemDataMap = {
     sword_01: {
@@ -14,6 +14,7 @@ let ItemsDB: itemDataMap = {
         stackable: false,
         rarity: ItemRarity.NORMAL,
         equippable: {
+            type: EquippableType.DYNAMIC,
             slot: PlayerSlots.WEAPON,
             mesh: "sword_01",
             material: "sword_material_01",
@@ -39,6 +40,7 @@ let ItemsDB: itemDataMap = {
         stackable: false,
         rarity: ItemRarity.NORMAL,
         equippable: {
+            type: EquippableType.DYNAMIC,
             slot: PlayerSlots.OFF_HAND,
             mesh: "shield_01",
             material: "shield_01_base.jpg",
@@ -65,6 +67,7 @@ let ItemsDB: itemDataMap = {
         stackable: false,
         rarity: ItemRarity.NORMAL,
         equippable: {
+            type: EquippableType.DYNAMIC,
             slot: PlayerSlots.HEAD,
             mesh: "helm_01",
             material: "helm_material_01",
@@ -80,11 +83,11 @@ let ItemsDB: itemDataMap = {
         },
     },
 
-    hat_01: {
-        key: "hat_01",
-        title: "Sorcerer Hat",
+    armor_01: {
+        key: "armor_01",
+        title: "Robe",
         description: "Description.",
-        icon: "ICON_ITEM_helm_01",
+        icon: "ICON_ITEM_armor_01",
         class: ItemClass.ARMOR,
         value: 2000,
         destroyable: false,
@@ -93,12 +96,10 @@ let ItemsDB: itemDataMap = {
         stackable: false,
         rarity: ItemRarity.NORMAL,
         equippable: {
-            slot: PlayerSlots.HEAD,
-            mesh: "helm_01",
+            type: EquippableType.EMBEDDED,
+            slot: PlayerSlots.CHEST,
+            mesh: "Armor_Robe",
             material: "helm_material_01",
-            offset_y: 0.465,
-            offset_z: -.10,
-            scale: 1,
         },
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
         benefits: [{ key: PlayerKeys.STRENGTH, type: CalculationTypes.ADD, amount: 10 }],
@@ -120,6 +121,7 @@ let ItemsDB: itemDataMap = {
         stackable: false,
         rarity: ItemRarity.NORMAL,
         equippable: {
+            type: EquippableType.NOT_VISIBLE,
             slot: PlayerSlots.AMULET,
         },
         requirements: [

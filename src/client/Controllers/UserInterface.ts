@@ -129,7 +129,6 @@ export class UserInterface {
 
         this._playerUI = uiLayerContainer;
 
-        /*
         const fpsPanel = new TextBlock("fpsPanel");
         fpsPanel.color = "#FFF";
         fpsPanel.top = "5px";
@@ -142,7 +141,7 @@ export class UserInterface {
         fpsPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         fpsPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         this._playerUI.addControl(fpsPanel);
-        this.fpsPanel = fpsPanel;*/
+        this.fpsPanel = fpsPanel;
     }
 
     // set current player
@@ -169,10 +168,6 @@ export class UserInterface {
 
         // create chat ui + events
         this._ChatBox = new ChatBox(this._playerUI, this._chatRoom, currentPlayer, this._entities, this._game);
-
-        // create damage text
-        // todo: let's do this with 3d billboards
-        //this._DamageText = new DamageText(this.NAMES_ADT, this._scene, this._entities);
 
         // create selected entity panel
         this._targetEntitySelectedBar = new EntitySelectedBar(this, {
@@ -254,7 +249,7 @@ export class UserInterface {
 
         // open inventory by default
         this.panelInventory.open();
-        this.panelHelp.open();
+        //this.panelHelp.open();
 
         // create tooltip
         this._Tooltip = new Tooltip(this, currentPlayer);
@@ -267,23 +262,52 @@ export class UserInterface {
     public update() {
         //
         //this.fpsPanel.text = "FPS: " + this._engine.getFps().toFixed(0);
-        this._targetEntitySelectedBar.update();
-        this._playerEntitySelectedBar.update();
-        this._Tooltip.update();
+        if (this._targetEntitySelectedBar) {
+            this._targetEntitySelectedBar.update();
+        }
+
+        if (this._playerEntitySelectedBar) {
+            this._playerEntitySelectedBar.update();
+        }
+
+        if (this._Tooltip) {
+            this._Tooltip.update();
+        }
 
         //
         this.dragging();
     }
 
+    // runs in the afterRender callback.
     // update every 1000ms
     public slow_update() {
-        this._DebugBox.update();
-        this.panelInventory.update();
-        this.panelAbilities.update();
-        this.panelCharacter.update();
-        this.panelHelp.update();
-        this.panelDialog.update();
-        this.panelQuests.update();
+        if (this._DebugBox) {
+            this._DebugBox.update();
+        }
+
+        if (this.panelInventory) {
+            this.panelInventory.update();
+        }
+
+        if (this.panelAbilities) {
+            this.panelAbilities.update();
+        }
+
+        if (this.panelCharacter) {
+            this.panelCharacter.update();
+        }
+
+        if (this.panelHelp) {
+            this.panelHelp.update();
+        }
+
+        if (this.panelDialog) {
+            this.panelDialog.update();
+        }
+
+        if (this.panelQuests) {
+            this.panelQuests.update();
+        }
     }
 
     public dragging() {
@@ -318,99 +342,5 @@ export class UserInterface {
                 this._ChatBox.chatPanel.top = "-30px;";
             }
         }
-    }
-
-    // chatbox label
-    public createEntityChatLabel(entity) {
-        var rect1 = new Rectangle("player_chat_" + entity.sessionId);
-        rect1.isVisible = false;
-        rect1.width = "175px";
-        rect1.adaptHeightToChildren = true;
-        rect1.thickness = 1;
-        rect1.cornerRadius = 5;
-        rect1.background = "rgba(0,0,0,.5)";
-        rect1.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-        this.LABELS_ADT.addControl(rect1);
-        rect1.linkWithMesh(entity.mesh);
-        rect1.linkOffsetY = -130;
-
-        var label = new TextBlock("player_chat_label_" + entity.sessionId);
-        label.text = entity.name;
-        label.color = "white";
-        label.paddingLeft = "5px;";
-        label.paddingTop = "5px";
-        label.paddingBottom = "5px";
-        label.paddingRight = "5px";
-        label.textWrapping = TextWrapping.WordWrap;
-        label.resizeToFit = true;
-        rect1.addControl(label);
-
-        return rect1;
-    }
-
-    // entity label
-    public createEntityLabel(entity) {
-        var rect1 = new Rectangle("player_nameplate_" + entity.sessionId);
-        rect1.isVisible = false;
-        rect1.width = "300px";
-        rect1.height = "40px";
-        rect1.thickness = 0;
-        this.LABELS_ADT.addControl(rect1);
-        rect1.linkWithMesh(entity.mesh);
-        rect1.linkOffsetY = -80;
-
-        var label = new TextBlock("player_nameplate_text_" + entity.sessionId);
-        label.text = entity.name;
-        label.color = "white";
-        label.fontWeight = "light";
-        label.outlineWidth = 5;
-        label.outlineColor = "black";
-        rect1.addControl(label);
-        return rect1;
-    }
-
-    // item label
-    public createItemLabel(entity) {
-        let title = entity.qty > 1 ? entity.title + " X " + entity.qty : entity.title;
-        var rect1 = new Rectangle("item_nameplate_" + entity.sessionId);
-        rect1.isVisible = false;
-        rect1.width = "200px";
-        rect1.height = "40px";
-        rect1.thickness = 0;
-        this.LABELS_ADT.addControl(rect1);
-        rect1.linkWithMesh(entity.mesh);
-        rect1.linkOffsetY = -30;
-
-        var label = new TextBlock("item_nameplate_text_" + entity.sessionId);
-        label.text = title;
-        label.color = "black";
-        label.fontWeight = "bold";
-        label.fontSize = "14px";
-        label.outlineWidth = 3;
-        label.outlineColor = "white";
-        rect1.addControl(label);
-        return rect1;
-    }
-
-    public createInteractableButtons(entity) {
-        if (!entity.spawnInfo) return false;
-
-        if (!entity.spawnInfo.interactable) return false;
-
-        var rect1 = new Rectangle("entity_buttons_" + entity.sessionId);
-        rect1.isVisible = false;
-        rect1.width = "50px";
-        rect1.height = "50px";
-        rect1.thickness = 0;
-        rect1.zIndex = 1;
-        this.LABELS_ADT.addControl(rect1);
-        rect1.linkWithMesh(entity.mesh);
-        rect1.linkOffsetY = -120;
-
-        var img = new Image("entityTalk-" + entity.sessionId, "./images/icons/talk.png");
-        img.stretch = Image.STRETCH_FILL;
-        rect1.addControl(img);
-
-        return rect1;
     }
 }

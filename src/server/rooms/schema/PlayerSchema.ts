@@ -58,6 +58,7 @@ export class PlayerSchema extends Entity {
     @type("string") public name: string = "";
     @type("string") public type: string = "player";
     @type("string") public race: string = "male_knight";
+    @type("string") public head: string = "Head_Base";
     @type("int8") public material: number = 0;
 
     @type("string") public location: string = "";

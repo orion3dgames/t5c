@@ -6,6 +6,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { generatePanel } from "./Theme";
 import { ServerMsg } from "../../../shared/types";
 import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
+import { SceneInstrumentation } from "@babylonjs/core/Instrumentation/sceneInstrumentation";
 
 export class DebugBox {
     private _playerUI;
@@ -17,6 +18,8 @@ export class DebugBox {
     private ping: number = 0;
     public _debugPanel: Rectangle;
     private _debugTextUI;
+    private instrumentation: SceneInstrumentation;
+    private currentDrawCallCounter: number = 0;
 
     constructor(_playerUI, _engine: Engine, _scene: Scene, _room, _currentPlayer, _entities) {
         this._playerUI = _playerUI;
@@ -25,6 +28,8 @@ export class DebugBox {
         this._room = _room;
         this._currentPlayer = _currentPlayer;
         this._entities = _entities;
+
+        this.instrumentation = new SceneInstrumentation(this._scene);
 
         this._createUI();
 
@@ -36,7 +41,7 @@ export class DebugBox {
     }
 
     _createUI() {
-        const debugPanel = generatePanel("debugPanel", "160px;", "180px", "0px", "-15px");
+        const debugPanel = generatePanel("debugPanel", "160px;", "260px", "0px", "-15px");
         debugPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
         debugPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         debugPanel.isVisible = false;
@@ -79,10 +84,15 @@ export class DebugBox {
             }
         });
 
+        console.log(this.instrumentation.drawCallsCounter.current);
+
         let locationText = "";
         locationText += "Total Nodes: " + entityCount + " \n";
         locationText += "Visible Nodes: " + count + " \n";
         locationText += "FPS: " + roundTo(this._engine.getFps(), 0) + " \n";
+        locationText += "Draw Calls: " + this.instrumentation.drawCallsCounter.current + " \n";
+        locationText += "Total Meshes: " + this._scene.meshes.length + " \n\n";
+
         locationText += "Ping: " + this.ping + "ms\n";
         locationText += "X: " + roundTo(this._currentPlayer.x, 2) + "\n";
         locationText += "y: " + roundTo(this._currentPlayer.y, 2) + "\n";

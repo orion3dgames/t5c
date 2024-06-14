@@ -11,9 +11,10 @@ import { mergeMesh, mergeMeshAndSkeleton } from "../Entities/Common/MeshHelper";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { PBRCustomMaterial } from "@babylonjs/materials/custom/pbrCustomMaterial";
-import { PlayerSlots } from "../../shared/types";
+import { EntityState, EquippableType, Item, PlayerSlots } from "../../shared/types";
 import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
+import { Entity } from "../Entities/Entity";
 
 class JavascriptDataDownloader {
     private data;
@@ -56,16 +57,15 @@ export class VatController {
     }
 
     async initialize() {
-        for (let spawn of this._spawns) {
-            if (!this._entityData.has(spawn.race)) {
-                await this.prepareMesh(spawn.race);
-            }
-        }
-    }
+        // always load humanoid
+        await this.prepareVat(this._game.getGameData("race", "humanoid"));
 
-    async check(race) {
-        if (!this._entityData.has(race)) {
-            await this.prepareMesh(race);
+        // load all others
+        for (let spawn of this._spawns) {
+            let race = this._game.getGameData("race", spawn.race);
+            if (!this._entityData.has(race.vat)) {
+                await this.prepareVat(race);
+            }
         }
     }
 
@@ -76,124 +76,226 @@ export class VatController {
         return movies;
     }
 
-    async prepareVat(vatKey){
-        if(!this._vatData.has(vatKey)){
+    async prepareVat(race) {
+        let key = race.vat.key;
+
+        if (!this._entityData.has(key)) {
+            console.log("[prepareVat] " + key, race);
+
             // get vat data
-            const bakedAnimationJson = await this.fetchVAT(vatKey);
+            const bakedAnimationJson = await this.fetchVAT(key);
 
-        }
-        return this._vatData.get(vatKey);
-    }
+            const { animationGroups, skeletons } = this._game._loadedAssets["VAT_" + key];
+            const skeleton = skeletons[0];
 
-    async prepareMesh(key) {
-        let race = this._game.getGameData("race", key);
-        let vatKey = race.vat;
-
-        const bakedAnimationJson = await this.fetchVAT(race.key);
-        const { meshes, animationGroups, skeletons } = this._game._loadedAssets["RACE_" + key];
-        const skeleton = skeletons[0];
-        const root = meshes[0];
-        root.name = "_root_race_" + key;
-
-        animationGroups.forEach((ag) => ag.stop());
-        const selectedAnimationGroups = this.getAnimationGroups(animationGroups, race.animations);
-
-        // reset positions
-        root.position.setAll(0);
-        root.scaling.setAll(1);
-        root.rotationQuaternion = null;
-        root.rotation.setAll(0);
-        root.setEnabled(false);
-
-        // merge mesh
-        const modelMeshMerged = mergeMeshAndSkeleton(root, skeleton);
-
-        // setup vat
-        if (modelMeshMerged) {
-            //
-            modelMeshMerged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
-            modelMeshMerged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+            // get selected animations
+            animationGroups.forEach((ag) => ag.stop());
+            const selectedAnimationGroups = this.getAnimationGroups(animationGroups, race.vat.animations);
 
             // calculate animations ranges
             const ranges = calculateRanges(selectedAnimationGroups);
 
             // create vat manager
-            const b = new VertexAnimationBaker(this._game.scene, modelMeshMerged);
+            const b = new VertexAnimationBaker(this._game.scene, skeleton);
             const manager = new BakedVertexAnimationManager(this._game.scene);
-
-            //
-            modelMeshMerged.bakedVertexAnimationManager = manager;
-            modelMeshMerged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-
-            // copy mesh for each material
-            let mergedMeshes: any[] = [];
-            let materials = race.materials ?? [];
-            if (materials.length > 1) {
-                let materialId = 0;
-                race.materials.forEach((material) => {
-                    let raceKey = race.key + "_" + materialId;
-
-                    // prepare clone
-                    let clone = modelMeshMerged.clone(raceKey);
-                    clone.bakedVertexAnimationManager = manager;
-                    clone.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
-                    clone.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-                    clone.setEnabled(false);
-                    mergedMeshes.push(this.prepareClone(clone, material, raceKey, materialId));
-                    materialId++;
-                });
-            } else {
-                // in the case where there is only one material
-                let raceKey = race.key + "_0";
-                let clone = modelMeshMerged.clone(raceKey);
-                clone.bakedVertexAnimationManager = manager;
-                clone.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
-                clone.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-                clone.setEnabled(false);
-                mergedMeshes.push(clone);
-            }
 
             // load prebaked vat animations
             let bufferFromMesh = b.loadBakedVertexDataFromJSON(bakedAnimationJson);
             manager.texture = b.textureFromBakedVertexData(bufferFromMesh);
 
-            // hide mesh
-            modelMeshMerged.setEnabled(false);
-
-            // save
+            // save vat
             this._entityData.set(key, {
-                meshes: mergedMeshes,
+                name: key,
+                meshes: new Map(),
                 animationRanges: ranges,
                 selectedAnimationGroups: selectedAnimationGroups,
                 vat: manager,
                 skeleton: skeleton,
                 items: new Map(),
+                bones: race.vat.bones,
+                animations: race.vat.animations,
             });
+        }
+        return this._entityData.get(key);
+    }
+
+    /**
+     * This function remove any unwanted meshes, apply the right materials and more
+     *
+     * @param baseMeshes
+     * @param data
+     * @returns
+     */
+    makeHumanoid(rawMesh, data) {
+        // we need to find any of the equipemnt required a specific mesh
+        let chest = "Base_Body";
+        if (data.equipment) {
+            data.equipment.forEach((equipment) => {
+                let item = this._game.getGameData("item", equipment.key) as Item;
+
+                // chest items
+                if (item.equippable?.type === EquippableType.EMBEDDED && item.equippable.slot === PlayerSlots.CHEST) {
+                    chest = item.equippable.mesh ?? "Base_Body";
+                }
+
+                // other
+            });
+        }
+
+        //
+        let keepArray = [
+            data.head, //
+            "Base_ArmLeft",
+            "Base_ArmRight",
+            chest,
+            "Base_LegLeft",
+            "Base_LegRight",
+        ];
+
+        rawMesh.getChildMeshes(false).forEach((element) => {
+            var n = element.id.lastIndexOf(".");
+            var result = element.id.substring(n + 1);
+            if (!keepArray.includes(result)) {
+                element.dispose();
+            }
+        });
+
+        return rawMesh;
+    }
+
+    // this should regenerate entity mesh with any head/equipemnt/material needed
+    async refreshMesh(entity: Entity) {
+        console.log("[VAT] refresh mesh", entity);
+
+        // reset parent of any dynamic items
+        if (entity.meshController.equipments.size > 0) {
+            entity.meshController.equipments.forEach((equipment) => {
+                equipment.setParent(entity);
+            });
+        }
+
+        // remove existing mesh
+        let mesh = entity.entityData.meshes.get(entity.sessionId);
+        if (mesh) {
+            mesh.dispose();
+            entity.entityData.meshes.delete(entity.sessionId);
+        }
+
+        // create new mesh based on the new data
+        this.prepareMesh(entity);
+
+        // wait a bit before adding the new mesh to the entity
+        setTimeout(() => {
+            entity.meshController.createMesh();
+            entity.animatorController.mesh = entity.meshController.mesh;
+            entity.animatorController.refreshAnimation();
+        }, 50);
+    }
+
+    async prepareMesh(entity) {
+        console.log("prepareMesh", entity);
+
+        let key = entity.race;
+        let race = this._game.getGameData("race", key);
+        let meshId = VatController.findMeshKey(race, entity.sessionId);
+
+        // gets or prepare vat
+        let vat = await this.prepareVat(race);
+
+        // gets mesh if already prepared
+        if (vat.meshes.has(meshId)) {
+            return false;
+        }
+
+        // clone raw mesh
+        let rawMesh = this._game._loadedAssets["RACE_" + key].meshes[0].clone("TEST");
+        rawMesh.name = "_root_race_" + key;
+
+        // reset positions
+        rawMesh.position.setAll(0);
+        rawMesh.scaling.setAll(1);
+        rawMesh.rotationQuaternion = null;
+        rawMesh.rotation.setAll(0);
+
+        // if customizable
+        // todo: more work here to make it better
+        if (race.customizable) {
+            rawMesh = this.makeHumanoid(rawMesh, entity);
+        }
+
+        // merge mesh with skeleton
+        let modelMeshMerged = mergeMeshAndSkeleton(rawMesh, vat.skeleton);
+
+        // setup vat
+        if (modelMeshMerged) {
+            // remove any existing material
+            const selectedMaterial = modelMeshMerged.material ?? false;
+            if (selectedMaterial) {
+                selectedMaterial.dispose();
+            }
+
+            // create a new material based on race and material index
+            let materialKey = race.materials[entity.material].material;
+            let alreadyExistMaterial = this._game.scene.getMaterialByName(materialKey);
+            if (alreadyExistMaterial) {
+                alreadyExistMaterial.freeze();
+                // material already exists
+                modelMeshMerged.material = alreadyExistMaterial;
+            } else {
+                // create material as it does not exists
+                let mat = new PBRCustomMaterial(materialKey);
+                mat.albedoTexture = new Texture("./models/races/materials/" + materialKey, this._game.scene, {
+                    invertY: false,
+                });
+                mat.reflectionColor = new Color3(0, 0, 0);
+                mat.reflectivityColor = new Color3(0, 0, 0);
+                mat.freeze();
+
+                // assign to mesh
+                modelMeshMerged.material = mat;
+            }
+
+            // set mesh
+            modelMeshMerged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
+            modelMeshMerged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+            modelMeshMerged.bakedVertexAnimationManager = vat.vat;
+
+            // save for later use
+            vat.meshes.set(meshId, modelMeshMerged);
+
+            // hide mesh
+            modelMeshMerged.setEnabled(false);
+            rawMesh.dispose();
         }
     }
 
-    async prepareItemForVat(raceKey, itemKey) {
-        // get entityData
-        let entityData = this._entityData.get(raceKey);
+    static findMeshKey(race, sessionId) {
+        let meshId = race.key;
+        if (race.customizable) {
+            meshId = sessionId;
+        }
+        return meshId;
+    }
 
-        // make sure not already loaded
+    async prepareItemForVat(entityData, itemKey) {
+        // if already prepared, stop
         if (entityData.items.has(itemKey)) {
             return false;
         }
 
         // load item
         let item = this._game.getGameData("item", itemKey);
-        let race = this._game.getGameData("race", raceKey);
         let slot = item.equippable ? PlayerSlots[item.equippable.slot] : 0;
-        let boneId = race.bones[slot];
+        let boneId = entityData.bones[slot]; // bones come from entityData
 
         if (!boneId) return false;
 
         // clone raw mesh
-        let rawMesh = this._game._loadedAssets["ITEM_" + item.key].meshes[0].clone("vat_" + item.key); // mandatory: needs to be cloned
+        let rawMesh = this._game._loadedAssets["ITEM_" + item.key].meshes[0].clone("TEST");
+        rawMesh.name = "_root_item_" + itemKey;
         rawMesh.position.copyFrom(entityData.skeleton.bones[boneId].getAbsolutePosition());
         rawMesh.rotationQuaternion = undefined;
-        rawMesh.rotation.set(0, Math.PI * 1.5, 0); // could be set it in Blender
+        rawMesh.rotation.set(0, Math.PI * 1.5, 0);
         rawMesh.scaling.setAll(1);
 
         // if mesh offset required
@@ -221,7 +323,7 @@ export class VatController {
         // merge mesh
         let itemMesh = mergeMesh(rawMesh, itemKey);
         if (itemMesh) {
-            itemMesh.name = race.key + "_" + itemMesh.name;
+            itemMesh.name = entityData.name + "_" + itemMesh.name;
 
             // attach to VAT
             itemMesh.skeleton = entityData.skeleton;
@@ -243,12 +345,10 @@ export class VatController {
             itemMesh.setVerticesData(VertexBuffer.MatricesWeightsKind, weaponMW, false);
 
             // cleanup
-            //rawMesh.dispose();
-            rawMesh.position.y = 5000; // offset to hide the raw item as setEnabled does not work
-            itemMesh.position.y = 5000; // offset to hide the raw item as setEnabled does not work
-            //itemMesh.setEnabled(false);
+            rawMesh.dispose();
+            itemMesh.setEnabled(false);
 
-            //console.log("PREPARING ITEM FOR VAT", race, itemKey);
+            // save for later use
             entityData.items.set(itemKey, itemMesh);
         }
     }

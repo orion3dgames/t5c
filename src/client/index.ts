@@ -175,6 +175,7 @@ class App {
         // make sure scene and camera is initialized
         if (this.game.scene && this.game.scene.activeCamera) {
             // render scene
+            this.game.currentScene.engineUpdate();
             this.game.scene.render();
         }
     }

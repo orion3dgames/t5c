@@ -4,7 +4,7 @@ import { EntityState } from "../../../shared/types";
 
 export class EntityAnimator {
     private _entity;
-    private mesh;
+    public mesh;
     private entityData;
     private ratio;
 
@@ -41,9 +41,7 @@ export class EntityAnimator {
     constructor(entity: Entity) {
         // get player mesh
         this.mesh = entity.meshController.mesh;
-
-        // set default vat animation
-        this.entityData = entity._game._vatController.entityData.get(entity.race);
+        this.entityData = entity.entityData;
 
         this._entity = entity;
         this.ratio = 0;
@@ -54,10 +52,10 @@ export class EntityAnimator {
     public refreshAnimationRatio() {
         this.ratio = this._entity._scene.getAnimationRatio();
         // set animation speed
-        this._idle.speedRatio = this._entity.animations["IDLE"].speed * this.ratio;
-        this._walk.speedRatio = this._entity.animations["WALK"].speed * this.ratio;
-        this._attack.speedRatio = this._entity.animations["ATTACK"].speed * this.ratio;
-        this._death.speedRatio = this._entity.animations["DEATH"].speed * this.ratio;
+        this._idle.speedRatio = this.entityData.animations["IDLE"].speed * this.ratio;
+        this._walk.speedRatio = this.entityData.animations["WALK"].speed * this.ratio;
+        this._attack.speedRatio = this.entityData.animations["ATTACK"].speed * this.ratio;
+        this._death.speedRatio = this.entityData.animations["DEATH"].speed * this.ratio;
     }
 
     private _build(): void {
@@ -196,5 +194,9 @@ export class EntityAnimator {
 
     refreshItem(itemMesh) {
         this.setAnimationParameters(itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim);
+    }
+
+    refreshAnimation(){
+        this._prevAnim = false;
     }
 }
