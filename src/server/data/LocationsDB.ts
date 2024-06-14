@@ -58,6 +58,10 @@ let LocationsDB = {
                     name: "Blacksmith Garin",
                     equipment: [
                         {
+                            key: "armor_01",
+                            slot: PlayerSlots.CHEST,
+                        },
+                        {
                             key: "shield_01",
                             slot: PlayerSlots.OFF_HAND,
                         },

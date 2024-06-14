@@ -143,7 +143,7 @@ export class EntityMesh {
         let item = this._game.getGameData("item", e.key);
         if (item && item.equippable) {
             if (item.equippable.mesh && item.equippable.type === EquippableType.EMBEDDED) {
-                this._game._vatController.refreshMesh(this._entity);
+                //this._game._vatController.refreshMesh(this._entity);
             }
         }
     }
@@ -160,31 +160,33 @@ export class EntityMesh {
 
             // if dynamic item
             if (equipOptions && equipOptions.mesh && equipOptions.type === EquippableType.DYNAMIC) {
-                // prepare item for vat
                 this._game._vatController.prepareItemForVat(this._entityData, e.key);
-
-                // create instance of mesh
-                let mesh = this._entityData.items.get(item.key);
-                let instance = mesh.createInstance("equip_" + this._entity.sessionId + "_" + e.key);
-                instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-                instance.isPickable = false;
-
-                // or like this(so we don't need to sync it every frame)
-                instance.setParent(this.mesh);
-                instance.position.setAll(0);
-                instance.rotationQuaternion = undefined;
-                instance.rotation.setAll(0);
-
-                // add
-                this.equipments.set(e.key, instance);
-
-                // refresh animation
-                this._entity.animatorController.refreshItems();
             }
+            if (equipOptions && equipOptions.mesh && equipOptions.type === EquippableType.EMBEDDED) {
+                this._game._vatController.prepareEmbeddedItemForVat(this._entityData, e.key);
+            }
+
+            // create instance of mesh
+            let mesh = this._entityData.items.get(item.key);
+            let instance = mesh.createInstance("equip_" + this._entity.sessionId + "_" + e.key);
+            instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+            instance.isPickable = false;
+
+            // or like this(so we don't need to sync it every frame)
+            instance.setParent(this.mesh);
+            instance.position.setAll(0);
+            instance.rotationQuaternion = undefined;
+            instance.rotation.setAll(0);
+
+            // add
+            this.equipments.set(e.key, instance);
+
+            // refresh animation
+            this._entity.animatorController.refreshAnimation();
 
             // if embedded item
             if (equipOptions && equipOptions.mesh && equipOptions.type === EquippableType.EMBEDDED) {
-                this._game._vatController.refreshMesh(this._entity);
+                //this._game._vatController.refreshMesh(this._entity);
             }
         }
     }

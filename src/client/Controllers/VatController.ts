@@ -147,7 +147,8 @@ export class VatController {
             data.head, //
             "Base_ArmLeft",
             "Base_ArmRight",
-            chest,
+            //chest,
+            "Base_Body",
             "Base_LegLeft",
             "Base_LegRight",
         ];
@@ -365,24 +366,26 @@ export class VatController {
         let rawMesh = this._game._loadedAssets["RACE_" + key].meshes[0].clone("TEST") as Mesh;
 
         // find raw mesh
-        let found = rawMesh.getChildMeshes(undefined, (node) => {
-            if (node.name.indexOf(item.equippable.mesh) > -1) {
-                return true;
+        rawMesh.getChildMeshes(false).forEach((element) => {
+            var n = element.id.lastIndexOf(".");
+            var result = element.id.substring(n + 1);
+            if (!item.equippable.mesh.includes(result)) {
+                element.dispose();
             }
-            return false;
         });
 
-        let modelMeshMerged = found[0] as Mesh;
+        let itemMesh = mergeMesh(rawMesh, itemKey);
 
-        if (modelMeshMerged) {
+        if (itemMesh) {
             // attach to VAT
-            modelMeshMerged.skeleton = entityData.skeleton;
-            modelMeshMerged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
-            modelMeshMerged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-            modelMeshMerged.bakedVertexAnimationManager = entityData.vat;
-            entityData.items.set(itemKey, modelMeshMerged);
+            itemMesh.skeleton = entityData.skeleton;
+            itemMesh.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
+            itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+            itemMesh.bakedVertexAnimationManager = entityData.vat;
+            entityData.items.set(itemKey, itemMesh);
 
-            rawMesh.setEnabled(false);
+            itemMesh.setEnabled(false);
+            rawMesh.dispose();
         }
     }
 
