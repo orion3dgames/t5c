@@ -47,7 +47,6 @@ export class EntityMesh {
     public createMesh() {
         // load player mesh
         let materialIndex = VatController.findMeshKey(this._entity.raceData, this._entity.sessionId);
-        console.log("[ENTITY_MESH]", this._entity.raceData.key);
         const playerMesh = this._entityData.meshes.get(materialIndex).createInstance(this._entity.type + "" + this._entity.sessionId);
         playerMesh.parent = this._entity;
         playerMesh.isPickable = true;
@@ -69,8 +68,6 @@ export class EntityMesh {
             race: this._entity.race,
             name: this._entity.name,
         };
-
-        console.log(this.equipments);
 
         this.equipments.forEach((equipment) => {
             equipment.setParent(this.mesh);

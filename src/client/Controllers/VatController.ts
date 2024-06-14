@@ -194,7 +194,7 @@ export class VatController {
     }
 
     async prepareMesh(entity) {
-        console.log("prepareMesh", entity);
+        //console.log("prepareMesh", entity);
 
         let key = entity.race;
         let race = this._game.getGameData("race", key);

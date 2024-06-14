@@ -84,8 +84,6 @@ export class DebugBox {
             }
         });
 
-        console.log(this.instrumentation.drawCallsCounter.current);
-
         let locationText = "";
         locationText += "Total Nodes: " + entityCount + " \n";
         locationText += "Visible Nodes: " + count + " \n";
