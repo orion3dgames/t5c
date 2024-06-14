@@ -229,32 +229,8 @@ export class VatController {
 
         // setup vat
         if (modelMeshMerged) {
-            // remove any existing material
-            const selectedMaterial = modelMeshMerged.material ?? false;
-            if (selectedMaterial) {
-                selectedMaterial.dispose();
-            }
-
-            // create a new material based on race and material index
-            let materialKey = race.materials[entity.material].material;
-            let alreadyExistMaterial = this._game.scene.getMaterialByName(materialKey);
-            if (alreadyExistMaterial) {
-                alreadyExistMaterial.freeze();
-                // material already exists
-                modelMeshMerged.material = alreadyExistMaterial;
-            } else {
-                // create material as it does not exists
-                let mat = new PBRCustomMaterial(materialKey);
-                mat.albedoTexture = new Texture("./models/races/materials/" + materialKey, this._game.scene, {
-                    invertY: false,
-                });
-                mat.reflectionColor = new Color3(0, 0, 0);
-                mat.reflectivityColor = new Color3(0, 0, 0);
-                mat.freeze();
-
-                // assign to mesh
-                modelMeshMerged.material = mat;
-            }
+            // update material
+            this.prepareMaterial(modelMeshMerged, race.key, entity.material);
 
             // set mesh
             modelMeshMerged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
@@ -377,6 +353,9 @@ export class VatController {
         let itemMesh = mergeMesh(rawMesh, itemKey);
 
         if (itemMesh) {
+            // update material
+            this.prepareMaterial(itemMesh, entityData.name, item.equippable.material);
+
             // attach to VAT
             itemMesh.skeleton = entityData.skeleton;
             itemMesh.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
@@ -389,35 +368,33 @@ export class VatController {
         }
     }
 
-    prepareClone(cloneMesh, material: any, raceKey, materialIndex) {
-        const selectedMaterial = cloneMesh.material ?? false;
+    prepareMaterial(cloneMesh, raceKey, materialIndex) {
+        // get race
+        let race = this._game.getGameData("race", raceKey);
 
+        // remove any existing material
+        const selectedMaterial = cloneMesh.material ?? false;
         if (selectedMaterial) {
             selectedMaterial.dispose();
         }
 
-        // create a new material based on race and material index
-        let alreadyExistMaterial = this._game.scene.getMaterialByName(raceKey);
-
+        let materialKey = race.materials[materialIndex].material;
+        let alreadyExistMaterial = this._game.scene.getMaterialByName(materialKey);
         if (alreadyExistMaterial) {
-            alreadyExistMaterial.freeze();
-            // material already exists
             cloneMesh.material = alreadyExistMaterial;
         } else {
             // create material as it does not exists
-            let mat = new PBRCustomMaterial(raceKey);
-            mat.albedoTexture = new Texture("./models/races/materials/" + material.material, this._game.scene, {
+            let mat = new PBRCustomMaterial(materialKey);
+            mat.albedoTexture = new Texture("./models/races/materials/" + materialKey, this._game.scene, {
                 invertY: false,
             });
             mat.reflectionColor = new Color3(0, 0, 0);
             mat.reflectivityColor = new Color3(0, 0, 0);
-            mat.freeze();
+            mat.backFaceCulling = false;
 
-            //
+            // assign to mesh
             cloneMesh.material = mat;
         }
-
-        return cloneMesh;
     }
 
     async bakeTextureAnimation(key: string, merged) {
