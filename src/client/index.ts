@@ -1,6 +1,6 @@
 if (process.env.NODE_ENV !== "production") {
-    import("@babylonjs/core/Debug/debugLayer");
-    import("@babylonjs/inspector");
+    //import("@babylonjs/core/Debug/debugLayer");
+    //import("@babylonjs/inspector");
 }
 
 // ES6 IMPORTS
@@ -175,7 +175,7 @@ class App {
         // make sure scene and camera is initialized
         if (this.game.scene && this.game.scene.activeCamera) {
             // render scene
-            this.game.currentScene.engineUpdate();
+            //this.game.currentScene.engineUpdate();
             this.game.scene.render();
         }
     }
