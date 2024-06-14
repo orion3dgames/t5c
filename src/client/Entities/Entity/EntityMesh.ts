@@ -29,8 +29,8 @@ export class EntityMesh {
     public playerMesh;
     public debugMesh: Mesh;
     public selectedMesh: Mesh;
+    public fakeShadow: Mesh;
     public equipments;
-    public namePlateAnchor: AbstractMesh;
 
     constructor(entity: Entity) {
         this._entity = entity;
@@ -69,6 +69,12 @@ export class EntityMesh {
             race: this._entity.race,
             name: this._entity.name,
         };
+
+        console.log(this.equipments);
+
+        this.equipments.forEach((equipment) => {
+            equipment.setParent(this.mesh);
+        });
     }
 
     public async load() {
@@ -94,24 +100,18 @@ export class EntityMesh {
             shadowMesh.checkCollisions = false;
             shadowMesh.doNotSyncBoundingInfo = true;
             shadowMesh.position = new Vector3(0, 0.04, 0);
+            this.fakeShadow = shadowMesh;
         }
-
-        // add name plate
-        var nameplateAnchor = new AbstractMesh("Nameplate Anchor", this._scene);
-        nameplateAnchor.billboardMode = Mesh.BILLBOARDMODE_ALL;
-        nameplateAnchor.position.y = -2.5; //-meshHieght
-        nameplateAnchor.parent = this._entity;
 
         setTimeout(() => {
             // check for any equipment changes
             this._entity.entity.equipment.onAdd((e) => {
-                console.log('ADDING EQUIPEMENT FROM SERVER', e);
                 this.equipItem(e);
             });
             this._entity.entity.equipment.onRemove((e) => {
                 this.removeItem(e);
             });
-        }, 200);
+        }, 300);
 
         return true;
     }
@@ -170,7 +170,7 @@ export class EntityMesh {
                 instance.isPickable = false;
 
                 // or like this(so we don't need to sync it every frame)
-                instance.setParent(this._entity);
+                instance.setParent(this.mesh);
                 instance.position.setAll(0);
                 instance.rotationQuaternion = undefined;
                 instance.rotation.setAll(0);
@@ -184,7 +184,6 @@ export class EntityMesh {
 
             // if embedded item
             if (equipOptions && equipOptions.mesh && equipOptions.type === EquippableType.EMBEDDED) {
-                console.log('[ENTITY_MESH] equipping ', item.key);
                 this._game._vatController.refreshMesh(this._entity);
             }
         }

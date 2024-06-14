@@ -7,7 +7,7 @@ let LocationsDB = {
         key: "lh_town",
         mesh: "lh_town",
         sun: true,
-        sunIntensity: 0.1,
+        sunIntensity: 0.6,
         spawnPoint: {
             x: 0,
             y: 0,
@@ -42,49 +42,6 @@ let LocationsDB = {
                 ///////////////////////
                 ///////// NPC /////////
 
-                {
-                    key: "spawn_dummy1",
-                    type: "static",
-                    behaviour: "idle",
-                    aggressive: false,
-                    canAttack: true,
-                    points: [new Vector3(13, 0, -13.7)],
-                    rotation: 0,
-                    radius: 0,
-                    amount: 1,
-                    race: "humanoid",
-                    head: "Head_Barbarian",
-                    material: 20,
-                    name: "Name",
-                    baseHealth: 5000,
-                    equipment: [
-                        {
-                            key: "armor_01",
-                            slot: PlayerSlots.CHEST,
-                        },
-                    ],
-                },
-
-                {
-                    key: "spawn_dummy2",
-                    type: "static",
-                    behaviour: "idle",
-                    aggressive: false,
-                    canAttack: true,
-                    points: [new Vector3(10.41, 0.06, -13.72)],
-                    rotation: 0,
-                    radius: 0,
-                    amount: 1,
-                    race: "humanoid",
-                    head: "Head_Mage",
-                    material: 10,
-                    name: "Name",
-                    baseHealth: 5000,
-                    equipment: [
-                    ],
-                },
-
-                
                 // BLACKSMITH
                 {
                     key: "lh_town_blacksmith",
@@ -93,7 +50,7 @@ let LocationsDB = {
                     aggressive: false,
                     canAttack: false,
                     points: [new Vector3(31.22, 0.06, -24.19)],
-                    rotation: 0,
+                    rotation: 2.75,
                     amount: 1,
                     race: "humanoid",
                     material: 3,
@@ -124,52 +81,6 @@ let LocationsDB = {
                     },
                 },
 
-                {
-                    key: "lh_town_bandits",
-                    type: "area",
-                    behaviour: "patrol",
-                    aggressive: true,
-                    canAttack: true,
-                    points: [new Vector3(27.16, 0.06, 1.38), new Vector3(31.74, 0.06, -3.27), new Vector3(38.56, 0.06, 0.31)],
-                    amount: 50,
-                    race: "male_knight",
-                    material: 0,
-                    name: "Bandit",
-                    baseHealth: 80,
-                    baseSpeed: Speed.VERY_SLOW,
-                    equipment: [
-                        {
-                            key: "shield_01",
-                            slot: PlayerSlots.OFF_HAND,
-                        },
-                        {
-                            key: "sword_01",
-                            slot: PlayerSlots.WEAPON,
-                        },
-                        {
-                            key: "helm_01",
-                            slot: PlayerSlots.HEAD,
-                        },
-                    ],
-                },
-
-                {
-                    key: "lh_town_rats",
-                    type: "area",
-                    behaviour: "patrol",
-                    aggressive: true,
-                    canAttack: true,
-                    points: [new Vector3(27.16, 0.06, 1.38), new Vector3(31.74, 0.06, -3.27), new Vector3(38.56, 0.06, 0.31)],
-                    amount: 50,
-                    race: "rat_01",
-                    material: 0,
-                    name: "Bandit",
-                    baseHealth: 80,
-                    baseSpeed: Speed.VERY_SLOW,
-                    equipment: [],
-                },
-
-                /*
                 // MERCHANT
                 {
                     key: "lh_town_merchant",
@@ -180,8 +91,9 @@ let LocationsDB = {
                     points: [new Vector3(10.18, 0.06, 25.43)],
                     rotation: 2.7,
                     amount: 1,
-                    race: "male_knight",
-                    material: 2,
+                    race: "humanoid",
+                    material: 9,
+                    head: "Head_Rogue",
                     name: "Merchant Elara",
                     interactable: {
                         title: "Talk",
@@ -209,8 +121,9 @@ let LocationsDB = {
                     rotation: 2.79,
                     radius: 0,
                     amount: 1,
-                    race: "male_knight",
-                    material: 0,
+                    race: "humanoid",
+                    material: 7,
+                    head: "Head_Mage",
                     name: "Mira The Sorceress",
                     baseHealth: 5000,
                     equipment: [
@@ -243,8 +156,9 @@ let LocationsDB = {
                     points: [new Vector3(7.45, 0.1, -28.12)],
                     rotation: 3.12,
                     amount: 2,
-                    race: "male_knight",
-                    material: 2,
+                    race: "humanoid",
+                    material: 6,
+                    head: "Head_Mage",
                     name: "Priestess Alice ",
                     equipment: [
                         {
@@ -297,8 +211,9 @@ let LocationsDB = {
                     points: [new Vector3(13.15, 0.06, 41.13)],
                     rotation: 2.4,
                     amount: 1,
-                    race: "male_knight",
-                    material: 1,
+                    race: "humanoid",
+                    material: 15,
+                    head: "Head_Engineer",
                     name: "Farmer Jorin",
                     interactable: {
                         title: "Talk",
@@ -322,8 +237,9 @@ let LocationsDB = {
                     points: [new Vector3(40.32, 0.1, 20.88)],
                     rotation: 1.85,
                     amount: 1,
-                    race: "male_knight",
-                    material: 0,
+                    race: "humanoid",
+                    material: 19,
+                    head: "Head_Engineer",
                     name: "Bartender Morin",
                     interactable: {
                         title: "Talk",
@@ -347,8 +263,9 @@ let LocationsDB = {
                     points: [new Vector3(47.54, 0.06, 67.27)],
                     rotation: 1.5,
                     amount: 1,
-                    race: "male_knight",
-                    material: 1,
+                    race: "humanoid",
+                    material: 8,
+                    head: "Head_Barbarian",
                     name: "Caretaker Ren",
                     interactable: {
                         title: "Talk",
@@ -372,8 +289,9 @@ let LocationsDB = {
                     points: [new Vector3(-12.24, 0.06, 17.5)],
                     rotation: -1.5,
                     amount: 2,
-                    race: "male_knight",
-                    material: 1,
+                    race: "humanoid",
+                    material: 12,
+                    head: "Head_Mage",
                     name: "Madame Seraphina",
                     interactable: {
                         title: "Talk",
@@ -397,57 +315,14 @@ let LocationsDB = {
                     rotation: 3.12,
                     radius: 0,
                     amount: 1,
-                    race: "male_knight",
-                    material: 2,
+                    race: "humanoid",
+                    material: 16,
+                    head: "Head_Base",
                     name: "Harmless Dummy",
                     baseHealth: 5000,
                     equipment: [
                         {
                             key: "head_02",
-                            slot: PlayerSlots.HEAD,
-                        },
-                    ],
-                },
-
-                {
-                    key: "spawn_dummy2",
-                    type: "static",
-                    behaviour: "idle",
-                    aggressive: false,
-                    canAttack: true,
-                    points: [new Vector3(11, 0, -13.7)],
-                    rotation: 3.12,
-                    radius: 0,
-                    amount: 1,
-                    race: "male_knight",
-                    material: 1,
-                    name: "Harmless Dummy",
-                    baseHealth: 5000,
-                    equipment: [
-                        {
-                            key: "head_01",
-                            slot: PlayerSlots.HEAD,
-                        },
-                    ],
-                },
-
-                {
-                    key: "spawn_dummy3",
-                    type: "static",
-                    behaviour: "idle",
-                    aggressive: false,
-                    canAttack: true,
-                    points: [new Vector3(13, 0, -13.7)],
-                    rotation: 3.12,
-                    radius: 0,
-                    amount: 1,
-                    race: "male_knight",
-                    material: 0,
-                    name: "Harmless Dummy",
-                    baseHealth: 5000,
-                    equipment: [
-                        {
-                            key: "head_03",
                             slot: PlayerSlots.HEAD,
                         },
                     ],
@@ -464,7 +339,7 @@ let LocationsDB = {
                     canAttack: true,
                     points: [new Vector3(36.29, 0.06, -0.59), new Vector3(45.93, 0.06, 0.88), new Vector3(40.4, 0.06, 7.2), new Vector3(32.86, 0.06, 8.73)],
                     amount: 5,
-                    race: "rat_01",
+                    race: "male_knight",
                     material: 0,
                     name: "Bandit",
                     baseHealth: 20,
@@ -488,8 +363,9 @@ let LocationsDB = {
                         new Vector3(28.44, 0.06, 78.08),
                     ],
                     amount: 10,
-                    race: "male_knight",
-                    material: 2,
+                    race: "humanoid",
+                    material: 17,
+                    head: "Head_Rogue",
                     name: "Bandit",
                     baseHealth: 80,
                     baseSpeed: Speed.VERY_SLOW,
@@ -508,7 +384,6 @@ let LocationsDB = {
                         },
                     ],
                 },
-                */
             ],
         },
     },

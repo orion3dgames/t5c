@@ -315,20 +315,12 @@ export class Entity extends TransformNode {
         let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
 
         if (distanceFromPlayer < this._game.config.PLAYER_VIEW_DISTANCE) {
-            this.mesh.setEnabled(true);
-            this.mesh.unfreezeWorldMatrix();
-            this.meshController.equipments?.forEach((equipment) => {
-                equipment.setEnabled(true);
-                equipment.unfreezeWorldMatrix();
-            });
+            this.setEnabled(true);
+            this.unfreezeWorldMatrix();
         } else {
             // hide everything
-            this.mesh.setEnabled(false);
-            this.mesh.freezeWorldMatrix();
-            this.meshController.equipments?.forEach((equipment) => {
-                equipment.setEnabled(false);
-                equipment.freezeWorldMatrix();
-            });
+            this.setEnabled(false);
+            this.freezeWorldMatrix();
         }
     }
 

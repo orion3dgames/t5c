@@ -165,8 +165,14 @@ export class VatController {
 
     // this should regenerate entity mesh with any head/equipemnt/material needed
     async refreshMesh(entity: Entity) {
-        
         console.log("[VAT] refresh mesh", entity);
+
+        // reset parent of any dynamic items
+        if (entity.meshController.equipments.size > 0) {
+            entity.meshController.equipments.forEach((equipment) => {
+                equipment.setParent(entity);
+            });
+        }
 
         // remove existing mesh
         let mesh = entity.entityData.meshes.get(entity.sessionId);
