@@ -293,7 +293,7 @@ export type Item = {
         type?: EquippableType;
         slot?: PlayerSlots;
         mesh?: string;
-        material?: string;
+        material?: number;
         rotation_x?: number;
         rotation_y?: number;
         rotation_z?: number;
