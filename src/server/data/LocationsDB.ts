@@ -77,7 +77,14 @@ let LocationsDB = {
                                 type: "text",
                                 text: "Greetings, adventurer! Looking for a new weapon or some sturdy armor? I've got the finest in Eldoria.",
                                 vendor: {
-                                    items: [{ key: "shield_01" }, { key: "sword_01" }, { key: "amulet_01" }, { key: "helm_01" }],
+                                    items: [
+                                        { key: "shield_01" }, //
+                                        { key: "sword_01" },
+                                        { key: "amulet_01" },
+                                        { key: "helm_01" },
+                                        { key: "armor_01" },
+                                        { key: "armor_02" },
+                                    ],
                                 },
                                 isEndOfDialog: true,
                             },
