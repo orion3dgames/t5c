@@ -80,7 +80,7 @@ export class EntityMove {
     }
 
     // move transform node
-    public tween(tween: number = 0.05): void {
+    public tween(tween: number = 0.1): void {
         // continuously lerp between current position and next position
         this._node.position = Vector3.Lerp(this._node.position, this.nextPosition, tween);
 
