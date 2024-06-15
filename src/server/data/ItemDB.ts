@@ -80,6 +80,35 @@ let ItemsDB: itemDataMap = {
         },
     },
 
+    hat_01: {
+        key: "hat_01",
+        title: "Helm",
+        description: "Description.",
+        icon: "ICON_ITEM_hat_01",
+        class: ItemClass.ARMOR,
+        value: 2000,
+        destroyable: false,
+        sellable: true,
+        tradable: true,
+        stackable: false,
+        rarity: ItemRarity.NORMAL,
+        equippable: {
+            type: EquippableType.DYNAMIC,
+            slot: PlayerSlots.HEAD,
+            mesh: "hat_01",
+            offset_y: 1,
+            offset_z: -0.1,
+            rotation_y: Math.PI * 1.5,
+            rotation_z: 0.2,
+            scale: 1,
+        },
+        requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
+        benefits: [{ key: PlayerKeys.STRENGTH, type: CalculationTypes.ADD, amount: 10 }],
+        meshData: {
+            scale: 0.8,
+        },
+    },
+
     armor_01: {
         key: "armor_01",
         title: "Purple Robe",

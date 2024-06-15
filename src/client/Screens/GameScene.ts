@@ -335,7 +335,7 @@ export class GameScene {
     engineUpdate() {}
 
     async spawn() {
-        let amountToSpawn = 10;
+        let amountToSpawn = 1;
         let i = 0;
         for (const value of this.toSpawnOthers) {
             let entity = value[1];

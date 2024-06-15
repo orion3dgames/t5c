@@ -157,11 +157,14 @@ export class EntityMesh {
             let equipOptions = item.equippable;
 
             // if dynamic item
-            if (equipOptions && equipOptions.mesh && equipOptions.type === EquippableType.DYNAMIC) {
+            if (equipOptions && equipOptions.type === EquippableType.DYNAMIC) {
                 this._game._vatController.prepareItemForVat(this._entityData, e.key);
             }
-            if (equipOptions && equipOptions.mesh && equipOptions.type === EquippableType.EMBEDDED) {
+            if (equipOptions && equipOptions.type === EquippableType.EMBEDDED) {
                 this._game._vatController.prepareEmbeddedItemForVat(this._entityData, e.key);
+            }
+            if (equipOptions && equipOptions.type === EquippableType.NOT_VISIBLE) {
+                return false;
             }
 
             // create instance of mesh

@@ -159,9 +159,9 @@ export class Item extends TransformNode {
         this.fakeShadow = shadowMesh;
 
         // add nameplate
-        this.nameplate = this.nameplateController.addNamePlate();
+        //this.nameplate = this.nameplateController.addNamePlate();
 
-        // add mesh to shadow generator
+        // set position
         this.setPosition();
 
         //////////////////////////////////////////////
@@ -212,7 +212,25 @@ export class Item extends TransformNode {
         //this.characterLabel = this._ui.createItemLabel(this);
     }
 
-    public lod(delta) {}
+    public lod(_currentPlayer) {
+        if (!this.mesh) {
+            return false;
+        }
+
+        // only enable if close enough to local player
+        let entityPos = this.getPosition();
+        let playerPos = _currentPlayer.getPosition();
+        let distanceFromPlayer = Vector3.Distance(playerPos, entityPos);
+
+        if (distanceFromPlayer < this._game.config.PLAYER_VIEW_DISTANCE) {
+            this.setEnabled(true);
+            this.unfreezeWorldMatrix();
+        } else {
+            // hide everything
+            this.setEnabled(false);
+            this.freezeWorldMatrix();
+        }
+    }
 
     public update(delta) {}
     public updateServerRate(delta) {}
