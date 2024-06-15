@@ -86,6 +86,7 @@ export class Entity extends TransformNode {
     // interactable
     public spawnInfo;
     public interactableButtons;
+    public nameplate;
 
     // raceData
     public rotationFix;
@@ -201,7 +202,7 @@ export class Entity extends TransformNode {
         //////////////////////////////////////////////////////////////////////////
         // misc
         if (!this.isCurrentPlayer) {
-            this.nameplateController.addNamePlate();
+            this.nameplate = this.nameplateController.addNamePlate();
         }
 
         //this.interactableButtons = this._ui.createInteractableButtons(this);
@@ -331,6 +332,10 @@ export class Entity extends TransformNode {
         if (this.interactableButtons) {
             this.interactableButtons.dispose();
         }
+
+        // remove nameplate
+        this.nameplate.dispose();
+
         // delete mesh, including equipment
         this.meshController.deleteMeshes();
 

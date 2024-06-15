@@ -1,10 +1,11 @@
 import { BrainSchema, LootSchema } from "../schema";
 import { GameRoom } from "../GameRoom";
-import { EntityState, Speed } from "../../../shared/types";
+import { EntityState, PlayerSlots, Speed } from "../../../shared/types";
 import { nanoid } from "nanoid";
 import Logger from "../../utils/Logger";
 import { randomNumberInRange } from "../../../shared/Utils";
 import { GameRoomState } from "../state/GameRoomState";
+import { Vector3 } from "../../../shared/Libs/yuka-min";
 
 export class spawnCTRL {
     private _state: GameRoomState;
@@ -22,15 +23,65 @@ export class spawnCTRL {
         this._state = state;
         this._room = state._gameroom;
         this.location = this._state.gameData.get("location", this._room.metadata.location);
+
+        // create a big population
+        let Items = this._state.gameData.load("items");
+        let keys = Object.keys(Items);
+        let heads = [
+            "Head_Base", //
+            "Head_Barbarian",
+            "Head_Engineer",
+            "Head_Mage",
+            "Head_Rogue",
+        ];
+        let race = this._state.gameData.get("race", "humanoid");
+        for (let i = 0; i < 100; i++) {
+            let rand = keys[Math.floor(Math.random() * keys.length)];
+            let randData = Items[rand];
+            let equipment = [];
+            if (randData.equippable) {
+                equipment.push({
+                    key: randData.key,
+                    slot: randData.equippable.slot,
+                }) as any;
+            }
+
+            this.location.dynamic.spawns.push({
+                key: "spawn_dummy_" + i,
+                type: "area",
+                behaviour: "patrol",
+                aggressive: false,
+                canAttack: true,
+                points: [
+                    new Vector3(9, 0, -13.7),
+                    new Vector3(10.65, 0.06, -21.49),
+                    new Vector3(-15.87, 0.06, -10.12),
+                    new Vector3(16.44, 0.06, 2.11),
+                    new Vector3(29.8, 0.06, -4.25),
+                    new Vector3(25.34, 0.06, 28.82),
+                ],
+                rotation: 3.12,
+                radius: 0,
+                amount: 1,
+                race: "humanoid",
+                material: randomNumberInRange(0, 23),
+                head: heads[Math.floor(Math.random() * heads.length)],
+                name: "Bot " + i,
+                baseHealth: 5000,
+                baseSpeed: Speed.VERY_SLOW,
+                equipment: equipment,
+            });
+        }
+
+        //
         this.process();
 
-        for (let i = 0; i < 20; i++) {
-            //this.createItem();
+        for (let i = 0; i < 400; i++) {
+            this.createItem();
         }
     }
 
     public debug_increase(amount) {
-        console.log(this.location.dynamic.spawns);
         if (this.location.dynamic.spawns[0]) {
             this.location.dynamic.spawns[0].amount += amount;
         }
@@ -107,6 +158,7 @@ export class spawnCTRL {
         }
 
         let data = {
+            name: randData.title,
             key: randData.key,
             sessionId: sessionId,
             x: currentPosition.x,

@@ -6,10 +6,11 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Scene } from "@babylonjs/core/scene";
 import { generateRandomId, randomNumberInRange } from "../../../shared/Utils";
 import { Entity } from "../Entity";
+import { Item } from "../Item";
 
 export class EntityNamePlate {
     private _scene: Scene;
-    private _entity: Entity;
+    private _entity: Entity | Item;
     private damageBubbles: any = [];
     private font_size = 40;
     private font = "bold 40px gamefont";
@@ -17,7 +18,7 @@ export class EntityNamePlate {
     private currentMessage;
     private messageTimeout;
 
-    constructor(entity: Entity) {
+    constructor(entity: Entity | Item) {
         this._scene = entity._scene;
         this._entity = entity;
     }
@@ -205,7 +206,7 @@ export class EntityNamePlate {
             instance.position.y = instance.position.y + entity_height;
 
             // don't continue
-            return;
+            return instance;
         }
 
         // else we create a unique mesh
@@ -223,6 +224,8 @@ export class EntityNamePlate {
 
         // draw text
         this.drawDynamicTexture(text, texture);
+
+        return plane;
     }
 
     /**

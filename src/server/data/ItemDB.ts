@@ -101,7 +101,7 @@ let ItemsDB: itemDataMap = {
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
         benefits: [{ key: PlayerKeys.STRENGTH, type: CalculationTypes.ADD, amount: 10 }],
         meshData: {
-            scale: 0.6,
+            scale: 1,
         },
     },
 
@@ -126,7 +126,7 @@ let ItemsDB: itemDataMap = {
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
         benefits: [{ key: PlayerKeys.STRENGTH, type: CalculationTypes.ADD, amount: 10 }],
         meshData: {
-            scale: 0.6,
+            scale: 1,
         },
     },
 

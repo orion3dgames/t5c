@@ -19,7 +19,6 @@ let RaceVAT = {
                 "Head_Base", //
                 "Head_Barbarian",
                 "Head_Engineer",
-                "Head_Knight",
                 "Head_Mage",
                 "Head_Rogue",
             ],

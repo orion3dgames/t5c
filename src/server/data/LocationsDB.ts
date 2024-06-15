@@ -316,29 +316,6 @@ let LocationsDB = {
                     },
                 },
 
-                {
-                    key: "spawn_dummy1",
-                    type: "static",
-                    behaviour: "idle",
-                    aggressive: false,
-                    canAttack: true,
-                    points: [new Vector3(9, 0, -13.7)],
-                    rotation: 3.12,
-                    radius: 0,
-                    amount: 1,
-                    race: "humanoid",
-                    material: 16,
-                    head: "Head_Base",
-                    name: "Harmless Dummy",
-                    baseHealth: 5000,
-                    equipment: [
-                        {
-                            key: "head_02",
-                            slot: PlayerSlots.HEAD,
-                        },
-                    ],
-                },
-
                 ////////////////////////
                 //////// ENEMIES ///////
 

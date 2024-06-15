@@ -116,6 +116,7 @@ export class EntityMesh {
     public deleteMeshes() {
         // remove player mesh
         this.mesh.dispose();
+        this.fakeShadow.dispose();
 
         // remove any other mesh
         if (this.equipments.length > 0) {

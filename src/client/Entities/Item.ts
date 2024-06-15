@@ -15,6 +15,7 @@ import { mergeMesh } from "./Common/MeshHelper";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { GameController } from "../Controllers/GameController";
 import { Mesh } from "@babylonjs/core";
+import { EntityNamePlate } from "./Entity/EntityNamePlate";
 
 export class Item extends TransformNode {
     public _game: GameController;
@@ -40,7 +41,13 @@ export class Item extends TransformNode {
     public qty: number;
 
     //
+    public scale: number = 1;
+    public health: number = 1;
     public meshData;
+    public fakeShadow;
+    public nameplateController;
+    public nameplate;
+    public spawnInfo;
 
     // flags
     public blocked: boolean = false; // if true, player will not moved
@@ -55,14 +62,23 @@ export class Item extends TransformNode {
         this._ui = ui;
 
         // add entity data
-        this.name = entity.key + "_" + entity.sessionId;
         this.entity = entity;
 
+        //
+        this.nameplateController = new EntityNamePlate(this);
+
         // update player data from server data
-        Object.assign(this, this._game.getGameData("item", entity.key));
+        let item = this._game.getGameData("item", entity.key);
+        Object.assign(this, item);
 
         // update player data from server data
         Object.assign(this, this.entity);
+
+        //
+        this.name = item.title;
+        this.spawnInfo = {
+            key: this.key,
+        };
 
         // set parent metadata
         this.metadata = {
@@ -134,6 +150,17 @@ export class Item extends TransformNode {
             name: this.entity.name,
         };
 
+        let shadowMesh = this._game._loadedAssets["DYNAMIC_shadow_01"].createInstance("shadow_" + this.sessionId);
+        shadowMesh.parent = this;
+        shadowMesh.isPickable = false;
+        shadowMesh.checkCollisions = false;
+        shadowMesh.doNotSyncBoundingInfo = true;
+        shadowMesh.position = new Vector3(0, 0.04, 0);
+        this.fakeShadow = shadowMesh;
+
+        // add nameplate
+        this.nameplate = this.nameplateController.addNamePlate();
+
         // add mesh to shadow generator
         this.setPosition();
 
@@ -200,8 +227,12 @@ export class Item extends TransformNode {
     }
 
     public remove() {
-        if (this.characterLabel) {
-            this.characterLabel.dispose();
+        if (this.nameplate) {
+            this.nameplate.dispose();
+        }
+
+        if (this.fakeShadow) {
+            this.fakeShadow.dispose();
         }
         if (this.mesh) {
             this.mesh.dispose();
