@@ -198,7 +198,7 @@ export class VatController {
 
         let key = entity.race;
         let race = this._game.getGameData("race", key);
-        let meshId = VatController.findMeshKey(race, entity.sessionId);
+        let meshId = VatController.findMeshKey(race, entity);
 
         // gets or prepare vat
         let vat = await this.prepareVat(race);
@@ -246,10 +246,11 @@ export class VatController {
         }
     }
 
-    static findMeshKey(race, sessionId) {
+    static findMeshKey(race, entity) {
         let meshId = race.key;
         if (race.customizable) {
-            meshId = sessionId;
+            meshId = entity.head+"_"+entity.material;
+            //meshId = entity.sessionId;
         }
         return meshId;
     }

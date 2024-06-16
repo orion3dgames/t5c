@@ -487,9 +487,10 @@ export class PlayerSchema extends Entity {
     }
 
     resetPosition() {
-        this.x = 0;
+        this.x = 6.3;
         this.y = 0;
-        this.z = 0;
+        this.z = -23.5;
+        this.rot = 3.13;
         this.ressurect();
     }
 

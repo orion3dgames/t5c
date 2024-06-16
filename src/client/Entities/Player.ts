@@ -312,6 +312,7 @@ export class Player extends Entity {
 
             ///////////// ENVIRONMENT LOD ///////////////////////////
             // only show meshes close to us
+            /*
             let currentPos = this.getPosition();
             let key = "ENV_" + this._game.currentLocation.mesh;
             let allMeshes = this._game._loadedAssets[key]?.loadedMeshes ?? [];
@@ -324,7 +325,7 @@ export class Player extends Entity {
                         element.setEnabled(false);
                     }
                 }
-            });
+            });*/
         }
     }
 

@@ -1,6 +1,6 @@
 import Logger from "../../utils/Logger";
 import { Vector3 } from "../../../shared/Libs/yuka-min";
-import { PlayerInputs } from "../../../shared/types";
+import { EntityState, PlayerInputs } from "../../../shared/types";
 import { BrainSchema, LootSchema, PlayerSchema } from "../schema";
 
 export class moveCTRL {

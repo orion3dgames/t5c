@@ -84,6 +84,7 @@ export enum ServerMsg {
     DEBUG_REMOVE_ENTITIES,
     DEBUG_INCREASE_ENTITIES,
     DEBUG_DECREASE_ENTITIES,
+    DEBUG_BOTS,
 }
 
 //////////////////////////////////////////////////////////////

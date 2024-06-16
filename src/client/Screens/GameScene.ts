@@ -1,7 +1,7 @@
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector2, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
@@ -30,6 +30,7 @@ import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 import { RenderTargetTexture } from "@babylonjs/core/Materials/Textures/renderTargetTexture";
 import { PlayerCamera } from "../Entities/Player/PlayerCamera";
+import { WaterMaterial } from "@babylonjs/materials/water/waterMaterial";
 
 export class GameScene {
     public _game: GameController;
@@ -89,7 +90,8 @@ export class GameScene {
         let location = this._game.currentLocation;
 
         // add background  color
-        scene.clearColor = new Color4(1, 1, 1, 1);
+        let color = location.skyColor;
+        scene.clearColor = new Color4(color[0],color[1],color[2],color[3],); 
 
         if (this._game.config.SHADOW_ON === true) {
             // shadow light
@@ -111,18 +113,20 @@ export class GameScene {
             //this._shadow.getShadowMap().resetRefreshCounter();
         }
 
-        // skybox
-        const skybox = MeshBuilder.CreateBox("skyBox", { size: 1000.0 }, scene);
-        const skyboxMaterial = new StandardMaterial("skyBox", scene);
-        skyboxMaterial.backFaceCulling = false;
-        skyboxMaterial.disableLighting = true;
-        skybox.material = skyboxMaterial;
-        skybox.infiniteDistance = true;
-        skyboxMaterial.reflectionTexture = new CubeTexture("textures/skybox", scene);
-        skyboxMaterial.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
-
-        // add sun
+        // add sky
         if (location.sun) {
+
+            // skybox
+            const skybox = MeshBuilder.CreateBox("skyBox", { size: 1000.0 }, scene);
+            const skyboxMaterial = new StandardMaterial("skyBox", scene);
+            skyboxMaterial.backFaceCulling = false;
+            skyboxMaterial.disableLighting = true;
+            skybox.material = skyboxMaterial;
+            skybox.infiniteDistance = true;
+            skyboxMaterial.reflectionTexture = new CubeTexture("textures/skybox", scene);
+            skyboxMaterial.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
+
+            // sunlight
             var sunLight = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
             sunLight.intensity = location.sunIntensity;
             sunLight.groundColor = new Color3(0.13, 0.13, 0.13);
@@ -131,9 +135,10 @@ export class GameScene {
 
         // add fog
         if (location.fog === true) {
+            
             scene.fogMode = Scene.FOGMODE_LINEAR;
-            scene.fogStart = 60.0;
-            scene.fogEnd = 120.0;
+            scene.fogStart = 70.0;
+            scene.fogEnd = 200.0;
             scene.fogColor = new Color3(0.9, 0.9, 0.85);
         }
 
@@ -335,7 +340,7 @@ export class GameScene {
     engineUpdate() {}
 
     async spawn() {
-        let amountToSpawn = 1;
+        let amountToSpawn = 20;
         let i = 0;
         for (const value of this.toSpawnOthers) {
             let entity = value[1];

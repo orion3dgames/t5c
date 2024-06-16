@@ -46,7 +46,7 @@ export class EntityMesh {
 
     public createMesh() {
         // load player mesh
-        let materialIndex = VatController.findMeshKey(this._entity.raceData, this._entity.sessionId);
+        let materialIndex = VatController.findMeshKey(this._entity.raceData, this._entity);
         const playerMesh = this._entityData.meshes.get(materialIndex).createInstance(this._entity.type + "" + this._entity.sessionId);
         playerMesh.parent = this._entity;
         playerMesh.isPickable = true;

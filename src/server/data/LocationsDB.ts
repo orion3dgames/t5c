@@ -15,7 +15,7 @@ let LocationsDB = {
             rot: -180,
         },
         waterPlane: true,
-        skyColor: 0,
+        skyColor: [1,1,1,1],
         fog: true,
         dynamic: {
             interactive: [
@@ -316,6 +316,39 @@ let LocationsDB = {
                     },
                 },
 
+                {
+                    key: "lh_town_citizen",
+                    type: "path",
+                    behaviour: "patrol",
+                    aggressive: false,
+                    canAttack: false,
+                    points: [
+                        new Vector3(26.33, 0.06, -8.77),
+                        new Vector3(25.96, 0.06, 25.97),
+                        new Vector3(-18.52, 0.06, 30.14),
+                        new Vector3(-23.42, 0.06, 8.63),
+                        new Vector3(-14.8, 0.06, -8.68)
+                    ],
+                    rotation: -1.5,
+                    amount: 5,
+                    race: "humanoid",
+                    material: 0,
+                    head: "Head_Base",
+                    name: "Citizen",
+                    baseSpeed: Speed.VERY_SLOW,
+                    randomize: true,
+                    interactable: {
+                        title: "Talk",
+                        data: [
+                            {
+                                type: "text",
+                                text: "Ah, a new face! Please, make yourself at home and enjoy our performances.",
+                                isEndOfDialog: true,
+                            },
+                        ],
+                    },
+                },
+
                 ////////////////////////
                 //////// ENEMIES ///////
 
@@ -389,7 +422,7 @@ let LocationsDB = {
             rot: -180,
         },
         waterPlane: false,
-        skyColor: 0,
+        skyColor: [0,0,0,1],
         dynamic: {
             interactive: [
                 {

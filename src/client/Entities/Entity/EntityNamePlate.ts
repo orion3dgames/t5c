@@ -65,13 +65,15 @@ export class EntityNamePlate {
         var planeWidth = DTWidth * ratio;
 
         // scale to mesh
+        // not needed anymore as player mesh is independant
+        /*
         if (scale < 1) {
             planeWidth = planeWidth * (1 / scale);
             planeHeight = planeHeight * (1 / scale);
         } else if (scale > 1) {
             planeWidth = planeWidth / scale;
             planeHeight = planeHeight / scale;
-        }
+        }*/
 
         //Create dynamic texture and write the text
         var texture = new DynamicTexture("UI_Nameplate_Txt_" + uuid, { width: DTWidth, height: DTHeight }, this._scene);

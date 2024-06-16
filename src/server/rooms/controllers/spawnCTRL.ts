@@ -24,8 +24,16 @@ export class spawnCTRL {
         this._room = state._gameroom;
         this.location = this._state.gameData.get("location", this._room.metadata.location);
 
-        // create a big population
-        /*
+        //
+        this.process();
+
+        //
+        for (let i = 0; i < 100; i++) {
+            this.createItem();
+        }
+    }
+
+    public debug_bots(){
         let Items = this._state.gameData.load("items");
         let keys = Object.keys(Items);
         let heads = [
@@ -36,7 +44,7 @@ export class spawnCTRL {
             "Head_Rogue",
         ];
         let race = this._state.gameData.get("race", "humanoid");
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 200; i++) {
             let rand = keys[Math.floor(Math.random() * keys.length)];
             let randData = Items[rand];
             let equipment = [];
@@ -74,14 +82,6 @@ export class spawnCTRL {
                 baseSpeed: Speed.VERY_SLOW,
                 equipment: equipment,
             });
-        }
-        */
-       
-        //
-        this.process();
-
-        for (let i = 0; i < 400; i++) {
-            this.createItem();
         }
     }
 
@@ -183,20 +183,30 @@ export class spawnCTRL {
         // monster pool to chose from
         let raceData = this._state.gameData.get("race", spawn.race);
         let position = spawn.points[Math.floor(Math.random() * spawn.points.length)];
-        console.log(position);
 
+        // replace default stats
         let health = spawn.baseHealth ?? raceData.baseHealth;
         let mana = spawn.baseMana ?? raceData.baseMana;
         let rotation = spawn.rotation ?? randomNumberInRange(0, Math.PI);
         let speed = spawn.baseSpeed ?? Speed.MEDIUM;
         let head = spawn.head ?? "Head_Base";
+        let material = spawn.material ?? 0;
+
+        // if randomize 
+        if(spawn.randomize){
+            let heads = raceData.vat.meshes.head ?? [];
+            material = randomNumberInRange(0, 23);
+            if(heads.length > 0){
+                head = heads[Math.floor(Math.random() * heads.length)];
+            }
+        }
 
         // create entity
         let data = {
             sessionId: sessionId,
             type: "entity",
             race: raceData.key,
-            material: spawn.material,
+            material: material,
             head: head,
             name: spawn.name,
             location: this._room.metadata.location,
@@ -230,8 +240,9 @@ export class spawnCTRL {
     removeEntity(entity) {
         //console.log(this.spawnsAmount, entity.AI_SPAWN_INFO.spawnIndex);
 
-        this.spawnsAmount[entity.AI_SPAWN_INFO.spawnIndex]--;
-
-        this._state.entities.delete(entity.sessionId);
+        if(entity.AI_SPAWN_INFO){
+            this.spawnsAmount[entity.AI_SPAWN_INFO.spawnIndex]--;
+            this._state.entities.delete(entity.sessionId);
+        }
     }
 }

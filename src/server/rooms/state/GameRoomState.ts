@@ -318,6 +318,11 @@ export class GameRoomState extends Schema {
         if (process.env.NODE_ENV !== "production") {
             let amountToChange = 100;
 
+            // debug: add random entities
+            if (type === ServerMsg.DEBUG_BOTS) {
+                this.spawnCTRL.debug_bots();
+            }
+
             // debug: add 100 entities
             if (type === ServerMsg.DEBUG_INCREASE_ENTITIES) {
                 this.spawnCTRL.debug_increase(amountToChange);
