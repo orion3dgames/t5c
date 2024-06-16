@@ -342,7 +342,7 @@ let LocationsDB = {
                         data: [
                             {
                                 type: "text",
-                                text: "Ah, a new face! Please, make yourself at home and enjoy our performances.",
+                                text: "Ah, @PlayerName!. It's nice to meet you.",
                                 isEndOfDialog: true,
                             },
                         ],
