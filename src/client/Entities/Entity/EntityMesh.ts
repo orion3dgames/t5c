@@ -78,6 +78,20 @@ export class EntityMesh {
         // create entity mesh
         this.createMesh();
 
+        if (this._entity.type === "entity") {
+            var material = this._scene.getMaterialByName("debug_entity_neutral");
+            const sphere = MeshBuilder.CreateTorus(
+                "debug_" + this._entity.race,
+                { diameter: this._game.config.MONSTER_AGGRO_DISTANCE * 2, thickness: 0.1 },
+                this._scene
+            );
+            sphere.isVisible = true;
+            sphere.position = new Vector3(0, 0.1, 0);
+            sphere.parent = this._entity;
+            sphere.material = material;
+            this.debugMesh = sphere;
+        }
+
         // selected circle
         var material = this._scene.getMaterialByName("entity_selected");
         const selectedMesh = MeshBuilder.CreateCylinder("entity_selected_" + this._entity.race, { diameter: 2, height: 0.01, tessellation: 8 }, this._scene);

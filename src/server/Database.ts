@@ -288,18 +288,18 @@ class Database {
                 this.generateStatPoint(),
                 this.generateStatPoint(),
                 this.generateStatPoint(),
-                "lh_town",
+                "training_ground",
 
-                "6.18",
-                "0.1",
-                "-11.21",
+                "16.64",
+                "0",
+                "4.97",
                 "1.72",
 
                 "1",
                 "0",
 
-                "5000",
-                "5000",
+                "50",
+                "50",
                 "50000",
                 "50",
             ])

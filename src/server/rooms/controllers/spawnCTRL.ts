@@ -26,14 +26,15 @@ export class spawnCTRL {
 
         //
         this.process();
-
-        //
-        for (let i = 0; i < 100; i++) {
-            this.createItem();
-        }
     }
 
     public debug_bots(){
+
+         //
+         for (let i = 0; i < 100; i++) {
+            this.createItem();
+        }
+
         let Items = this._state.gameData.load("items");
         let keys = Object.keys(Items);
         let heads = [
