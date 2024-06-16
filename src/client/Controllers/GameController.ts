@@ -289,7 +289,7 @@ export class GameController {
 
     public sendMessage(type: ServerMsg, data: {} = {}) {
         let message = {
-            date: new Date().getTime(),
+            //date: new Date().getTime(),
         };
         if (Object.keys(data).length) {
             for (const [key, value] of Object.entries(data)) {

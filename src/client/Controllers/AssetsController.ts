@@ -25,6 +25,7 @@ import { mergeMesh } from "../Entities/Common/MeshHelper";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 import { RenderTargetTexture } from "@babylonjs/core/Materials/Textures/renderTargetTexture";
+import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 
 type AssetEntry = {
     name: string;
@@ -289,6 +290,7 @@ export class AssetsController {
         material.diffuseTexture = texture;
         material.alpha = 0.4;
         material.useAlphaFromDiffuseTexture = true;
+        material.specularColor = Color3.Black();
         material.emissiveColor = Color3.White(); // material to be fully "lit"
 
         // entity selected circle
@@ -339,7 +341,7 @@ export class AssetsController {
         this.allMeshes = this._game._loadedAssets[assetKey].loadedMeshes;
 
         //Loop through all environment meshes that were imported
-        this.allMeshes.forEach((m: Mesh) => {
+        this.allMeshes.forEach((m) => {
             m.isPickable = false;
             m.doNotSyncBoundingInfo = true;
             m.freezeWorldMatrix();
@@ -347,6 +349,13 @@ export class AssetsController {
             m.metadata = {
                 type: "environment",
             };
+
+            let material = m.material as PBRMaterial;
+            if(material){
+                material.roughness = 0;
+                material.metallic = 0;
+                material.specularIntensity = 0
+            }
 
             if (this._game.config.SHADOW_ON === true) {
                 m.receiveShadows = true;
@@ -368,7 +377,7 @@ export class AssetsController {
 
         // only render shadows once
         if (this._shadow) {
-            this._shadow.getShadowMap().refreshRate = RenderTargetTexture.REFRESHRATE_RENDER_ONCE;
+            this._shadow.getShadowMap().refreshRate = RenderTargetTexture.REFRESHRATE_RENDER_ONEVERYTWOFRAMES;
         }
     }
 
