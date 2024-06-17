@@ -7,7 +7,7 @@ let LocationsDB = {
         key: "lh_town",
         mesh: "lh_town",
         sun: true,
-        sunIntensity: 0,
+        sunIntensity: 0.6,
         spawnPoint: {
             x: 0,
             y: 0,
@@ -15,7 +15,7 @@ let LocationsDB = {
             rot: -180,
         },
         waterPlane: true,
-        skyColor: [0,0,0,1],
+        skyColor: [0, 0, 0, 1],
         fog: true,
         dynamic: {
             interactive: [
@@ -327,7 +327,7 @@ let LocationsDB = {
                         new Vector3(25.96, 0.06, 25.97),
                         new Vector3(-18.52, 0.06, 30.14),
                         new Vector3(-23.42, 0.06, 8.63),
-                        new Vector3(-14.8, 0.06, -8.68)
+                        new Vector3(-14.8, 0.06, -8.68),
                     ],
                     rotation: -1.5,
                     amount: 5,
@@ -422,7 +422,7 @@ let LocationsDB = {
             rot: -180,
         },
         waterPlane: false,
-        skyColor: [0,0,0,1],
+        skyColor: [0, 0, 0, 1],
         dynamic: {
             interactive: [
                 {

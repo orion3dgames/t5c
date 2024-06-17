@@ -58,13 +58,13 @@ export class AssetsController {
         // set list of assets
         this.assetDatabase = [
             // sounds
-            
+
             //{ name: "SOUND_enemy_attack_1", filename: "enemy_attack_1.wav", extension: "wav" },
             //{ name: "SOUND_enemy_attack_2", filename: "enemy_attack_2.wav", extension: "wav" },
             //{ name: "SOUND_fire_attack_1", filename: "fire_attack_1.wav", extension: "wav" },
             //{ name: "SOUND_fire_attack_2", filename: "fire_attack_2.wav", extension: "wav" },
             //{ name: "SOUND_heal_1", filename: "heal_1.wav", extension: "wav" },
-            { name: "MUSIC_01", filename: "music.mp3", extension: "mp3", type: "sound"},
+            { name: "MUSIC_01", filename: "music.mp3", extension: "mp3", type: "sound" },
             //{ name: "SOUND_player_walking", filename: "player_walking.wav", extension: "wav", instantiate: false },
 
             // textures
@@ -330,11 +330,20 @@ export class AssetsController {
         }
 
         // start  music
-        let soundData = this._game._loadedAssets['MUSIC_01'];
-        let sound = new Sound("music", soundData, this._game.scene, function(){ sound.play() }, {
-            volume: 0.2,
-            loop: true
-        });
+        /*
+        let soundData = this._game._loadedAssets["MUSIC_01"];
+        let sound = new Sound(
+            "music",
+            soundData,
+            this._game.scene,
+            function () {
+                sound.play();
+            },
+            {
+                volume: 0.2,
+                loop: true,
+            }
+        );*/
 
         // instantiate the scene
         let assetKey = "ENV_" + key;
@@ -351,10 +360,10 @@ export class AssetsController {
             };
 
             let material = m.material as PBRMaterial;
-            if(material){
+            if (material) {
                 material.roughness = 0;
                 material.metallic = 0;
-                material.specularIntensity = 0
+                material.specularIntensity = 0;
             }
 
             if (this._game.config.SHADOW_ON === true) {
@@ -377,7 +386,7 @@ export class AssetsController {
 
         // only render shadows once
         if (this._shadow) {
-            this._shadow.getShadowMap().refreshRate = RenderTargetTexture.REFRESHRATE_RENDER_ONEVERYTWOFRAMES;
+            this._shadow.getShadowMap().refreshRate = RenderTargetTexture.REFRESHRATE_RENDER_ONCE;
         }
     }
 

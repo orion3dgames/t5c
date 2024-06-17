@@ -28,12 +28,12 @@ export class spawnCTRL {
         this.process();
 
         //
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 400; i++) {
             this.createItem();
         }
     }
 
-    public debug_bots(){
+    public debug_bots() {
         let Items = this._state.gameData.load("items");
         let keys = Object.keys(Items);
         let heads = [
@@ -44,7 +44,7 @@ export class spawnCTRL {
             "Head_Rogue",
         ];
         let race = this._state.gameData.get("race", "humanoid");
-        for (let i = 0; i < 200; i++) {
+        for (let i = 0; i < 100; i++) {
             let rand = keys[Math.floor(Math.random() * keys.length)];
             let randData = Items[rand];
             let equipment = [];
@@ -69,7 +69,7 @@ export class spawnCTRL {
                     new Vector3(29.8, 0.06, -4.25),
                     new Vector3(25.34, 0.06, 28.82),
                     new Vector3(39.12, 0.06, -13.92),
-                    new Vector3(-10.94, 0.06, -25.08)
+                    new Vector3(-10.94, 0.06, -25.08),
                 ],
                 rotation: 3.12,
                 radius: 0,
@@ -192,11 +192,11 @@ export class spawnCTRL {
         let head = spawn.head ?? "Head_Base";
         let material = spawn.material ?? 0;
 
-        // if randomize 
-        if(spawn.randomize){
+        // if randomize
+        if (spawn.randomize) {
             let heads = raceData.vat.meshes.head ?? [];
             material = randomNumberInRange(0, 23);
-            if(heads.length > 0){
+            if (heads.length > 0) {
                 head = heads[Math.floor(Math.random() * heads.length)];
             }
         }
@@ -240,7 +240,7 @@ export class spawnCTRL {
     removeEntity(entity) {
         //console.log(this.spawnsAmount, entity.AI_SPAWN_INFO.spawnIndex);
 
-        if(entity.AI_SPAWN_INFO){
+        if (entity.AI_SPAWN_INFO) {
             this.spawnsAmount[entity.AI_SPAWN_INFO.spawnIndex]--;
             this._state.entities.delete(entity.sessionId);
         }
