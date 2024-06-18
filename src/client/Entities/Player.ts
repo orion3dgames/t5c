@@ -298,7 +298,7 @@ export class Player extends Entity {
         if (this.isMoving) {
             // look for closest npc
             // todo: maybe this is a silly way?
-            this.findCloseToInteractableEntity();
+            //this.findCloseToInteractableEntity();
 
             // if close enough, show interactable button
             if (this.closestEntityDistance < 5 && this.closestEntity.interactableButtons) {

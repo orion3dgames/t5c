@@ -201,9 +201,7 @@ export class Entity extends TransformNode {
 
         //////////////////////////////////////////////////////////////////////////
         // misc
-        if (!this.isCurrentPlayer) {
-            this.nameplate = this.nameplateController.addNamePlate();
-        }
+        //this.nameplate = this.nameplateController.addNamePlate();
 
         //this.interactableButtons = this._ui.createInteractableButtons(this);
     }
@@ -317,11 +315,11 @@ export class Entity extends TransformNode {
 
         if (distanceFromPlayer < this._game.config.PLAYER_VIEW_DISTANCE) {
             this.setEnabled(true);
-            this.unfreezeWorldMatrix();
+            //this.unfreezeWorldMatrix();
         } else {
             // hide everything
             this.setEnabled(false);
-            this.freezeWorldMatrix();
+            //this.freezeWorldMatrix();
         }
     }
 

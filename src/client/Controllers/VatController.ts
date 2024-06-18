@@ -249,7 +249,7 @@ export class VatController {
     static findMeshKey(race, entity) {
         let meshId = race.key;
         if (race.customizable) {
-            meshId = entity.head+"_"+entity.material;
+            meshId = entity.head + "_" + entity.material;
             //meshId = entity.sessionId;
         }
         return meshId;
@@ -392,6 +392,7 @@ export class VatController {
             mat.reflectionColor = new Color3(0, 0, 0);
             mat.reflectivityColor = new Color3(0, 0, 0);
             mat.backFaceCulling = false;
+            mat.freeze();
 
             // assign to mesh
             cloneMesh.material = mat;

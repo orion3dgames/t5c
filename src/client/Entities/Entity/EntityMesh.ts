@@ -56,8 +56,6 @@ export class EntityMesh {
         }
         playerMesh.scaling.set(this._entity.scale, this._entity.scale, this._entity.scale);
         playerMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-        playerMesh.occlusionRetryCount = 1;
-        playerMesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_STRICT;
 
         this.mesh = playerMesh;
 
