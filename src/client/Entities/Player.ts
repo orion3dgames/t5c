@@ -118,7 +118,7 @@ export class Player extends Entity {
             // select entity
             let targetSessionId = metadata.sessionId;
             let target = this.entities.get(targetSessionId);
-            this._game.selectedEntity = target;
+            this._ui._targetEntitySelectedBar.setTarget(target);
 
             // display nameplate for a certain time for any entity right clicked
             if (target.characterLabel) {

@@ -44,7 +44,7 @@ export class spawnCTRL {
             "Head_Rogue",
         ];
         let race = this._state.gameData.get("race", "humanoid");
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 50; i++) {
             let rand = keys[Math.floor(Math.random() * keys.length)];
             let randData = Items[rand];
             let equipment = [];
@@ -73,7 +73,7 @@ export class spawnCTRL {
                 ],
                 rotation: 3.12,
                 radius: 0,
-                amount: 1,
+                amount: 2,
                 race: "humanoid",
                 material: randomNumberInRange(0, 23),
                 head: heads[Math.floor(Math.random() * heads.length)],

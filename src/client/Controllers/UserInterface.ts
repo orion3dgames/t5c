@@ -63,8 +63,8 @@ export class UserInterface {
     public _ChatBox: ChatBox;
     public _DebugBox: DebugBox;
     private _HotBar: HotBar;
-    private _targetEntitySelectedBar: EntitySelectedBar;
-    private _playerEntitySelectedBar: EntitySelectedBar;
+    public _targetEntitySelectedBar: EntitySelectedBar;
+    public _playerEntitySelectedBar: EntitySelectedBar;
     public _Tooltip: Tooltip;
     private _MainMenu: MainMenu;
     public _CastingBar: CastingBar;
@@ -113,12 +113,10 @@ export class UserInterface {
 
         // create ui
         const uiLayer = AdvancedDynamicTexture.CreateFullscreenUI("UI_Player", true, this._scene);
+        uiLayer.renderScale = 1;
         this.MAIN_ADT = uiLayer;
-        /*
-        uiLayer.idealWidth = 1024;
-        uiLayer.idealHeight = 768;
-        uiLayer.useSmallestIdeal = true;*/
 
+        //
         const uiLayerContainer = new Rectangle("uiLayerContainer");
         uiLayerContainer.width = 1;
         uiLayerContainer.height = 1;
@@ -128,20 +126,6 @@ export class UserInterface {
         uiLayer.addControl(uiLayerContainer);
 
         this._playerUI = uiLayerContainer;
-
-        const fpsPanel = new TextBlock("fpsPanel");
-        fpsPanel.color = "#FFF";
-        fpsPanel.top = "5px";
-        fpsPanel.left = "-5px";
-        fpsPanel.fontSize = "12px;";
-        fpsPanel.resizeToFit = true;
-        fpsPanel.text = "FPS: 0";
-        fpsPanel.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        fpsPanel.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        fpsPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        fpsPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        this._playerUI.addControl(fpsPanel);
-        this.fpsPanel = fpsPanel;
     }
 
     // set current player
@@ -178,6 +162,7 @@ export class UserInterface {
             panelName: "player",
             currentPlayer: currentPlayer,
         });
+        this._playerEntitySelectedBar.setTarget(currentPlayer);
 
         // create panel
         this.panelInventory = new Panel_Inventory(this, currentPlayer, {
@@ -249,7 +234,7 @@ export class UserInterface {
 
         // open inventory by default
         this.panelInventory.open();
-        //this.panelHelp.open();
+        this.panelHelp.open();
 
         // create tooltip
         this._Tooltip = new Tooltip(this, currentPlayer);
@@ -260,8 +245,6 @@ export class UserInterface {
 
     // update every server tick
     public update() {
-        //
-        //this.fpsPanel.text = "FPS: " + this._engine.getFps().toFixed(0);
         if (this._targetEntitySelectedBar) {
             this._targetEntitySelectedBar.update();
         }

@@ -318,7 +318,7 @@ export class AssetsController {
     public async prepareLevel(key) {
         // add water
         if (this._game.currentLocation.waterPlane) {
-            var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 32 }, this._game.scene);
+            var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 1 }, this._game.scene);
             waterMesh.position = new Vector3(0, -0.5, 0);
             var water = new StandardMaterial("water");
 

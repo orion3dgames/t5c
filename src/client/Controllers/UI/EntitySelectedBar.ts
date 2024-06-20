@@ -193,58 +193,48 @@ export class EntitySelectedBar {
         this._manaBarInside = manaBarInside;
         this._manaBarText = manaBarText;
 
-        ////////////////////////////////////
-        //////////////////// show target label
+        // hide it by default
+        this._selectedEntityBar.isVisible = false;
     }
 
-    public createLabel(entity) {
-        var rect1 = new Rectangle("entity_nameplate");
-        rect1.isVisible = true;
-        rect1.width = "300px";
-        rect1.height = "40px";
-        rect1.thickness = 0;
-        this.LABELS_ADT.addControl(rect1);
-        rect1.linkWithMesh(entity.mesh);
-        rect1.linkOffsetY = -80;
-        this._label = rect1;
+    public setTarget(target) {
+        // show selected
+        this._selectedEntityBar.isVisible = true;
 
-        var label = new TextBlock("player_nameplate_text_" + entity.sessionId);
-        label.text = entity.name;
-        label.color = "white";
-        label.fontWeight = "light";
-        label.outlineWidth = 5;
-        label.outlineColor = "black";
-        rect1.addControl(label);
+        // set as selected
+        this._game.selectedEntity = target;
+
+        // update data
+        this._entityNameTxt.text = target.name;
+        this._entityLevelTxt.text = "Lvl " + target.level;
+
+        //
+        this.setData(target);
+    }
+
+    setData(entity) {
+        // health
+        let health = roundTo(entity.health, 0);
+        let healthWidth = entity.health / entity.maxHealth;
+        this._healthBarInside.width = healthWidth;
+        this._healthBarText.text = health + "/" + entity.maxHealth;
+
+        // mana
+        let mana = roundTo(entity.mana, 0);
+        let manaWidth = entity.mana / entity.maxMana;
+        this._manaBarInside.width = manaWidth;
+        this._manaBarText.text = mana + "/" + entity.maxMana;
     }
 
     // refresh panel
     public update() {
-        this._selectedEntityBar.isVisible = false;
-
         let entity = this._game.selectedEntity ? this._game.selectedEntity : false;
         if (this._options.currentPlayer !== false) {
             entity = this._options.currentPlayer;
         }
 
         if (entity) {
-            // show selected
-            this._selectedEntityBar.isVisible = true;
-
-            // update name
-            this._entityNameTxt.text = entity.name;
-            this._entityLevelTxt.text = "Lvl " + entity.level;
-
-            // health
-            let health = roundTo(entity.health, 0);
-            let healthWidth = entity.health / entity.maxHealth;
-            this._healthBarInside.width = healthWidth;
-            this._healthBarText.text = health + "/" + entity.maxHealth;
-
-            // mana
-            let mana = roundTo(entity.mana, 0);
-            let manaWidth = entity.mana / entity.maxMana;
-            this._manaBarInside.width = manaWidth;
-            this._manaBarText.text = mana + "/" + entity.maxMana;
+            this.setData(entity);
         }
     }
 }

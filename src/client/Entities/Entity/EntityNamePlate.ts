@@ -18,6 +18,9 @@ export class EntityNamePlate {
     private currentMessage;
     private messageTimeout;
 
+    private planeMesh;
+    private planeTexture;
+
     constructor(entity: Entity | Item) {
         this._scene = entity._scene;
         this._entity = entity;
@@ -173,6 +176,11 @@ export class EntityNamePlate {
         let height = 0.4;
         let t_height = 1.4;
 
+        /*
+        let mesh = this._entity._game._loadedAssets["DYNAMIC_name_plate"].createInstance("rawNameplate_" + this._entity.name);
+        mesh.position.y = mesh.position.y + entity_height;
+        mesh.parent = this._entity;*/
+
         // if entity is a spawn, we can use instances as they all have the same name.
         if (this._entity.spawnInfo) {
             let spawnKey = this._entity.spawnInfo.key;
@@ -184,7 +192,7 @@ export class EntityNamePlate {
                 let { planeWidth, planeHeight, texture, material } = this.createMaterial(height, t_height, text, this._entity.scale);
                 var plane = MeshBuilder.CreatePlane(
                     "RawNamePlate_" + spawnKey,
-                    { width: planeWidth, height: planeHeight, sideOrientation: Mesh.DOUBLESIDE },
+                    { width: planeWidth, height: planeHeight, sideOrientation: Mesh.FRONTSIDE },
                     this._scene
                 );
                 plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
@@ -216,7 +224,7 @@ export class EntityNamePlate {
         let { planeWidth, planeHeight, texture, material } = this.createMaterial(height, t_height, text, this._entity.scale);
         var plane = MeshBuilder.CreatePlane(
             "namePlate_" + this._entity.name,
-            { width: planeWidth, height: planeHeight, sideOrientation: Mesh.DOUBLESIDE },
+            { width: planeWidth, height: planeHeight, sideOrientation: Mesh.FRONTSIDE },
             this._scene
         );
         plane.parent = this._entity;
