@@ -2,16 +2,12 @@ import { Scene } from "@babylonjs/core/scene";
 import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { ActionManager } from "@babylonjs/core/Actions/actionManager";
-import { ExecuteCodeAction } from "@babylonjs/core/Actions/directActions";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3, Vector4 } from "@babylonjs/core/Maths/math";
 import { Entity } from "../Entity";
 import { Skeleton } from "@babylonjs/core/Bones/skeleton";
 import { GameController } from "../../Controllers/GameController";
 import { EquipmentSchema } from "../../../server/rooms/schema";
 import { UserInterface } from "../../Controllers/UserInterface";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { VatController } from "../../Controllers/VatController";
 import { EquippableType } from "../../../shared/types";
 
@@ -183,9 +179,9 @@ export class EntityMesh {
             // refresh animation
             this._entity.animatorController.refreshAnimation();
 
-            // if embedded item
-            if (equipOptions && equipOptions.mesh && equipOptions.type === EquippableType.EMBEDDED) {
-                //this._game._vatController.refreshMesh(this._entity);
+            // add item modifier
+            if (this._entity.isCurrentPlayer && this._entity.stats) {
+                this._entity.stats.addItemModifier(item);
             }
         }
     }

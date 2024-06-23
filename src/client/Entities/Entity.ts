@@ -1,5 +1,4 @@
 import { Scene } from "@babylonjs/core/scene";
-import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -16,7 +15,6 @@ import { EntityActions } from "./Entity/EntityActions";
 import { EntityMesh } from "./Entity/EntityMesh";
 
 import { UserInterface } from "../../client/Controllers/UserInterface";
-import { NavMesh } from "../../shared/Libs/yuka-min";
 import { AI_STATE } from "./Entity/AIState";
 import { EntityState } from "../../shared/types";
 import { PlayerInput } from "../../client/Controllers/PlayerInput";
@@ -24,7 +22,7 @@ import { PlayerInput } from "../../client/Controllers/PlayerInput";
 import { GameController } from "../Controllers/GameController";
 import { GameScene } from "../Screens/GameScene";
 import { Player } from "./Player";
-import e from "express";
+import { Stats } from "../../shared/Class/Stats";
 
 export class Entity extends TransformNode {
     public _scene: Scene;
@@ -82,6 +80,7 @@ export class Entity extends TransformNode {
     public abilities = [];
     public inventory = [];
     public equipment = [];
+    public stats: Stats;
 
     // interactable
     public spawnInfo;
@@ -142,6 +141,11 @@ export class Entity extends TransformNode {
 
         // spawn player
         this._game._vatController.prepareMesh(entity);
+
+        //
+        if (this.isCurrentPlayer) {
+            this.stats = new Stats(this);
+        }
 
         // wait for vat to be ready
         setTimeout(() => {
