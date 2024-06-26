@@ -22,7 +22,6 @@ import { PlayerInput } from "../../client/Controllers/PlayerInput";
 import { GameController } from "../Controllers/GameController";
 import { GameScene } from "../Screens/GameScene";
 import { Player } from "./Player";
-import { Stats } from "../../shared/Class/Stats";
 
 export class Entity extends TransformNode {
     public _scene: Scene;
@@ -80,7 +79,6 @@ export class Entity extends TransformNode {
     public abilities = [];
     public inventory = [];
     public equipment = [];
-    public stats: Stats;
 
     // interactable
     public spawnInfo;

@@ -52,7 +52,9 @@ let ItemsDB: itemDataMap = {
             scale: 1.4,
         },
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
-        statModifiers: {},
+        statModifiers: {
+            endurance: [{ type: "multiplicative", value: 1.4 }],
+        },
         meshData: {
             scale: 1.4,
         },

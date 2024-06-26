@@ -4,6 +4,7 @@ import { abilitiesCTRL } from "../controllers/abilityCTRL";
 import { animationCTRL } from "../controllers/animationCTRL";
 import { moveCTRL } from "../controllers/moveCTRL";
 import { dynamicCTRL } from "../controllers/dynamicCTRL";
+import { statsCTRL } from "../controllers/statsCTRL";
 import { NavMesh, Vector3 } from "../../../shared/Libs/yuka-min";
 import { InventorySchema, EquipmentSchema, AbilitySchema, LootSchema, BrainSchema, QuestSchema, HotbarSchema } from "../schema";
 import { GameRoomState } from "../state/GameRoomState";
@@ -12,8 +13,6 @@ import { EntityState, ItemClass, CalculationTypes } from "../../../shared/types"
 import { nanoid } from "nanoid";
 import { Database } from "../../Database";
 import Logger from "../../utils/Logger";
-import { Stats } from "../../../shared/Class/Stats";
-import { GameData } from "../../GameData";
 
 export class PlayerData extends Schema {
     @type({ map: InventorySchema }) inventory = new MapSchema<InventorySchema>();
@@ -81,7 +80,6 @@ export class PlayerSchema extends Entity {
     public isInteracting;
     public interactingStep: number = 0;
     public interactingTarget: BrainSchema;
-    public stats: Stats;
 
     // controllers
     public _navMesh: NavMesh;
@@ -91,6 +89,7 @@ export class PlayerSchema extends Entity {
     public moveCTRL: moveCTRL;
     public animationCTRL: animationCTRL;
     public dynamicCTRL: dynamicCTRL;
+    public statsCTRL: statsCTRL;
 
     // TIMER
     public spawnTimer: number = 0;
@@ -126,7 +125,7 @@ export class PlayerSchema extends Entity {
         });
 
         // initalize stats
-        this.stats = new Stats(this);
+        this.statsCTRL = new statsCTRL(this);
 
         // add abilities
         data.initial_abilities.forEach((element) => {
@@ -453,7 +452,7 @@ export class PlayerSchema extends Entity {
         this.equipment.delete(key);
 
         //
-        this.stats.unequipItem(this._state.gameData.get("item", key));
+        this.statsCTRL.unequipItem(this._state.gameData.get("item", key));
 
         // equip
         this.pickupItem(
