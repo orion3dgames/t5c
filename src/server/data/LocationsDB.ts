@@ -41,7 +41,7 @@ let LocationsDB = {
             spawns: [
                 ///////////////////////
                 ///////// NPC /////////
-                /*
+
                 // BLACKSMITH
                 {
                     key: "lh_town_blacksmith",
@@ -405,7 +405,6 @@ let LocationsDB = {
                         },
                     ],
                 },
-                */
             ],
         },
     },

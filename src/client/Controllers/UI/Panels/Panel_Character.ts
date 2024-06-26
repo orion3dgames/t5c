@@ -72,11 +72,11 @@ export class Panel_Character extends Panel {
             },
             health: {
                 label: "Health",
-                value: this._currentPlayer.health,
+                value: this._currentPlayer.health + "/" + this._currentPlayer.maxHealth,
             },
             mana: {
                 label: "Mana",
-                value: this._currentPlayer.mana,
+                value: this._currentPlayer.mana + "/" + this._currentPlayer.maxMana,
             },
         };
 
@@ -213,7 +213,7 @@ export class Panel_Character extends Panel {
             valueText.left = "-5px";
             valueText.fontSize = "14px;";
             valueText.resizeToFit = true;
-            valueText.text = this._currentPlayer[key] ?? "ERROR";
+            valueText.text = line.value;
             valueText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
             valueText.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
             valueText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
