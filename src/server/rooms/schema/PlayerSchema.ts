@@ -1,6 +1,5 @@
 import { Client } from "@colyseus/core";
-import { Schema, MapSchema, ArraySchema, type, filter } from "@colyseus/schema";
-import { GameRoom } from "../GameRoom";
+import { Schema, MapSchema, type, filter } from "@colyseus/schema";
 import { abilitiesCTRL } from "../controllers/abilityCTRL";
 import { animationCTRL } from "../controllers/animationCTRL";
 import { moveCTRL } from "../controllers/moveCTRL";
@@ -9,22 +8,12 @@ import { NavMesh, Vector3 } from "../../../shared/Libs/yuka-min";
 import { InventorySchema, EquipmentSchema, AbilitySchema, LootSchema, BrainSchema, QuestSchema, HotbarSchema } from "../schema";
 import { GameRoomState } from "../state/GameRoomState";
 import { Entity } from "../schema/Entity";
-import {
-    EntityState,
-    ItemClass,
-    PlayerSlots,
-    PlayerKeys,
-    CalculationTypes,
-    ServerMsg,
-    QuestUpdate,
-    QuestStatus,
-    Quest,
-    QuestObjective,
-} from "../../../shared/types";
+import { EntityState, ItemClass, CalculationTypes } from "../../../shared/types";
 import { nanoid } from "nanoid";
 import { Database } from "../../Database";
 import Logger from "../../utils/Logger";
-import { Leveling } from "../../../shared/Class/Leveling";
+import { Stats } from "../../../shared/Class/Stats";
+import { GameData } from "../../GameData";
 
 export class PlayerData extends Schema {
     @type({ map: InventorySchema }) inventory = new MapSchema<InventorySchema>();
@@ -92,6 +81,7 @@ export class PlayerSchema extends Entity {
     public isInteracting;
     public interactingStep: number = 0;
     public interactingTarget: BrainSchema;
+    public stats: Stats;
 
     // controllers
     public _navMesh: NavMesh;
@@ -130,6 +120,14 @@ export class PlayerSchema extends Entity {
         // add spawn data
         Object.assign(this, data);
 
+        // add default player data
+        Object.entries(data.initial_player_data).forEach(([k, v]) => {
+            this.player_data[k] = v;
+        });
+
+        // initalize stats
+        this.stats = new Stats(this);
+
         // add abilities
         data.initial_abilities.forEach((element) => {
             this.player_data.abilities.set(element.key, new AbilitySchema(element));
@@ -137,7 +135,7 @@ export class PlayerSchema extends Entity {
 
         // add equipment
         data.initial_equipment.forEach((element) => {
-            this.equipment.set(element.key, new EquipmentSchema(element));
+            this.equipment.set(element.key, new EquipmentSchema(element, this));
         });
 
         // add quests
@@ -156,11 +154,6 @@ export class PlayerSchema extends Entity {
             element.i = "" + i;
             this.player_data.inventory.set("" + i, new InventorySchema(element));
             i++;
-        });
-
-        // add default player data
-        Object.entries(data.initial_player_data).forEach(([k, v]) => {
-            this.player_data[k] = v;
         });
 
         // set controllers
@@ -444,7 +437,7 @@ export class PlayerSchema extends Entity {
             this.reduceItemQuantity(item, 1);
 
             // equip
-            this.equipment.set(key, new EquipmentSchema({ key: key, slot: slot }));
+            this.equipment.set(key, new EquipmentSchema({ key: key, slot: slot }, this));
         }
     }
 
@@ -458,6 +451,9 @@ export class PlayerSchema extends Entity {
 
         // remove item from equipment
         this.equipment.delete(key);
+
+        //
+        this.stats.unequipItem(this._state.gameData.get("item", key));
 
         // equip
         this.pickupItem(

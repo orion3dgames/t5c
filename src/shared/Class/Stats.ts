@@ -1,58 +1,106 @@
-import { CalculationTypes } from "../types";
+import { CalculationTypes, Item } from "../types";
+
 import { Stat } from "./Stat";
 
 export class Stats {
+    //
     private health;
     private maxHealth;
-
     private mana;
     private maxMana;
-
     private strength;
     private agility;
     private endurance;
     private intelligence;
     private wisdom;
 
+    private stats;
     private entity;
-
-    private modifiers = [];
+    onStatsChange: (stats: { [key: string]: number }) => void;
 
     constructor(entity) {
-        //
+        // save base stats
+        this.stats = {
+            health: new Stat(entity.health),
+            maxHealth: new Stat(entity.maxHealth),
+            mana: new Stat(entity.mana),
+            maxMana: new Stat(entity.maxMana),
+            strength: new Stat(entity.player_data ? entity.player_data.strength : 0),
+            agility: new Stat(entity.player_data ? entity.player_data.agility : 0),
+            endurance: new Stat(entity.player_data ? entity.player_data.endurance : 0),
+            intelligence: new Stat(entity.player_data ? entity.player_data.intelligence : 0),
+            wisdom: new Stat(entity.player_data ? entity.player_data.wisdom : 0),
+        };
+
         this.entity = entity;
 
-        // set base stats
-        this.setBasetStats();
+        // whenever a stat is modified, update entity with the latest
+        this.onStatsChange = (stats) => {
+            console.log("onStatsChange", stats);
+            this.entity.health = this.stats.health.value;
+            this.entity.maxHealth = this.stats.maxHealth.value;
+            this.entity.mana = this.stats.mana.value;
+            this.entity.maxMana = this.stats.maxMana.value;
+            this.entity.player_data.strength = this.stats.strength.value;
+            this.entity.player_data.agility = this.stats.agility.value;
+            this.entity.player_data.endurance = this.stats.endurance.value;
+            this.entity.player_data.intelligence = this.stats.intelligence.value;
+            this.entity.player_data.wisdom = this.stats.wisdom.value;
+        };
     }
 
-    addItemModifier(item) {
-        if (item.benefits && item.benefits.length > 0) {
-            item.benefits.forEach((benefit) => {
-                this.modifiers.push(benefit);
-            });
+    equipItem(item: Item): void {
+        this.applyItemModifiers(item, true);
+        this.updateStats();
+    }
+
+    unequipItem(item): void {
+        if (item) {
+            this.applyItemModifiers(item, false);
+            this.updateStats();
         }
     }
 
-    setBasetStats() {
-        // set base stats
-        this.health = new Stat(this.entity.health);
-        this.maxHealth = new Stat(this.entity.maxHealth);
-        this.mana = new Stat(this.entity.mana);
-        this.maxMana = new Stat(this.entity.maxMana);
-        if (this.entity.player_data) {
-            this.strength = new Stat(this.entity.player_data.strength);
-            this.agility = new Stat(this.entity.player_data.agility);
-            this.endurance = new Stat(this.entity.player_data.endurance);
-            this.intelligence = new Stat(this.entity.player_data.intelligence);
-            this.wisdom = new Stat(this.entity.player_data.wisdom);
+    applyItemModifiers(item: Item, apply: boolean): void {
+        for (let stat in item.statModifiers) {
+            if (this.stats[stat]) {
+                item.statModifiers[stat].forEach((modifier) => {
+                    if (apply) {
+                        this.stats[stat].addModifier(modifier);
+                    } else {
+                        this.stats[stat].removeModifier(modifier);
+                    }
+                });
+            }
         }
-        console.log("[STATS] set base stats", this);
     }
 
-    update() {
-        this.modifiers.forEach((modifier) => {
-            this[modifier.key].set(modifier.amount, modifier.type);
-        });
+    updateStats(): void {
+        // Ensure health and mana do not exceed their max values
+        if (this.stats.health.value > this.stats.maxHealth.value) {
+            this.stats.health.baseValue = this.stats.maxHealth.value;
+        }
+        if (this.stats.mana.value > this.stats.maxMana.value) {
+            this.stats.mana.baseValue = this.stats.maxMana.value;
+        }
+        // Trigger stats change callback
+        this.onStatsChange(this.currentStats);
+    }
+
+    updateBaseStats(newBaseStats: { [key: string]: number }): void {
+        for (let stat in newBaseStats) {
+            if (this.stats[stat]) {
+                this.stats[stat].baseValue = newBaseStats[stat];
+            }
+        }
+        this.updateStats();
+    }
+
+    get currentStats(): { [key: string]: number } {
+        const stats: { [key: string]: number } = {};
+        for (let stat in this.stats) {
+            stats[stat] = this.stats[stat].value;
+        }
+        return stats;
     }
 }

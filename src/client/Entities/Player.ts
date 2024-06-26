@@ -226,9 +226,6 @@ export class Player extends Entity {
         // run super function first
         super.updateServerRate(delta);
 
-        // update stats
-        this.stats.update();
-
         if (this.moveController) {
             // process player movement
             this.moveController.processMove();

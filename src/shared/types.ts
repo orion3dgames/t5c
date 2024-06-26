@@ -288,7 +288,7 @@ export type Item = {
     stackable: boolean;
     rarity?: ItemRarity;
     requirements?: {};
-    benefits?: {};
+    statModifiers?: {};
 
     equippable?: {
         type?: EquippableType;

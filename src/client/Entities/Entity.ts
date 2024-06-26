@@ -142,11 +142,6 @@ export class Entity extends TransformNode {
         // spawn player
         this._game._vatController.prepareMesh(entity);
 
-        //
-        if (this.isCurrentPlayer) {
-            this.stats = new Stats(this);
-        }
-
         // wait for vat to be ready
         setTimeout(() => {
             this.spawn(entity);

@@ -325,9 +325,9 @@ class Database {
 
         // default equipment
         const sql_equip1 = `INSERT INTO character_equipment ("owner_id", "slot", "key") VALUES ("${c.id}", "${PlayerSlots.OFF_HAND}", "shield_01")`;
-        this.run(sql_equip1);
+        //this.run(sql_equip1);
         const sql_equip2 = `INSERT INTO character_equipment ("owner_id", "slot", "key") VALUES ("${c.id}", "${PlayerSlots.WEAPON}", "sword_01")`;
-        //this.run(sql_equip2);
+        this.run(sql_equip2);
         const sql_equip3 = `INSERT INTO character_equipment ("owner_id", "slot", "key") VALUES ("${c.id}", "${PlayerSlots.CHEST}", "armor_01")`;
         //this.run(sql_equip3);
 
@@ -338,8 +338,8 @@ class Database {
         // add default items
         let items = [{ qty: 5, key: "potion_small_red" }];
         items.forEach((item) => {
-            const sql = `INSERT INTO character_inventory ("owner_id", "qty", "order", "key") VALUES ("${c.id}", "${item.qty}", "1", "${item.key}")`;
-            this.run(sql);
+            //const sql = `INSERT INTO character_inventory ("owner_id", "qty", "order", "key") VALUES ("${c.id}", "${item.qty}", "1", "${item.key}")`;
+            //this.run(sql);
         });
 
         return await this.getCharacter(c.id);

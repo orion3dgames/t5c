@@ -20,7 +20,13 @@ let ItemsDB: itemDataMap = {
             rotation_y: Math.PI * 1.5,
         },
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
-        benefits: [{ key: PlayerKeys.STRENGTH, type: CalculationTypes.ADD, amount: 10 }],
+        statModifiers: {
+            strength: [
+                { type: "additive", value: 5 },
+                { type: "multiplicative", value: 1.1 },
+            ],
+            agility: [{ type: "multiplicative", value: 2 }],
+        },
         meshData: {
             scale: 1.3,
         },
@@ -46,7 +52,7 @@ let ItemsDB: itemDataMap = {
             scale: 1.4,
         },
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
-        benefits: [{ key: PlayerKeys.STRENGTH, type: CalculationTypes.ADD, amount: 10 }],
+        statModifiers: {},
         meshData: {
             scale: 1.4,
         },
@@ -74,7 +80,7 @@ let ItemsDB: itemDataMap = {
             scale: 1,
         },
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
-        benefits: [{ key: PlayerKeys.STRENGTH, type: CalculationTypes.ADD, amount: 10 }],
+        statModifiers: {},
         meshData: {
             scale: 0.8,
         },
@@ -103,7 +109,7 @@ let ItemsDB: itemDataMap = {
             scale: 1,
         },
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
-        benefits: [{ key: PlayerKeys.STRENGTH, type: CalculationTypes.ADD, amount: 10 }],
+        statModifiers: {},
         meshData: {
             scale: 0.8,
         },
@@ -128,7 +134,7 @@ let ItemsDB: itemDataMap = {
             material: 4,
         },
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
-        benefits: [{ key: PlayerKeys.STRENGTH, type: CalculationTypes.ADD, amount: 10 }],
+        statModifiers: {},
         meshData: {
             scale: 1,
         },
@@ -153,7 +159,7 @@ let ItemsDB: itemDataMap = {
             material: 3,
         },
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
-        benefits: [{ key: PlayerKeys.STRENGTH, type: CalculationTypes.ADD, amount: 10 }],
+        statModifiers: {},
         meshData: {
             scale: 1,
         },
@@ -179,11 +185,7 @@ let ItemsDB: itemDataMap = {
             { key: PlayerKeys.LEVEL, amount: 10 },
             { key: PlayerKeys.STRENGTH, amount: 20 },
         ],
-        benefits: [
-            { key: PlayerKeys.AC, type: CalculationTypes.ADD, amount: 10 },
-            { key: PlayerKeys.STRENGTH, type: CalculationTypes.ADD, amount: 8 },
-            { key: PlayerKeys.WISDOM, type: CalculationTypes.REMOVE, amount: 2 },
-        ],
+        statModifiers: {},
         meshData: {
             scale: 1,
         },
@@ -202,7 +204,7 @@ let ItemsDB: itemDataMap = {
         sellable: true,
         tradable: true,
         stackable: true,
-        benefits: [{ key: PlayerKeys.HEALTH, type: CalculationTypes.ADD, amount: 25 }],
+        statModifiers: {},
         meshData: {
             scale: 1.5,
         },
@@ -220,7 +222,7 @@ let ItemsDB: itemDataMap = {
         sellable: true,
         tradable: true,
         stackable: true,
-        benefits: [{ key: PlayerKeys.MANA, type: CalculationTypes.ADD, amount: 25 }],
+        statModifiers: {},
         meshData: {
             scale: 1.5,
         },

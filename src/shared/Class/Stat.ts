@@ -1,37 +1,45 @@
-import { CalculationTypes } from "../types";
+type Modifier = {
+    type: "additive" | "multiplicative";
+    value: number;
+};
 
 export class Stat {
-    private baseValue = 0;
-    private value = 0;
+    baseValue: number;
+    additiveModifiers: Modifier[];
+    multiplicativeModifiers: Modifier[];
 
-    public modifiers = [];
-
-    constructor(value) {
-        this.baseValue = value;
-        this.value = value;
+    constructor(baseValue: number = 0) {
+        this.baseValue = baseValue;
+        this.additiveModifiers = [];
+        this.multiplicativeModifiers = [];
     }
 
-    public set(value, type = CalculationTypes.ADD) {
-        var previous = this.value;
+    get value(): number {
+        let additiveSum = this.additiveModifiers.reduce((sum, mod) => sum + mod.value, 0);
+        let additiveValue = this.baseValue + additiveSum;
 
-        console.log(`[gameroom][Stats][set] ${value} -> ${type}`);
+        let multiplicativeProduct = this.multiplicativeModifiers.reduce((product, mod) => product * mod.value, 1);
+        return additiveValue * multiplicativeProduct;
+    }
 
-        if (type === CalculationTypes.ADD) {
-            this.value = this.value + value;
-            let delta = this.value - this.baseValue;
-            console.log(`[gameroom][Stats][add] ${previous} -> ${this.value} = ${delta}`);
+    addModifier(modifier: Modifier): void {
+        if (modifier.type === "additive") {
+            this.additiveModifiers.push(modifier);
+        } else if (modifier.type === "multiplicative") {
+            this.multiplicativeModifiers.push(modifier);
         }
+    }
 
-        if (type === CalculationTypes.MULTIPLY) {
-            this.value = this.value * value;
-            let delta = this.value - this.baseValue;
-            console.log(`[gameroom][Stats][multiply] ${previous} -> ${this.value} = ${delta}`);
+    removeModifier(modifier: Modifier): void {
+        if (modifier.type === "additive") {
+            this.additiveModifiers = this.additiveModifiers.filter((mod) => mod !== modifier);
+        } else if (modifier.type === "multiplicative") {
+            this.multiplicativeModifiers = this.multiplicativeModifiers.filter((mod) => mod !== modifier);
         }
+    }
 
-        if (type === CalculationTypes.REMOVE) {
-            this.value = this.value - value;
-            let delta = this.value - this.baseValue;
-            console.log(`[gameroom][Stats][remove] ${previous} -> ${this.value} = ${delta}`);
-        }
+    clearModifiers(): void {
+        this.additiveModifiers = [];
+        this.multiplicativeModifiers = [];
     }
 }

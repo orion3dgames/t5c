@@ -178,11 +178,6 @@ export class EntityMesh {
 
             // refresh animation
             this._entity.animatorController.refreshAnimation();
-
-            // add item modifier
-            if (this._entity.isCurrentPlayer && this._entity.stats) {
-                this._entity.stats.addItemModifier(item);
-            }
         }
     }
 
