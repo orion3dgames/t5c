@@ -74,6 +74,10 @@ export class Panel_Character extends Panel {
                 label: "Mana",
                 value: this._currentPlayer.mana,
             },
+            ac: {
+                name: "AC",
+                button: false,
+            },
         };
 
         this.slots = ["HEAD", "AMULET", "CHEST", "PANTS", "SHOES", "WEAPON", "OFF_HAND", "RING_1", "RING_2"];

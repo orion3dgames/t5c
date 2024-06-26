@@ -21,8 +21,8 @@ let ItemsDB: itemDataMap = {
         },
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
         statModifiers: {
-            strength: [{ type: "multiplicative", value: 1.1 }],
-            agility: [{ type: "additive", value: 2 }],
+            strength: [{ type: CalculationTypes.MULTIPLY, value: 1.1 }],
+            agility: [{ type: CalculationTypes.ADD, value: 2 }],
         },
         meshData: {
             scale: 1.3,
@@ -50,7 +50,7 @@ let ItemsDB: itemDataMap = {
         },
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
         statModifiers: {
-            endurance: [{ type: "multiplicative", value: 1.4 }],
+            ac: [{ type: CalculationTypes.ADD, value: 5 }],
         },
         meshData: {
             scale: 1.4,

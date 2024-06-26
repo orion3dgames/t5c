@@ -27,6 +27,7 @@ export class PlayerData extends Schema {
     @type("uint8") public wisdom: number = 0;
     @type("uint32") public experience: number = 0;
     @type("uint32") public points: number = 5;
+    @type("uint32") public ac: number = 0;
 }
 
 export class PlayerSchema extends Entity {

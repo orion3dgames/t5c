@@ -1,7 +1,7 @@
-import { Item } from "../../../shared/types";
+import { CalculationTypes, Item } from "../../../shared/types";
 
 type Modifier = {
-    type: "additive" | "multiplicative";
+    type: CalculationTypes;
     value: number;
 };
 
@@ -25,17 +25,17 @@ export class Stat {
     }
 
     addModifier(modifier: Modifier): void {
-        if (modifier.type === "additive") {
+        if (modifier.type === CalculationTypes.ADD) {
             this.additiveModifiers.push(modifier);
-        } else if (modifier.type === "multiplicative") {
+        } else if (modifier.type === CalculationTypes.MULTIPLY) {
             this.multiplicativeModifiers.push(modifier);
         }
     }
 
     removeModifier(modifier: Modifier): void {
-        if (modifier.type === "additive") {
+        if (modifier.type === CalculationTypes.ADD) {
             this.additiveModifiers = this.additiveModifiers.filter((mod) => mod !== modifier);
-        } else if (modifier.type === "multiplicative") {
+        } else if (modifier.type === CalculationTypes.MULTIPLY) {
             this.multiplicativeModifiers = this.multiplicativeModifiers.filter((mod) => mod !== modifier);
         }
     }
@@ -63,6 +63,7 @@ export class statsCTRL {
             endurance: new Stat(entity.player_data ? entity.player_data.endurance : 0),
             intelligence: new Stat(entity.player_data ? entity.player_data.intelligence : 0),
             wisdom: new Stat(entity.player_data ? entity.player_data.wisdom : 0),
+            ac: new Stat(entity.player_data ? entity.player_data.ac : 0),
         };
 
         this.entity = entity;
@@ -79,6 +80,7 @@ export class statsCTRL {
             this.entity.player_data.endurance = this.stats.endurance.value;
             this.entity.player_data.intelligence = this.stats.intelligence.value;
             this.entity.player_data.wisdom = this.stats.wisdom.value;
+            this.entity.player_data.ac = this.stats.ac.value;
         };
     }
 
