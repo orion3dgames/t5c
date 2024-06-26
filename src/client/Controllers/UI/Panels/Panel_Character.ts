@@ -43,6 +43,10 @@ export class Panel_Character extends Panel {
                 name: "Wisdom",
                 button: true,
             },
+            ac: {
+                name: "AC",
+                button: false,
+            },
             points: {
                 name: "Available Points",
             },
@@ -73,10 +77,6 @@ export class Panel_Character extends Panel {
             mana: {
                 label: "Mana",
                 value: this._currentPlayer.mana,
-            },
-            ac: {
-                name: "AC",
-                button: false,
             },
         };
 

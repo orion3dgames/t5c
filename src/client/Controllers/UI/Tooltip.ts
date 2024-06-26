@@ -7,6 +7,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { generatePanel } from "./Theme";
 import { GameController } from "../GameController";
+import { CalculationTypes } from "../../../shared/types";
 
 export class Tooltip {
     private _playerUI;
@@ -152,10 +153,15 @@ export class Tooltip {
         this.tooltipValue.text = "Value: " + data.value;
 
         let stats = "";
-        for (let key in data.benefits) {
-            let benefit = data.benefits[key];
-            let title = benefit.key.charAt(0).toUpperCase() + benefit.key.slice(1);
-            stats += title + ": " + (benefit.type === 1 ? "+" : "-") + " " + benefit.amount + "\n";
+        for (let key in data.statModifiers) {
+            for (let line of data.statModifiers[key]) {
+                let title = key.toUpperCase() + ": ";
+                if (line.type === CalculationTypes.ADD) {
+                    stats += title + " + " + line.value + "\n";
+                } else if (line.type === CalculationTypes.MULTIPLY) {
+                    stats += title + " Multiply by " + line.value * 100 + "% \n";
+                }
+            }
         }
         stats = stats.slice(0, -1);
         this.tooltipStats.text = stats;
