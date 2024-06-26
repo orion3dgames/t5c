@@ -11,6 +11,8 @@ export class EquipmentSchema extends Schema {
         Object.assign(this, data);
 
         // update player stats
-        owner.statsCTRL.equipItem(owner._state.gameData.get("item", this.key));
+        if (owner.statsCTRL) {
+            owner.statsCTRL.equipItem(owner._state.gameData.get("item", this.key));
+        }
     }
 }
