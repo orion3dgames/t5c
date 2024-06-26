@@ -197,8 +197,7 @@ export class GameRoomState extends Schema {
         if (type === ServerMsg.PLAYER_ADD_STAT_POINT) {
             let key = data.key;
             if (playerState.player_data.points > 0) {
-                playerState.player_data[key] += 1;
-                playerState.player_data.points -= 1;
+                playerState.statsCTRL.updateBaseStats(key, 1);
             }
         }
 

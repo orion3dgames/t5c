@@ -21,11 +21,8 @@ let ItemsDB: itemDataMap = {
         },
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
         statModifiers: {
-            strength: [
-                { type: "additive", value: 5 },
-                { type: "multiplicative", value: 1.1 },
-            ],
-            agility: [{ type: "multiplicative", value: 2 }],
+            strength: [{ type: "multiplicative", value: 1.1 }],
+            agility: [{ type: "additive", value: 2 }],
         },
         meshData: {
             scale: 1.3,

@@ -120,11 +120,9 @@ export class statsCTRL {
         this.onStatsChange(this.currentStats);
     }
 
-    updateBaseStats(newBaseStats: { [key: string]: number }): void {
-        for (let stat in newBaseStats) {
-            if (this.stats[stat]) {
-                this.stats[stat].baseValue = newBaseStats[stat];
-            }
+    updateBaseStats(key, value): void {
+        if (this.stats[key]) {
+            this.stats[key].baseValue += value;
         }
         this.updateStats();
     }
