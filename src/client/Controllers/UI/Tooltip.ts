@@ -159,7 +159,7 @@ export class Tooltip {
                 if (line.type === CalculationTypes.ADD) {
                     stats += title + " + " + line.value + "\n";
                 } else if (line.type === CalculationTypes.MULTIPLY) {
-                    stats += title + " Multiply by " + line.value * 100 + "% \n";
+                    stats += title + " + " + line.value * 10 + "% \n";
                 }
             }
         }
