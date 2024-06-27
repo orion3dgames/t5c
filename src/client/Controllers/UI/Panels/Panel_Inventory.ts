@@ -3,7 +3,7 @@ import { Image } from "@babylonjs/gui/2D/controls/image";
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Grid } from "@babylonjs/gui/2D/controls/grid";
-import { Item, ServerMsg } from "../../../../shared/types";
+import { Item, ItemRarity, ServerMsg } from "../../../../shared/types";
 import { Panel } from "./Panel";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { createButton } from "../Theme";
@@ -165,6 +165,15 @@ export class Panel_Inventory extends Panel {
         }
     }
 
+    colorGrid(item) {
+        if (item.rarity === ItemRarity.RARE) {
+            return "rgba(0,20,135,1)";
+        } else if (item.rarity === ItemRarity.LEGENDARY) {
+            return "rgba(240,171,28,1)";
+        }
+        return "";
+    }
+
     ///////////////////////////////////////
     ///////////////////////////////////////
     // INVENTORY PANEL
@@ -188,6 +197,13 @@ export class Panel_Inventory extends Panel {
             let index = element.i;
             let child = this._inventoryGrid[index];
             let item = this._game.getGameData("item", element.key) as Item;
+
+            //
+            let color = this.colorGrid(item);
+            if (color) {
+                child.background = this.colorGrid(item);
+                //child.thickness = 1;
+            }
 
             // dispose
             child.getDescendants().forEach((el) => {

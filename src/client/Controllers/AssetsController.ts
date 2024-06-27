@@ -26,6 +26,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 import { RenderTargetTexture } from "@babylonjs/core/Materials/Textures/renderTargetTexture";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
+import { VatController } from "./VatController";
 
 type AssetEntry = {
     name: string;
@@ -89,7 +90,13 @@ export class AssetsController {
             for (let key in items) {
                 let el = items[key];
                 this.assetDatabase.push({ name: el.icon, filename: "icons/" + el.icon + ".png", extension: "png", type: "image" });
-                this.assetDatabase.push({ name: "ITEM_" + el.key, filename: "items/" + el.key + ".glb", extension: "glb", type: "mesh", instantiate: true });
+                this.assetDatabase.push({
+                    name: "ITEM_" + el.key,
+                    filename: "items/" + el.model + ".glb",
+                    extension: "glb",
+                    type: "mesh",
+                    instantiate: true,
+                });
             }
         }
 
@@ -394,12 +401,20 @@ export class AssetsController {
         let modelToLoadKey = "ROOT_ITEM_" + itemKey;
         if (!this._game._loadedAssets[modelToLoadKey]) {
             // get raw mesh
-            let rawMesh = this._game._loadedAssets["ITEM_" + itemKey].meshes[0];
+            let rawMesh = this._game._loadedAssets["ITEM_" + itemKey].meshes[0].clone("CLONE");
             // create a merged mesh
             let itemMesh = mergeMesh(rawMesh, "raw_" + itemKey);
             if (itemMesh) {
+                //
+                let item = this._game.getGameData("item", itemKey);
+
+                if (item.material) {
+                    VatController.loadItemMaterial(this._game.scene, itemMesh, item.material);
+                }
+
                 // hide it
-                itemMesh.setEnabled(false);
+                itemMesh.setEnabled(true);
+
                 // save it for future usage
                 this._game._loadedAssets[modelToLoadKey] = itemMesh;
             }

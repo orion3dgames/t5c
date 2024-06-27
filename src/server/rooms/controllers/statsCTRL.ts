@@ -84,32 +84,6 @@ export class statsCTRL {
         };
     }
 
-    equipItem(item: Item): void {
-        this.applyItemModifiers(item, true);
-        this.updateStats();
-    }
-
-    unequipItem(item): void {
-        if (item) {
-            this.applyItemModifiers(item, false);
-            this.updateStats();
-        }
-    }
-
-    applyItemModifiers(item: Item, apply: boolean): void {
-        for (let stat in item.statModifiers) {
-            if (this.stats[stat]) {
-                item.statModifiers[stat].forEach((modifier) => {
-                    if (apply) {
-                        this.stats[stat].addModifier(modifier);
-                    } else {
-                        this.stats[stat].removeModifier(modifier);
-                    }
-                });
-            }
-        }
-    }
-
     updateStats(): void {
         // Ensure health and mana do not exceed their max values
         if (this.stats.health.value > this.stats.maxHealth.value) {
@@ -135,5 +109,34 @@ export class statsCTRL {
             stats[stat] = this.stats[stat].value;
         }
         return stats;
+    }
+
+    // ITEMS
+    // todo: I could probably abstract the below to work for abilities and debuffs too.
+
+    equipItem(item: Item): void {
+        this.applyItemModifiers(item, true);
+        this.updateStats();
+    }
+
+    unequipItem(item): void {
+        if (item) {
+            this.applyItemModifiers(item, false);
+            this.updateStats();
+        }
+    }
+
+    applyItemModifiers(item: Item, apply: boolean): void {
+        for (let stat in item.statModifiers) {
+            if (this.stats[stat]) {
+                item.statModifiers[stat].forEach((modifier) => {
+                    if (apply) {
+                        this.stats[stat].addModifier(modifier);
+                    } else {
+                        this.stats[stat].removeModifier(modifier);
+                    }
+                });
+            }
+        }
     }
 }
