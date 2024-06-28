@@ -176,6 +176,9 @@ export class PlayerInput {
                     if (kbInfo.event.code === "NumpadEnter") {
                         this._game.sendMessage(ServerMsg.DEBUG_BOTS);
                     }
+                    if (kbInfo.event.code === "Home") {
+                        this._ui._MainMenu.takeScreenshot();
+                    }
                     if (kbInfo.event.code === "KeyN") {
                         this._gameScene._navMeshDebug.isVisible = !this._gameScene._navMeshDebug.isVisible;
                     }

@@ -48,6 +48,22 @@ export class MainMenu {
         this._createDropdownMenu();
     }
 
+    takeScreenshot() {
+        this._UI._Watermark._bloc.isVisible = true;
+        Tools.CreateScreenshot(
+            this._engine,
+            this._currentPlayer.cameraController.camera,
+            { width: 2560, height: 1440, precision: 0.9 },
+            () => {
+                this._UI._Watermark._bloc.isVisible = false;
+                console.log("Screnshot taken!");
+            },
+            "image/jpeg",
+            true,
+            0.9
+        );
+    }
+
     _createDropdownMenu() {
         let dropdownOptions = {
             menuTitle: "O",
@@ -61,19 +77,7 @@ export class MainMenu {
                 screenshot: {
                     menuTitle: "Take a picture",
                     click: () => {
-                        this._UI._Watermark._bloc.isVisible = true;
-                        Tools.CreateScreenshot(
-                            this._engine,
-                            this._currentPlayer.cameraController.camera,
-                            { width: 2560, height: 1440, precision: 0.9 },
-                            () => {
-                                this._UI._Watermark._bloc.isVisible = false;
-                                console.log("Screnshot taken!");
-                            },
-                            "image/jpeg",
-                            true,
-                            0.9
-                        );
+                        this.takeScreenshot();
                     },
                 },
                 quit: {

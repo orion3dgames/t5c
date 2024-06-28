@@ -6,6 +6,7 @@ import { applyTheme, createButton } from "../Theme";
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import { ServerMsg } from "../../../../shared/types";
+import { Rarity } from "../../../../shared/Class/Rarity";
 
 export class Panel_Character extends Panel {
     // inventory tab
@@ -319,8 +320,8 @@ export class Panel_Character extends Panel {
             panelRectangle.left = leftMargin;
             panelRectangle.width = iconWidth + "px";
             panelRectangle.height = iconWidth + "px";
-            panelRectangle.thickness = 1;
-            panelRectangle.color = "gray";
+            panelRectangle.thickness = 2;
+            panelRectangle.color = "black";
             panel.addControl(panelRectangle);
 
             var panelText = new TextBlock("slot_text_" + i);
@@ -347,6 +348,8 @@ export class Panel_Character extends Panel {
         let slotImage = slotPanel.getChildByName("slot_image_" + slot_id) as Image;
         let item = this._game.getGameData("item", item_key);
 
+        console.log("slotPanelContentRefresh", type, slotPanel, data);
+
         // make sure to remove any exisiting events
         slotImage.source = "";
         slotPanel.onPointerClickObservable.clear();
@@ -355,6 +358,12 @@ export class Panel_Character extends Panel {
 
         // equip item
         if (type === "ADD") {
+            // color based on rarity
+            slotPanel.background = Rarity.getColor(item);
+            slotPanel.color = Rarity.getColor(item);
+            slotPanel.thickness = 2;
+
+            //
             var imageData = this._loadedAssets[item.icon];
             slotImage.source = imageData;
 
@@ -373,6 +382,11 @@ export class Panel_Character extends Panel {
             slotPanel.onPointerOutObservable.add((e) => {
                 this._UI._Tooltip.close();
             });
+        }
+
+        if (type === "REMOVE") {
+            slotPanel.background = "transparent";
+            slotPanel.color = "#000000";
         }
     }
 }

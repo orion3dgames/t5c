@@ -27,7 +27,6 @@ export class InventoryDropdown {
 
     public hideDropdown() {
         if (this.dropdown) {
-            this._selected.background = "rgba(255,255,255,.1)";
             this.dropdown.dispose();
         }
     }
@@ -38,7 +37,6 @@ export class InventoryDropdown {
         }
 
         this._selected = el;
-        this._selected.background = this._bgColor;
 
         const rect = new StackPanel("InventoryDropdown");
         rect.top = el._currentMeasure.top + el.heightInPixels;
@@ -121,6 +119,7 @@ export class InventoryDropdown {
             button.onPointerDownObservable.add(() => {
                 action.click();
                 this.hideDropdown();
+                this._UI.panelInventory.refresh();
             });
         });
     }

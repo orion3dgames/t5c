@@ -8,6 +8,7 @@ import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { generatePanel } from "./Theme";
 import { GameController } from "../GameController";
 import { CalculationTypes } from "../../../shared/types";
+import { Rarity } from "../../../shared/Class/Rarity";
 
 export class Tooltip {
     private _playerUI;
@@ -152,6 +153,7 @@ export class Tooltip {
         this.tooltipValue.isVisible = true;
         this.tooltipValue.text = "Value: " + data.value;
 
+        //
         let stats = "";
         for (let key in data.statModifiers) {
             for (let line of data.statModifiers[key]) {
@@ -165,6 +167,11 @@ export class Tooltip {
         }
         stats = stats.slice(0, -1);
         this.tooltipStats.text = stats;
+        this.tooltipStats.isVisible = stats === "" ? false : true;
+
+        // color based on rarity
+        this.tooltipContainer.color = Rarity.getColor(data);
+        this.tooltipName.color = Rarity.getTooltipColor(data, 1);
     }
 
     private generateAbility(data) {
