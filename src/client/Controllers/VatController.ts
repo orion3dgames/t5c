@@ -78,9 +78,9 @@ export class VatController {
 
     async prepareVat(race) {
         let key = race.vat.key;
-
+        
         if (!this._entityData.has(key)) {
-            console.log("[prepareVat] " + key, race);
+            console.log("[prepareVat] 2 " + key, race);
 
             // get vat data
             const bakedAnimationJson = await this.fetchVAT(key);
@@ -194,11 +194,14 @@ export class VatController {
     }
 
     async prepareMesh(entity) {
-        //console.log("prepareMesh", entity);
-
+   
         let key = entity.race;
         let race = this._game.getGameData("race", key);
         let meshId = VatController.findMeshKey(race, entity);
+
+        if(!race){
+            console.log('Race does not exists', key);
+        }
 
         // gets or prepare vat
         let vat = await this.prepareVat(race);
