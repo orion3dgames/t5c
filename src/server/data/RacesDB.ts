@@ -39,6 +39,17 @@ let RaceVAT = {
         bones: {},
         meshes: {},
     },
+    skeleton: {
+        key: "skeleton_01",
+        animations: {
+            ATTACK: { name: "1H_Melee_Attack_Chop", duration: 1000, speed: 1 },
+            DEATH: { name: "Death_A", duration: 1000, speed: 1 },
+            IDLE: { name: "Idle", duration: 1000, speed: 1 },
+            WALK: { name: "Walking_A", duration: 1000, speed: 1.3 },
+        },
+        bones: {},
+        meshes: {},
+    },
 };
 
 let RacesDB: raceDataMap = {
@@ -93,11 +104,11 @@ let RacesDB: raceDataMap = {
         ],
     },
 
-    male_knight: {
-        key: "male_knight",
-        title: "Knight",
+    skeleton_01: {
+        key: "skeleton_01",
+        title: "Skeleton",
         description: "The knight is as knight should be, strong and righteous. It has a large health pool and uses stamina to cast its abilities.",
-        icon: "ICON_RACE_male_knight",
+        icon: "ICON_RACE_skeleton_01",
         speed: 0.7,
         scale: 1,
         rotationFix: Math.PI,
@@ -111,7 +122,7 @@ let RacesDB: raceDataMap = {
         default_abilities: ["base_attack"],
         vat: RaceVAT.humanoid,
         materials: [
-            { title: "Color 1", material: "knight_texture.png" }, //
+            { title: "Color 1", material: "skeleton_texture.png" }, //
         ],
     },
 
