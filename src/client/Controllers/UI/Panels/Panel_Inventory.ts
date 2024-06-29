@@ -4,16 +4,15 @@ import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Grid } from "@babylonjs/gui/2D/controls/grid";
 import { Item, ServerMsg } from "../../../../shared/types";
+import { Rarity } from "../../../../shared/Class/Rarity";
 import { Panel } from "./Panel";
-import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
-import { createButton } from "../Theme";
-import { InventoryDropdown } from "../InventoryDropdown";
 
 export class Panel_Inventory extends Panel {
     // inventory tab
     private panel: Rectangle;
     private _inventoryGrid: Rectangle[] = [];
     private _goldUI: TextBlock;
+    private bgColor: string = "rgba(255,255,255,.1)";
 
     public sceneRendered = false;
 
@@ -135,7 +134,6 @@ export class Panel_Inventory extends Panel {
         for (let r = 0; r < inventorySpaceRows; r++) {
             for (let col = 0; col < inventorySpaceCols; col++) {
                 if (i < this._game.config.PLAYER_INVENTORY_SPACE) {
-                    let bgColor = "rgba(255,255,255,.1)";
                     const inventorySpace = new Rectangle("inventorySpace_" + i);
                     inventorySpace.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
                     inventorySpace.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
@@ -143,8 +141,9 @@ export class Panel_Inventory extends Panel {
                     inventorySpace.left = 0.1;
                     inventorySpace.width = 0.9;
                     inventorySpace.height = 0.9;
-                    inventorySpace.background = bgColor;
-                    inventorySpace.thickness = 0;
+                    inventorySpace.background = this.bgColor;
+                    inventorySpace.thickness = 2;
+                    inventorySpace.color = this.bgColor;
                     inventorySpace.cornerRadius = 0;
                     grid.addControl(inventorySpace, r, col);
 
@@ -169,25 +168,35 @@ export class Panel_Inventory extends Panel {
     ///////////////////////////////////////
     // INVENTORY PANEL
     public refresh() {
-        if (this._inventoryGrid.length < 1) {
-            return false;
-        }
-
         // if inventory is empty, make sure to clear all unessacary UI elements
         this._inventoryGrid.forEach((child) => {
             child.getDescendants().forEach((el) => {
                 el.dispose();
             });
             child.metadata = {};
+            child.background = this.bgColor;
+            child.color = this.bgColor;
             this._UI._Tooltip.close();
         });
 
-        ///////////////////////
-        // else show items
+        // if inventory is empty, do not do anything
+        if (this._inventoryGrid.length < 1) {
+            return false;
+        }
+
+        // show items
         this._currentPlayer.player_data.inventory.forEach((element) => {
             let index = element.i;
             let child = this._inventoryGrid[index];
             let item = this._game.getGameData("item", element.key) as Item;
+
+            //
+            let color = Rarity.getColor(item);
+            if (color) {
+                child.background = color;
+                child.thickness = 2;
+                child.color = color;
+            }
 
             // dispose
             child.getDescendants().forEach((el) => {

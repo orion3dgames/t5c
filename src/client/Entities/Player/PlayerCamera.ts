@@ -42,6 +42,7 @@ export class PlayerCamera {
         this.camera.fov = 0.35;
         this.camera.parent = yTilt;
         this.camera.inputs.clear();
+        this.camera.position.z = -50;
 
         // set as active camera
         this._scene.activeCamera = this.camera;
@@ -59,7 +60,7 @@ export class PlayerCamera {
     }
 
     public update(): void {
-        let preventVertical = false;
+        let preventVertical = true;
 
         // rotate camera around the Y position if right click is true
         if (!this._input.middle_click) {

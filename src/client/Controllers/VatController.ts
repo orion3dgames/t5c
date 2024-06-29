@@ -303,6 +303,11 @@ export class VatController {
         if (itemMesh) {
             itemMesh.name = entityData.name + "_" + itemMesh.name;
 
+            // update material
+            if (item.material) {
+                VatController.loadItemMaterial(this._game.scene, itemMesh, item.material);
+            }
+
             // attach to VAT
             itemMesh.skeleton = entityData.skeleton;
             itemMesh.bakedVertexAnimationManager = entityData.vat;
@@ -355,7 +360,9 @@ export class VatController {
 
         if (itemMesh) {
             // update material
-            this.prepareMaterial(itemMesh, entityData.name, item.equippable.material);
+            if (item.material) {
+                VatController.loadItemMaterial(this._game.scene, itemMesh, item.material);
+            }
 
             // attach to VAT
             itemMesh.skeleton = entityData.skeleton;
@@ -386,13 +393,39 @@ export class VatController {
         } else {
             // create material as it does not exists
             let mat = new PBRCustomMaterial(materialKey);
-            mat.albedoTexture = new Texture("./models/races/materials/" + materialKey, this._game.scene, {
+            mat.albedoTexture = new Texture("./models/materials/" + materialKey, this._game.scene, {
                 invertY: false,
             });
             mat.reflectionColor = new Color3(0, 0, 0);
             mat.reflectivityColor = new Color3(0, 0, 0);
             mat.backFaceCulling = false;
             mat.freeze();
+
+            // assign to mesh
+            cloneMesh.material = mat;
+        }
+    }
+
+    static loadItemMaterial(scene, cloneMesh, materialName) {
+        // remove any existing material
+        const existing = cloneMesh.material ?? false;
+        if (existing) {
+            existing.dispose();
+        }
+
+        //
+        let alreadyExistMaterial = scene.getMaterialByName(materialName);
+        if (alreadyExistMaterial) {
+            cloneMesh.material = alreadyExistMaterial;
+        } else {
+            // create material as it does not exists
+            let mat = new PBRCustomMaterial(materialName);
+            mat.albedoTexture = new Texture("./models/materials/" + materialName, scene, {
+                invertY: false,
+            });
+            mat.reflectionColor = new Color3(0, 0, 0);
+            mat.reflectivityColor = new Color3(0, 0, 0);
+            mat.backFaceCulling = false;
 
             // assign to mesh
             cloneMesh.material = mat;

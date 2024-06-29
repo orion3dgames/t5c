@@ -66,7 +66,7 @@ export class UserInterface {
     public _targetEntitySelectedBar: EntitySelectedBar;
     public _playerEntitySelectedBar: EntitySelectedBar;
     public _Tooltip: Tooltip;
-    private _MainMenu: MainMenu;
+    public _MainMenu: MainMenu;
     public _CastingBar: CastingBar;
     public _RessurectBox: RessurectBox;
     private _ExperienceBar: ExperienceBar;
@@ -234,7 +234,7 @@ export class UserInterface {
 
         // open inventory by default
         this.panelInventory.open();
-        this.panelHelp.open();
+        //this.panelHelp.open();
 
         // create tooltip
         this._Tooltip = new Tooltip(this, currentPlayer);

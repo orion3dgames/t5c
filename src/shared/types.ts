@@ -268,17 +268,19 @@ export enum ItemRarity {
 }
 
 export enum EquippableType {
-    DYNAMIC = 0,
-    EMBEDDED,
-    NOT_VISIBLE,
+    DYNAMIC = 0, // is attached to bone via dynamic weighting
+    EMBEDDED, // is rigged via blender
+    NOT_VISIBLE, // not visible as a mesh
 }
 
 export type Item = {
     key: string;
+    model: string;
     title: string;
     description: string;
     icon: string;
     material?: string;
+    color?: { r: number; g: number; b: number; a: number };
     class: ItemClass;
     cooldown?: number;
     value: number;
@@ -288,7 +290,8 @@ export type Item = {
     stackable: boolean;
     rarity?: ItemRarity;
     requirements?: {};
-    benefits?: {};
+    statModifiers?: {};
+    damage?;
 
     equippable?: {
         type?: EquippableType;

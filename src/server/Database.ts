@@ -282,12 +282,11 @@ class Database {
                 name,
                 race,
                 material,
-                this.generateStatPoint(),
-
-                this.generateStatPoint(),
-                this.generateStatPoint(),
-                this.generateStatPoint(),
-                this.generateStatPoint(),
+                20,
+                20,
+                20,
+                20,
+                20,
                 "lh_town",
 
                 "6.18",
@@ -325,19 +324,24 @@ class Database {
         });
 
         // default equipment
-        const sql_equip1 = `INSERT INTO character_equipment ("owner_id", "slot", "key") VALUES ("${c.id}", "${PlayerSlots.OFF_HAND}", "shield_01")`;
-        //this.run(sql_equip1);
-        const sql_equip2 = `INSERT INTO character_equipment ("owner_id", "slot", "key") VALUES ("${c.id}", "${PlayerSlots.WEAPON}", "sword_01")`;
-        //this.run(sql_equip2);
-        const sql_equip3 = `INSERT INTO character_equipment ("owner_id", "slot", "key") VALUES ("${c.id}", "${PlayerSlots.CHEST}", "armor_01")`;
-        //this.run(sql_equip3);
+        let equipment = [{ key: "sword_01", slot: PlayerSlots.WEAPON }];
+        equipment.forEach((e) => {
+            const sql_equip1 = `INSERT INTO character_equipment ("owner_id", "slot", "key") VALUES ("${c.id}", "${e.slot}", "${e.key}")`;
+            this.run(sql);
+        });
 
-        //
+        // default quests
         const sql_quests = `INSERT INTO character_quests ("owner_id", "key", "status", "qty") VALUES ("${c.id}", "LH_DANGEROUS_ERRANDS_01", "0", "5")`;
         //this.run(sql_quests);
 
         // add default items
-        let items = [{ qty: 5, key: "potion_small_red" }];
+        let items = [
+            { qty: 5, key: "potion_small_red" },
+            { qty: 1, key: "sword_01" },
+            { qty: 1, key: "armor_01" },
+            { qty: 1, key: "armor_02" },
+            { qty: 1, key: "amulet_01" },
+        ];
         items.forEach((item) => {
             const sql = `INSERT INTO character_inventory ("owner_id", "qty", "order", "key") VALUES ("${c.id}", "${item.qty}", "1", "${item.key}")`;
             this.run(sql);
