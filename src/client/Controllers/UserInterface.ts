@@ -192,7 +192,7 @@ export class UserInterface {
         this.panelCharacter = new Panel_Character(this, currentPlayer, {
             name: "Character",
             width: "500px;",
-            height: "300px;",
+            height: "320px;",
             top: "-50px;",
             left: "0px;",
             horizontal_position: Control.HORIZONTAL_ALIGNMENT_CENTER,

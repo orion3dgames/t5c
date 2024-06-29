@@ -5,6 +5,9 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { BlackAndWhitePostProcess } from "@babylonjs/core/PostProcesses/blackAndWhitePostProcess";
 import { Player } from "../Player";
 import { PlayerInput } from "../../Controllers/PlayerInput";
+import { RayHelper } from "@babylonjs/core/Debug/rayHelper";
+import { Ray } from "@babylonjs/core/Culling/ray";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
 export class PlayerCamera {
     private player: Player;
@@ -14,6 +17,7 @@ export class PlayerCamera {
     public _camRoot;
     public cameraPos;
     private _postProcess: BlackAndWhitePostProcess; //
+    private rayHelper;
 
     constructor(player) {
         this._scene = player._scene;
@@ -82,12 +86,43 @@ export class PlayerCamera {
 
         // apply canmera rotation
         this._camRoot.rotation = new Vector3(rotationX, rotationY, 0);
+
+        //
+        this.castRay();
     }
 
     public zoom(deltaY): void {
         // zoom in/out
         if (deltaY > 0 && this.camera.position.z > -50) this.camera.position.z -= 2;
         if (deltaY < 0 && this.camera.position.z < -20) this.camera.position.z += 2;
+    }
+
+    public vecToLocal(vector, mesh){
+        var m = mesh.getWorldMatrix();
+        var v = Vector3.TransformCoordinates(vector, m);
+		return v;		 
+    }
+
+    public castRay(){       
+
+        /*
+        todo: WIP
+        if(this.rayHelper){
+            this.rayHelper.dispose()
+        }
+
+        const ray = this.camera.getForwardRay(50) as Ray;
+        this.rayHelper = new RayHelper(ray);		
+		this.rayHelper.show(this._scene);		
+
+        var pickInfos = ray.intersectsMeshes(this._scene.meshes)
+        if(pickInfos.length > 0){
+            pickInfos.forEach((m:any) => {
+                console.log('hiding', m.pickedMesh.name);
+                m.pickedMesh.setEnabled(false);
+            } );
+        }
+            */
     }
 
     // post processing effect black and white

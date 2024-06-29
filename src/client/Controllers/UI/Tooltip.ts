@@ -165,12 +165,19 @@ export class Tooltip {
                 }
             }
         }
+
+        // if damage
+        if(data.damage){
+            stats += "Damage: "+data.damage.min+" - "+data.damage.max+" \n";
+        }
+
         stats = stats.slice(0, -1);
         this.tooltipStats.text = stats;
         this.tooltipStats.isVisible = stats === "" ? false : true;
 
+
         // color based on rarity
-        this.tooltipContainer.color = Rarity.getColor(data);
+        this.tooltipContainer.color = Rarity.getColor(data).color;
         this.tooltipName.color = Rarity.getTooltipColor(data, 1);
     }
 
@@ -202,6 +209,10 @@ export class Tooltip {
 
         stats = stats.slice(0, -1);
         this.tooltipStats.text = stats;
+
+        // color based on rarity
+        this.tooltipContainer.color = Rarity.getColor(false).color;
+        this.tooltipName.color = Rarity.getTooltipColor(false, 1);
     }
 
     /** called externally to refresh tooltip with content */

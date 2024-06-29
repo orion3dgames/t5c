@@ -226,7 +226,9 @@ let ItemsDB: itemDataMap = {
         sellable: true,
         tradable: true,
         stackable: true,
-        statModifiers: {},
+        statModifiers: {
+            health: [{ type: CalculationTypes.ADD, value: 25 }],
+        },
         meshData: {
             scale: 1.5,
         },
@@ -246,7 +248,9 @@ let ItemsDB: itemDataMap = {
         sellable: true,
         tradable: true,
         stackable: true,
-        statModifiers: {},
+        statModifiers: {
+            mana: [{ type: CalculationTypes.ADD, value: 25 }],
+        },
         meshData: {
             scale: 1.5,
         },

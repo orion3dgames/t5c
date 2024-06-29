@@ -321,7 +321,7 @@ export class Panel_Character extends Panel {
             panelRectangle.width = iconWidth + "px";
             panelRectangle.height = iconWidth + "px";
             panelRectangle.thickness = 2;
-            panelRectangle.color = "black";
+            panelRectangle.color = "rgba(255,255,255, .3";
             panel.addControl(panelRectangle);
 
             var panelText = new TextBlock("slot_text_" + i);
@@ -348,8 +348,6 @@ export class Panel_Character extends Panel {
         let slotImage = slotPanel.getChildByName("slot_image_" + slot_id) as Image;
         let item = this._game.getGameData("item", item_key);
 
-        console.log("slotPanelContentRefresh", type, slotPanel, data);
-
         // make sure to remove any exisiting events
         slotImage.source = "";
         slotPanel.onPointerClickObservable.clear();
@@ -359,8 +357,9 @@ export class Panel_Character extends Panel {
         // equip item
         if (type === "ADD") {
             // color based on rarity
-            slotPanel.background = Rarity.getColor(item);
-            slotPanel.color = Rarity.getColor(item);
+            let color = Rarity.getColor(item);
+            slotPanel.background = color.bg;
+            slotPanel.color = color.color;
             slotPanel.thickness = 2;
 
             //
@@ -386,7 +385,7 @@ export class Panel_Character extends Panel {
 
         if (type === "REMOVE") {
             slotPanel.background = "transparent";
-            slotPanel.color = "#000000";
+            slotPanel.color = "rgba(255,255,255, .3";
         }
     }
 }

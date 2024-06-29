@@ -192,11 +192,9 @@ export class Panel_Inventory extends Panel {
 
             //
             let color = Rarity.getColor(item);
-            if (color) {
-                child.background = color;
-                child.thickness = 2;
-                child.color = color;
-            }
+            child.background = color.bg;
+            child.thickness = 2;
+            child.color = color.color;
 
             // dispose
             child.getDescendants().forEach((el) => {

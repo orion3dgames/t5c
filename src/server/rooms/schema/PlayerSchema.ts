@@ -398,16 +398,18 @@ export class PlayerSchema extends Entity {
     }
 
     consumeItem(item) {
-        // process benefits
-        item.benefits.forEach((element) => {
-            let key = element.key;
-            if (CalculationTypes.ADD === element.type) {
-                this[key] += element.amount;
-            }
-            if (CalculationTypes.REMOVE === element.type) {
-                this[key] -= element.amount;
-            }
-        });
+        
+        // process 
+        for (let stat in item.statModifiers) {
+            item.statModifiers[stat].forEach((modifier) => {
+                if (CalculationTypes.ADD === modifier.type) {
+                    this[stat] += modifier.value;
+                }
+                if (CalculationTypes.REMOVE === modifier.type) {
+                    this[stat] -= modifier.value;
+                }
+            })
+        }
 
         // reduce item quantity
         this.reduceItemQuantity(item, 1);
