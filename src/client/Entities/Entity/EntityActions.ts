@@ -6,17 +6,16 @@ import { Path3D } from "@babylonjs/core/Maths/math.path";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { ParticleSystem } from "@babylonjs/core/Particles/particleSystem";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import State from "../../../client/Screens/Screens";
-import { Sound } from "@babylonjs/core/Audio/sound";
-import { Space } from "@babylonjs/core/Maths/math.axis";
 import { Tools } from "@babylonjs/core/Misc/tools";
-import { Entity } from "../Entity";
+import { randomNumberInRange } from "../../../shared/Utils";
+import { nanoid } from "nanoid";
 
 export class EntityActions {
     private _scene: Scene;
     private _loadedAssets: any[];
     private _entities;
     private particleTxt_01: Texture;
+    private projectiles = new Map();
 
     private colors = {
         white: [Color3.FromInts(255, 255, 255), Color3.FromInts(240, 240, 240)],
@@ -33,6 +32,33 @@ export class EntityActions {
 
     public playSound() {}
 
+    public update(){
+
+        this.projectiles.forEach((element, key)=>{
+
+            //
+            let targetMesh = element.target.mesh;
+            let end = element.target.getPosition();
+            end.y = 1; // fix to hit in the center of body 
+            element.projectile.lookAt(end);
+            element.projectile.rotate(new Vector3(0, 1, 0), Tools.ToRadians(180));
+
+            // calculate next position
+            var endVector = element.projectile.calcMovePOV(0, 0, 0.4).addInPlace(element.projectile.position);
+            element.projectile.position = endVector;
+
+            // if intersect with target mesh then display impact
+            if (element.projectile.intersectsMesh(targetMesh, true)) {
+                this.particule_impact(targetMesh, element.color);
+                element.projectile.dispose(true, true);
+                element.particleSystem.dispose(true);
+                element.particleSystemTrail.dispose(true);
+                this.projectiles.delete(key);
+            }
+        })
+
+    }
+
     public process(player, data, ability) {
         /*
         let soundToPlay = this._scene.getSoundByName("sound_"+ability.key);
@@ -44,19 +70,10 @@ export class EntityActions {
             });
         }
         */
+
+        //
         let source = this._entities.get(data.fromId);
         let target = this._entities.get(data.targetId);
-
-        // adjust from pos to be the bone position
-        /*
-        let bone = player.playerSkeleton.bones[12];
-        data.fromPos = bone.getPosition(Space.WORLD, player.mesh);
-        data.fromPos.y -= 0.8;*/
-
-        // correct height
-        /*
-        start.y += 1;
-        end.y += 1;*/
 
         // set effect
         if (ability.effect.particule === "fireball") {
@@ -217,9 +234,21 @@ export class EntityActions {
         particleSystem.start();
 
         //////////////////////////////////////////////
+        
+
+        //
+        this.projectiles.set(nanoid(), {
+            color: color,
+            source: source,
+            target: target,
+            projectile: projectile,
+            particleSystem: particleSystem,
+            particleSystemTrail: particleSystemTrail,
+        })
+
+        /*
         projectile.lookAt(end);
         projectile.rotate(new Vector3(0, 1, 0), Tools.ToRadians(180));
-
         var endVector = projectile.calcMovePOV(0, 0, 72).addInPlace(projectile.position);
         var points = [start, endVector];
         var path = new Path3D(points);
@@ -237,5 +266,6 @@ export class EntityActions {
                 this._scene.onBeforeRenderObservable.remove(loop);
             }
         });
+        */
     }
 }

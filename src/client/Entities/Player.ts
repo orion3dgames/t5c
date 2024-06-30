@@ -212,6 +212,10 @@ export class Player extends Entity {
         // run super function first
         super.update(delta);
 
+        if (this.actionsController) {
+            this.actionsController.update();
+        }
+
         if (this && this.moveController) {
             // tween entity
             this.moveController.tween();

@@ -212,12 +212,14 @@ export class Entity extends TransformNode {
             this._game.selectedEntity = null;
 
             // remove selected mesh
-            this.meshController.selectedMesh.isVisible = false;
+            if(this.meshController){
+                this.meshController.selectedMesh.isVisible = false;
 
-            // remove any action managers
-            if (this.meshController.mesh.actionManager) {
-                this.meshController.mesh.actionManager.dispose();
-                this.meshController.mesh.actionManager = null;
+                // remove any action managers
+                if (this.meshController.mesh.actionManager) {
+                    this.meshController.mesh.actionManager.dispose();
+                    this.meshController.mesh.actionManager = null;
+                }
             }
 
             // hide interactable button
