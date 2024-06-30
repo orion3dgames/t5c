@@ -80,7 +80,7 @@ export class VatController {
         let key = race.vat.key;
         
         if (!this._entityData.has(key)) {
-            console.log("[prepareVat] 2 " + key, race);
+            //console.log("[prepareVat] 2 " + key, race);
 
             // get vat data
             const bakedAnimationJson = await this.fetchVAT(key);
@@ -127,6 +127,7 @@ export class VatController {
      * @returns
      */
     makeHumanoid(rawMesh, data) {
+    
         // we need to find any of the equipemnt required a specific mesh
         let chest = "Base_Body";
         if (data.equipment) {
@@ -380,6 +381,7 @@ export class VatController {
     }
 
     prepareMaterial(cloneMesh, raceKey, materialIndex) {
+       
         // get race
         let race = this._game.getGameData("race", raceKey);
 

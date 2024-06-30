@@ -144,6 +144,7 @@ export class AssetsController {
         this.assetToPreload = this.assetDatabase;
         await this.preloadAssets();
         await this.prepareTextures();
+        await this.prepareDynamicMeshes();
     }
 
     public async fetchAsset(key) {

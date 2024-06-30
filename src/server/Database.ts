@@ -37,6 +37,7 @@ class Database {
             "name" TEXT,
             "race" TEXT,
             "material" INTEGER DEFAULT 0,
+            "head" TEXT,
             "location" TEXT,
             "level" int,
             "experience" int,
@@ -245,13 +246,14 @@ class Database {
         return Math.trunc(70 / 5 + Math.random() * 10);
     }
 
-    async createCharacter(token, name, race, material) {
+    async createCharacter(token, name, race, material, head) {
         let user = await this.getUserByToken(token);
         const sql = `INSERT INTO characters (
-            "user_id", "name", "race", "material",
+            "user_id", "name", "race", "material", "head",
             "strength", "endurance", "agility", "intelligence", "wisdom", 
             "location","x","y","z","rot","level","experience","health", "mana", "gold", "points") 
             VALUES (
+                ?,
                 ?,
                 ?,
                 ?,
@@ -282,6 +284,7 @@ class Database {
                 name,
                 race,
                 material,
+                head,
                 20,
                 20,
                 20,

@@ -104,8 +104,9 @@ class Api {
             const name: string = (req.query.name as string) ?? "";
             const race: string = (req.query.race as string) ?? "";
             const material: number = (req.query.material as number) ?? 0;
+            const head: number = (req.query.head as number) ?? 0;
             if (token !== "") {
-                database.createCharacter(token, name, race, material).then((character) => {
+                database.createCharacter(token, name, race, material, head).then((character) => {
                     if (!character) {
                         return res.status(400).send({
                             message: "Create Failed",
@@ -172,9 +173,8 @@ class Api {
                 database.saveUser(username, password).then((user) => {
                     let race = GameData.get('race', "humanoid");
                     let material = race.materials[Math.floor(Math.random()*race.materials.length)];
-                    console.log(material);
                     let materialIndex = race.materials.indexOf(material);
-                    database.createCharacter(user.token, generateRandomPlayerName(), race.key, materialIndex).then((character) => {
+                    database.createCharacter(user.token, generateRandomPlayerName(), race.key, materialIndex, "Head_Engineer").then((character) => {
                         character.user_id = user.id;
                         character.token = user.token;
                         character.password = user.password;

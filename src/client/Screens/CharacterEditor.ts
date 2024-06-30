@@ -22,6 +22,9 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { GameController } from "../Controllers/GameController";
 import axios from "axios";
 import { Race } from "../../shared/types";
+import { VatController } from "../Controllers/VatController";
+import { Grid } from "@babylonjs/gui/2D/controls/grid";
+import { ScrollViewer } from "@babylonjs/gui/2D/controls/scrollViewers/scrollViewer";
 
 export class CharacterEditor {
     public _game: GameController;
@@ -44,7 +47,17 @@ export class CharacterEditor {
     private selected_textures;
 
     private selected_race;
+    private selected_face;
     private selected_variant;
+
+    private entityData;
+    private entity:any = {
+        race: "humanoid",
+        head: "Head_Base",
+        material: 1,
+        raceData: {},
+        mesh: null
+    }
 
     constructor() {
         this._newState = State.NULL;
@@ -171,7 +184,7 @@ export class CharacterEditor {
         //////////////////////// MESHES
         /////////////////////////////////////////////////////////
 
-        let choices = ["male_knight", "male_mage"];
+        let choices = ["humanoid"];
         let races = this._game.loadGameData("races");
 
         for (let race in races) {
@@ -184,15 +197,19 @@ export class CharacterEditor {
         let defaultVariant = races[defaultRace].materials[Math.floor(Math.random() * races[defaultRace].materials.length)];
 
         this.selected_race = races[defaultRace];
+        this.selected_face = this.selected_race.vat.meshes.HEAD[0];
         this.selected_variant = defaultVariant;
-
-        console.log(this.selected_race, this.selected_variant);
-
+  
         // initialize assets controller
         this._game.initializeAssetController();
+        await this._game._assetsCtrl.load();
+
+        this._game._vatController = new VatController(this._game, []);
+        await this._game._vatController.initialize();
+        console.log("[VAT] fully loaded", this._game._vatController._entityData);
 
         // load character
-        await this.loadCharacter(this.selected_race);
+        await this.initialize(this.selected_race);
     }
 
     cleanup(previousChoice) {
@@ -207,7 +224,7 @@ export class CharacterEditor {
         });
     }
 
-    async loadCharacter(choice) {
+    async initialize(race) {
         if (this.selected_mesh) {
             this.selected_mesh.dispose();
         }
@@ -216,31 +233,50 @@ export class CharacterEditor {
                 element.dispose();
             });
         }
+        
+        this.entity.raceData = race;
+        this.entityData = this._game._vatController._entityData.get(race.key);
 
-        // instatiate model
-        await this._game._assetsCtrl.fetchAsset("RACE_" + choice.key);
+        await this.loadCharacter(race);
 
-        const result = this._game._loadedAssets["RACE_" + choice.key].instantiateModelsToScene(
-            () => {
-                return choice.key;
-            },
-            true,
-            { doNotInstantiate: true }
-        );
+        // create ui
+        this.refreshUI();
 
-        if (result.rootNodes.length > 0) {
-            this.selected_mesh = result.rootNodes[0];
-            this.selected_animations = result.animationGroups;
+        this._scene.registerBeforeRender(() => {
 
-            // add shadow
-            this._shadow.addShadowCaster(this.selected_mesh, true);
+            // get current delta
+            let delta = this._game.engine.getFps();
 
-            // play idle animation
-            this.selected_animations[36].play(true);
+            // process vat animations
+            this._game._vatController.process(delta);
 
-            // refresh UI
-            this.refreshUI();
+        });
+    }
+
+    async loadCharacter(choice){
+
+        if(this.entity.mesh){
+            this.entity.mesh.dispose();
         }
+
+        this._game._vatController.prepareMesh(this.entity);
+
+        let idle = {
+            name: "IDLE",
+            index: 2,
+            loop: true,
+            speed: 1,
+            ranges: this.entityData.animationRanges[2],
+        };
+
+        setTimeout(()=>{
+
+            let materialIndex = VatController.findMeshKey(this.entity.raceData, this.entity);
+            const playerMesh = this.entityData.meshes.get(materialIndex).createInstance("CHARACTER");
+            this.entity.mesh = playerMesh;
+            this.setAnimationParameters(playerMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, idle);
+
+        }, 200)
     }
 
     disposeUI() {
@@ -265,7 +301,9 @@ export class CharacterEditor {
         // if race selected
         if (this.selected_race) {
             // create race description
-            this.sectionDescription();
+            //this.sectionDescription();
+
+            this.sectionFaces();
 
             // create race variants
             this.sectionVariant();
@@ -331,11 +369,10 @@ export class CharacterEditor {
         this.rightStackPanel.addControl(section3Description);
     }
 
-    sectionVariant() {
-        let selectedChoices = this.selected_race.materials;
-        let selectedMaterial = this._scene.getMaterialByName(this.selected_race.key) as PBRMaterial;
-
-        const sectionTitle = new TextBlock("sectionTitle", "Choose Variant");
+    sectionFaces() {
+        let selectedChoices = this.selected_race.vat.meshes.HEAD;
+  
+        const sectionTitle = new TextBlock("sectionTitle", "Choose Face");
         sectionTitle.width = 0.8;
         sectionTitle.height = "40px";
         sectionTitle.color = "white";
@@ -344,8 +381,22 @@ export class CharacterEditor {
         sectionTitle.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         this.leftStackPanel.addControl(sectionTitle);
 
-        selectedChoices.forEach((color, key) => {
-            const btnChoice = Button.CreateSimpleButton("btnChoice", color.title);
+        // add scrollable container
+        const chatScrollViewer = new ScrollViewer("chatScrollViewer");
+        chatScrollViewer.width = 1;
+        chatScrollViewer.height = "150px;";
+        chatScrollViewer.thickness = 1;
+        this.leftStackPanel.addControl(chatScrollViewer);
+
+        const chatStackPanel = new StackPanel("chatStackPanel");
+        chatStackPanel.width = "100%";
+        chatStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        chatStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        chatStackPanel.paddingTop = "5px;";
+        chatScrollViewer.addControl(chatStackPanel);
+
+        selectedChoices.forEach((faceKey) => {
+            const btnChoice = Button.CreateSimpleButton("btnChoice", faceKey);
             btnChoice.top = "0px";
             btnChoice.width = 1;
             btnChoice.height = "30px";
@@ -353,22 +404,66 @@ export class CharacterEditor {
             btnChoice.background = "gray";
             btnChoice.thickness = 1;
             btnChoice.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-            btnChoice.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-            this.leftStackPanel.addControl(btnChoice);
+            btnChoice.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            chatStackPanel.addControl(btnChoice);
 
-            if (this.selected_race && this.selected_variant && this.selected_variant.title === color.title) {
+            if (this.entity.head === faceKey) {
                 btnChoice.background = "green";
             }
 
             btnChoice.onPointerDownObservable.add(() => {
-                color.index = key;
-                this.selected_variant = color;
-                if (selectedMaterial) {
-                    if (selectedMaterial.albedoTexture) {
-                        selectedMaterial.albedoTexture.dispose();
-                        selectedMaterial.albedoTexture = new Texture("./models/races/materials/" + color.material, this._scene, { invertY: false });
-                    }
-                }
+                this.entity.head = faceKey;
+                this.loadCharacter(this.selected_race);
+                this.refreshUI();
+            });
+        });
+    }
+
+    sectionVariant() {
+        let selectedChoices = this.selected_race.materials;
+  
+        const sectionTitle = new TextBlock("sectionTitle", "Choose Face");
+        sectionTitle.width = 0.8;
+        sectionTitle.height = "40px";
+        sectionTitle.color = "white";
+        sectionTitle.top = "100px";
+        sectionTitle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        sectionTitle.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        this.leftStackPanel.addControl(sectionTitle);
+
+        // add scrollable container
+        const chatScrollViewer = new ScrollViewer("chatScrollViewer");
+        chatScrollViewer.width = 1;
+        chatScrollViewer.height = "150px;";
+        chatScrollViewer.thickness = 1;
+        this.leftStackPanel.addControl(chatScrollViewer);
+
+        const chatStackPanel = new StackPanel("chatStackPanel");
+        chatStackPanel.width = "100%";
+        chatStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        chatStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        chatStackPanel.paddingTop = "5px;";
+        chatScrollViewer.addControl(chatStackPanel);
+
+        selectedChoices.forEach((mat, index) => {
+            const btnChoice = Button.CreateSimpleButton("btnChoice_"+index, mat.material);
+            btnChoice.top = "0px";
+            btnChoice.width = 1;
+            btnChoice.height = "30px";
+            btnChoice.color = "white";
+            btnChoice.background = "gray";
+            btnChoice.thickness = 1;
+            btnChoice.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+            btnChoice.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            chatStackPanel.addControl(btnChoice);
+
+            if (this.entity.material === index) {
+                btnChoice.background = "green";
+            }
+
+            btnChoice.onPointerDownObservable.add(() => {
+                this.entity.material = index;
+                this.loadCharacter(this.selected_race);
                 this.refreshUI();
             });
         });
@@ -437,6 +532,16 @@ export class CharacterEditor {
         });
     }
 
+    private setAnimationParameters(vec, currentAnim, delta = 60) {
+        const animIndex = currentAnim.index ?? 0;
+        const anim = this.entityData.animationRanges[animIndex];
+
+        const from = Math.floor(anim.from);
+        const to = Math.floor(anim.to);
+
+        vec.set(from, to - 1, 0, delta); // skip one frame to avoid weird artifacts
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////
@@ -455,8 +560,9 @@ export class CharacterEditor {
             params: {
                 token: token,
                 name: name,
-                race: this.selected_race.key,
-                material: this.selected_variant.index,
+                race: this.entity.race,
+                material: this.entity.material,
+                head: this.entity.head,
             },
             url: apiUrl(this._game.config.port) + "/create_character",
         });

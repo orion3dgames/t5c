@@ -55,7 +55,7 @@ let RaceVAT = {
 let RacesDB: raceDataMap = {
     humanoid: {
         key: "humanoid",
-        title: "Knight",
+        title: "Human",
         description: "The knight is as knight should be, strong and righteous. It has a large health pool and uses stamina to cast its abilities.",
         icon: "ICON_RACE_male_knight",
         speed: 0.7,
