@@ -337,10 +337,11 @@ class Database {
         // add default items
         let items = [
             { qty: 5, key: "potion_small_red" },
-            { qty: 1, key: "sword_01" },
-            { qty: 1, key: "armor_01" },
-            { qty: 1, key: "armor_02" },
-            { qty: 1, key: "amulet_01" },
+            { qty: 5, key: "potion_small_blue" },
+            //{ qty: 1, key: "sword_01" },
+            //{ qty: 1, key: "armor_01" },
+            //{ qty: 1, key: "armor_02" },
+            //{ qty: 1, key: "amulet_01" },
         ];
         items.forEach((item) => {
             const sql = `INSERT INTO character_inventory ("owner_id", "qty", "order", "key") VALUES ("${c.id}", "${item.qty}", "1", "${item.key}")`;
