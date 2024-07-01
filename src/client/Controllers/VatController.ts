@@ -150,6 +150,8 @@ export class VatController {
             "Base_ArmRight",
             //chest,
             "Base_Body",
+            //"Armor_Pants",
+            "Base_Body",
             "Base_LegLeft",
             "Base_LegRight",
         ];
