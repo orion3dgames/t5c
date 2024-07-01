@@ -341,6 +341,7 @@ class Database {
         let items = [
             { qty: 5, key: "potion_small_red" },
             { qty: 5, key: "potion_small_blue" },
+            { qty: 1, key: "cape_01" },
             //{ qty: 1, key: "sword_01" },
             //{ qty: 1, key: "armor_01" },
             //{ qty: 1, key: "armor_02" },

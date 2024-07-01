@@ -338,7 +338,7 @@ export class AssetsController {
         }
 
         // start  music
-        /*
+        
         let soundData = this._game._loadedAssets["MUSIC_01"];
         let sound = new Sound(
             "music",
@@ -351,7 +351,7 @@ export class AssetsController {
                 volume: 0.2,
                 loop: true,
             }
-        );*/
+        );
 
         // instantiate the scene
         let assetKey = "ENV_" + key;

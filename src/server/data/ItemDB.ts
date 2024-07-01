@@ -181,6 +181,34 @@ let ItemsDB: itemDataMap = {
         },
     },
 
+    cape_01: {
+        key: "cape_01",
+        model: "cape_01",
+        title: "Cape ",
+        description: "Description.",
+        icon: "ICON_ITEM_armor_02",
+        material: "knight_texture_alt_C.png",
+        class: ItemClass.ARMOR,
+        value: 2000,
+        destroyable: false,
+        sellable: true,
+        tradable: true,
+        stackable: false,
+        rarity: ItemRarity.RARE,
+        equippable: {
+            type: EquippableType.EMBEDDED,
+            slot: PlayerSlots.BACK,
+            mesh: "Armor_Cape",
+        },
+        requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
+        statModifiers: {
+            ac: [{ type: CalculationTypes.ADD, value: 5 }],
+        },
+        meshData: {
+            scale: 1,
+        },
+    },
+
     amulet_01: {
         key: "amulet_01",
         model: "amulet_01",

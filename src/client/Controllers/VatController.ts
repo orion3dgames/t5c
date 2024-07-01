@@ -127,30 +127,11 @@ export class VatController {
      * @returns
      */
     makeHumanoid(rawMesh, data) {
-    
-        // we need to find any of the equipemnt required a specific mesh
-        let chest = "Base_Body";
-        if (data.equipment) {
-            data.equipment.forEach((equipment) => {
-                let item = this._game.getGameData("item", equipment.key) as Item;
 
-                // chest items
-                if (item.equippable?.type === EquippableType.EMBEDDED && item.equippable.slot === PlayerSlots.CHEST) {
-                    chest = item.equippable.mesh ?? "Base_Body";
-                }
-
-                // other
-            });
-        }
-
-        //
         let keepArray = [
             data.head, //
             "Base_ArmLeft",
             "Base_ArmRight",
-            //chest,
-            "Base_Body",
-            //"Armor_Pants",
             "Base_Body",
             "Base_LegLeft",
             "Base_LegRight",

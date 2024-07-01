@@ -191,7 +191,7 @@ export class UserInterface {
         // create panel
         this.panelCharacter = new Panel_Character(this, currentPlayer, {
             name: "Character",
-            width: "500px;",
+            width: "600px;",
             height: "320px;",
             top: "-50px;",
             left: "0px;",

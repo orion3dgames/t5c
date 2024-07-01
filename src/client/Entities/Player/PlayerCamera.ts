@@ -64,7 +64,7 @@ export class PlayerCamera {
     }
 
     public update(): void {
-        let preventVertical = true;
+        let preventVertical = false;
 
         // rotate camera around the Y position if right click is true
         if (!this._input.middle_click) {

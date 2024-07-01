@@ -259,6 +259,7 @@ export enum PlayerSlots {
     OFF_HAND = 7,
     RING_1 = 8,
     RING_2 = 9,
+    BACK = 10,
 }
 
 export enum ItemRarity {

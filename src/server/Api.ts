@@ -174,7 +174,7 @@ class Api {
                     let race = GameData.get('race', "humanoid");
                     let material = race.materials[Math.floor(Math.random()*race.materials.length)];
                     let materialIndex = race.materials.indexOf(material);
-                    database.createCharacter(user.token, generateRandomPlayerName(), race.key, materialIndex, "Head_Engineer").then((character) => {
+                    database.createCharacter(user.token, generateRandomPlayerName(), race.key, materialIndex, "Head_Paladin").then((character) => {
                         character.user_id = user.id;
                         character.token = user.token;
                         character.password = user.password;

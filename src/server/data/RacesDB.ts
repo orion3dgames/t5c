@@ -21,10 +21,7 @@ let RaceVAT = {
                 "Head_Engineer",
                 "Head_Mage",
                 "Head_Rogue",
-            ],
-            BODY: [
-                "Base_Body", //
-                "Armor_Robe",
+                "Head_Paladin"
             ],
         },
     },
