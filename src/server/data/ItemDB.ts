@@ -187,7 +187,7 @@ let ItemsDB: itemDataMap = {
         title: "Cape ",
         description: "Description.",
         icon: "ICON_ITEM_armor_02",
-        material: "knight_texture_alt_C.png",
+        material: "knight_texture.png",
         class: ItemClass.ARMOR,
         value: 2000,
         destroyable: false,

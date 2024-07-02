@@ -108,6 +108,9 @@ export class EntityNamePlate {
     }
 
     getEntityheight(offset_y) {
+        if(!this._entity.mesh){
+            return 1;
+        }
         let extendSize = this._entity.mesh.getBoundingInfo().boundingBox.extendSize.y ?? 1;
         return extendSize * 2 + offset_y;
     }

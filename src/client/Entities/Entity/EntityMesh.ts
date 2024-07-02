@@ -42,30 +42,36 @@ export class EntityMesh {
 
     public createMesh() {
         // load player mesh
+
         let materialIndex = VatController.findMeshKey(this._entity.raceData, this._entity);
-        const playerMesh = this._entityData.meshes.get(materialIndex).createInstance(this._entity.type + "" + this._entity.sessionId);
-        playerMesh.parent = this._entity;
-        playerMesh.isPickable = true;
-        playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
-        if (this._entity.rotationFix) {
-            playerMesh.rotation.set(0, this._entity.rotationFix, 0);
+
+        if(this._entityData.meshes.has(materialIndex)){
+            const playerMesh = this._entityData.meshes.get(materialIndex).createInstance(this._entity.type + "" + this._entity.sessionId);
+            playerMesh.parent = this._entity;
+            playerMesh.isPickable = true;
+            playerMesh.rotationQuaternion = null; // You cannot use a rotationQuaternion followed by a rotation on the same mesh. Once a rotationQuaternion is applied any subsequent use of rotation will produce the wrong orientation, unless the rotationQuaternion is first set to null.
+            if (this._entity.rotationFix) {
+                playerMesh.rotation.set(0, this._entity.rotationFix, 0);
+            }
+            playerMesh.scaling.set(this._entity.scale, this._entity.scale, this._entity.scale);
+            playerMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
+
+            this.mesh = playerMesh;
+
+            // set metadata
+            this.mesh.metadata = {
+                sessionId: this._entity.sessionId,
+                type: this._entity.type,
+                race: this._entity.race,
+                name: this._entity.name,
+            };
+
+            this.equipments.forEach((equipment) => {
+                equipment.setParent(this.mesh);
+            });
+        }else{
+            console.error('ENTITY MESH, COULD NOT FIND MESH AT', materialIndex);
         }
-        playerMesh.scaling.set(this._entity.scale, this._entity.scale, this._entity.scale);
-        playerMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
-
-        this.mesh = playerMesh;
-
-        // set metadata
-        this.mesh.metadata = {
-            sessionId: this._entity.sessionId,
-            type: this._entity.type,
-            race: this._entity.race,
-            name: this._entity.name,
-        };
-
-        this.equipments.forEach((equipment) => {
-            equipment.setParent(this.mesh);
-        });
     }
 
     public async load() {
@@ -125,18 +131,9 @@ export class EntityMesh {
     ////////////////////////////////////////////////////
 
     removeItem(e) {
-        //
         if (this.equipments.has(e.key)) {
             this.equipments.get(e.key).dispose();
             this.equipments.delete(e.key);
-        }
-
-        // refresh base mesh
-        let item = this._game.getGameData("item", e.key);
-        if (item && item.equippable) {
-            if (item.equippable.mesh && item.equippable.type === EquippableType.EMBEDDED) {
-                //this._game._vatController.refreshMesh(this._entity);
-            }
         }
     }
 
@@ -163,6 +160,12 @@ export class EntityMesh {
 
             // create instance of mesh
             let mesh = this._entityData.items.get(item.key);
+     
+            if(!mesh){
+                console.error('Cannot find mesh to create item instance', item.key);
+                return false;
+            }
+            
             let instance = mesh.createInstance("equip_" + this._entity.sessionId + "_" + e.key);
             instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
             instance.isPickable = false;
@@ -178,6 +181,7 @@ export class EntityMesh {
 
             // refresh animation
             this._entity.animatorController.refreshAnimation();
+       
         }
     }
 

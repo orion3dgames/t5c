@@ -159,6 +159,10 @@ export class EntityAnimator {
 
     // play animation
     play(player) {
+
+        // 
+        if(!this.mesh) return false;
+
         // play animation and stop previous animation
         if (this._currentAnim != null && this._prevAnim !== this._currentAnim) {
             //console.log("[PLAY 1] ANIMATION CHANGED for", player.name, this._prevAnim.name, "-", this._currentAnim.name);
