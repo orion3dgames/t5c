@@ -13,7 +13,7 @@ export class SoundController {
 
     play(key: string, loop: boolean = false): void {
         // start  music
-        console.log("[SOUND] playing " + key);
+        console.log("[SOUND] loading " + key);
         if (!this.sounds.has(key)) {
             let soundData = this._gamescene._game._loadedAssets[key];
             let sound = new Sound(
@@ -23,6 +23,7 @@ export class SoundController {
                 () => {
                     this.sounds.set(key, sound);
                     sound.play();
+                    console.log("[SOUND] playing " + key, sound);
                 },
                 {
                     volume: this.volume,
@@ -31,6 +32,7 @@ export class SoundController {
             );
         } else {
             this.sounds.get(key).play(loop);
+            console.log("[SOUND] playing from cache " + key);
         }
     }
 }

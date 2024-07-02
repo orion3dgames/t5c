@@ -2,15 +2,15 @@ import { Scene } from "@babylonjs/core/scene";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color4, Color3 } from "@babylonjs/core/Maths/math.color";
-import { Path3D } from "@babylonjs/core/Maths/math.path";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { ParticleSystem } from "@babylonjs/core/Particles/particleSystem";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Tools } from "@babylonjs/core/Misc/tools";
-import { randomNumberInRange } from "../../../shared/Utils";
 import { nanoid } from "nanoid";
+import { GameScene } from "../../Screens/GameScene";
 
 export class EntityActions {
+    private _gamescene: GameScene;
     private _scene: Scene;
     private _loadedAssets: any[];
     private _entities;
@@ -23,7 +23,8 @@ export class EntityActions {
         orange: [Color3.FromInts(249, 115, 0), Color3.FromInts(222, 93, 54)],
     };
 
-    constructor(scene, _loadedAssets, entities) {
+    constructor(scene, _loadedAssets, entities, gamescene) {
+        this._gamescene = gamescene;
         this._scene = scene;
         this._entities = entities;
         this._loadedAssets = _loadedAssets;
@@ -32,14 +33,12 @@ export class EntityActions {
 
     public playSound() {}
 
-    public update(){
-
-        this.projectiles.forEach((element, key)=>{
-
+    public update() {
+        this.projectiles.forEach((element, key) => {
             //
             let targetMesh = element.target.mesh;
             let end = element.target.getPosition();
-            end.y = 1; // fix to hit in the center of body 
+            end.y = 1; // fix to hit in the center of body
             element.projectile.lookAt(end);
             element.projectile.rotate(new Vector3(0, 1, 0), Tools.ToRadians(180));
 
@@ -55,8 +54,7 @@ export class EntityActions {
                 element.particleSystemTrail.dispose(true);
                 this.projectiles.delete(key);
             }
-        })
-
+        });
     }
 
     public process(player, data, ability) {
@@ -163,6 +161,9 @@ export class EntityActions {
     }
 
     public particule_fireball(source, target, color) {
+        // play sound
+        this._gamescene._sound.play("SOUND_fire_attack_1");
+
         // get local position
         let start = source.getPosition();
         let end = target.getPosition();
@@ -234,7 +235,6 @@ export class EntityActions {
         particleSystem.start();
 
         //////////////////////////////////////////////
-        
 
         //
         this.projectiles.set(nanoid(), {
@@ -244,7 +244,7 @@ export class EntityActions {
             projectile: projectile,
             particleSystem: particleSystem,
             particleSystemTrail: particleSystemTrail,
-        })
+        });
 
         /*
         projectile.lookAt(end);
