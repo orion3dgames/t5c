@@ -1,6 +1,6 @@
 import { BrainSchema, LootSchema } from "../schema";
 import { GameRoom } from "../GameRoom";
-import { EntityState, PlayerSlots, Speed } from "../../../shared/types";
+import { EntityState, Speed } from "../../../shared/types";
 import { nanoid } from "nanoid";
 import Logger from "../../utils/Logger";
 import { randomNumberInRange } from "../../../shared/Utils";
@@ -12,28 +12,29 @@ export class spawnCTRL {
     private _room: GameRoom;
     public location;
     private spawnsAmount = [];
-
     private SPAWN_RATE = 10;
     private SPAWN_INTERVAL = 300;
     private SPAWN_CURRENT = 0;
-
-    private DESPAWN = false;
 
     constructor(state: GameRoomState) {
         this._state = state;
         this._room = state._gameroom;
         this.location = this._state.gameData.get("location", this._room.metadata.location);
 
-        //
-        this.process();
+        // add fake item for testing purposes
+        if (this.location.key === "lh_town") {
+            // add items to the ground
+            for (let i = 0; i < 400; i++) {
+                this.createItem();
+            }
+        }
 
         //
-        for (let i = 0; i < 400; i++) {
-            this.createItem();
-        }
+        this.process();
     }
 
     public debug_bots() {
+        // added npc's
         let Items = this._state.gameData.load("items");
         let keys = Object.keys(Items);
         let heads = [
@@ -42,9 +43,10 @@ export class spawnCTRL {
             "Head_Engineer",
             "Head_Mage",
             "Head_Rogue",
+            "Head_Paladin",
         ];
         let race = this._state.gameData.get("race", "humanoid");
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 100; i++) {
             let rand = keys[Math.floor(Math.random() * keys.length)];
             let randData = Items[rand];
             let equipment = [];
@@ -73,8 +75,8 @@ export class spawnCTRL {
                 ],
                 rotation: 3.12,
                 radius: 0,
-                amount: 2,
-                race: "humanoid",
+                amount: 1,
+                race: race.key,
                 material: randomNumberInRange(0, 23),
                 head: heads[Math.floor(Math.random() * heads.length)],
                 name: "Bot " + i,
@@ -114,7 +116,7 @@ export class spawnCTRL {
     }
 
     public process() {
-        //Logger.info("[gameroom][state][spawning] spawnController: " + this._location.key);
+        //Logger.info("[gameroom][state][spawning] process: " + this.location.key, this.spawnsAmount);
         let dynamic = this.location.dynamic;
         let spawns = dynamic.spawns ?? [];
         spawns.forEach((spawn, index) => {
@@ -224,6 +226,7 @@ export class spawnCTRL {
             toRegion: false,
             AI_SPAWN_INFO: spawn,
             spawn_id: spawn.index,
+            spawn_key: spawn.key,
             initial_equipment: spawn.equipment,
         };
 
@@ -238,11 +241,9 @@ export class spawnCTRL {
     }
 
     removeEntity(entity) {
-        //console.log(this.spawnsAmount, entity.AI_SPAWN_INFO.spawnIndex);
-
         if (entity.AI_SPAWN_INFO) {
-            this.spawnsAmount[entity.AI_SPAWN_INFO.spawnIndex]--;
-            this._state.entities.delete(entity.sessionId);
+            this.spawnsAmount[entity.AI_SPAWN_INFO.key]--;
         }
+        this._state.entities.delete(entity.sessionId);
     }
 }

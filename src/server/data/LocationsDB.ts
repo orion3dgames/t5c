@@ -17,6 +17,7 @@ let LocationsDB = {
         waterPlane: true,
         skyColor: [0, 0, 0, 1],
         fog: true,
+        music: "MUSIC_01",
         dynamic: {
             interactive: [
                 {
@@ -408,6 +409,41 @@ let LocationsDB = {
             ],
         },
     },
+    training_ground: {
+        title: "Training Ground",
+        key: "training_ground",
+        mesh: "training_ground",
+        sun: true,
+        sunIntensity: 1,
+        fog: true,
+        spawnPoint: {
+            x: 0,
+            y: 0,
+            z: 0,
+            rot: -180,
+        },
+        waterPlane: false,
+        skyColor: [0, 0, 0, 1],
+        music: "MUSIC_01",
+        dynamic: {
+            interactive: [],
+            spawns: [
+                {
+                    key: "spawn_01",
+                    type: "static",
+                    behaviour: "idle",
+                    aggressive: false,
+                    canAttack: true,
+                    points: [new Vector3(-5, 0, -5)],
+                    amount: 1,
+                    race: "skeleton_01",
+                    material: 0,
+                    name: "Training Dummy",
+                    baseSpeed: Speed.VERY_SLOW,
+                },
+            ],
+        },
+    },
     lh_dungeon_01: {
         title: "Dungeon Level 1",
         key: "lh_dungeon_01",
@@ -423,6 +459,7 @@ let LocationsDB = {
         },
         waterPlane: false,
         skyColor: [0, 0, 0, 1],
+        music: "MUSIC_01",
         dynamic: {
             interactive: [
                 {

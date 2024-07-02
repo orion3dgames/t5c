@@ -1,11 +1,11 @@
-import { PointerEventTypes, PointerInfo } from "@babylonjs/core/Events/pointerEvents";
+import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PlayerCamera } from "./Player/PlayerCamera";
 import { EntityActions } from "./Entity/EntityActions";
 import { Entity } from "./Entity";
 import State from "../../client/Screens/Screens";
 import { Ability, ServerMsg } from "../../shared/types";
 import { GameScene } from "../Screens/GameScene";
+import { SoundController } from "../Controllers/SoundController";
 
 export class Player extends Entity {
     public game;
@@ -29,6 +29,10 @@ export class Player extends Entity {
 
     public input_sequence: number = 0;
 
+    // sounds
+    public footstepInterval = 400;
+    public footstepCurrent = 0;
+
     constructor(name, scene, gamescene: GameScene, entity) {
         super(name, scene, gamescene, entity);
 
@@ -47,7 +51,7 @@ export class Player extends Entity {
         // add player controllers
         this.cameraController = this._gamescene._camera;
         this.cameraController.attach(this);
-        this.actionsController = new EntityActions(this._scene, this._game._loadedAssets, this.entities);
+        this.actionsController = new EntityActions(this._scene, this._game._loadedAssets, this.entities, this._gamescene);
 
         // register player server messages
         this.registerServerMessages();
@@ -291,6 +295,13 @@ export class Player extends Entity {
             this._ui._RessurectBox.close();
             this.isDeadUI = false;
         }
+
+        if (this.isMoving && this.footstepCurrent > this.footstepInterval) {
+            this._gamescene._sound.play("SOUND_player_walking");
+            this.footstepCurrent = 0;
+        }
+
+        this.footstepCurrent += delta;
     }
 
     public updateSlowRate(delta: any): void {

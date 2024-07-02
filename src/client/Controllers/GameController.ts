@@ -97,6 +97,7 @@ export class GameController {
             url: apiUrl(this.config.port) + "/load_game_data",
         });
         this._gameData = result.data.data;
+        console.log("[GAME] loaded game data", this._gameData);
     }
 
     public getGameData(type, key) {
@@ -268,6 +269,7 @@ export class GameController {
 
     // set character
     public setCharacter(character) {
+        console.log(character);
         this._currentCharacter = character;
         this.currentLocationKey = character.location;
         this.currentLocation = this.getGameData("location", character.location);

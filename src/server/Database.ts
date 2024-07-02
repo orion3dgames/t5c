@@ -278,34 +278,33 @@ class Database {
                 ?,
                 ?
             );`;
-        let c = await (<any>(
-            this.run(sql, [
-                user.id,
-                name,
-                race,
-                material,
-                head,
-                20,
-                20,
-                20,
-                20,
-                20,
-                "lh_town",
+        let c = await (<any>this.run(sql, [
+            user.id,
+            name,
+            race,
+            material,
+            head,
+            20,
+            20,
+            20,
+            20,
+            20,
+            //"training_ground",
+            "lh_town",
 
-                "6.18",
-                "0.1",
-                "-11.21",
-                "1.72",
+            "6.18",
+            "0.1",
+            "-11.21",
+            "1.72",
 
-                "1",
-                "0",
+            "1",
+            "0",
 
-                "5000",
-                "5000",
-                "50000",
-                "50",
-            ])
-        ));
+            "5000",
+            "5000",
+            "50000",
+            "50",
+        ]));
 
         // add default abilities
         let abilities = [{ key: "base_attack" }, { key: "fire_dart" }];

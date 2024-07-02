@@ -17,6 +17,7 @@ import "@babylonjs/loaders/glTF/2.0/Extensions/KHR_materials_pbrSpecularGlossine
 import "@babylonjs/loaders/glTF/2.0/Extensions/KHR_draco_mesh_compression";
 import "@babylonjs/core/Rendering/depthRendererSceneComponent";
 import "@babylonjs/core/Rendering/outlineRenderer";
+import "@babylonjs/core/Audio/audioSceneComponent";
 
 import { Engine } from "@babylonjs/core/Engines/engine";
 

@@ -66,7 +66,8 @@ export class AssetsController {
             //{ name: "SOUND_fire_attack_2", filename: "fire_attack_2.wav", extension: "wav" },
             //{ name: "SOUND_heal_1", filename: "heal_1.wav", extension: "wav" },
             { name: "MUSIC_01", filename: "music.mp3", extension: "mp3", type: "sound" },
-            //{ name: "SOUND_player_walking", filename: "player_walking.wav", extension: "wav", instantiate: false },
+            { name: "SOUND_player_walking", filename: "player_walking.wav", extension: "wav", type: "sound" },
+            { name: "SOUND_fire_attack_1", filename: "fire_attack_1.wav", extension: "wav", type: "sound" },
 
             // textures
             { name: "TXT_selected_circle_green", filename: "selected_circle_green.png", extension: "png", type: "texture" },
@@ -336,22 +337,6 @@ export class AssetsController {
             water.diffuseTexture = waterTexture;
             waterMesh.material = water;
         }
-
-        // start  music
-        
-        let soundData = this._game._loadedAssets["MUSIC_01"];
-        let sound = new Sound(
-            "music",
-            soundData,
-            this._game.scene,
-            function () {
-                sound.play();
-            },
-            {
-                volume: 0.2,
-                loop: true,
-            }
-        );
 
         // instantiate the scene
         let assetKey = "ENV_" + key;
