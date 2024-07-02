@@ -17,6 +17,7 @@ let LocationsDB = {
         waterPlane: true,
         skyColor: [0, 0, 0, 1],
         fog: true,
+        music: "MUSIC_01",
         dynamic: {
             interactive: [
                 {
@@ -423,6 +424,7 @@ let LocationsDB = {
         },
         waterPlane: false,
         skyColor: [0, 0, 0, 1],
+        music: "MUSIC_01",
         dynamic: {
             interactive: [
                 {
