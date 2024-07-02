@@ -26,14 +26,15 @@ export class spawnCTRL {
 
         //
         this.process();
-
-        //
-        for (let i = 0; i < 400; i++) {
-            this.createItem();
-        }
     }
 
     public debug_bots() {
+        // add items to the ground
+        for (let i = 0; i < 400; i++) {
+            this.createItem();
+        }
+
+        // added npc's
         let Items = this._state.gameData.load("items");
         let keys = Object.keys(Items);
         let heads = [
@@ -42,9 +43,10 @@ export class spawnCTRL {
             "Head_Engineer",
             "Head_Mage",
             "Head_Rogue",
+            "Head_Paladin",
         ];
         let race = this._state.gameData.get("race", "humanoid");
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 100; i++) {
             let rand = keys[Math.floor(Math.random() * keys.length)];
             let randData = Items[rand];
             let equipment = [];
@@ -73,8 +75,8 @@ export class spawnCTRL {
                 ],
                 rotation: 3.12,
                 radius: 0,
-                amount: 2,
-                race: "humanoid",
+                amount: 1,
+                race: race.key,
                 material: randomNumberInRange(0, 23),
                 head: heads[Math.floor(Math.random() * heads.length)],
                 name: "Bot " + i,
@@ -114,7 +116,7 @@ export class spawnCTRL {
     }
 
     public process() {
-        //Logger.info("[gameroom][state][spawning] spawnController: " + this._location.key);
+        //Logger.info("[gameroom][state][spawning] process: " + this.location.key, this.spawnsAmount);
         let dynamic = this.location.dynamic;
         let spawns = dynamic.spawns ?? [];
         spawns.forEach((spawn, index) => {
@@ -224,6 +226,7 @@ export class spawnCTRL {
             toRegion: false,
             AI_SPAWN_INFO: spawn,
             spawn_id: spawn.index,
+            spawn_key: spawn.key,
             initial_equipment: spawn.equipment,
         };
 
@@ -238,10 +241,10 @@ export class spawnCTRL {
     }
 
     removeEntity(entity) {
-        //console.log(this.spawnsAmount, entity.AI_SPAWN_INFO.spawnIndex);
+        //console.log("[removeEntity]", this.spawnsAmount, entity.AI_SPAWN_INFO);
 
         if (entity.AI_SPAWN_INFO) {
-            this.spawnsAmount[entity.AI_SPAWN_INFO.spawnIndex]--;
+            this.spawnsAmount[entity.AI_SPAWN_INFO.key]--;
             this._state.entities.delete(entity.sessionId);
         }
     }

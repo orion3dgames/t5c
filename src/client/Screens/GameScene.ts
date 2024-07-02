@@ -1,7 +1,6 @@
-import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
-import { Vector2, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
@@ -16,31 +15,28 @@ import { Room } from "colyseus.js";
 import { NavMesh } from "../../shared/Libs/yuka-min";
 
 import { createConvexRegionHelper } from "../Utils/navMeshHelper";
-import { mergeMesh } from "../Entities/Common/MeshHelper";
 import { GameController } from "../Controllers/GameController";
 import loadNavMeshFromString from "../Utils/loadNavMeshFromString";
 import { PlayerInputs, ServerMsg } from "../../shared/types";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VatController } from "../Controllers/VatController";
-import { SceneOptimizer, SceneOptimizerOptions } from "@babylonjs/core/Misc/sceneOptimizer";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
-import { RenderTargetTexture } from "@babylonjs/core/Materials/Textures/renderTargetTexture";
 import { PlayerCamera } from "../Entities/Player/PlayerCamera";
-import { WaterMaterial } from "@babylonjs/materials/water/waterMaterial";
+import { SoundController } from "../Controllers/SoundController";
 
 export class GameScene {
     public _game: GameController;
     public _scene: Scene;
     public _input: PlayerInput;
-    public _ui;
+    public _ui: UserInterface;
     public _shadow: ShadowGenerator;
     public _navMesh: NavMesh;
     public _navMeshDebug;
-    public _camera;
+    public _camera: PlayerCamera;
+    public _sound: SoundController;
 
     public _roomId: string;
     public room: Room<any>;
@@ -91,7 +87,7 @@ export class GameScene {
 
         // add background  color
         let color = location.skyColor;
-        scene.clearColor = new Color4(color[0],color[1],color[2],color[3],); 
+        scene.clearColor = new Color4(color[0], color[1], color[2], color[3]);
 
         if (this._game.config.SHADOW_ON === true) {
             // shadow light
@@ -115,7 +111,6 @@ export class GameScene {
 
         // add sky
         if (location.sun) {
-
             // skybox
             const skybox = MeshBuilder.CreateBox("skyBox", { size: 1000.0 }, scene);
             const skyboxMaterial = new StandardMaterial("skyBox", scene);
@@ -135,7 +130,6 @@ export class GameScene {
 
         // add fog
         if (location.fog === true) {
-            
             scene.fogMode = Scene.FOGMODE_LINEAR;
             scene.fogStart = 70.0;
             scene.fogEnd = 200.0;
@@ -206,6 +200,10 @@ export class GameScene {
         // setup input Controller
         this._input = new PlayerInput(this);
         this._camera = new PlayerCamera(this);
+        this._sound = new SoundController(this);
+
+        // start music controller
+        this._sound.play(this._game.currentLocation.music, true);
 
         ////////////////////////////////////////////////////
         //  when a entity joins the room event

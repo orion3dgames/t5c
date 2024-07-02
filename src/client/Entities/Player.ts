@@ -1,11 +1,11 @@
-import { PointerEventTypes, PointerInfo } from "@babylonjs/core/Events/pointerEvents";
+import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PlayerCamera } from "./Player/PlayerCamera";
 import { EntityActions } from "./Entity/EntityActions";
 import { Entity } from "./Entity";
 import State from "../../client/Screens/Screens";
 import { Ability, ServerMsg } from "../../shared/types";
 import { GameScene } from "../Screens/GameScene";
+import { SoundController } from "../Controllers/SoundController";
 
 export class Player extends Entity {
     public game;

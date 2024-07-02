@@ -9,7 +9,8 @@ export class SoundController {
         this._game = game;
     }
 
-    play(key: string, loop: false): void {
+    play(key: string, loop: boolean = false): void {
+        console.log("[SOUND] playing " + key);
         // start  music
         let soundData = this._game._loadedAssets[key];
         let sound = new Sound(
