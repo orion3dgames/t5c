@@ -29,6 +29,10 @@ export class Player extends Entity {
 
     public input_sequence: number = 0;
 
+    // sounds
+    public footstepInterval = 400;
+    public footstepCurrent = 0;
+
     constructor(name, scene, gamescene: GameScene, entity) {
         super(name, scene, gamescene, entity);
 
@@ -291,6 +295,13 @@ export class Player extends Entity {
             this._ui._RessurectBox.close();
             this.isDeadUI = false;
         }
+
+        if (this.isMoving && this.footstepCurrent > this.footstepInterval) {
+            this._gamescene._sound.play("SOUND_player_walking");
+            this.footstepCurrent = 0;
+        }
+
+        this.footstepCurrent += delta;
     }
 
     public updateSlowRate(delta: any): void {

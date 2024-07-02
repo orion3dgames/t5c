@@ -1,6 +1,6 @@
 import { BrainSchema, LootSchema } from "../schema";
 import { GameRoom } from "../GameRoom";
-import { EntityState, PlayerSlots, Speed } from "../../../shared/types";
+import { EntityState, Speed } from "../../../shared/types";
 import { nanoid } from "nanoid";
 import Logger from "../../utils/Logger";
 import { randomNumberInRange } from "../../../shared/Utils";
@@ -12,28 +12,28 @@ export class spawnCTRL {
     private _room: GameRoom;
     public location;
     private spawnsAmount = [];
-
     private SPAWN_RATE = 10;
     private SPAWN_INTERVAL = 300;
     private SPAWN_CURRENT = 0;
-
-    private DESPAWN = false;
 
     constructor(state: GameRoomState) {
         this._state = state;
         this._room = state._gameroom;
         this.location = this._state.gameData.get("location", this._room.metadata.location);
 
+        // add fake item for testing purposes
+        if (this.location.key === "lh_town") {
+            // add items to the ground
+            for (let i = 0; i < 400; i++) {
+                this.createItem();
+            }
+        }
+
         //
         this.process();
     }
 
     public debug_bots() {
-        // add items to the ground
-        for (let i = 0; i < 400; i++) {
-            this.createItem();
-        }
-
         // added npc's
         let Items = this._state.gameData.load("items");
         let keys = Object.keys(Items);
@@ -241,11 +241,9 @@ export class spawnCTRL {
     }
 
     removeEntity(entity) {
-        //console.log("[removeEntity]", this.spawnsAmount, entity.AI_SPAWN_INFO);
-
         if (entity.AI_SPAWN_INFO) {
             this.spawnsAmount[entity.AI_SPAWN_INFO.key]--;
-            this._state.entities.delete(entity.sessionId);
         }
+        this._state.entities.delete(entity.sessionId);
     }
 }
