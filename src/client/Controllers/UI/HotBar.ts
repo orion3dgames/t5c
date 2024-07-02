@@ -111,14 +111,13 @@ export class HotBar {
                 }
 
                 if (hotbarData) {
-                    this.addAbilityIcon(data.digit, data, hotbarData, abilityRect[data.digit]);
+                    this.addIcon(data.digit, data, hotbarData, abilityRect[data.digit]);
                 }
             });
         }
     }
 
-    addAbilityIcon(digit, hotbar, hotbarData, headlineRect: Rectangle) {
-        var imageData = this._game._loadedAssets[hotbarData.icon];
+    addIcon(digit, hotbar, hotbarData, headlineRect: Rectangle) {
         var img = new Image("ability_image_" + digit, "./images/icons/" + hotbarData.icon + ".png");
         img.stretch = Image.STRETCH_FILL;
         headlineRect.addControl(img);
@@ -164,7 +163,6 @@ export class HotBar {
         abilityNumber.addControl(roomTxt);
 
         // add cooldown
-        // container
         var abilityCooldown = new Rectangle("ability_" + digit + "_cooldown");
         abilityCooldown.top = 0;
         abilityCooldown.left = 0;

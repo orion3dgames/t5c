@@ -41,7 +41,7 @@ export class DebugBox {
     }
 
     _createUI() {
-        const debugPanel = generatePanel("debugPanel", "160px;", "260px", "-100dpx", "-15px");
+        const debugPanel = generatePanel("debugPanel", "160px;", "260px", "-100px", "-15px");
         debugPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
         debugPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         debugPanel.isVisible = false;
