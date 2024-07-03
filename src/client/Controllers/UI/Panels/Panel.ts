@@ -197,6 +197,10 @@ export class Panel {
         }
     }
 
+    public isOpen(): boolean {
+        return this._panel.isVisible;
+    }
+
     // update panel
     public update() {}
 

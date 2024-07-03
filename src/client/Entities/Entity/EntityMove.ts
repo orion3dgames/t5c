@@ -79,23 +79,20 @@ export class EntityMove {
         this.playerInputs.push(latestInput);
     }
 
-    // move transform node
-    public tween(tween: number = 0.1): void {
+    // update loop
+    public update(tween: number = 0.1): void {
         // continuously lerp between current position and next position
         this._node.position = Vector3.Lerp(this._node.position, this.nextPosition, tween);
 
-        // move camera at the same time
-        if (this._node.isCurrentPlayer) {
-            // this._node.cameraController._camRoot.position = Vector3.Lerp(this._node.cameraController._camRoot.position, this.nextPosition, tween);
+        // continuously lerp between current rotation and next rotation
+        const gap = Math.abs(this._node.rotation.y - this.nextRotation.y);
+        if (gap > Math.PI) {
+            this._node.rotation.y = this.nextRotation.y;
+        } else {
+            this._node.rotation = Vector3.Lerp(this._node.rotation, this.nextRotation, 0.45);
         }
 
-        // rotation
-        // TODO DAYD : make it better
-        // maybe look into Scalar.LerpAngle ??? https://doc.babylonjs.com/typedoc/classes/BABYLON.Scalar#LerpAngle
-        const gap = Math.abs(this._node.rotation.y - this.nextRotation.y);
-        if (gap > Math.PI) this._node.rotation.y = this.nextRotation.y;
-        else this._node.rotation = Vector3.Lerp(this._node.rotation, this.nextRotation, 0.45);
-        // camera
+        // rotate camera to copy player rotation
         if (this._node.isCurrentPlayer) {
             this._node.cameraController._camRoot.rotation.y = -this._node.rotation.y + this._game.deltaCamY;
         }

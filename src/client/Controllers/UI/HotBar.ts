@@ -131,7 +131,7 @@ export class HotBar {
         });
 
         headlineRect.onPointerClickObservable.add(() => {
-            if (!this._currentPlayer.isCasting) {
+            if (!this._currentPlayer.abilityController.isCasting) {
                 this._game.sendMessage(ServerMsg.PLAYER_HOTBAR_ACTIVATED, {
                     senderId: this._room.sessionId,
                     targetId: this._game?.selectedEntity?.sessionId ?? false,
