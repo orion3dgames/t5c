@@ -63,8 +63,8 @@ let RacesDB: raceDataMap = {
         rotationFix: Math.PI,
         baseHealth: 50,
         baseMana: 50,
-        healthRegen: 0.1,
-        manaRegen: 0.1, // per second
+        healthRegen: 5,
+        manaRegen: 5, // per second
         experienceGain: { min: 0, max: 0 },
         goldGain: { min: 0, max: 0 },
         drops: [],

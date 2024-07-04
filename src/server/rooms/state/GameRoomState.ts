@@ -11,6 +11,7 @@ import { GameRoom } from "../GameRoom";
 import { NavMesh, Vector3 } from "../../../shared/Libs/yuka-min";
 import Logger from "../../utils/Logger";
 import { ItemClass, ServerMsg, Speed } from "../../../shared/types";
+import { Config } from "../../../shared/Config";
 
 export class GameRoomState extends Schema {
     // networked variables
@@ -34,7 +35,7 @@ export class GameRoomState extends Schema {
     public entityCTRL: entityCTRL;
     public gameData: gameDataCTRL;
 
-    public config;
+    public config: Config;
     public roomDetails;
 
     private spawnTimer = 0;

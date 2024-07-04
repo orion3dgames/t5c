@@ -224,6 +224,10 @@ export class EntitySelectedBar {
         let manaWidth = entity.mana / entity.maxMana;
         this._manaBarInside.width = manaWidth;
         this._manaBarText.text = mana + "/" + entity.maxMana;
+
+        // update data
+        this._entityNameTxt.text = entity.name;
+        this._entityLevelTxt.text = "Lvl " + entity.level;
     }
 
     // refresh panel
