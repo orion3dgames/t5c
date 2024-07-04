@@ -57,9 +57,6 @@ export class GameScene {
         // app
         this._game = game;
 
-        // show loading screen
-        this._game.engine.displayLoadingUI();
-
         // create scene
         let scene = new Scene(this._game.engine);
 
@@ -316,7 +313,7 @@ export class GameScene {
                 // add to entities
                 this._entities.set(this.toSpawnPlayer.sessionId, _player);
 
-                // player is loaded, let's hide the loading gui
+                // hide
                 this._game.engine.hideLoadingUI();
 
                 // only do it once
