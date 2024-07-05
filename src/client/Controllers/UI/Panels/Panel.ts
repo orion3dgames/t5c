@@ -183,8 +183,10 @@ export class Panel {
         // if already open, close panel
         if (visible) {
             this._panel.isVisible = false;
+            this._game.gamescene._sound.play("SOUND_dialog_close");
         } else {
             this._panel.isVisible = true;
+            this._game.gamescene._sound.play("SOUND_dialog_open");
         }
     }
 
@@ -195,6 +197,8 @@ export class Panel {
         if (this.vendor) {
             this.vendor.sellingModeOff();
         }
+
+        this._game.gamescene._sound.play("SOUND_dialog_close");
     }
 
     public isOpen(): boolean {

@@ -191,6 +191,9 @@ export class GameScene {
     }
 
     private async _initGame() {
+        // so we can access it later
+        this._game.gamescene = this;
+
         // setup interface
         this._ui = new UserInterface(this._game, this._entities, this._currentPlayer);
 
@@ -283,8 +286,7 @@ export class GameScene {
 
             // game update loop
             if (currentTime - lastUpdates.PING.TIME >= lastUpdates.PING.RATE) {
-                // send ping to server
-                this._game.sendMessage(ServerMsg.PING);
+                this._game.sendMessage(ServerMsg.PING); // send ping to server
                 lastUpdates.PING.TIME = currentTime;
             }
 
