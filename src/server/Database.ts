@@ -289,13 +289,13 @@ class Database {
             20,
             20,
             20,
-            //"training_ground",
-            "lh_town",
+            "training_ground",
+            //"lh_town",
 
             "6.18",
             "0.1",
             "-11.21",
-            "1.72",
+            "2.08",
 
             "1",
             "0",
@@ -307,7 +307,7 @@ class Database {
         ]));
 
         // add default abilities
-        let abilities = [{ key: "base_attack" }, { key: "fire_dart" }];
+        let abilities = [{ key: "base_attack" }, { key: "fire_dart" }, { key: "fire_dart" }];
         abilities.forEach((ability) => {
             const sql_abilities = `INSERT INTO character_abilities ("owner_id", "key") VALUES ("${c.id}", "${ability.key}")`;
             this.run(sql_abilities);
@@ -317,6 +317,8 @@ class Database {
         let hotbar = [
             { digit: 1, type: "ability", key: "base_attack" },
             { digit: 2, type: "ability", key: "fire_dart" },
+            { digit: 3, type: "ability", key: "poison" },
+            { digit: 4, type: "ability", key: "light_heal" },
             { digit: 8, type: "item", key: "potion_small_red" },
             { digit: 9, type: "item", key: "potion_small_blue" },
         ];
@@ -340,10 +342,10 @@ class Database {
         let items = [
             { qty: 5, key: "potion_small_red" },
             { qty: 5, key: "potion_small_blue" },
-            //{ qty: 1, key: "sword_01" },
-            //{ qty: 1, key: "armor_01" },
-            //{ qty: 1, key: "armor_02" },
-            //{ qty: 1, key: "amulet_01" },
+            { qty: 1, key: "sword_01" },
+            { qty: 1, key: "armor_01" },
+            { qty: 1, key: "armor_02" },
+            { qty: 1, key: "amulet_01" },
         ];
         items.forEach((item) => {
             const sql = `INSERT INTO character_inventory ("owner_id", "qty", "order", "key") VALUES ("${c.id}", "${item.qty}", "1", "${item.key}")`;

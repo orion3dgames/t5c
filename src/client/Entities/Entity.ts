@@ -177,7 +177,8 @@ export class Entity extends TransformNode {
 
             // if taking damage, show damage bubble
             if (this.health !== this.entity.health) {
-                this.nameplateController.addDamageBubble();
+                this.entity.health = this.health; // TODO: REMOVE
+                //this.nameplateController.addDamageBubble();
             }
 
             if (this.type === "player" && this.anim_state !== this.entity.anim_state) {

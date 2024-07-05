@@ -12,8 +12,8 @@ export class EntityNamePlate {
     private _scene: Scene;
     private _entity: Entity | Item;
     private damageBubbles: any = [];
-    private font_size = 40;
-    private font = "bold 40px gamefont";
+    private font_size = 50;
+    private font = "bold 50px gamefont";
 
     private currentMessage;
     private messageTimeout;
@@ -252,7 +252,7 @@ export class EntityNamePlate {
 
         let text = "" + healthChange;
         let color = healthChange > 0 ? Color3.Green().toHexString() : Color3.Yellow().toHexString(); // set current color
-        let { planeWidth, planeHeight, texture, material } = this.createMaterial(0.4, 1.5, text);
+        let { planeWidth, planeHeight, texture, material } = this.createMaterial(0.4, 1, text);
         let entity_height = this.getEntityheight(offset_y);
 
         // create plane

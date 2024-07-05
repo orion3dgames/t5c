@@ -76,7 +76,6 @@ export class abilitiesCTRL {
         // make sure ability exists
         if (!ability) {
             return false;
-            3;
         }
 
         // cancel any existing auto attack
@@ -90,6 +89,7 @@ export class abilitiesCTRL {
         // if there is a minRange, set target as target
         if (ability.minRange > 0 && owner.AI_TARGET != target) {
             console.log("minRange > 0");
+            ability.digit = digit;
             owner.AI_TARGET = target;
             owner.AI_ABILITY = ability; // store ability to use once user gets close enough
             return false;
@@ -228,6 +228,7 @@ export class abilitiesCTRL {
 
     // process target affected properties
     affectTarget(target, owner, ability) {
+        let healthDamage = 0;
         ability.targetPropertyAffected.forEach((p) => {
             // get min and max damage
             let base_min = p.min;
@@ -242,7 +243,12 @@ export class abilitiesCTRL {
             let amount = this.affect(p.type, target[p.key], base_damage);
 
             target[p.key] = amount;
+
+            if (p.key === "health") {
+                healthDamage = base_damage;
+            }
         });
+        return healthDamage;
     }
 
     // start cooldown
@@ -262,7 +268,7 @@ export class abilitiesCTRL {
      * @param digit
      */
     castAbility(owner, target, ability: Ability, digit) {
-        //console.log("castAbility", digit, ability);
+        console.log("castAbility", digit, ability);
 
         // rotate sender to face target
         owner.rot = owner.moveCTRL.calculateRotation(owner.getPosition(), target.getPosition());
@@ -276,10 +282,11 @@ export class abilitiesCTRL {
         this.affectCaster(owner, ability);
 
         //
+        let healthDamage = 0;
         if (ability.repeat > 0) {
             let repeat = 1;
             let timer = setInterval(() => {
-                this.affectTarget(target, owner, ability);
+                healthDamage = this.affectTarget(target, owner, ability);
                 if (target.isEntityDead()) {
                     this.processDeath(owner, target);
                     clearInterval(timer);
@@ -290,7 +297,7 @@ export class abilitiesCTRL {
                 repeat += 1;
             }, ability.repeatInterval);
         } else {
-            this.affectTarget(target, owner, ability);
+            healthDamage = this.affectTarget(target, owner, ability);
         }
 
         //
@@ -307,6 +314,7 @@ export class abilitiesCTRL {
             fromPos: owner.getPosition(),
             targetId: target.sessionId,
             targetPos: target.getPosition(),
+            damage: healthDamage,
         });
 
         // removing any casting timers
@@ -315,7 +323,7 @@ export class abilitiesCTRL {
         }
 
         // play animation
-        owner.animationCTRL.playAnim(owner, ability.animation);
+        //owner.animationCTRL.playAnim(owner, ability.animation);
 
         // if target is dead, process target death
         if (target.isEntityDead()) {
@@ -366,6 +374,7 @@ export class abilitiesCTRL {
         if (!owner || !target || !ability) {
             return false;
         }
+
         //console.log("START AUTO ATTACK");
         this.doAutoAttack(owner, target, ability);
         this.attackTimer = setInterval(() => {
@@ -374,11 +383,13 @@ export class abilitiesCTRL {
     }
 
     doAutoAttack(owner, target, ability) {
-        //console.log("AUTO ATTACK");
         // only auto attack if entity has a target
         if (target !== null) {
-            owner.anim_state = EntityState.ATTACK;
-            this.castAbility(owner, target, ability, 1);
+            //owner.anim_state = ability.animation;
+            this.castAbility(owner, target, ability, ability.digit);
+        } else {
+            // cancel any existing auto attack
+            this.cancelAutoAttack(owner);
         }
     }
 

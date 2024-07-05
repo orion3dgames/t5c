@@ -8,6 +8,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { nanoid } from "nanoid";
 import { GameScene } from "../../Screens/GameScene";
+import { EntityState } from "../../../shared/types";
 
 export class EntityActions {
     private _gamescene: GameScene;
@@ -72,6 +73,11 @@ export class EntityActions {
         //
         let source = this._entities.get(data.fromId);
         let target = this._entities.get(data.targetId);
+
+        // set effect
+        if (ability.effect.type === "target") {
+            source.anim_state = EntityState.ATTACK;
+        }
 
         // set effect
         if (ability.effect.particule === "fireball") {

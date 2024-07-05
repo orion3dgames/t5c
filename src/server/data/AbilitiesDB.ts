@@ -24,6 +24,29 @@ let AbilitiesDB: abilityMap = {
         targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 2, max: 5 }],
     },
 
+    side_attack: {
+        title: "Side Attack",
+        key: "side_attack",
+        icon: "ICON_ABILITY_base_attack",
+        sound: "enemy_attack_2",
+        description: "A unimpressive attack that deals very little damage.",
+        castSelf: false,
+        castTime: 0,
+        cooldown: 1000,
+        repeat: 0,
+        repeatInterval: 0,
+        range: 0,
+        minRange: 3,
+        animation: EntityState.ATTACK,
+        effect: {
+            type: "target",
+            particule: "damage",
+            color: "white",
+        },
+        casterPropertyAffected: [],
+        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 2, max: 5 }],
+    },
+
     fire_dart: {
         //-((1d17+6+self.int/23)*self.fire/target.r_fire)
         title: "Fire dart",

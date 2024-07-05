@@ -196,7 +196,7 @@ export class EntityAnimator {
         this.setAnimationParameters(itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim);
     }
 
-    refreshAnimation(){
+    refreshAnimation() {
         this._prevAnim = false;
     }
 }
