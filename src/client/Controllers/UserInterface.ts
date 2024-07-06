@@ -245,14 +245,6 @@ export class UserInterface {
 
     // update every server tick
     public update() {
-        if (this._targetEntitySelectedBar) {
-            this._targetEntitySelectedBar.update();
-        }
-
-        if (this._playerEntitySelectedBar) {
-            this._playerEntitySelectedBar.update();
-        }
-
         if (this._Tooltip) {
             this._Tooltip.update();
         }
@@ -264,6 +256,14 @@ export class UserInterface {
     // runs in the afterRender callback.
     // update every 1000ms
     public slow_update() {
+        if (this._targetEntitySelectedBar) {
+            this._targetEntitySelectedBar.update();
+        }
+
+        if (this._playerEntitySelectedBar) {
+            this._playerEntitySelectedBar.update();
+        }
+
         if (this._DebugBox) {
             this._DebugBox.update();
         }

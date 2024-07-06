@@ -8,6 +8,7 @@ import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { Room } from "colyseus.js";
 import { Config } from "../../shared/Config";
 import { ServerMsg } from "../../shared/types";
+import { GameScene } from "../Screens/GameScene";
 
 export class GameController {
     // core
@@ -20,6 +21,7 @@ export class GameController {
     public state: number = 0;
     public currentScene;
     public nextScene;
+    public gamescene: GameScene;
 
     // all user data
     public currentSessionID: string;
@@ -269,7 +271,6 @@ export class GameController {
 
     // set character
     public setCharacter(character) {
-        console.log(character);
         this._currentCharacter = character;
         this.currentLocationKey = character.location;
         this.currentLocation = this.getGameData("location", character.location);
@@ -291,7 +292,7 @@ export class GameController {
 
     public sendMessage(type: ServerMsg, data: {} = {}) {
         let message = {
-            //date: new Date().getTime(),
+            date: new Date().getTime(),
         };
         if (Object.keys(data).length) {
             for (const [key, value] of Object.entries(data)) {

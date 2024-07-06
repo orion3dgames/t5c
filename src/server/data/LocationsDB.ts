@@ -364,9 +364,10 @@ let LocationsDB = {
                     race: "skeleton_01",
                     material: 0,
                     name: "Skeleton",
-                    baseHealth: 20,
+                    baseHealth: 30,
                     baseSpeed: Speed.VERY_SLOW,
                     equipment: [],
+                    experienceGain: { min: 2000, max: 5000 },
                 },
 
                 {
@@ -405,6 +406,7 @@ let LocationsDB = {
                             slot: PlayerSlots.WEAPON,
                         },
                     ],
+                    experienceGain: { min: 2000, max: 2500 },
                 },
             ],
         },

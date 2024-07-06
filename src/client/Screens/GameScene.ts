@@ -57,9 +57,6 @@ export class GameScene {
         // app
         this._game = game;
 
-        // show loading screen
-        this._game.engine.displayLoadingUI();
-
         // create scene
         let scene = new Scene(this._game.engine);
 
@@ -194,6 +191,9 @@ export class GameScene {
     }
 
     private async _initGame() {
+        // so we can access it later
+        this._game.gamescene = this;
+
         // setup interface
         this._ui = new UserInterface(this._game, this._entities, this._currentPlayer);
 
@@ -286,8 +286,7 @@ export class GameScene {
 
             // game update loop
             if (currentTime - lastUpdates.PING.TIME >= lastUpdates.PING.RATE) {
-                // send ping to server
-                this._game.sendMessage(ServerMsg.PING);
+                this._game.sendMessage(ServerMsg.PING); // send ping to server
                 lastUpdates.PING.TIME = currentTime;
             }
 
@@ -316,7 +315,7 @@ export class GameScene {
                 // add to entities
                 this._entities.set(this.toSpawnPlayer.sessionId, _player);
 
-                // player is loaded, let's hide the loading gui
+                // hide
                 this._game.engine.hideLoadingUI();
 
                 // only do it once

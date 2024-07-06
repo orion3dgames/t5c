@@ -5,19 +5,13 @@ import { Entity } from "./Entity";
 import State from "../../client/Screens/Screens";
 import { Ability, ServerMsg } from "../../shared/types";
 import { GameScene } from "../Screens/GameScene";
-import { SoundController } from "../Controllers/SoundController";
+import { PlayerAbility } from "./Player/PlayerAbility";
 
 export class Player extends Entity {
     public game;
     public entities;
     public interval;
-
-    public isCasting: boolean = false;
-    public castingDigit: number = 0;
-    public castingTimer;
-    public castingElapsed: number = 0;
-    public castingTarget: number = 0;
-    public ability_in_cooldown;
+    public abilityController: PlayerAbility;
 
     public onPointerObservable;
 
@@ -40,8 +34,6 @@ export class Player extends Entity {
 
         this._input = gamescene._input;
 
-        this.ability_in_cooldown = [false, false, false, false, false, false, false, false, false, false, false];
-
         this.type = "player";
 
         this.spawnPlayer();
@@ -52,6 +44,7 @@ export class Player extends Entity {
         this.cameraController = this._gamescene._camera;
         this.cameraController.attach(this);
         this.actionsController = new EntityActions(this._scene, this._game._loadedAssets, this.entities, this._gamescene);
+        this.abilityController = new PlayerAbility(this);
 
         // register player server messages
         this.registerServerMessages();
@@ -86,9 +79,6 @@ export class Player extends Entity {
                 }
             }
         });
-
-        // add chat label
-        //this.characterChatLabel = this._ui.createEntityChatLabel(this);
     }
 
     getMeshMetadata(pointerInfo) {
@@ -216,13 +206,9 @@ export class Player extends Entity {
         // run super function first
         super.update(delta);
 
+        // action controller
         if (this.actionsController) {
             this.actionsController.update();
-        }
-
-        if (this && this.moveController) {
-            // tween entity
-            this.moveController.tween();
         }
 
         // update camera
@@ -239,68 +225,28 @@ export class Player extends Entity {
             this.moveController.processMove();
         }
 
-        ///////////// ABILITY & CASTING EVENTS ///////////////////////////
-        // if digit pressed
-        if (this._input.digit_pressed > 0 && !this.isCasting) {
-            // get all necessary vars
-            let digit = this._input.digit_pressed;
-            let target = this._game.selectedEntity;
-
-            // send to server
-            this._game.sendMessage(ServerMsg.PLAYER_HOTBAR_ACTIVATED, {
-                senderId: this._room.sessionId,
-                targetId: target ? target.sessionId : false,
-                digit: digit,
-            });
-
-            // clear digit
-            this._input.digit_pressed = 0;
+        if (this.abilityController) {
+            this.abilityController.update(delta);
         }
-
-        // check if casting
-        if (this.isCasting === true) {
-            // increment casting timer
-            this._ui._CastingBar.open();
-            this.castingElapsed += delta; // increment casting timer by server delta
-            let widthInPercentage = ((this.castingElapsed / this.castingTarget) * 100) / 100; // percentage between 0 and 1
-            let text = this.castingElapsed + "/" + this.castingTarget;
-            let width = widthInPercentage;
-            this._ui._CastingBar.update(text, width);
-        }
-
-        // check for cooldowns (estethic only as server really controls cooldowns)
-        this.ability_in_cooldown.forEach((cooldown, digit) => {
-            if (cooldown > 0) {
-                let cooldownUI = this._ui.MAIN_ADT.getControlByName("ability_" + digit + "_cooldown");
-                let ability = this.getAbilityByDigit(digit) as Ability;
-                if (ability && cooldownUI) {
-                    this.ability_in_cooldown[digit] -= delta;
-                    let percentage = ((this.ability_in_cooldown[digit] / ability.cooldown) * 100) / 100;
-                    cooldownUI.height = percentage;
-                }
-            }
-        });
-
-        ///////////// RESSURECT EVENTS ///////////////////////////
-        // if dead
+        // if dead, show ressurect panel
         if (!this.isDeadUI && this.health < 1) {
             this._ui._RessurectBox.open();
             this.cameraController.vfx_black_and_white_on();
             this.isDeadUI = true;
         }
 
-        // if ressurect
+        // if ressurected, hide panel
         if (this.isDeadUI && this.health > 0) {
             this.cameraController.vfx_black_and_white_off();
             this._ui._RessurectBox.close();
             this.isDeadUI = false;
         }
 
+        // sounds
         if (this.isMoving && this.footstepCurrent > this.footstepInterval) {
             this._gamescene._sound.play("SOUND_player_walking");
             this.footstepCurrent = 0;
         }
-
         this.footstepCurrent += delta;
     }
 
@@ -364,38 +310,6 @@ export class Player extends Entity {
         });
     }
 
-    public getAbilityByDigit(digit): Ability | boolean {
-        let found = false;
-        this.player_data.hotbar.forEach((element) => {
-            if (element.digit === digit) {
-                found = this._game.getGameData("ability", element.key);
-            }
-        });
-        return found;
-    }
-
-    // player is casting
-    public startCasting(data) {
-        let digit = data.digit;
-        let ability = this.getAbilityByDigit(digit) as Ability;
-        if (ability) {
-            this.isCasting = true;
-            this.castingElapsed = 0;
-            this.castingTarget = ability.castTime;
-            this.castingDigit = digit;
-            this._ui._CastingBar.open();
-        }
-    }
-
-    // player cancel casting
-    public stopCasting(data) {
-        this.isCasting = false;
-        this.castingElapsed = 0;
-        this.castingTarget = 0;
-        this.castingDigit = 0;
-        this._ui._CastingBar.close();
-    }
-
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
@@ -403,45 +317,31 @@ export class Player extends Entity {
 
     public registerServerMessages() {
         this._room.onMessage(ServerMsg.SERVER_MESSAGE, (data) => {
+            console.log("ServerMsg.SERVER_MESSAGE", data);
             this._ui._ChatBox.addNotificationMessage(data.type, data.message, data.message);
         });
 
         // on teleport confirmation
         this._room.onMessage(ServerMsg.PLAYER_TELEPORT, (location) => {
-            console.log(location);
+            console.log("ServerMsg.PLAYER_TELEPORT", location);
             this.teleport(location);
         });
 
         // server confirm player can start casting
         this._room.onMessage(ServerMsg.PLAYER_CASTING_START, (data) => {
             console.log("ServerMsg.PLAYER_CASTING_START", data);
-            this.startCasting(data);
+            this.abilityController.startCasting(data);
         });
 
         this._room.onMessage(ServerMsg.PLAYER_CASTING_CANCEL, (data) => {
             console.log("ServerMsg.PLAYER_CASTING_CANCEL", data);
-            this.stopCasting(data);
+            this.abilityController.stopCasting(data);
         });
 
         // server confirms ability can be cast
         this._room.onMessage(ServerMsg.PLAYER_ABILITY_CAST, (data) => {
             console.log("ServerMsg.PLAYER_ABILITY_CAST", data);
-            let digit = data.digit;
-            let ability = this.getAbilityByDigit(digit) as Ability;
-            if (ability) {
-                // if you are sender, cancel casting and strat cooldown on client
-                if (data.fromId === this.sessionId) {
-                    // cancel casting
-                    this.castingElapsed = 0;
-                    this.castingTarget = 0;
-                    this.isCasting = false;
-                    this._ui._CastingBar.close();
-                    this.ability_in_cooldown[digit] = ability.cooldown; // set cooldown
-                }
-
-                // action ability
-                this.actionsController.process(this, data, ability);
-            }
+            this.abilityController.processServerCasting(data);
         });
     }
 

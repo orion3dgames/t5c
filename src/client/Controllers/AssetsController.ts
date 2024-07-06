@@ -58,16 +58,14 @@ export class AssetsController {
 
         // set list of assets
         this.assetDatabase = [
-            // sounds
-
-            //{ name: "SOUND_enemy_attack_1", filename: "enemy_attack_1.wav", extension: "wav" },
-            //{ name: "SOUND_enemy_attack_2", filename: "enemy_attack_2.wav", extension: "wav" },
-            //{ name: "SOUND_fire_attack_1", filename: "fire_attack_1.wav", extension: "wav" },
-            //{ name: "SOUND_fire_attack_2", filename: "fire_attack_2.wav", extension: "wav" },
-            //{ name: "SOUND_heal_1", filename: "heal_1.wav", extension: "wav" },
+            // music
             { name: "MUSIC_01", filename: "music.mp3", extension: "mp3", type: "sound" },
+
+            // sounds
             { name: "SOUND_player_walking", filename: "player_walking.wav", extension: "wav", type: "sound" },
             { name: "SOUND_fire_attack_1", filename: "fire_attack_1.wav", extension: "wav", type: "sound" },
+            { name: "SOUND_dialog_close", filename: "dialog_close.wav", extension: "wav", type: "sound" },
+            { name: "SOUND_dialog_open", filename: "dialog_open.wav", extension: "wav", type: "sound" },
 
             // textures
             { name: "TXT_selected_circle_green", filename: "selected_circle_green.png", extension: "png", type: "texture" },

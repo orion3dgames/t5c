@@ -199,96 +199,41 @@ export class Entity extends TransformNode {
         //////////////////////////////////////////////////////////////////////////
         // misc
         this.nameplate = this.nameplateController.addNamePlate();
-        //this.interactableButtons = this._ui.createInteractableButtons(this);
     }
 
     public update(delta): any {
-        ////////////////////////////////////
-        // what to do when an entity dies
-        if (this.health < 1 && !this.isDead) {
-            this.isDead = true;
-
-            // remove from player selection
-            this._game.selectedEntity = null;
-
-            // remove selected mesh
-            if(this.meshController){
-                this.meshController.selectedMesh.isVisible = false;
-
-                // remove any action managers
-                if (this.meshController.mesh.actionManager) {
-                    this.meshController.mesh.actionManager.dispose();
-                    this.meshController.mesh.actionManager = null;
-                }
-            }
-
-            // hide interactable button
-            if (this.interactableButtons) {
-                this.interactableButtons.isVisible = false;
-            }
-
-            // hide any dialog this entity could be linked too
-            if (this._ui.panelDialog.currentEntity && this._ui.panelDialog.currentEntity.sessionId === this.sessionId) {
-                this._ui.panelDialog.clear();
-                this._ui.panelDialog.close();
-            }
-        }
-
-        ////////////////////////////////////
-        if (this.health > 0) {
-            this.isDead = false;
-        }
-
-        ////////////////////////////////////
-        // animate player continuously
+        // choose entity animation state
         if (this.animatorController) {
             this.animatorController.animate(this);
         }
 
-        ////////////////////////////////////
-        // only do the below if entity is not dead
-        if (!this.isDead) {
-            // if entity is selected, show
-            if (this.selectedMesh && this.selectedMesh.visibility) {
-                if (this._game.selectedEntity && this._game.selectedEntity.sessionId === this.sessionId) {
-                    this.selectedMesh.isVisible = true;
-                    this.selectedMesh.rotate(new Vector3(0, 0.1, 0), 0.01);
-                } else {
-                    this.selectedMesh.isVisible = false;
-                }
-            }
-
-            // if entity has aggro
-            if (this.ai_state === AI_STATE.SEEKING || this.ai_state === AI_STATE.ATTACKING) {
-                if (this.debugMesh) {
-                    this.debugMesh.material = this.debugMaterialActive;
-                }
-            }
-
-            // if entity lose aggro
-            if (this.ai_state === AI_STATE.WANDER) {
-                if (this.debugMesh) {
-                    this.debugMesh.material = this.debugMaterialNeutral;
-                }
-            }
-
-            // tween entity
-            if (this && this.moveController) {
-                this.moveController.tween();
-            }
+        // move update
+        if (this && this.moveController) {
+            this.moveController.update();
         }
 
+        // animate player continuously
         if (this.animatorController) {
-            // animate player continuously
+            // refresh animation ratio
             this.animatorController.refreshAnimationRatio();
 
             // animate player continuously
             this.animatorController.play(this);
         }
 
-        //
+        // update nameplate
         if (this.nameplateController) {
             this.nameplateController.update();
+        }
+
+        // if entity is selected, show
+        if (this.selectedMesh && this.selectedMesh.visibility) {
+            if (this._game.selectedEntity && this._game.selectedEntity.sessionId === this.sessionId) {
+                this.selectedMesh.isVisible = true;
+                this.selectedMesh.rotate(new Vector3(0, 0.1, 0), 0.01);
+            } else {
+                this.selectedMesh.isVisible = false;
+            }
         }
     }
 

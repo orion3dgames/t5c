@@ -193,6 +193,7 @@ export class spawnCTRL {
         let speed = spawn.baseSpeed ?? Speed.MEDIUM;
         let head = spawn.head ?? "Head_Base";
         let material = spawn.material ?? 0;
+        let experienceGain = spawn.experienceGain ?? 0;
 
         // if randomize
         if (spawn.randomize) {
@@ -227,6 +228,7 @@ export class spawnCTRL {
             AI_SPAWN_INFO: spawn,
             spawn_id: spawn.index,
             spawn_key: spawn.key,
+            experienceGain: experienceGain,
             initial_equipment: spawn.equipment,
         };
 

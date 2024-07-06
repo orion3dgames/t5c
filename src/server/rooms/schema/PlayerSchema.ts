@@ -94,6 +94,8 @@ export class PlayerSchema extends Entity {
 
     // TIMER
     public spawnTimer: number = 0;
+    public regenTimer: number = 5000;
+    public regenTimerElapsed: number = 0;
 
     ////////////////////////////
     public AI_TARGET = null; // AI_TARGET will always represent an entity
@@ -114,13 +116,13 @@ export class PlayerSchema extends Entity {
         this.client = this.getClient();
         this.isTeleporting = false;
 
-        // add default
+        // add default race data
         Object.assign(this, this._state.gameData.get("race", data.race));
 
         // add spawn data
         Object.assign(this, data);
 
-        // add default player data
+        // add default player data (from DB)
         Object.entries(data.initial_player_data).forEach(([k, v]) => {
             this.player_data[k] = v;
         });
@@ -182,23 +184,29 @@ export class PlayerSchema extends Entity {
         }
 
         // if not dead
-        if (this.isDead === false) {
+        if (this.isDead === true) {
+            return false;
+        }
+
+        // regen timer 5seconds
+        this.regenTimerElapsed += this._state.config.updateRate;
+        if (this.regenTimerElapsed >= this.regenTimer) {
             // continuously gain mana
             if (this.mana < this.maxMana) {
                 this.mana += this.manaRegen;
             }
-
             // continuously gain health
             if (this.health < this.maxHealth) {
                 this.health += this.healthRegen;
             }
-
-            // update dynamic stuuf
-            this.dynamicCTRL.update();
-
-            // move player
-            this.moveCTRL.update();
+            this.regenTimerElapsed = 0;
         }
+
+        // update dynamic stuuf
+        this.dynamicCTRL.update();
+
+        // move player
+        this.moveCTRL.update();
     }
 
     public getClient() {
@@ -398,8 +406,7 @@ export class PlayerSchema extends Entity {
     }
 
     consumeItem(item) {
-        
-        // process 
+        // process
         for (let stat in item.statModifiers) {
             item.statModifiers[stat].forEach((modifier) => {
                 if (CalculationTypes.ADD === modifier.type) {
@@ -408,7 +415,7 @@ export class PlayerSchema extends Entity {
                 if (CalculationTypes.REMOVE === modifier.type) {
                     this[stat] -= modifier.value;
                 }
-            })
+            });
         }
 
         // reduce item quantity
