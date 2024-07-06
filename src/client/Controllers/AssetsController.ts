@@ -59,7 +59,7 @@ export class AssetsController {
         // set list of assets
         this.assetDatabase = [
             // music
-            { name: "MUSIC_01", filename: "music.mp3", extension: "mp3", type: "sound" },
+            { name: "MUSIC_01", filename: "music_02.mp3", extension: "mp3", type: "sound" },
 
             // sounds
             { name: "SOUND_player_walking", filename: "player_walking.wav", extension: "wav", type: "sound" },

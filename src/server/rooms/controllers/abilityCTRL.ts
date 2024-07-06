@@ -104,7 +104,7 @@ export class abilitiesCTRL {
             });
 
             // play animation
-            owner.animationCTRL.playAnim(owner, EntityState.SPELL_CASTING, true);
+            //owner.animationCTRL.playAnim(owner, EntityState.SPELL_CASTING, true);
 
             // start a timer
             this.player_casting_timer = setTimeout(() => {
@@ -311,9 +311,7 @@ export class abilitiesCTRL {
             key: ability.key,
             digit: digit,
             fromId: owner.sessionId,
-            fromPos: owner.getPosition(),
             targetId: target.sessionId,
-            targetPos: target.getPosition(),
             damage: healthDamage,
         });
 

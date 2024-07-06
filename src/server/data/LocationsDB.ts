@@ -436,7 +436,7 @@ let LocationsDB = {
                     behaviour: "idle",
                     aggressive: true,
                     canAttack: true,
-                    points: [new Vector3(14, 0, -21)],
+                    points: [new Vector3(8.67, 0, -14.59)],
                     amount: 1,
                     baseHealth: 8000,
                     race: "skeleton_01",
