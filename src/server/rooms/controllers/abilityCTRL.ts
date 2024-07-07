@@ -243,10 +243,6 @@ export class abilitiesCTRL {
             let amount = this.affect(p.type, target[p.key], base_damage);
 
             target[p.key] = amount;
-
-            if (p.key === "health") {
-                healthDamage = base_damage;
-            }
         });
         return healthDamage;
     }
@@ -398,10 +394,7 @@ export class abilitiesCTRL {
             // remove target
             owner.AI_TARGET = null;
             owner.AI_ABILITY = null;
-
-            // reset animation
-            owner.animationCTRL.playAnim(owner, EntityState.IDLE);
-
+            
             // remove attack timer
             if (this.attackTimer) {
                 clearInterval(this.attackTimer);

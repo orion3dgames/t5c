@@ -504,7 +504,6 @@ export class PlayerSchema extends Entity {
         this.health = this.maxHealth;
         this.mana = this.maxMana;
         this.blocked = false;
-        this.anim_state = EntityState.IDLE;
         this.gracePeriod = true;
         setTimeout(() => {
             this.gracePeriod = false;

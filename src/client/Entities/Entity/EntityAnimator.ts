@@ -69,26 +69,26 @@ export class EntityAnimator {
 
         this._death = {
             name: "DEATH",
-            index: 1,
-            loop: false,
-            speed: 1,
-            ranges: this.entityData.animationRanges[1],
-        };
-
-        this._idle = {
-            name: "IDLE",
             index: 2,
-            loop: true,
+            loop: false,
             speed: 1,
             ranges: this.entityData.animationRanges[2],
         };
 
-        this._walk = {
-            name: "WALK",
-            index: 3,
+        this._idle = {
+            name: "IDLE",
+            index: 4,
             loop: true,
             speed: 1,
-            ranges: this.entityData.animationRanges[3],
+            ranges: this.entityData.animationRanges[4],
+        };
+
+        this._walk = {
+            name: "WALK",
+            index: 8,
+            loop: true,
+            speed: 1,
+            ranges: this.entityData.animationRanges[8],
         };
 
         this._currentAnim = this._idle;
@@ -127,6 +127,7 @@ export class EntityAnimator {
 
     // determine what animation should be played
     public animate(entity): void {
+
         let currentPos = entity.getPosition();
         let nextPos = entity.moveController.getNextPosition();
         entity.isMoving = false;

@@ -279,6 +279,42 @@ export class EntityNamePlate {
     }
 
     /**
+     * Draw damage bubble above entity
+     * TODO: add instances to improve performance
+     * @param entity
+     */
+    addDamageBubble2(damage, offset_y = 0.2) {
+        // only proceed if damage has occured
+        let healthChange = damage;
+        let text = "" + healthChange;
+        let color = healthChange > 0 ? Color3.Green().toHexString() : Color3.Yellow().toHexString(); // set current color
+        let { planeWidth, planeHeight, texture, material } = this.createMaterial(0.4, 1, text);
+        let entity_height = this.getEntityheight(offset_y);
+
+        // create plane
+        let uuid = generateRandomId(6);
+        var plane = MeshBuilder.CreatePlane("damageBubble_" + uuid, { width: planeWidth, height: planeHeight, sideOrientation: Mesh.DOUBLESIDE }, this._scene);
+        plane.parent = this._entity;
+        plane.position.y = plane.position.y + entity_height;
+        plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
+        plane.material = material;
+
+        // draw text
+        this.drawDynamicTexture(text, texture, color);
+
+        // set meta
+        plane.metadata = {
+            end_position: this._entity.position.y + 6,
+            material: material,
+            texture: texture,
+            offset: randomNumberInRange(-0.002, 0.002),
+        };
+
+        // add to damage bubbles array
+        this.damageBubbles.push(plane);
+    }
+
+    /**
      * Update Loop
      */
     update() {
