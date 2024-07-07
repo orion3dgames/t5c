@@ -147,10 +147,8 @@ export class EntityAnimator {
 
             // todo: I hate this, but I have no idea how to fix this in a better way at this stage...
             if (entity._input && !entity._input.player_can_move) {
-                /*
                 this._currentAnim = this._idle;
                 entity.isMoving = false;
-                */
             }
 
             // else play idle

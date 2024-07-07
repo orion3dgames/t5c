@@ -5,8 +5,13 @@ let RaceVAT = {
         key: "humanoid",
         animations: {
             ATTACK: { name: "1H_Melee_Attack_Chop", duration: 1000, speed: 1 },
+            ATTACK_HORIZONTAL: { name: "1H_Melee_Attack_Slice_Horizontal", duration: 1000, speed: 1 },
             DEATH: { name: "Death_A", duration: 1000, speed: 1 },
+            HIT_A: { name: "Hit_A", duration: 1000, speed: 1 },
             IDLE: { name: "Idle", duration: 1000, speed: 1 },
+            SPELL_CAST: { name: "Spellcast_Shoot", duration: 1000, speed: 1 },
+            SPELL_CASTING: { name: "Spellcasting", duration: 1000, speed: 1 },
+            UNARMED: { name: "Unarmed_Melee_Attack_Punch_A", duration: 1000, speed: 1 },
             WALK: { name: "Walking_B", duration: 1000, speed: 1.3 },
         },
         bones: {
@@ -21,6 +26,7 @@ let RaceVAT = {
                 "Head_Engineer",
                 "Head_Mage",
                 "Head_Rogue",
+                "Head_Paladin",
             ],
             BODY: [
                 "Base_Body", //
@@ -29,7 +35,7 @@ let RaceVAT = {
         },
     },
     rat: {
-        key: "rat",
+        key: "rat_01",
         animations: {
             ATTACK: { name: "Rat_Attack", duration: 1000, speed: 1 },
             DEATH: { name: "Rat_Death", duration: 1000, speed: 1 },
@@ -123,28 +129,6 @@ let RacesDB: raceDataMap = {
         vat: RaceVAT.humanoid,
         materials: [
             { title: "Color 1", material: "skeleton_texture.png" }, //
-        ],
-    },
-
-    rat_01: {
-        key: "rat_01",
-        title: "Rat",
-        description: "To be written...",
-        icon: "ICON_RACE_male_mage",
-        baseHealth: 50,
-        baseMana: 50,
-        healthRegen: 0,
-        manaRegen: 0,
-        experienceGain: { min: 5, max: 10 },
-        goldGain: { min: 4, max: 20 },
-        drops: [],
-        default_abilities: ["base_attack"],
-        speed: 0.1,
-        scale: 0.3,
-        rotationFix: Math.PI,
-        vat: RaceVAT.rat,
-        materials: [
-            { title: "Color 1", material: "knight_texture.png" }, //
         ],
     },
 
