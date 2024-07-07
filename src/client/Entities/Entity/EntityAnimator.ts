@@ -125,8 +125,24 @@ export class EntityAnimator {
             this._currentAnim = this.getAnimation('DEATH');
 
             // if player is attacking
-        } else if (entity.anim_state === EntityState.ATTACK) {
+        } else if (entity.anim_state === EntityState.ATTACK_VERTICAL) {
             this._currentAnim = this.getAnimation('ATTACK');
+
+            // if player is attacking
+        } else if (entity.anim_state === EntityState.UNARMED) {
+            this._currentAnim = this.getAnimation('UNARMED');
+
+            // if player is attacking
+        } else if (entity.anim_state === EntityState.ATTACK_HORIZONTAL) {
+            this._currentAnim = this.getAnimation('ATTACK_HORIZONTAL');
+
+            // if player is attacking
+        } else if (entity.anim_state === EntityState.SPELL_CASTING) {
+            this._currentAnim = this.getAnimation('SPELL_CASTING');
+
+            // if player is attacking
+        } else if (entity.anim_state === EntityState.SPELL_CAST) {
+            this._currentAnim = this.getAnimation('SPELL_CAST');
 
             // if player is moving
         } else if (this.checkIfPlayerIsMoving(currentPos, nextPos) && entity.health > 0) {

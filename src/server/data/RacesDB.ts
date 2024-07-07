@@ -4,14 +4,14 @@ let RaceVAT = {
     humanoid: {
         key: "humanoid",
         animations: {
-            ATTACK: { name: "1H_Melee_Attack_Chop", duration: 1000, speed: 1, loop: false },
-            ATTACK_HORIZONTAL: { name: "1H_Melee_Attack_Slice_Horizontal", duration: 1000, speed: 1, loop: false },
+            ATTACK: { name: "1H_Melee_Attack_Chop", duration: 1000, speed: 1, loop: true },
+            ATTACK_HORIZONTAL: { name: "1H_Melee_Attack_Slice_Horizontal", duration: 1000, speed: 1, loop: true },
             DEATH: { name: "Death_A", duration: 1000, speed: 1, loop: false },
-            HIT_A: { name: "Hit_A", duration: 1000, speed: 1, loop: false },
+            HIT_A: { name: "Hit_A", duration: 1000, speed: 1, loop: true },
             IDLE: { name: "Idle", duration: 1000, speed: 1, loop: true },
-            SPELL_CAST: { name: "Spellcast_Shoot", duration: 1000, speed: 1, loop: false },
-            SPELL_CASTING: { name: "Spellcasting", duration: 1000, speed: 1, loop: false },
-            UNARMED: { name: "Unarmed_Melee_Attack_Punch_A", duration: 1000, speed: 1, loop: false },
+            SPELL_CAST: { name: "Spellcast_Shoot", duration: 1000, speed: 1, loop: true },
+            SPELL_CASTING: { name: "Spellcasting", duration: 1000, speed: 1, loop: true },
+            UNARMED: { name: "Unarmed_Melee_Attack_Punch_A", duration: 1000, speed: 1, loop: true },
             WALK: { name: "Walking_B", duration: 1000, speed: 1.3, loop: true },
         },
         bones: {

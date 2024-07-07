@@ -74,9 +74,14 @@ export class EntityActions {
         let source = this._entities.get(data.fromId);
         let target = this._entities.get(data.targetId);
 
+        // play sound
+        setTimeout(()=>{
+            this._gamescene._sound.play("SOUND_"+ability.sound);
+        }, ability.soundDelay);
+
         // set effect
         if (ability.effect.type === "target") {
-            source.anim_state = EntityState.ATTACK;
+            //source.anim_state = EntityState.ATTACK;
         }
 
         // set effect
@@ -167,8 +172,6 @@ export class EntityActions {
     }
 
     public particule_fireball(source, target, color) {
-        // play sound
-        this._gamescene._sound.play("SOUND_fire_attack_1");
 
         // get local position
         let start = source.getPosition();

@@ -342,14 +342,12 @@ export class Player extends Entity {
         this._room.onMessage(ServerMsg.PLAYER_ABILITY_CAST, (data) => {
             console.log("ServerMsg.PLAYER_ABILITY_CAST", data);
             this.abilityController.processServerCasting(data);
-            //this.anim_state = EntityState.ATTACK;
 
-            //
+            /*
+            //this.anim_state = EntityState.ATTACK;
             let source = this._gamescene._entities.get(data.fromId);
             let target = this._gamescene._entities.get(data.targetId);
-            target?.nameplateController.addDamageBubble2(data.damage);
-
-            
+            target?.nameplateController.addDamageBubble2(data.damage);*/    
         });
     }
 

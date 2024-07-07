@@ -104,7 +104,7 @@ export class abilitiesCTRL {
             });
 
             // play animation
-            //owner.animationCTRL.playAnim(owner, EntityState.SPELL_CASTING, true);
+            owner.animationCTRL.playAnim(owner, EntityState.SPELL_CASTING, true);
 
             // start a timer
             this.player_casting_timer = setTimeout(() => {
@@ -152,6 +152,13 @@ export class abilitiesCTRL {
         if (target.AI_SPAWN_INFO && target.AI_SPAWN_INFO.canAttack === false) {
             Logger.warning(`[canEntityCastAbility] target is not attackable`, target.health);
             return false;
+        }
+
+        // if abiltiy already running 
+        if(this._owner.animationCTRL.currentTimeout){
+            console.log(this._owner.animationCTRL.currentTimeout);
+            //Logger.warning(`[canEntityCastAbility] player is already casting an ability`, ability);
+            // return false;
         }
 
         // if already casting
@@ -313,11 +320,12 @@ export class abilitiesCTRL {
 
         // removing any casting timers
         if (this.player_casting_timer) {
+            clearTimeout(this.player_casting_timer);
             this.player_casting_timer = false;
         }
 
         // play animation
-        //owner.animationCTRL.playAnim(owner, ability.animation);
+        owner.animationCTRL.playAnim(owner, ability.animation);
 
         // if target is dead, process target death
         if (target.isEntityDead()) {
@@ -369,11 +377,14 @@ export class abilitiesCTRL {
             return false;
         }
 
-        //console.log("START AUTO ATTACK");
-        this.doAutoAttack(owner, target, ability);
-        this.attackTimer = setInterval(() => {
+        if(ability.autoattack){
             this.doAutoAttack(owner, target, ability);
-        }, 900);
+            this.attackTimer = setInterval(() => {
+                this.doAutoAttack(owner, target, ability);
+            }, 900);
+        }else{
+            this.castAbility(owner, target, ability, ability.digit);
+        }   
     }
 
     doAutoAttack(owner, target, ability) {
@@ -388,16 +399,20 @@ export class abilitiesCTRL {
     }
 
     cancelAutoAttack(owner) {
-        if (owner.AI_TARGET || this.attackTimer || this.player_casting_timer) {
-            //console.log("CANCEL AUTO ATTACK");
 
-            // remove target
+        owner.anim_state = EntityState.IDLE;
+
+        if (owner.AI_TARGET){
             owner.AI_TARGET = null;
             owner.AI_ABILITY = null;
-            
+        } 
+        
+        if(this.attackTimer || this.player_casting_timer) {
+
             // remove attack timer
             if (this.attackTimer) {
                 clearInterval(this.attackTimer);
+                this.attackTimer = false;
             }
 
             // remove casting timer

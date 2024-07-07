@@ -40,14 +40,18 @@ export type PlayerCharacter = {
 
 export enum EntityState {
     IDLE = 0,
-    WALKING = 1,
-    RUNNING = 2,
-    ATTACK = 3,
-    TAKING_DAMAGE = 4,
-    DEAD = 5,
-    SPELL_CASTING = 6,
-    SPELL_CAST = 7,
-    PICKUP = 8,
+    WALKING,
+    RUNNING,
+
+    TAKING_DAMAGE,
+    DEAD,
+    PICKUP,
+
+    SPELL_CASTING,
+    SPELL_CAST,
+    UNARMED,
+    ATTACK_VERTICAL,
+    ATTACK_HORIZONTAL,
 }
 
 export enum AI_STATE {
@@ -162,6 +166,7 @@ export type Ability = {
 
     // sound effect
     sound: string;
+    soundDelay: number;
 
     // ability title
     title: string;
@@ -189,6 +194,9 @@ export type Ability = {
 
     // min range target must be (if entity is further, prevent casting)
     minRange: number;
+
+    // if true, will repeat as long as user can
+    autoattack?: boolean;
 
     // animation to play
     animation: EntityState;

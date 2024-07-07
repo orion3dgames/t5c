@@ -38,7 +38,7 @@ class AttackState extends State {
         owner.ATTACK_TIMER += owner._state.config.updateRate;
 
         // set state and anim state
-        owner.anim_state = EntityState.ATTACK;
+        owner.anim_state = EntityState.ATTACK_HORIZONTAL;
 
         //debug
         //console.log("[AttackState] attacking entity", owner.AI_TARGET.name);

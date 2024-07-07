@@ -238,6 +238,7 @@ export class EntitySelectedBar {
         }
 
         if (entity) {
+            //console.log('[UPDATE]', entity.name, entity.health);
             this.setData(entity);
         }
     }

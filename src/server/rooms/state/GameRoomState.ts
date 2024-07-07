@@ -292,7 +292,7 @@ export class GameRoomState extends Schema {
             let targetState = this.getEntity(data.targetId) as Entity;
             let hotbarData = playerState.player_data.hotbar.get("" + data.digit);
 
-            if (data.digit === 5) {
+            if (data.digit === 6) {
                 this.spawnCTRL.createItem(playerState);
                 return false;
             }
