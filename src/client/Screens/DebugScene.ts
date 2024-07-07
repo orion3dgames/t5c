@@ -243,6 +243,8 @@ export class DebugScene {
                 this.stackPanel.isVisible = false;
                 let entityData = this.entityData.get(element.key);
                 this.bakeTextureAnimation(element.key, entityData.mesh);
+
+                this.spawn(entityData);
             });
 
         };
@@ -259,22 +261,14 @@ export class DebugScene {
         this._scene.registerBeforeRender(() => {
             label.text = "FPS: " + this._engine.getFps();
         });
-
-        // create intances
-        /*
-        for (const spawn of this.SPAWN_INFO) {
-            for (let i = 0; i < spawn.amount; i++) {
-                this.createInst(spawn, i + "");
-            }
-        }*/
     }
 
-    ///
-    createInst(spawnInfo, id) {
-        let sessionId = nanoid();
-        let entityData = this.entityData.get(spawnInfo.key);
-        const playerInstance = entityData.mesh.createInstance("player_" + id);
-        this.entities.set(sessionId, new Entity(playerInstance, entityData, this, spawnInfo));
+    spawn(entityData){
+        for (let i = 0; i < 100; i++) {
+            let sessionId = nanoid();
+            const playerInstance = entityData.mesh.createInstance("player_" + i);
+            this.entities.set(sessionId, new Entity(playerInstance, entityData, this, {}));
+        } 
     }
 
     async prepareMesh(spawnInfo) {
@@ -282,7 +276,6 @@ export class DebugScene {
         let race = this._game.getGameData("race", spawnInfo.key);
         let key = spawnInfo.key;
 
-        const rawMesh = asset.meshes[0].clone('clone_'+key) as Mesh;
         const animationGroups = asset.animationGroups;
         const skeletons = asset.skeletons;
         const skeleton = skeletons[0];
@@ -292,10 +285,14 @@ export class DebugScene {
         const selectedAnimationGroups = this.getAnimationGroups(animationGroups, race.vat.animations);
      
         // reset position & rotation
+        let rawMesh = this._game._loadedAssets["RACE_" + key].meshes[0].clone("TEST");
         rawMesh.position.setAll(0);
         rawMesh.scaling.setAll(1);
         rawMesh.rotationQuaternion = null;
         rawMesh.rotation.setAll(0);
+
+        // add material
+        this.prepareMaterial(rawMesh, spawnInfo.key, 0)
 
         // calculate animations ranges
         const ranges = calculateRanges(selectedAnimationGroups);
@@ -305,9 +302,6 @@ export class DebugScene {
 
         // setup vat
         if (merged) {
-
-            // add material
-            this.prepareMaterial(merged, spawnInfo.key, 0)
 
             // create vat manager
             const vat = new BakedVertexAnimationManager(this._scene);
@@ -341,13 +335,11 @@ export class DebugScene {
     }
 
     async bakeTextureAnimation(key: string, merged) {
-        merged.isEnabled(true);
         const b = new VertexAnimationBaker(this._scene, merged);
         const bufferFromMesh = await bakeVertexData(merged, this.entityData.get(key).selectedAnimationGroups);
         let vertexDataJson = b.serializeBakedVertexDataToJSON(bufferFromMesh);
         new JavascriptDataDownloader(vertexDataJson).download("text/json", key + ".json");
         this.stackPanel.isVisible = true;
-        merged.isEnabled(false);
     }
 
     async bakeTextureAnimationRealtime(key: string, merged) {
