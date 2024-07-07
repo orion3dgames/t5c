@@ -446,8 +446,8 @@ let LocationsDB = {
                 },
                 {
                     key: "spawn_02",
-                    type: "static",
-                    behaviour: "idle",
+                    type: "global",
+                    behaviour: "area",
                     aggressive: true,
                     canAttack: true,
                     points: [new Vector3(12, 0, -14.59)],
