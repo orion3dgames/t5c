@@ -325,10 +325,10 @@ export class EntityNamePlate {
             // loop through damage bubbles and update them
             for (let i = 0; i < this.damageBubbles.length; i++) {
                 let metadata = this.damageBubbles[i].metadata;
-                this.damageBubbles[i].position.y += 0.04;
+                this.damageBubbles[i].position.y += 0.02;
                 this.damageBubbles[i].position.z += metadata.offset;
                 this.damageBubbles[i].position.x += metadata.offset;
-                this.damageBubbles[i].visibility -= 0.02;
+                this.damageBubbles[i].visibility -= 0.01;
 
                 // if higher than end position, remove
                 if (this.damageBubbles[i].position.y > this.damageBubbles[i].metadata.end_position) {
