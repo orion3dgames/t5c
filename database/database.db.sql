@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS `users` (
 ALTER TABLE `users` ADD PRIMARY KEY (`id`);
 ALTER TABLE `users` MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
--------------------------------
---------- CHARACTERS ----------
+--
+-- USERS
 
 DROP TABLE IF EXISTS `characters`;
 CREATE TABLE IF NOT EXISTS `characters` (
@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS `characters` (
 ALTER TABLE `characters` ADD PRIMARY KEY (`id`);
 ALTER TABLE `characters` MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
----------------------------------------------
---------- CHARACTER INVENTORY ---------------
+--
+-- USERS
 
 DROP TABLE IF EXISTS `character_inventory`;
 CREATE TABLE IF NOT EXISTS `character_inventory` (
@@ -59,8 +59,8 @@ CREATE TABLE IF NOT EXISTS `character_inventory` (
 ALTER TABLE `character_inventory` ADD PRIMARY KEY (`id`);
 ALTER TABLE `character_inventory` MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
----------------------------------------------
---------- CHARACTER ABILITIES ---------------
+--
+-- USERS
 
 DROP TABLE IF EXISTS `character_abilities`;
 CREATE TABLE IF NOT EXISTS `character_abilities` (
@@ -71,8 +71,8 @@ CREATE TABLE IF NOT EXISTS `character_abilities` (
 ALTER TABLE `character_abilities` ADD PRIMARY KEY (`id`);
 ALTER TABLE `character_abilities` MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
----------------------------------------------
---------- CHARACTER EQUIPMENT ---------------
+--
+-- USERS
 
 DROP TABLE IF EXISTS `character_equipment`;
 CREATE TABLE IF NOT EXISTS `character_equipment` (
@@ -84,8 +84,8 @@ CREATE TABLE IF NOT EXISTS `character_equipment` (
 ALTER TABLE `character_equipment` ADD PRIMARY KEY (`id`);
 ALTER TABLE `character_equipment` MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
----------------------------------------------
---------- CHARACTER QUESTS ---------------
+--
+-- USERS
 
 DROP TABLE IF EXISTS `character_quests`;
 CREATE TABLE IF NOT EXISTS `character_quests` (
@@ -98,8 +98,8 @@ CREATE TABLE IF NOT EXISTS `character_quests` (
 ALTER TABLE `character_quests` ADD PRIMARY KEY (`id`);
 ALTER TABLE `character_quests` MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
----------------------------------------------
---------- CHARACTER HOTBAR ------------------
+--
+-- USERS
 
 DROP TABLE IF EXISTS `character_hotbar`;
 CREATE TABLE IF NOT EXISTS `character_hotbar` (

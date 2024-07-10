@@ -8,6 +8,9 @@ import { AbilitySchema } from "./rooms/schema/player/AbilitySchema";
 import { EquipmentSchema, HotbarSchema, PlayerSchema, QuestSchema } from "./rooms/schema";
 import { MapSchema } from "@colyseus/schema/lib/types/MapSchema";
 
+// Get the client
+import mysql from "mysql2/promise";
+
 class Database {
     private db;
     private debug: boolean = true;
@@ -19,6 +22,26 @@ class Database {
 
     async initDatabase() {
         this.db = await this.connectDatabase();
+        Logger.info("[database] Connected to database");
+    }
+
+    async connectDatabase() {
+        let dbFilePath = this._config.databaseLocation;
+
+        // Create the connection to database
+        return await mysql.createConnection({
+            host: "localhost",
+            user: "root",
+            database: "t5c",
+        });
+
+        return new sqlite3.Database(dbFilePath, (err: any) => {
+            if (err) {
+                Logger.error("[database] Could not connect to database: " + dbFilePath, err);
+            } else {
+                Logger.info("[database] Connected to database: " + dbFilePath);
+            }
+        });
     }
 
     async createDatabase() {
@@ -110,64 +133,36 @@ class Database {
         });
     }
 
-    async connectDatabase() {
-        let dbFilePath = this._config.databaseLocation;
-        return new sqlite3.Database(dbFilePath, (err: any) => {
+    async get(sql: string, params = []) {
+        let [result] = await this.db.query(sql, params, (err: any, result: []) => {
             if (err) {
-                Logger.error("[database] Could not connect to database: " + dbFilePath, err);
-            } else {
-                Logger.info("[database] Connected to database: " + dbFilePath);
+                console.log("Error running sql: " + sql);
+                console.log(err);
+            }
+        });
+        return result[0];
+    }
+
+    async all(sql: string, params = []) {
+        return await this.db.query(sql, params, (err: any, result: []) => {
+            if (err) {
+                console.log("Error running sql: " + sql);
+                console.log(err);
             }
         });
     }
 
-    get(sql: string, params = []): Promise<any> {
-        return new Promise((resolve, reject) => {
-            this.db.get(sql, params, (err: any, result: []) => {
-                if (err) {
-                    console.log("Error running sql: " + sql);
-                    console.log(err);
-                    reject(err);
-                } else {
-                    if (this.debug) {
-                        //console.log("sql: " + sql, params);
-                    }
-                    resolve(result);
-                }
-            });
-        });
-    }
-
-    all(sql: string, params = []): Promise<any[]> {
-        return new Promise((resolve, reject) => {
-            this.db.all(sql, params, (err: any, rows: []) => {
-                if (err) {
-                    console.log("Error running sql: " + sql);
-                    console.log(err);
-                    reject(err);
-                } else {
-                    if (this.debug) {
-                        //console.log("sql: " + sql, params);
-                    }
-                    resolve(rows);
-                }
-            });
-        });
-    }
-
     async run(sql: string, params = []) {
-        return new Promise((resolve, reject) => {
-            this.db.run(sql, params, function (err: any) {
-                if (err) {
-                    console.log("Error running sql " + sql);
-                    console.log(err);
-                    reject(err);
-                } else {
-                    //console.log("sql: " + sql, params, err);
-                    resolve({ id: this.lastID });
-                }
-            });
+        console.log(sql);
+        let [result, error] = await this.db.execute(sql, params, function (err: any) {
+            if (err) {
+                console.log("Error running sql " + sql);
+                console.log(err);
+            }
         });
+        let resultJson = JSON.parse(JSON.stringify(result));
+        console.log(resultJson);
+        return resultJson.insertId;
     }
 
     ///////////////////////////////////////
@@ -224,8 +219,8 @@ class Database {
     }
 
     async saveUser(username: string, password: string, token: string = nanoid()) {
-        let c = (await this.run(`INSERT INTO users (username, password, token) VALUES (?,?,?)`, [username, password, token])) as any;
-        return await this.getUserById(c.id);
+        let insertId = await this.run(`INSERT INTO users (username, password, token) VALUES (?,?,?)`, [username, password, token]);
+        return await this.getUserById(insertId);
     }
 
     ///////////////////////////////////////
@@ -248,37 +243,29 @@ class Database {
 
     async createCharacter(token, name, race, material, head) {
         let user = await this.getUserByToken(token);
-        const sql = `INSERT INTO characters (
-            "user_id", "name", "race", "material", "head",
-            "strength", "endurance", "agility", "intelligence", "wisdom", 
-            "location","x","y","z","rot","level","experience","health", "mana", "gold", "points") 
-            VALUES (
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                
-                ?,
-                ?,
-                ?,
-                ?
-            );`;
-        let c = await (<any>this.run(sql, [
+        const sql = `INSERT INTO characters SET
+                         user_id = ?, 
+                         name = ?, 
+                         race = ?, 
+                         material = ?, 
+                         head = ?, 
+                         strength = ?, 
+                         endurance = ?, 
+                         agility = ?, 
+                         intelligence = ?, 
+                         wisdom = ?, 
+                         location = ?, 
+                         x = ?, 
+                         y = ?, 
+                         z = ?, 
+                         rot = ?, 
+                         level = ?, 
+                         experience = ?, 
+                         health = ?, 
+                         mana = ?, 
+                         gold = ?, 
+                         points = ? `;
+        let characterId = await (<any>this.run(sql, [
             user.id,
             name,
             race,
@@ -308,11 +295,11 @@ class Database {
 
         // add default abilities
         let abilities = [{ key: "base_attack" }, { key: "fire_dart" }];
-        abilities.forEach((ability) => {
-            const sql_abilities = `INSERT INTO character_abilities ("owner_id", "key") VALUES ("${c.id}", "${ability.key}")`;
-            this.run(sql_abilities);
-        });
+        for (const ability of abilities) {
+            await this.run(`INSERT INTO character_abilities (owner_id, key) VALUES (?,?) `, [characterId, ability.key]);
+        }
 
+        /*
         // add default hotbar
         let hotbar = [
             { digit: 1, type: "ability", key: "base_attack" },
@@ -321,19 +308,17 @@ class Database {
             { digit: 9, type: "item", key: "potion_small_blue" },
         ];
         hotbar.forEach((item) => {
-            const sql = `INSERT INTO character_hotbar ("owner_id", "digit", "type", "key") VALUES ("${c.id}", "${item.digit}", "${item.type}", "${item.key}")`;
-            this.run(sql);
+            this.run(`INSERT INTO character_hotbar SET owner_id = ?, digit = ?, type = ?, key = ?`, [characterId, item.digit, item.type, item.key]);
         });
 
         // default equipment
         let equipment = [{ key: "sword_01", slot: PlayerSlots.WEAPON }];
         equipment.forEach((e) => {
-            const sql_equip1 = `INSERT INTO character_equipment ("owner_id", "slot", "key") VALUES ("${c.id}", "${e.slot}", "${e.key}")`;
-            this.run(sql);
+            this.run(`INSERT INTO character_equipment SET owner_id = ?, slot = ?, key = ?`, [characterId, e.slot, e.key]);
         });
 
         // default quests
-        const sql_quests = `INSERT INTO character_quests ("owner_id", "key", "status", "qty") VALUES ("${c.id}", "LH_DANGEROUS_ERRANDS_01", "0", "5")`;
+        //const sql_quests = `INSERT INTO character_quests ("owner_id", "key", "status", "qty") VALUES ("${c.id}", "LH_DANGEROUS_ERRANDS_01", "0", "5")`;
         //this.run(sql_quests);
 
         // add default items
@@ -347,11 +332,12 @@ class Database {
             //{ qty: 1, key: "amulet_01" },
         ];
         items.forEach((item) => {
-            const sql = `INSERT INTO character_inventory ("owner_id", "qty", "order", "key") VALUES ("${c.id}", "${item.qty}", "1", "${item.key}")`;
-            this.run(sql);
+            const sql = `INSERT INTO character_inventory SET owner_id = ?, qty = ?, order = ?, key = ?`;
+            this.run(sql, [characterId, item.qty, 1, item.key]);
         });
+        */
 
-        return await this.getCharacter(c.id);
+        return await this.getCharacter(characterId);
     }
 
     async updateCharacter(character_id: number, data) {
@@ -400,7 +386,7 @@ class Database {
         const sql = `DELETE FROM character_hotbar WHERE owner_id=?;`;
         await this.run(sql, [character_id]);
         if (hotbar && hotbar.size > 0) {
-            let sqlItems = `INSERT INTO character_hotbar (owner_id, digit, type, key) VALUES `;
+            let sqlItems = `INSERT INTO character_hotbar owner_id = ?, digit = ?, type =?, key =?`;
             hotbar.forEach((element: HotbarSchema) => {
                 sqlItems += ` ('${character_id}', '${element.digit}', '${element.type}', '${element.key}'),`;
             });

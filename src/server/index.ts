@@ -34,7 +34,7 @@ class GameServer {
         // start db
         this.database = new Database(this.config);
         await this.database.initDatabase();
-        await this.database.createDatabase();
+        //await this.database.createDatabase();
 
         //////////////////////////////////////////////////
         ///////////// COLYSEUS GAME SERVER ///////////////

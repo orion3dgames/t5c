@@ -2,76 +2,71 @@
     "name": "t5c",
     "version": "0.4.0",
     "repository": {
-      "url": "git+https://github.com/orion3dgames/t5c.git"
+        "url": "git+https://github.com/orion3dgames/t5c.git"
     },
     "description": "Building a basic multiplayer 3d top down rpg using babylon.js and colyseus",
     "main": "./dist/client/index.html",
     "scripts": {
-      "client-dev": "webpack serve --open --config webpack.dev.js",
-      "client-start": "webpack serve --open --config webpack.dev.js",
-      "client-build": "webpack --config webpack.prod.js",
-      "server-debug": "ts-node-dev --respawn --inspect --transpile-only src/server/index.ts",
-      "server-dev": "ts-node-dev --respawn --transpile-only src/server/index.ts",
-      "server-start": "ts-node --transpile-only src/server/index.ts",
-      "server-build": "tsc && cp -r public dist",
-      "loadtest": "npx tsx loadtest/test.ts --room game_room --numClients 10 --endpoint ws://localhost:3000"
+        "client-dev": "webpack serve --open --config webpack.dev.js",
+        "client-start": "webpack serve --open --config webpack.dev.js",
+        "client-build": "webpack --config webpack.prod.js",
+        "server-debug": "ts-node-dev --respawn --inspect --transpile-only src/server/index.ts",
+        "server-dev": "ts-node-dev --respawn --transpile-only src/server/index.ts",
+        "server-start": "ts-node --transpile-only src/server/index.ts",
+        "server-build": "tsc && cp -r public dist",
+        "loadtest": "npx tsx loadtest/test.ts --room game_room --numClients 10 --endpoint ws://localhost:3000"
     },
     "author": "Orion3d",
     "license": "MIT",
     "devDependencies": {
-      "@babylonjs/gui-editor": "7.11.0",
-      "@babylonjs/inspector": "7.11.0",
-      "@babylonjs/materials": "7.11.0",
-
-      "@colyseus/core": "^0.15.39",
-      "@colyseus/loadtest": "^0.15.2",
-      "@colyseus/monitor": "^0.15.6",
-      "@colyseus/schema": "^2.0.32",
-      "@colyseus/ws-transport": "^0.15.2",
-
-      "@types/node": "^20.12.12",
-      "@types/react": "^18.3.2",
-      "@types/react-dom": "^18.3.0",
-      "copy-webpack-plugin": "^12.0.2",
-      "ts-loader": "^9.5.1",
-      "ts-node": "^10.9.2",
-      "ts-node-dev": "^2.0.0",
-      "typescript": "^5.4.5",
-      "webpack": "^5.92.0",
-      "webpack-bundle-analyzer": "^4.10.2",
-      "webpack-cli": "^5.1.4",
-      "webpack-dev-server": "^5.0.4",
-      "webpack-merge": "^5.10.0",
-      "axios": "^1.7.1"
+        "@babylonjs/gui-editor": "7.11.0",
+        "@babylonjs/inspector": "7.11.0",
+        "@babylonjs/materials": "7.11.0",
+        "@colyseus/core": "^0.15.39",
+        "@colyseus/loadtest": "^0.15.2",
+        "@colyseus/monitor": "^0.15.6",
+        "@colyseus/schema": "^2.0.32",
+        "@colyseus/ws-transport": "^0.15.2",
+        "@types/node": "^20.12.12",
+        "@types/react": "^18.3.2",
+        "@types/react-dom": "^18.3.0",
+        "axios": "^1.7.1",
+        "copy-webpack-plugin": "^12.0.2",
+        "ts-loader": "^9.5.1",
+        "ts-node": "^10.9.2",
+        "ts-node-dev": "^2.0.0",
+        "typescript": "^5.4.5",
+        "webpack": "^5.92.0",
+        "webpack-bundle-analyzer": "^4.10.2",
+        "webpack-cli": "^5.1.4",
+        "webpack-dev-server": "^5.0.4",
+        "webpack-merge": "^5.10.0"
     },
     "dependencies": {
-
-      "@babylonjs/core": "7.11.0",
-      "@babylonjs/gui": "7.11.0",
-      "@babylonjs/loaders": "7.11.0",
-      "@babylonjs/serializers": "7.11.0",
-      "babylonjs-gltf2interface": "7.11.0",
-
-      "colyseus": "^0.15.17",
-      "colyseus.js": "^0.15.19",
-
-      "cors": "^2.8.5",
-      "dotenv-webpack": "^8.1.0",
-      "express": "^4.19.2",
-      "fs-extra": "^11.2.0",
-      "nanoid": "^3.0.0",
-      "sqlite3": "^5.1.7",
-      "winston": "^3.13.0"
+        "@babylonjs/core": "7.11.0",
+        "@babylonjs/gui": "7.11.0",
+        "@babylonjs/loaders": "7.11.0",
+        "@babylonjs/serializers": "7.11.0",
+        "babylonjs-gltf2interface": "7.11.0",
+        "colyseus": "^0.15.17",
+        "colyseus.js": "^0.15.19",
+        "cors": "^2.8.5",
+        "dotenv-webpack": "^8.1.0",
+        "express": "^4.19.2",
+        "fs-extra": "^11.2.0",
+        "mysql2": "^3.10.2",
+        "nanoid": "^3.0.0",
+        "sqlite3": "^5.1.7",
+        "winston": "^3.13.0"
     },
-    "peerDependencies": {},
     "browserslist": {
-      "production": [
-        "> 5%"
-      ],
-      "development": [
-        "last 1 chrome version",
-        "last 1 firefox version",
-        "last 1 safari version"
-      ]
+        "production": [
+            "> 5%"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
     }
-  }
+}
