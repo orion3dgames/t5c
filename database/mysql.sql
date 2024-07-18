@@ -1,4 +1,3 @@
-BEGIN;
 
 --
 -- USERS
@@ -15,7 +14,6 @@ ALTER TABLE `users` MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=
 
 --
 -- USERS
-
 DROP TABLE IF EXISTS `characters`;
 CREATE TABLE IF NOT EXISTS `characters` (
 	`id`			int(10) NOT NULL,
@@ -111,6 +109,3 @@ CREATE TABLE IF NOT EXISTS `character_hotbar` (
 );
 ALTER TABLE `character_hotbar` ADD PRIMARY KEY (`id`);
 ALTER TABLE `character_hotbar` MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
-
-
-COMMIT;

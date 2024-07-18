@@ -171,13 +171,14 @@ class Api {
 
             loop(1).then(() => {
                 database.saveUser(username, password).then((user) => {
-                    let race = GameData.get('race', "humanoid");
-                    let material = race.materials[Math.floor(Math.random()*race.materials.length)];
+                    let race = GameData.get("race", "humanoid");
+                    let material = race.materials[Math.floor(Math.random() * race.materials.length)];
                     let materialIndex = race.materials.indexOf(material);
                     database.createCharacter(user.token, generateRandomPlayerName(), race.key, materialIndex, "Head_Paladin").then((character) => {
                         character.user_id = user.id;
                         character.token = user.token;
                         character.password = user.password;
+                        console.log("/returnRandomUser", character);
                         return res.send({
                             message: "Successful",
                             user: character,

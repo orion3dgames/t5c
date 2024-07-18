@@ -54,7 +54,7 @@ export class GameRoom extends Room<GameRoomState> {
 
         // initialize database
         this.database = new Database(this.config);
-        await this.database.initDatabase();
+        await this.database.init();
 
         ///////////////////////////////////////////////////////////////////////////
         // if players are in a room, make sure we save any changes to the database.
@@ -63,7 +63,7 @@ export class GameRoom extends Room<GameRoomState> {
             if (this.state.entities && this.state.entities.size > 0) {
                 this.state.entityCTRL.all.forEach((entity) => {
                     if (entity instanceof PlayerSchema) {
-                        //entity.save(this.database);
+                        entity.save(this.database);
                     }
                 });
             }

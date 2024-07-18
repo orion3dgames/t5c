@@ -51,6 +51,7 @@
         "colyseus": "^0.15.17",
         "colyseus.js": "^0.15.19",
         "cors": "^2.8.5",
+        "dotenv": "^16.4.5",
         "dotenv-webpack": "^8.1.0",
         "express": "^4.19.2",
         "fs-extra": "^11.2.0",

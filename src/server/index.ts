@@ -16,13 +16,15 @@ import { Database } from "./Database";
 import Logger from "./utils/Logger";
 import { Config } from "../shared/Config";
 
+import "dotenv/config";
+
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 
 class GameServer {
     public api;
-    public database;
+    public database: Database;
     public config: Config;
 
     constructor() {
@@ -33,8 +35,8 @@ class GameServer {
     async init() {
         // start db
         this.database = new Database(this.config);
-        await this.database.initDatabase();
-        //await this.database.createDatabase();
+        await this.database.init();
+        await this.database.create();
 
         //////////////////////////////////////////////////
         ///////////// COLYSEUS GAME SERVER ///////////////

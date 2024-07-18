@@ -131,6 +131,7 @@ export class PlayerSchema extends Entity {
         this.statsCTRL = new statsCTRL(this);
 
         // add abilities
+        console.log(data.initial_abilities);
         data.initial_abilities.forEach((element) => {
             this.player_data.abilities.set(element.key, new AbilitySchema(element));
         });
