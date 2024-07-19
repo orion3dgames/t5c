@@ -239,6 +239,16 @@ export class PlayerSchema extends Entity {
         Logger.info("[gameroom][onCreate] player " + this.name + " saved to database.");
     }
 
+    /**
+     * Calculate rotation based on moving from v1 to v2
+     * @param {Vector3} v1
+     * @param {Vector3} v2
+     * @returns rotation in radians
+     */
+    rotateTowards(v1: Vector3, v2: Vector3): number {
+        return Math.atan2(v1.x - v2.x, v1.z - v2.z);
+    }
+
     //////////////////////////////////////////////
     /////////////// HOTBAR ///////////////////////
     //////////////////////////////////////////////

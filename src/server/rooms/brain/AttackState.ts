@@ -1,16 +1,46 @@
 import { EntityState, AI_STATE } from "../../../shared/types";
 import { State } from "../brain/StateManager";
+import { BrainSchema } from "../schema";
 
 class AttackState extends State {
     enter(owner) {
         //console.log("[AttackState] ----------------------------------");
         owner.ai_state = AI_STATE.ATTACKING;
         owner.ATTACK_TIMER = 0;
-        owner.ATTACK_ISINTERVAL = false;
-        owner.anim_state = EntityState.ATTACK_HORIZONTAL;
+        owner.ATTACK_ISINTERVAL = true;
+        //owner.anim_state = EntityState.ATTACK_HORIZONTAL;
+
+        this.attack(owner);
     }
 
-    execute(owner) {
+    getAbilityKeyByChance(abilities) {
+        var sum = 0;
+        let result = "base_attack";
+        for (let i = 0; i < abilities.length; i++) {
+            sum += abilities[i].chance;
+        }
+        var rnd = Math.floor(Math.random() * (sum * 100));
+        var counter = 0;
+        for (let i = 0; i < abilities.length; i++) {
+            counter += abilities[i].chance * 100;
+            if (counter > rnd) {
+                result = abilities[i].key;
+                break;
+            }
+        }
+        return result;
+    }
+
+    attack(owner) {
+        // cast ability
+        let abilities = owner.AI_SPAWN_INFO.abilities ?? [];
+        let abilityKey = this.getAbilityKeyByChance(abilities);
+        let ability = owner._state.gameData.get("ability", abilityKey);
+        owner.abilitiesCTRL.castAbility(owner, owner.AI_TARGET, ability, 1);
+        console.log(owner.name, owner.sessionId, "attacking with", abilityKey, "target: ", owner.AI_TARGET.sessionId);
+    }
+
+    execute(owner: BrainSchema) {
         // target is valid, keep attacking
         if (owner.AI_TARGET === null || owner.AI_TARGET === undefined || owner.AI_TARGET === false || owner.AI_TARGET.isEntityDead() === true) {
             //console.log("[AttackState] invalid target");
@@ -26,19 +56,18 @@ class AttackState extends State {
             return false;
         }
 
+        // rotate towards target
+        owner.rot = owner.rotateTowards(owner.getPosition(), owner.AI_TARGET.getPosition());
+
         // attack target
         if (owner.ATTACK_TIMER >= 900) {
             if (!owner.ATTACK_ISINTERVAL) {
-                owner.anim_state = EntityState.IDLE;
                 owner.ATTACK_ISINTERVAL = true;
 
-                let damage = owner.calculateDamage(owner, owner.AI_TARGET);
-                owner.ATTACK_ISINTERVAL = true;
-                owner.AI_TARGET.health -= damage;
-                owner.AI_TARGET.normalizeStats();
-                console.log(owner.name, owner.sessionId, "attacking", owner.AI_TARGET.sessionId, "dmg: ", damage);
+                // cast ability
+                this.attack(owner);
             } else {
-                owner.anim_state = EntityState.ATTACK_HORIZONTAL;
+                // break time
                 owner.ATTACK_ISINTERVAL = false;
             }
 
@@ -47,7 +76,6 @@ class AttackState extends State {
 
         // increment attack timer
         owner.ATTACK_TIMER += owner._state.config.updateRate;
-        //console.log("[AttackState] attacking entity", owner.AI_TARGET.name);
     }
 
     exit(owner) {

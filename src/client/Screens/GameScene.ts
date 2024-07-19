@@ -203,7 +203,7 @@ export class GameScene {
         this._sound = new SoundController(this);
 
         // start music controller
-        this._sound.play(this._game.currentLocation.music, true);
+        //this._sound.play(this._game.currentLocation.music, true);
 
         ////////////////////////////////////////////////////
         //  when a entity joins the room event

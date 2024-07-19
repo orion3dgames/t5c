@@ -106,6 +106,7 @@ export class abilitiesCTRL {
 
             // play animation
             owner.animationCTRL.playAnim(owner, EntityState.SPELL_CASTING, true);
+            owner.rot = owner.rotateTowards(owner.getPosition(), target.getPosition());
 
             // start a timer
             this.player_casting_timer = setTimeout(() => {
@@ -272,10 +273,12 @@ export class abilitiesCTRL {
      * @param digit
      */
     castAbility(owner, target, ability: Ability, digit) {
-        console.log("castAbility", digit, ability);
+        //console.log("castAbility", digit, ability);
 
         // rotate sender to face target
-        owner.rot = owner.moveCTRL.calculateRotation(owner.getPosition(), target.getPosition());
+        if (owner.moveCTRL) {
+            owner.rot = owner.moveCTRL.calculateRotation(owner.getPosition(), target.getPosition());
+        }
 
         // set sender as enemy target
         if (target.type === "entity") {
@@ -326,7 +329,9 @@ export class abilitiesCTRL {
         }
 
         // play animation
-        owner.animationCTRL.playAnim(owner, ability.animation);
+        if (owner.animationCTRL) {
+            owner.animationCTRL.playAnim(owner, ability.animation);
+        }
 
         // if target is dead, process target death
         if (target.isEntityDead()) {

@@ -86,7 +86,7 @@ export class EntityActions {
     public particule_impact(mesh, ability) {
         let color = ability.effect.color;
 
-        this._gamescene._sound.play("SOUND_hit_a");
+        //this._gamescene._sound.play("SOUND_hit_a");
 
         //////////////////////////////////////////////
         // create a particle system
