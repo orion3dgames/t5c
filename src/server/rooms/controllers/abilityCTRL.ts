@@ -392,7 +392,7 @@ export class abilitiesCTRL {
                     this.attackInterval = 0;
                     this.doAutoAttack(owner, target, ability);
                 }
-            }, 900);
+            }, this._owner._state.config.COMBAT_SPEED);
         } else {
             this.castAbility(owner, target, ability, ability.digit);
         }

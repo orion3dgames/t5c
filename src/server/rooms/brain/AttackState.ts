@@ -60,7 +60,7 @@ class AttackState extends State {
         owner.rot = owner.rotateTowards(owner.getPosition(), owner.AI_TARGET.getPosition());
 
         // attack target
-        if (owner.ATTACK_TIMER >= 900) {
+        if (owner.ATTACK_TIMER >= owner._state.config.COMBAT_SPEED) {
             if (!owner.ATTACK_ISINTERVAL) {
                 owner.ATTACK_ISINTERVAL = true;
 
