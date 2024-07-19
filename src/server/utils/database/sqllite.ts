@@ -8,7 +8,7 @@ export class DB_SQLLITE {
     constructor() {}
 
     async init(config) {
-        let dbFilePath = config.databaseLocation;
+        let dbFilePath = process.env.DATABASE_PATH || "./database.db";
         this.db = new sqlite3.Database(dbFilePath, (err: any) => {
             if (err) {
                 Logger.error("[database] Could not connect to database: " + dbFilePath, err);

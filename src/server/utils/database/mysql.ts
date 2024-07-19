@@ -1,5 +1,4 @@
 import Logger from "../Logger";
-import sqlite3 from "sqlite3";
 import fs from "fs";
 
 import mysql, { ConnectionOptions } from "mysql2/promise";

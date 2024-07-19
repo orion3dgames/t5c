@@ -178,7 +178,7 @@ class Api {
                         character.user_id = user.id;
                         character.token = user.token;
                         character.password = user.password;
-                        console.log("/returnRandomUser", character);
+                        console.log("/returnRandomUser", character.name);
                         return res.send({
                             message: "Successful",
                             user: character,

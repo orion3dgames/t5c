@@ -8,10 +8,11 @@ import { InventorySchema } from "./rooms/schema/player/InventorySchema";
 import { AbilitySchema } from "./rooms/schema/player/AbilitySchema";
 import { EquipmentSchema, HotbarSchema, PlayerSchema, QuestSchema } from "./rooms/schema";
 import { MapSchema } from "@colyseus/schema/lib/types/MapSchema";
+import { Config } from "../shared/Config";
 
 class Database {
     private debug: boolean = true;
-    private _config;
+    private _config: Config;
     private querier: DB_MYSQL | DB_SQLLITE;
 
     constructor(config) {
@@ -20,9 +21,17 @@ class Database {
 
     async init() {
         Logger.info("[database] Trying to connect to database");
-        //this.querier = new DB_MYSQL();
-        this.querier = new DB_SQLLITE();
+
+        if (this._config.database === "mysql") {
+            this.querier = new DB_MYSQL();
+        } else if (this._config.database === "sqllite") {
+            this.querier = new DB_SQLLITE();
+        } else {
+            this.querier = new DB_SQLLITE();
+        }
+
         await this.querier.init(this._config);
+
         Logger.info("[database] Connected to database");
     }
 
