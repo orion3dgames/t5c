@@ -243,7 +243,7 @@ export class EntityNamePlate {
      * TODO: add instances to improve performance
      * @param entity
      */
-    addDamageBubble(offset_y = 0.2) {
+    addDamageBubble(offset_y = 0.2, ping = 0) {
         // only proceed if damage has occured
         let healthChange = this._entity.entity.health - this._entity.health;
         if (healthChange === 0 || healthChange === 1) {
@@ -268,47 +268,15 @@ export class EntityNamePlate {
 
         // set meta
         plane.metadata = {
+            ping: ping,
+            delta: 0,
             end_position: this._entity.position.y + 6,
             material: material,
             texture: texture,
             offset: randomNumberInRange(-0.002, 0.002),
         };
 
-        // add to damage bubbles array
-        this.damageBubbles.push(plane);
-    }
-
-    /**
-     * Draw damage bubble above entity
-     * TODO: add instances to improve performance
-     * @param entity
-     */
-    addDamageBubble2(damage, offset_y = 0.2) {
-        // only proceed if damage has occured
-        let healthChange = damage;
-        let text = "" + healthChange;
-        let color = healthChange > 0 ? Color3.Green().toHexString() : Color3.Yellow().toHexString(); // set current color
-        let { planeWidth, planeHeight, texture, material } = this.createMaterial(0.4, 1, text);
-        let entity_height = this.getEntityheight(offset_y);
-
-        // create plane
-        let uuid = generateRandomId(6);
-        var plane = MeshBuilder.CreatePlane("damageBubble_" + uuid, { width: planeWidth, height: planeHeight, sideOrientation: Mesh.DOUBLESIDE }, this._scene);
-        plane.parent = this._entity;
-        plane.position.y = plane.position.y + entity_height;
-        plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
-        plane.material = material;
-
-        // draw text
-        this.drawDynamicTexture(text, texture, color);
-
-        // set meta
-        plane.metadata = {
-            end_position: this._entity.position.y + 6,
-            material: material,
-            texture: texture,
-            offset: randomNumberInRange(-0.002, 0.002),
-        };
+        plane.isVisible = false;
 
         // add to damage bubbles array
         this.damageBubbles.push(plane);
@@ -318,13 +286,20 @@ export class EntityNamePlate {
      * Update Loop
      */
     update() {
-        //
-
         // update damage bubbles
         if (this.damageBubbles.length > 0) {
             // loop through damage bubbles and update them
             for (let i = 0; i < this.damageBubbles.length; i++) {
                 let metadata = this.damageBubbles[i].metadata;
+
+                // delay nameplate for the duration of the player ping
+                metadata.delta += 15;
+                if (metadata.delta < metadata.ping) {
+                    continue;
+                } else {
+                    this.damageBubbles[i].isVisible = true;
+                }
+
                 this.damageBubbles[i].position.y += 0.02;
                 this.damageBubbles[i].position.z += metadata.offset;
                 this.damageBubbles[i].position.x += metadata.offset;

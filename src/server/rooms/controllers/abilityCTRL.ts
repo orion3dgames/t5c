@@ -18,6 +18,7 @@ export class abilitiesCTRL {
     public player_casting_timer: any = false;
     public gracePeriod: boolean = true;
     public attackTimer;
+    public attackInterval;
 
     constructor(owner, data) {
         this._owner = owner;
@@ -154,8 +155,8 @@ export class abilitiesCTRL {
             return false;
         }
 
-        // if abiltiy already running 
-        if(this._owner.animationCTRL.currentTimeout){
+        // if abiltiy already running
+        if (this._owner.animationCTRL.currentTimeout) {
             console.log(this._owner.animationCTRL.currentTimeout);
             //Logger.warning(`[canEntityCastAbility] player is already casting an ability`, ability);
             // return false;
@@ -377,14 +378,19 @@ export class abilitiesCTRL {
             return false;
         }
 
-        if(ability.autoattack){
+        if (ability.autoattack) {
             this.doAutoAttack(owner, target, ability);
+            this.attackInterval = 0;
             this.attackTimer = setInterval(() => {
-                this.doAutoAttack(owner, target, ability);
+                this.attackInterval++;
+                if (this.attackInterval === 2) {
+                    this.attackInterval = 0;
+                    this.doAutoAttack(owner, target, ability);
+                }
             }, 900);
-        }else{
+        } else {
             this.castAbility(owner, target, ability, ability.digit);
-        }   
+        }
     }
 
     doAutoAttack(owner, target, ability) {
@@ -399,16 +405,16 @@ export class abilitiesCTRL {
     }
 
     cancelAutoAttack(owner) {
-
         owner.anim_state = EntityState.IDLE;
 
-        if (owner.AI_TARGET){
+        this.attackInterval = 0;
+
+        if (owner.AI_TARGET) {
             owner.AI_TARGET = null;
             owner.AI_ABILITY = null;
-        } 
-        
-        if(this.attackTimer || this.player_casting_timer) {
+        }
 
+        if (this.attackTimer || this.player_casting_timer) {
             // remove attack timer
             if (this.attackTimer) {
                 clearInterval(this.attackTimer);

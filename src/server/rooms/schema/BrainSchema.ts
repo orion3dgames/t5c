@@ -65,6 +65,7 @@ export class BrainSchema extends Entity {
     public IDLE_TIMER_LENGTH = 0;
     public CHASE_TIMER = 0;
     public ATTACK_TIMER = 0;
+    public ATTACK_ISINTERVAL = false;
     public DEAD_TIMER = 0;
 
     // AI

@@ -4,9 +4,10 @@ import { State } from "../brain/StateManager";
 class AttackState extends State {
     enter(owner) {
         //console.log("[AttackState] ----------------------------------");
-        owner.ATTACK_TIMER = 0;
-
         owner.ai_state = AI_STATE.ATTACKING;
+        owner.ATTACK_TIMER = 0;
+        owner.ATTACK_ISINTERVAL = false;
+        owner.anim_state = EntityState.ATTACK_HORIZONTAL;
     }
 
     execute(owner) {
@@ -27,20 +28,25 @@ class AttackState extends State {
 
         // attack target
         if (owner.ATTACK_TIMER >= 900) {
-            let damage = owner.calculateDamage(owner, owner.AI_TARGET);
+            if (!owner.ATTACK_ISINTERVAL) {
+                owner.anim_state = EntityState.IDLE;
+                owner.ATTACK_ISINTERVAL = true;
+
+                let damage = owner.calculateDamage(owner, owner.AI_TARGET);
+                owner.ATTACK_ISINTERVAL = true;
+                owner.AI_TARGET.health -= damage;
+                owner.AI_TARGET.normalizeStats();
+                console.log(owner.name, owner.sessionId, "attacking", owner.AI_TARGET.sessionId, "dmg: ", damage);
+            } else {
+                owner.anim_state = EntityState.ATTACK_HORIZONTAL;
+                owner.ATTACK_ISINTERVAL = false;
+            }
+
             owner.ATTACK_TIMER = 0;
-            owner.AI_TARGET.health -= damage;
-            owner.AI_TARGET.normalizeStats();
-            console.log(owner.name, owner.sessionId, 'attacking', owner.AI_TARGET.sessionId, 'dmg: ', damage);
         }
 
         // increment attack timer
         owner.ATTACK_TIMER += owner._state.config.updateRate;
-
-        // set state and anim state
-        owner.anim_state = EntityState.ATTACK_HORIZONTAL;
-
-        //debug
         //console.log("[AttackState] attacking entity", owner.AI_TARGET.name);
     }
 

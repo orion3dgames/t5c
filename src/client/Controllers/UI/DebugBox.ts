@@ -15,7 +15,7 @@ export class DebugBox {
     private _room;
     private _currentPlayer;
     private _entities;
-    private ping: number = 0;
+    public ping: number = 0;
     public _debugPanel: Rectangle;
     private _debugTextUI;
     private instrumentation: SceneInstrumentation;
