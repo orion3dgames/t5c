@@ -10,7 +10,7 @@ Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 - multiplayer animated characters
 - global chat (works accross zones)
 - uses a navmesh for collision detection
-- basic persistence with mysql lite
+- player data can be saved with mysql lite / mysql
 - basic enemies with simple AI behaviour (IDLE, PATROL, CHASE, ATTACK, DEAD)
 - enemies can drop items (based on a loot table)
 - 4 basic abilities ( sword attack, fireball, dot, heal )
@@ -37,6 +37,7 @@ Check out my devlogs on [https://dev.to/orion3d](https://dev.to/orion3d)
 - Babylon.js 6.x.x [https://www.babylonjs.com/](https://www.babylonjs.com/)
 - Colyseus 0.15.x [https://colyseus.io/](https://colyseus.io/)
 - SQLite 3.x.x [https://www.sqlite.org/](https://www.sqlite.org/)
+  - Optionally, you can use MYSQL instead by updating the setting in src/shared/Config.ts
 
 ## How to run
 - Run `npm run server-dev` to launch the server
