@@ -185,6 +185,11 @@ export class PlayerSchema extends Entity {
 
         // if not dead
         if (this.isDead === true) {
+            // if player is dead make sure player animation is EntityState.DEAD
+            if (this.anim_state !== EntityState.DEAD) {
+                this.anim_state = EntityState.DEAD;
+            }
+
             return false;
         }
 
