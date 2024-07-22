@@ -181,6 +181,7 @@ let ItemsDB: itemDataMap = {
         },
     },
 
+    /*
     cape_01: {
         key: "cape_01",
         model: "cape_01",
@@ -207,7 +208,7 @@ let ItemsDB: itemDataMap = {
         meshData: {
             scale: 1,
         },
-    },
+    },*/
 
     amulet_01: {
         key: "amulet_01",

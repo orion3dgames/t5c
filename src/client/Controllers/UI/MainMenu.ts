@@ -80,6 +80,7 @@ export class MainMenu {
                         this.takeScreenshot();
                     },
                 },
+                /*
                 debug: {
                     menuTitle: "Debug Scene",
                     click: () => {
@@ -88,7 +89,7 @@ export class MainMenu {
                         this._game.currentChat.leave();
                         this._game.setScene(State.DEBUG_SCENE);
                     },
-                },
+                },*/
                 quit: {
                     menuTitle: "Quit",
                     click: () => {

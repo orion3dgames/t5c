@@ -79,7 +79,7 @@ export class VatController {
 
     async prepareVat(race) {
         let key = race.vat.key;
-        
+
         if (!this._entityData.has(key)) {
             //console.log("[prepareVat] 2 " + key, race);
 
@@ -128,7 +128,6 @@ export class VatController {
      * @returns
      */
     makeHumanoid(rawMesh, data) {
-
         let keepArray = [
             data.head, //
             "Base_ArmLeft",
@@ -144,13 +143,12 @@ export class VatController {
             var result = element.id.substring(n + 1);
             if (!keepArray.includes(result)) {
                 element.dispose();
-                console.error('DISPOSING', element.id);
-            }else{
-                
+                console.error("DISPOSING", element.id);
+            } else {
                 //element.removeVerticesData(VertexBuffer.MatricesIndicesKind)
                 //element.removeVerticesData(VertexBuffer.MatricesWeightsKind)
                 console.log(element.getVerticesDataKinds());
-                console.log('KEEPING', element.id);
+                console.log("KEEPING", element.id);
             }
         });
 
@@ -187,13 +185,12 @@ export class VatController {
     }
 
     async prepareMesh(entity) {
-   
         let key = entity.race;
         let race = this._game.getGameData("race", key);
         let meshId = VatController.findMeshKey(race, entity);
 
-        if(!race){
-            console.log('Race does not exists', key);
+        if (!race) {
+            console.log("Race does not exists", key);
         }
 
         // gets or prepare vat
@@ -341,7 +338,7 @@ export class VatController {
         // clone raw mesh
         let key = entityData.name;
         let item = this._game.getGameData("item", itemKey);
-        let rawMesh = this._game._loadedAssets["RACE_" + key].meshes[0].clone("embedded_vat_"+itemKey) as Mesh;
+        let rawMesh = this._game._loadedAssets["RACE_" + key].meshes[0].clone("embedded_vat_" + itemKey) as Mesh;
 
         // find raw mesh
         console.log(rawMesh.id, rawMesh.getChildMeshes());
@@ -350,8 +347,8 @@ export class VatController {
             var result = element.id.substring(n + 1);
             if (!item.equippable.mesh.includes(result)) {
                 element.dispose();
-            }else{
-                console.log('FOUND MESH', element.id);
+            } else {
+                console.log("FOUND MESH", element.id);
             }
         });
 
@@ -360,7 +357,7 @@ export class VatController {
         if (itemMesh) {
             // update material
             if (item.material) {
-                //VatController.loadItemMaterial(this._game.scene, itemMesh, item.material);
+                VatController.loadItemMaterial(this._game.scene, itemMesh, item.material);
             }
 
             // attach to VAT
@@ -376,7 +373,6 @@ export class VatController {
     }
 
     prepareMaterial(cloneMesh, raceKey, materialIndex) {
-       
         // get race
         let race = this._game.getGameData("race", raceKey);
 
@@ -419,13 +415,14 @@ export class VatController {
             cloneMesh.material = alreadyExistMaterial;
         } else {
             // create material as it does not exists
-            let mat = new PBRCustomMaterial(materialName);
+            let mat = new PBRCustomMaterial(materialName + "_custom");
             mat.albedoTexture = new Texture("./models/materials/" + materialName, scene, {
                 invertY: false,
             });
             mat.reflectionColor = new Color3(0, 0, 0);
             mat.reflectivityColor = new Color3(0, 0, 0);
             mat.backFaceCulling = false;
+            mat.freeze();
 
             // assign to mesh
             cloneMesh.material = mat;

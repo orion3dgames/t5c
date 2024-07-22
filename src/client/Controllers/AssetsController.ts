@@ -401,6 +401,7 @@ export class AssetsController {
 
                 // hide it
                 itemMesh.setEnabled(true);
+                rawMesh.setEnabled(false);
 
                 // save it for future usage
                 this._game._loadedAssets[modelToLoadKey] = itemMesh;

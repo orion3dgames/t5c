@@ -364,10 +364,29 @@ let LocationsDB = {
                     race: "skeleton_01",
                     material: 0,
                     name: "Skeleton",
-                    baseHealth: 30,
+                    baseHealth: 3,
                     baseSpeed: Speed.VERY_SLOW,
-                    equipment: [],
-                    experienceGain: { min: 2000, max: 5000 },
+                    baseDamageMultiplier: 1, // multiplicater for damage
+                    experienceGain: { min: 100, max: 200 },
+                    goldGain: { min: 10, max: 20 },
+                    equipment: [
+                        {
+                            key: "helm_01",
+                            slot: PlayerSlots.HEAD,
+                        },
+                        {
+                            key: "shield_01",
+                            slot: PlayerSlots.OFF_HAND,
+                        },
+                        {
+                            key: "sword_01",
+                            slot: PlayerSlots.WEAPON,
+                        },
+                    ],
+                    abilities: [
+                        { key: "base_attack", chance: 0.8 },
+                        { key: "slice_attack", chance: 0.2 },
+                    ],
                 },
 
                 {
@@ -390,8 +409,12 @@ let LocationsDB = {
                     material: 17,
                     head: "Head_Rogue",
                     name: "Bandit",
-                    baseHealth: 80,
+
+                    baseHealth: 100,
                     baseSpeed: Speed.VERY_SLOW,
+                    baseDamageMultiplier: 2, // multiplicater for damage
+                    experienceGain: { min: 1000, max: 2000 },
+                    goldGain: { min: 100, max: 200 },
                     equipment: [
                         {
                             key: "helm_01",
@@ -406,7 +429,11 @@ let LocationsDB = {
                             slot: PlayerSlots.WEAPON,
                         },
                     ],
-                    experienceGain: { min: 2000, max: 2500 },
+                    abilities: [
+                        { key: "base_attack", chance: 0.8 },
+                        { key: "slice_attack", chance: 0.2 },
+                        { key: "fire_dart", chance: 0.1 },
+                    ],
                 },
             ],
         },
@@ -452,10 +479,11 @@ let LocationsDB = {
                     canAttack: true,
                     points: [new Vector3(12, 0, -14.59)],
                     amount: 1,
-                    baseHealth: 100,
                     race: "skeleton_01",
                     material: 0,
                     name: "Dummy 1",
+
+                    baseHealth: 100,
                     baseSpeed: Speed.VERY_SLOW,
                     baseDamageMultiplier: 2, // multiplicater for damage
                     experienceGain: { min: 5000, max: 10000 },

@@ -154,8 +154,8 @@ class Database {
                 20,
                 20,
                 20,
-                "training_ground",
-                //"lh_town",
+                //"training_ground",
+                "lh_town",
 
                 6.18,
                 0.1,
@@ -211,11 +211,11 @@ class Database {
         let items = [
             { qty: 5, key: "potion_small_red" },
             { qty: 5, key: "potion_small_blue" },
-            { qty: 1, key: "cape_01" },
-            //{ qty: 1, key: "sword_01" },
-            //{ qty: 1, key: "armor_01" },
-            //{ qty: 1, key: "armor_02" },
-            //{ qty: 1, key: "amulet_01" },
+            //{ qty: 1, key: "cape_01" },
+            { qty: 1, key: "sword_01" },
+            { qty: 1, key: "armor_01" },
+            { qty: 1, key: "armor_02" },
+            { qty: 1, key: "amulet_01" },
         ];
         for (const item of items) {
             const sql = "INSERT INTO character_inventory (`owner_id`, `qty`, `order`, `key`) VALUES (?,?,?,?)";
