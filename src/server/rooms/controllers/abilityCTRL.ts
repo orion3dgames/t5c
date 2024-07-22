@@ -79,13 +79,13 @@ export class abilitiesCTRL {
             return false;
         }
 
-        // cancel any existing auto attack
-        this.cancelAutoAttack(owner);
-
         // make sure player can cast this ability
         if (!this.canEntityCastAbility(owner, target, ability, digit)) {
             return false;
         }
+
+        // cancel any existing auto attack
+        this.cancelAutoAttack(owner);
 
         // if there is a minRange, set target as target
         if (ability.minRange > 0 && owner.AI_TARGET != target) {
@@ -248,9 +248,7 @@ export class abilitiesCTRL {
 
             // add any multiplicater
             if (p.key === "health" && owner.AI_SPAWN_INFO && owner.AI_SPAWN_INFO.baseDamageMultiplier) {
-                console.log("affectTarget", base_damage, owner.AI_SPAWN_INFO.baseDamageMultiplier);
                 base_damage *= owner.AI_SPAWN_INFO.baseDamageMultiplier;
-                console.log("multiplied", base_damage);
             }
 
             // add a multiplier to increase damage per level

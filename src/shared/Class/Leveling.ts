@@ -81,23 +81,23 @@ export class Leveling {
     }
 
     public static addExperience(owner: PlayerSchema, amount) {
-        // does player level up?
-        let doesLevelUp = false;
-        if (Leveling.doesPlayerlevelUp(owner.level, owner.player_data.experience, amount)) {
-            doesLevelUp = true;
-        }
-
         // add experience to player
+        let currentLevel = owner.level;
         owner.player_data.experience += amount;
         owner.level = Leveling.convertXpToLevel(owner.player_data.experience);
+
         console.log(`[gameroom][addExperience] player has gained ${amount} experience`);
 
-        if (doesLevelUp) {
-            console.log(`[gameroom][addExperience] player has gained a level and is now level ${owner.level}`);
-            owner.maxMana = owner.maxMana + 50;
-            owner.maxHealth = owner.maxHealth + 50;
-            owner.health = owner.maxHealth;
-            owner.mana = owner.maxMana;
+        // has the level changed
+        if (owner.level > currentLevel) {
+            let levelDifference = owner.level - currentLevel;
+            let levelUpChange = 50 * levelDifference;
+
+            console.log(`[gameroom][addExperience] player has gained ${levelDifference} level and are now level ${owner.level}`);
+            owner.statsCTRL.updateBaseStats("maxMana", levelUpChange);
+            owner.statsCTRL.updateBaseStats("maxHealth", levelUpChange);
+            owner.health = owner.statsCTRL.getStat("maxHealth");
+            owner.mana = owner.statsCTRL.getStat("maxMana");
             owner.player_data.points += 5;
 
             // inform player

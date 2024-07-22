@@ -458,6 +458,8 @@ let LocationsDB = {
                     name: "Dummy 1",
                     baseSpeed: Speed.VERY_SLOW,
                     baseDamageMultiplier: 2, // multiplicater for damage
+                    experienceGain: { min: 5000, max: 10000 },
+                    goldGain: { min: 100, max: 200 },
                     equipment: [
                         {
                             key: "sword_01",
