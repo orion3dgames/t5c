@@ -300,8 +300,8 @@ class Database {
             "1",
             "0",
 
-            "5000",
-            "5000",
+            100,
+            100,
             "50000",
             "50",
         ]));
@@ -309,10 +309,10 @@ class Database {
         // add default abilities
         let abilities = [
             { key: "base_attack" }, //
-            { key: "slice_attack" }, 
+            { key: "slice_attack" },
             { key: "fire_dart" },
             { key: "poison" },
-            { key: "light_heal" }
+            { key: "light_heal" },
         ];
         abilities.forEach((ability) => {
             const sql_abilities = `INSERT INTO character_abilities ("owner_id", "key") VALUES ("${c.id}", "${ability.key}")`;

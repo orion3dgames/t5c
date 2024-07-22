@@ -5,6 +5,11 @@ import { BrainSchema } from "../schema";
 class DeadState extends State {
     enter(owner: BrainSchema) {
         console.log("[DeadState] ----------------------------------");
+    }
+
+    execute(owner: BrainSchema) {
+        console.log("[DeadState] ai is dead ", owner.name, owner.sessionId);
+
         owner.health = 0;
         owner.mana = 0;
         owner.blocked = true;
@@ -12,10 +17,6 @@ class DeadState extends State {
         owner.ai_state = AI_STATE.IDLE;
         owner.isDead = true;
         owner.resetDestination();
-    }
-
-    execute(owner: BrainSchema) {
-        console.log("[DeadState] ai is dead ", owner.name, owner.sessionId);
 
         owner.DEAD_TIMER += 100;
 

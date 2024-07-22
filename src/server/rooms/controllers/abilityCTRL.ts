@@ -3,7 +3,7 @@ import { EntityState, Ability, CalculationTypes, ServerMsg } from "../../../shar
 import { dropCTRL } from "./dropCTRL";
 import { AbilitySchema } from "../schema/player/AbilitySchema";
 import { randomNumberInRange } from "../../../shared/Utils";
-import { HotbarSchema } from "../schema";
+import { HotbarSchema, PlayerSchema } from "../schema";
 
 export class abilitiesCTRL {
     private _owner;
@@ -334,7 +334,7 @@ export class abilitiesCTRL {
         }
 
         // if target is dead, process target death
-        if (target.isEntityDead()) {
+        if (owner instanceof PlayerSchema && target.isEntityDead()) {
             this.processDeath(owner, target);
         }
     }
@@ -357,21 +357,18 @@ export class abilitiesCTRL {
         // get player
         let client = owner.getClient();
 
-        // update owner rewards
-        if (client) {
-            // send notif to player
-            client.send(ServerMsg.SERVER_MESSAGE, {
-                type: "event",
-                message: "You've killed " + target.name + ".",
-                date: new Date(),
-            });
+        // send notif to player
+        client.send(ServerMsg.SERVER_MESSAGE, {
+            type: "event",
+            message: "You've killed " + target.name + ".",
+            date: new Date(),
+        });
 
-            // process drops, experience and gold
-            let drop = new dropCTRL(owner, client);
-            drop.addExperience(target);
-            drop.addGold(target);
-            drop.dropItems(target);
-        }
+        // process drops, experience and gold
+        let drop = new dropCTRL(owner, client);
+        drop.addExperience(target);
+        drop.addGold(target);
+        drop.dropItems(target);
     }
 
     //////////////////////////////////////////////
