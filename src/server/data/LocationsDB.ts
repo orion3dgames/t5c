@@ -457,6 +457,7 @@ let LocationsDB = {
                     material: 0,
                     name: "Dummy 1",
                     baseSpeed: Speed.VERY_SLOW,
+                    baseDamageMultiplier: 2, // multiplicater for damage
                     equipment: [
                         {
                             key: "sword_01",
@@ -464,28 +465,8 @@ let LocationsDB = {
                         },
                     ],
                     abilities: [
-                        { key: "base_attack", chance: 0.7 },
-                        { key: "slice_attack", chance: 0.3 },
-                    ],
-                },
-                {
-                    key: "spawn_03",
-                    type: "global",
-                    behaviour: "area",
-                    aggressive: true,
-                    canAttack: true,
-                    points: [new Vector3(12, 0, -14.59)],
-                    amount: 1,
-                    baseHealth: 100,
-                    race: "skeleton_01",
-                    material: 0,
-                    name: "Dummy 1",
-                    baseSpeed: Speed.VERY_SLOW,
-                    equipment: [
-                        {
-                            key: "sword_01",
-                            slot: PlayerSlots.WEAPON,
-                        },
+                        { key: "base_attack", chance: 0.3 },
+                        { key: "slice_attack", chance: 0.7 },
                     ],
                 },
             ],

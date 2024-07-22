@@ -246,6 +246,13 @@ export class abilitiesCTRL {
             // generate a random number
             let base_damage = randomNumberInRange(base_min, base_max);
 
+            // add any multiplicater
+            if (p.key === "health" && owner.AI_SPAWN_INFO && owner.AI_SPAWN_INFO.baseDamageMultiplier) {
+                console.log("affectTarget", base_damage, owner.AI_SPAWN_INFO.baseDamageMultiplier);
+                base_damage *= owner.AI_SPAWN_INFO.baseDamageMultiplier;
+                console.log("multiplied", base_damage);
+            }
+
             // add a multiplier to increase damage per level
             base_damage *= 1 + owner.level / 10;
 
