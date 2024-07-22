@@ -3,7 +3,7 @@ import { EntityState, Ability, CalculationTypes, ServerMsg } from "../../../shar
 import { dropCTRL } from "./dropCTRL";
 import { AbilitySchema } from "../schema/player/AbilitySchema";
 import { randomNumberInRange } from "../../../shared/Utils";
-import { HotbarSchema } from "../schema";
+import { HotbarSchema, PlayerSchema } from "../schema";
 
 export class abilitiesCTRL {
     private _owner;
@@ -18,6 +18,7 @@ export class abilitiesCTRL {
     public player_casting_timer: any = false;
     public gracePeriod: boolean = true;
     public attackTimer;
+    public attackInterval;
 
     constructor(owner, data) {
         this._owner = owner;
@@ -76,20 +77,20 @@ export class abilitiesCTRL {
         // make sure ability exists
         if (!ability) {
             return false;
-            3;
         }
-
-        // cancel any existing auto attack
-        this.cancelAutoAttack(owner);
 
         // make sure player can cast this ability
         if (!this.canEntityCastAbility(owner, target, ability, digit)) {
             return false;
         }
 
+        // cancel any existing auto attack
+        this.cancelAutoAttack(owner);
+
         // if there is a minRange, set target as target
         if (ability.minRange > 0 && owner.AI_TARGET != target) {
             console.log("minRange > 0");
+            ability.digit = digit;
             owner.AI_TARGET = target;
             owner.AI_ABILITY = ability; // store ability to use once user gets close enough
             return false;
@@ -105,6 +106,7 @@ export class abilitiesCTRL {
 
             // play animation
             owner.animationCTRL.playAnim(owner, EntityState.SPELL_CASTING, true);
+            owner.rot = owner.rotateTowards(owner.getPosition(), target.getPosition());
 
             // start a timer
             this.player_casting_timer = setTimeout(() => {
@@ -152,6 +154,13 @@ export class abilitiesCTRL {
         if (target.AI_SPAWN_INFO && target.AI_SPAWN_INFO.canAttack === false) {
             Logger.warning(`[canEntityCastAbility] target is not attackable`, target.health);
             return false;
+        }
+
+        // if abiltiy already running
+        if (this._owner.animationCTRL.currentTimeout) {
+            console.log(this._owner.animationCTRL.currentTimeout);
+            //Logger.warning(`[canEntityCastAbility] player is already casting an ability`, ability);
+            // return false;
         }
 
         // if already casting
@@ -228,6 +237,7 @@ export class abilitiesCTRL {
 
     // process target affected properties
     affectTarget(target, owner, ability) {
+        let healthDamage = 0;
         ability.targetPropertyAffected.forEach((p) => {
             // get min and max damage
             let base_min = p.min;
@@ -236,6 +246,11 @@ export class abilitiesCTRL {
             // generate a random number
             let base_damage = randomNumberInRange(base_min, base_max);
 
+            // add any multiplicater
+            if (p.key === "health" && owner.AI_SPAWN_INFO && owner.AI_SPAWN_INFO.baseDamageMultiplier) {
+                base_damage *= owner.AI_SPAWN_INFO.baseDamageMultiplier;
+            }
+
             // add a multiplier to increase damage per level
             base_damage *= 1 + owner.level / 10;
 
@@ -243,6 +258,7 @@ export class abilitiesCTRL {
 
             target[p.key] = amount;
         });
+        return healthDamage;
     }
 
     // start cooldown
@@ -265,7 +281,9 @@ export class abilitiesCTRL {
         //console.log("castAbility", digit, ability);
 
         // rotate sender to face target
-        owner.rot = owner.moveCTRL.calculateRotation(owner.getPosition(), target.getPosition());
+        if (owner.moveCTRL) {
+            owner.rot = owner.moveCTRL.calculateRotation(owner.getPosition(), target.getPosition());
+        }
 
         // set sender as enemy target
         if (target.type === "entity") {
@@ -276,10 +294,11 @@ export class abilitiesCTRL {
         this.affectCaster(owner, ability);
 
         //
+        let healthDamage = 0;
         if (ability.repeat > 0) {
             let repeat = 1;
             let timer = setInterval(() => {
-                this.affectTarget(target, owner, ability);
+                healthDamage = this.affectTarget(target, owner, ability);
                 if (target.isEntityDead()) {
                     this.processDeath(owner, target);
                     clearInterval(timer);
@@ -290,7 +309,7 @@ export class abilitiesCTRL {
                 repeat += 1;
             }, ability.repeatInterval);
         } else {
-            this.affectTarget(target, owner, ability);
+            healthDamage = this.affectTarget(target, owner, ability);
         }
 
         //
@@ -304,21 +323,23 @@ export class abilitiesCTRL {
             key: ability.key,
             digit: digit,
             fromId: owner.sessionId,
-            fromPos: owner.getPosition(),
             targetId: target.sessionId,
-            targetPos: target.getPosition(),
+            damage: healthDamage,
         });
 
         // removing any casting timers
         if (this.player_casting_timer) {
+            clearTimeout(this.player_casting_timer);
             this.player_casting_timer = false;
         }
 
         // play animation
-        owner.animationCTRL.playAnim(owner, ability.animation);
+        if (owner.animationCTRL) {
+            owner.animationCTRL.playAnim(owner, ability.animation);
+        }
 
         // if target is dead, process target death
-        if (target.isEntityDead()) {
+        if (owner instanceof PlayerSchema && target.isEntityDead()) {
             this.processDeath(owner, target);
         }
     }
@@ -341,21 +362,18 @@ export class abilitiesCTRL {
         // get player
         let client = owner.getClient();
 
-        // update owner rewards
-        if (client) {
-            // send notif to player
-            client.send(ServerMsg.SERVER_MESSAGE, {
-                type: "event",
-                message: "You've killed " + target.name + ".",
-                date: new Date(),
-            });
+        // send notif to player
+        client.send(ServerMsg.SERVER_MESSAGE, {
+            type: "event",
+            message: "You've killed " + target.name + ".",
+            date: new Date(),
+        });
 
-            // process drops, experience and gold
-            let drop = new dropCTRL(owner, client);
-            drop.addExperience(target);
-            drop.addGold(target);
-            drop.dropItems(target);
-        }
+        // process drops, experience and gold
+        let drop = new dropCTRL(owner, client);
+        drop.addExperience(target);
+        drop.addGold(target);
+        drop.dropItems(target);
     }
 
     //////////////////////////////////////////////
@@ -366,36 +384,48 @@ export class abilitiesCTRL {
         if (!owner || !target || !ability) {
             return false;
         }
-        //console.log("START AUTO ATTACK");
-        this.doAutoAttack(owner, target, ability);
-        this.attackTimer = setInterval(() => {
+
+        if (ability.autoattack) {
             this.doAutoAttack(owner, target, ability);
-        }, 900);
+            this.attackInterval = 0;
+            this.attackTimer = setInterval(() => {
+                this.attackInterval++;
+                if (this.attackInterval === 2) {
+                    this.attackInterval = 0;
+                    this.doAutoAttack(owner, target, ability);
+                }
+            }, this._owner._state.config.COMBAT_SPEED);
+        } else {
+            this.castAbility(owner, target, ability, ability.digit);
+        }
     }
 
     doAutoAttack(owner, target, ability) {
-        //console.log("AUTO ATTACK");
         // only auto attack if entity has a target
         if (target !== null) {
-            owner.anim_state = EntityState.ATTACK;
-            this.castAbility(owner, target, ability, 1);
+            //owner.anim_state = ability.animation;
+            this.castAbility(owner, target, ability, ability.digit);
+        } else {
+            // cancel any existing auto attack
+            this.cancelAutoAttack(owner);
         }
     }
 
     cancelAutoAttack(owner) {
-        if (owner.AI_TARGET || this.attackTimer || this.player_casting_timer) {
-            //console.log("CANCEL AUTO ATTACK");
+        owner.anim_state = EntityState.IDLE;
 
-            // remove target
+        this.attackInterval = 0;
+
+        if (owner.AI_TARGET) {
             owner.AI_TARGET = null;
             owner.AI_ABILITY = null;
+        }
 
-            // reset animation
-            owner.animationCTRL.playAnim(owner, EntityState.IDLE);
-
+        if (this.attackTimer || this.player_casting_timer) {
             // remove attack timer
             if (this.attackTimer) {
                 clearInterval(this.attackTimer);
+                this.attackTimer = false;
             }
 
             // remove casting timer

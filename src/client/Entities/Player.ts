@@ -3,7 +3,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { EntityActions } from "./Entity/EntityActions";
 import { Entity } from "./Entity";
 import State from "../../client/Screens/Screens";
-import { Ability, ServerMsg } from "../../shared/types";
+import { Ability, EntityState, ServerMsg } from "../../shared/types";
 import { GameScene } from "../Screens/GameScene";
 import { PlayerAbility } from "./Player/PlayerAbility";
 

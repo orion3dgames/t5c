@@ -181,7 +181,10 @@ class Database {
         // add default hotbar
         let hotbar = [
             { digit: 1, type: "ability", key: "base_attack" },
-            { digit: 2, type: "ability", key: "fire_dart" },
+            { digit: 2, type: "ability", key: "slice_attack" },
+            { digit: 3, type: "ability", key: "fire_dart" },
+            { digit: 4, type: "ability", key: "poison" },
+            { digit: 5, type: "ability", key: "light_heal" },
             { digit: 8, type: "item", key: "potion_small_red" },
             { digit: 9, type: "item", key: "potion_small_blue" },
         ];

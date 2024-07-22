@@ -45,6 +45,7 @@ export class Stat {
         this.multiplicativeModifiers = [];
     }
 }
+
 export class statsCTRL {
     private stats;
     private entity;
@@ -54,9 +55,9 @@ export class statsCTRL {
     constructor(entity) {
         // set base stats
         this.stats = {
-            health: new Stat(entity.health),
+            //health: new Stat(entity.health),
             maxHealth: new Stat(entity.maxHealth),
-            mana: new Stat(entity.mana),
+            //mana: new Stat(entity.mana),
             maxMana: new Stat(entity.maxMana),
             strength: new Stat(entity.player_data ? entity.player_data.strength : 0),
             agility: new Stat(entity.player_data ? entity.player_data.agility : 0),
@@ -71,9 +72,9 @@ export class statsCTRL {
         // whenever a stat is modified, update entity with the latest
         this.onStatsChange = (stats) => {
             console.log("onStatsChange", stats);
-            this.entity.health = this.stats.health.value;
+            //this.entity.health = this.stats.health.value;
             this.entity.maxHealth = this.stats.maxHealth.value;
-            this.entity.mana = this.stats.mana.value;
+            //this.entity.mana = this.stats.mana.value;
             this.entity.maxMana = this.stats.maxMana.value;
             this.entity.player_data.strength = this.stats.strength.value;
             this.entity.player_data.agility = this.stats.agility.value;
@@ -85,6 +86,7 @@ export class statsCTRL {
     }
 
     updateStats(): void {
+        /*
         // Ensure health and mana do not exceed their max values
         if (this.stats.health.value > this.stats.maxHealth.value) {
             this.stats.health.baseValue = this.stats.maxHealth.value;
@@ -92,8 +94,12 @@ export class statsCTRL {
         if (this.stats.mana.value > this.stats.maxMana.value) {
             this.stats.mana.baseValue = this.stats.maxMana.value;
         }
+        */
+
         // Trigger stats change callback
         this.onStatsChange(this.currentStats);
+
+        console.log(this);
     }
 
     updateBaseStats(key, value): void {
@@ -109,6 +115,10 @@ export class statsCTRL {
             stats[stat] = this.stats[stat].value;
         }
         return stats;
+    }
+
+    getStat(key) {
+        return this.stats[key].baseValue;
     }
 
     // ITEMS

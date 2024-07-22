@@ -186,6 +186,11 @@ export class PlayerSchema extends Entity {
 
         // if not dead
         if (this.isDead === true) {
+            // if player is dead make sure player animation is EntityState.DEAD
+            if (this.anim_state !== EntityState.DEAD) {
+                this.anim_state = EntityState.DEAD;
+            }
+
             return false;
         }
 
@@ -238,6 +243,16 @@ export class PlayerSchema extends Entity {
 
         // log
         Logger.info("[gameroom][onCreate] player " + this.name + " saved to database.");
+    }
+
+    /**
+     * Calculate rotation based on moving from v1 to v2
+     * @param {Vector3} v1
+     * @param {Vector3} v2
+     * @returns rotation in radians
+     */
+    rotateTowards(v1: Vector3, v2: Vector3): number {
+        return Math.atan2(v1.x - v2.x, v1.z - v2.z);
     }
 
     //////////////////////////////////////////////
@@ -505,8 +520,8 @@ export class PlayerSchema extends Entity {
         this.health = this.maxHealth;
         this.mana = this.maxMana;
         this.blocked = false;
-        this.anim_state = EntityState.IDLE;
         this.gracePeriod = true;
+        this.anim_state = EntityState.IDLE;
         setTimeout(() => {
             this.gracePeriod = false;
         }, this._state.config.PLAYER_GRACE_PERIOD);

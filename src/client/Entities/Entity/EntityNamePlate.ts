@@ -12,8 +12,8 @@ export class EntityNamePlate {
     private _scene: Scene;
     private _entity: Entity | Item;
     private damageBubbles: any = [];
-    private font_size = 40;
-    private font = "bold 40px gamefont";
+    private font_size = 50;
+    private font = "bold 50px gamefont";
 
     private currentMessage;
     private messageTimeout;
@@ -246,7 +246,7 @@ export class EntityNamePlate {
      * TODO: add instances to improve performance
      * @param entity
      */
-    addDamageBubble(offset_y = 0.2) {
+    addDamageBubble(offset_y = 0.2, ping = 0) {
         // only proceed if damage has occured
         let healthChange = this._entity.entity.health - this._entity.health;
         if (healthChange === 0 || healthChange === 1) {
@@ -255,7 +255,7 @@ export class EntityNamePlate {
 
         let text = "" + healthChange;
         let color = healthChange > 0 ? Color3.Green().toHexString() : Color3.Yellow().toHexString(); // set current color
-        let { planeWidth, planeHeight, texture, material } = this.createMaterial(0.4, 1.5, text);
+        let { planeWidth, planeHeight, texture, material } = this.createMaterial(0.4, 1, text);
         let entity_height = this.getEntityheight(offset_y);
 
         // create plane
@@ -271,11 +271,15 @@ export class EntityNamePlate {
 
         // set meta
         plane.metadata = {
+            ping: ping,
+            delta: 0,
             end_position: this._entity.position.y + 6,
             material: material,
             texture: texture,
             offset: randomNumberInRange(-0.002, 0.002),
         };
+
+        plane.isVisible = false;
 
         // add to damage bubbles array
         this.damageBubbles.push(plane);
@@ -285,17 +289,24 @@ export class EntityNamePlate {
      * Update Loop
      */
     update() {
-        //
-
         // update damage bubbles
         if (this.damageBubbles.length > 0) {
             // loop through damage bubbles and update them
             for (let i = 0; i < this.damageBubbles.length; i++) {
                 let metadata = this.damageBubbles[i].metadata;
-                this.damageBubbles[i].position.y += 0.04;
+
+                // delay nameplate for the duration of the player ping
+                metadata.delta += 15;
+                if (metadata.delta < metadata.ping) {
+                    continue;
+                } else {
+                    this.damageBubbles[i].isVisible = true;
+                }
+
+                this.damageBubbles[i].position.y += 0.02;
                 this.damageBubbles[i].position.z += metadata.offset;
                 this.damageBubbles[i].position.x += metadata.offset;
-                this.damageBubbles[i].visibility -= 0.02;
+                this.damageBubbles[i].visibility -= 0.01;
 
                 // if higher than end position, remove
                 if (this.damageBubbles[i].position.y > this.damageBubbles[i].metadata.end_position) {

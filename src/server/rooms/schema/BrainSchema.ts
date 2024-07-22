@@ -9,6 +9,7 @@ import { Vector3 } from "../../../shared/Libs/yuka-min";
 import { randomNumberInRange } from "../../../shared/Utils";
 import { EquipmentSchema } from "./player/EquipmentSchema";
 import { GameRoomState } from "../state/GameRoomState";
+import { animationCTRL } from "../controllers/animationCTRL";
 
 export class BrainSchema extends Entity {
     /////////////////////////////////////////////////////////////
@@ -56,6 +57,7 @@ export class BrainSchema extends Entity {
 
     // CTRL
     public abilitiesCTRL: abilitiesCTRL;
+    public animationCTRL: animationCTRL;
     public abilities: AbilitySchema[] = [];
     public default_abilities;
 
@@ -65,6 +67,7 @@ export class BrainSchema extends Entity {
     public IDLE_TIMER_LENGTH = 0;
     public CHASE_TIMER = 0;
     public ATTACK_TIMER = 0;
+    public ATTACK_ISINTERVAL = false;
     public DEAD_TIMER = 0;
 
     // AI
@@ -94,6 +97,10 @@ export class BrainSchema extends Entity {
                 this.equipment.set(element.key, new EquipmentSchema(element, this));
             });
         }
+
+        // set controllers
+        this.abilitiesCTRL = new abilitiesCTRL(this, data);
+        this.animationCTRL = new animationCTRL(this);
 
         // initialize state machine
         this._stateMachine = new StateManager(this);

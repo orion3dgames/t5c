@@ -19,12 +19,19 @@ export class dropCTRL {
     public addExperience(target) {
         // calculate experience total
         let exp = target.experienceGain;
+        if (target.AI_SPAWN_INFO && target.AI_SPAWN_INFO.experienceGain) {
+            exp = target.AI_SPAWN_INFO.experienceGain;
+        }
         let amount = Math.floor(randomNumberInRange(exp.min, exp.max));
         Leveling.addExperience(this._owner, amount);
+        console.log("[addExperience]", amount);
     }
 
     public addGold(target) {
         let goldGains = target.goldGain;
+        if (target.AI_SPAWN_INFO && target.AI_SPAWN_INFO.goldGain) {
+            goldGains = target.AI_SPAWN_INFO.goldGain;
+        }
         if (goldGains.min && goldGains.max) {
             let gold = Math.floor(randomNumberInRange(goldGains.min, goldGains.max));
             this._owner.player_data.gold += gold;

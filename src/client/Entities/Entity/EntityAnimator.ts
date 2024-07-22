@@ -9,7 +9,7 @@ export class EntityAnimator {
     private ratio;
 
     //animations
-    private _playerAnimations: AnimationGroup[];
+    private _animations = [];
     private _idle;
     private _walk;
     private _attack;
@@ -50,49 +50,37 @@ export class EntityAnimator {
     }
 
     public refreshAnimationRatio() {
+        /*
         this.ratio = this._entity._scene.getAnimationRatio();
         // set animation speed
         this._idle.speedRatio = this.entityData.animations["IDLE"].speed * this.ratio;
         this._walk.speedRatio = this.entityData.animations["WALK"].speed * this.ratio;
         this._attack.speedRatio = this.entityData.animations["ATTACK"].speed * this.ratio;
         this._death.speedRatio = this.entityData.animations["DEATH"].speed * this.ratio;
+        */
     }
 
     private _build(): void {
-        this._attack = {
-            name: "ATTACK",
-            index: 0,
-            loop: true,
-            speed: 1,
-            ranges: this.entityData.animationRanges[0],
+
+        // build animation list and properties
+        let animations = this._entity.raceData.vat.animations ?? [];
+        let i = 0;
+        for(let key in animations){
+            let anim = animations[key];
+            anim.key = key;
+            anim.index = i;
+            anim.ranges = this.entityData.animationRanges[i],
+            this._animations[key] = anim;
+            i++;
         };
 
-        this._death = {
-            name: "DEATH",
-            index: 1,
-            loop: false,
-            speed: 1,
-            ranges: this.entityData.animationRanges[1],
-        };
+        // set default animation
+        this._currentAnim = this.getAnimation('IDLE');
+        this._prevAnim = this.getAnimation('WALK');
+    }
 
-        this._idle = {
-            name: "IDLE",
-            index: 2,
-            loop: true,
-            speed: 1,
-            ranges: this.entityData.animationRanges[2],
-        };
-
-        this._walk = {
-            name: "WALK",
-            index: 3,
-            loop: true,
-            speed: 1,
-            ranges: this.entityData.animationRanges[3],
-        };
-
-        this._currentAnim = this._idle;
-        this._prevAnim = this._walk;
+    getAnimation(key){
+        return this._animations[key];
     }
 
     // This method will compute the VAT offset to use so that the animation starts at frame #0 for VAT time = time passed as 3rd parameter
@@ -127,33 +115,51 @@ export class EntityAnimator {
 
     // determine what animation should be played
     public animate(entity): void {
+
         let currentPos = entity.getPosition();
         let nextPos = entity.moveController.getNextPosition();
         entity.isMoving = false;
 
         // if player has died
         if (entity.anim_state === EntityState.DEAD) {
-            this._currentAnim = this._death;
+            this._currentAnim = this.getAnimation('DEATH');
 
             // if player is attacking
-        } else if (entity.anim_state === EntityState.ATTACK) {
-            this._currentAnim = this._attack;
+        } else if (entity.anim_state === EntityState.ATTACK_VERTICAL) {
+            this._currentAnim = this.getAnimation('ATTACK');
+
+            // if player is attacking
+        } else if (entity.anim_state === EntityState.UNARMED) {
+            this._currentAnim = this.getAnimation('UNARMED');
+
+            // if player is attacking
+        } else if (entity.anim_state === EntityState.ATTACK_HORIZONTAL) {
+            this._currentAnim = this.getAnimation('ATTACK_HORIZONTAL');
+
+            // if player is attacking
+        } else if (entity.anim_state === EntityState.SPELL_CASTING) {
+            this._currentAnim = this.getAnimation('SPELL_CASTING');
+
+            // if player is attacking
+        } else if (entity.anim_state === EntityState.SPELL_CAST) {
+            this._currentAnim = this.getAnimation('SPELL_CAST');
 
             // if player is moving
         } else if (this.checkIfPlayerIsMoving(currentPos, nextPos) && entity.health > 0) {
             //console.log("PLAYER IS STILL MOVING...");
-            this._currentAnim = this._walk;
+            this._currentAnim = this.getAnimation('WALK');
             entity.isMoving = true;
 
             // todo: I hate this, but I have no idea how to fix this in a better way at this stage...
+            /*
             if (entity._input && !entity._input.player_can_move) {
-                this._currentAnim = this._idle;
+                this._currentAnim = this.getAnimation('IDLE');
                 entity.isMoving = false;
-            }
+            }*/
 
             // else play idle
         } else {
-            this._currentAnim = this._idle;
+            this._currentAnim = this.getAnimation('IDLE')
         }
     }
 
@@ -200,7 +206,7 @@ export class EntityAnimator {
         this.setAnimationParameters(itemMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, this._currentAnim);
     }
 
-    refreshAnimation(){
+    refreshAnimation() {
         this._prevAnim = false;
     }
 }

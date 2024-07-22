@@ -8,6 +8,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { nanoid } from "nanoid";
 import { GameScene } from "../../Screens/GameScene";
+import { EntityState } from "../../../shared/types";
 
 export class EntityActions {
     private _gamescene: GameScene;
@@ -48,7 +49,7 @@ export class EntityActions {
 
             // if intersect with target mesh then display impact
             if (element.projectile.intersectsMesh(targetMesh, true)) {
-                this.particule_impact(targetMesh, element.color);
+                this.particule_impact(targetMesh, element.ability);
                 element.projectile.dispose(true, true);
                 element.particleSystem.dispose(true);
                 element.particleSystemTrail.dispose(true);
@@ -58,32 +59,35 @@ export class EntityActions {
     }
 
     public process(player, data, ability) {
-        /*
-        let soundToPlay = this._scene.getSoundByName("sound_"+ability.key);
-        if(!soundToPlay){
-            // play sound
-            let soundData = this._loadedAssets[ability.sound];
-            let sound = new Sound("sound_"+ability.key, soundData, this._scene, function(){ sound.play(); }, {
-                volume: 0.3
-            });
-        }
-        */
-
         //
         let source = this._entities.get(data.fromId);
         let target = this._entities.get(data.targetId);
 
+        // play sound
+        setTimeout(() => {
+            this._gamescene._sound.play("SOUND_" + ability.sound);
+        }, ability.soundDelay);
+
+        // set effect
+        if (ability.effect.type === "target") {
+            //source.anim_state = EntityState.ATTACK;
+        }
+
         // set effect
         if (ability.effect.particule === "fireball") {
-            this.particule_fireball(source, target, ability.effect.color);
+            this.particule_fireball(source, target, ability);
         }
 
         if (ability.effect.particule === "heal") {
-            this.particule_heal(target, ability.effect.color);
+            this.particule_heal(target, ability);
         }
     }
 
-    public particule_impact(mesh, color) {
+    public particule_impact(mesh, ability) {
+        let color = ability.effect.color;
+
+        this._gamescene._sound.play("SOUND_hit_a");
+
         //////////////////////////////////////////////
         // create a particle system
         var particleSystem = new ParticleSystem("particles", 1000, this._scene);
@@ -115,7 +119,9 @@ export class EntityActions {
         //
     }
 
-    public particule_heal(target, color) {
+    public particule_heal(target, ability) {
+        let color = ability.effect.color;
+
         // get mesh
         let mesh = target.mesh;
 
@@ -160,11 +166,9 @@ export class EntityActions {
         //
     }
 
-    public particule_fireball(source, target, color) {
-        // play sound
-        this._gamescene._sound.play("SOUND_fire_attack_1");
-
+    public particule_fireball(source, target, ability) {
         // get local position
+        let color = ability.effect.color;
         let start = source.getPosition();
         let end = target.getPosition();
 
@@ -239,33 +243,12 @@ export class EntityActions {
         //
         this.projectiles.set(nanoid(), {
             color: color,
+            ability: ability,
             source: source,
             target: target,
             projectile: projectile,
             particleSystem: particleSystem,
             particleSystemTrail: particleSystemTrail,
         });
-
-        /*
-        projectile.lookAt(end);
-        projectile.rotate(new Vector3(0, 1, 0), Tools.ToRadians(180));
-        var endVector = projectile.calcMovePOV(0, 0, 72).addInPlace(projectile.position);
-        var points = [start, endVector];
-        var path = new Path3D(points);
-        var i = 0;
-        var loop = this._scene.onBeforeRenderObservable.add(() => {
-            if (i < 1) {
-                projectile.position = path.getPointAt(i);
-                i += 0.005;
-            }
-            if (projectile.intersectsMesh(mesh, true) || i > 1) {
-                this.particule_impact(mesh, color);
-                projectile.dispose(true, true);
-                particleSystem.dispose(true);
-                particleSystemTrail.dispose(true);
-                this._scene.onBeforeRenderObservable.remove(loop);
-            }
-        });
-        */
     }
 }

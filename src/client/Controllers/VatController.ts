@@ -71,6 +71,7 @@ export class VatController {
 
     async fetchVAT(key) {
         const url = "./models/races/vat/" + key + ".json";
+        console.log(url);
         const response = await fetch(url);
         const movies = await response.json();
         return movies;

@@ -23,7 +23,7 @@ export class SoundController {
                 () => {
                     this.sounds.set(key, sound);
                     sound.play();
-                    console.log("[SOUND] playing " + key, sound);
+                    //console.log("[SOUND] playing " + key, sound);
                 },
                 {
                     volume: this.volume,
@@ -32,7 +32,7 @@ export class SoundController {
             );
         } else {
             this.sounds.get(key).play(loop);
-            console.log("[SOUND] playing from cache " + key);
+            //console.log("[SOUND] playing from cache " + key);
         }
     }
 }

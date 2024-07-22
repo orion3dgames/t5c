@@ -4,10 +4,15 @@ let RaceVAT = {
     humanoid: {
         key: "humanoid",
         animations: {
-            ATTACK: { name: "1H_Melee_Attack_Chop", duration: 1000, speed: 1 },
-            DEATH: { name: "Death_A", duration: 1000, speed: 1 },
-            IDLE: { name: "Idle", duration: 1000, speed: 1 },
-            WALK: { name: "Walking_B", duration: 1000, speed: 1.3 },
+            ATTACK: { name: "1H_Melee_Attack_Chop", duration: 1000, speed: 1, loop: true },
+            ATTACK_HORIZONTAL: { name: "1H_Melee_Attack_Slice_Horizontal", duration: 1000, speed: 1, loop: true },
+            DEATH: { name: "Death_A", duration: 1000, speed: 1, loop: false },
+            HIT_A: { name: "Hit_A", duration: 1000, speed: 1, loop: true },
+            IDLE: { name: "Idle", duration: 1000, speed: 1, loop: true },
+            SPELL_CAST: { name: "Spellcast_Shoot", duration: 1000, speed: 1, loop: true },
+            SPELL_CASTING: { name: "Spellcasting", duration: 1000, speed: 1, loop: true },
+            UNARMED: { name: "Unarmed_Melee_Attack_Punch_A", duration: 1000, speed: 1, loop: true },
+            WALK: { name: "Walking_B", duration: 1000, speed: 1.3, loop: true },
         },
         bones: {
             WEAPON: 12,
@@ -21,28 +26,17 @@ let RaceVAT = {
                 "Head_Engineer",
                 "Head_Mage",
                 "Head_Rogue",
-                "Head_Paladin"
+                "Head_Paladin",
             ],
         },
     },
     rat: {
-        key: "rat",
+        key: "rat_01",
         animations: {
             ATTACK: { name: "Rat_Attack", duration: 1000, speed: 1 },
             DEATH: { name: "Rat_Death", duration: 1000, speed: 1 },
             IDLE: { name: "Rat_Idle", duration: 1000, speed: 1 },
             WALK: { name: "Rat_Walk", duration: 1000, speed: 1.3 },
-        },
-        bones: {},
-        meshes: {},
-    },
-    skeleton: {
-        key: "skeleton_01",
-        animations: {
-            ATTACK: { name: "1H_Melee_Attack_Chop", duration: 1000, speed: 1 },
-            DEATH: { name: "Death_A", duration: 1000, speed: 1 },
-            IDLE: { name: "Idle", duration: 1000, speed: 1 },
-            WALK: { name: "Walking_A", duration: 1000, speed: 1.3 },
         },
         bones: {},
         meshes: {},
@@ -62,8 +56,8 @@ let RacesDB: raceDataMap = {
         baseMana: 50,
         healthRegen: 5,
         manaRegen: 5, // per second
-        experienceGain: { min: 0, max: 0 },
-        goldGain: { min: 0, max: 0 },
+        experienceGain: { min: 1, max: 1 },
+        goldGain: { min: 1, max: 1 },
         drops: [],
         default_abilities: ["base_attack"],
         vat: RaceVAT.humanoid,
@@ -113,35 +107,13 @@ let RacesDB: raceDataMap = {
         baseMana: 50,
         healthRegen: 0.1,
         manaRegen: 0.1,
-        experienceGain: { min: 0, max: 0 },
-        goldGain: { min: 0, max: 0 },
+        experienceGain: { min: 1, max: 1 },
+        goldGain: { min: 1, max: 1 },
         drops: [],
         default_abilities: ["base_attack"],
         vat: RaceVAT.humanoid,
         materials: [
             { title: "Color 1", material: "skeleton_texture.png" }, //
-        ],
-    },
-
-    rat_01: {
-        key: "rat_01",
-        title: "Rat",
-        description: "To be written...",
-        icon: "ICON_RACE_male_mage",
-        baseHealth: 50,
-        baseMana: 50,
-        healthRegen: 0,
-        manaRegen: 0,
-        experienceGain: { min: 5, max: 10 },
-        goldGain: { min: 4, max: 20 },
-        drops: [],
-        default_abilities: ["base_attack"],
-        speed: 0.1,
-        scale: 0.3,
-        rotationFix: Math.PI,
-        vat: RaceVAT.rat,
-        materials: [
-            { title: "Color 1", material: "knight_texture.png" }, //
         ],
     },
 

@@ -1,26 +1,54 @@
+import { clearTimeout } from "timers";
 import { EntityState } from "../../../shared/types";
 import { GameRoomState } from "../state/GameRoomState";
 
 export class animationCTRL {
+
     private _state: GameRoomState;
+
+    private currentTimeout;
+
     constructor(state) {
         this._state = state;
     }
 
-    public playAnim(owner, anim_state: EntityState, callback: ()=> void): void {
+    public playAnim(owner, anim_state: EntityState, callback: ()=> void) {
+
+        if(this.currentTimeout){
+            return false;
+        }
+
         owner.anim_state = anim_state;
 
         // if spellcast, only play once
-        if (anim_state === EntityState.SPELL_CAST) {
-            setTimeout(() => {
+        if (anim_state === EntityState.ATTACK_VERTICAL) {
+            this.currentTimeout = setTimeout(() => {
                 owner.anim_state = EntityState.IDLE;
+                this.currentTimeout = undefined;
+            }, 1100);
+        }
+
+        // if spellcast, only play once
+        if (anim_state === EntityState.ATTACK_HORIZONTAL) {
+            this.currentTimeout = setTimeout(() => {
+                owner.anim_state = EntityState.IDLE;
+                this.currentTimeout = undefined;
+            }, 900);
+        }
+
+        // if spellcast, only play once
+        if (anim_state === EntityState.SPELL_CAST) {
+            this.currentTimeout = setTimeout(() => {
+                owner.anim_state = EntityState.IDLE;
+                this.currentTimeout = undefined;
             }, 900);
         }
 
         // if spellcast, only play once
         if (anim_state === EntityState.PICKUP ) {
-            setTimeout(() => {
+            this.currentTimeout = setTimeout(() => {
                 owner.anim_state = EntityState.IDLE;
+                this.currentTimeout = undefined;
                 if(callback){
                     callback();
                 }

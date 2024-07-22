@@ -22,6 +22,7 @@ class Config {
     PLAYER_INTERACTABLE_DISTANCE = 5;
     PLAYER_INVENTORY_SPACE = 23;
     PLAYER_HOTBAR_SIZE = 9;
+    COMBAT_SPEED = 1300;
 
     // enemies settings
     MONSTER_RESPAWN_RATE = 20000;

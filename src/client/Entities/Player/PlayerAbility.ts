@@ -105,8 +105,7 @@ export class PlayerAbility {
 
     // process server casting events
     public processServerCasting(data) {
-        let digit = data.digit;
-        let ability = this.getAbilityByDigit(digit) as Ability;
+        let ability = this.player._game.getGameData("ability", data.key);
         if (ability) {
             // if you are sender, cancel casting and strat cooldown on client
             if (data.fromId === this.player.sessionId) {
@@ -115,7 +114,7 @@ export class PlayerAbility {
                 this.castingTarget = 0;
                 this.isCasting = false;
                 this.player._ui._CastingBar.close();
-                this.ability_in_cooldown[digit] = ability.cooldown; // set cooldown
+                this.ability_in_cooldown[data.digit] = ability.cooldown; // set cooldown
             }
 
             // action ability

@@ -20,9 +20,11 @@ import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { calculateRanges, bakeVertexData, setAnimationParameters } from "../Entities/Common/VatHelper";
 import AnimationHelper from "../Entities/Common/AnimationHelper";
 import { GameController } from "../Controllers/GameController";
-import { AnimationGroup, InstancedMesh } from "@babylonjs/core";
+import { AnimationGroup, InstancedMesh, Texture } from "@babylonjs/core";
 import { nanoid } from "nanoid";
 import { mergeMesh, mergeMeshAndSkeleton } from "../Entities/Common/MeshHelper";
+import { PBRCustomMaterial } from "@babylonjs/materials/custom/pbrCustomMaterial";
+import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 
 class JavascriptDataDownloader {
     private data;
@@ -71,12 +73,13 @@ class Entity {
         this.createLabel(this.mesh, spawnInfo.name);
 
         // attach weapon
+        /*
         let weaponMeshMerged = this.game._loadedAssets["ITEM_sword_01"];
         const weapon = weaponMeshMerged.createInstance("player_sword") as InstancedMesh;
         const skeletonAnim = entityData.skeletonForAnim[0];
         let bone = skeletonAnim.bones[12];
         weapon.attachToBone(bone, playerInstance);
-        this.equipment.push(weapon);
+        this.equipment.push(weapon);*/
 
         // default animation
         this.mesh.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
@@ -137,16 +140,10 @@ export class DebugScene {
     public _newState: State;
     public _button: Button;
     public _ui;
+    public stackPanel;
 
     public results;
-    public SPAWN_INFO = [
-        {
-            key: "male_knight",
-            name: "Knight",
-            material: 0,
-            amount: 1,
-        },
-    ];
+    public SPAWN_INFO = [];
 
     public entityData = new Map();
     public entities = new Map();
@@ -188,25 +185,69 @@ export class DebugScene {
         label.text = "FPS: " + this._engine.getFps();
         label.color = "white";
         label.top = "15px;";
-        label.left = "15px;";
+        label.left = "-15px;";
         label.textWrapping = TextWrapping.WordWrap;
-        label.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        label.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
         label.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         this._ui.addControl(label);
 
         // preload assets
         this._game.initializeAssetController();
         await this._game._assetsCtrl.load();
-        console.log("loading complete", this._game._loadedAssets);
+ 
+        // UI
+        const leftStackPanel = new StackPanel("leftStackPanel");
+        leftStackPanel.topInPixels = 15;
+        leftStackPanel.leftInPixels = 15;
+        leftStackPanel.width = .2;
+        leftStackPanel.height = 0.6;
+        leftStackPanel.background = "transparent";
+        leftStackPanel.spacing = 5;
+        leftStackPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        leftStackPanel.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+        leftStackPanel.adaptHeightToChildren = true;
+        leftStackPanel.setPaddingInPixels(5, 5, 5, 5);
+        leftStackPanel.isVertical = true;
+        this._ui.addControl(leftStackPanel);
+        this.stackPanel = leftStackPanel;
 
-        // load and merge weapon
-        const weaponLoad = this._game._loadedAssets["ITEM_sword_01"];
-        const weaponMesh = weaponLoad.meshes[0];
-        const merged = mergeMesh(weaponMesh);
-        if (merged) {
-            merged.isVisible = false;
-            this._game._loadedAssets["ITEM_sword_01"] = merged;
-        }
+        const btnTitle = Button.CreateSimpleButton("btnChoice", "Generate VAT");
+        btnTitle.top = "0px";
+        btnTitle.width = 1;
+        btnTitle.height = "30px";
+        btnTitle.color = "white";
+        btnTitle.background = "transparent";
+        btnTitle.thickness = 0;
+        btnTitle.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        btnTitle.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        leftStackPanel.addControl(btnTitle);
+
+        let races = this._game.loadGameData('races');
+        for(let id in races){
+            let element = races[id];
+
+            this.SPAWN_INFO.push(element);
+
+            const btnChoice = Button.CreateSimpleButton("btnChoice_"+element.key, element.key);
+            btnChoice.top = "0px";
+            btnChoice.width = 1;
+            btnChoice.height = "30px";
+            btnChoice.color = "white";
+            btnChoice.background = "gray";
+            btnChoice.thickness = 1;
+            btnChoice.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+            btnChoice.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+            leftStackPanel.addControl(btnChoice);
+
+            btnChoice.onPointerDownObservable.add(() => {
+                this.stackPanel.isVisible = false;
+                let entityData = this.entityData.get(element.key);
+                this.bakeTextureAnimation(element.key, entityData.mesh);
+
+                this.spawn(entityData);
+            });
+
+        };
 
         // preload skeletons and animation
         await Promise.all(
@@ -214,66 +255,20 @@ export class DebugScene {
                 await this.prepareMesh(spawn);
             })
         );
+        console.log('[VAT] Loaded', this.entityData);
 
-        /*
 
-        // create intances
-        for (const spawn of this.SPAWN_INFO) {
-            for (let i = 0; i < spawn.amount; i++) {
-                this.createInst(spawn, i + "");
-            }
-        }
-
-        // render animations
         this._scene.registerBeforeRender(() => {
-            // show fps
-            label.text = "FPS: " + this._engine.getFps() + "\n";
-            label.text += "INSTANCES: " + this.entities.size;
-
-            // process vat animations
-            this.entityData.forEach((entityData) => {
-                entityData.vat.time += this._scene.getEngine().getDeltaTime() / 1000.0;
-                const frame = entityData.vat.time * 60 + frameOffset;
-
-                // prepare skeleton (for weapon animations)
-                entityData.skeletonForAnim.forEach((skel) => {
-                    skel.prepare();
-                });
-
-                // not sure what is the purpose of this block
-                if (entityData.selectedAnimationGroups) {
-                    entityData.selectedAnimationGroups.forEach((animationGroup) => {
-                        const frameRange = animationGroup.to - animationGroup.from;
-                        animationGroup.goToFrame(animationGroup.from + (frame % Math.trunc(frameRange)));
-                    });
-                }
-            });
-
-            // update entity
-            this.entities.forEach((element) => {
-                element.update();
-            });
+            label.text = "FPS: " + this._engine.getFps();
         });
-
-        // retarget animations for equipment
-        this.entityData.forEach((entityData) => {
-            let indexAnim = 0;
-            for (const animationGroup of entityData.selectedAnimationGroups) {
-                AnimationHelper.RetargetAnimationGroupToRoot(animationGroup, entityData.rootForAnim[indexAnim]);
-                AnimationHelper.RetargetSkeletonToAnimationGroup(animationGroup, entityData.skeletonForAnim[indexAnim]);
-                animationGroup.play(true);
-                entityData.rootForAnim[indexAnim].setEnabled(false);
-                indexAnim++;
-            }
-        });*/
     }
 
-    ///
-    createInst(spawnInfo, id) {
-        let sessionId = nanoid();
-        let entityData = this.entityData.get(spawnInfo.key);
-        const playerInstance = entityData.mesh.createInstance("player_" + id);
-        this.entities.set(sessionId, new Entity(playerInstance, entityData, this, spawnInfo));
+    spawn(entityData){
+        for (let i = 0; i < 100; i++) {
+            let sessionId = nanoid();
+            const playerInstance = entityData.mesh.createInstance("player_" + i);
+            this.entities.set(sessionId, new Entity(playerInstance, entityData, this, {}));
+        } 
     }
 
     async prepareMesh(spawnInfo) {
@@ -281,47 +276,32 @@ export class DebugScene {
         let race = this._game.getGameData("race", spawnInfo.key);
         let key = spawnInfo.key;
 
-        const meshes = asset.meshes;
         const animationGroups = asset.animationGroups;
         const skeletons = asset.skeletons;
         const skeleton = skeletons[0];
-        const root = meshes[0] as Mesh;
 
         animationGroups.forEach((ag) => ag.stop());
 
-        const selectedAnimationGroups = this.getAnimationGroups(animationGroups, race.animations);
-
-        // prepare skeletons and root anims
-        const rootForAnimations: any[] = [];
-        const skeletonForAnim: any[] = [];
-        for (let i in race.animations) {
-            const skel = skeleton.clone("skeleton_" + key + "_" + i);
-            skeletonForAnim.push(skel);
-            const rootAnim = root.instantiateHierarchy(null, { doNotInstantiate: true }, (source, clone) => {
-                clone.name = source.name;
-            });
-            if (rootAnim) {
-                rootAnim.name = "_root_" + i;
-                rootForAnimations.push(rootAnim);
-            }
-        }
-
+        const selectedAnimationGroups = this.getAnimationGroups(animationGroups, race.vat.animations);
+     
         // reset position & rotation
-        root.position.setAll(0);
-        root.scaling.setAll(1);
-        root.rotationQuaternion = null;
-        root.rotation.setAll(0);
+        let rawMesh = this._game._loadedAssets["RACE_" + key].meshes[0].clone("TEST");
+        rawMesh.position.setAll(0);
+        rawMesh.scaling.setAll(1);
+        rawMesh.rotationQuaternion = null;
+        rawMesh.rotation.setAll(0);
+
+        // add material
+        this.prepareMaterial(rawMesh, spawnInfo.key, 0)
 
         // calculate animations ranges
         const ranges = calculateRanges(selectedAnimationGroups);
 
         // merge mesh
-        const merged = mergeMeshAndSkeleton(root, skeleton);
+        const merged = mergeMeshAndSkeleton(rawMesh, skeleton, race.key+"_merged");
 
         // setup vat
         if (merged) {
-            // hide
-            merged.isVisible = false;
 
             // create vat manager
             const vat = new BakedVertexAnimationManager(this._scene);
@@ -337,13 +317,14 @@ export class DebugScene {
                 animationRanges: ranges,
                 animationGroups: animationGroups,
                 selectedAnimationGroups: selectedAnimationGroups,
-                rootForAnim: rootForAnimations,
-                skeletonForAnim: skeletonForAnim,
                 vat: vat,
             });
 
+            rawMesh.dispose();
+            merged.isEnabled(true);
+
             // bake to file
-            await this.bakeTextureAnimation(key, merged);
+            //await this.bakeTextureAnimation(key, merged);
 
             // bake realtime
             //await this.bakeTextureAnimationRealtime(key, merged);
@@ -358,6 +339,7 @@ export class DebugScene {
         const bufferFromMesh = await bakeVertexData(merged, this.entityData.get(key).selectedAnimationGroups);
         let vertexDataJson = b.serializeBakedVertexDataToJSON(bufferFromMesh);
         new JavascriptDataDownloader(vertexDataJson).download("text/json", key + ".json");
+        this.stackPanel.isVisible = true;
     }
 
     async bakeTextureAnimationRealtime(key: string, merged) {
@@ -375,7 +357,39 @@ export class DebugScene {
         this.entityData.get(key).vat.texture = b.textureFromBakedVertexData(bufferFromMesh);
     }
 
-    // todo: there must a better way to do this, it's so ugly
+    //
+    prepareMaterial(cloneMesh, raceKey, materialIndex) {
+       
+        // get race
+        let race = this._game.getGameData("race", raceKey);
+
+        // remove any existing material
+        const selectedMaterial = cloneMesh.material ?? false;
+        if (selectedMaterial) {
+            selectedMaterial.dispose();
+        }
+
+        let materialKey = race.materials[materialIndex].material;
+        let mat = this._game.scene.getMaterialByName(materialKey);
+        if (mat) {
+            cloneMesh.material = mat;
+        } else {
+            // create material as it does not exists
+            mat = new PBRCustomMaterial(materialKey);
+            mat.albedoTexture = new Texture("./models/materials/" + materialKey, this._game.scene, {
+                invertY: false,
+            });
+            mat.reflectionColor = new Color3(0, 0, 0);
+            mat.reflectivityColor = new Color3(0, 0, 0);
+            mat.backFaceCulling = false;
+
+            // assign to mesh
+            cloneMesh.material = mat;
+        }
+
+        console.log(mat);
+    }
+
     getAnimationGroups(animationGroups, raceAnimations) {
         let anims: AnimationGroup[] = [];
         for (let i in raceAnimations) {
