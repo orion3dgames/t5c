@@ -22,7 +22,9 @@ let ItemsDB: itemDataMap = {
             rotation_y: Math.PI * 1.5,
         },
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
-        statModifiers: {},
+        statModifiers: {
+            maxHealth: [{ type: CalculationTypes.MULTIPLY, value: 4 }],
+        },
         damage: { min: 1, max: 3 },
         meshData: {
             scale: 1.3,

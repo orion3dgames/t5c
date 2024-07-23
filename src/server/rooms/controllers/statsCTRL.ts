@@ -5,6 +5,22 @@ type Modifier = {
     value: number;
 };
 
+type StatModifiers = {
+    [key: string]: Modifier[];
+};
+
+class Buff {
+    name: string;
+    statModifiers: StatModifiers;
+    duration: number; // Duration in seconds, 0 for permanent buffs/debuffs
+
+    constructor(name: string, statModifiers: StatModifiers, duration: number = 0) {
+        this.name = name;
+        this.statModifiers = statModifiers;
+        this.duration = duration;
+    }
+}
+
 export class Stat {
     baseValue: number;
     additiveModifiers: Modifier[];
@@ -50,6 +66,9 @@ export class statsCTRL {
     private stats;
     private entity;
 
+    private equippedItems: Item[] = [];
+    private activeBuffs: Buff[] = [];
+
     onStatsChange: (stats: { [key: string]: number }) => void;
 
     constructor(entity) {
@@ -82,24 +101,21 @@ export class statsCTRL {
             this.entity.player_data.intelligence = this.stats.intelligence.value;
             this.entity.player_data.wisdom = this.stats.wisdom.value;
             this.entity.player_data.ac = this.stats.ac.value;
+
+            // make sure health is bigger than max health
+            if (this.entity.health > this.entity.maxHealth) {
+                this.entity.health = this.entity.maxHealth;
+            }
+
+            // make sure mana is bigger than max mana
+            if (this.entity.mana > this.entity.maxMana) {
+                this.entity.mana = this.entity.maxMana;
+            }
         };
     }
 
     updateStats(): void {
-        /*
-        // Ensure health and mana do not exceed their max values
-        if (this.stats.health.value > this.stats.maxHealth.value) {
-            this.stats.health.baseValue = this.stats.maxHealth.value;
-        }
-        if (this.stats.mana.value > this.stats.maxMana.value) {
-            this.stats.mana.baseValue = this.stats.maxMana.value;
-        }
-        */
-
-        // Trigger stats change callback
         this.onStatsChange(this.currentStats);
-
-        console.log(this);
     }
 
     updateBaseStats(key, value): void {
@@ -121,25 +137,10 @@ export class statsCTRL {
         return this.stats[key].baseValue;
     }
 
-    // ITEMS
-    // todo: I could probably abstract the below to work for abilities and debuffs too.
-
-    equipItem(item: Item): void {
-        this.applyItemModifiers(item, true);
-        this.updateStats();
-    }
-
-    unequipItem(item): void {
-        if (item) {
-            this.applyItemModifiers(item, false);
-            this.updateStats();
-        }
-    }
-
-    applyItemModifiers(item: Item, apply: boolean): void {
-        for (let stat in item.statModifiers) {
+    applyModifiers(modifiers: StatModifiers, apply: boolean): void {
+        for (let stat in modifiers) {
             if (this.stats[stat]) {
-                item.statModifiers[stat].forEach((modifier) => {
+                modifiers[stat].forEach((modifier) => {
                     if (apply) {
                         this.stats[stat].addModifier(modifier);
                     } else {
@@ -147,6 +148,44 @@ export class statsCTRL {
                     }
                 });
             }
+        }
+    }
+
+    // BUFFS / DEBUFFS
+    applyBuff(buff: Buff): void {
+        this.activeBuffs.push(buff);
+        this.applyModifiers(buff.statModifiers, true);
+        this.updateStats();
+
+        if (buff.duration > 0) {
+            setTimeout(() => {
+                this.removeBuff(buff.name);
+            }, buff.duration * 1000);
+        }
+    }
+
+    removeBuff(buffName: string): void {
+        const buff = this.activeBuffs.find((buff) => buff.name === buffName);
+        if (buff) {
+            this.activeBuffs = this.activeBuffs.filter((b) => b !== buff);
+            this.applyModifiers(buff.statModifiers, false);
+            this.updateStats();
+        }
+    }
+
+    // ITEMS
+    equipItem(item: Item): void {
+        console.log("equipItem", item);
+        this.equippedItems.push(item);
+        this.applyModifiers(item.statModifiers, true);
+        this.updateStats();
+    }
+
+    unequipItem(item): void {
+        if (item) {
+            this.equippedItems = this.equippedItems.filter((i) => i !== item);
+            this.applyModifiers(item.statModifiers, false);
+            this.updateStats();
         }
     }
 }
