@@ -136,18 +136,18 @@ class App {
         });
 
         //for development: make inspector visible/invisible
-        //if (isLocal()) {
-        window.addEventListener("keydown", (ev) => {
-            //Shift+Ctrl+Alt+I
-            if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.keyCode === 73) {
-                if (this.game.scene.debugLayer.isVisible()) {
-                    this.game.scene.debugLayer.hide();
-                } else {
-                    this.game.scene.debugLayer.show();
+        if (isLocal()) {
+            window.addEventListener("keydown", (ev) => {
+                //Shift+Ctrl+Alt+I
+                if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.keyCode === 73) {
+                    if (this.game.scene.debugLayer.isVisible()) {
+                        this.game.scene.debugLayer.hide();
+                    } else {
+                        this.game.scene.debugLayer.show();
+                    }
                 }
-            }
-        });
-        //}
+            });
+        }
 
         //resize if the screen is resized/rotated
         window.addEventListener("resize", () => {
