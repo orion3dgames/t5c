@@ -112,22 +112,24 @@ export class EntityMove {
         let newZ = oldZ - input.v * speed;
         const newRotY = Math.atan2(input.h, input.v);
 
-        // check it fits in navmesh
-        if (this.isCurrentPlayer) {
-            let sourcePos = new Vector3Y(oldX, oldY, oldZ); // new pos
-            let destinationPos = new Vector3Y(newX, newY, newZ); // new pos
-            const foundPath = this._navMesh.getRegionForPoint(destinationPos, 0.5);
-            if (foundPath) {
-                // adjust height of the entity according to the ground
-                let currentRegion = foundPath;
-                const distance = currentRegion.plane.distanceToPoint(destinationPos);
-                newY -= distance; // smooth transition*/
+        // check if destination is in navmesh
+        let sourcePos = new Vector3Y(oldX, oldY, oldZ); // new pos
+        let destinationPos = new Vector3Y(newX, newY, newZ); // new pos
 
-                this.nextPosition.x = newX;
-                this.nextPosition.y = newY;
-                this.nextPosition.z = newZ;
-                this.nextRotation.y = this.nextRotation.y + (newRotY - this.nextRotation.y);
-            }
+        // get clamped position
+        let clampedPosition = this._navMesh.clampMovementV2(sourcePos, destinationPos) as Vector3Y;
+
+        // collision detected, return player old position
+        this.nextPosition.x = clampedPosition.x;
+        this.nextPosition.y = clampedPosition.y;
+        this.nextPosition.z = clampedPosition.z;
+        this.nextRotation.y = this.nextRotation.y + (newRotY - this.nextRotation.y);
+
+        //
+        let nextRegion = this._navMesh.getRegionForPoint(clampedPosition, 0.5);
+        if (nextRegion && nextRegion.plane) {
+            const distance = nextRegion.plane.distanceToPoint(clampedPosition);
+            newY -= distance; // smooth transition
         }
     }
 
