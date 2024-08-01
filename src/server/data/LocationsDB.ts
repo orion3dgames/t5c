@@ -364,7 +364,7 @@ let LocationsDB = {
                     race: "skeleton_01",
                     material: 0,
                     name: "Skeleton",
-                    baseHealth: 3,
+                    baseHealth: 50,
                     baseSpeed: Speed.VERY_SLOW,
                     baseDamageMultiplier: 1, // multiplicater for damage
                     experienceGain: { min: 100, max: 200 },
