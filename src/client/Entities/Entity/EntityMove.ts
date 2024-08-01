@@ -149,7 +149,7 @@ export class EntityMove {
             this._game.sendMessage(ServerMsg.PLAYER_MOVE, latestInput);
 
             // do client side prediction
-            this.predictionMove(latestInput);
+            //this.predictionMove(latestInput);
         }
     }
 }

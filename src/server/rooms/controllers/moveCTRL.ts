@@ -6,6 +6,8 @@ import { BrainSchema, LootSchema, PlayerSchema } from "../schema";
 export class moveCTRL {
     private _owner: PlayerSchema;
 
+    private currentRegion;
+
     constructor(owner) {
         this._owner = owner;
     }
@@ -159,28 +161,22 @@ export class moveCTRL {
         // check if destination is in navmesh
         let sourcePos = new Vector3(oldX, oldY, oldZ); // new pos
         let destinationPos = new Vector3(newX, newY, newZ); // new pos
-        const foundPath: any = this._owner._navMesh.checkPath(sourcePos, destinationPos);
-        if (foundPath) {
-            // adjust height of the entity according to the ground
-            let currentRegion = this._owner._navMesh.getRegionForPoint(destinationPos, 0.5);
-            if (currentRegion && currentRegion.plane) {
-                const distance = currentRegion.plane.distanceToPoint(destinationPos);
-                newY -= distance; // smooth transition*/
-            }
 
-            // next position validated, update player
-            this._owner.x = newX;
-            this._owner.y = newY;
-            this._owner.z = newZ;
-            this._owner.rot = newRot;
-            this._owner.sequence = playerInput.seq;
-        } else {
-            // collision detected, return player old position
-            this._owner.x = oldX;
-            this._owner.y = oldY;
-            this._owner.z = oldZ;
-            this._owner.rot = oldRot;
-            this._owner.sequence = playerInput.seq;
+        // get clamped position
+        let clampedPosition = this._owner._navMesh.clampMovementV2(sourcePos, destinationPos) as Vector3;
+
+        // collision detected, return player old position
+        this._owner.x = clampedPosition.x;
+        this._owner.y = clampedPosition.y;
+        this._owner.z = clampedPosition.z;
+        this._owner.rot = newRot;
+        this._owner.sequence = playerInput.seq;
+
+        //
+        let nextRegion = this._owner._navMesh.getRegionForPoint(clampedPosition, 0.5);
+        if (nextRegion && nextRegion.plane) {
+            const distance = nextRegion.plane.distanceToPoint(clampedPosition);
+            newY -= distance; // smooth transition
         }
     }
 

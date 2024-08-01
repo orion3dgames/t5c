@@ -1646,6 +1646,145 @@ class HalfEdge {
     }
 }
 
+const p1 = new Vector3();
+const p2 = new Vector3();
+
+/**
+ * Class representing a 3D line segment.
+ *
+ * @author {@link https://github.com/Mugen87|Mugen87}
+ */
+class LineSegment {
+    /**
+     * Constructs a new line segment with the given values.
+     *
+     * @param {Vector3} from - The start point of the line segment.
+     * @param {Vector3} to - The end point of the line segment.
+     */
+    constructor(from = new Vector3(), to = new Vector3()) {
+        /**
+         * The start point of the line segment.
+         * @type {Vector3}
+         */
+        this.from = from;
+
+        /**
+         * The end point of the line segment.
+         * @type {Vector3}
+         */
+        this.to = to;
+    }
+
+    /**
+     * Sets the given values to this line segment.
+     *
+     * @param {Vector3} from - The start point of the line segment.
+     * @param {Vector3} to - The end point of the line segment.
+     * @return {LineSegment} A reference to this line segment.
+     */
+    set(from, to) {
+        this.from = from;
+        this.to = to;
+
+        return this;
+    }
+
+    /**
+     * Copies all values from the given line segment to this line segment.
+     *
+     * @param {LineSegment} lineSegment - The line segment to copy.
+     * @return {LineSegment} A reference to this line segment.
+     */
+    copy(lineSegment) {
+        this.from.copy(lineSegment.from);
+        this.to.copy(lineSegment.to);
+
+        return this;
+    }
+
+    /**
+     * Creates a new line segment and copies all values from this line segment.
+     *
+     * @return {LineSegment} A new line segment.
+     */
+    clone() {
+        return new this.constructor().copy(this);
+    }
+
+    /**
+     * Computes the difference vector between the end and start point of this
+     * line segment and stores the result in the given vector.
+     *
+     * @param {Vector3} result - The result vector.
+     * @return {Vector3} The result vector.
+     */
+    delta(result) {
+        return result.subVectors(this.to, this.from);
+    }
+
+    /**
+     * Computes a position on the line segment according to the given t value
+     * and stores the result in the given 3D vector. The t value has usually a range of
+     * [0, 1] where 0 means start position and 1 the end position.
+     *
+     * @param {Number} t - A scalar value representing a position on the line segment.
+     * @param {Vector3} result - The result vector.
+     * @return {Vector3} The result vector.
+     */
+    at(t, result) {
+        return this.delta(result).multiplyScalar(t).add(this.from);
+    }
+
+    /**
+     * Computes the closest point on an infinite line defined by the line segment.
+     * It's possible to clamp the closest point so it does not exceed the start and
+     * end position of the line segment.
+     *
+     * @param {Vector3} point - A point in 3D space.
+     * @param {Boolean} clampToLine - Indicates if the results should be clamped.
+     * @param {Vector3} result - The result vector.
+     * @return {Vector3} The closest point.
+     */
+    closestPointToPoint(point, clampToLine, result) {
+        const t = this.closestPointToPointParameter(point, clampToLine);
+
+        return this.at(t, result);
+    }
+
+    /**
+     * Computes a scalar value which represents the closest point on an infinite line
+     * defined by the line segment. It's possible to clamp this value so it does not
+     * exceed the start and end position of the line segment.
+     *
+     * @param {Vector3} point - A point in 3D space.
+     * @param {Boolean} clampToLine - Indicates if the results should be clamped.
+     * @return {Number} A scalar representing the closest point.
+     */
+    closestPointToPointParameter(point, clampToLine = true) {
+        p1.subVectors(point, this.from);
+        p2.subVectors(this.to, this.from);
+
+        const dotP2P2 = p2.dot(p2);
+        const dotP2P1 = p2.dot(p1);
+
+        let t = dotP2P1 / dotP2P2;
+
+        if (clampToLine) t = MathUtils.clamp(t, 0, 1);
+
+        return t;
+    }
+
+    /**
+     * Returns true if the given line segment is deep equal with this line segment.
+     *
+     * @param {LineSegment} lineSegment - The line segment to test.
+     * @return {Boolean} The result of the equality test.
+     */
+    equals(lineSegment) {
+        return lineSegment.from.equals(this.from) && lineSegment.to.equals(this.to);
+    }
+}
+
 /**
  * Implementation of a navigation mesh. A navigation mesh is a network of convex polygons
  * which define the walkable areas of a game environment. A convex polygon allows unobstructed travel
@@ -1661,6 +1800,20 @@ class HalfEdge {
  * @author {@link https://github.com/Mugen87|Mugen87}
  * @author {@link https://github.com/robp94|robp94}
  */
+
+const pointOnLineSegment = new Vector3();
+const edgeDirection = new Vector3();
+const movementDirection = new Vector3();
+const newPosition = new Vector3();
+const lineSegment = new LineSegment();
+const edges = new Array();
+const closestBorderEdge = {
+    edge: null,
+    closestPoint: new Vector3(),
+};
+
+const lineSegment$1 = new LineSegment();
+
 class NavMesh {
     /**
      * Constructs a new navigation mesh.
@@ -1999,6 +2152,73 @@ class NavMesh {
             }
 
             return path;
+        }
+    }
+
+    /**
+     * This method can be used to restrict the movement of a game entity on the navigation mesh.
+     * Instead of preventing any form of translation when a game entity hits a border edge, the
+     * movement is clamped along the contour of the navigation mesh. The computational overhead
+     * of this method for complex navigation meshes can be reduced by using a spatial index.
+     *
+     * @param {Vector3} startPosition - The original start position of the entity for the current simulation step.
+     * @param {Vector3} endPosition - The original end position of the entity for the current simulation step.
+     * @return {Vector3} The new convex region the game entity is in.
+     */
+    clampMovementV2(startPosition, endPosition) {
+        let newRegion = this.getRegionForPoint(endPosition, this.epsilonContainsTest);
+        let clampedPosition = endPosition;
+
+        // if newRegion is null, "endPosition" lies outside of the navMesh
+        if (newRegion === null) {
+            // determine closest border edge
+            this._getClosestBorderEdge(startPosition, closestBorderEdge);
+
+            const closestEdge = closestBorderEdge.edge;
+            const closestPoint = closestBorderEdge.closestPoint;
+
+            // calculate movement and edge direction
+            closestEdge.getDirection(edgeDirection);
+            const length = movementDirection.subVectors(endPosition, startPosition).length();
+
+            // this value influences the speed at which the entity moves along the edge
+            let f = 0;
+
+            // if startPosition and endPosition are equal, length becomes zero.
+            // it's important to test this edge case in order to avoid NaN values.
+            if (length !== 0) {
+                movementDirection.divideScalar(length);
+                f = edgeDirection.dot(movementDirection);
+            }
+
+            // calculate new position on the edge
+            newPosition.copy(closestPoint).add(edgeDirection.multiplyScalar(f * length));
+
+            // the following value "t" tells us if the point exceeds the line segment
+            lineSegment$1.set(closestEdge.prev.vertex, closestEdge.vertex);
+            const t = lineSegment$1.closestPointToPointParameter(newPosition, false);
+
+            if (t >= 0 && t <= 1) {
+                // point is within line segment, we can safely use the new position
+                clampedPosition.copy(newPosition);
+            } else {
+                // check, if the new point lies outside the navMesh
+                newRegion = this.getRegionForPoint(newPosition, this.epsilonContainsTest);
+
+                if (newRegion !== null) {
+                    // if not, everything is fine
+                    clampedPosition.copy(newPosition);
+                    return clampedPosition;
+                }
+
+                // otherwise prevent movement
+                clampedPosition.copy(startPosition);
+            }
+
+            return clampedPosition;
+        } else {
+            // return the new region
+            return clampedPosition;
         }
     }
 
