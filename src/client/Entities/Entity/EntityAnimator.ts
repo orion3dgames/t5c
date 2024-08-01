@@ -1,6 +1,7 @@
-import { AnimationGroup, Vector3 } from "@babylonjs/core";
+import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
 import { Entity } from "../Entity";
 import { EntityState } from "../../../shared/types";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class EntityAnimator {
     private _entity;
@@ -61,25 +62,23 @@ export class EntityAnimator {
     }
 
     private _build(): void {
-
         // build animation list and properties
         let animations = this._entity.raceData.vat.animations ?? [];
         let i = 0;
-        for(let key in animations){
+        for (let key in animations) {
             let anim = animations[key];
             anim.key = key;
             anim.index = i;
-            anim.ranges = this.entityData.animationRanges[i],
-            this._animations[key] = anim;
+            (anim.ranges = this.entityData.animationRanges[i]), (this._animations[key] = anim);
             i++;
-        };
+        }
 
         // set default animation
-        this._currentAnim = this.getAnimation('IDLE');
-        this._prevAnim = this.getAnimation('WALK');
+        this._currentAnim = this.getAnimation("IDLE");
+        this._prevAnim = this.getAnimation("WALK");
     }
 
-    getAnimation(key){
+    getAnimation(key) {
         return this._animations[key];
     }
 
@@ -115,39 +114,38 @@ export class EntityAnimator {
 
     // determine what animation should be played
     public animate(entity): void {
-
         let currentPos = entity.getPosition();
         let nextPos = entity.moveController.getNextPosition();
         entity.isMoving = false;
 
         // if player has died
         if (entity.anim_state === EntityState.DEAD) {
-            this._currentAnim = this.getAnimation('DEATH');
+            this._currentAnim = this.getAnimation("DEATH");
 
             // if player is attacking
         } else if (entity.anim_state === EntityState.ATTACK_VERTICAL) {
-            this._currentAnim = this.getAnimation('ATTACK');
+            this._currentAnim = this.getAnimation("ATTACK");
 
             // if player is attacking
         } else if (entity.anim_state === EntityState.UNARMED) {
-            this._currentAnim = this.getAnimation('UNARMED');
+            this._currentAnim = this.getAnimation("UNARMED");
 
             // if player is attacking
         } else if (entity.anim_state === EntityState.ATTACK_HORIZONTAL) {
-            this._currentAnim = this.getAnimation('ATTACK_HORIZONTAL');
+            this._currentAnim = this.getAnimation("ATTACK_HORIZONTAL");
 
             // if player is attacking
         } else if (entity.anim_state === EntityState.SPELL_CASTING) {
-            this._currentAnim = this.getAnimation('SPELL_CASTING');
+            this._currentAnim = this.getAnimation("SPELL_CASTING");
 
             // if player is attacking
         } else if (entity.anim_state === EntityState.SPELL_CAST) {
-            this._currentAnim = this.getAnimation('SPELL_CAST');
+            this._currentAnim = this.getAnimation("SPELL_CAST");
 
             // if player is moving
         } else if (this.checkIfPlayerIsMoving(currentPos, nextPos) && entity.health > 0) {
             //console.log("PLAYER IS STILL MOVING...");
-            this._currentAnim = this.getAnimation('WALK');
+            this._currentAnim = this.getAnimation("WALK");
             entity.isMoving = true;
 
             // todo: I hate this, but I have no idea how to fix this in a better way at this stage...
@@ -159,15 +157,14 @@ export class EntityAnimator {
 
             // else play idle
         } else {
-            this._currentAnim = this.getAnimation('IDLE')
+            this._currentAnim = this.getAnimation("IDLE");
         }
     }
 
     // play animation
     play(player) {
-
-        // 
-        if(!this.mesh) return false;
+        //
+        if (!this.mesh) return false;
 
         // play animation and stop previous animation
         if (this._currentAnim != null && this._prevAnim !== this._currentAnim) {

@@ -20,11 +20,13 @@ import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import { calculateRanges, bakeVertexData, setAnimationParameters } from "../Entities/Common/VatHelper";
 import AnimationHelper from "../Entities/Common/AnimationHelper";
 import { GameController } from "../Controllers/GameController";
-import { AnimationGroup, InstancedMesh, Texture } from "@babylonjs/core";
+import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
 import { nanoid } from "nanoid";
 import { mergeMesh, mergeMeshAndSkeleton } from "../Entities/Common/MeshHelper";
 import { PBRCustomMaterial } from "@babylonjs/materials/custom/pbrCustomMaterial";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
+import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 
 class JavascriptDataDownloader {
     private data;
@@ -194,12 +196,12 @@ export class DebugScene {
         // preload assets
         this._game.initializeAssetController();
         await this._game._assetsCtrl.load();
- 
+
         // UI
         const leftStackPanel = new StackPanel("leftStackPanel");
         leftStackPanel.topInPixels = 15;
         leftStackPanel.leftInPixels = 15;
-        leftStackPanel.width = .2;
+        leftStackPanel.width = 0.2;
         leftStackPanel.height = 0.6;
         leftStackPanel.background = "transparent";
         leftStackPanel.spacing = 5;
@@ -222,13 +224,13 @@ export class DebugScene {
         btnTitle.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         leftStackPanel.addControl(btnTitle);
 
-        let races = this._game.loadGameData('races');
-        for(let id in races){
+        let races = this._game.loadGameData("races");
+        for (let id in races) {
             let element = races[id];
 
             this.SPAWN_INFO.push(element);
 
-            const btnChoice = Button.CreateSimpleButton("btnChoice_"+element.key, element.key);
+            const btnChoice = Button.CreateSimpleButton("btnChoice_" + element.key, element.key);
             btnChoice.top = "0px";
             btnChoice.width = 1;
             btnChoice.height = "30px";
@@ -246,8 +248,7 @@ export class DebugScene {
 
                 this.spawn(entityData);
             });
-
-        };
+        }
 
         // preload skeletons and animation
         await Promise.all(
@@ -255,20 +256,19 @@ export class DebugScene {
                 await this.prepareMesh(spawn);
             })
         );
-        console.log('[VAT] Loaded', this.entityData);
-
+        console.log("[VAT] Loaded", this.entityData);
 
         this._scene.registerBeforeRender(() => {
             label.text = "FPS: " + this._engine.getFps();
         });
     }
 
-    spawn(entityData){
+    spawn(entityData) {
         for (let i = 0; i < 100; i++) {
             let sessionId = nanoid();
             const playerInstance = entityData.mesh.createInstance("player_" + i);
             this.entities.set(sessionId, new Entity(playerInstance, entityData, this, {}));
-        } 
+        }
     }
 
     async prepareMesh(spawnInfo) {
@@ -283,7 +283,7 @@ export class DebugScene {
         animationGroups.forEach((ag) => ag.stop());
 
         const selectedAnimationGroups = this.getAnimationGroups(animationGroups, race.vat.animations);
-     
+
         // reset position & rotation
         let rawMesh = this._game._loadedAssets["RACE_" + key].meshes[0].clone("TEST");
         rawMesh.position.setAll(0);
@@ -292,17 +292,16 @@ export class DebugScene {
         rawMesh.rotation.setAll(0);
 
         // add material
-        this.prepareMaterial(rawMesh, spawnInfo.key, 0)
+        this.prepareMaterial(rawMesh, spawnInfo.key, 0);
 
         // calculate animations ranges
         const ranges = calculateRanges(selectedAnimationGroups);
 
         // merge mesh
-        const merged = mergeMeshAndSkeleton(rawMesh, skeleton, race.key+"_merged");
+        const merged = mergeMeshAndSkeleton(rawMesh, skeleton, race.key + "_merged");
 
         // setup vat
         if (merged) {
-
             // create vat manager
             const vat = new BakedVertexAnimationManager(this._scene);
 
@@ -359,7 +358,6 @@ export class DebugScene {
 
     //
     prepareMaterial(cloneMesh, raceKey, materialIndex) {
-       
         // get race
         let race = this._game.getGameData("race", raceKey);
 

@@ -1,5 +1,4 @@
 import { Scene } from "@babylonjs/core/scene";
-import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { ActionManager } from "@babylonjs/core/Actions/actionManager";
 import { ExecuteCodeAction } from "@babylonjs/core/Actions/directActions";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
@@ -11,10 +10,7 @@ import { PlayerInput } from "../Controllers/PlayerInput";
 
 import { randomNumberInRange } from "../../shared/Utils";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { mergeMesh } from "./Common/MeshHelper";
-import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { GameController } from "../Controllers/GameController";
-import { Mesh } from "@babylonjs/core";
 import { EntityNamePlate } from "./Entity/EntityNamePlate";
 
 export class Item extends TransformNode {

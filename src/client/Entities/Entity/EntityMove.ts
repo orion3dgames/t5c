@@ -1,9 +1,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-
 import { PlayerInputs, ServerMsg } from "../../../shared/types";
 import { NavMesh, Vector3 as Vector3Y } from "../../../shared/Libs/yuka-min";
 import { Entity } from "../Entity";
-import { Player } from "../Player";
 
 export class EntityMove {
     private _node: Entity;
