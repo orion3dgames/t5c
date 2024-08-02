@@ -334,14 +334,12 @@ export class abilitiesCTRL {
         }
 
         // play animation
-        if (owner.animationCTRL) {
-            owner.animationCTRL.playAnim(owner, ability.animation);
-        }
-
-        // if target is dead, process target death
-        if (owner instanceof PlayerSchema && target.isEntityDead()) {
-            this.processDeath(owner, target);
-        }
+        owner.animationCTRL.playAnim(owner, ability.animation, () => {
+            // if target is dead, process target death
+            if (owner instanceof PlayerSchema && target.isEntityDead()) {
+                this.processDeath(owner, target);
+            }
+        });
     }
 
     processDeath(owner, target) {

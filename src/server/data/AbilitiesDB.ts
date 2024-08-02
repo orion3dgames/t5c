@@ -23,7 +23,7 @@ let AbilitiesDB: abilityMap = {
             color: "white",
         },
         casterPropertyAffected: [],
-        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 2, max: 5 }],
+        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 10, max: 20 }],
     },
 
     slice_attack: {
@@ -47,7 +47,7 @@ let AbilitiesDB: abilityMap = {
             color: "white",
         },
         casterPropertyAffected: [],
-        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 15, max: 30 }],
+        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 25, max: 40 }],
     },
 
     fire_dart: {
@@ -72,7 +72,7 @@ let AbilitiesDB: abilityMap = {
             color: "orange",
         },
         casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 5, max: 10 }],
-        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 10, max: 20 }],
+        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 20, max: 30 }],
         type: AbilityType.PHYSICAL,
         element: AbilityElement.FIRE,
         required_level: 2,
