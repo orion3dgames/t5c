@@ -8,7 +8,8 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { nanoid } from "nanoid";
 import { GameScene } from "../../Screens/GameScene";
-import { EntityState } from "../../../shared/types";
+import { EntityState, PlayerSlots } from "../../../shared/types";
+import { MeshParticleEmitter } from "@babylonjs/core/Particles/EmitterTypes/meshParticleEmitter";
 
 export class EntityActions {
     private _gamescene: GameScene;
@@ -22,6 +23,7 @@ export class EntityActions {
         white: [Color3.FromInts(255, 255, 255), Color3.FromInts(240, 240, 240)],
         green: [Color3.FromInts(64, 141, 33), Color3.FromInts(146, 245, 107)],
         orange: [Color3.FromInts(249, 115, 0), Color3.FromInts(222, 93, 54)],
+        red: [Color3.FromInts(194, 24, 7), Color3.FromInts(249, 115, 0)],
     };
 
     constructor(scene, _loadedAssets, entities, gamescene) {
@@ -58,29 +60,94 @@ export class EntityActions {
         });
     }
 
+    public findWeaponMesh(entity) {
+        if (!entity.equipment) {
+            return;
+        }
+        let found = false;
+        entity.equipment.forEach((element) => {
+            if (element.slot === PlayerSlots.WEAPON) {
+                found = element.mesh;
+            }
+        });
+        return found;
+    }
+
     public process(player, data, ability) {
         //
         let source = this._entities.get(data.fromId);
         let target = this._entities.get(data.targetId);
 
+        if (!source || !target) return;
+
         // play sound
         setTimeout(() => {
             this._gamescene._sound.play("SOUND_" + ability.sound);
+
+            // set effect
+            if (ability.effect.type === "target") {
+                //let mesh = this.findWeaponMesh(source);
+                this.particule_damage(target.mesh, ability);
+            }
+
+            // set effect
+            if (ability.effect.particule === "fireball") {
+                this.particule_fireball(source, target, ability);
+            }
+
+            if (ability.effect.particule === "heal") {
+                this.particule_heal(target, ability);
+            }
         }, ability.soundDelay);
 
-        // set effect
-        if (ability.effect.type === "target") {
-            //source.anim_state = EntityState.ATTACK;
-        }
+        /*
+        type: "target",
+            particule: "damage",
+            color: "red",*/
+    }
 
-        // set effect
-        if (ability.effect.particule === "fireball") {
-            this.particule_fireball(source, target, ability);
-        }
+    public particule_damage(mesh, ability) {
+        this._gamescene._sound.play("SOUND_hit_a");
 
-        if (ability.effect.particule === "heal") {
-            this.particule_heal(target, ability);
-        }
+        let color = ability.effect.color;
+
+        /*
+        //////////////////////////////////////////////
+        // create a particle system
+        var particleSystemTrail = new ParticleSystem("particles", 100, this._scene);
+        particleSystemTrail.particleTexture = this._loadedAssets["TXT_particle_03"].clone();
+
+        const emitter = new MeshParticleEmitter(mesh);
+        emitter.useMeshNormalsForDirection = true;
+        particleSystemTrail.emitter = mesh;
+        particleSystemTrail.particleEmitterType = emitter; // the starting location
+
+        // Colors of all particles
+        particleSystemTrail.color1 = Color4.FromColor3(this.colors[color][0]);
+        particleSystemTrail.color2 = Color4.FromColor3(this.colors[color][1]);
+        particleSystemTrail.colorDead = new Color4(0, 0, 0, 0.0);
+        // Size of each particle (random between...
+        particleSystemTrail.minSize = 0.4;
+        particleSystemTrail.maxSize = 0.6;
+        // Life time of each particle (random between...
+        particleSystemTrail.minLifeTime = 0.05;
+        particleSystemTrail.maxLifeTime = 0.1;
+        // Emission rate
+        particleSystemTrail.emitRate = 10;
+        // Speed
+        particleSystemTrail.minEmitPower = 5;
+        particleSystemTrail.maxEmitPower = 10;
+        particleSystemTrail.targetStopDuration = 1;
+
+        // Start the particle system
+        particleSystemTrail.start();
+        //////////////////////////////////////////////
+
+        setTimeout(() => {
+            //particleSystemTrail.dispose(true);
+        }, 1000);
+        //
+        */
     }
 
     public particule_impact(mesh, ability) {

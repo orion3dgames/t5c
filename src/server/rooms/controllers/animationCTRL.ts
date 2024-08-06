@@ -3,7 +3,6 @@ import { EntityState } from "../../../shared/types";
 import { GameRoomState } from "../state/GameRoomState";
 
 export class animationCTRL {
-
     private _state: GameRoomState;
 
     private currentTimeout;
@@ -12,9 +11,8 @@ export class animationCTRL {
         this._state = state;
     }
 
-    public playAnim(owner, anim_state: EntityState, callback: ()=> void) {
-
-        if(this.currentTimeout){
+    public playAnim(owner, anim_state: EntityState, callback: () => void) {
+        if (this.currentTimeout) {
             return false;
         }
 
@@ -25,7 +23,7 @@ export class animationCTRL {
             this.currentTimeout = setTimeout(() => {
                 owner.anim_state = EntityState.IDLE;
                 this.currentTimeout = undefined;
-            }, 1100);
+            }, 1050);
         }
 
         // if spellcast, only play once
@@ -45,11 +43,11 @@ export class animationCTRL {
         }
 
         // if spellcast, only play once
-        if (anim_state === EntityState.PICKUP ) {
+        if (anim_state === EntityState.PICKUP) {
             this.currentTimeout = setTimeout(() => {
                 owner.anim_state = EntityState.IDLE;
                 this.currentTimeout = undefined;
-                if(callback){
+                if (callback) {
                     callback();
                 }
             }, 900);

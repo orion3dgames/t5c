@@ -19,20 +19,25 @@ import "@babylonjs/core/Rendering/depthRendererSceneComponent";
 import "@babylonjs/core/Rendering/outlineRenderer";
 import "@babylonjs/core/Audio/audioSceneComponent";
 
-import { Engine } from "@babylonjs/core/Engines/engine";
+import { DracoCompression } from "@babylonjs/core/Meshes/Compression/dracoCompression";
+DracoCompression.Configuration = {
+    decoder: {
+        wasmUrl: "/lib/draco_wasm_wrapper_gltf.js",
+        wasmBinaryUrl: "/lib/draco_decoder_gltf.wasm",
+        fallbackUrl: "/lib/draco_decoder_gltf.js",
+    },
+};
 
-// IMPORT SCREEN
+import { Engine } from "@babylonjs/core/Engines/engine";
 import State from "./Screens/Screens";
 import { LoginScene } from "./Screens/LoginScene";
 import { CharacterSelectionScene } from "./Screens/CharacterSelection";
 import { CharacterEditor } from "./Screens/CharacterEditor";
 import { GameScene } from "./Screens/GameScene";
 import { DebugScene } from "./Screens/DebugScene";
-
 import { Config } from "../shared/Config";
 import { Loading } from "./Controllers/Loading";
 import { isLocal } from "./Utils";
-
 import { GameController } from "./Controllers/GameController";
 
 // App class is our entire game application

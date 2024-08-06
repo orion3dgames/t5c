@@ -104,6 +104,7 @@ export class PlayerSchema extends Entity {
     public AI_TARGET_WAYPOINTS = [];
     public AI_ABILITY = null;
     public AI_TARGET_FOUND = false;
+    public AI_TARGET_ATTACK_SPOTS;
 
     // inventory
     public INVENTORY_LENGTH = 25;

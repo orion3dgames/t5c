@@ -45,7 +45,7 @@ export class EntityMesh {
 
         let materialIndex = VatController.findMeshKey(this._entity.raceData, this._entity);
 
-        if(this._entityData.meshes.has(materialIndex)){
+        if (this._entityData.meshes.has(materialIndex)) {
             const playerMesh = this._entityData.meshes.get(materialIndex).createInstance(this._entity.type + "" + this._entity.sessionId);
             playerMesh.parent = this._entity;
             playerMesh.isPickable = true;
@@ -69,8 +69,8 @@ export class EntityMesh {
             this.equipments.forEach((equipment) => {
                 equipment.setParent(this.mesh);
             });
-        }else{
-            console.error('ENTITY MESH, COULD NOT FIND MESH AT', materialIndex);
+        } else {
+            console.error("ENTITY MESH, COULD NOT FIND MESH AT", materialIndex);
         }
     }
 
@@ -160,12 +160,12 @@ export class EntityMesh {
 
             // create instance of mesh
             let mesh = this._entityData.items.get(item.key);
-     
-            if(!mesh){
-                console.error('Cannot find mesh to create item instance', item.key);
+
+            if (!mesh) {
+                console.error("Cannot find mesh to create item instance", item.key);
                 return false;
             }
-            
+
             let instance = mesh.createInstance("equip_" + this._entity.sessionId + "_" + e.key);
             instance.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
             instance.isPickable = false;
@@ -179,9 +179,11 @@ export class EntityMesh {
             // add
             this.equipments.set(e.key, instance);
 
+            //
+            e.mesh = instance;
+
             // refresh animation
             this._entity.animatorController.refreshAnimation();
-       
         }
     }
 

@@ -144,7 +144,7 @@ export class abilitiesCTRL {
      * @returns boolean
      */
     canEntityCastAbility(owner, target, ability, digit) {
-        // if target is not already dead
+        // if target is moving
         if (owner.isMoving) {
             Logger.warning(`[canEntityCastAbility] target is moving, cannot cast an ability`, this._owner.isMoving);
             return false;
@@ -270,6 +270,30 @@ export class abilitiesCTRL {
         }, ability.cooldown);
     }
 
+    findTargetsInRange(owner, range) {
+        let targets = [];
+        let ownerPosition = owner.getPosition();
+        owner._state.entities.forEach((entity) => {
+            // if AI, only targets players
+            if (owner.type === "entity" && entity.type === "player") {
+                let distance = entity.getPosition();
+                let distanceBetween = distance.distanceTo(ownerPosition);
+                if (distanceBetween < range) {
+                    targets.push(entity);
+                }
+
+                // else players should hit any entity in range
+            } else if (owner.type === "player") {
+                let distance = entity.getPosition();
+                let distanceBetween = distance.distanceTo(ownerPosition);
+                if (distanceBetween < range) {
+                    targets.push(entity);
+                }
+            }
+        });
+        return targets;
+    }
+
     /**
      * cast an ability onto target
      * does not do any check, use canEntityCastAbility() to check.
@@ -293,23 +317,57 @@ export class abilitiesCTRL {
         //
         this.affectCaster(owner, ability);
 
-        //
-        let healthDamage = 0;
-        if (ability.repeat > 0) {
-            let repeat = 1;
-            let timer = setInterval(() => {
-                healthDamage = this.affectTarget(target, owner, ability);
-                if (target.isEntityDead()) {
-                    this.processDeath(owner, target);
-                    clearInterval(timer);
+        // if area of effect ability
+        if (ability.range > 0) {
+            // find target
+            let targets = this.findTargetsInRange(owner, ability.range);
+            console.log("[castAbility], there is " + targets.length + " in range(" + ability.range + ")");
+
+            targets.forEach((t) => {
+                this.affectTarget(t, owner, ability);
+
+                // send to clients
+                owner._state._gameroom.broadcast(ServerMsg.PLAYER_ABILITY_CAST, {
+                    key: ability.key,
+                    digit: digit,
+                    fromId: owner.sessionId,
+                    targetId: t.sessionId,
+                    damage: 0,
+                });
+
+                if (t.isEntityDead()) {
+                    this.processDeath(owner, t);
                 }
-                if (repeat >= ability.repeat) {
-                    clearInterval(timer);
-                }
-                repeat += 1;
-            }, ability.repeatInterval);
+            });
+
+            // else single target
         } else {
-            healthDamage = this.affectTarget(target, owner, ability);
+            let healthDamage = 0;
+            if (ability.repeat > 0) {
+                let repeat = 1;
+                let timer = setInterval(() => {
+                    healthDamage = this.affectTarget(target, owner, ability);
+                    if (target.isEntityDead()) {
+                        this.processDeath(owner, target);
+                        clearInterval(timer);
+                    }
+                    if (repeat >= ability.repeat) {
+                        clearInterval(timer);
+                    }
+                    repeat += 1;
+                }, ability.repeatInterval);
+            } else {
+                healthDamage = this.affectTarget(target, owner, ability);
+            }
+
+            // send to clients
+            owner._state._gameroom.broadcast(ServerMsg.PLAYER_ABILITY_CAST, {
+                key: ability.key,
+                digit: digit,
+                fromId: owner.sessionId,
+                targetId: target.sessionId,
+                damage: 0,
+            });
         }
 
         //
@@ -317,15 +375,6 @@ export class abilitiesCTRL {
 
         // make sure no values are out of range.
         target.normalizeStats();
-
-        // send to clients
-        owner._state._gameroom.broadcast(ServerMsg.PLAYER_ABILITY_CAST, {
-            key: ability.key,
-            digit: digit,
-            fromId: owner.sessionId,
-            targetId: target.sessionId,
-            damage: healthDamage,
-        });
 
         // removing any casting timers
         if (this.player_casting_timer) {
@@ -348,6 +397,10 @@ export class abilitiesCTRL {
         }
 
         if (owner.isDead) {
+            return false;
+        }
+
+        if (owner.type !== "player") {
             return false;
         }
 

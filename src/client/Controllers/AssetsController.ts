@@ -74,6 +74,8 @@ export class AssetsController {
             { name: "TXT_selected_circle_green", filename: "selected_circle_green.png", extension: "png", type: "texture" },
             { name: "TXT_decal_target", filename: "decal_target.png", extension: "png", type: "texture" },
             { name: "TXT_particle_01", filename: "particle_01.png", extension: "png", type: "texture" },
+            { name: "TXT_particle_02", filename: "slash_01.png", extension: "png", type: "texture" },
+            { name: "TXT_particle_03", filename: "star_01.png", extension: "png", type: "texture" },
             { name: "TXT_shadow_01", filename: "shadow_01.png", extension: "png", type: "texture" },
         ];
 
@@ -331,6 +333,7 @@ export class AssetsController {
             var waterMesh = CreateGround("waterMesh", { width: 512, height: 512, subdivisions: 1 }, this._game.scene);
             waterMesh.position = new Vector3(0, -0.5, 0);
             var water = new StandardMaterial("water");
+            water.roughness = 0;
 
             let waterTexture = new Texture("textures/waterbump.jpg");
             waterTexture.uScale = 40;
@@ -345,7 +348,7 @@ export class AssetsController {
 
         //Loop through all environment meshes that were imported
         this.allMeshes.forEach((m) => {
-            m.isPickable = false;
+            m.isPickable = true;
             m.doNotSyncBoundingInfo = true;
             m.freezeWorldMatrix();
             m.checkCollisions = false;
