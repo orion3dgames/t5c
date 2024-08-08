@@ -90,7 +90,7 @@ export class statsCTRL {
 
         // whenever a stat is modified, update entity with the latest
         this.onStatsChange = (stats) => {
-            console.log("onStatsChange", stats);
+            //console.log("onStatsChange", stats);
             //this.entity.health = this.stats.health.value;
             this.entity.maxHealth = this.stats.maxHealth.value;
             //this.entity.mana = this.stats.mana.value;
@@ -175,7 +175,6 @@ export class statsCTRL {
 
     // ITEMS
     equipItem(item: Item): void {
-        console.log("equipItem", item);
         this.equippedItems.push(item);
         this.applyModifiers(item.statModifiers, true);
         this.updateStats();

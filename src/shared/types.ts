@@ -176,6 +176,7 @@ export type Ability = {
 
     // can ability be cast on self ? true or false
     castSelf: boolean;
+    needTarget: boolean;
 
     // cast time in milliseconds
     castTime: number;

@@ -322,7 +322,7 @@ export class GameRoomState extends Schema {
             }
 
             // if ability
-            if (targetState && hotbarData && hotbarData.type === "ability") {
+            if (hotbarData && hotbarData.type === "ability") {
                 playerState.abilitiesCTRL.processAbility(playerState, targetState, data);
                 return false;
             }

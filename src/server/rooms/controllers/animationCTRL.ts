@@ -23,6 +23,9 @@ export class animationCTRL {
             this.currentTimeout = setTimeout(() => {
                 owner.anim_state = EntityState.IDLE;
                 this.currentTimeout = undefined;
+                if (callback) {
+                    callback();
+                }
             }, 1050);
         }
 
@@ -31,6 +34,9 @@ export class animationCTRL {
             this.currentTimeout = setTimeout(() => {
                 owner.anim_state = EntityState.IDLE;
                 this.currentTimeout = undefined;
+                if (callback) {
+                    callback();
+                }
             }, 900);
         }
 
@@ -39,6 +45,9 @@ export class animationCTRL {
             this.currentTimeout = setTimeout(() => {
                 owner.anim_state = EntityState.IDLE;
                 this.currentTimeout = undefined;
+                if (callback) {
+                    callback();
+                }
             }, 900);
         }
 

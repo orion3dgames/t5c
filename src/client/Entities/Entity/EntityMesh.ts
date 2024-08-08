@@ -2,7 +2,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { Vector3, Vector4 } from "@babylonjs/core/Maths/math";
+import { Color3, Vector3, Vector4 } from "@babylonjs/core/Maths/math";
 import { Entity } from "../Entity";
 import { Skeleton } from "@babylonjs/core/Bones/skeleton";
 import { GameController } from "../../Controllers/GameController";
@@ -10,6 +10,7 @@ import { EquipmentSchema } from "../../../server/rooms/schema";
 import { UserInterface } from "../../Controllers/UserInterface";
 import { VatController } from "../../Controllers/VatController";
 import { EquippableType } from "../../../shared/types";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 
 export class EntityMesh {
     private _entity: Entity;
@@ -25,6 +26,7 @@ export class EntityMesh {
     public playerMesh;
     public debugMesh: Mesh;
     public selectedMesh: Mesh;
+    public selectedCone: Mesh;
     public fakeShadow: Mesh;
     public equipments;
 
@@ -88,6 +90,20 @@ export class EntityMesh {
         selectedMesh.checkCollisions = false;
         selectedMesh.position = new Vector3(0, 0.05, 0);
         this.selectedMesh = selectedMesh;
+
+        // add cone of view
+        /*
+        const coneMat = new StandardMaterial("coneMat");
+        coneMat.diffuseColor = Color3.Green();
+        coneMat.alpha = 0.5;
+        const tessellation = 12;
+        const arc = 90 / 360;
+        const coneMesh = MeshBuilder.CreateDisc("Cone", { tessellation, arc, radius: 3 }, this._scene);
+        coneMesh.position = new Vector3(0, 0.5, 0);
+        coneMesh.parent = this._entity;
+        coneMesh.material = coneMat;
+        coneMesh.rotation = new Vector3(Math.PI / 2, Math.PI / 1.2, 0);
+        this.selectedCone = coneMesh;*/
 
         // add cheap shadow
         if (this._loadedAssets["DYNAMIC_shadow_01"]) {

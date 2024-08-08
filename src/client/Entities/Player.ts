@@ -6,6 +6,7 @@ import State from "../../client/Screens/Screens";
 import { Ability, EntityState, ServerMsg } from "../../shared/types";
 import { GameScene } from "../Screens/GameScene";
 import { PlayerAbility } from "./Player/PlayerAbility";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 
 export class Player extends Entity {
     public game;
@@ -122,9 +123,9 @@ export class Player extends Entity {
             // if spawninfo available
             if (!target.spawnInfo) return false;
 
+            /*
             // if targets is aggressive, clicking on with will trigger move & attack
             // note: need to find a better way to do this, not linked to hotbar
-            /*
             if (target.spawnInfo.aggressive) {
                 // send to server
                 this._game.sendMessage(ServerMsg.PLAYER_HOTBAR_ACTIVATED, {
@@ -160,17 +161,19 @@ export class Player extends Entity {
                 sessionId: metadata.sessionId,
             });
         }
-        /*
+
         // move to clicked point
         if (metadata.type === "environment" && !this.isDead) {
+            /*
             // deselect any entity
             this._game.selectedEntity = false;
 
-            /*
             // removed click to move
             // todo: add client prediction.
             let destination = pointerInfo._pickInfo.pickedPoint;
             let pickedMesh = pointerInfo._pickInfo.pickedMesh;
+
+            console.log("[LEFT CLICK]", destination);
 
             const foundPath = this._navMesh.getRegionForPoint(destination);
             if (foundPath) {
@@ -196,9 +199,8 @@ export class Player extends Entity {
                     z: destination._z,
                 });
             }
-            
+            */
         }
-        */
     }
 
     // update at engine rate 60fps

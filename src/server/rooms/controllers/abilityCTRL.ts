@@ -4,6 +4,7 @@ import { dropCTRL } from "./dropCTRL";
 import { AbilitySchema } from "../schema/player/AbilitySchema";
 import { randomNumberInRange } from "../../../shared/Utils";
 import { HotbarSchema, PlayerSchema } from "../schema";
+import { Vector3 } from "../../../shared/Libs/yuka-min";
 
 export class abilitiesCTRL {
     private _owner;
@@ -150,40 +151,27 @@ export class abilitiesCTRL {
             return false;
         }
 
-        // if target is not already dead
-        if (target.AI_SPAWN_INFO && target.AI_SPAWN_INFO.canAttack === false) {
-            Logger.warning(`[canEntityCastAbility] target is not attackable`, target.health);
-            return false;
-        }
-
         // if abiltiy already running
         if (this._owner.animationCTRL.currentTimeout) {
-            console.log(this._owner.animationCTRL.currentTimeout);
-            //Logger.warning(`[canEntityCastAbility] player is already casting an ability`, ability);
-            // return false;
+            Logger.warning(`[canEntityCastAbility] player is already casting an ability`);
+            return false;
         }
 
         // if already casting
         if (ability.castTime > 0 && this.player_casting_timer !== false) {
-            Logger.warning(`[canEntityCastAbility] player is already casting an ability`, ability);
+            Logger.warning(`[canEntityCastAbility] player is already casting an ability`);
             return false;
         }
 
         // if caster is dead, cancel everything
         if (this._owner.health < 0 || this._owner.health === 0) {
-            Logger.warning(`[canEntityCastAbility] caster is dead`, ability);
+            Logger.warning(`[canEntityCastAbility] caster is dead`);
             return false;
         }
 
         // if ability not found, cancel everything
         if (!ability) {
-            Logger.error(`[canEntityCastAbility] ability not found`, ability);
-            return false;
-        }
-
-        // if target is not already dead
-        if (target.isEntityDead()) {
-            Logger.warning(`[canEntityCastAbility] target is dead`, target.health);
+            Logger.error(`[canEntityCastAbility] ability not found`, ability.key);
             return false;
         }
 
@@ -200,13 +188,31 @@ export class abilitiesCTRL {
             return false;
         }
 
+        // if ability does not need a target
+        if (ability.needTarget === true && !target) {
+            Logger.warning(`[canEntityCastAbility] you must have a target before casting this ability`);
+            return false;
+        }
+
+        // if target is not already dead
+        if (target && target.isEntityDead()) {
+            Logger.warning(`[canEntityCastAbility] target is dead`, target.health);
+            return false;
+        }
+
+        // if target is not attackable
+        if (target && target.AI_SPAWN_INFO && target.AI_SPAWN_INFO.canAttack === false) {
+            Logger.warning(`[canEntityCastAbility] target is not attackable`, target.health);
+            return false;
+        }
+
         // sender cannot cast on himself
-        if (ability.castSelf === false && target.sessionId === this._owner.sessionId) {
+        if (ability.needTarget === true && ability.castSelf === false && target.sessionId === this._owner.sessionId) {
             Logger.warning(`[canEntityCastAbility] cannot cast this ability on yourself`);
             return false;
         }
 
-        //Logger.info(`[canEntityCastAbility] player can cast ability`, ability);
+        Logger.info(`[canEntityCastAbility] player can cast ability`, ability.key);
 
         return true;
     }
@@ -272,26 +278,38 @@ export class abilitiesCTRL {
 
     findTargetsInRange(owner, range) {
         let targets = [];
-        let ownerPosition = owner.getPosition();
+        let ownerPosition = owner.getPosition() as Vector3;
         owner._state.entities.forEach((entity) => {
             // if AI, only targets players
             if (owner.type === "entity" && entity.type === "player") {
                 let distance = entity.getPosition();
-                let distanceBetween = distance.distanceTo(ownerPosition);
+                let distanceBetween = distance.squaredDistanceTo(ownerPosition);
                 if (distanceBetween < range) {
                     targets.push(entity);
                 }
 
                 // else players should hit any entity in range
-            } else if (owner.type === "player") {
+            } else if (owner.type === "player" && owner.sessionId !== entity.sessionId) {
+                /*
+                let entityPosition = entity.getPosition();
+                let p1 = ownerPosition.sub(entityPosition).normalize();
+                let p2 = entityPosition.normalize();
+                console.log(entity.name + " is in field of view: ", this.isInFov(p2, p1));
+                */
                 let distance = entity.getPosition();
-                let distanceBetween = distance.distanceTo(ownerPosition);
+                let distanceBetween = distance.squaredDistanceTo(ownerPosition);
                 if (distanceBetween < range) {
                     targets.push(entity);
                 }
             }
         });
         return targets;
+    }
+
+    isInFov(fovDirection: Vector3, directionToTarget: Vector3, fovAngle = Math.PI / 2) {
+        let dot = fovDirection.dot(directionToTarget);
+        let angleToTarget = Math.acos(dot);
+        return angleToTarget <= fovAngle / 2;
     }
 
     /**
@@ -305,7 +323,8 @@ export class abilitiesCTRL {
         //console.log("castAbility", digit, ability);
 
         // rotate sender to face target
-        if (owner.moveCTRL) {
+        if (target && target.sessionId !== owner.sessionId && owner.moveCTRL) {
+            console.log("rotate sender to face target", digit);
             owner.rot = owner.moveCTRL.calculateRotation(owner.getPosition(), target.getPosition());
         }
 
@@ -314,15 +333,13 @@ export class abilitiesCTRL {
             target.setTarget(owner);
         }
 
-        //
+        // affect caster
         this.affectCaster(owner, ability);
 
         // if area of effect ability
         if (ability.range > 0) {
             // find target
             let targets = this.findTargetsInRange(owner, ability.range);
-            console.log("[castAbility], there is " + targets.length + " in range(" + ability.range + ")");
-
             targets.forEach((t) => {
                 this.affectTarget(t, owner, ability);
 
@@ -335,6 +352,7 @@ export class abilitiesCTRL {
                     damage: 0,
                 });
 
+                // check if entity is dead
                 if (t.isEntityDead()) {
                     this.processDeath(owner, t);
                 }
@@ -366,15 +384,16 @@ export class abilitiesCTRL {
                 digit: digit,
                 fromId: owner.sessionId,
                 targetId: target.sessionId,
-                damage: 0,
+                damage: healthDamage,
             });
+
+            if (target.isEntityDead()) {
+                this.processDeath(owner, target);
+            }
         }
 
-        //
+        // start owner cooldown
         this.startCooldown(digit, ability);
-
-        // make sure no values are out of range.
-        target.normalizeStats();
 
         // removing any casting timers
         if (this.player_casting_timer) {
@@ -383,12 +402,7 @@ export class abilitiesCTRL {
         }
 
         // play animation
-        owner.animationCTRL.playAnim(owner, ability.animation, () => {
-            // if target is dead, process target death
-            if (owner instanceof PlayerSchema && target.isEntityDead()) {
-                this.processDeath(owner, target);
-            }
-        });
+        owner.animationCTRL.playAnim(owner, ability.animation, () => {});
     }
 
     processDeath(owner, target) {
@@ -400,9 +414,7 @@ export class abilitiesCTRL {
             return false;
         }
 
-        if (owner.type !== "player") {
-            return false;
-        }
+        console.log("PROCESS DEATH 4");
 
         // check if quest update
         owner.dynamicCTRL.checkQuestUpdate("kill", target);
@@ -436,7 +448,13 @@ export class abilitiesCTRL {
             return false;
         }
 
+        if (this.attackTimer) {
+            clearInterval(this.attackTimer);
+        }
+
         if (ability.autoattack) {
+            console.log("----------startAutoAttack--------");
+
             this.doAutoAttack(owner, target, ability);
             this.attackInterval = 0;
             this.attackTimer = setInterval(() => {
@@ -463,6 +481,7 @@ export class abilitiesCTRL {
     }
 
     cancelAutoAttack(owner) {
+        console.log("----------cancelAutoAttack--------");
         owner.anim_state = EntityState.IDLE;
 
         this.attackInterval = 0;
@@ -472,19 +491,18 @@ export class abilitiesCTRL {
             owner.AI_ABILITY = null;
         }
 
-        if (this.attackTimer || this.player_casting_timer) {
+        if (this.attackTimer) {
             // remove attack timer
-            if (this.attackTimer) {
-                clearInterval(this.attackTimer);
-                this.attackTimer = false;
-            }
+            clearInterval(this.attackTimer);
+            this.attackTimer = null;
+            console.log("------------ CLEAR ATTACK INTERVAL ----------");
+        }
 
+        if (this.player_casting_timer) {
             // remove casting timer
-            if (this.player_casting_timer) {
-                clearInterval(this.player_casting_timer);
-                this.player_casting_timer = false;
-                owner._state._gameroom.broadcast(ServerMsg.PLAYER_CASTING_CANCEL);
-            }
+            clearInterval(this.player_casting_timer);
+            this.player_casting_timer = false;
+            owner._state._gameroom.broadcast(ServerMsg.PLAYER_CASTING_CANCEL);
         }
     }
 

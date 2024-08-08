@@ -23,7 +23,7 @@ let LocationsDB = {
                 {
                     type: "zone_change",
                     from: new Vector3(13.82, 0.1, -33.46),
-                    to_map: "lh_dungeon_01",
+                    to_map: "training_ground",
                     to_vector: new Vector3(0, 0, 0),
                 },
                 {

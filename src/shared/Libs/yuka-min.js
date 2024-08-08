@@ -636,6 +636,50 @@ class Vector3 {
     equals(v) {
         return v.x === this.x && v.y === this.y && v.z === this.z;
     }
+
+    /////
+    /////
+    /////
+    /////
+    /////
+    subtractToRef(other, result) {
+        const m = this._m,
+            otherM = other.m,
+            resultM = result._m;
+        for (let i = 0; i < 16; i++) {
+            resultM[i] = m[i] - otherM[i];
+        }
+        return result;
+    }
+
+    /**
+     * Gets the rotation that aligns the roll axis (Y) to the line joining the start point to the target point and stores it in the ref Vector3
+     * Example PG https://playground.babylonjs.com/#R1F8YU#189
+     * @param start the starting point
+     * @param target the target point
+     * @param ref the vector3 to store the result
+     * @returns ref in the form (pitch, yaw, 0)
+     */
+    static PitchYawRollToMoveBetweenPointsToRef(start, target, ref) {
+        const diff = TmpVectors.Vector3[0];
+        target.subtractToRef(start, diff);
+        ref.y = Math.atan2(diff.x, diff.z) || 0;
+        ref.x = Math.atan2(Math.sqrt(diff.x ** 2 + diff.z ** 2), diff.y) || 0;
+        ref.z = 0;
+        return ref;
+    }
+
+    /**
+     * Gets the rotation that aligns the roll axis (Y) to the line joining the start point to the target point
+     * Example PG https://playground.babylonjs.com/#R1F8YU#188
+     * @param start the starting point
+     * @param target the target point
+     * @returns the rotation in the form (pitch, yaw, 0)
+     */
+    static PitchYawRollToMoveBetweenPoints(start, target) {
+        const ref = Vector3(0, 0, 0);
+        return Vector3.PitchYawRollToMoveBetweenPointsToRef(start, target, ref);
+    }
 }
 
 const v1$2 = new Vector3();
