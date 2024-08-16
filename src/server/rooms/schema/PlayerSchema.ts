@@ -161,7 +161,7 @@ export class PlayerSchema extends Entity {
         });
 
         // set controllers
-        this.abilitiesCTRL = new abilitiesCTRL(this, data);
+        this.abilitiesCTRL = new abilitiesCTRL(this);
         this.moveCTRL = new moveCTRL(this);
         this.animationCTRL = new animationCTRL(this);
         this.dynamicCTRL = new dynamicCTRL(this);
@@ -182,7 +182,7 @@ export class PlayerSchema extends Entity {
     update() {
         // always check if player is dead ??
         if (this.isEntityDead() && !this.isDead) {
-            this.setAsDead();
+            //this.setAsDead();
         }
 
         // if not dead
@@ -191,7 +191,6 @@ export class PlayerSchema extends Entity {
             if (this.anim_state !== EntityState.DEAD) {
                 this.anim_state = EntityState.DEAD;
             }
-
             return false;
         }
 
@@ -500,7 +499,7 @@ export class PlayerSchema extends Entity {
 
     setAsDead() {
         this.AI_TARGET = null;
-        this.abilitiesCTRL.cancelAutoAttack(this);
+        this.AI_ABILITY = null;
         this.isDead = true;
         this.health = 0;
         this.blocked = true;

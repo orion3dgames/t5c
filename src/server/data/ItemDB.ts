@@ -23,7 +23,7 @@ let ItemsDB: itemDataMap = {
         },
         requirements: [{ key: PlayerKeys.LEVEL, amount: 1 }],
         statModifiers: {
-            maxHealth: [{ type: CalculationTypes.MULTIPLY, value: 4 }],
+            strength: [{ type: CalculationTypes.ADD, value: 10 }],
         },
         damage: { min: 1, max: 3 },
         meshData: {

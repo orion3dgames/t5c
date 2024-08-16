@@ -36,7 +36,7 @@ class AttackState extends State {
         let abilities = owner.AI_SPAWN_INFO.abilities ?? [];
         let abilityKey = this.getAbilityKeyByChance(abilities);
         let ability = owner._state.gameData.get("ability", abilityKey);
-        owner.abilitiesCTRL.castAbility(owner, owner.AI_TARGET, ability, 1);
+        owner.abilitiesCTRL.cast(owner, owner.AI_TARGET, ability, 1);
         console.log(owner.name, owner.sessionId, "attacking with", abilityKey, "target: ", owner.AI_TARGET.sessionId);
     }
 

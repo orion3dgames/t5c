@@ -42,16 +42,14 @@ export enum EntityState {
     IDLE = 0,
     WALKING,
     RUNNING,
-
     TAKING_DAMAGE,
     DEAD,
     PICKUP,
-
     SPELL_CASTING,
     SPELL_CAST,
     UNARMED,
-    ATTACK_VERTICAL,
-    ATTACK_HORIZONTAL,
+    ATTACK_01,
+    ATTACK_02,
 }
 
 export enum AI_STATE {
@@ -234,6 +232,9 @@ export type Ability = {
 
     // costs
     value?: number;
+
+    digit?: number;
+    animationDuration?: number;
 };
 
 export interface abilityMap {
@@ -411,3 +412,14 @@ export enum CalculationTypes {
     REMOVE = 2,
     MULTIPLY = 3,
 }
+
+export type EventToAction = {
+    id: string;
+    date: string;
+    type: string;
+    delay: number;
+    length: number;
+    actionned_on_tick?: number;
+    action_on_tick?: number;
+    callback: () => void;
+};

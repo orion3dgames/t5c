@@ -4,15 +4,15 @@ let RaceVAT = {
     humanoid: {
         key: "humanoid",
         animations: {
-            ATTACK: { name: "1H_Melee_Attack_Chop", duration: 1000, speed: 1, loop: true },
-            ATTACK_HORIZONTAL: { name: "1H_Melee_Attack_Slice_Horizontal", duration: 1000, speed: 1, loop: true },
+            ATTACK_01: { name: "1H_Melee_Attack_Chop", duration: 2000, speed: 1.5, loop: false },
+            ATTACK_02: { name: "1H_Melee_Attack_Slice_Horizontal", duration: 2000, speed: 0.75, loop: false },
             DEATH: { name: "Death_A", duration: 1000, speed: 1, loop: false },
             HIT_A: { name: "Hit_A", duration: 1000, speed: 1, loop: true },
             IDLE: { name: "Idle", duration: 1000, speed: 1, loop: true },
-            SPELL_CAST: { name: "Spellcast_Shoot", duration: 1000, speed: 1, loop: true },
-            SPELL_CASTING: { name: "Spellcasting", duration: 1000, speed: 1, loop: true },
+            SPELL_CAST: { name: "Spellcast_Shoot", duration: 1000, speed: 1, loop: false },
+            SPELL_CASTING: { name: "Spellcasting", duration: 2000, speed: 1, loop: true },
             UNARMED: { name: "Unarmed_Melee_Attack_Punch_A", duration: 1000, speed: 1, loop: true },
-            WALK: { name: "Walking_B", duration: 1000, speed: 1.3, loop: true },
+            WALK: { name: "Walking_B", duration: 1000, speed: 1, loop: true },
         },
         bones: {
             WEAPON: 12,
@@ -33,7 +33,7 @@ let RaceVAT = {
     rat: {
         key: "rat_01",
         animations: {
-            ATTACK: { name: "Rat_Attack", duration: 1000, speed: 1 },
+            ATTACK_1: { name: "Rat_Attack", duration: 2000, speed: 1 },
             DEATH: { name: "Rat_Death", duration: 1000, speed: 1 },
             IDLE: { name: "Rat_Idle", duration: 1000, speed: 1 },
             WALK: { name: "Rat_Walk", duration: 1000, speed: 1.3 },

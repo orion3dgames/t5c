@@ -4,6 +4,7 @@ import { BrainSchema, Entity, EquipmentSchema, LootSchema, PlayerSchema } from "
 
 import { spawnCTRL } from "../controllers/spawnCTRL";
 import { entityCTRL } from "../controllers/entityCTRL";
+import { eventsCTRL } from "../controllers/eventsCTRL";
 import { gameDataCTRL } from "../controllers/gameDataCTRL";
 
 import { GameRoom } from "../GameRoom";
@@ -33,6 +34,7 @@ export class GameRoomState extends Schema {
     public spawnCTRL: spawnCTRL;
     public navMesh: NavMesh = null;
     public entityCTRL: entityCTRL;
+    public eventsCTRL: eventsCTRL;
     public gameData: gameDataCTRL;
 
     public config: Config;
@@ -62,6 +64,7 @@ export class GameRoomState extends Schema {
         // load controllers
         this.entityCTRL = new entityCTRL(this);
         this.spawnCTRL = new spawnCTRL(this);
+        //this.eventsCTRL = new eventsCTRL(this);
     }
 
     public update(deltaTime: number) {
@@ -69,13 +72,13 @@ export class GameRoomState extends Schema {
         if (this.entityCTRL.hasEntities()) {
             this.entityCTRL.all.forEach((entity) => {
                 entity.update(deltaTime);
-
                 // todo: remove item/loot that's been on the ground over 5 minutes
             });
         }
 
         // update spawn controller
         this.spawnCTRL.update(deltaTime);
+        //this.eventsCTRL.update(deltaTime);
     }
 
     getEntity(sessionId) {
@@ -202,7 +205,7 @@ export class GameRoomState extends Schema {
         /////////////////////////////////////
         // on player learn skill
         if (type === ServerMsg.PLAYER_LEARN_SKILL) {
-            playerState.abilitiesCTRL.learnAbility(data.key);
+            //playerState.abilitiesCTRL.learnAbility(data.key);
         }
 
         /////////////////////////////////////
@@ -226,14 +229,14 @@ export class GameRoomState extends Schema {
 
         // on player click to move
         if (type === ServerMsg.PLAYER_MOVE_TO) {
-            playerState.abilitiesCTRL.cancelAutoAttack(playerState);
+            //playerState.abilitiesCTRL.cancelAutoAttack(playerState);
             playerState.moveCTRL.setTargetDestination(new Vector3(data.x, data.y, data.z));
         }
 
         /////////////////////////////////////
         // on player ressurect
         if (type === ServerMsg.PLAYER_PICKUP) {
-            playerState.abilitiesCTRL.cancelAutoAttack(playerState);
+            //playerState.abilitiesCTRL.cancelAutoAttack(playerState);
             const itemState = this.getEntity(data.sessionId);
             if (itemState) {
                 playerState.setTarget(itemState);
@@ -303,6 +306,8 @@ export class GameRoomState extends Schema {
             let targetState = this.getEntity(data.targetId) as Entity;
             let hotbarData = playerState.player_data.hotbar.get("" + data.digit);
 
+            Logger.warning(`[ServerMsg.PLAYER_HOTBAR_ACTIVATED]`, data.digit);
+
             if (data.digit === 6) {
                 this.spawnCTRL.createItem(playerState);
                 return false;
@@ -323,7 +328,7 @@ export class GameRoomState extends Schema {
 
             // if ability
             if (hotbarData && hotbarData.type === "ability") {
-                playerState.abilitiesCTRL.processAbility(playerState, targetState, data);
+                playerState.abilitiesCTRL.addAbility(playerState, targetState, data);
                 return false;
             }
         }
@@ -331,13 +336,13 @@ export class GameRoomState extends Schema {
         /////////
         /////// DEBUG /////////////////
 
+        // debug: add random entities
+        if (type === ServerMsg.DEBUG_BOTS) {
+            this.spawnCTRL.debug_bots();
+        }
+
         if (process.env.NODE_ENV !== "production") {
             let amountToChange = 100;
-
-            // debug: add random entities
-            if (type === ServerMsg.DEBUG_BOTS) {
-                this.spawnCTRL.debug_bots();
-            }
 
             // debug: add 100 entities
             if (type === ServerMsg.DEBUG_INCREASE_ENTITIES) {

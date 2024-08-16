@@ -100,7 +100,7 @@ export class BrainSchema extends Entity {
         }
 
         // set controllers
-        this.abilitiesCTRL = new abilitiesCTRL(this, data);
+        this.abilitiesCTRL = new abilitiesCTRL(this);
         this.animationCTRL = new animationCTRL(this);
 
         // initialize state machine
@@ -120,7 +120,7 @@ export class BrainSchema extends Entity {
         /////////////////////////////////////////////////////////////////
         // if players are connected, start monitoring them
         if (this.isEntityDead() && !this.isDead) {
-            this._stateMachine.changeTo("DEAD");
+            //this._stateMachine.changeTo("DEAD");
         }
 
         // if does not have a target, keep monitoring the closest player

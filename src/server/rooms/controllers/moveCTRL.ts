@@ -36,26 +36,28 @@ export class moveCTRL {
             }
 
             // do auto attack
-            if (distance < 2.5 && (target instanceof BrainSchema || target instanceof PlayerSchema)) {
-                // start auto attack
-                this._owner.abilitiesCTRL.startAutoAttack(this._owner, target, ability);
+            if (this._owner.AI_ABILITY && (target instanceof BrainSchema || target instanceof PlayerSchema)) {
+                if (distance <= ability.minRange) {
+                    // cast ability
+                    this._owner.abilitiesCTRL.cast(this._owner, target, ability, 1);
 
-                // if ai entity
-                if (target instanceof BrainSchema) {
-                    this._owner.AI_TARGET = null;
+                    // if ai entity
+                    if (target instanceof BrainSchema) {
+                        this._owner.AI_TARGET = null;
+                    }
+
+                    // if player entity
+                    if (target instanceof PlayerSchema) {
+                        this._owner.AI_TARGET_FOUND = true;
+                    }
+
+                    this.cancelTargetDestination();
                 }
-
-                // if player entity
-                if (target instanceof PlayerSchema) {
-                    this._owner.AI_TARGET_FOUND = true;
-                }
-
-                this.cancelTargetDestination();
             }
 
             // if already found and target escapes
             if (distance > 2.5 && this._owner.AI_TARGET_FOUND) {
-                this._owner.abilitiesCTRL.cancelAutoAttack(this._owner);
+                //this._owner.abilitiesCTRL.cancelAutoAttack(this._owner);
                 this._owner.AI_TARGET = null;
                 this._owner.AI_TARGET_FOUND = false;
             }
@@ -143,7 +145,7 @@ export class moveCTRL {
         }
 
         // cancel any auto attack
-        this._owner.abilitiesCTRL.cancelAutoAttack(this._owner);
+        //this._owner.abilitiesCTRL.cancelAutoAttack(this._owner);
         let speed = this._owner.speed;
 
         // save current position
