@@ -78,32 +78,27 @@ export class EntityActions {
         let source = this._entities.get(data.fromId);
         let target = this._entities.get(data.targetId);
 
-        if (!source || !target) return;
-
         // play sound
         setTimeout(() => {
             this._gamescene._sound.play("SOUND_" + ability.sound);
-
-            // set effect
-            if (ability.effect.type === "target") {
-                //let mesh = this.findWeaponMesh(source);
-                this.particule_damage(target.mesh, ability);
-            }
-
-            // set effect
-            if (ability.effect.particule === "fireball") {
-                this.particule_fireball(source, target, ability);
-            }
-
-            if (ability.effect.particule === "heal") {
-                this.particule_heal(target, ability);
-            }
         }, ability.soundDelay);
 
-        /*
-        type: "target",
-            particule: "damage",
-            color: "red",*/
+        // set effect
+        if (ability.effect.type === "target") {
+            //let mesh = this.findWeaponMesh(source);
+            this.particule_damage(source.mesh, ability);
+        }
+
+        if (!source || !target) return;
+
+        // set effect
+        if (ability.effect.particule === "fireball") {
+            this.particule_fireball(source, target, ability);
+        }
+
+        if (ability.effect.particule === "heal") {
+            this.particule_heal(target, ability);
+        }
     }
 
     public particule_damage(mesh, ability) {
@@ -111,43 +106,50 @@ export class EntityActions {
 
         let color = ability.effect.color;
 
-        /*
         //////////////////////////////////////////////
         // create a particle system
-        var particleSystemTrail = new ParticleSystem("particles", 100, this._scene);
-        particleSystemTrail.particleTexture = this._loadedAssets["TXT_particle_03"].clone();
+        var particleSystem = new ParticleSystem("particles", 100, this._scene);
+        particleSystem.particleTexture = this._loadedAssets["TXT_particle_02"].clone();
 
         const emitter = new MeshParticleEmitter(mesh);
         emitter.useMeshNormalsForDirection = true;
-        particleSystemTrail.emitter = mesh;
-        particleSystemTrail.particleEmitterType = emitter; // the starting location
+        particleSystem.emitter = mesh;
+        particleSystem.particleEmitterType = emitter; // the starting locatio
+
+        /*
+        var cylinderEmitter = particleSystem.createCylinderEmitter(4, 1, 1, 0);
+        particleSystem.emitter = mesh; // the starting location
+        particleSystem.particleEmitterType = cylinderEmitter;*/
 
         // Colors of all particles
-        particleSystemTrail.color1 = Color4.FromColor3(this.colors[color][0]);
-        particleSystemTrail.color2 = Color4.FromColor3(this.colors[color][1]);
-        particleSystemTrail.colorDead = new Color4(0, 0, 0, 0.0);
+        particleSystem.color1 = Color4.FromColor3(this.colors[color][0]);
+        particleSystem.color2 = Color4.FromColor3(this.colors[color][1]);
+        particleSystem.colorDead = new Color4(0, 0, 0, 0.0);
         // Size of each particle (random between...
-        particleSystemTrail.minSize = 0.4;
-        particleSystemTrail.maxSize = 0.6;
+        particleSystem.minSize = 2;
+        particleSystem.maxSize = 4;
         // Life time of each particle (random between...
-        particleSystemTrail.minLifeTime = 0.05;
-        particleSystemTrail.maxLifeTime = 0.1;
+        //particleSystem.minLifeTime = 1;
+        particleSystem.maxLifeTime = 1;
+
         // Emission rate
-        particleSystemTrail.emitRate = 10;
-        // Speed
-        particleSystemTrail.minEmitPower = 5;
-        particleSystemTrail.maxEmitPower = 10;
-        particleSystemTrail.targetStopDuration = 1;
+        particleSystem.emitRate = 200;
+        particleSystem.minEmitPower = 1;
+        particleSystem.maxEmitPower = 1;
+
+        particleSystem.minAngularSpeed = 0;
+        particleSystem.maxAngularSpeed = Math.PI;
+        particleSystem.minInitialRotation = 0;
+        particleSystem.maxInitialRotation = Math.PI / 2;
 
         // Start the particle system
-        particleSystemTrail.start();
+        particleSystem.start();
         //////////////////////////////////////////////
 
         setTimeout(() => {
-            //particleSystemTrail.dispose(true);
-        }, 1000);
+            particleSystem.dispose(true);
+        }, 2000);
         //
-        */
     }
 
     public particule_impact(mesh, ability) {
