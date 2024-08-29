@@ -496,7 +496,7 @@ let LocationsDB = {
                     ],
                     abilities: [
                         { key: "base_attack", chance: 0.3 },
-                        { key: "slice_attack", chance: 0.7 },
+                        { key: "fire_dart", chance: 0.7 },
                     ],
                 },
             ],

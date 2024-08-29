@@ -4,7 +4,6 @@ import { BrainSchema, Entity, EquipmentSchema, LootSchema, PlayerSchema } from "
 
 import { spawnCTRL } from "../controllers/spawnCTRL";
 import { entityCTRL } from "../controllers/entityCTRL";
-import { eventsCTRL } from "../controllers/eventsCTRL";
 import { gameDataCTRL } from "../controllers/gameDataCTRL";
 
 import { GameRoom } from "../GameRoom";
@@ -34,7 +33,6 @@ export class GameRoomState extends Schema {
     public spawnCTRL: spawnCTRL;
     public navMesh: NavMesh = null;
     public entityCTRL: entityCTRL;
-    public eventsCTRL: eventsCTRL;
     public gameData: gameDataCTRL;
 
     public config: Config;
@@ -64,7 +62,6 @@ export class GameRoomState extends Schema {
         // load controllers
         this.entityCTRL = new entityCTRL(this);
         this.spawnCTRL = new spawnCTRL(this);
-        //this.eventsCTRL = new eventsCTRL(this);
     }
 
     public update(deltaTime: number) {
@@ -78,7 +75,6 @@ export class GameRoomState extends Schema {
 
         // update spawn controller
         this.spawnCTRL.update(deltaTime);
-        //this.eventsCTRL.update(deltaTime);
     }
 
     getEntity(sessionId) {

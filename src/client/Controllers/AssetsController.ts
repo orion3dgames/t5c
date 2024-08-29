@@ -75,7 +75,7 @@ export class AssetsController {
             { name: "TXT_decal_target", filename: "decal_target.png", extension: "png", type: "texture" },
             { name: "TXT_particle_01", filename: "particle_01.png", extension: "png", type: "texture" },
             { name: "TXT_particle_02", filename: "slash_01.png", extension: "png", type: "texture" },
-            { name: "TXT_particle_03", filename: "star_01.png", extension: "png", type: "texture" },
+            { name: "TXT_particle_03", filename: "circle_02.png", extension: "png", type: "texture" },
             { name: "TXT_shadow_01", filename: "shadow_01.png", extension: "png", type: "texture" },
         ];
 

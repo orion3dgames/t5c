@@ -21,7 +21,7 @@ let AbilitiesDB: abilityMap = {
         effect: {
             type: "target",
             particule: "damage",
-            color: "white",
+            color: "blood",
         },
         casterPropertyAffected: [],
         targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 10, max: 20 }],
@@ -46,7 +46,7 @@ let AbilitiesDB: abilityMap = {
         effect: {
             type: "target",
             particule: "damage",
-            color: "white",
+            color: "blood",
         },
         casterPropertyAffected: [],
         targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 10, max: 20 }],
