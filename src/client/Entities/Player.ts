@@ -7,6 +7,7 @@ import { Ability, EntityState, ServerMsg } from "../../shared/types";
 import { GameScene } from "../Screens/GameScene";
 import { PlayerAbility } from "./Player/PlayerAbility";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 export class Player extends Entity {
     public game;

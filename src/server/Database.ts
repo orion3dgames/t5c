@@ -154,8 +154,8 @@ class Database {
                 20,
                 20,
                 20,
-                "training_ground",
-                //"lh_town",
+                //"training_ground",
+                "lh_town",
 
                 6.18,
                 0.1,
@@ -165,8 +165,8 @@ class Database {
                 1,
                 0,
 
-                10000,
-                10000,
+                1000,
+                1000,
                 50000,
                 50,
             ]

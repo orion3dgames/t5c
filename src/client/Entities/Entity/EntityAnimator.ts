@@ -156,7 +156,7 @@ export class EntityAnimator {
         }
 
         if (entity.type === "player" && entity.anim_state !== EntityState.IDLE) {
-            console.log(entity.anim_state, EntityState[entity.anim_state], this._animations);
+            //console.log(entity.anim_state, EntityState[entity.anim_state], this._animations);
         }
     }
 

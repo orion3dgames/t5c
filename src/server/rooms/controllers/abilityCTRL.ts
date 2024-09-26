@@ -34,7 +34,7 @@ export class abilitiesCTRL {
         }
 
         // rotate towards player
-        if (target && owner.sessionId !== target.sessionId) {
+        if (target) {
             owner.rot = owner.rotateTowards(owner.getPosition(), target.getPosition());
         }
 
@@ -82,6 +82,7 @@ export class abilitiesCTRL {
         // start owner cooldown
         this.startCooldown(digit, ability);
 
+        /////////////////////////////
         // if area of effect ability
         if (ability.range > 0) {
             // find target
@@ -104,9 +105,10 @@ export class abilitiesCTRL {
                     this.processDeath(owner, t);
                 }
             });
-
-            // else single target
         } else {
+            //////////////////////
+            // else single target
+
             // affect target
             this.affectTarget(target, owner, ability);
 
@@ -147,10 +149,12 @@ export class abilitiesCTRL {
         let start = this._owner.getPosition() as Vector3;
         let distanceToTarget = start.distanceTo(target.getPosition());
 
+        //
         if (ability.minRange > 0 && distanceToTarget > ability.minRange) {
             return false;
         }
 
+        // if target is dead, do nothing
         if (target && target.isEntityDead()) {
             return false;
         }
@@ -199,6 +203,9 @@ export class abilitiesCTRL {
             // generate a random number
             let base_damage = randomNumberInRange(base_min, base_max);
 
+            // affinity roll
+
+            /*
             // add any multiplicater
             if (p.key === "health" && owner.AI_SPAWN_INFO && owner.AI_SPAWN_INFO.baseDamageMultiplier) {
                 base_damage *= owner.AI_SPAWN_INFO.baseDamageMultiplier;
@@ -210,6 +217,7 @@ export class abilitiesCTRL {
 
             // add a multiplier to increase damage per level
             //base_damage *= 1 + owner.level / 10;
+            */
 
             let amount = this.affect(p.type, target[p.key], base_damage);
 
@@ -263,6 +271,12 @@ export class abilitiesCTRL {
         // if target is not already dead
         if (target && target.isEntityDead()) {
             Logger.warning(`[canEntityCastAbility] target is dead`, target.health);
+            return false;
+        }
+
+        // if target is not attackable
+        if (target && target.AI_SPAWN_INFO && target.AI_SPAWN_INFO.canAttack === false) {
+            Logger.warning(`[canEntityCastAbility] target is not attackable`, target.health);
             return false;
         }
 
@@ -327,8 +341,16 @@ export class abilitiesCTRL {
                     targets.push(entity);
                 }
 
-                // else players should hit any entity in range
-            } else if (owner.type === "player" && owner.sessionId !== entity.sessionId) {
+                // else players should hit any entity in range if canAttack == true;
+            } else if (owner.type === "player" && entity.type === "entity" && entity.AI_SPAWN_INFO.canAttack === true) {
+                let distance = entity.getPosition();
+                let distanceBetween = distance.squaredDistanceTo(ownerPosition);
+                if (distanceBetween < range) {
+                    targets.push(entity);
+                }
+
+                // else players should hit any other players in range
+            } else if (owner.type === "player" && entity.type === "player" && owner.sessionId !== entity.sessionId) {
                 let distance = entity.getPosition();
                 let distanceBetween = distance.squaredDistanceTo(ownerPosition);
                 if (distanceBetween < range) {

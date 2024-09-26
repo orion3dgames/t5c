@@ -1,4 +1,4 @@
-import { abilityMap, EntityState, CalculationTypes, AbilityType, AbilityElement } from "../../shared/types";
+import { abilityMap, EntityState, CalculationTypes, AbilityType, AbilityElement, PlayerKeys } from "../../shared/types";
 
 let AbilitiesDB: abilityMap = {
     base_attack: {
@@ -25,6 +25,7 @@ let AbilitiesDB: abilityMap = {
         },
         casterPropertyAffected: [],
         targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 10, max: 20 }],
+        affinity: PlayerKeys.STRENGTH,
     },
 
     slice_attack: {
@@ -40,8 +41,8 @@ let AbilitiesDB: abilityMap = {
         cooldown: 2000,
         repeat: 0,
         repeatInterval: 0,
-        range: 4,
-        minRange: 4,
+        range: 6,
+        minRange: 2,
         animation: EntityState.ATTACK_02,
         effect: {
             type: "target",
@@ -49,7 +50,8 @@ let AbilitiesDB: abilityMap = {
             color: "blood",
         },
         casterPropertyAffected: [],
-        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 10, max: 20 }],
+        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 20, max: 40 }],
+        affinity: PlayerKeys.STRENGTH,
     },
 
     fire_dart: {
@@ -77,11 +79,11 @@ let AbilitiesDB: abilityMap = {
         casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 5, max: 10 }],
         targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 50, max: 60 }],
         type: AbilityType.PHYSICAL,
-        element: AbilityElement.FIRE,
+        affinity: PlayerKeys.INTELLIGENCE,
+
         required_level: 2,
         required_intelligence: 21,
         required_wisdom: 21,
-        skill_points: 5,
         value: 532,
     },
 
@@ -109,11 +111,15 @@ let AbilitiesDB: abilityMap = {
             color: "green",
         },
         casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 5, max: 10 }],
-        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 4, max: 8 }],
+        targetPropertyAffected: [{ key: "health", type: CalculationTypes.REMOVE, min: 5, max: 10 }],
+
         required_level: 3,
         required_intelligence: 25,
         required_wisdom: 19,
         value: 500,
+
+        type: AbilityType.PHYSICAL,
+        affinity: PlayerKeys.INTELLIGENCE,
     },
     light_heal: {
         //(1d5+8+self.wis/23)*self.light/100)
@@ -140,11 +146,14 @@ let AbilitiesDB: abilityMap = {
         },
         casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 2, max: 3 }],
         targetPropertyAffected: [{ key: "health", type: CalculationTypes.ADD, min: 30, max: 50 }],
+
         required_level: 2,
         required_intelligence: 15,
         required_wisdom: 19,
-        skill_points: 9,
         value: 897,
+
+        type: AbilityType.PHYSICAL,
+        affinity: PlayerKeys.WISDOM,
     },
 };
 

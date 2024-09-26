@@ -215,9 +215,8 @@ export type Ability = {
 
     //
     type?: AbilityType;
-
-    //
     element?: AbilityElement;
+    affinity?: PlayerKeys;
 
     // what properties a player must have to learn this ability
     required_level?: number;
@@ -228,6 +227,7 @@ export type Ability = {
     required_wisdom?: number;
 
     // skill points
+    //????????????????
     skill_points?: number;
 
     // costs

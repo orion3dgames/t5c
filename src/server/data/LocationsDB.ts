@@ -364,16 +364,12 @@ let LocationsDB = {
                     race: "skeleton_01",
                     material: 0,
                     name: "Skeleton",
-                    baseHealth: 50,
+                    baseHealth: 100,
                     baseSpeed: Speed.VERY_SLOW,
                     baseDamageMultiplier: 1, // multiplicater for damage
                     experienceGain: { min: 100, max: 200 },
                     goldGain: { min: 10, max: 20 },
                     equipment: [
-                        {
-                            key: "helm_01",
-                            slot: PlayerSlots.HEAD,
-                        },
                         {
                             key: "shield_01",
                             slot: PlayerSlots.OFF_HAND,
@@ -383,10 +379,7 @@ let LocationsDB = {
                             slot: PlayerSlots.WEAPON,
                         },
                     ],
-                    abilities: [
-                        { key: "base_attack", chance: 0.8 },
-                        { key: "slice_attack", chance: 0.2 },
-                    ],
+                    abilities: [{ key: "base_attack", chance: 1 }],
                 },
 
                 {
