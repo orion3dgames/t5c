@@ -2,6 +2,9 @@ import { Vector3 } from "../../../shared/Libs/yuka-min";
 import { randomNumberInRange } from "../../../shared/Utils";
 import { Ability, CalculationTypes, EntityState, ServerMsg } from "../../../shared/types";
 import Logger from "../../utils/Logger";
+import { AbilitySchema } from "../schema/player/AbilitySchema";
+import { HotbarSchema } from "../schema/player/HotbarSchema";
+import { dropCTRL } from "./dropCTRL";
 
 export class abilitiesCTRL {
     private _owner;
@@ -15,6 +18,42 @@ export class abilitiesCTRL {
     constructor(owner) {
         this._owner = owner;
         this.abilitiesDB = this._owner._state.gameData.load("abilities");
+    }
+
+    /**
+     * allow player to learn a ability
+     * @param ability
+     */
+    public learnAbility(key) {
+        const ability = this._owner._state.gameData.get("ability", key);
+
+        // only proceed if the ability exists
+        if (!ability) {
+            return false;
+        }
+
+        // only proceed if the ability does not already
+        if (!this._owner.player_data.abilities[ability.key]) {
+            // add ability to player
+            this._owner.player_data.abilities.set(
+                ability.key,
+                new AbilitySchema({
+                    key: ability.key,
+                })
+            );
+            // add ability to the hotbar
+            let slotAvailable = this._owner.findNextAvailableHotbarSlot();
+            if (slotAvailable) {
+                this._owner.player_data.hotbar.set(
+                    slotAvailable,
+                    new HotbarSchema({
+                        digit: slotAvailable,
+                        type: "ability",
+                        key: ability.key,
+                    })
+                );
+            }
+        }
     }
 
     public addAbility(owner, target, data) {
@@ -121,6 +160,10 @@ export class abilitiesCTRL {
                 damage: 0,
             });
 
+            if (target.type === "entity") {
+                target.AI_TARGET = owner;
+            }
+
             // check if entity is dead
             if (target.isEntityDead()) {
                 this.processDeath(owner, target);
@@ -143,6 +186,36 @@ export class abilitiesCTRL {
         if (target.isEntityDead() && target.isDead === false) {
             target.setAsDead();
         }
+
+        if (target.isDead) {
+            return false;
+        }
+
+        if (owner.isDead) {
+            return false;
+        }
+
+        // check if quest update
+        owner.dynamicCTRL.checkQuestUpdate("kill", target);
+
+        // cancel auto attack timer
+        //this.cancelAutoAttack(owner);
+
+        // get player
+        let client = owner.getClient();
+
+        // send notif to player
+        client.send(ServerMsg.SERVER_MESSAGE, {
+            type: "event",
+            message: "You've killed " + target.name + ".",
+            date: new Date(),
+        });
+
+        // process drops, experience and gold
+        let drop = new dropCTRL(owner, client);
+        drop.addExperience(target);
+        drop.addGold(target);
+        drop.dropItems(target);
     }
 
     shouldAffectTarget(owner, target, ability) {
@@ -204,7 +277,6 @@ export class abilitiesCTRL {
             let base_damage = randomNumberInRange(base_min, base_max);
 
             // affinity roll
-
             /*
             // add any multiplicater
             if (p.key === "health" && owner.AI_SPAWN_INFO && owner.AI_SPAWN_INFO.baseDamageMultiplier) {
@@ -213,11 +285,10 @@ export class abilitiesCTRL {
 
             if (p.key === "health") {
                 healthDamage = base_damage;
-            }
+            }*/
 
             // add a multiplier to increase damage per level
-            //base_damage *= 1 + owner.level / 10;
-            */
+            base_damage *= 1 + owner.level / 10;
 
             let amount = this.affect(p.type, target[p.key], base_damage);
 
@@ -375,4 +446,67 @@ export class abilitiesCTRL {
             return this.abilitiesDB[hotbarData.key] as Ability;
         }
     }
+
+    //////////////////////////////////////////////
+    ////////////// BASIC AUTO ATTACK /////////////
+    //////////////////////////////////////////////
+
+    /*
+    startAutoAttack(owner, target, ability) {
+        if (!owner || !target || !ability) {
+            return false;
+        }
+
+        if (ability.autoattack) {
+            this.doAutoAttack(owner, target, ability);
+            this.attackInterval = 0;
+            this.attackTimer = setInterval(() => {
+                this.attackInterval++;
+                if (this.attackInterval === 2) {
+                    this.attackInterval = 0;
+                    this.doAutoAttack(owner, target, ability);
+                }
+            }, this._owner._state.config.COMBAT_SPEED);
+        } else {
+            this.castAbility(owner, target, ability, ability.digit);
+        }
+    }
+
+    doAutoAttack(owner, target, ability) {
+        // only auto attack if entity has a target
+        if (target !== null) {
+            //owner.anim_state = ability.animation;
+            this.castAbility(owner, target, ability, ability.digit);
+        } else {
+            // cancel any existing auto attack
+            this.cancelAutoAttack(owner);
+        }
+    }
+
+    cancelAutoAttack(owner) {
+        owner.anim_state = EntityState.IDLE;
+
+        this.attackInterval = 0;
+
+        if (owner.AI_TARGET) {
+            owner.AI_TARGET = null;
+            owner.AI_ABILITY = null;
+        }
+
+        if (this.attackTimer || this.player_casting_timer) {
+            // remove attack timer
+            if (this.attackTimer) {
+                clearInterval(this.attackTimer);
+                this.attackTimer = false;
+            }
+
+            // remove casting timer
+            if (this.player_casting_timer) {
+                clearInterval(this.player_casting_timer);
+                this.player_casting_timer = false;
+                owner._state._gameroom.broadcast(ServerMsg.PLAYER_CASTING_CANCEL);
+            }
+        }
+    }
+    */
 }

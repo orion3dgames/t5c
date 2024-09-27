@@ -25,7 +25,7 @@ export class spawnCTRL {
         if (this.location.key === "lh_town") {
             // add items to the ground
             for (let i = 0; i < 400; i++) {
-                this.createItem();
+                //this.createItem();
             }
         }
 

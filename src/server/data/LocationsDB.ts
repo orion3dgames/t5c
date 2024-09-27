@@ -1,5 +1,15 @@
 import { PlayerSlots, Speed } from "../../shared/types";
 import { Vector3 } from "../../shared/Libs/yuka-min";
+import { LootTableEntry } from "../../shared/Class/LootTable";
+
+const DEFAULT_LOOT = [
+    LootTableEntry("sword_01", 10, 1, 1, 1, 1),
+    LootTableEntry("potion_small_blue", 40, 1, 1, 1, 1),
+    LootTableEntry("potion_small_red", 25, 1, 1, 1, 1),
+    LootTableEntry("shield_01", 5, 1, 1, 1, 1),
+    LootTableEntry("armor_01", 5, 1, 1, 1, 1),
+    LootTableEntry("amulet_01", 1, 1, 1, 1, 1),
+];
 
 let LocationsDB = {
     lh_town: {
@@ -380,6 +390,7 @@ let LocationsDB = {
                         },
                     ],
                     abilities: [{ key: "base_attack", chance: 1 }],
+                    drops: DEFAULT_LOOT,
                 },
 
                 {
@@ -402,17 +413,12 @@ let LocationsDB = {
                     material: 17,
                     head: "Head_Rogue",
                     name: "Bandit",
-
                     baseHealth: 100,
                     baseSpeed: Speed.VERY_SLOW,
                     baseDamageMultiplier: 2, // multiplicater for damage
                     experienceGain: { min: 1000, max: 2000 },
                     goldGain: { min: 100, max: 200 },
                     equipment: [
-                        {
-                            key: "helm_01",
-                            slot: PlayerSlots.HEAD,
-                        },
                         {
                             key: "shield_01",
                             slot: PlayerSlots.OFF_HAND,
@@ -427,6 +433,7 @@ let LocationsDB = {
                         { key: "slice_attack", chance: 0.2 },
                         { key: "fire_dart", chance: 0.1 },
                     ],
+                    drops: DEFAULT_LOOT,
                 },
             ],
         },

@@ -145,7 +145,7 @@ let AbilitiesDB: abilityMap = {
             color: "white",
         },
         casterPropertyAffected: [{ key: "mana", type: CalculationTypes.REMOVE, min: 2, max: 3 }],
-        targetPropertyAffected: [{ key: "health", type: CalculationTypes.ADD, min: 30, max: 50 }],
+        targetPropertyAffected: [{ key: "health", type: CalculationTypes.ADD, min: 100, max: 200 }],
 
         required_level: 2,
         required_intelligence: 15,

@@ -48,7 +48,8 @@ export class dropCTRL {
     }
 
     public dropItems(target) {
-        let loot = GetLoot(target.drops);
+        let items = target.AI_SPAWN_INFO.drops ?? [];
+        let loot = GetLoot(items);
         loot.forEach((drop) => {
             // drop item on the ground
             let sessionId = nanoid(10);
