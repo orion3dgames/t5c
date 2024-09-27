@@ -367,8 +367,13 @@ export class Player extends Entity {
      */
     public async quit() {
         // leave colyseus rooms
-        await this._room.leave();
-        await this._game.currentChat.leave();
+        if (this._room) {
+            await this._room.leave();
+        }
+
+        if (this._game.currentChat) {
+            await this._game.currentChat.leave();
+        }
 
         // clear cached chats
         this._game.currentChats = [];

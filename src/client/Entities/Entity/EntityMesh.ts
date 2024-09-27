@@ -92,14 +92,15 @@ export class EntityMesh {
         this.selectedMesh = selectedMesh;
 
         // add range helper
+        /*
         var material = this._scene.getMaterialByName("debug_entity_neutral");
         const sphere = MeshBuilder.CreateTorus(
             "debug_" + this._entity.race,
             { diameter: this._game.config.MONSTER_AGGRO_DISTANCE * 2, thickness: 0.1 },
             this._scene
         );
-        sphere.isVisible = true;
-        sphere.position = new Vector3(0, -1, 0);
+        sphere.isVisible = false;
+        sphere.position = new Vector3(0, 1, 0);
         sphere.parent = this._entity;
         sphere.material = material;
         this.debugMesh = sphere;

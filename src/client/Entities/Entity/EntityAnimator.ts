@@ -72,7 +72,7 @@ export class EntityAnimator {
             (anim.ranges = this.entityData.animationRanges[i]), (this._animations[key] = anim);
             i++;
         }
-        console.log("animations", this._animations);
+        //console.log("animations", this._animations);
         // set default animation
         this._currentAnim = this.getAnimation("IDLE");
         this._prevAnim = this.getAnimation("WALK");
