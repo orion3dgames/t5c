@@ -209,7 +209,7 @@ let LocationsDB = {
                                 isEndOfDialog: true,
                                 triggeredByClosing: {
                                     type: "cast_ability",
-                                    ability: "heal",
+                                    ability: "light_heal",
                                     target: "target",
                                 },
                             },

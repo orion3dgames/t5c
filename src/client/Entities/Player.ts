@@ -357,11 +357,6 @@ export class Player extends Entity {
         }
     }
 
-    //////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////
-    // to refactor
-
     /**
      * when current player quits the game
      */
@@ -384,8 +379,9 @@ export class Player extends Entity {
 
     public async teleport(location) {
         // leave colyseus room
-        await this._room.leave();
-        //await this._game.currentChat.leave();
+        if (this._room) {
+            await this._room.leave();
+        }
 
         // update auth data
         this._game.setLocation(location);

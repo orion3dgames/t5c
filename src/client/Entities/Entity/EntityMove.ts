@@ -133,8 +133,9 @@ export class EntityMove {
 
     //
     public processMove() {
+        let inputStrength = this._input.horizontal + this._input.vertical;
         // detect movement
-        if (this._input.player_can_move && !this._node.blocked) {
+        if (this._input.player_can_move && !this._node.blocked && inputStrength !== 0) {
             // increment seq
             this.sequence++;
 

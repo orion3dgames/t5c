@@ -337,6 +337,7 @@ export class GameRoomState extends Schema {
             this.spawnCTRL.debug_bots();
         }
 
+        /*
         if (process.env.NODE_ENV !== "production") {
             let amountToChange = 100;
 
@@ -361,7 +362,7 @@ export class GameRoomState extends Schema {
                     }
                 });
             }
-        }
+        }*/
 
         if (type === ServerMsg.DEBUG_REMOVE_ENTITIES) {
             if (this.entityCTRL.hasEntities()) {
