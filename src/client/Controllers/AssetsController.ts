@@ -151,6 +151,28 @@ export class AssetsController {
         await this.prepareDynamicMeshes();
     }
 
+    public async loadRaces() {
+        this.assetDatabase = [];
+        this.assetToPreload = [];
+        let races = this._game.loadGameData("races");
+        if (races) {
+            for (let key in races) {
+                let el = races[key];
+                this.assetDatabase.push({ name: "RACE_" + el.key, filename: "races/" + el.key + ".glb", extension: "glb", type: "mesh", instantiate: true });
+                this.assetDatabase.push({
+                    name: "VAT_" + el.vat.key,
+                    filename: "races/" + el.vat.key + ".glb",
+                    extension: "glb",
+                    type: "mesh",
+                    instantiate: true,
+                });
+            }
+        }
+        this.assetToPreload = this.assetDatabase;
+        console.log("loadRacesloadRacesloadRaces", this.assetToPreload);
+        await this.preloadAssets();
+    }
+
     public async fetchAsset(key) {
         // is asset is database
         let entry = this.assetDatabase.find((el: AssetEntry) => {

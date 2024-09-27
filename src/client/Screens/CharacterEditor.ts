@@ -50,14 +50,19 @@ export class CharacterEditor {
     private selected_face;
     private selected_variant;
 
+    private btnsFace: any = [];
+    private btnsColor: any = [];
+
+    private randomPlayerName: string = "";
+
     private entityData;
-    private entity:any = {
+    private entity: any = {
         race: "humanoid",
         head: "Head_Base",
         material: 1,
         raceData: {},
-        mesh: null
-    }
+        mesh: null,
+    };
 
     constructor() {
         this._newState = State.NULL;
@@ -199,10 +204,13 @@ export class CharacterEditor {
         this.selected_race = races[defaultRace];
         this.selected_face = this.selected_race.vat.meshes.HEAD[0];
         this.selected_variant = defaultVariant;
-  
+
+        //
+        this.randomPlayerName = generateRandomPlayerName();
+
         // initialize assets controller
         this._game.initializeAssetController();
-        await this._game._assetsCtrl.load();
+        await this._game._assetsCtrl.loadRaces();
 
         this._game._vatController = new VatController(this._game, []);
         await this._game._vatController.initialize();
@@ -233,7 +241,7 @@ export class CharacterEditor {
                 element.dispose();
             });
         }
-        
+
         this.entity.raceData = race;
         this.entityData = this._game._vatController._entityData.get(race.key);
 
@@ -243,40 +251,36 @@ export class CharacterEditor {
         this.refreshUI();
 
         this._scene.registerBeforeRender(() => {
-
             // get current delta
             let delta = this._game.engine.getFps();
 
             // process vat animations
             this._game._vatController.process(delta);
-
         });
     }
 
-    async loadCharacter(choice){
-
-        if(this.entity.mesh){
+    async loadCharacter(choice) {
+        if (this.entity.mesh) {
             this.entity.mesh.dispose();
         }
 
         this._game._vatController.prepareMesh(this.entity);
 
+        let animIndex = 4;
         let idle = {
             name: "IDLE",
-            index: 2,
+            index: animIndex,
             loop: true,
             speed: 1,
-            ranges: this.entityData.animationRanges[2],
+            ranges: this.entityData.animationRanges[animIndex],
         };
 
-        setTimeout(()=>{
-
+        setTimeout(() => {
             let materialIndex = VatController.findMeshKey(this.entity.raceData, this.entity);
             const playerMesh = this.entityData.meshes.get(materialIndex).createInstance("CHARACTER");
             this.entity.mesh = playerMesh;
             this.setAnimationParameters(playerMesh.instancedBuffers.bakedVertexAnimationSettingsInstanced, idle);
-
-        }, 200)
+        }, 400);
     }
 
     disposeUI() {
@@ -347,31 +351,9 @@ export class CharacterEditor {
         }
     }
 
-    sectionDescription() {
-        const section3Title = new TextBlock("section3Title", "Class Description");
-        section3Title.width = 0.8;
-        section3Title.height = "60px";
-        section3Title.color = "white";
-        section3Title.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        section3Title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        section3Title.fontWeight = "bold";
-        this.rightStackPanel.addControl(section3Title);
-
-        const section3Description = new TextBlock("section3Description", this.selected_race.description);
-        section3Description.width = 0.8;
-        section3Description.height = "100px";
-        section3Description.color = "white";
-        section3Description.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        section3Description.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
-        section3Description.fontSize = "16px";
-        section3Description.textWrapping = TextWrapping.WordWrap;
-        section3Description.resizeToFit = true;
-        this.rightStackPanel.addControl(section3Description);
-    }
-
     sectionFaces() {
         let selectedChoices = this.selected_race.vat.meshes.HEAD;
-  
+
         const sectionTitle = new TextBlock("sectionTitle", "Choose Face");
         sectionTitle.width = 0.8;
         sectionTitle.height = "40px";
@@ -407,6 +389,8 @@ export class CharacterEditor {
             btnChoice.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             chatStackPanel.addControl(btnChoice);
 
+            this.btnsFace.push(btnChoice);
+
             if (this.entity.head === faceKey) {
                 btnChoice.background = "green";
             }
@@ -414,15 +398,16 @@ export class CharacterEditor {
             btnChoice.onPointerDownObservable.add(() => {
                 this.entity.head = faceKey;
                 this.loadCharacter(this.selected_race);
-                this.refreshUI();
+                this.resetButtons(this.btnsFace);
+                btnChoice.background = "green";
             });
         });
     }
 
     sectionVariant() {
         let selectedChoices = this.selected_race.materials;
-  
-        const sectionTitle = new TextBlock("sectionTitle", "Choose Face");
+
+        const sectionTitle = new TextBlock("sectionTitle", "Choose Color");
         sectionTitle.width = 0.8;
         sectionTitle.height = "40px";
         sectionTitle.color = "white";
@@ -446,7 +431,7 @@ export class CharacterEditor {
         chatScrollViewer.addControl(chatStackPanel);
 
         selectedChoices.forEach((mat, index) => {
-            const btnChoice = Button.CreateSimpleButton("btnChoice_"+index, mat.material);
+            const btnChoice = Button.CreateSimpleButton("btnChoice_" + index, mat.material);
             btnChoice.top = "0px";
             btnChoice.width = 1;
             btnChoice.height = "30px";
@@ -457,6 +442,8 @@ export class CharacterEditor {
             btnChoice.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
             chatStackPanel.addControl(btnChoice);
 
+            this.btnsColor.push(btnChoice);
+
             if (this.entity.material === index) {
                 btnChoice.background = "green";
             }
@@ -464,8 +451,15 @@ export class CharacterEditor {
             btnChoice.onPointerDownObservable.add(() => {
                 this.entity.material = index;
                 this.loadCharacter(this.selected_race);
-                this.refreshUI();
+                this.resetButtons(this.btnsColor);
+                btnChoice.background = "green";
             });
+        });
+    }
+
+    resetButtons(btns) {
+        btns.forEach((btnChoice) => {
+            btnChoice.background = "gray";
         });
     }
 
@@ -488,7 +482,7 @@ export class CharacterEditor {
         usernameInput.width = "200px";
         usernameInput.height = "30px;";
         usernameInput.color = "#FFF";
-        usernameInput.text = generateRandomPlayerName();
+        usernameInput.text = this.randomPlayerName;
         usernameInput.placeholderText = "Enter username";
         usernameInput.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         usernameInput.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
@@ -541,6 +535,29 @@ export class CharacterEditor {
 
         vec.set(from, to - 1, 0, delta); // skip one frame to avoid weird artifacts
     }
+
+    /*
+    sectionDescription() {
+        const section3Title = new TextBlock("section3Title", "Class Description");
+        section3Title.width = 0.8;
+        section3Title.height = "60px";
+        section3Title.color = "white";
+        section3Title.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        section3Title.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        section3Title.fontWeight = "bold";
+        this.rightStackPanel.addControl(section3Title);
+
+        const section3Description = new TextBlock("section3Description", this.selected_race.description);
+        section3Description.width = 0.8;
+        section3Description.height = "100px";
+        section3Description.color = "white";
+        section3Description.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        section3Description.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        section3Description.fontSize = "16px";
+        section3Description.textWrapping = TextWrapping.WordWrap;
+        section3Description.resizeToFit = true;
+        this.rightStackPanel.addControl(section3Description);
+    }*/
 
     ///////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////

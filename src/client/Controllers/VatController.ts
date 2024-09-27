@@ -143,12 +143,12 @@ export class VatController {
             var result = element.id.substring(n + 1);
             if (!keepArray.includes(result)) {
                 element.dispose();
-                console.error("DISPOSING", element.id);
+                //console.error("DISPOSING", element.id);
             } else {
                 //element.removeVerticesData(VertexBuffer.MatricesIndicesKind)
                 //element.removeVerticesData(VertexBuffer.MatricesWeightsKind)
-                console.log(element.getVerticesDataKinds());
-                console.log("KEEPING", element.id);
+                //console.log(element.getVerticesDataKinds());
+                //console.log("KEEPING", element.id);
             }
         });
 
@@ -341,14 +341,14 @@ export class VatController {
         let rawMesh = this._game._loadedAssets["RACE_" + key].meshes[0].clone("embedded_vat_" + itemKey) as Mesh;
 
         // find raw mesh
-        console.log(rawMesh.id, rawMesh.getChildMeshes());
+        //console.log(rawMesh.id, rawMesh.getChildMeshes());
         rawMesh.getChildMeshes(false).forEach((element) => {
             var n = element.id.lastIndexOf(".");
             var result = element.id.substring(n + 1);
             if (!item.equippable.mesh.includes(result)) {
                 element.dispose();
             } else {
-                console.log("FOUND MESH", element.id);
+                //console.log("FOUND MESH", element.id);
             }
         });
 
