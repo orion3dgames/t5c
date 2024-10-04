@@ -181,7 +181,7 @@ export class VatController {
             entity.meshController.createMesh();
             entity.animatorController.mesh = entity.meshController.mesh;
             entity.animatorController.refreshAnimation();
-        }, 50);
+        }, 100);
     }
 
     async prepareMesh(entity) {
@@ -223,7 +223,6 @@ export class VatController {
         // setup vat
         if (modelMeshMerged) {
             // update material
-            console.log(race.key, entity.material);
             this.prepareMaterial(modelMeshMerged, race.key, entity.material);
 
             // set mesh
