@@ -138,6 +138,7 @@ export class AssetsController {
     public async loadLevel(key) {
         this.assetToPreload = this.assetDatabase;
         this.assetToPreload.push({ name: "ENV_" + key, filename: "environment/" + key + ".glb", extension: "glb", type: "mesh" });
+        console.log(this.assetToPreload);
         await this.preloadAssets();
         await this.prepareLevel(key);
         await this.prepareTextures();

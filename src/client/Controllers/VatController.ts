@@ -223,6 +223,7 @@ export class VatController {
         // setup vat
         if (modelMeshMerged) {
             // update material
+            console.log(race.key, entity.material);
             this.prepareMaterial(modelMeshMerged, race.key, entity.material);
 
             // set mesh
