@@ -225,6 +225,8 @@ export class VatController {
             // update material
             this.prepareMaterial(modelMeshMerged, race.key, entity.material);
 
+            console.log(race.key, entity);
+
             // set mesh
             modelMeshMerged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
             modelMeshMerged.instancedBuffers.bakedVertexAnimationSettingsInstanced = new Vector4(0, 0, 0, 0);
