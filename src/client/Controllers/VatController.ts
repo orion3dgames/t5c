@@ -181,7 +181,7 @@ export class VatController {
             entity.meshController.createMesh();
             entity.animatorController.mesh = entity.meshController.mesh;
             entity.animatorController.refreshAnimation();
-        }, 100);
+        }, 200);
     }
 
     async prepareMesh(entity) {

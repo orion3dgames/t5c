@@ -143,7 +143,7 @@ export class Entity extends TransformNode {
         // wait for vat to be ready
         setTimeout(() => {
             this.spawn(entity);
-        }, 200);
+        }, 500);
     }
 
     public async spawn(entity) {
