@@ -17,7 +17,7 @@ let LocationsDB = {
         key: "lh_town",
         mesh: "lh_town",
         sun: true,
-        sunIntensity: 0.6,
+        sunIntensity: 0.0,
         spawnPoint: {
             x: 0,
             y: 0,
@@ -443,7 +443,7 @@ let LocationsDB = {
         key: "training_ground",
         mesh: "training_ground",
         sun: true,
-        sunIntensity: 1,
+        sunIntensity: 0,
         fog: false,
         spawnPoint: {
             x: 0,
@@ -456,50 +456,7 @@ let LocationsDB = {
         music: "MUSIC_01",
         dynamic: {
             interactive: [],
-            spawns: [
-                {
-                    key: "spawn_01",
-                    type: "static",
-                    behaviour: "idle",
-                    aggressive: true,
-                    canAttack: true,
-                    points: [new Vector3(8.67, 0, -14.59)],
-                    amount: 1,
-                    baseHealth: 8000,
-                    race: "skeleton_01",
-                    material: 0,
-                    name: "Dummy 2",
-                    baseSpeed: Speed.VERY_SLOW,
-                },
-                {
-                    key: "spawn_02",
-                    type: "global",
-                    behaviour: "area",
-                    aggressive: true,
-                    canAttack: true,
-                    points: [new Vector3(12, 0, -14.59)],
-                    amount: 1,
-                    race: "skeleton_01",
-                    material: 0,
-                    name: "Dummy 1",
-
-                    baseHealth: 100,
-                    baseSpeed: Speed.VERY_SLOW,
-                    baseDamageMultiplier: 2, // multiplicater for damage
-                    experienceGain: { min: 5000, max: 10000 },
-                    goldGain: { min: 100, max: 200 },
-                    equipment: [
-                        {
-                            key: "sword_01",
-                            slot: PlayerSlots.WEAPON,
-                        },
-                    ],
-                    abilities: [
-                        { key: "base_attack", chance: 0.3 },
-                        { key: "fire_dart", chance: 0.7 },
-                    ],
-                },
-            ],
+            spawns: [],
         },
     },
     lh_dungeon_01: {

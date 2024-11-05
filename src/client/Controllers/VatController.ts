@@ -1,20 +1,18 @@
 // colyseus
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { GameController } from "./GameController";
-import { bakeVertexData, calculateRanges, setAnimationParameters } from "../Entities/Common/VatHelper";
+import { bakeVertexData, calculateRanges } from "../Entities/Common/VatHelper";
 import { BakedVertexAnimationManager } from "@babylonjs/core/BakedVertexAnimation/bakedVertexAnimationManager";
 import { Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
 import { VertexAnimationBaker } from "@babylonjs/core/BakedVertexAnimation/vertexAnimationBaker";
 import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
-import AnimationHelper from "../Entities/Common/AnimationHelper";
 import { mergeMesh, mergeMeshAndSkeleton } from "../Entities/Common/MeshHelper";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { PBRCustomMaterial } from "@babylonjs/materials/custom/pbrCustomMaterial";
 import { EntityState, EquippableType, Item, PlayerSlots } from "../../shared/types";
 import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
-import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { Entity } from "../Entities/Entity";
+import { PBRCustomMaterial } from "@babylonjs/materials/custom/pbrCustomMaterial";
 
 class JavascriptDataDownloader {
     private data;
@@ -224,8 +222,6 @@ export class VatController {
         if (modelMeshMerged) {
             // update material
             this.prepareMaterial(modelMeshMerged, race.key, entity.material);
-
-            console.log(race.key, entity);
 
             // set mesh
             modelMeshMerged.registerInstancedBuffer("bakedVertexAnimationSettingsInstanced", 4);
