@@ -1,7 +1,7 @@
 # T5C - The 5th Continent
 Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 
-![Screenshot of T5c showing a mythical knight in a green lust forest.]([https://myoctocat.com/assets/images/base-octocat.svg](https://us1.discourse-cdn.com/flex024/uploads/babylonjs/original/3X/7/3/730ef766396a083a3e3f97c0af46c443b4eba22b.jpeg))
+![Screenshot of T5c showing a mythical knight in a green lust forest.]([https://us1.discourse-cdn.com/flex024/uploads/babylonjs/original/3X/7/3/730ef766396a083a3e3f97c0af46c443b4eba22b.jpeg])
 
 ## Current progress:
 - vat animations and instances
