@@ -2,6 +2,7 @@
 Building a basic multiplayer 3d top down rpg using babylon.js and colyseus
 
 ![Screenshot of T5c showing a mythical knight in a green lust forest.](https://us1.discourse-cdn.com/flex024/uploads/babylonjs/original/3X/7/3/730ef766396a083a3e3f97c0af46c443b4eba22b.jpeg)
+![Screen of Eldoria, the imaginary land of T5C](https://github.com/user-attachments/assets/36710dd5-180b-4395-85db-7f98bfd6e08c)
 
 ## Current progress:
 - vat animations and instances
